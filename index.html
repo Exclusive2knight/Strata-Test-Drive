@@ -734,8 +734,10 @@ body.onfoot #ui2 .u2mid,body.onfoot #ui2 #u2start,body.onfoot #ui2 #u2arrows,bod
 <div id="boot"><div class="bc"><div class="bt">Test Drive</div><div class="bb"><i id="bootBar"></i></div><div class="bs" id="bootMsg">Building the world…</div></div></div>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2>Version 52 · Real suspension on AI cars</h2></div>
+    <div class="nh"><small>What's new</small><h2>Version 53 · Haptics</h2></div>
     <div class="nb">
+      <h4>Haptics and vibration</h4><ul><li>Your phone now vibrates when you crash (harder the faster you hit), drop a wheel in a pothole, hit a kerb or a big bump, or drive over rumble strips (faster buzzes the faster you go).</li><li>ABS pulses through the phone when you brake hard enough to lock the wheels. Lane departure warnings shake like a real steering wheel. Forward collision warnings give a double pulse, and automatic emergency braking a long hard buzz.</li><li>Small taps for gear shifts and buttons, and the engine shakes when it cranks (EVs and hybrids give a soft tap).</li><li>New Haptics setting in Settings › Car: Off, Light (only the big moments) or Full. Full is the default on phones.</li><li>Works on Android phones. iPhone browsers only allow a tap when you touch a button; the App Store version would get full haptics.</li></ul>
+      <h4 class="old">Version 52 · Real suspension on AI cars</h4>
       <h4>AI suspension</h4><ul><li>Traffic cars now use the same suspension as the cars you drive. Each one gets the suspension of its real model (coil springs, frequency-selective, adaptive, Magnetic Ride or air) with four corner springs and dampers, anti-roll bars and its real weight. Bumps and potholes hit each wheel separately, and soft air-sprung SUVs float while sporty cars stay flat.</li></ul>
       <h4>Fixes</h4><ul><li>Cars waiting at lights no longer drift sideways or turn crooked. They don't start lane changes while stopped at a light, and they only move sideways while driving forward.</li></ul>
       <h4 class="old">Version 51 · Realistic traffic lights</h4>
@@ -2299,7 +2301,7 @@ function tyre(kappa,alpha,Fz,mu){const sx=kappa/KP,sy=Math.tan(alpha)/Math.tan(A
 Object.assign(car,{w:[0,0,0,0],alpha:[0,0,0,0],kap:[0,0,0,0],tq:[0,0,0,0],tcsF:[1,1,1,1],tcsI:[0,0,0,0],tcsB:[0,0,0,0],absF:[1,1,1,1],absS:[0,0,0,0],absT:[0,0,0,0],wP:[0,0,0,0],fxr:[0,0,0,0],muEst:1.15,absEv:0,fz:[0,0,0,0],
   phi:0,phid:0,th:0,thd:0,defl:[0,0,0,0],bt:[30,30,30,30],bp:0,squeal:0,camYaw:null,escB:[0,0,0,0],hyb:{fuel:50,tank:55,soc:0.6,eng:false,onT:0,Pe:0,Pb:0,pAvail:200e3,rpm:0,f:{engW:0,engB:0,batM:0,reg:0}}});
 // a wheel dropping into a pothole: a thud you hear and feel, and the suspension says what it did about it
-function potholeHit(i,depth,SU){car.inHole=car.inHole||[false,false,false,false];if(car.inHole[i])return;car.inHole[i]=true;const v=Math.abs(car.vx);if(v<2||depth>-0.015)return;
+function potholeHit(i,depth,SU){car.inHole=car.inHole||[false,false,false,false];if(car.inHole[i])return;car.inHole[i]=true;const v=Math.abs(car.vx);if(v<2||depth>-0.015)return;haptic(Math.min(120,30-depth*900),Math.min(1,0.35-depth*8));
   const sev=clamp(v*-depth*2.2,0.05,1);if(au.ctx){const t=au.ctx.currentTime;rNoiseFx(t,0.12+sev*0.12,0.15+sev*0.45);beep(55+sev*25,0.14,"sine",0.15+sev*0.3)}if(navigator.vibrate)navigator.vibrate(Math.round(20+sev*60));
   car.vzb-=sev*0.25;const now=performance.now();if(now-(sys.holeT||0)>25000){sys.holeT=now;const k=suspKey();
     toast(SU.cam?"Pothole: Road Preview saw it coming and softened the damper before the wheel dropped in":SU.adapt?`Pothole: ${suspName()} firmed up that corner so the wheel didn't drop as far`:"Pothole! Passive suspension: you feel all of it");logResult(`Pothole at ${fmtSpeed(v)} (${suspName()})`)}}
@@ -2566,7 +2568,29 @@ function hitResponse(n,d,cp,vO,mO,e){
   const dvx=(Jx*c+Jy*s)/m, dvy=(-Jx*s+Jy*c)/m; car.vx+=dvx; car.vy+=dvy; car.r+=(rx*Jy-ry*Jx)/Iz;
   for(let i=0;i<4;i++)car.w[i]+=dvx/WR;
   return {v:vrel,j,share}}
-function crashFx(v,what){const now=performance.now();if(v<0.6||now-(sys.lastHitT||0)<450)return;sys.lastHitT=now;if(v>1.5)dashClip("Impact: "+what);
+// ---- haptics: Android phones vibrate (Vibration API); iPhones get a system tap from Safari's switch control on taps you make;
+// inside the app version, Capacitor's Haptics plugin gives real light / medium / heavy impacts on both
+const HAP={busy:0,bs:0,ios:null,abs:0,rum:0,vz:0,ldw:false,fcw:false,aeb:false,kerb:false};
+const hapLvl=()=>st.haptic??(matchMedia("(pointer:coarse)").matches?2:0);
+function hapIOS(){if(!HAP.ios){const l=document.createElement("label"),i=document.createElement("input");i.type="checkbox";i.setAttribute("switch","");l.style.cssText="position:fixed;left:-200px;top:0;opacity:0;pointer-events:none";l.appendChild(i);document.body.appendChild(l);HAP.ios=l}try{HAP.ios.click()}catch(e){}}
+function haptic(ms,k){const L=hapLvl();if(!L)return;if(L===1){if(k<0.35)return;ms=Math.min(ms,45)}const now=performance.now();if(now<HAP.busy&&k<=HAP.bs)return;HAP.busy=now+ms;HAP.bs=k;
+  const C=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.Haptics;
+  if(C){try{if(ms>90)C.vibrate({duration:ms});else C.impact({style:k>0.7?"HEAVY":k>0.35?"MEDIUM":"LIGHT"})}catch(e){}return}
+  if(navigator.vibrate){try{navigator.vibrate(Math.round(ms))}catch(e){}return}hapIOS()}
+function hapPat(P,k){const L=hapLvl();if(!L)return;if(L===1&&k<0.35)return;let tot=0;P.forEach(x=>tot+=x);const now=performance.now();if(now<HAP.busy&&k<=HAP.bs)return;HAP.busy=now+tot;HAP.bs=k;
+  const C=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.Haptics;
+  if(!C&&navigator.vibrate){try{navigator.vibrate(P)}catch(e){}return}let t=0;P.forEach((d,i)=>{if(i%2===0){setTimeout(()=>{HAP.busy=0;haptic(d,k)},t)}t+=d})}
+// continuous feel, every frame: ABS pulsing through the pedal, rumble strips, jolts through the body (bumps, potholes, kerbs, gravel),
+// the lane departure warning shaking the wheel, forward collision warning and automatic braking
+function hapTick(dt){if(!hapLvl()||st.walk||!st.started)return;const v=Math.abs(car.vx),now=performance.now();
+  if(car.abs&&v>2){if(now>HAP.abs){HAP.abs=now+260;hapPat([28,35,28,35,28],0.5)}}
+  const rum=car.gnd&&car.gnd.some(g=>g&&g.rum);if(rum&&v>4&&now>HAP.rum){HAP.rum=now+Math.max(70,600/v*1.0);haptic(18,0.3)}
+  const kb=car.gnd&&car.gnd.some(g=>g&&g.kind==="kerb");if(kb&&!HAP.kerb&&v>0.8)haptic(45,0.55);HAP.kerb=kb;
+  const vz=car.vzb||0,j=Math.abs(vz-HAP.vz)/Math.max(dt,1e-3);HAP.vz=vz;if(j>18&&v>1)haptic(Math.min(80,15+j*0.8),Math.min(0.9,j/60));
+  const ldw=!!sys.ldw||!!sys.lcw;if(ldw&&!HAP.ldw)hapPat([70,50,70,50,70],0.6);HAP.ldw=ldw;
+  const fcw=!!sys.fcw;if(fcw&&!HAP.fcw)hapPat([120,70,120],0.8);HAP.fcw=fcw;
+  const aeb=(sys.aebBrake||0)>0.45;if(aeb&&!HAP.aeb)haptic(350,1);HAP.aeb=aeb}
+function crashFx(v,what){const now=performance.now();if(v<0.6||now-(sys.lastHitT||0)<450)return;sys.lastHitT=now;haptic(Math.min(450,70+v*30),Math.min(1,0.4+v/10));if(v>1.5)dashClip("Impact: "+what);
   const sev=clamp(v/12,0.15,1);if(au.ctx){const c=au.ctx,t=c.currentTime;rNoiseFx(t,0.25+sev*0.4,0.25+sev*0.5);beep(90+sev*40,0.25+sev*0.3,"sawtooth",0.12+sev*0.2)}
   if(v>1.5){logResult(`Hit ${what} at ${fmtSpeed(v)}${st.aeb?"":" (AEB off)"}`);toast(`Impact: ${what} at ${fmtSpeed(v)}`)}
   if(navigator.vibrate)navigator.vibrate(Math.round(40+sev*120));if(v>3)car.crashed=1.0;dmgHit(v,what)}
@@ -3105,7 +3129,7 @@ function ui2Tick(){if(!document.body.classList.contains("ui2")||GFX.frame%4)retu
 // ignition, as in the car: off -> accessory (screens and radio, no engine) -> running. Brake + start button starts it; in an EV
 // (Tesla and co.) the car is simply on when you get in.
 const isEVT=()=>{const T=TRIMS[st.trim];return !T.ice&&!T.hybrid};
-function ignition(cmd){const T=TRIMS[st.trim],H=car.hyb;if(!st.started||st.walk)return;
+function ignition(cmd){const T=TRIMS[st.trim],H=car.hyb;if(!st.started||st.walk)return;if(cmd==="start"&&st.power!==true)setTimeout(()=>{if(st.power===true)isEVT()||H?haptic(30,0.5):hapPat([50,40,50,40,180],0.7)},250);
   if(cmd==="start"){if(st.power===true){if(Math.abs(car.vx)<0.5)powerToggle();return}st.power=false;powerToggle();return}
   if(st.power===true){if(Math.abs(car.vx)>0.5){toast("Stop the car first");return}powerToggle();return}
   if(st.power==="acc"){st.power=false;document.body.classList.add("carOff");toast("Off");beep(440,.08,"sine",.1);return}
@@ -6644,7 +6668,7 @@ function shiftTo(g){const v=car.vx,from=st.gear;if(g===from)return;if(st.power!=
   if(g==="P"&&Math.abs(v)>0.8){toast("Stop before shifting to Park");beep(500,.12,"square",.15);return}
   if(from==="P"&&inp.brk<0.2&&!sys.hold&&!sys.pa&&PC.on){toast("Press the brake to shift out of Park");beep(500,.12,"square",.15);return}
   if((g==="R"&&v>2)||(g==="D"&&v<-2)){toast("Slow down before changing direction");beep(500,.12,"square",.15);return}
-  st.gear=g;if(g!=="D"){st.acc=false;st.pilot=false}
+  st.gear=g;haptic(18,0.4);if(g!=="D"){st.acc=false;st.pilot=false}
   if(g==="P"){sys.epb=true;sys.hold=false;sys.apStrike=false}
   const T=TRIMS[st.trim],H=car.hyb;
   if(g==="D"&&T.ice){const D=DRIVES[st.trim],ws=Math.abs((car.w[0]+car.w[1]+car.w[2]+car.w[3])/4);let best=1;for(let k=1;k<=D.gears.length;k++)if(ws*D.gears[k-1]*D.fd*9.549>1300)best=k;H.gear=best}
@@ -6766,6 +6790,7 @@ TABS.controls=()=>{const T=TRIMS[st.trim],H=car.hyb,ev=!T.ice&&!T.hybrid,o=(attr
   <h3>Throttle response</h3><div class="grid2">${[[1.6,"Gentle","More pedal for the same push"],[1,"Normal",""],[0.7,"Sharp","Quick response, little pedal"]].map(([k,n,d])=>o(`data-set="thrK:${k}"`,(st.thrK||1)===k,n,d)).join("")}</div>
   <h3>Brake response</h3><div class="grid2">${[[1.5,"Gentle","Progressive, easy to modulate"],[1,"Normal",""],[0.7,"Sharp","Bites early"]].map(([k,n,d])=>o(`data-set="brkK:${k}"`,(st.brkK||1)===k,n,d)).join("")}</div>
   <h3>Pedal smoothing</h3><div class="grid2">${[[0,"Instant","Keys and buttons go straight to full"],[1,"Natural","Pedals move like a real foot: about half a second to floor it"],[2,"Smooth","Gentle squeezes on and off, no jerks"]].map(([k,n,d])=>o(`data-set="pedalS:${k}"`,(st.pedalS??1)===k,n,d)).join("")}</div>
+  <h3>Haptics</h3><div class="grid2">${[[0,"Off","No vibration"],[1,"Light","Only the big moments: crashes, potholes, warnings, automatic braking"],[2,"Full","Also bumps, kerbs, rumble strips, ABS pulsing, gear shifts and button taps"]].map(([k,n,d])=>o(`data-set="haptic:${k}"`,hapLvl()===k,n,d)).join("")}</div>
   <h3>Smooth stops</h3><div class="grid2">${o('data-set="softStop:1"',st.softStop!==0,"On","Eases off the brake in the last metre so you stop without a jolt, like a chauffeur (and like Mercedes' Comfort stop)")}${o('data-set="softStop:0"',st.softStop===0,"Off","The brakes stay as hard as you press them")}</div>
   <h3>Seat</h3><div class="grid2">${[[-0.05,"Low"],[0,"Middle"],[0.05,"High"]].map(([k,n])=>o(`data-set="seatH:${k}"`,(st.seatH||0)===k,"Height: "+n,"")).join("")}${[[-0.08,"Forward"],[0,"Middle"],[0.1,"Back"]].map(([k,n])=>o(`data-set="seatZ:${k}"`,(st.seatZ||0)===k,"Position: "+n,"")).join("")}</div>
   <h3>Load · ${Math.round(T.mass+loadKg())} kg total</h3><div class="grid2">
@@ -6832,7 +6857,8 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(/Intel/i.test(gpu)&&/(UHD|HD) Graphics/i.test(gpu)&&!/Iris/i.test(gpu))return cores>=8?"medium":"low";   // older Intel integrated graphics: Surface Go, budget laptops
   if(/SwiftShader|llvmpipe|Microsoft Basic/i.test(gpu))return "low";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
-const APP_VER="52";try{if(localStorage.getItem("strata.ver")!==APP_VER){for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
+const APP_VER="53";try{if(localStorage.getItem("strata.ver")!==APP_VER){for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){return GQ[GFX.q==="auto"?GFX.eff:GFX.q]}
 function setGfx(q){GFX.q=q;GFX.dyn=1;try{localStorage.setItem("strata.gfx",q)}catch(e){}}
@@ -7084,7 +7110,7 @@ function controls(dt){
 let last=performance.now(), acc=0;
 function frame(now){gfxTick(Math.min(0.1,(now-last)/1000));
   const dt=Math.min(0.05,(now-last)/1000);last=now;
-  if(st.started){controls(dt);assist(dt);updateTraffic(dt);updatePark(dt);enforcePkgs();weatherTick(dt);
+  if(st.started){controls(dt);assist(dt);updateTraffic(dt);updatePark(dt);enforcePkgs();weatherTick(dt);try{hapTick(dt)}catch(e){}
     if(sys.hillDemo){sys.hillT+=dt;if(sys.hillT>6){sys.hillT=0;st.leveling=!st.leveling;toast(st.leveling?"Active levelling ON: beam hugs the ground":"Active levelling OFF: beam fixed to the body")}if(!car.offroad&&Math.abs(car.vx)>3)sys.hillDemo=false}
     if(sys.aim!=null){sys.levT=(sys.levT||0)+dt;if(sys.levT>5){sys.levT=0;st.leveling=!st.leveling;toast(st.leveling?"Levelling ON: beam back down on the road":"Levelling OFF: the loaded car aims the beam high")}
       if(Math.hypot(car.px-sys.aim.x,car.py-sys.aim.y)>40){sys.aim=null;car.cargo=0;st.leveling=true}}acc+=dt;const h=1/G().hz;while(acc>=h){physics(h);acc-=h}if(car.crashed>0)car.crashed-=dt;updateAudio()}
