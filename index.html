@@ -784,8 +784,12 @@ body #drawer #tabBody .seg5{max-width:520px;border:1px solid rgba(255,255,255,.0
 <div id="boot"><div class="bc"><div class="bt">Test Drive</div><div class="bb"><i id="bootBar"></i></div><div class="bs" id="bootMsg">Building the world…</div></div></div>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2>Version 57 · Park assist everywhere</h2></div>
+    <div class="nh"><small>What's new</small><h2>Version 58 · Faster on slow laptops, proving ground and hills polished</h2></div>
     <div class="nb">
+      <h4>Speed (Surface Go and other slow laptops)</h4><ul><li>The scenery is now split into tiles, and only the tiles in front of you and within sight are drawn. In town that cuts what the graphics chip draws each frame by about two thirds (1.5 million triangles down to about 0.5 million). The proving ground is no longer drawn when you're across town.</li><li>New Lowest graphics: half resolution, very few cars, shorter view distance, 30 fps. Auto now drops to it by itself if Low still lags.</li><li>New Frame rate setting (Settings › Graphics): Auto, 30, 60 or Unlimited. 30 fps keeps a Surface Go steadier and cooler, especially while it's charging and running hot.</li><li>Charging spots and fuel pumps are looked up once instead of hundreds of times a second while you charge.</li></ul>
+      <h4>Proving ground</h4><ul><li>Every section board has its name and what it tests written on it, on a bigger board on two posts.</li><li>The 10 %, 20 % and 30 % hills now have real vertical curves: the slope eases in and out at the bottom and top instead of a sharp kink.</li><li>The hills have solid sides and guard rails along both edges, so you can't drive off the top. The rails, sign posts and other proving ground obstacles now really block you; they were being wiped from the collision list before.</li></ul>
+      <h4>Hills</h4><ul><li>Grass no longer pokes through any road: every road nearby now pulls the ground down under it, not just the nearest one. A check of 71,000 points along every road found none left (15 before).</li></ul>
+      <h4 class="old">Version 57 · Park assist everywhere</h4>
       <h4>Park assist</h4><ul><li>Park assist now works on the garage ramps. It used to creep too weakly on the slope, stop and roll backwards. Its speed control now measures which way you're really rolling, adds the extra throttle a slope needs, and holds the brake while it does, so it parks smoothly uphill and downhill on every level.</li><li>Store charging stations have painted bays, and park assist backs you into them, lined up with the charger.</li><li>Tested on every kind of space: both garage bays (uphill and downhill, ground and upper levels), the store parking lots, Main St parallel parking, the charger plaza and store charging bays. It finished every one with no hits, centred in the space and less than 1.5° off straight.</li></ul>
       <h4>Fixes</h4><ul><li>Building a new car while you're on an upper level of the garage no longer drops it to the ground floor.</li></ul>
       <h4 class="old">Version 56 · New 2-bay double-threaded helix garage</h4>
@@ -1414,9 +1418,24 @@ const TCS=[   // [lane, y0, y1, name, what it tests]
   [1,-840,-700,"Gravel","Loose gravel with ruts and washboard: traction and ABS"],
   [2,-1280,-1180,"10% hill","5 m up and down at 10%: hill start and hill hold"],[2,-1160,-1060,"20% hill","4 m up and down at 20%"],[2,-1040,-940,"30% ramp","3 m at 30%: off-road climb, try Downhill Assist"],
   [3,-1300,-1150,"Brake strip","Brake hard from 60 mph between the cones"]];
-const TC_SKID={x:-1880,y:-1000,R:40};
+const TC_SKID={x:-1880,y:-1000,R:40};const TC_SIGNS=[];
 const inTC=(x,y,m=0)=>x>TC.x0-m&&x<TC.x1+m&&y>TC.y0-m&&y<TC.y1+m||x>TC.dw[0]-m&&x<TC.dw[1]+m&&y>TC.dw[2]-m&&y<TC.dw[3]+m;
 const tcHash=(i,j)=>{let h=(i*374761393+j*668265263)|0;h=(h^(h>>>13))*1274126177|0;return ((h^(h>>>16))>>>0)/4294967296};
+// section boards: white text on blue, drawn as a texture on the front of each board when you're near
+let TC_TEX=null;
+function tcSignsDraw(){const e=CULL.eye;if(!TC_SIGNS.length||Math.hypot(e[0]-(TC.x0+TC.x1)/2,-e[2]-(TC.y0+TC.y1)/2)>700)return;
+  if(!TC_TEX){TC_TEX=TC_SIGNS.map(g=>{const c=document.createElement("canvas");c.width=512;c.height=256;const x=c.getContext("2d");x.fillStyle="#1e5bb8";x.fillRect(0,0,512,256);x.strokeStyle="#fff";x.lineWidth=10;x.strokeRect(12,12,488,232);
+      x.fillStyle="#fff";x.textAlign="center";x.textBaseline="middle";let f=64;x.font=`800 ${f}px Inter,system-ui,sans-serif`;while(x.measureText(g.S[3]).width>440&&f>30){f-=4;x.font=`800 ${f}px Inter,system-ui,sans-serif`}x.fillText(g.S[3],256,82);
+      x.font="500 25px Inter,system-ui,sans-serif";const words=g.S[4].split(" "),lines=[];let ln="";for(const w of words){const t=ln?ln+" "+w:w;if(x.measureText(t).width>440){lines.push(ln);ln=w}else ln=t}lines.push(ln);
+      lines.slice(0,3).forEach((l,i)=>x.fillText(l,256,150+i*32));const t=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,c);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);
+      gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+      const O=[g.x-g.w/2,g.z-g.h/2,-g.y],U=[g.w,0,0],V=[0,g.h,0],m=meshFrom([O[0],O[1],O[2],O[0]+g.w,O[1],O[2],O[0]+g.w,O[1]+g.h,O[2],O[0],O[1]+g.h,O[2]],[0,0,1,0,0,1,0,0,1,0,0,1],[0,1,2,0,2,3]);return {t,O,U,V,m}})}
+  gl.activeTexture(gl.TEXTURE0);gl.uniformMatrix4fv(U.uM,false,M4.id());
+  TC_TEX.forEach((T,i)=>{const g=TC_SIGNS[i];if(Math.hypot(e[0]-g.x,-e[2]-g.y)>140)return;gl.bindTexture(gl.TEXTURE_2D,T.t);gl.uniform3fv(U.uSO,T.O);gl.uniform3fv(U.uSU,T.U);gl.uniform3fv(U.uSV,T.V);mat([0.95,0,0],null,0,1,1,5);draw(T.m)})}
+// hill profile with real vertical curves: the grade eases in and out over T metres at every break, like a built test hill
+function tcHill(nm,v){const g=nm[0]==="1"?0.1:nm[0]==="2"?0.2:0.3,H=nm[0]==="1"?5:nm[0]==="2"?4:3,run=H/g,top=10,T=nm[0]==="3"?2.2:3;
+  const I=(a)=>{const t=(v-a)/T;return t<=0?0:t>=1?T/2+(v-a-T):T*(t*t*t-t*t*t*t/2)};
+  return Math.max(0,g*(I(-T/2)-I(run-T/2)-I(run+top-T/2)+I(2*run+top-T/2)))}
 function tcSec(x,y){for(const S of TCS){if(Math.abs(x-TCL[S[0]])<3.5&&y>=S[1]&&y<=S[2])return S}return null}
 function tcH(x,y){const S=tcSec(x,y);if(!S)return {h:0,mu:1.05,kind:"pad"};const v=y-S[1],L=S[2]-S[1],lx=x-TCL[S[0]];   // lx > 0: right side when driving south (+y)
   switch(S[3]){
@@ -1431,8 +1450,7 @@ function tcH(x,y){const S=tcSec(x,y);if(!S)return {h:0,mu:1.05,kind:"pad"};const
     case "Curb drop":return {h:lx>0&&v>10&&v<50?0.15:0,mu:1.0,kind:"pad"};
     case "Rough road":return {h:0.025*(Math.sin(v*1.7+lx*0.9)*Math.sin(v*0.83-lx*1.4)+0.6*Math.sin(v*3.1+lx*2.3)*Math.cos(v*0.37)),mu:1.0,kind:"pad"};
     case "Gravel":return {h:dirtH({i:3,W:3.5},v,lx),mu:0.74,kind:"dirt"};
-    case "10% hill":case "20% hill":case "30% ramp":{const g=S[3][0]==="1"?0.1:S[3][0]==="2"?0.2:0.3,H=S[3][0]==="1"?5:S[3][0]==="2"?4:3,run=H/g,top=10;
-      const h=v<run?v*g:v<run+top?H:v<2*run+top?H-(v-run-top)*g:0;return {h:Math.max(0,h),mu:1.05,kind:"pad"}}
+    case "10% hill":case "20% hill":case "30% ramp":return {h:tcHill(S[3],v),mu:1.05,kind:"pad"};
     default:return {h:0,mu:1.05,kind:"pad"}}}
 function tcWhere(x,y){const S=tcSec(x,y);if(S)return S;if(Math.hypot(x-TC_SKID.x,y-TC_SKID.y)<TC_SKID.R+4)return [9,0,0,"Skidpad","80 m circle: steady cornering, find the grip limit"];return null}
 // ---- ground under a tyre: road (with bumps, rumble strips), kerbs, sidewalks, and grass with less grip off the road
@@ -1550,7 +1568,7 @@ const STARTS={shops:{name:"Grand River shops",desc:"Outside the freeway: Fresh M
   bridge:{name:"Rouge River",desc:"Maple Blvd over the river bridge",x:-60,y:-12,h:0}};
 
 const COLL={g:new Map(),C:25}, BLD_LIST=[];
-function collReset(){COLL.g=new Map();BLD_LIST.length=0}
+const COLL_KEEP=[];function collReset(){COLL.g=new Map();BLD_LIST.length=0;for(const o of COLL_KEEP)collAdd(o)}
 function collAdd(o){const Rr=o.t==="c"?o.r:Math.hypot(o.hl,o.hw),C=COLL.C;for(let i=Math.floor((o.x-Rr)/C);i<=Math.floor((o.x+Rr)/C);i++)for(let j=Math.floor((o.y-Rr)/C);j<=Math.floor((o.y+Rr)/C);j++){const k=i*100003+j;let a=COLL.g.get(k);if(!a)COLL.g.set(k,a=[]);a.push(o)}}
 function collNear(x,y){return COLL.g.get(Math.floor(x/COLL.C)*100003+Math.floor(y/COLL.C))||[]}
 
@@ -2595,7 +2613,7 @@ function battCap(){const T=TRIMS[st.trim];if(T.kWh)return T.kWh;return T.phev?18
 function evRange(){const T=TRIMS[st.trim],H=car.hyb;if(T.ice)return 0;return Math.max(0,(H.soc-(T.phev?0.16:0.05))*battCap()/(T.hybrid?0.36:0.33))}
 // ---- the service plaza
 const STN={chargers:[0,1,2,3,4,5].map(k=>[51.8+k*3.6,-40.6]),pumps:[[18,-18],[30,-18],[18,-24],[30,-24]]};
-function stnWorld(list){const L=STN[list].map(([u,o])=>padPt(u,o));for(const S of XSITES)if(S[list])L.push(...S[list]);return L}
+const STNW={};function stnWorld(list){if(STNW[list])return STNW[list];const L=STN[list].map(([u,o])=>padPt(u,o));for(const S of XSITES)if(S[list])L.push(...S[list]);if(SCN.sm)STNW[list]=L;return L}
 function nearStn(list,r){return stnWorld(list).some(p=>Math.hypot(p[0]-car.px,p[1]-car.py)<r)}
 function onPad(){return Math.hypot(car.px-PAD.cx,car.py-PAD.cy)<PAD.rad&&padHit(car.px,car.py)}
 let xcars=[], onc=[];       // everything drives in "cars" now; these stay empty
@@ -4732,10 +4750,26 @@ for(const [name,ob] of Object.entries(STRATA_MESH.objects)){
 function bind(o){gl.bindBuffer(gl.ARRAY_BUFFER,o.p);gl.enableVertexAttribArray(aP);gl.vertexAttribPointer(aP,3,gl.FLOAT,false,0,0);
   gl.bindBuffer(gl.ARRAY_BUFFER,o.n);gl.enableVertexAttribArray(aN);gl.vertexAttribPointer(aN,3,gl.FLOAT,false,0,0);gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,o.i)}
 function mat(c,e,sp,shin,a,pat){gl.uniform3fv(U.uC,c);gl.uniform3fv(U.uE,e||[0,0,0]);gl.uniform1f(U.uSp,sp||0);gl.uniform1f(U.uSh,shin||16);gl.uniform1f(U.uA,a==null?1:a);gl.uniform1f(U.uPat,pat||0)}
-function draw(o){if(!o.count)return;if(KO.on!==!!o.ko){KO.on=!!o.ko;gl.uniform1f(U.uKOn,KO.on?1:0)}bind(o);gl.drawElements(gl.TRIANGLES,o.count,o.type||gl.UNSIGNED_SHORT,0)}
+// view culling: big static meshes are split into 320 m tiles at build time; each tile is drawn only if it is inside the view and within sight distance
+const CULL={pl:null,eye:[0,0,0],maxD:1e9,n:0,skip:0};
+function cullSet(VP,eye,maxD){const m=VP,pl=[];const r=i=>[m[i],m[4+i],m[8+i],m[12+i]];const r0=r(0),r1=r(1),r2=r(2),r3=r(3);
+  for(const [a,sg] of [[r0,1],[r0,-1],[r1,1],[r1,-1],[r2,1]]){const q=[r3[0]+sg*a[0],r3[1]+sg*a[1],r3[2]+sg*a[2],r3[3]+sg*a[3]],l=Math.hypot(q[0],q[1],q[2])||1;pl.push([q[0]/l,q[1]/l,q[2]/l,q[3]/l])}
+  CULL.pl=pl;CULL.eye=eye;if(maxD!==undefined)CULL.maxD=maxD}
+function chunkVis(c){const e=CULL.eye,d=Math.hypot(c.c[0]-e[0],c.c[1]-e[1],c.c[2]-e[2])-c.r;if(d>CULL.maxD)return false;if(!CULL.pl)return true;
+  for(const p of CULL.pl)if(p[0]*c.c[0]+p[1]*c.c[1]+p[2]*c.c[2]+p[3]<-c.r)return false;return true}
+function draw(o){if(o.chunks){for(const c of o.chunks){if(chunkVis(c)){c.ko=o.ko;draw(c)}else CULL.skip+=c.count}return}if(!o.count)return;if(KO.on!==!!o.ko){KO.on=!!o.ko;gl.uniform1f(U.uKOn,KO.on?1:0)}bind(o);gl.drawElements(gl.TRIANGLES,o.count,o.type||gl.UNSIGNED_SHORT,0)}
 
 // ---- static scene
-function meshFrom(P,N,I){const big=P.length/3>65535;if(big&&!EXT_U32){const n=65535*3;P=P.slice(0,n);N=N.slice(0,n);I=I.filter((v,k)=>I[k-k%3]<65535&&I[k-k%3+1]<65535&&I[k-k%3+2]<65535)}
+function meshChunked(P,N,I){const CS=360,cells=new Map(),nT=I.length/3;
+  for(let t=0;t<nT;t++){const a=I[t*3];const k=Math.floor(P[a*3]/CS)+","+Math.floor(P[a*3+2]/CS);let L=cells.get(k);if(!L)cells.set(k,L=[]);L.push(t)}
+  const nV=P.length/3,mark=new Int32Array(nV).fill(-1),idx=new Int32Array(nV),out=[];let id=0,total=0;
+  for(const L of cells.values()){id++;const p=[],n=[],ii=[];let vc=0,mn=[1e9,1e9,1e9],mx=[-1e9,-1e9,-1e9];
+    const flush=()=>{if(!ii.length)return;meshFrom.noChunk=true;const m=meshFrom(p,n,ii);meshFrom.noChunk=false;const c=[(mn[0]+mx[0])/2,(mn[1]+mx[1])/2,(mn[2]+mx[2])/2];m.c=c;m.r=Math.hypot(mx[0]-c[0],mx[1]-c[1],mx[2]-c[2]);out.push(m);total+=m.count;p.length=0;n.length=0;ii.length=0;vc=0;id++;mn=[1e9,1e9,1e9];mx=[-1e9,-1e9,-1e9]};
+    for(const t of L){if(vc>65000)flush();for(let j=0;j<3;j++){const v=I[t*3+j];if(mark[v]!==id){mark[v]=id;idx[v]=vc++;const x=P[v*3],y=P[v*3+1],z=P[v*3+2];p.push(x,y,z);n.push(N[v*3],N[v*3+1],N[v*3+2]);
+      if(x<mn[0])mn[0]=x;if(y<mn[1])mn[1]=y;if(z<mn[2])mn[2]=z;if(x>mx[0])mx[0]=x;if(y>mx[1])mx[1]=y;if(z>mx[2])mx[2]=z}ii.push(idx[v])}}
+    flush()}
+  return {chunks:out,count:total}}
+function meshFrom(P,N,I){if(I.length>30000&&!meshFrom.noChunk)return meshChunked(P,N,I);const big=P.length/3>65535;if(big&&!EXT_U32){const n=65535*3;P=P.slice(0,n);N=N.slice(0,n);I=I.filter((v,k)=>I[k-k%3]<65535&&I[k-k%3+1]<65535&&I[k-k%3+2]<65535)}
   return upload(new Float32Array(P),new Float32Array(N),big&&EXT_U32?new Uint32Array(I):new Uint16Array(I))}
 function boxInto(B,cx,cy,cz,sx,sy,sz,rot){
   const c=Math.cos(rot||0),s=Math.sin(rot||0);const f=[[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]];
@@ -4791,8 +4825,8 @@ function terrainMesh(){const N=360,X0=WORLD.x0,X1=WORLD.x1,Y0=WORLD.y0,Y1=WORLD.
   const H=(x,y)=>{if(inCity(x,y)||inTC(x,y,4)||inExtra(x,y,6))return -0.14;const d=dfAt(x,y);let z=Math.max(d<45?hillZ(x,y)+riverCut(x,y):terrainH(x,y,d),embZ(x,y));
     for(const n of gAt(GRID.n,x,y)){if(n.pr){const dn=Math.hypot(x-n.x,y-n.y)-n.pr;if(dn<14)z=Math.min(z,n.z-0.25+Math.max(0,dn)*0.12)}}
     if(d<70){let best=1e9,rz=null,zc=1e9;for(const e of edgesNear(x,y,34)){const p=eProj(e,x,y);if(p.u<-6||p.u>e.L+6)continue;const dd=Math.abs(p.t)-e.W-auxW(e,p.u,p.t),zz=e.hz?ez(e,clamp(p.u,0,e.L)):0;
-        if(e.dip&&onDip(e,p.u)||e.ov&&overDeck(e,p.u)){if(!(e.ov&&overDeck(e,p.u)))zc=Math.min(zc,zz-0.35+Math.max(0,dd-16)*0.42);continue}if(dd<best){best=dd;rz=zz}}
-      if(rz!==null&&best<40){const b=Math.max(0,best-1.2);z=Math.min(z,rz-0.22+(b<12?b*0.12:1.44+(b-12)*0.3))}z=Math.min(z,zc)}
+        if(e.dip&&onDip(e,p.u)||e.ov&&overDeck(e,p.u)){if(!(e.ov&&overDeck(e,p.u)))zc=Math.min(zc,zz-0.35+Math.max(0,dd-16)*0.42);continue}if(dd<best){best=dd;rz=zz}if(dd<40){const b=Math.max(0,dd-1.2);z=Math.min(z,zz-0.3+(b<12?b*0.1:1.2+(b-12)*0.3))}}   // every road nearby pulls the ground down under it, not just the nearest
+      z=Math.min(z,zc)}
     return z-0.08};
   TERR.N=N;TERR.NY=NY;TERR.h=new Float32Array((N+1)*(NY+1));
   for(let j=0;j<=NY;j++)for(let i=0;i<=N;i++){const x=X0+(X1-X0)*i/N,y=Y0+(Y1-Y0)*j/NY,h=H(x,y),hx=H(x+3,y)-h,hy=H(x,y+3)-h;TERR.h[j*(N+1)+i]=h;P.push(x,h,-y);Nn.push(...norm([-hx/3,1,hy/3]))}
@@ -4909,7 +4943,7 @@ function buildWorld(){retailSites();placeExtras();
   worldScenery();
 }
 // the proving ground: concrete pad, the test sections as real height-mapped surfaces, paint, cones and section boards
-function tcMesh(){const M_=()=>({P:[],N:[],I:[]}),out={conc:M_(),sec:M_(),asph:M_(),cob:M_(),grav:M_(),paint:M_(),dark:M_(),board:M_(),post:M_()};
+function tcMesh(){const collAdd=o=>{COLL_KEEP.push(o);window.collAdd(o)};COLL_KEEP.length=0;const M_=()=>({P:[],N:[],I:[]}),out={conc:M_(),sec:M_(),asph:M_(),cob:M_(),grav:M_(),paint:M_(),dark:M_(),board:M_(),post:M_(),rail:M_()};TC_SIGNS.length=0;
   const hmap=(B,x0,x1,y0,y1,dx,dy,lift)=>{const nx=Math.max(1,Math.round((x1-x0)/dx)),ny=Math.max(1,Math.round((y1-y0)/dy)),k0=B.P.length/3,H=(x,y)=>tcH(x,y).h+lift;
     for(let j=0;j<=ny;j++)for(let i=0;i<=nx;i++){const x=x0+(x1-x0)*i/nx,y=y0+(y1-y0)*j/ny,h=H(x,y),hx=H(x+0.05,y)-H(x-0.05,y),hy=H(x,y+0.05)-H(x,y-0.05);B.P.push(x,h,-y);B.N.push(...norm([-hx/0.1,1,hy/0.1]))}
     for(let j=0;j<ny;j++)for(let i=0;i<nx;i++){const a=k0+j*(nx+1)+i;B.I.push(a,a+1,a+nx+2,a,a+nx+2,a+nx+1)}};
@@ -4920,7 +4954,15 @@ function tcMesh(){const M_=()=>({P:[],N:[],I:[]}),out={conc:M_(),sec:M_(),asph:M
     if(nm==="Speed humps"||nm==="Articulation"||nm==="Curb drop"){const P=M_();hmap(P,xc-3.4,xc+3.4,S[1],S[2],0.4,0.2,0.012);   // yellow paint only where it stands up
       for(let q=0;q<P.I.length;q+=3){const a=P.I[q],b=P.I[q+1],c=P.I[q+2];if(P.P[a*3+1]>0.03||P.P[b*3+1]>0.03||P.P[c*3+1]>0.03){const k=out.paint.P.length/3;for(const v of [a,b,c]){out.paint.P.push(P.P[v*3],P.P[v*3+1],P.P[v*3+2]);out.paint.N.push(P.N[v*3],P.N[v*3+1],P.N[v*3+2])}out.paint.I.push(k,k+1,k+2)}}}
     // a board at the start of each section: post plus a coloured panel
-    const bx=xc-4.6,by=S[1]-2;boxInto(out.post,bx,1.0,-by,0.1,2.0,0.1,0);boxInto(out.board,bx,2.15,-by,1.6,0.7,0.06,0);collAdd({t:"c",x:bx,y:by,r:0.08})}
+    const bx=xc-5.2,by=S[1]-3;for(const sx of [-1.05,1.05]){boxInto(out.post,bx+sx,1.2,-by,0.1,2.4,0.1,0);collAdd({t:"c",x:bx+sx,y:by,r:0.08})}boxInto(out.board,bx,2.2,-by,2.6,1.3,0.06,0);
+    TC_SIGNS.push({x:bx,y:by-0.035,z:2.2,w:2.5,h:1.2,S});
+    // hills: solid sides down to the pad, and a guard rail along both edges (posts every 2 m) so you can't drive off the top
+    if(/hill|ramp/.test(nm)){const L=S[2]-S[1],Q=(m,ps,n)=>{const k=m.P.length/3;for(const [x,y,z] of ps){m.P.push(x,z,-y);m.N.push(n[0],n[1],n[2])}m.I.push(k,k+1,k+2,k,k+2,k+3)};
+      for(let v=0;v<L;v+=1){const za=tcHill(nm,v),zb=tcHill(nm,Math.min(L,v+1)),ya=S[1]+v,yb=S[1]+Math.min(L,v+1);if(za<0.01&&zb<0.01)continue;
+        for(const sd of [-1,1]){const x=xc+sd*3.5;Q(out.sec,[[x,ya,za],[x,yb,zb],[x,yb,0],[x,ya,0]],[sd,0,0]);const xr=xc+sd*3.62;
+          Q(out.rail,[[xr,ya,za+0.55],[xr,yb,zb+0.55],[xr,yb,zb+0.78],[xr,ya,za+0.78]],[-sd,0,0]);Q(out.rail,[[xr+sd*0.02,ya,za+0.55],[xr+sd*0.02,yb,zb+0.55],[xr+sd*0.02,yb,zb+0.78],[xr+sd*0.02,ya,za+0.78]],[sd,0,0])}}
+      for(let v=1;v<L;v+=2){const z=tcHill(nm,v);if(z<0.05)continue;for(const sd of [-1,1]){const x=xc+sd*3.66,y=S[1]+v;boxInto(out.rail,x,z+0.4,-y,0.1,0.8,0.1,0)}}
+      for(let v=0;v<L;v+=2){const za=tcHill(nm,v),zb=tcHill(nm,Math.min(L,v+2));if(Math.max(za,zb)<0.2)continue;for(const sd of [-1,1])collAdd({t:"b",x:xc+sd*3.65,y:S[1]+v+1,h:Math.PI/2,hl:1.05,hw:0.08,z0:Math.min(za,zb)-0.4,z1:Math.max(za,zb)+0.85,what:"the guard rail"})}}}
   // lane edge lines down the whole course
   for(const xc of TCL)for(const sd of [-3.6,3.6])boxInto(out.paint,xc+sd,0.006,-(TC.y0+TC.y1)/2,0.15,0.004,TC.y1-TC.y0-20,0);
   // skidpad: painted circle, brake strip cones
@@ -6290,21 +6332,21 @@ function render(dt){
   const VP=M4.mul(M4.persp(fov,asp,st.cam===1?0.06:0.3,4800),M4.look(eye,tgt,up));
   if(st.cam===1){const f=norm(sub(tgt,eye)),rt=norm(cross(f,up)),u2=cross(rt,f),ty=Math.tan(fov/2),O=M4.p(cm,SCR_BL);SCR.info={eye,f,rt,up:u2,tx:ty*asp,ty,cm};
     SCR.quad={O,U:sub(M4.p(cm,SCR_BR),O),V:sub(M4.p(cm,SCR_TL),O),N:M4.d(cm,SCR_N)}}
-  gl.uniformMatrix4fv(U.uVP,false,VP); gl.uniform3fv(U.uEye,eye);
+  gl.uniformMatrix4fv(U.uVP,false,VP); gl.uniform3fv(U.uEye,eye);cullSet(VP,eye);
   {const az=(GT.min/1440)*Math.PI*2-Math.PI/2,e=Math.max(0.12,GT.el??0.8);gl.uniform3fv(U.uSun,norm(D_<0.15?[0.3,0.5,0.2]:[Math.cos(az)*0.8,e+0.1,Math.sin(az)*0.6+0.25]))}
   gl.uniform3fv(U.uSunC,[0.03,0.035,0.05].map((v,i)=>lerp(v,[1.05,1.0,0.92][i]*[1,0.78+0.22*D_,0.55+0.45*D_][i],D_)).map(v=>v*(1-(wsky?ww*0.55:0)))); gl.uniform3fv(U.uAmb,[0.014,0.016,0.024].map((v,i)=>lerp(v,[0.30,0.34,0.40][i],D_)));
-  gl.uniform3fv(U.uFog,sky);gl.uniform1f(U.uNt,clamp(1-(GT.D??(night?0:1))*1.4,0,1));gl.uniform1i(U.uTex,0); gl.uniform1f(U.uFD,(night?0.004:0.0011)+(wsky?ww*{rain:0.0032,snow:0.0055,fog:0.012}[wk]:0));
+  gl.uniform3fv(U.uFog,sky);gl.uniform1f(U.uNt,clamp(1-(GT.D??(night?0:1))*1.4,0,1));gl.uniform1i(U.uTex,0); {const fd=(night?0.004:0.0011)+(wsky?ww*{rain:0.0032,snow:0.0055,fog:0.012}[wk]:0);gl.uniform1f(U.uFD,fd);CULL.maxD=Math.min(G().cullD||4800,3.6/Math.max(1e-4,fd))}
   const lampsOn=(st.lights||night)&&st.power!==false;
   headlights(cm,fwd,lampsOn);
   const braking=car.brake>0.05; gl.uniform3fv(U.uTP,M4.p(cm,VEH.tail)); gl.uniform1f(U.uTail,braking?1:(lampsOn?0.25:0));
-  const pass=(VP,eye,tgt,cam2)=>{gl.uniformMatrix4fv(U.uVP,false,VP);gl.uniform3fv(U.uEye,eye);
+  const pass=(VP,eye,tgt,cam2)=>{gl.uniformMatrix4fv(U.uVP,false,VP);gl.uniform3fv(U.uEye,eye);cullSet(VP,eye);
   gl.disable(gl.CULL_FACE);gl.uniformMatrix4fv(U.uM,false,M4.id());
   // layered flat surfaces: push lower layers back in depth so the road and paint never flicker at distance
   gl.enable(gl.POLYGON_OFFSET_FILL);
   gl.polygonOffset(8,8);mat(st.surface==="snow"?[0.8,0.82,0.86]:MAP.ground,null,0.02,8,1,MAP.gpat);draw(SCN.ground);
   gl.polygonOffset(7,7);mat([0.33,0.33,0.32],null,0.05,10,1,2);draw(SCN.plate);
   if(SCN.tc){const T_=SCN.tc;mat([0.42,0.42,0.4],null,0.05,10,1,2);draw(T_.conc);mat([0.55,0.5,0.43],null,0.08,12,1,2);draw(T_.sec);mat([0.09,0.09,0.095],null,0.2,30,1,2);draw(T_.asph);mat([0.33,0.29,0.25],null,0.1,10,1,2);draw(T_.cob);mat([0.36,0.3,0.22],null,0.05,8,1,1);draw(T_.grav);
-    mat([0.85,0.7,0.1],null,0.2,20);draw(T_.paint);mat([0.95,0.38,0.05],null,0.2,20);draw(T_.dark);mat([0.55,0.55,0.55],null,0.3,20);draw(T_.post);mat([0.1,0.35,0.75],null,0.2,20);draw(T_.board)}
+    mat([0.85,0.7,0.1],null,0.2,20);draw(T_.paint);mat([0.95,0.38,0.05],null,0.2,20);draw(T_.dark);mat([0.55,0.55,0.55],null,0.3,20);draw(T_.post);mat([0.1,0.35,0.75],null,0.2,20);draw(T_.board);if(T_.rail){mat([0.62,0.64,0.66],null,0.6,40);draw(T_.rail)}tcSignsDraw()}
   gl.polygonOffset(6,6);mat([0.36,0.36,0.35],null,0.05,10,1,2);draw(SCN.walk);draw(SCN.drive);mat([0.1,0.102,0.11],null,0.2,30,1,2);draw(SCN.lot);mat([0.11,0.23,0.07],null,0.02,8,1,1);draw(SCN.green);mat([0.13,0.135,0.14],null,0.2,30,1,2);draw(SCN.pad);if(SCN.parkLane){mat([0.095,0.098,0.105],null,0.25,30,1,2);draw(SCN.parkLane)}
   gl.polygonOffset(4,4);
   {const wet=st.surface==="wet",snow=st.surface==="snow",sp_=wet?1.6:0.22,sh_=wet?90:26;
@@ -6804,7 +6846,7 @@ const TABS={
     ${T.bMode?`<h3>Shift position</h3><div class="grid2">${[[1,"D","Normal"],[2,"B","More regen when you lift, for long downhills"]].map(([v,n,d])=>opt(`data-regen="${v}"`,st.regen===v,n,d)).join("")}</div>`:""}
     ${T.ice||T.bMode?"":`<h3>Regenerative braking</h3><div class="grid2">${["Off","Low","Standard","One-pedal"].slice(0,(T.regenMax??3)+1).map((n,i)=>opt(`data-regen="${i}"`,st.regen===i,n,["Coasts like a gas car","Gentle slowing when you lift","About 0.1 g when you lift","Slows to a stop and holds, no brake needed"][i])).join("")}</div>`}
     <h3>Sound</h3><div class="grid2">${["Quiet","Normal","Loud"].map((n,i)=>opt(`data-ev="${i}"`,(st.engVol??1)===i,`Engine: ${n}`,i===1?"Default":"")).join("")}${tog("traffic","Traffic sounds","Nearby cars, quietly",st.aiSnd)}</div>
-    <h3>Graphics</h3><div class="grid2">${["auto","low","medium","high"].map(k=>opt(`data-gfx="${k}"`,GFX.q===k,k==="auto"?"Auto":GQ[k].label,k==="auto"?`Now ${G().label} · ${Math.round(GFX.fps)} fps`:"")).join("")}</div>
+    <h3>Graphics</h3><div class="grid2">${["auto","lowest","low","medium","high"].map(k=>opt(`data-gfx="${k}"`,GFX.q===k,k==="auto"?"Auto":GQ[k].label,k==="auto"?`Now ${G().label} · ${Math.round(GFX.fps)} fps`:"")).join("")}</div>
     <h3>Weather · now ${WX.w>0.05?WX.cur:"clear"}</h3><div class="grid2">${[["auto","Auto","Changes every few minutes"],["clear","Clear","Dry road"],["rain","Rain","Wet road, about 70% grip"],["snow","Snow","About 30% grip: try TCS and ABS"],["fog","Fog","You see a lot less"]].map(([k,n,d])=>opt(`data-wx="${k}"`,st.weather===k,n,d)).join("")}</div>
     <h3>Road condition</h3><div class="rcRow"><span>Potholes</span><div class="seg5">${ROADC_N.map((n,i)=>`<button class="${ROADC.holes===i?"on":""}" data-rch="${i}">${n}</button>`).join("")}</div><small>${["Perfect pavement","A pothole now and then","Like most towns","Spring after a hard winter","Every few metres"][ROADC.holes]}</small></div>
     <div class="rcRow"><span>Bumps</span><div class="seg5">${ROADC_N.map((n,i)=>`<button class="${ROADC.bumps===i?"on":""}" data-rcb="${i}">${n}</button>`).join("")}</div><small>${["Glass smooth","Smooth","Like most towns: heaves, manholes, patches","Bumpy","Washboard everywhere"][ROADC.bumps]}</small></div>
@@ -6837,7 +6879,7 @@ function test(k,b,s){return `<button class="opt" data-test="${k}"><b>${b}</b><sm
 const SECS=h=>h.split(/(?=<h3>)/).filter(p=>/^<h3>/.test(p)),ALLS=()=>SECS(TABS.car()+TABS.safety());
 const SEC_RX={graphics:/^<h3>Graphics/,world:/^<h3>(Weather|Road condition|Random events|People)/,assists:/^<h3>(Collision|Forward collision|Lanes|Hands-free|Adaptive cruise)/,sound:/^<h3>(Sound|Lights, sound)/,spawn:/^<h3>Go to/};
 const secOf=p=>Object.keys(SEC_RX).find(k=>SEC_RX[k].test(p))||"cars";
-TABS.graphics=()=>ALLS().filter(p=>secOf(p)==="graphics").join("")+`<h3>Mirrors</h3><div class="grid2">${opt('data-mir="1"',st.mirrors!==false,"Realistic mirrors","Door and rear-view mirrors show the road behind you (inside view)")}${opt('data-mir="0"',st.mirrors===false,"Simple mirrors","Faster on older devices")}</div>`;
+TABS.graphics=()=>ALLS().filter(p=>secOf(p)==="graphics").join("")+`<h3>Frame rate</h3><div class="grid2">${[[0,"Auto","30 fps on the Lowest graphics, otherwise as fast as it can"],[30,"30 fps","Steady and cooler: best on a Surface Go or while charging"],[60,"60 fps","Smooth on most laptops and phones"],[-1,"Unlimited","As fast as your screen allows"]].map(([k,n,d])=>opt(`data-set="fpsCap:${k}"`,(st.fpsCap??0)===k,n,d)).join("")}</div><h3>Mirrors</h3><div class="grid2">${opt('data-mir="1"',st.mirrors!==false,"Realistic mirrors","Door and rear-view mirrors show the road behind you (inside view)")}${opt('data-mir="0"',st.mirrors===false,"Simple mirrors","Faster on older devices")}</div>`;
 TABS.features=()=>{const T=TRIMS[st.trim];const sec=(t,h)=>h.trim()?`<h3>${t}</h3><div class="grid2">${h}</div>`:"";
   return `<p class="note">Every feature this ${T.short||T.name} has. Turn any of them off; anything the real car doesn't have is left out.</p>`+
   sec("Collision avoidance",tog("aeb","Automatic emergency braking","Brakes for cars, people and animals ahead",st.aeb)+tog("esa","Evasive steering assist","Adds steering when you swerve round an obstacle",st.esa)+tog("rAeb","Rear automatic braking","Stops you backing into things",st.rAeb)+tog("rcta","Rear cross traffic alert","Warns of cars crossing behind you in reverse"+(has("rAeb")?", and brakes for them":""),st.rcta!==false))+
@@ -6907,8 +6949,8 @@ $("sensorBox").onclick=()=>{const hy=isHybT(st.trim),tc=has("tech");st.panel=(hy
 $("dPilot").onclick=()=>act("pilot");$("dSigL").onclick=()=>act("sigL"); $("dSigR").onclick=()=>act("sigR");
 
 // ---- graphics quality. Auto picks from the device, then lowers the render resolution by itself if the frame rate drops
-const GQ={low:{res:0.62,fullCars:6,traffic:9,onc:8,lod:60,hz:400,trees:false,shadow:false,aiSnd:false,scrEvery:3,camEvery:3,label:"Low"},
-  medium:{res:1.0,fullCars:10,traffic:16,onc:16,lod:120,hz:600,trees:true,shadow:true,aiSnd:true,scrEvery:2,camEvery:2,label:"Medium"},
+const GQ={lowest:{cullD:1300,res:0.5,fullCars:3,traffic:6,onc:5,lod:38,hz:300,trees:false,shadow:false,aiSnd:false,scrEvery:4,camEvery:4,label:"Lowest",cap:30},low:{cullD:1900,res:0.62,fullCars:6,traffic:9,onc:8,lod:60,hz:400,trees:false,shadow:false,aiSnd:false,scrEvery:3,camEvery:3,label:"Low"},
+  medium:{cullD:2800,res:1.0,fullCars:10,traffic:16,onc:16,lod:120,hz:600,trees:true,shadow:true,aiSnd:true,scrEvery:2,camEvery:2,label:"Medium"},
   high:{res:2,fullCars:18,traffic:40,onc:32,lod:260,hz:1000,trees:true,shadow:true,aiSnd:true,scrEvery:1,camEvery:2,label:"High"}};
 const GFX={q:"auto",eff:"medium",dyn:1,fps:60,t:0,slow:0,frame:0};
 function gpuName(){try{const c=document.createElement("canvas").getContext("webgl"),e=c&&c.getExtension("WEBGL_debug_renderer_info");return e?String(c.getParameter(e.UNMASKED_RENDERER_WEBGL)):""}catch(_){return ""}}
@@ -6918,13 +6960,13 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(/SwiftShader|llvmpipe|Microsoft Basic/i.test(gpu))return "low";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="57";try{if(localStorage.getItem("strata.ver")!==APP_VER){for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="58";try{if(localStorage.getItem("strata.ver")!==APP_VER){for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){return GQ[GFX.q==="auto"?GFX.eff:GFX.q]}
 function setGfx(q){GFX.q=q;GFX.dyn=1;try{localStorage.setItem("strata.gfx",q)}catch(e){}}
 function gfxTick(dt){GFX.fps=lerp(GFX.fps,1/Math.max(dt,1e-3),0.05);GFX.t+=dt;GFX.frame++;
   if(GFX.q!=="auto"||!st.started||GFX.t<1)return;GFX.t=0;
-  if(GFX.fps<45){GFX.dyn=Math.max(0.5,GFX.dyn-0.07);if(GFX.fps<30||GFX.dyn<=0.5)GFX.slow++;if(GFX.slow>5&&GFX.eff!=="low"){GFX.eff=GFX.eff==="high"?"medium":"low";GFX.slow=0;GFX.dyn=1;toast(`Graphics lowered to ${G().label} to keep it smooth`)}}
+  if(GFX.fps<45){GFX.dyn=Math.max(0.5,GFX.dyn-0.07);if(GFX.fps<30||GFX.dyn<=0.5)GFX.slow++;if(GFX.slow>5&&GFX.eff!=="lowest"){GFX.eff=GFX.eff==="high"?"medium":GFX.eff==="medium"?"low":"lowest";GFX.slow=0;GFX.dyn=1;toast(`Graphics lowered to ${G().label} to keep it smooth`)}}
   else{GFX.slow=0;if(GFX.fps>56)GFX.dyn=Math.min(1,GFX.dyn+0.04)}}
 // ---- PC detection
 const PC={on:false,gp:null,prev:[]};
@@ -7176,7 +7218,9 @@ function controls(dt){
 
 // ======================================================================= loop
 let last=performance.now(), acc=0;
-function frame(now){gfxTick(Math.min(0.1,(now-last)/1000));
+// frame-rate cap: steadier and cooler on weak or hot laptops (Auto caps at 30 fps on the Lowest graphics)
+function fpsCap(){const c=st.fpsCap??0;return c===-1?0:c===0?(G().cap||0):c}
+function frame(now){{const c=fpsCap();if(c&&now-last<1000/c-2){requestAnimationFrame(frame);return}}gfxTick(Math.min(0.1,(now-last)/1000));
   const dt=Math.min(0.05,(now-last)/1000);last=now;
   if(st.started){controls(dt);assist(dt);updateTraffic(dt);updatePark(dt);enforcePkgs();weatherTick(dt);try{hapTick(dt)}catch(e){}
     if(sys.hillDemo){sys.hillT+=dt;if(sys.hillT>6){sys.hillT=0;st.leveling=!st.leveling;toast(st.leveling?"Active levelling ON: beam hugs the ground":"Active levelling OFF: beam fixed to the body")}if(!car.offroad&&Math.abs(car.vx)>3)sys.hillDemo=false}
@@ -7491,7 +7535,7 @@ function renderCfg(){fitPaint();const b=$("cfgBody"),T=TRIMS[st.trim],step=st.cf
   else{const base=PRICE[st.trim],tot=cfgTotal(),pp=paintPrice(),opt=tot-base-pp;
     h=`<h3>Price</h3><div class="sumBox"><div><span>${short(T)}</span><b>${money(base)}</b></div><div><span>${paintName()}</span><b>${pp===0?"Included":money(pp)}</b></div>${opt>0?`<div><span>Options and accessories</span><b>${money(opt)}</b></div>`:""}<div class="sumT"><span>As built</span><b>${money(tot)}</b></div></div>
     <h3>Start the drive at</h3>${Object.entries(STARTS).map(([k,m])=>`<button class="cRow ${st.map===k?"on":""}" data-cm="${k}"><span><b>${m.name}</b><small>${m.desc}</small></span></button>`).join("")}
-    <h3>Graphics</h3>${["auto","low","medium","high"].map(k=>`<button class="cRow ${GFX.q===k?"on":""}" data-gfx="${k}"><span><b>${k==="auto"?`Auto (${GQ[GFX.eff].label} on this device)`:GQ[k].label}</b><small>${{auto:"Recommended: picks for your device and lowers the resolution by itself if it starts to lag",low:"Older laptops and phones: lighter shading, fewer cars",medium:"Most phones and laptops",high:"New phones and PCs: full resolution, 40 cars, trees and shadows"}[k]}</small></span></button>`).join("")}`}
+    <h3>Graphics</h3>${["auto","lowest","low","medium","high"].map(k=>`<button class="cRow ${GFX.q===k?"on":""}" data-gfx="${k}"><span><b>${k==="auto"?`Auto (${GQ[GFX.eff].label} on this device)`:GQ[k].label}</b><small>${{auto:"Recommended: picks for your device and lowers the resolution by itself if it starts to lag",lowest:"Surface Go and the slowest laptops: half resolution, very few cars, 30 fps",low:"Older laptops and phones: lighter shading, fewer cars",medium:"Most phones and laptops",high:"New phones and PCs: full resolution, 40 cars, trees and shadows"}[k]}</small></span></button>`).join("")}`}
   return h};
   h=step==="model"?sec("model"):T.real?(cfgTabs(T)+((st.cfgTab||"color")==="color"?sec("color").replace(/<h3>Wheel finish<\/h3>[\s\S]*$/,""):"")+((st.cfgTab||"color")==="acc"?sec("drive"):"")):["color","options","drive"].map(sec).join("");
   {const key=step+"/"+(st.cfgTab||""),y=b.scrollTop,same=b._step===key;b.innerHTML=h;b.scrollTop=same?y:0;b._step=key}cfgGoLabel();
