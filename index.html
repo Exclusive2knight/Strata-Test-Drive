@@ -784,8 +784,10 @@ body #drawer #tabBody .seg5{max-width:520px;border:1px solid rgba(255,255,255,.0
 <div id="boot"><div class="bc"><div class="bt">Test Drive</div><div class="bb"><i id="bootBar"></i></div><div class="bs" id="bootMsg">Building the world…</div></div></div>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2>Version 55 · Car builder: your money, a new start button, stay where you are</h2></div>
+    <div class="nh"><small>What's new</small><h2>Version 56 · New 2-bay double-threaded helix garage</h2></div>
     <div class="nb">
+      <h4>Parking garage</h4><ul><li>The Fort St garage is rebuilt as a real 2-bay double-threaded helix. There are no flat decks: every floor is a gentle ramp (1 in 15) and you park right on the slope.</li><li>The north bay climbs a full level going east, the south bay a full level going west, with flat turn landings at both ends. The two threads wind round each other a level apart and each one climbs two levels per lap.</li><li>Two entrances off Fort St, each with its own ticket and pay gates: the west entrance takes you up one thread, the east entrance up the other. Four levels of ramps up to an open roof.</li><li>Stall lines on both sides of every aisle, a centre wall between the bays, columns, parapets, lights under every slab, and a coloured band on each landing. Parked cars sit level across the slope, and park assist finds stalls on the ramp you're on.</li></ul>
+      <h4 class="old">Version 55 · Car builder: your money, a new start button, stay where you are</h4>
       <h4>Car builder</h4><ul><li>Your money is shown at the top of the builder (green), and under the price as "You have $…". It turns amber when the car costs more than you have.</li><li>The Start test drive button is now a glowing orange button with a steering wheel, so it stands out from the Next buttons.</li><li>Building a new car out on the map (Redo car or Spawn another car) no longer sends you back to the start. You come out right where you were. If your old car is parked there, the new one appears just ahead of it.</li></ul>
       <h4 class="old">Version 54 · Cleaner settings, sharper traffic lights</h4>
       <h4>Settings</h4><ul><li>Settings has a cleaner, evenly spaced layout: the sections run down the left, and the options sit in an even grid on the right. Before, half the window was empty and the options were squeezed into one column.</li><li>The search box, Redo car and Done sit in one tidy bar. Selected options have a teal outline and dot, and the five-step road bars are teal to match.</li><li>On phones held sideways, settings fill the screen with a narrower list of sections. Held upright, the sections become a row across the top.</li></ul>
@@ -1295,30 +1297,24 @@ const onBridge=(e,u)=>e.br&&Math.abs(u-e.br.uc)<e.br.half+BRIDGE_RAMP;
 const onOver=(e,u)=>e.ov&&Math.abs(u-e.ov.uc)<e.ov.half+(u<e.ov.uc?e.ov.rA:e.ov.rB), overDeck=(e,u)=>e.ov&&Math.abs(u-e.ov.uc)<e.ov.half;
 for(const n of NODES)n.z=hillZ(n.x,n.y);
 for(const e of EDGES){let mx=0;for(let u=0;u<=e.L;u+=10)mx=Math.max(mx,Math.abs(ez(e,u)));e.hz=mx>0.05}
-// ---- the parking garage: four levels on Fort St, decks either side of a double-helix ramp tower in the middle
-// two interleaved ramps share one oval lane, each climbing two levels per lap, so every deck meets one of them at each side
-const GAR={x0:-805,x1:-741,y0:-209,y1:-165,H:3.0,L:4,bx0:-781.5,bx1:-764.5,cx:-773,ya:-199,yb:-175,R:6,hw:2.5,F:4.2,op:3.6,ent:[-799,-787],gy:-168.5,isl:-793};
-GAR.ym=(GAR.ya+GAR.yb)/2;GAR.Ls=2*(GAR.yb-GAR.ya)+2*Math.PI*GAR.R;GAR.top=(GAR.L-1)*GAR.H;
-let GREF=0;      // height of whoever is asking (the car or the person walking): picks the right deck in the garage
+// ---- the parking garage on Fort St: a 2-bay, double-threaded helix. Every floor is a gentle ramp (1 in 15) and there are no flat decks:
+// the north bay rises one full level going east, the south bay one full level going west, and flat turn landings at both ends link them.
+// That makes two separate helices wound round each other, a level apart, each climbing two levels per lap: the west entrance takes you
+// up one thread, the east entrance up the other, and you park right on the ramps
+const GAR={x0:-805,x1:-741,y0:-209,y1:-165,H:3.0,T:4,E:9.5,ym:-187,cw:0.35};
+GAR.xa=GAR.x0+GAR.E;GAR.xb=GAR.x1-GAR.E;GAR.Lr=GAR.xb-GAR.xa;GAR.top=GAR.T*GAR.H;GAR.L=GAR.T+1;GAR.slope=GAR.H/GAR.Lr;
+GAR.ayA=(GAR.ym+GAR.cw+5.5+GAR.y1-5.5)/2;GAR.ayB=(GAR.y0+5.5+GAR.ym-GAR.cw-5.5)/2;   // aisle centre lines
+GAR.wIn=[GAR.x0+0.6,GAR.xa-0.4];GAR.eIn=[GAR.xb+0.4,GAR.x1-0.6];GAR.gy=GAR.y1+2.6;   // the two entrances, both off Fort St, and where their gates are
+const garU=x=>clamp((x-GAR.xa)/GAR.Lr,0,1);
+const garZ=(bay,n,x)=>(n+(bay?garU(x):1-garU(x)))*GAR.H;   // bay 1 = north (rises east), bay 0 = south (rises west)
+let GREF=0;      // height of whoever is asking (the car or the person walking): picks the right floor in the garage
 const inGarage=(x,y)=>x>GAR.x0-0.3&&x<GAR.x1+0.3&&y>GAR.y0-0.3&&y<GAR.y1+0.3;
-// where a point sits on the helix lane: distance along the lap (0 = the west landing) and how far out from the lane centre
-function helixS(x,y){const G=GAR,h=G.ym-G.ya,P=Math.PI*G.R;
-  if(y>=G.ya&&y<=G.yb){if(x<G.cx)return [y<=G.ym?G.ym-y:G.Ls-(y-G.ym),(G.cx-G.R)-x];return [h+P+(y-G.ya),x-(G.cx+G.R)]}
-  if(y<G.ya){const dx=x-G.cx,dy=y-G.ya,a=Math.atan2(dy,dx),t=a<=0?a+Math.PI:(dx<0?0:Math.PI);return [h+G.R*t,Math.hypot(dx,dy)-G.R]}
-  const dx=x-G.cx,dy=y-G.yb,a=Math.atan2(dy,dx),t=a>=0?a:(dx<0?Math.PI:0);return [h+P+2*h+G.R*t,Math.hypot(dx,dy)-G.R]}
-function helixPt(s){const G=GAR,h=G.ym-G.ya,P=Math.PI*G.R;s=((s%G.Ls)+G.Ls)%G.Ls;
-  if(s<h)return [G.cx-G.R,G.ym-s,-1,0];if(s<h+P){const a=-Math.PI+(s-h)/G.R;return [G.cx+G.R*Math.cos(a),G.ya+G.R*Math.sin(a),Math.cos(a),Math.sin(a)]}
-  if(s<3*h+P)return [G.cx+G.R,G.ya+(s-h-P),1,0];if(s<3*h+2*P){const a=(s-3*h-P)/G.R;return [G.cx+G.R*Math.cos(a),G.yb+G.R*Math.sin(a),Math.cos(a),Math.sin(a)]}
-  return [G.cx-G.R,G.ym+(G.Ls-s),-1,0]}
-// height progress round the lap: flat landings at both openings, an even 8-9 % grade between
-function helixP(s){const G=GAR,F=G.F,h=G.Ls/2;if(s<=F)return 0;if(s<h-F)return 0.5*(s-F)/(h-2*F);if(s<=h+F)return 0.5;if(s<G.Ls-F)return 0.5+0.5*(s-h-F)/(h-2*F);return 1}
-const helixZs=s=>{const G=GAR,b=2*helixP(s),o=[];for(let j=Math.floor(-b)-1;j<=G.L;j++){const z=G.H*(b+j);if(z>=-0.4&&z<=G.top+0.4)o.push(clamp(z,0,G.top))}return o};
 function garageGround(x,y){let best=-1e9,low=1e9;const test=z=>{if(z<low)low=z;if(z<=GREF+0.9&&z>best)best=z},G=GAR;
-  if(x>G.bx0&&x<G.bx1){const [s_,r]=helixS(x,y);if(Math.abs(r)<=G.hw+0.4)for(const z of helixZs(s_))test(z);else test(0)}
-  else{test(0);for(let k=1;k<G.L;k++)test(k*G.H)}
+  if(x<=G.xa||x>=G.xb){for(let n=0;n<=G.T;n++)test(n*G.H)}
+  else{const bay=y>G.ym?1:0;test(0);for(let n=0;n<G.T;n++)test(garZ(bay,n,x))}
   return {h:best>-1e8?best:low,mu:1.0,kind:"garage"}}
-// ticket gates at the entrance: take a ticket coming in, pay on the way out
-const GATE={entry:{x0:GAR.ent[0]+0.5,x1:GAR.isl-0.5,dir:-1,a:0,open:false,t:0},exit:{x0:GAR.isl+0.5,x1:GAR.ent[1]-0.5,dir:1,a:0,open:false,t:0}};
+// ticket gates at both entrances: take a ticket coming in, pay on the way out
+const GATE=(()=>{const o={};for(const [k,[a,b]] of [["",GAR.wIn],["2",GAR.eIn]]){const isl=(a+b)/2;o["entry"+k]={x0:a+0.4,x1:isl-0.5,dir:-1,isl,gy:GAR.gy,a:0,open:false,t:0};o["exit"+k]={x0:isl+0.5,x1:b-0.4,dir:1,isl,gy:GAR.gy,a:0,open:false,t:0}}return o})();
 // ---- spatial index: which roads and junctions are near a point
 const GRID={C:40,e:new Map(),n:new Map()};
 function gAdd(map,x,y,r,v){const C=GRID.C;for(let i=Math.floor((x-r)/C);i<=Math.floor((x+r)/C);i++)for(let j=Math.floor((y-r)/C);j<=Math.floor((y+r)/C);j++){const k=i*100003+j;let a=map.get(k);if(!a)map.set(k,a=[]);if(a[a.length-1]!==v&&!a.includes(v))a.push(v)}}
@@ -1478,7 +1474,7 @@ function retailSites(){if(XSITES.some(S=>S.custom))return;
     for(const a of R.ent)XSITES.push({kind:"lot",custom:true,drive:true,x:a,y:s*((8.2+RB0)/2+0.05),L:9,D:RB0-8.2+0.1,U:[1,0],N:[0,s],stalls:[]});
     STORES.push({x:R.ac,y:s*(bf+R.bd/2),U:[1,0],N:[0,s],w:R.bw-0.4,d:R.bd-0.4,hh:R.h,store:R,door:[R.ac,s*(bf-1.5)]})}
   // the Fort St garage: a proper concrete driveway from the street, through the kerb, up to the ticket gates
-  XSITES.push({kind:"lot",custom:true,drive:true,x:(GAR.ent[0]+GAR.ent[1])/2,y:(-156+GAR.y1)/2,L:GAR.ent[1]-GAR.ent[0]+4,D:Math.abs(GAR.y1+156),U:[1,0],N:[0,1],stalls:[]});
+  for(const [a,b] of [GAR.wIn,GAR.eIn])XSITES.push({kind:"lot",custom:true,drive:true,x:(a+b)/2,y:(-156+GAR.y1)/2,L:b-a+4,D:Math.abs(GAR.y1+156),U:[1,0],N:[0,1],stalls:[]});
   for(const T of RETAIL_STN)XSITES.push({kind:"stn",custom:true,x:T.x,y:T.s*(RB0+15.5),L:40,D:30,U:[1,0],N:[0,T.s],name:T.name})}
 function groundAt(x,y){
   if(inTC(x,y))return tcH(x,y);
@@ -1546,7 +1542,7 @@ const STARTS={shops:{name:"Grand River shops",desc:"Outside the freeway: Fresh M
   suburb:{name:"Rosedale",desc:"Subdivision streets: all-way stops, speed humps, 25 mph",x:745,y:497,h:0},
   hwy:{name:"Hwy 7",desc:"65 mph freeway loop, 3 lanes each way, four interchanges with on- and off-ramps",x:1716,y:-650,h:Math.PI/2},
   station:{name:"Service plaza",desc:"Gas pumps and fast chargers on Hwy 7, north side",x:-180,y:1116,h:Math.PI},
-  garage:{name:"Parking garage",desc:"Fort St · 4 levels, entrance on your right: take a ticket at the gate, double-helix ramps in the middle",x:-845,y:-151.8,h:0},
+  garage:{name:"Parking garage",desc:"Fort St · 2-bay double-threaded helix: every floor is a ramp. Two entrances on your right, take a ticket at the gate",x:-845,y:-151.8,h:0},
   hills:{name:"Lake Rd hill",desc:"Steep two-lane road over a 26 m hill (up to 16% grades)",x:-1003,y:-420,h:-Math.PI/2},
   bridge:{name:"Rouge River",desc:"Maple Blvd over the river bridge",x:-60,y:-12,h:0}};
 
@@ -2872,7 +2868,7 @@ function aiSusp(c,dt){if(Math.abs(c.wx-car.px)>180||Math.abs(c.wy-car.py)>180||c
     let Mp=-ms*S.ax*0.52,Mr=ms*ay*0.45;for(let i=0;i<4;i++){Mp-=F[i]*S.W[i][0];Mr+=F[i]*S.W[i][1]}
     S.thd+=(Mp/(ms*1.9))*h;S.th+=S.thd*h;S.phid+=(Mr/(ms*0.36))*h;S.phi+=S.phid*h}
   S.th=clamp(S.th,-0.07,0.07);S.phi=clamp(S.phi,-0.08,0.08);S.zb=clamp(S.zb,-0.12,0.12);S.p=-S.th;S.r=-S.phi;S.z=S.zb}
-function aiMat(c){const S=c.sus;return S?carMatrix(c.wx,c.wy,c.wh,(c.wz||0)+S.z,(c.wp||0)+S.p,S.r):carMatrix(c.wx,c.wy,c.wh,c.wz||0,c.wp||0,0)}
+function aiMat(c){const S=c.sus;return S?carMatrix(c.wx,c.wy,c.wh,(c.wz||0)+S.z,(c.wp||0)+S.p,S.r+(c.wr||0)):carMatrix(c.wx,c.wy,c.wh,c.wz||0,c.wp||0,c.wr||0)}
 let respT=0;
 function updateTraffic(dt){
   st.clock=(st.clock||0)+dt;
@@ -5147,45 +5143,49 @@ function worldScenery(){
       collAdd({t:"b",x:p[0],y:p[1],h:p[2],hl:0.8,hw:Wt+0.6,z0:-0.4,z1:z-1.3,what:"the bridge abutment"})}}
   for(let y=WORLD.y0;y<WORLD.y1;y+=16){const k=water.P.length/3,a=riverX(y),b=riverX(y+16),hw=RIVER.w/2-2;
     water.P.push(a-hw,RIVER.water,-y,a+hw,RIVER.water,-y,b+hw,RIVER.water,-(y+16),b-hw,RIVER.water,-(y+16));water.N.push(0,1,0,0,1,0,0,1,0,0,1,0);water.I.push(k,k+1,k+2,k,k+2,k+3)}
-  // ---- parking garage on Fort St: two decks of 4 levels either side of a double-helix ramp tower, ticket gates at the entrance
-  {const G=GAR,top=G.top,dkW=[[G.x0,G.bx0],[G.bx1,G.x1]],dd=G.y1-G.y0,cy=(G.y0+G.y1)/2;
-    B(gSlab,(G.x0+G.x1)/2,cy,0.002,0.02,G.x1-G.x0,dd);
-    for(let k=1;k<G.L;k++)for(const [a,b] of dkW)B(gSlab,(a+b)/2,cy,k*G.H-0.3,0.3,b-a,dd);
-    // the two ramps: one oval lane, surfaces stacked a level apart, each rising two levels per lap
-    {const N=Math.ceil(G.Ls/0.6),ds=G.Ls/N;
-      for(let j=-2;j<=G.L;j++)for(let i=0;i<N;i++){const sa=i*ds,sb=sa+ds,za=G.H*(2*helixP(sa)+j),zb=G.H*(2*helixP(sb)+j);if(zb<-0.4||za>top+0.4)continue;
-        const A=helixPt(sa),Bp=helixPt(sb),z1=clamp(za,0,top),z2=clamp(zb,0,top),q=[[A[0]-A[2]*G.hw,A[1]-A[3]*G.hw,z1],[A[0]+A[2]*G.hw,A[1]+A[3]*G.hw,z1],[Bp[0]+Bp[2]*G.hw,Bp[1]+Bp[3]*G.hw,z2],[Bp[0]-Bp[2]*G.hw,Bp[1]-Bp[3]*G.hw,z2]];
-        let kk=gSlab.P.length/3;for(const [x,y,z] of q){gSlab.P.push(x,z+0.004,-y);gSlab.N.push(0,1,0)}gSlab.I.push(kk,kk+2,kk+1,kk,kk+3,kk+2);
-        kk=gSlab.P.length/3;for(const [x,y,z] of q){gSlab.P.push(x,z-0.3,-y);gSlab.N.push(0,-1,0)}gSlab.I.push(kk,kk+1,kk+2,kk,kk+2,kk+3)}}
-    const wall=(x0,y0,x1,y1,z0,h,coll,what)=>{const x=(x0+x1)/2,y=(y0+y1)/2,len=Math.hypot(x1-x0,y1-y0),a=Math.atan2(y1-y0,x1-x0);boxInto(gWall,x,z0+h/2,-y,len+0.02,h,0.3,a);
-      if(coll)collAdd({t:"b",x,y,h:a,hl:len/2,hw:0.18,z0:z0-0.3,z1:z0+Math.max(h,1.4),what:what||"a wall"})};
-    const arc=(yc,r,a0,a1,z0,h)=>{const n=Math.ceil(Math.abs(a1-a0)*r/1.2);for(let i=0;i<n;i++){const p=a0+(a1-a0)*i/n,q=a0+(a1-a0)*(i+1)/n;wall(G.cx+r*Math.cos(p),yc+r*Math.sin(p),G.cx+r*Math.cos(q),yc+r*Math.sin(q),z0,h,1,"the ramp wall")}};
-    const ri=G.R-G.hw,ro=G.R+G.hw,fh=top+1.05;
-    // the core inside the oval, and the tower's outer wall round the curved ends
-    wall(G.cx-ri,G.ya,G.cx-ri,G.yb,0,fh,1,"the ramp core");wall(G.cx+ri,G.ya,G.cx+ri,G.yb,0,fh,1,"the ramp core");arc(G.ya,ri,-Math.PI,0,0,fh);arc(G.yb,ri,0,Math.PI,0,fh);
-    B(gWall,G.cx,G.ym,fh+0.05,0.1,2*ri,G.yb-G.ya);arc(G.ya,ro,-Math.PI,0,0,fh);arc(G.yb,ro,0,Math.PI,0,fh);
-    // decks meet the tower through one opening each side, on every level
-    for(const x of [G.bx0,G.bx1]){wall(x,G.y0,x,G.ym-G.op,0,fh,1);wall(x,G.ym+G.op,x,G.y1,0,fh,1)}
-    // no driving under the start of a ramp, or off the end of the top one
-    const yb_=G.op+0.5;wall(G.bx0,G.ym+yb_,G.bx0+2*G.hw,G.ym+yb_,0,2.35,1,"the ramp");wall(G.bx1-2*G.hw,G.ym-yb_,G.bx1,G.ym-yb_,0,2.35,1,"the ramp");
-    wall(G.bx0,G.ym-yb_,G.bx0+2*G.hw,G.ym-yb_,top,1.1,1);wall(G.bx1-2*G.hw,G.ym+yb_,G.bx1,G.ym+yb_,top,1.1,1);
-    for(let k=1;k<G.L;k++)B(gLight,G.cx,G.ym,k*G.H-0.36,0.06,1.2,6);
-    for(let k=0;k<G.L;k++){const z=k*G.H,h=k===0?1.1:1.05,zz=k===0?0:z-0.3,hh=k===0?h:h+0.3;
-      if(k===0){wall(G.x0,G.y1,G.ent[0],G.y1,zz,hh,1);wall(G.ent[1],G.y1,G.x1,G.y1,zz,hh,1);B(gBlue,(G.ent[0]+G.ent[1])/2,G.y1+0.2,2.6,1.4,4.2,0.12)}
-      else wall(G.x0,G.y1,G.x1,G.y1,zz,hh,1);
-      wall(G.x0,G.y0,G.x1,G.y0,zz,hh,1);wall(G.x0,G.y0,G.x0,G.y1,zz,hh,1);wall(G.x1,G.y0,G.x1,G.y1,zz,hh,1);
-      for(const [a,b] of dkW){if(k>0)for(let x=a+4;x<b-2;x+=8)for(const y of [G.y1-11,G.y0+11])B(gLight,x,y,z-0.36,0.06,1.2,0.25);
-        for(let x=a+1.2;x<b-1;x+=2.7)for(const y of [G.y1-2.9,G.y0+2.9])B(stall,x,y,z+0.012,0.012,0.12,5.4)}}
-    for(const [a,b] of dkW)for(let x=a+4;x<b;x+=8)for(const y of [G.ym+6,G.ym-6]){   // two lines of columns down the middle of the aisle, clear of the stall mouths and the ramp openings
-B(gWall,x,y,0,top+1.05,0.5,0.5);collAdd({t:"c",x,y,r:0.35,what:"a pillar"})}
-    // the driveway apron in from Fort St, lane arrows, and a clearance bar with the height on it
-    {const xc=(G.ent[0]+G.ent[1])/2,ya=-156,yb=G.y1;B(drive,xc,(ya+yb)/2,-0.01,0.03,G.ent[1]-G.ent[0]+4,Math.abs(yb-ya));
-      for(const [x,dir] of [[G.ent[0]+3,1],[G.ent[1]-3,-1]]){B(signW,x,(ya+yb)/2,0.02,0.01,0.2,2.2);B(signW,x-0.35,(ya+yb)/2+dir*0.9,0.02,0.01,0.2,0.6);B(signW,x+0.35,(ya+yb)/2+dir*0.9,0.02,0.01,0.2,0.6)}
-      for(const sx of [G.ent[0]-1.2,G.ent[1]+1.2]){B(post,sx,yb+1.2,0,2.5,0.12,0.12);collAdd({t:"c",x:sx,y:yb+1.2,r:0.1})}B(signK,xc,yb+1.2,2.1,0.25,G.ent[1]-G.ent[0]+2.4,0.12);
-      B(signGW,xc,yb+1.12,2.15,0.18,1.6,0.02)}
-    // ticket island between the in and out lanes, with a ticket machine and a pay machine
-    B(gWall,G.isl,G.gy,0,0.15,1.0,5);collAdd({t:"b",x:G.isl,y:G.gy,h:Math.PI/2,hl:2.5,hw:0.5,z0:-0.3,z1:1.4,what:"the ticket island"});
-    for(const [x,y] of [[G.isl-0.25,G.gy+1.3],[G.isl+0.25,G.gy-1.3]]){B(gBlue,x,y,0.15,1.25,0.45,0.4);B(gLight,x+(x<G.isl?-0.231:0.231),y,0.95,0.012,0.22,0.18)}
+  // ---- parking garage on Fort St: a 2-bay double-threaded helix. Both bays are ramps on every floor, flat turn landings at the ends
+  {const G=GAR,top=G.top,H=G.H,cy=(G.y0+G.y1)/2,W=G.x1-G.x0,D=G.y1-G.y0,yA0=G.ym+G.cw,yB1=G.ym-G.cw;
+    const Q=(m,ps,n)=>{const k=m.P.length/3;for(const [x,y,z] of ps){m.P.push(x,z,-y);m.N.push(n[0],n[1],n[2])}m.I.push(k,k+1,k+2,k,k+2,k+3)};
+    // a box that slopes along x: top from zA (at xA) to zB (at xB), th thick, between ya and yb
+    const sbox=(m,xA,xB,ya,yb,zA,zB,th)=>{const sl=(zB-zA)/(xB-xA),nl=Math.hypot(sl,1),nt=[-sl/nl,1/nl,0];
+      Q(m,[[xA,ya,zA],[xB,ya,zB],[xB,yb,zB],[xA,yb,zA]],nt);Q(m,[[xA,ya,zA-th],[xA,yb,zA-th],[xB,yb,zB-th],[xB,ya,zB-th]],[-nt[0],-nt[1],0]);
+      Q(m,[[xA,ya,zA],[xA,ya,zA-th],[xB,ya,zB-th],[xB,ya,zB]],[0,0,1]);Q(m,[[xA,yb,zA],[xB,yb,zB],[xB,yb,zB-th],[xA,yb,zA-th]],[0,0,-1]);
+      Q(m,[[xA,ya,zA],[xA,yb,zA],[xA,yb,zA-th],[xA,ya,zA-th]],[-1,0,0]);Q(m,[[xB,ya,zB],[xB,ya,zB-th],[xB,yb,zB-th],[xB,yb,zB]],[1,0,0])};
+    // a wall along x that follows a ramp (z at each end), h high, with collision in 3 m pieces
+    const swall=(xA,xB,y,zA,zB,h,what)=>{sbox(gWall,xA,xB,y-0.15,y+0.15,zA+h,zB+h,h);const n=Math.max(1,Math.ceil((xB-xA)/3));
+      for(let i=0;i<n;i++){const a=xA+(xB-xA)*i/n,b=xA+(xB-xA)*(i+1)/n,za=zA+(zB-zA)*i/n,zb=zA+(zB-zA)*(i+1)/n;collAdd({t:"b",x:(a+b)/2,y,h:0,hl:(b-a)/2,hw:0.18,z0:Math.min(za,zb)-0.3,z1:Math.max(za,zb)+Math.max(h,1.4),what:what||"a wall"})}};
+    const wallX=(x,ya,yb,z0,h,what)=>{B(gWall,x,(ya+yb)/2,z0,h,0.3,yb-ya);collAdd({t:"b",x,y:(ya+yb)/2,h:Math.PI/2,hl:(yb-ya)/2,hw:0.18,z0:z0-0.3,z1:z0+Math.max(h,1.4),what:what||"a wall"})};
+    const wallY=(xa,xb,y,z0,h,what)=>swall(xa,xb,y,z0,z0,h,what);
+    B(gSlab,(G.x0+G.x1)/2,cy,0.002,0.02,W,D);
+    // turn landings at both ends, one on every level
+    for(let n=1;n<=G.T;n++)for(const [a,b] of [[G.x0,G.xa],[G.xb,G.x1]])B(gSlab,(a+b)/2,cy,n*H-0.3,0.3,b-a,D);
+    // the ramps: the north bay climbs a level going east, the south bay a level going west, on every floor (the lowest pair is solid fill)
+    for(let n=0;n<G.T;n++)for(const bay of [1,0]){const zA=garZ(bay,n,G.xa),zB=garZ(bay,n,G.xb),ya=bay?yA0:G.y0,yb=bay?G.y1:yB1;sbox(gSlab,G.xa,G.xb,ya,yb,zA,zB,n===0?Math.max(zA,zB)+0.05:0.3)}
+    // outer parapets on every ramp and landing, and the ground-floor walls with the two entrances in the north side
+    for(let n=0;n<G.T;n++){swall(G.xa,G.xb,G.y1-0.15,garZ(1,n,G.xa),garZ(1,n,G.xb),1.05);swall(G.xa,G.xb,G.y0+0.15,garZ(0,n,G.xa),garZ(0,n,G.xb),1.05)}
+    for(let n=0;n<=G.T;n++){const z=n*H,h=n?1.05:1.1;wallX(G.x0+0.15,G.y0,G.y1,z,h);wallX(G.x1-0.15,G.y0,G.y1,z,h);
+      wallY(G.x0,G.xa,G.y0+0.15,z,h);wallY(G.xb,G.x1,G.y0+0.15,z,h);
+      if(n===0){wallY(G.x0,G.wIn[0],G.y1-0.15,0,h);wallY(G.wIn[1],G.xa,G.y1-0.15,0,h);wallY(G.xb,G.eIn[0],G.y1-0.15,0,h);wallY(G.eIn[1],G.x1,G.y1-0.15,0,h)}
+      else{wallY(G.x0,G.xa,G.y1-0.15,z,h);wallY(G.xb,G.x1,G.y1-0.15,z,h)}
+      for(const x of [G.x0+0.32,G.x1-0.32])B(gBlue,x,cy,z+1.15,0.32,0.06,D*0.6)}   // a coloured band on the end walls marks each level
+    // the spine wall between the bays, and walls where a bay has no ramp to meet (under the lowest ramps, and at the top)
+    B(gWall,(G.xa+G.xb)/2,G.ym,0,top+1.05,G.Lr,2*G.cw);collAdd({t:"b",x:(G.xa+G.xb)/2,y:G.ym,h:0,hl:G.Lr/2,hw:G.cw+0.03,z0:-0.3,z1:99,what:"the centre wall"});
+    wallX(G.xa,G.y0,yB1,0,H-0.3,"the ramp");wallX(G.xb,yA0,G.y1,0,H-0.3,"the ramp");wallX(G.xa,yA0,G.y1,top,1.05);wallX(G.xb,G.y0,yB1,top,1.05);
+    // columns along the outside walls, every three stalls
+    for(let x=G.xa+0.3;x<=G.xb+0.1;x+=8.1)for(const y of [G.y1-0.3,G.y0+0.3]){B(gWall,x,y,0,top+1.05,0.5,0.5);collAdd({t:"c",x,y,r:0.3,what:"a pillar"})}
+    // stall lines on every ramp, both sides of each aisle (lines run across the slope, so they sit level)
+    for(let n=0;n<G.T;n++)for(const bay of [1,0])for(let x=G.xa+0.3;x<=G.xb-0.3;x+=2.7){const z=garZ(bay,n,x)+0.014;
+      for(const y of bay?[G.y1-0.3-2.6,yA0+2.6]:[G.y0+0.3+2.6,yB1-2.6])B(stall,x,y,z,0.012,0.12,5.2)}
+    // lights under every slab: down the aisles of the ramps, and across the landings
+    for(let n=1;n<=G.T;n++){for(const bay of [1,0])if(n<G.T)for(let x=G.xa+4;x<G.xb;x+=8)B(gLight,x,bay?G.ayA:G.ayB,garZ(bay,n,x)-0.36,0.06,1.2,0.25);
+      for(const xc of [(G.x0+G.xa)/2,(G.xb+G.x1)/2])for(const y of [G.ayA,G.ym,G.ayB])B(gLight,xc,y,n*H-0.36,0.06,1.2,0.25)}
+    // the two driveways in from Fort St, lane arrows, ticket islands, and clearance bars with the height on them
+    for(const [a,b] of [G.wIn,G.eIn]){const xc=(a+b)/2,ya=-156,yb=G.y1;B(drive,xc,(ya+yb)/2,-0.01,0.03,b-a+4,Math.abs(yb-ya));
+      for(const [x,dir] of [[a+2,1],[b-2,-1]]){B(signW,x,(ya+yb)/2,0.02,0.01,0.2,2.2);B(signW,x-0.35,(ya+yb)/2+dir*0.9,0.02,0.01,0.2,0.6);B(signW,x+0.35,(ya+yb)/2+dir*0.9,0.02,0.01,0.2,0.6)}
+      for(const sx of [a-0.5,b+0.5]){B(post,sx,yb+0.6,0,2.5,0.12,0.12);collAdd({t:"c",x:sx,y:yb+0.6,r:0.1})}B(signK,xc,yb+0.6,2.1,0.25,b-a+1.2,0.12);B(signGW,xc,yb+0.52,2.15,0.18,1.6,0.02);
+      B(gBlue,xc,G.y1+0.2,2.6,1.4,b-a,0.12);
+      B(gWall,xc,G.gy,0,0.15,1.0,5);collAdd({t:"b",x:xc,y:G.gy,h:Math.PI/2,hl:2.5,hw:0.5,z0:-0.3,z1:1.4,what:"the ticket island"});
+      for(const [x,y] of [[xc-0.25,G.gy+1.3],[xc+0.25,G.gy-1.3]]){B(gBlue,x,y,0.15,1.25,0.45,0.4);B(gLight,x+(x<xc?-0.231:0.231),y,0.95,0.012,0.22,0.18)}}
     BLD_LIST.push([(G.x0+G.x1)/2,(G.y0+G.y1)/2,(G.x1-G.x0)/2,(G.y1-G.y0)/2])}
   stationInto(pad,chg,stall);
   {const Bx=(m,S,a,b,z0,h,la,lb,coll)=>{const [x,y]=xLocal(S,a,b),yaw=Math.atan2(S.U[1],S.U[0]);boxInto(m,x,z0+h/2,-y,la,h,lb,yaw);if(coll)collAdd({t:"b",x,y,h:yaw,hl:la/2,hw:lb/2,what:coll})};
@@ -5235,8 +5235,9 @@ function spawnParked(){parked=[];const K=PARK;let i=0;
   for(let s=K.s0+3.4;s<K.s1-2.5;s+=6.4,i++){if(i===4||i===10)continue;parked.push({e:K.e,dir:K.dir,s,off:K.oP,offT:K.oP,head:0,v:0,spin:0,sig:0,kind:"parked",paint:TRAFFIC_PAINTS[(i*5)%TRAFFIC_PAINTS.length]})}
   for(const p of parked)carPose(p);
   {let sd=5;const r=()=>(sd=(sd*16807)%2147483647)/2147483647;let n=0;
-   for(const t of garStalls()){const x=t.x,y=t.y,k=t.k,h=t.uy>0?-Math.PI/2:Math.PI/2;if(r()>0.2||n>=22)continue;n++;
-     parked.push({fixed:true,kind:"parked",wx:x,wy:y,wh:h+(r()<0.5?Math.PI:0),wz:k*GAR.H,v:0,spin:0,sig:0,head:0,paint:TRAFFIC_PAINTS[Math.floor(r()*TRAFFIC_PAINTS.length)]})}}}
+   for(const t of garStalls()){const x=t.x,y=t.y,h=(t.uy>0?Math.PI/2:-Math.PI/2)+(r()<0.5?Math.PI:0);if(r()>0.22||n>=30)continue;n++;
+     const P={fixed:true,kind:"parked",wx:x+t.uy*0,wy:y,wh:h,wz:t.z,v:0,spin:0,sig:0,head:0,paint:TRAFFIC_PAINTS[Math.floor(r()*TRAFFIC_PAINTS.length)]};
+     {const ro=Math.atan(t.sl),M=carMatrix(0,0,h,0,0,ro),q=M4.p(M,[1,0,0]);P.wr=Math.abs(q[1]-t.sl*q[0])<Math.abs(-q[1]-t.sl*q[0])?ro:-ro}parked.push(P)}}}
 buildWorld();spawnParked();
 // load the 3D accessories ahead of time, one at a time while nothing else is happening, so fitting a roof rack (or a
 // box, kayak or bikes) never stalls a frame while you drive
@@ -6191,7 +6192,7 @@ function dynBuild(eye,cm){if(dynFrame===GFX.frame)return;dynFrame=GFX.frame;CHAR
     if(charQueue(p.mk,p.wx,p.wy,p.wz||0,p.wh,Math.abs(p.v??1.2),p.sd)){if(p.dog){const c=Math.cos(p.wh),s_=Math.sin(p.wh);charQueue(p.dog,p.wx+c*0.9-s_*0.5,p.wy+s_*0.9+c*0.5,p.wz||0,p.wh,Math.abs(p.v??1.2),p.sd+0.3)}continue}}personInto(p.wx,p.wy,p.wz,p.wh,p.ph,p,p.mode==="down"?"down":"walk")}
   for(const c of cars){if(!near(c.wx,c.wy,220))continue;if(c.kind==="bike")riderInto(c);else if(c.kind==="cone")coneInto(c)}
   for(const d of EV.crit)if(near(d.wx,d.wy,250))deerInto(d);
-  if(near(GAR.isl,GAR.gy,160))for(const g of Object.values(GATE)){const px=GAR.isl+(g.dir<0?-0.42:0.42),py=GAR.gy+(g.dir<0?0.25:-0.25),yaw=g.dir<0?Math.PI:0,ca=Math.cos(g.a),sa=Math.sin(g.a);
+  for(const g of Object.values(GATE)){if(!near(g.isl,g.gy,160))continue;const px=g.isl+(g.dir<0?-0.42:0.42),py=g.gy+(g.dir<0?0.25:-0.25),yaw=g.dir<0?Math.PI:0,ca=Math.cos(g.a),sa=Math.sin(g.a);
     oBox("gateP",px,py,0.6,0.32,0.32,1.2,yaw,0);for(let i=0;i<6;i++){const d=0.35+0.75*i+0.375;oBox(i%2?"gateR":"gateW",px+g.dir*d*ca,py,1.05+d*sa,0.75,0.07,0.09,yaw,-g.a)}}
   koDraw();dmgSmoke();
   // broken-down cars: bonnet up and the driver standing by the kerb side
@@ -6767,7 +6768,7 @@ function placeTest(kind){
     toast("Main St parking: park assist is searching. Creep forward; when it finds a space, stop and tap Park");return}
   if(kind==="pullin"){closeDrawer();if(!has("autopark")){toast("Needs the Parking Pack (☰ › Car › Rebuild)");return}
     const p=fpt(PAD.e,PAD.dir,PAD.s0-60,-LANE);resetCar({x:p[0],y:p[1],h:p[2],k:-1});st.parkAssist=true;PA.mode="perp";PA.side=1;PA.found=false;toast("Roll toward the plaza: park assist offers a charger bay, then tap Park");return}
-  if(kind==="stall"){closeDrawer();if(!has("autopark")){toast("Needs park assist");return}resetCar({free:true,x:GAR.x0+6,y:GAR.y0+12.5,h:0});car.vx=0;st.gear="D";st.parkAssist=true;PA.mode="perp";PA.side=1;PA.found=false;
+  if(kind==="stall"){closeDrawer();if(!has("autopark")){toast("Needs park assist");return}resetCar({free:true,x:GAR.x0+5,y:GAR.ayA+0.8,h:0});car.vx=0;st.gear="D";st.parkAssist=true;PA.mode="perp";PA.side=1;PA.found=false;
     cars=cars.filter(c=>c.kind==="ai"&&Math.hypot(c.wx-car.px,c.wy-car.py)>60);toast("Parking garage: creep along the aisle, it looks for a free stall on your right (signal left for the other side)");return}
   if(kind==="pedestrian"){closeDrawer();resetCar(STARTS.city);car.vx=12;st.started=true;setTimeout(()=>{if(!jaywalk(30,60))toast("No sidewalk here")},2500);toast("Main St at 27 mph: someone will step out ahead. Let AEB stop you");return}
   if(kind==="deer"){closeDrawer();resetCar(STARTS.hwy);car.vx=27;setTimeout(()=>startEvent("deer"),2200);toast("Hwy 7 at 60 mph: a deer will run across. Watch AEB");return}
@@ -6914,7 +6915,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(/SwiftShader|llvmpipe|Microsoft Basic/i.test(gpu))return "low";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="55";try{if(localStorage.getItem("strata.ver")!==APP_VER){for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="56";try{if(localStorage.getItem("strata.ver")!==APP_VER){for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){return GQ[GFX.q==="auto"?GFX.eff:GFX.q]}
 function setGfx(q){GFX.q=q;GFX.dyn=1;try{localStorage.setItem("strata.gfx",q)}catch(e){}}
@@ -6979,8 +6980,11 @@ function invSteer(dF){const sIn=clamp(-dF/0.576,-1,1),a=Math.abs(sIn);return Mat
 // ======================================================================= park assist: pick Parallel / Perpendicular / Park exit, it searches while you creep along,
 // then steers, shifts, accelerates and brakes by itself. Touch the pedals or the steering to take over.
 const PA={mode:null,side:1,found:false};
-var GSTALLS=null;function garStalls(){if(GSTALLS)return GSTALLS;const S=[];for(let k=0;k<GAR.L;k++)for(const [a,b] of [[GAR.x0,GAR.bx0],[GAR.bx1,GAR.x1]])for(let x=a+2.55;x<b-1.5;x+=2.7){if(k===0&&x>GAR.ent[0]-1.5&&x<GAR.ent[1]+1.5){S.push({x,y:GAR.y0+2.9,ux:0,uy:-1,k});continue}S.push({x,y:GAR.y1-2.9,ux:0,uy:1,k});S.push({x,y:GAR.y0+2.9,ux:0,uy:-1,k})}return GSTALLS=S}
-function stallFree(t){return !parked.some(p=>p.fixed&&Math.abs(p.wx-t.x)<1.2&&Math.abs(p.wy-t.y)<2.2&&Math.abs((p.wz||0)-t.k*GAR.H)<1)&&!cars.some(c=>c.wx!==undefined&&Math.hypot(c.wx-t.x,c.wy-t.y)<2.6)}
+var GSTALLS=null;function garStalls(){if(GSTALLS)return GSTALLS;const G=GAR,S=[];   // stalls both sides of each bay, on every ramp; z follows the ramp
+  for(let n=0;n<G.T;n++)for(const bay of [1,0])for(let x=G.xa+1.35+0.3;x<G.xb-1.2;x+=2.7){const yo=bay?G.y1-2.95:G.y0+2.95,yi=bay?G.ym+G.cw+2.95:G.ym-G.cw-2.95,z=garZ(bay,n,x),sl=bay?G.slope:-G.slope;
+    S.push({x,y:yo,ux:0,uy:bay?1:-1,k:n,z,sl,bay});S.push({x,y:yi,ux:0,uy:bay?-1:1,k:n,z,sl,bay})}
+  return GSTALLS=S}
+function stallFree(t){return !parked.some(p=>p.fixed&&Math.abs(p.wx-t.x)<1.2&&Math.abs(p.wy-t.y)<2.2&&Math.abs((p.wz||0)-t.z)<1)&&!cars.some(c=>c.wx!==undefined&&Math.hypot(c.wx-t.x,c.wy-t.y)<2.6)}
 const rearAx=()=>[car.px-Math.cos(car.psi)*B,car.py-Math.sin(car.psi)*B];
 function cumOf(p){const c=[0];for(let i=1;i<p.length;i++)c.push(c[i-1]+Math.hypot(p[i][0]-p[i-1][0],p[i][1]-p[i-1][1]));return c}
 // pure pursuit about the rear axle; the same steering law works going forward and in reverse
@@ -6988,7 +6992,7 @@ function ppSteer(A,pts,cum,Ld){const r=rearAx();let best=A.idx,bd=1e9;for(let i=
   let tI=best;while(tI<pts.length-1&&cum[tI]-cum[best]<Ld)tI++;const q=pts[tI],dx=q[0]-r[0],dy=q[1]-r[1],c=Math.cos(car.psi),s=Math.sin(car.psi),lx=dx*c+dy*s,ly=-dx*s+dy*c,L2=Math.max(lx*lx+ly*ly,1);
   const d=Math.atan(2*ly/L2*WB);return {steer:invSteer(clamp(d,-0.56,0.56)),left:cum[cum.length-1]-cum[best],d}}
 // ---- smarter perpendicular parking: every stall nearby (garage decks and the parking lots), both sides, a path checked for clearance, and up to 3 corrections
-function perpSpots(){const out=[];if(inGarage(car.px,car.py)){const lvl=Math.round((car.zb||0)/GAR.H);for(const t of garStalls())if(t.k===lvl)out.push({...t,z:t.k*GAR.H})}
+function perpSpots(){const out=[];if(inGarage(car.px,car.py)){for(const t of garStalls())if(Math.abs(t.z-(car.zb||0))<1.3)out.push({...t})}
   for(const S of XSITES){if(S.kind!=="lot"||Math.hypot(S.x-car.px,S.y-car.py)>Math.max(S.L,S.D))continue;
     if(S.custom){for(const t of S.stalls||[])if(Math.hypot(t.p[0]-car.px,t.p[1]-car.py)<45)out.push({x:t.p[0],y:t.p[1],ux:Math.cos(t.h),uy:Math.sin(t.h),k:0,z:0});continue}
     const b1=-S.D/2+8,b2=S.D/2-2.9;for(let a=-S.L/2+2.75;a<S.L/2-1.4;a+=2.7){const p1=xLocal(S,a,b1),p2=xLocal(S,a,b2);out.push({x:p1[0],y:p1[1],ux:-S.N[0],uy:-S.N[1],k:0,z:0});out.push({x:p2[0],y:p2[1],ux:S.N[0],uy:S.N[1],k:0,z:0})}}
@@ -7123,7 +7127,7 @@ function paTopView(g,W,H){const sc=Math.min(W,H)/16.5,c=Math.cos(car.psi),sn=Mat
   const box=(x,y,h,l,w,col)=>{const p=P(x,y);g.save();g.translate(p[0],p[1]);g.rotate(-(h-car.psi));g.fillStyle=col;g.fillRect(-w*sc/2,-l*sc/2,w*sc,l*sc);g.restore()};
   const lvl=Math.round((car.zb||0)/GAR.H);
   if(PA.mode==="perp")for(const t of perpSpots()){if(Math.hypot(t.x-car.px,t.y-car.py)>14)continue;const p=P(t.x,t.y);g.strokeStyle="rgba(200,220,222,.35)";g.lineWidth=1;box(t.x,t.y,Math.atan2(t.uy,t.ux),5.6,2.6,"rgba(255,255,255,.04)")}
-  for(const p of parked){if(p.wx===undefined||Math.hypot(p.wx-car.px,p.wy-car.py)>14||(p.fixed&&Math.abs((p.wz||0)-lvl*GAR.H)>1))continue;box(p.wx,p.wy,p.wh,4.6,1.9,"#5d6b70")}
+  for(const p of parked){if(p.wx===undefined||Math.hypot(p.wx-car.px,p.wy-car.py)>14||(p.fixed&&Math.abs((p.wz||0)-(car.zb||0))>1.5))continue;box(p.wx,p.wy,p.wh,4.6,1.9,"#5d6b70")}
   const S=sys.paSpot;if(S&&S.type==="perp")box(S.t.x,S.t.y,Math.atan2(S.t.uy,S.t.ux),5.2,2.4,"rgba(85,214,140,.55)");
   if(S&&S.type==="par"){const q=fpt(PARK.e,PARK.dir,S.s,PARK.oP);box(q[0],q[1],q[2],S.len,2.1,"rgba(85,214,140,.55)")}
   g.fillStyle="#e8eef0";g.fillRect(W/2-VEH.width*sc/2,H/2+16-VEH.len*sc/2,VEH.width*sc,VEH.len*sc);g.fillStyle="#35c2bf";g.fillRect(W/2-VEH.width*sc/2+3,H/2+16-VEH.len*sc/2+4,VEH.width*sc-6,8);
@@ -7327,19 +7331,19 @@ const BSTEPS={Toyota:["Model","Grade","Color","Packages","Summary"],Lexus:["Mode
 function gateFee(){const T=st.ticket;if(!T)return {usd:25,txt:"Lost ticket · $25.00"};const min=(Date.now()-T.t0)/60000;if(min<15)return {usd:0,txt:`${Math.max(1,Math.round(min))} min · free (under 15 min)`};
   const usd=Math.min(18,3*Math.ceil(min/60));return {usd,txt:`${min<60?Math.round(min)+" min":(min/60).toFixed(1)+" h"} · $${usd.toFixed(2)}`}}
 function gateAct(k){const g=GATE[k];if(g.open)return;const clk=gDate().toLocaleTimeString([],{hour:"numeric",minute:"2-digit"});
-  if(k==="entry"){st.ticket={t0:Date.now(),n:1000+Math.floor(Math.random()*9000),clk};beep(1800,.06,"square",.1);setTimeout(()=>beep(1800,.06,"square",.1),120);toast(`Ticket #${st.ticket.n} · in at ${clk}. Pay on the way out`);logResult(`Garage: took ticket #${st.ticket.n}`)}
+  if(k.startsWith("entry")){st.ticket={t0:Date.now(),n:1000+Math.floor(Math.random()*9000),clk};beep(1800,.06,"square",.1);setTimeout(()=>beep(1800,.06,"square",.1),120);toast(`Ticket #${st.ticket.n} · in at ${clk}. Pay on the way out`);logResult(`Garage: took ticket #${st.ticket.n}`)}
   else{const f=gateFee();beep(1500,.08,"sine",.12);toast(f.usd?`Paid $${f.usd.toFixed(2)} (${f.txt.split(" · ")[0]}). Thank you`:"No charge. Thank you");logResult(`Garage: paid ${f.usd?"$"+f.usd.toFixed(2):"nothing"}${st.ticket?"":" (lost ticket)"}`);st.ticket=null}
   g.open=true;g.t=0;g.wait=0}
 $("gateBtn").addEventListener("click",()=>{if(MP.gp){gateAct(MP.gp);MP.gp=null;$("gateBtn").hidden=true}});
 function gateTick(dt){const G=GAR;let prompt=null;
   for(const g of Object.values(GATE)){g.a+=clamp((g.open?1.4:0)-g.a,-1.5*dt,1.5*dt);if(g.open){g.t+=dt;if(g.t>30)g.open=false}}
-  if(st.started&&!st.walk&&Math.abs(car.px-G.isl)<14&&Math.abs(car.py-G.gy)<12&&(car.zb||0)<1){const c=Math.cos(car.psi),s=Math.sin(car.psi),fy=car.py+s*BODY_HL,ry=car.py-s*BODY_HL,ymin=Math.min(fy,ry),ymax=Math.max(fy,ry);
-    for(const [k,g] of Object.entries(GATE)){if(car.px<g.x0-0.7||car.px>g.x1+0.7)continue;
-      if(g.open&&g.t>1.5&&(k==="entry"?ymax<G.gy-0.8:ymin>G.gy+0.8))g.open=false;
-      if(g.a<0.6&&ymin<G.gy+0.06&&ymax>G.gy-0.06){const push=car.py>G.gy?(G.gy+0.08)-ymin:(G.gy-0.08)-ymax;car.py+=push;const v=Math.abs(car.vx);car.vx=0;if(car.vy)car.vy=0;crashFx(v,"the gate arm")}
-      const before=k==="entry"?ymin>G.gy:ymax<G.gy,dist=k==="entry"?ymin-G.gy:G.gy-ymax;
-      if(before&&!g.open&&dist<5){prompt=k;g.wait=Math.abs(car.vx)<0.2?(g.wait||0)+dt:0;if(g.wait>2.5&&k==="entry")gateAct(k)}}}
-  const b=$("gateBtn");if(!b)return;if(prompt!==MP.gp){MP.gp=prompt;b.hidden=!prompt;if(prompt)b.innerHTML=prompt==="entry"?"🎫 Take ticket":`💳 Pay · ${gateFee().txt}`}}
+  if(st.started&&!st.walk&&(car.zb||0)<1){const c=Math.cos(car.psi),s=Math.sin(car.psi),fy=car.py+s*BODY_HL,ry=car.py-s*BODY_HL,ymin=Math.min(fy,ry),ymax=Math.max(fy,ry);
+    for(const [k,g] of Object.entries(GATE)){if(Math.abs(car.px-g.isl)>14||Math.abs(car.py-g.gy)>12)continue;if(car.px<g.x0-0.7||car.px>g.x1+0.7)continue;const ent=k.startsWith("entry"),gy=g.gy;
+      if(g.open&&g.t>1.5&&(ent?ymax<gy-0.8:ymin>gy+0.8))g.open=false;
+      if(g.a<0.6&&ymin<gy+0.06&&ymax>gy-0.06){const push=car.py>gy?(gy+0.08)-ymin:(gy-0.08)-ymax;car.py+=push;const v=Math.abs(car.vx);car.vx=0;if(car.vy)car.vy=0;crashFx(v,"the gate arm")}
+      const before=ent?ymin>gy:ymax<gy,dist=ent?ymin-gy:gy-ymax;
+      if(before&&!g.open&&dist<5){prompt=k;g.wait=Math.abs(car.vx)<0.2?(g.wait||0)+dt:0;if(g.wait>2.5&&ent)gateAct(k)}}}
+  const b=$("gateBtn");if(!b)return;if(prompt!==MP.gp){MP.gp=prompt;b.hidden=!prompt;if(prompt)b.innerHTML=prompt.startsWith("entry")?"🎫 Take ticket":`💳 Pay · ${gateFee().txt}`}}
 
 // ---- things you can knock down: signs, poles and (hit hard enough) trees. The standing one is hidden in the world mesh and a falling copy takes its place
 function knockDown(o,kind,dir){if(KO.list.filter(k=>k.kind!=="sign").length>=10&&kind!=="sign")return false;const tp=kind==="tree"?TREEP.get(Math.round(o.x*2)+","+Math.round(o.y*2)):null;
