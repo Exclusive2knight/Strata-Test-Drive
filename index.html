@@ -594,6 +594,46 @@ body.ui2.sbOpen.pc #sensorBox{bottom:150px}
 @media (max-height:440px){#ph2{height:94vh;right:calc(env(safe-area-inset-right,0px) + 54px)}#ph2 .pX{left:-42px}}
 
 body.onfoot #ui2 .u2mid,body.onfoot #ui2 #u2start,body.onfoot #ui2 #u2arrows,body.onfoot #pedals,body.onfoot #ui2 .u2row,body.onfoot #ui2 #u2msg,body.onfoot #ui2 .u2right,body.onfoot #ui2 #u2gearpop,body.onfoot.sbOpen #sensorBox{display:none!important}
+/* ---- settings, v54: one clean layout. A card with the tabs down the left, options in an even grid; full screen on phones */
+body #drawer{display:flex!important;justify-content:center!important;align-items:center!important;background:rgba(4,6,12,.6)!important;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+body #drawer[hidden]{display:none!important}
+body #drawer #panel{display:grid!important;grid-template-columns:184px minmax(0,1fr)!important;grid-template-rows:auto minmax(0,1fr)!important;width:min(940px,95vw)!important;height:min(640px,92vh)!important;
+  background:#11131c!important;border:1px solid rgba(255,255,255,.09)!important;border-radius:22px!important;overflow:hidden;box-shadow:0 30px 90px rgba(0,0,0,.6);color:#eef0f6}
+body #drawer #panel header{grid-column:1/-1!important;display:flex!important;align-items:center;gap:10px;padding:12px 16px!important;border-bottom:1px solid rgba(255,255,255,.07)!important}
+body #drawer #panel header strong{font:700 18px/1 Inter,system-ui,sans-serif!important;letter-spacing:0!important;white-space:nowrap;margin-right:6px}
+body #drawer #setSearch{flex:1;min-width:60px;max-width:340px;height:36px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:inherit;padding:0 12px;font:500 14px Inter,system-ui,sans-serif;outline:none}
+body #drawer #setSearch:focus{border-color:var(--teal)}
+body #drawer #panel header #redo{margin-left:auto!important;margin-right:0!important;height:36px;padding:0 14px!important;border-radius:10px!important;border:1px solid rgba(255,255,255,.12)!important;background:transparent!important;color:inherit;font:600 13px Inter,system-ui,sans-serif!important;white-space:nowrap}
+body #drawer #panel header #close{height:36px;padding:0 18px!important;border-radius:10px!important;border:0!important;background:var(--teal)!important;color:#04211f!important;font:700 14px Inter,system-ui,sans-serif!important}
+body #drawer #tabs{grid-column:1!important;grid-row:2!important;display:flex!important;flex-direction:column!important;flex-wrap:nowrap!important;gap:2px!important;margin:0!important;padding:10px 8px!important;border:0!important;border-right:1px solid rgba(255,255,255,.07)!important;border-radius:0!important;overflow-y:auto!important;overflow-x:hidden!important;background:rgba(255,255,255,.015)}
+body #drawer #tabs .tab{flex:none!important;text-align:left!important;padding:10px 12px!important;border-radius:10px!important;font:600 14px/1.1 Inter,system-ui,sans-serif!important;letter-spacing:0!important;text-transform:none!important;color:#9aa0b4!important;background:transparent!important;border:0!important}
+body #drawer #tabs .tab:hover{color:#dfe2ec!important;background:rgba(255,255,255,.04)!important}
+body #drawer #tabs .tab.on{color:#fff!important;background:rgba(53,194,191,.16)!important;box-shadow:inset 3px 0 0 var(--teal)}
+body #drawer #tabBody{grid-column:2!important;grid-row:2!important;overflow-y:auto!important;padding:16px 20px calc(env(safe-area-inset-bottom,0px) + 24px)!important}
+body #drawer #tabBody h3{font:700 12px/1 Inter,system-ui,sans-serif!important;letter-spacing:.08em!important;text-transform:uppercase!important;color:#8d93a8!important;margin:22px 0 10px!important}
+body #drawer #tabBody h3:first-child{margin-top:2px!important}
+body #drawer #tabBody .grid2{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(200px,1fr))!important;gap:8px!important}
+body #drawer #tabBody .opt{position:relative;min-height:54px;justify-content:center;padding:11px 14px!important;border-radius:14px!important;border:1px solid rgba(255,255,255,.08)!important;background:rgba(255,255,255,.035)!important;color:inherit;gap:3px!important;transition:border-color .15s,background .15s}
+body #drawer #tabBody .opt[data-tog]{padding-right:58px!important}
+body #drawer #tabBody .opt b{font:600 14px/1.25 Inter,system-ui,sans-serif!important}
+body #drawer #tabBody .opt small{font:400 12px/1.35 Inter,system-ui,sans-serif!important;color:#8d93a8!important}
+body #drawer #tabBody .opt.on{border-color:var(--teal)!important;background:rgba(53,194,191,.1)!important}
+body #drawer #tabBody .opt.on small{color:#a9d9d7!important}
+body #drawer #tabBody .opt:not([data-tog]).on::after{content:"";position:absolute;right:12px;top:12px;width:8px;height:8px;border-radius:50%;background:var(--teal)}
+body #drawer #tabBody .cRow{border-radius:14px!important;border:1px solid rgba(255,255,255,.08)!important;background:rgba(255,255,255,.035)!important;padding:11px 14px!important}
+body #drawer #tabBody .cRow.on{border-color:var(--teal)!important;background:rgba(53,194,191,.1)!important;box-shadow:none!important}
+body #drawer #tabBody .seg5{max-width:520px;border:1px solid rgba(255,255,255,.08)}body #drawer #tabBody .seg5 button.on{background:var(--teal)!important;color:#04211f!important}
+/* phones on their side: full screen, a narrower tab rail */
+@media (max-height:520px){body #drawer #panel{width:100vw!important;height:100vh!important;height:100dvh!important;border-radius:0!important;border:0!important;grid-template-columns:136px minmax(0,1fr)!important;padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+  body #drawer #panel header{padding:8px 12px!important}body #drawer #panel header strong{font-size:16px!important}
+  body #drawer #tabs .tab{padding:8px 10px!important;font-size:13px!important}body #drawer #tabBody{padding:12px 14px 20px!important}
+  body #drawer #tabBody .grid2{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))!important}body #drawer #tabBody .opt{min-height:48px;padding:9px 12px!important}}
+/* upright: tabs become a row along the top */
+@media (orientation:portrait){body #drawer #panel{width:100vw!important;height:100vh!important;height:100dvh!important;border-radius:0!important;grid-template-columns:minmax(0,1fr)!important;grid-template-rows:auto auto minmax(0,1fr)!important}
+  body #drawer #panel header strong{display:none}body #drawer #setSearch{max-width:none}
+  body #drawer #tabs{grid-column:1!important;grid-row:2!important;flex-direction:row!important;overflow-x:auto!important;overflow-y:hidden!important;border-right:0!important;border-bottom:1px solid rgba(255,255,255,.07)!important;scrollbar-width:none}
+  body #drawer #tabs .tab{white-space:nowrap}body #drawer #tabs .tab.on{box-shadow:inset 0 -3px 0 var(--teal)}
+  body #drawer #tabBody{grid-column:1!important;grid-row:3!important}body #drawer #tabBody .grid2{grid-template-columns:1fr 1fr!important}}
 </style>
 
 <canvas id="gl"></canvas>
@@ -734,8 +774,11 @@ body.onfoot #ui2 .u2mid,body.onfoot #ui2 #u2start,body.onfoot #ui2 #u2arrows,bod
 <div id="boot"><div class="bc"><div class="bt">Test Drive</div><div class="bb"><i id="bootBar"></i></div><div class="bs" id="bootMsg">Building the world…</div></div></div>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2>Version 53 · Haptics</h2></div>
+    <div class="nh"><small>What's new</small><h2>Version 54 · Cleaner settings, sharper traffic lights</h2></div>
     <div class="nb">
+      <h4>Settings</h4><ul><li>Settings has a cleaner, evenly spaced layout: the sections run down the left, and the options sit in an even grid on the right. Before, half the window was empty and the options were squeezed into one column.</li><li>The search box, Redo car and Done sit in one tidy bar. Selected options have a teal outline and dot, and the five-step road bars are teal to match.</li><li>On phones held sideways, settings fill the screen with a narrower list of sections. Held upright, the sections become a row across the top.</li></ul>
+      <h4>Fixes</h4><ul><li>Traffic lights no longer flicker or show stripes. The lenses, lit lamps, backplates and their yellow borders no longer fight to be drawn at the same depth, at any distance.</li></ul>
+      <h4 class="old">Version 53 · Haptics</h4>
       <h4>Haptics and vibration</h4><ul><li>Your phone now vibrates when you crash (harder the faster you hit), drop a wheel in a pothole, hit a kerb or a big bump, or drive over rumble strips (faster buzzes the faster you go).</li><li>ABS pulses through the phone when you brake hard enough to lock the wheels. Lane departure warnings shake like a real steering wheel. Forward collision warnings give a double pulse, and automatic emergency braking a long hard buzz.</li><li>Small taps for gear shifts and buttons, and the engine shakes when it cranks (EVs and hybrids give a soft tap).</li><li>New Haptics setting in Settings › Car: Off, Light (only the big moments) or Full. Full is the default on phones.</li><li>Works on Android phones. iPhone browsers only allow a tap when you touch a button; the App Store version would get full haptics.</li></ul>
       <h4 class="old">Version 52 · Real suspension on AI cars</h4>
       <h4>AI suspension</h4><ul><li>Traffic cars now use the same suspension as the cars you drive. Each one gets the suspension of its real model (coil springs, frequency-selective, adaptive, Magnetic Ride or air) with four corner springs and dampers, anti-roll bars and its real weight. Bumps and potholes hit each wheel separately, and soft air-sprung SUVs float while sporty cars stay flat.</li></ul>
@@ -5032,15 +5075,16 @@ function worldScenery(){
         const L_=e.n>=2;
         for(let k=lo;k<=hi;k++){const at=(sideO-1.2)+(hi*LANE+0.9-(sideO-1.2))*0,q=fpt(e,dir,sF-0.05,k*LANE),zc=gz+5.62,armZ=gz+6.45+0.3*((k*LANE-(sideO-1.2))/(hi*LANE+0.9-(sideO-1.2)));
           boxInto(sigH,q[0],zc,-q[1],0.26,1.08,0.36,q[2]);boxInto(sigH,q[0],(zc+0.54+armZ)/2,-q[1],0.07,armZ-zc-0.54,0.07,q[2]);   // housing and hanger
-          boxInto(sigBP,q[0]+fx*0.128,zc,-(q[1]+fy*0.128),0.02,1.3,0.6,q[2]);boxInto(sigY,q[0]+fx*0.146,zc,-(q[1]+fy*0.146),0.02,1.42,0.72,q[2]);   // backplate with its yellow reflective border
-          const lx=q[0]-fx*0.135,ly=q[1]-fy*0.135;
-          for(const dz of [0.35,0,-0.35]){octInto(lens,lx,ly,zc+dz,q[2],0.15,0.012,16,0);visorInto(sigH,lx,ly,zc+dz,q[2],0.172,0.26)}
-          SIGH.push({t:L_&&k===hi?"fya":"ball",x:lx-fx*0.012,y:ly-fy*0.012,h:q[2],z:zc,n,g:l.grp})}
+          {const bx=q[0]+fx*0.14,by=q[1]+fy*0.14,sx=-Math.sin(q[2]),sy=Math.cos(q[2]);boxInto(sigBP,bx,zc,-by,0.02,1.3,0.6,q[2]);
+            boxInto(sigY,bx,zc+0.68,-by,0.02,0.06,0.72,q[2]);boxInto(sigY,bx,zc-0.68,-by,0.02,0.06,0.72,q[2]);for(const sd of [1,-1])boxInto(sigY,bx+sx*0.33*sd,zc,-(by+sy*0.33*sd),0.02,1.3,0.06,q[2])}   // backplate with its yellow reflective border
+          const lx=q[0]-fx*0.15,ly=q[1]-fy*0.15;
+          for(const dz of [0.35,0,-0.35]){octInto(lens,lx,ly,zc+dz,q[2],0.15,0.02,16,0);visorInto(sigH,lx+fx*0.02,ly+fy*0.02,zc+dz,q[2],0.172,0.28)}
+          SIGH.push({t:L_&&k===hi?"fya":"ball",x:lx-fx*0.03,y:ly-fy*0.03,h:q[2],z:zc,n,g:l.grp})}
         // pedestrian signal on the pole for people crossing alongside this traffic, with a push button
         {const px=p[0]-fx*0.3,py=p[1]-fy*0.3,pz=gz+3.0;boxInto(sigH,px,pz,-py,0.2,0.46,0.48,ph);boxInto(sigH,p[0]-fx*0.18,pz,-(p[1]-fy*0.18),0.12,0.08,0.08,ph);
-          boxInto(lens,px-fx*0.101,pz,-(py-fy*0.101),0.004,0.4,0.42,ph);visorInto(sigH,px-fx*0.1,py-fy*0.1,pz-0.03,ph,0.25,0.12,7);
+          boxInto(lens,px-fx*0.11,pz,-(py-fy*0.11),0.012,0.4,0.42,ph);visorInto(sigH,px-fx*0.1,py-fy*0.1,pz-0.03,ph,0.25,0.12,7);
           const bx=p[0]-fx*0.2+Math.sin(ph)*0.0,by=p[1]-fy*0.2;boxInto(sigH,bx,gz+1.05,-by,0.06,0.16,0.11,ph);octInto(sigY,bx-fx*0.035,by-fy*0.035,gz+1.05,ph,0.025,0.012,10,0);
-          SIGH.push({t:"ped",x:px-fx*0.108,y:py-fy*0.108,h:ph,z:pz,n,g:l.grp})}}
+          SIGH.push({t:"ped",x:px-fx*0.135,y:py-fy*0.135,h:ph,z:pz,n,g:l.grp})}}
       else if(n.ctrl==="allstop"||(n.ctrl==="minor"&&!l.major)){const s=e.L-l.r-1.4,p=fpt(e,dir,s,sideO-0.9);B(post,p[0],p[1],0,2.1,0.08,0.08);collAdd({t:"c",x:p[0],y:p[1],r:0.08});
         const hF=p[2]+Math.PI;octInto(stopR,p[0],p[1],2.45,hF,0.42,0.04);const fx=Math.cos(hF)*0.025,fy=Math.sin(hF)*0.025;
         boxInto(signW,p[0]+fx,2.45,-(p[1]+fy),0.02,0.1,0.5,p[2]);if(n.ctrl==="allstop")boxInto(signW,p[0]+fx,1.9,-(p[1]+fy),0.02,0.2,0.5,p[2])}}}
@@ -6272,7 +6316,7 @@ function render(dt){
   gl.enable(gl.POLYGON_OFFSET_FILL);gl.polygonOffset(1,1);mat(st.surface==="snow"?[0.55,0.6,0.65]:[0.05,0.11,0.13],null,1.4,90);draw(SCN.water);gl.disable(gl.POLYGON_OFFSET_FILL);mat([0.62,0.64,0.66],null,0.9,60);draw(SCN.rail);
   mat([0.9,0.9,0.88],night?[0.05,0.05,0.05]:null,0.3,30);draw(SCN.signW);mat([0.03,0.03,0.03],null,0.2,20);draw(SCN.signK);
   mat([0.02,0.24,0.12],null,0.3,30);draw(SCN.signG);mat([0.92,0.94,0.92],night?[0.25,0.25,0.25]:null,0.3,30);draw(SCN.signGW);
-  mat([0.2,0.2,0.21],null,0.3,30);draw(SCN.post);if(SCN.furn){mat([0.12,0.22,0.16],null,0.4,30);draw(SCN.furn)}mat([0.08,0.08,0.085],null,0.3,30);draw(SCN.pole);mat([0.05,0.05,0.048],null,0.35,30);draw(SCN.sigH);mat([0.03,0.03,0.032],null,0.9,80);draw(SCN.lens);if(SCN.sigPole){mat([0.5,0.51,0.5],null,0.5,40);draw(SCN.sigPole);mat([0.035,0.035,0.035],null,0.15,20);draw(SCN.sigBP);mat([0.95,0.78,0.06],[0.12,0.09,0],0.4,30);draw(SCN.sigY)}
+  mat([0.2,0.2,0.21],null,0.3,30);draw(SCN.post);if(SCN.furn){mat([0.12,0.22,0.16],null,0.4,30);draw(SCN.furn)}mat([0.08,0.08,0.085],null,0.3,30);draw(SCN.pole);mat([0.05,0.05,0.048],null,0.35,30);draw(SCN.sigH);gl.enable(gl.POLYGON_OFFSET_FILL);gl.polygonOffset(-1,-4);mat([0.03,0.03,0.032],null,0.9,80);draw(SCN.lens);gl.polygonOffset(0,0);gl.disable(gl.POLYGON_OFFSET_FILL);if(SCN.sigPole){mat([0.5,0.51,0.5],null,0.5,40);draw(SCN.sigPole);mat([0.035,0.035,0.035],null,0.15,20);draw(SCN.sigBP);mat([0.95,0.78,0.06],[0.12,0.09,0],0.4,30);draw(SCN.sigY)}
   mat([0.6,0.04,0.03],null,0.3,30);draw(SCN.stopR);
   mat([0.85,0.87,0.88],null,0.6,40);draw(SCN.chg);
   if(SCN.via){const V=SCN.via;gl.uniformMatrix4fv(U.uM,false,M4.id());mat([0.56,0.56,0.54],null,0.1,10,1,2);draw(V.dk);draw(V.pl);draw(V.cap);mat([0.24,0.3,0.36],null,0.8,50);draw(V.gd);mat([0.62,0.63,0.62],null,0.2,10);draw(V.par);mat([0.3,0.27,0.24],null,0.05,8);draw(V.bl);mat([0.08,0.08,0.085],null,0.1,10);draw(V.xp);mat([0.35,0.33,0.31],null,0.9,60);draw(V.rl)}
@@ -6289,7 +6333,7 @@ function render(dt){
     gl.uniformMatrix4fv(U.uM,false,M4.id());
     [[3.2,0.12,0.06],[3.0,1.7,0.12],[0.25,3.0,1.6],[3.0,1.1,0.15],[2.6,2.7,2.6]].forEach((em,ci)=>{const Bk=BK[ci],o=SCN.lit[ci];o.count=Math.min(Bk.I.length,0);if(!Bk.I.length||Bk.P.length/3>65000)return;o.count=Bk.I.length;
       gl.bindBuffer(gl.ARRAY_BUFFER,o.p);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(Bk.P),gl.DYNAMIC_DRAW);gl.bindBuffer(gl.ARRAY_BUFFER,o.n);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(Bk.N),gl.DYNAMIC_DRAW);
-      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,o.i);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new Uint16Array(Bk.I),gl.DYNAMIC_DRAW);mat([0.3,0.3,0.3],em,0.6,40);draw(o)})}
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,o.i);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new Uint16Array(Bk.I),gl.DYNAMIC_DRAW);mat([0.3,0.3,0.3],em,0.6,40);gl.enable(gl.POLYGON_OFFSET_FILL);gl.polygonOffset(-2,-8);draw(o);gl.polygonOffset(0,0);gl.disable(gl.POLYGON_OFFSET_FILL)})}
   // charger screens
   {const S_=SCN.stn;gl.uniformMatrix4fv(U.uM,false,M4.id());mat([0.86,0.87,0.88],null,0.4,30);draw(S_.canopy);mat([0.75,0.76,0.78],null,0.5,40);draw(S_.pillar);mat([0.3,0.31,0.33],null,0.3,30);draw(S_.island);
     mat([0.12,0.13,0.14],null,0.6,50);draw(S_.pump);mat([0.55,0.53,0.5],null,0.2,20);draw(S_.shop);
@@ -6858,7 +6902,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(/SwiftShader|llvmpipe|Microsoft Basic/i.test(gpu))return "low";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="53";try{if(localStorage.getItem("strata.ver")!==APP_VER){for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="54";try{if(localStorage.getItem("strata.ver")!==APP_VER){for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){return GQ[GFX.q==="auto"?GFX.eff:GFX.q]}
 function setGfx(q){GFX.q=q;GFX.dyn=1;try{localStorage.setItem("strata.gfx",q)}catch(e){}}
