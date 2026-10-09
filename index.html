@@ -634,6 +634,16 @@ body #drawer #tabBody .seg5{max-width:520px;border:1px solid rgba(255,255,255,.0
   body #drawer #tabs{grid-column:1!important;grid-row:2!important;flex-direction:row!important;overflow-x:auto!important;overflow-y:hidden!important;border-right:0!important;border-bottom:1px solid rgba(255,255,255,.07)!important;scrollbar-width:none}
   body #drawer #tabs .tab{white-space:nowrap}body #drawer #tabs .tab.on{box-shadow:inset 0 -3px 0 var(--teal)}
   body #drawer #tabBody{grid-column:1!important;grid-row:3!important}body #drawer #tabBody .grid2{grid-template-columns:1fr 1fr!important}}
+/* builder: your money, and a start button that stands out */
+.cfgTop{display:flex!important;align-items:center;gap:12px;flex-wrap:nowrap;min-width:0}.cfgTop #cfgBrand{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.cfgTop .wn{white-space:nowrap;flex:none}
+#cfgCash{margin-left:auto;flex:none;padding:5px 11px;border-radius:999px;background:rgba(85,214,140,.14);border:1px solid rgba(85,214,140,.35);color:#7fe3a8;font:700 13px/1 Inter,system-ui,sans-serif;white-space:nowrap}
+#cfgHave{display:block;margin-top:2px;font-size:11px!important;color:#7fe3a8!important}#cfgHave.short{color:#ffc46b!important}
+#go.final{display:inline-flex;align-items:center;gap:9px;padding:13px 22px!important;border-radius:999px!important;border:0;
+  background:linear-gradient(135deg,#ffb340,#ff6a3d)!important;color:#1d0d00!important;font:800 16px/1 Inter,system-ui,sans-serif!important;letter-spacing:.01em;
+  box-shadow:0 6px 22px rgba(255,120,60,.45),inset 0 1px 0 rgba(255,255,255,.35);animation:goPulse 2.4s ease-in-out infinite}
+#go.final svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
+#go.final:active{transform:scale(.97)}
+@keyframes goPulse{0%,100%{box-shadow:0 6px 22px rgba(255,120,60,.4),inset 0 1px 0 rgba(255,255,255,.35)}50%{box-shadow:0 6px 30px rgba(255,120,60,.7),inset 0 1px 0 rgba(255,255,255,.35)}}
 </style>
 
 <canvas id="gl"></canvas>
@@ -774,8 +784,10 @@ body #drawer #tabBody .seg5{max-width:520px;border:1px solid rgba(255,255,255,.0
 <div id="boot"><div class="bc"><div class="bt">Test Drive</div><div class="bb"><i id="bootBar"></i></div><div class="bs" id="bootMsg">Building the world…</div></div></div>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2>Version 54 · Cleaner settings, sharper traffic lights</h2></div>
+    <div class="nh"><small>What's new</small><h2>Version 55 · Car builder: your money, a new start button, stay where you are</h2></div>
     <div class="nb">
+      <h4>Car builder</h4><ul><li>Your money is shown at the top of the builder (green), and under the price as "You have $…". It turns amber when the car costs more than you have.</li><li>The Start test drive button is now a glowing orange button with a steering wheel, so it stands out from the Next buttons.</li><li>Building a new car out on the map (Redo car or Spawn another car) no longer sends you back to the start. You come out right where you were. If your old car is parked there, the new one appears just ahead of it.</li></ul>
+      <h4 class="old">Version 54 · Cleaner settings, sharper traffic lights</h4>
       <h4>Settings</h4><ul><li>Settings has a cleaner, evenly spaced layout: the sections run down the left, and the options sit in an even grid on the right. Before, half the window was empty and the options were squeezed into one column.</li><li>The search box, Redo car and Done sit in one tidy bar. Selected options have a teal outline and dot, and the five-step road bars are teal to match.</li><li>On phones held sideways, settings fill the screen with a narrower list of sections. Held upright, the sections become a row across the top.</li></ul>
       <h4>Fixes</h4><ul><li>Traffic lights no longer flicker or show stripes. The lenses, lit lamps, backplates and their yellow borders no longer fight to be drawn at the same depth, at any distance.</li></ul>
       <h4 class="old">Version 53 · Haptics</h4>
@@ -1015,10 +1027,10 @@ body #drawer #tabBody .seg5{max-width:520px;border:1px solid rgba(255,255,255,.0
 </div>
 <div id="start">
   <div class="cfg">
-    <div class="cfgHead"><div class="cfgTop"><small id="cfgBrand">Build your car</small><button class="wn" id="walkStart">🚶 Just walk around</button><button class="wn" id="newsOpen">What's new</button></div><h1 id="cfgModel">Build your <span>car</span></h1><div id="cfgStats"></div></div>
+    <div class="cfgHead"><div class="cfgTop"><small id="cfgBrand">Build your car</small><button class="wn" id="walkStart">🚶 Just walk around</button><button class="wn" id="newsOpen">What's new</button><span id="cfgCash" title="Money in your checking account">$0</span></div><h1 id="cfgModel">Build your <span>car</span></h1><div id="cfgStats"></div></div>
     <div id="cfgSteps"></div>
     <div id="cfgBody"></div>
-    <div class="cfgFoot"><div id="cfgSum"></div><div class="cfgNav"><button id="cfgBack">Back</button><button id="cfgNext">Next</button></div><div class="cfgGo"><div><small>As built</small><b id="cfgTotal">$0</b></div><button id="go">Start test drive</button></div></div>
+    <div class="cfgFoot"><div id="cfgSum"></div><div class="cfgNav"><button id="cfgBack">Back</button><button id="cfgNext">Next</button></div><div class="cfgGo"><div><small>As built</small><b id="cfgTotal">$0</b><small id="cfgHave"></small></div><button id="go">Start test drive</button></div></div>
   </div>
 </div>
 <button id="scrBtn" hidden>Screen</button>
@@ -6902,7 +6914,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(/SwiftShader|llvmpipe|Microsoft Basic/i.test(gpu))return "low";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="54";try{if(localStorage.getItem("strata.ver")!==APP_VER){for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="55";try{if(localStorage.getItem("strata.ver")!==APP_VER){for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){return GQ[GFX.q==="auto"?GFX.eff:GFX.q]}
 function setGfx(q){GFX.q=q;GFX.dyn=1;try{localStorage.setItem("strata.gfx",q)}catch(e){}}
@@ -7433,8 +7445,9 @@ function trimCards(keys,name,short){const used=new Set(),out=[];
   return out.join("")}
 var CFG_TABK=["color","pt","pk","ext","int","acc"],CFG_TABN={color:"Color",pt:"Powertrain",pk:"Packages",ext:"Exterior",int:"Interior",acc:"Accessories"};
 function cfgAtEnd(){const T=TRIMS[st.trim];if((st.cfgStep||"model")==="model")return false;return !T.real||(st.cfgTab||"color")==="acc"}
-function cfgGoLabel(){const g=$("go");if(!g)return;const step=st.cfgStep||"model",T=TRIMS[st.trim];
-  if(cfgAtEnd()){g.textContent=st.everStarted?"Back to the drive":"Start test drive";return}
+function cfgCashShow(){const c=Math.floor(ECON.cash),t=cfgTotal(),a=$("cfgCash"),h=$("cfgHave");if(a)a.textContent="💵 "+money(c);if(h){h.textContent="You have "+money(c);h.classList.toggle("short",c<t)}}
+function cfgGoLabel(){const g=$("go");if(!g)return;const step=st.cfgStep||"model",T=TRIMS[st.trim];g.classList.toggle("final",cfgAtEnd());cfgCashShow();
+  if(cfgAtEnd()){g.innerHTML=`<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.4"/><path d="M3.4 10.5h6.2M14.4 10.5h6.2M12 14.4V21"/></svg><span>${st.everStarted?"Back to the drive":"Start test drive"}</span>`;return}
   if(step==="model"){g.textContent="Next: Make it yours ›";return}
   const i=CFG_TABK.indexOf(st.cfgTab||"color");g.textContent="Next: "+CFG_TABN[CFG_TABK[i+1]]+" ›"}
 function cfgAdvance(){const step=st.cfgStep||"model";if(step==="model"){st.cfgStep="color";st.cfgTab="color"}else{const i=CFG_TABK.indexOf(st.cfgTab||"color");st.cfgTab=CFG_TABK[Math.min(i+1,CFG_TABK.length-1)]}renderCfg();const t=document.querySelector(".cfgTabs .on");if(t)t.scrollIntoView({block:"nearest",inline:"center"})}
@@ -7473,7 +7486,7 @@ function renderCfg(){fitPaint();const b=$("cfgBody"),T=TRIMS[st.trim],step=st.cf
   $("cfgBrand").textContent=T.group||"Strata";$("cfgModel").innerHTML="Build your <span>car</span>";$("cfgStats").innerHTML="";
   $("cfgSum").innerHTML=`<b>${short(T)}</b><small>${T.desc} · ${paintName()}</small>`;
   const i=step==="model"?0:1;$("cfgBack").hidden=i===0||TES1;$("cfgNext").hidden=i===STEPS.length-1||TES1;$("cfgNext").textContent=`${STEPS[Math.min(i+1,STEPS.length-1)][1]} ›`;
-  $("cfgTotal").textContent=money(cfgTotal())}
+  $("cfgTotal").textContent=money(cfgTotal());cfgCashShow()}
 {const STEPK=["model","color"];
  $("cfgSteps").addEventListener("click",e=>{const b=e.target.closest("button");if(b){st.cfgStep=b.dataset.cs;renderCfg()}});
  $("cfgBack").onclick=()=>{if(cfgPrevTab())return;st.cfgStep=STEPK[Math.max(0,STEPK.indexOf(st.cfgStep||"model")-1)];renderCfg()};$("cfgNext").onclick=()=>{st.cfgStep=STEPK[Math.min(1,STEPK.indexOf(st.cfgStep||"model")+1)];renderCfg()}}
@@ -7496,7 +7509,7 @@ $("cfgBody").addEventListener("click",e=>{const b=e.target.closest("button");if(
   else if(d.xt){st.extras[d.xt]=!st.extras[d.xt];if(d.xt==="hud"&&st.extras.hud)st.hudOn=true}
   else if(d.cm){st.map=d.cm}
   tick(1);renderCfg()});
-function openBuilder(){document.body.classList.add("building");st.started=false;$("go").textContent="Back to the drive";renderCfg();$("start").hidden=false}
+function openBuilder(){if(st.everStarted&&!st.walk)st.buildFrom={x:car.px,y:car.py,h:car.psi,z:car.zb||0,map:st.map};document.body.classList.add("building");st.started=false;$("go").textContent="Back to the drive";renderCfg();$("start").hidden=false}
 // ---- loading in stages: the world, then the car you're looking at, then the rest of the cars in the background
 const LOADING={};
 function loadModel(k){if(MODELS[k])return Promise.resolve(MODELS[k]);
@@ -7517,7 +7530,7 @@ async function boot(){
 requestAnimationFrame(()=>setTimeout(boot,30));
 $("newsGo").onclick=()=>{$("news").hidden=true;tick(1)};$("newsOpen").onclick=()=>{$("news").hidden=false};
 $("walkStart").onclick=()=>{st.cfgStep="color";st.cfgTab="acc";$("go").click();setTimeout(()=>{if(st.started&&!st.walk)walkAction();toast(PC.on?"Walking · WASD to move, O to get in a car, P phone":"Walking · tap the car to get in")},400)};$("paBtn").onclick=()=>paStart();$("scrBtn").onclick=()=>{SCR.focus=!SCR.focus;tick(1)};
-$("go").onclick=()=>{initAudio();setTimeout(()=>{if(st.power===true)welcomeChime()},1200);if(matchMedia("(pointer:coarse)").matches){try{const d=document.documentElement;(d.requestFullscreen?d.requestFullscreen({navigationUI:"hide"}):Promise.reject()).then(()=>screen.orientation&&screen.orientation.lock&&screen.orientation.lock("landscape")).catch(()=>{})}catch(e){}}if(au.ctx&&au.ctx.resume)au.ctx.resume();const first=!st.everStarted;document.body.classList.remove("building");setMap(st.map);st.gear="D";st.started=true;st.everStarted=true;$("start").hidden=true;enforcePkgs();{const ev=isEVT()||TRIMS[st.trim].tesla;st.belt=false;if(ev){st.power=true;st.gear="P";document.body.classList.remove("carOff")}else{st.power=false;st.gear="P";sys.epb=true;document.body.classList.add("carOff");const H=car.hyb;H.eng=false;H.everRan=false;setTimeout(()=>toast(PC.on?"Hold S (brake) and press F to start the engine · F alone for accessory":"Hold the brake pedal and press the start button to start your vehicle"),1400)}}
+$("go").onclick=()=>{initAudio();setTimeout(()=>{if(st.power===true)welcomeChime()},1200);if(matchMedia("(pointer:coarse)").matches){try{const d=document.documentElement;(d.requestFullscreen?d.requestFullscreen({navigationUI:"hide"}):Promise.reject()).then(()=>screen.orientation&&screen.orientation.lock&&screen.orientation.lock("landscape")).catch(()=>{})}catch(e){}}if(au.ctx&&au.ctx.resume)au.ctx.resume();const first=!st.everStarted;document.body.classList.remove("building");{const B=st.buildFrom;st.buildFrom=null;if(!first&&B&&B.map===st.map){const near=parked.some(o=>o.fleet&&Math.hypot(o.wx-B.x,o.wy-B.y)<4);let x=B.x,y=B.y;if(near){x+=Math.cos(B.h)*9;y+=Math.sin(B.h)*9}resetCar({free:true,x,y,h:B.h});car.camYaw=null}else setMap(st.map)}st.gear="D";st.started=true;st.everStarted=true;$("start").hidden=true;enforcePkgs();{const ev=isEVT()||TRIMS[st.trim].tesla;st.belt=false;if(ev){st.power=true;st.gear="P";document.body.classList.remove("carOff")}else{st.power=false;st.gear="P";sys.epb=true;document.body.classList.add("carOff");const H=car.hyb;H.eng=false;H.everRan=false;setTimeout(()=>toast(PC.on?"Hold S (brake) and press F to start the engine · F alone for accessory":"Hold the brake pedal and press the start button to start your vehicle"),1400)}}
   if(first){spawnTraffic(G().traffic);spawnOncoming(G().onc);if(st.people!==false)spawnBikes(Math.max(2,Math.round(G().traffic/6)));if(PC.on)setTimeout(()=>toast("B seatbelt · hold S + F to start · E / Q gears · W A S D drive · G assists · ? all keys"),3400)}
   const pk=TRIMS[st.trim].real?"":Object.keys(PKGS).filter(k=>st.pkgs[k]).map(k=>PKGS[k].name.replace(" Pack","")).join(", ");
   toast(`${TRIMS[st.trim].short} in ${paintName()}${pk?" with "+pk:""} · ${money(cfgTotal())}. Tap ☰ for tests.`)};
