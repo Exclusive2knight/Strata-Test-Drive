@@ -784,8 +784,11 @@ body #drawer #tabBody .seg5{max-width:520px;border:1px solid rgba(255,255,255,.0
 <div id="boot"><div class="bc"><div class="bt">Test Drive</div><div class="bb"><i id="bootBar"></i></div><div class="bs" id="bootMsg">Building the world…</div></div></div>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2>Version 56 · New 2-bay double-threaded helix garage</h2></div>
+    <div class="nh"><small>What's new</small><h2>Version 57 · Park assist everywhere</h2></div>
     <div class="nb">
+      <h4>Park assist</h4><ul><li>Park assist now works on the garage ramps. It used to creep too weakly on the slope, stop and roll backwards. Its speed control now measures which way you're really rolling, adds the extra throttle a slope needs, and holds the brake while it does, so it parks smoothly uphill and downhill on every level.</li><li>Store charging stations have painted bays, and park assist backs you into them, lined up with the charger.</li><li>Tested on every kind of space: both garage bays (uphill and downhill, ground and upper levels), the store parking lots, Main St parallel parking, the charger plaza and store charging bays. It finished every one with no hits, centred in the space and less than 1.5° off straight.</li></ul>
+      <h4>Fixes</h4><ul><li>Building a new car while you're on an upper level of the garage no longer drops it to the ground floor.</li></ul>
+      <h4 class="old">Version 56 · New 2-bay double-threaded helix garage</h4>
       <h4>Parking garage</h4><ul><li>The Fort St garage is rebuilt as a real 2-bay double-threaded helix. There are no flat decks: every floor is a gentle ramp (1 in 15) and you park right on the slope.</li><li>The north bay climbs a full level going east, the south bay a full level going west, with flat turn landings at both ends. The two threads wind round each other a level apart and each one climbs two levels per lap.</li><li>Two entrances off Fort St, each with its own ticket and pay gates: the west entrance takes you up one thread, the east entrance up the other. Four levels of ramps up to an open roof.</li><li>Stall lines on both sides of every aisle, a centre wall between the bays, columns, parapets, lights under every slab, and a coloured band on each landing. Parked cars sit level across the slope, and park assist finds stalls on the ramp you're on.</li></ul>
       <h4 class="old">Version 55 · Car builder: your money, a new start button, stay where you are</h4>
       <h4>Car builder</h4><ul><li>Your money is shown at the top of the builder (green), and under the price as "You have $…". It turns amber when the car costs more than you have.</li><li>The Start test drive button is now a glowing orange button with a steering wheel, so it stands out from the Next buttons.</li><li>Building a new car out on the map (Redo car or Spawn another car) no longer sends you back to the start. You come out right where you were. If your old car is parked there, the new one appears just ahead of it.</li></ul>
@@ -5193,7 +5196,7 @@ function worldScenery(){
    for(const S of XSITES){if(S.custom&&S.kind!=="stn")continue;if(S.kind==="stn"){Bx(pad,S,0,0,0.002,0.02,S.L,S.D);
        Bx(XM.canopy,S,0,-4,5.1,0.6,24,12);Bx(XM.glow,S,0,-4,5.08,0.03,22,10);for(const a of [-9,9])for(const b of [-7,-1])Bx(XM.pillar,S,a,b,0,5.1,0.45,0.45,"a canopy pillar");
        for(const a of [-6,6])for(const b of [-7,-1]){Bx(XM.pump,S,a,b,0,1.9,0.85,0.7,"a fuel pump");Bx(XM.glow,S,a,b,1.92,0.1,0.9,0.75)}
-       for(let k=0;k<4;k++){Bx(chg,S,-17+k*3.4,10,0,1.9,0.55,0.45,"a charger")}
+       for(let k=0;k<4;k++){Bx(chg,S,-17+k*3.4,10,0,1.9,0.55,0.45,"a charger")}for(let k=0;k<=4;k++)Bx(stall,S,-18.7+k*3.4,7.0,0.012,0.012,0.12,5.2);
        Bx(XM.shop,S,8,9,0,4.2,16,9,"the shop");Bx(XM.win,S,8,4.48,0.4,2.4,12,0.04);Bx(XM.sign,S,-17,-12.5,0,6,1.6,0.5,"a sign");
        S.pumps=[[-6,-7],[6,-7],[-6,-1],[6,-1]].map(([a,b])=>xLocal(S,a,b));S.chargers=[0,1,2,3].map(k=>xLocal(S,-17+k*3.4,8.6))}
      else{Bx(lot,S,0,0,0.003,0.02,S.L,S.D);S.stalls=[];for(let a=-S.L/2+1.4;a<=S.L/2-1.4;a+=2.7){Bx(stall,S,a,-S.D/2+8,0.012,0.012,0.12,5.4);Bx(stall,S,a,S.D/2-2.9,0.012,0.012,0.12,5.4)}
@@ -6915,7 +6918,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(/SwiftShader|llvmpipe|Microsoft Basic/i.test(gpu))return "low";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="56";try{if(localStorage.getItem("strata.ver")!==APP_VER){for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="57";try{if(localStorage.getItem("strata.ver")!==APP_VER){for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){return GQ[GFX.q==="auto"?GFX.eff:GFX.q]}
 function setGfx(q){GFX.q=q;GFX.dyn=1;try{localStorage.setItem("strata.gfx",q)}catch(e){}}
@@ -6993,7 +6996,8 @@ function ppSteer(A,pts,cum,Ld){const r=rearAx();let best=A.idx,bd=1e9;for(let i=
   const d=Math.atan(2*ly/L2*WB);return {steer:invSteer(clamp(d,-0.56,0.56)),left:cum[cum.length-1]-cum[best],d}}
 // ---- smarter perpendicular parking: every stall nearby (garage decks and the parking lots), both sides, a path checked for clearance, and up to 3 corrections
 function perpSpots(){const out=[];if(inGarage(car.px,car.py)){for(const t of garStalls())if(Math.abs(t.z-(car.zb||0))<1.3)out.push({...t})}
-  for(const S of XSITES){if(S.kind!=="lot"||Math.hypot(S.x-car.px,S.y-car.py)>Math.max(S.L,S.D))continue;
+  for(const S of XSITES){if(S.kind==="stn"&&Math.hypot(S.x-car.px,S.y-car.py)<45){for(let k=0;k<4;k++){const p=xLocal(S,-17+k*3.4,7.0);out.push({x:p[0],y:p[1],ux:S.N[0],uy:S.N[1],k:0,z:0,chg:true})}continue}
+    if(S.kind!=="lot"||Math.hypot(S.x-car.px,S.y-car.py)>Math.max(S.L,S.D))continue;
     if(S.custom){for(const t of S.stalls||[])if(Math.hypot(t.p[0]-car.px,t.p[1]-car.py)<45)out.push({x:t.p[0],y:t.p[1],ux:Math.cos(t.h),uy:Math.sin(t.h),k:0,z:0});continue}
     const b1=-S.D/2+8,b2=S.D/2-2.9;for(let a=-S.L/2+2.75;a<S.L/2-1.4;a+=2.7){const p1=xLocal(S,a,b1),p2=xLocal(S,a,b2);out.push({x:p1[0],y:p1[1],ux:-S.N[0],uy:-S.N[1],k:0,z:0});out.push({x:p2[0],y:p2[1],ux:S.N[0],uy:S.N[1],k:0,z:0})}}
   return out}
@@ -7111,8 +7115,12 @@ function paUpdate(dt){const A=sys.pa;if(!A)return null;
     st.gear="D";steer=o.steer;vt=clamp(left*0.5,0,3.4);A.msg="Pulling into bay "+(A.bay+1);
     if(fr<0.45)vt=0;
     if((left<0.3||fr<0.45)&&Math.abs(v)<0.03){paStop(`Parked in bay ${A.bay+1}: ${fr.toFixed(1)} m from the charger`,true);return null}}
-  const sp=Math.abs(v), err=vt-sp;
-  let thr=0, brk=0; if(vt<0.01){brk=sp>0.02?0.6:0.3}else if(err>-0.15){thr=clamp(0.06+err*0.35,0,0.28)}else brk=clamp(-err*0.9,0.1,0.8);
+  // speed control that copes with ramps: speed is measured in the direction of the gear (rolling back counts as negative),
+  // an integral term finds the extra throttle a slope needs, and the brake holds the car while it builds
+  const dirS=st.gear==="R"?-1:1,sp=v*dirS,err=vt-sp;
+  let thr=0, brk=0; if(vt<0.01){A.ki=0;brk=Math.abs(sp)>0.02?0.6:0.35}
+  else{A.ki=clamp((A.ki||0)+err*dt*0.25,0,0.45);if(err>-0.15)thr=clamp(0.06+err*0.35+A.ki,0,0.7);else{brk=clamp(-err*0.9,0.1,0.8);A.ki=Math.max(0,A.ki-dt*0.2)}
+    if(sp<-0.03)brk=Math.max(brk,clamp(-sp*1.5,0.2,0.7))}
   return [steer,thr,brk]}
 // the status card (like the car's own screen) and a small top view of what it sees
 function paPanel(){const el=$("paPanel"),on=!!(PA.mode||sys.pa);$("dPA").classList.toggle("on",on||!!SCR.paMenu);if(!on||st.walk||st.cam===1){el.hidden=true;return}el.hidden=false;
@@ -7534,7 +7542,7 @@ async function boot(){
 requestAnimationFrame(()=>setTimeout(boot,30));
 $("newsGo").onclick=()=>{$("news").hidden=true;tick(1)};$("newsOpen").onclick=()=>{$("news").hidden=false};
 $("walkStart").onclick=()=>{st.cfgStep="color";st.cfgTab="acc";$("go").click();setTimeout(()=>{if(st.started&&!st.walk)walkAction();toast(PC.on?"Walking · WASD to move, O to get in a car, P phone":"Walking · tap the car to get in")},400)};$("paBtn").onclick=()=>paStart();$("scrBtn").onclick=()=>{SCR.focus=!SCR.focus;tick(1)};
-$("go").onclick=()=>{initAudio();setTimeout(()=>{if(st.power===true)welcomeChime()},1200);if(matchMedia("(pointer:coarse)").matches){try{const d=document.documentElement;(d.requestFullscreen?d.requestFullscreen({navigationUI:"hide"}):Promise.reject()).then(()=>screen.orientation&&screen.orientation.lock&&screen.orientation.lock("landscape")).catch(()=>{})}catch(e){}}if(au.ctx&&au.ctx.resume)au.ctx.resume();const first=!st.everStarted;document.body.classList.remove("building");{const B=st.buildFrom;st.buildFrom=null;if(!first&&B&&B.map===st.map){const near=parked.some(o=>o.fleet&&Math.hypot(o.wx-B.x,o.wy-B.y)<4);let x=B.x,y=B.y;if(near){x+=Math.cos(B.h)*9;y+=Math.sin(B.h)*9}resetCar({free:true,x,y,h:B.h});car.camYaw=null}else setMap(st.map)}st.gear="D";st.started=true;st.everStarted=true;$("start").hidden=true;enforcePkgs();{const ev=isEVT()||TRIMS[st.trim].tesla;st.belt=false;if(ev){st.power=true;st.gear="P";document.body.classList.remove("carOff")}else{st.power=false;st.gear="P";sys.epb=true;document.body.classList.add("carOff");const H=car.hyb;H.eng=false;H.everRan=false;setTimeout(()=>toast(PC.on?"Hold S (brake) and press F to start the engine · F alone for accessory":"Hold the brake pedal and press the start button to start your vehicle"),1400)}}
+$("go").onclick=()=>{initAudio();setTimeout(()=>{if(st.power===true)welcomeChime()},1200);if(matchMedia("(pointer:coarse)").matches){try{const d=document.documentElement;(d.requestFullscreen?d.requestFullscreen({navigationUI:"hide"}):Promise.reject()).then(()=>screen.orientation&&screen.orientation.lock&&screen.orientation.lock("landscape")).catch(()=>{})}catch(e){}}if(au.ctx&&au.ctx.resume)au.ctx.resume();const first=!st.everStarted;document.body.classList.remove("building");{const B=st.buildFrom;st.buildFrom=null;if(!first&&B&&B.map===st.map){const near=parked.some(o=>o.fleet&&Math.hypot(o.wx-B.x,o.wy-B.y)<4);let x=B.x,y=B.y;if(near){x+=Math.cos(B.h)*9;y+=Math.sin(B.h)*9}resetCar({free:true,x,y,h:B.h,z:B.z});car.camYaw=null}else setMap(st.map)}st.gear="D";st.started=true;st.everStarted=true;$("start").hidden=true;enforcePkgs();{const ev=isEVT()||TRIMS[st.trim].tesla;st.belt=false;if(ev){st.power=true;st.gear="P";document.body.classList.remove("carOff")}else{st.power=false;st.gear="P";sys.epb=true;document.body.classList.add("carOff");const H=car.hyb;H.eng=false;H.everRan=false;setTimeout(()=>toast(PC.on?"Hold S (brake) and press F to start the engine · F alone for accessory":"Hold the brake pedal and press the start button to start your vehicle"),1400)}}
   if(first){spawnTraffic(G().traffic);spawnOncoming(G().onc);if(st.people!==false)spawnBikes(Math.max(2,Math.round(G().traffic/6)));if(PC.on)setTimeout(()=>toast("B seatbelt · hold S + F to start · E / Q gears · W A S D drive · G assists · ? all keys"),3400)}
   const pk=TRIMS[st.trim].real?"":Object.keys(PKGS).filter(k=>st.pkgs[k]).map(k=>PKGS[k].name.replace(" Pack","")).join(", ");
   toast(`${TRIMS[st.trim].short} in ${paintName()}${pk?" with "+pk:""} · ${money(cfgTotal())}. Tap ☰ for tests.`)};
