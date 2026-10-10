@@ -800,8 +800,10 @@ body #drawer #tabBody .seg5{max-width:520px;border:1px solid rgba(255,255,255,.0
 <div id="boot"><div class="bc"><div class="bt">Test Drive</div><div class="bb"><i id="bootBar"></i></div><div class="bs" id="bootMsg">Building the world…</div><div class="bs" style="opacity:.5;font-size:11px;margin-top:14px">© 2026 Exclusive2knight · All rights reserved</div></div></div>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2>Version 70 · Spotify skip buttons, remembers your music, phone pairing</h2></div>
+    <div class="nh"><small>What's new</small><h2>Version 71 · Play it inside Discord</h2></div>
     <div class="nb">
+      <h4>Discord</h4><ul><li>The game can now run as a Discord Activity: launch it inside Discord, and your profile shows "Playing Strata Test Drive" while you drive. Friends in the voice channel can see it too.</li></ul>
+      <h4 class="old">Version 70 · Spotify skip buttons, remembers your music, phone pairing</h4>
       <h4>Spotify</h4><ul><li>⏮ and ⏭ buttons on the car's Spotify screen. ⏭ jumps to the next song. ⏮ goes back to the start of the song, and tapping it again within 2 seconds starts the playlist over from the first song.</li><li>Spotify now shows up everywhere music does: Ford and Lincoln home screens, CarPlay and Android Auto (with play/pause and skip), and the Volvo and Lincoln cluster media panels. They used to say "Audio off" or "Not playing".</li></ul>
       <h4>Remembers what you were playing</h4><ul><li>The game remembers your audio: Spotify and the playlist, or the radio station, plus your volume and whether your phone was connected. This stays even when a new version comes out. Spotify waits for you to tap ▶ (browsers don't let pages play sound on their own); the radio comes back at your first tap.</li></ul>
       <h4>Connect a phone</h4><ul><li>The Connect a phone button now really pairs your phone: tap Add Phone, a pairing code shows for a couple of seconds, then it connects. CarPlay or Android Auto starts on cars that have it.</li><li>The home screen shows your phone's name (like "iPhone 17 Pro · Connected"), and the phone page has Play phone audio and Disconnect.</li></ul>
@@ -7207,7 +7209,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(/SwiftShader|llvmpipe|Microsoft Basic/i.test(gpu))return "low";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="70";try{if(localStorage.getItem("strata.ver")!==APP_VER){for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="71";try{if(localStorage.getItem("strata.ver")!==APP_VER){for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){return GQ[GFX.q==="auto"?GFX.eff:GFX.q]}
 function setGfx(q){GFX.q=q;GFX.dyn=1;try{localStorage.setItem("strata.gfx",q)}catch(e){}}
@@ -7854,6 +7856,12 @@ $("go").onclick=()=>{initAudio();setTimeout(()=>{if(st.power===true)welcomeChime
   toast(`${TRIMS[st.trim].short} in ${paintName()}${pk?" with "+pk:""} · ${money(cfgTotal())}. Tap ☰ for tests.`)};
 spawnTraffic(0);
 try{audioRestore()}catch(e){}
+// ---- Discord Activity: when the game runs inside Discord (https://<app id>.discordsays.com), say hello to the Discord client so it
+// keeps the game open and shows "Playing Strata Test Drive" on your profile. (Same handshake as Discord's Embedded App SDK.)
+const DSC={on:false,ready:false};
+try{const q=new URLSearchParams(location.search),fid=q.get("frame_id");if(/\.discordsays\.com$/.test(location.hostname)&&fid){DSC.on=true;const cid=location.hostname.split(".")[0],src=window.parent.opener||window.parent,org=document.referrer||"*";
+  window.addEventListener("message",e=>{if(!/^https:\/\/(\w+\.)?discord(app)?\.com$/.test(e.origin)&&e.origin!==location.origin)return;const d=e.data;if(!Array.isArray(d))return;if(d[0]===1&&d[1]&&d[1].evt==="READY"){DSC.ready=true}});
+  src.postMessage([0,{v:1,encoding:"json",client_id:cid,frame_id:fid,sdk_version:"2.0.0"}],org)}}catch(e){}
 requestAnimationFrame(frame);
 window.__strata={SCR,step:(n,dt)=>{for(let k=0;k<n;k++){controls(dt);assist(dt);updateTraffic(dt);updatePark(dt);weatherTick(dt);const hz=window.TESTHZ||1000;for(let j=0;j<Math.round(dt*hz);j++)physics(1/hz)}},paStart,paUpdate,sys,parked:()=>parked,PAD:()=>PAD,stnWorld,paScan,onc:()=>onc,tp:fpt,me,frameProj,NET:{EDGES,NODES,PAD,PARK,STARTS,sigState},spawnTraffic,setMap,simFrame:(dt)=>{for(let k=0;k<Math.round(dt*1000);k++)physics(1/1000)},look,st,car,sys,act,placeTest,setTrim,inp,cars:()=>cars,setCars:c=>{cars=c},physics,assist,updateTraffic,spawnTraffic,me,
   openDrawer,renderTab};

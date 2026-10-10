@@ -27,7 +27,7 @@ if i >= 0:
 
 OWNER = "Exclusive2knight"
 LOCK = r"""
-{const h=location.hostname.toLowerCase(),ok=/(^|\.)exclusive2knight\.github\.io$/.test(h)||(window.Capacitor&&(h==="localhost"||location.protocol==="capacitor:"));
+{const h=location.hostname.toLowerCase(),ok=/(^|\.)exclusive2knight\.github\.io$/.test(h)||/\.discordsays\.com$/.test(h)||(window.Capacitor&&(h==="localhost"||location.protocol==="capacitor:"));
  if(!ok){document.title="Strata Test Drive";document.body.innerHTML='<div style="font:16px system-ui;max-width:520px;margin:15vh auto;padding:24px;color:#ddd;background:#111;border-radius:12px;text-align:center"><h2 style="margin-top:0">Unauthorized copy</h2><p>Strata Test Drive is © """ + OWNER + r""". All rights reserved. This copy is not allowed to run here.</p><p>Play the real game at <a style="color:#7cf" href="https://exclusive2knight.github.io/Strata-Test-Drive/">exclusive2knight.github.io/Strata-Test-Drive</a></p></div>';throw new Error("unauthorized host")}}
 """
 body = (LOCK if lock else "") + js
