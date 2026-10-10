@@ -12,6 +12,7 @@ https://exclusive2knight.github.io/Strata-Test-Drive/
 - `models/<key>.json` — one file per car model, fetched on demand.
 - `acc_out/*.json` — people, animals and accessories (rigid-part skinned characters with `anims`).
 - `sounds/` — audio.
+- `docs/CARS.md` — every car with its current data and research status. `docs/RESEARCH_PLAN.md` — what still needs research and the data formats.
 - `tools/` — test and screenshot tools (see below). `tools/research/` holds the raw research JSON behind the drive-mode (`DMODES`) and suspension (`SUSR`) tables that are embedded in the template.
 
 ## Workflow for every change
