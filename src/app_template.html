@@ -787,8 +787,11 @@ body #drawer #tabBody .seg5{max-width:520px;border:1px solid rgba(255,255,255,.0
 <div id="boot"><div class="bc"><div class="bt">Test Drive</div><div class="bb"><i id="bootBar"></i></div><div class="bs" id="bootMsg">Building the world…</div></div></div>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2>Version 60 · Researched suspension on every car</h2></div>
+    <div class="nh"><small>What's new</small><h2>Version 61 · Fuel nozzles and charge cables</h2></div>
     <div class="nb">
+      <h4>Filling up and charging</h4><ul><li>Pumping gas now pulls a real hose from the pump to your car's fuel door, with the nozzle in the filler. Plugging in an EV or plug-in hybrid runs a charge cable from the charger to the car's charge port: front fender on most EVs and plug-ins, the rear corner on a Tesla. The hose and cable hang in a natural curve and follow the car.</li><li>You can get back in your car while it pumps or charges, and it keeps going. Walk back to the pump or charger to hang up the nozzle or unplug.</li><li>Plugged-in EVs stay in Park until you unplug, like real ones. Drive off with the gas nozzle still in and the hose's breakaway coupling snaps, like a real pump.</li></ul>
+      <h4>Fixes</h4><ul><li>The fast-charger plaza is paved again; grass was showing through the pavement.</li></ul>
+      <h4 class="old">Version 60 · Researched suspension on every car</h4>
       <h4>Suspension</h4><ul><li>All 541 real trims now have their real suspension hardware, researched: MacPherson strut, double wishbone or multi-link, torsion beam or solid axles on leaf springs, coils or air; passive, frequency-selective, adaptive or MagneRide dampers, Multimatic DSSV, Fox internal-bypass and remote-reservoir off-road shocks; front sway-bar disconnects and active anti-roll. Settings › Car shows each car's real setup.</li><li>Springs now come from each car's real ride feel and weight, instead of the same springs on every car (which made heavy trucks wallow): plush luxury cars around 1.1 Hz, sports cars around 1.7 Hz, and leaf-sprung truck rears stiffer.</li><li>Solid axles carry their real extra weight, leaf springs have their interleaf friction, and wheel travel matches the real car: a Raptor or TRX can soak up far more than a Camry before hitting the bump stops.</li><li>Body lean is set from the real car's character. In testing at about 0.5 g: Camry about 3°/g, Q5 about 4.5°/g, Escalade about 6°/g, Gladiator Rubicon about 7°/g, and the RS Q8 with active anti-roll stays almost flat. Sport modes stiffen it a little.</li><li>Off-road shocks behave like the real ones: Fox bypass shocks firm up deep in their travel, DSSV spool valves stay controlled on big hits, and frequency-selective dampers soften over sharp bumps. MagneRide and fully active systems hold the body flatter.</li><li>On Gladiator and Wrangler Rubicon, Bronco, Tacoma TRD Off-Road, GX Overtrail and Power Wagon, the front sway bar disconnects by itself in an off-road or terrain mode below 20 mph.</li><li>Air suspension stays within the car's real ride-height range, and air springs level the car when it's loaded.</li><li>Traffic cars use the same researched springs and lean.</li></ul>
       <h4 class="old">Version 59 · Real drive modes on every car, and an EV mode box</h4>
       <h4>Drive modes</h4><ul><li>Every real car now has its own drive mode names in the mode box: 541 trims, up from 107. For example the Ranger Raptor has Normal, Sport, Slippery, Sand, Rock Crawl, Mud/Ruts and Baja, the Bronco Sport Badlands adds Rock Crawl and Rally, GM trucks have Tour, Sport, Off-Road, Snow/Ice, Tow/Haul and Terrain, and Hondas have Normal, Econ, Sport and Snow. Cars that really have no mode selector (Chevy Trax, Ram ProMaster) show just Normal.</li><li>Each mode works the way its type should: Eco softens the throttle, Sport sharpens it and firms up the suspension, Snow and Slippery start gently, the off-road modes let the traction control allow more wheelspin, and Tow/Haul holds gears.</li><li>The 2019 RAV4's Multi-Terrain Select dial has its real names (Mud & Sand, Rock & Dirt, Snow). Long mode names shrink to fit the box.</li></ul>
@@ -3009,6 +3012,25 @@ function dynDraw(alpha){gl.uniformMatrix4fv(U.uM,false,M4.id());const cull=gl.is
 // a person: standing / walking (legs and arms swing), sitting in a car, or lying down
 // a box rotated by yaw and then pitched forward (+pitch tips the top toward the heading)
 Object.assign(DMAT,{smoke:[[0.85,0.85,0.83],[0.3,0.3,0.3],0,4,0.4],trunkD:[[0.24,0.16,0.09]],crownD:[[0.11,0.24,0.07]],poleD:[[0.2,0.2,0.21]],signD:[[0.82,0.82,0.8]],hoodD:[[0.5,0.52,0.55]],airbag:[[0.93,0.93,0.9]],triD:[[0.9,0.12,0.05]]});
+// ---- fuel hose and charge cable: from the pump or charger to the car's fuel door or charge port, hanging in a natural curve
+Object.assign(DMAT,{hose:[[0.035,0.035,0.04],null,0.3,20],nozB:[[0.06,0.06,0.07],null,0.4,30],nozM:[[0.62,0.63,0.65],null,0.8,60],plugB:[[0.1,0.1,0.11],null,0.4,30],plugL:[[0.05,0.25,0.3],[0.15,0.9,1.0]]});
+function hosePortLocal(side){const T=TRIMS[st.trim],hw=(VEH.width||1.9)/2,hy=VEH.head?VEH.head[1]:0.7,tz=VEH.tail?VEH.tail[2]:2.3,fz=VEH.head?VEH.head[2]:-2.3,ev=!T.ice&&!T.hybrid,sd=side;
+  if(sys.hose&&sys.hose.kind==="plug"){if(T.tesla)return [sd*(hw-0.02),hy+0.12,tz*0.9];if(ev)return [sd*(hw+0.005),hy+0.22,fz*0.68];return [sd*(hw+0.005),hy+0.24,fz*0.62]}   // plug-in hybrids: front fender
+  return [sd*(hw+0.005),hy+0.3,tz*0.62]}
+function hoseCm(){let cm=carMatrix(car.px,car.py,car.psi,car.height+(car.zb||0),car.pitch||0,car.roll||0);if(VEH.cgOff)cm=chain(cm,M4.T(0,0,VEH.cgOff));return cm}
+function hosePort(){if(!sys.hose)return null;const q=M4.p(hoseCm(),hosePortLocal(sys.hose.side));return [q[0],-q[2],q[1]]}
+function hoseStart(kind){const L=stnWorld(kind==="pump"?"pumps":"chargers");let best=null,bd=1e9;for(const p of L){const d=Math.hypot(p[0]-car.px,p[1]-car.py);if(d<bd){bd=d;best=p}}if(!best)return;
+  sys.hose={kind,p:[best[0],best[1]],side:1};const a=hosePort();sys.hose.side=-1;const b=hosePort();sys.hose.side=Math.hypot(a[0]-best[0],a[1]-best[1])<Math.hypot(b[0]-best[0],b[1]-best[1])?1:-1;
+  sys.hose.len=Math.max(kind==="pump"?3.6:4.2,Math.hypot((sys.hose.side>0?a:b)[0]-best[0],(sys.hose.side>0?a:b)[1]-best[1])+0.9)}
+function hoseTick(){const H_=sys.hose;if(!H_)return;if(H_.kind==="plug"&&st.gear!=="P"&&!st.walk){st.gear="P";const n=performance.now();if(n-(H_.warn||0)>3000){H_.warn=n;toast("Unplug the charge cable first: the car stays in Park while it's plugged in");tick(1)}}const pt=hosePort(),d=Math.hypot(pt[0]-H_.p[0],pt[1]-H_.p[1]);
+  if(d>H_.len+0.4){if(H_.kind==="pump"){sys.fuel=null;sys.hose=null;crashFx(2,"the fuel hose");toast("Drive-off! The hose's breakaway coupling snapped: no fuel spilled, but that's a $300 repair")}else{sys.fuel=null;sys.hose=null;toast("The charge cable pulled out")}}}
+function hoseDraw(){const H_=sys.hose;if(!H_)return;const pt=hosePort(),A=[H_.p[0],H_.p[1],H_.kind==="pump"?1.15:1.05],B=pt,dist=Math.hypot(B[0]-A[0],B[1]-A[1],B[2]-A[2]),sag=Math.max(0.12,Math.sqrt(Math.max(0,H_.len*H_.len-dist*dist))*0.5),N=16;
+  const P=[];for(let i=0;i<=N;i++){const t=i/N;P.push([A[0]+(B[0]-A[0])*t,A[1]+(B[1]-A[1])*t,Math.max(0.03,A[2]+(B[2]-A[2])*t-sag*4*t*(1-t))])}
+  const th=H_.kind==="pump"?0.042:0.038;for(let i=0;i<N;i++){const a=P[i],b=P[i+1],dx=b[0]-a[0],dy=b[1]-a[1],dz=b[2]-a[2],h=Math.hypot(dx,dy);oBox("hose",(a[0]+b[0])/2,(a[1]+b[1])/2,(a[2]+b[2])/2,Math.hypot(h,dz)+0.01,th,th,Math.atan2(dy,dx),-Math.atan2(dz,h))}
+  // the nozzle or plug, pushed into the car's fuel door / charge port
+  const cm=hoseCm(),L=hosePortLocal(H_.side),o=M4.p(cm,[L[0]+H_.side*0.12,L[1]+0.02,L[2]]),q=[o[0],-o[2],o[1]],yaw=Math.atan2(pt[1]-q[1],pt[0]-q[0]);
+  if(H_.kind==="pump"){oBox("nozB",q[0],q[1],q[2]+0.03,0.2,0.11,0.06,yaw,0);oBox("nozM",(q[0]+pt[0])/2,(q[1]+pt[1])/2,pt[2]+0.01,0.16,0.025,0.025,yaw,0.35);oBox("nozB",q[0]-Math.cos(yaw)*0.06,q[1]-Math.sin(yaw)*0.06,q[2]-0.07,0.05,0.12,0.04,yaw,0.2)}
+  else{oBox("plugB",q[0],q[1],q[2],0.2,0.08,0.07,yaw,0);oBox("plugL",q[0]+Math.cos(yaw)*0.06,q[1]+Math.sin(yaw)*0.06,q[2]+0.045,0.05,0.012,0.05,yaw,0)}}
 function oBox(k,X,Y,Hc,sx,sy,sz,yaw,pitch){const B=dB(k),c=Math.cos(yaw),s=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
   const f=[c*cp,s*cp,-sp],u=[c*sp,s*sp,cp],l=[-s,c,0],ax=[f,u,l],hs=[sx/2,sy/2,sz/2];
   for(let a=0;a<3;a++)for(const sg of [1,-1]){const b=(a+1)%3,d=(a+2)%3,base=B.P.length/3,n=ax[a].map(v=>v*sg);
@@ -3152,7 +3174,10 @@ function evTick(dt){
 function walkCtx(){const W=st.walk,T=TRIMS[st.trim];if(!W)return null;
   const door=[car.px-Math.sin(car.psi)*1.25+Math.cos(car.psi)*0.3,car.py+Math.cos(car.psi)*1.25+Math.sin(car.psi)*0.3],dd=Math.hypot(W.x-door[0],W.y-door[1]);
   const fuelOK=T.ice||T.hybrid, plugOK=T.phev||T.plug||(!T.hybrid&&!T.ice);
-  if(sys.fuel==="pump")return {a:"stopP",label:"Stop fuelling"};if(sys.fuel==="plug")return {a:"stopC",label:"Unplug"};
+  if(sys.hose){const H_=sys.hose,pt=hosePort(),atStn=Math.hypot(W.x-H_.p[0],W.y-H_.p[1])<2.6||(pt&&Math.hypot(W.x-pt[0],W.y-pt[1])<1.6);
+    if(atStn)return H_.kind==="pump"?{a:"stopP",label:sys.fuel==="pump"?"Stop fuelling and hang up the nozzle":"Hang up the nozzle"}:{a:"stopC",label:"Unplug the cable"};
+    if(dd<2.4)return {a:"in",label:H_.kind==="pump"?"Get in (keeps pumping)":"Get in (keeps charging)"};
+    return {a:null,label:H_.kind==="pump"?"Nozzle in · walk back to the pump to hang it up":"Plugged in · walk back to the charger to unplug"}}
   const near=(l,r)=>stnWorld(l).some(p=>Math.hypot(p[0]-W.x,p[1]-W.y)<r&&Math.hypot(p[0]-car.px,p[1]-car.py)<8);
   if(fuelOK&&near("pumps",2.2))return {a:"pump",label:"⛽ Fill up"};
   if(plugOK&&near("chargers",2.2))return {a:"plug",label:"⚡ Plug in"};
@@ -3244,10 +3269,10 @@ function walkAction(){
     const lx=-Math.sin(car.psi),ly=Math.cos(car.psi);st.walk={x:car.px+lx*1.45+Math.cos(car.psi)*0.3,y:car.py+ly*1.45+Math.sin(car.psi)*0.3,z:car.zb||0,h:car.psi+Math.PI/2,v:0,ph:0,P:{skin:0,shirt:1,sc:1}};
     st.acc=false;st.pilot=false;st.signal=0;tick(1);toast(PC.on?"On foot: WASD to walk, drag to look, Space to jump, L to lock, P for your phone":"On foot: stick to walk, drag to look, your phone and key are on the right");return}
   const c=walkCtx();if(!c||!c.a)return;const T=TRIMS[st.trim],H=car.hyb;
-  if(c.a==="pump"){if(H.fuel>=H.tank-0.2){toast("The tank is already full");return}sys.fuel="pump";beep(660,.08,"sine",.2);toast("Pumping fuel…")}
-  else if(c.a==="plug"){if(T.plug?(H.pb||0)>=0.99:H.soc>=0.895){toast(T.plug?"The battery is already full":"Already charged to 90 %");return}sys.fuel="plug";beep(880,.08,"sine",.2);setTimeout(()=>beep(1320,.1,"sine",.2),120);toast(`Plugged in · ${T.phev?"Level 2, 7 kW (sped up)":"DC fast charging (sped up)"}`)}
-  else if(c.a==="stopP"||c.a==="stopC"){sys.fuel=null;tick(1);toast(c.a==="stopP"?`Done: ${Math.round(H.fuel/H.tank*100)}% fuel`:`Unplugged at ${Math.round(H.soc*100)}%`)}
-  else if(c.a==="in"){if(st.locked){st.locked=false;beep(1500,.06,"square",.14)}st.walk=null;FOOT.phone=false;renderPhone();sys.fuel=null;tick(1);toast("Back in the car")}}
+  if(c.a==="pump"){if(H.fuel>=H.tank-0.2){toast("The tank is already full");return}sys.fuel="pump";hoseStart("pump");beep(660,.08,"sine",.2);toast("Pumping fuel…")}
+  else if(c.a==="plug"){if(T.plug?(H.pb||0)>=0.99:H.soc>=0.895){toast(T.plug?"The battery is already full":"Already charged to 90 %");return}sys.fuel="plug";hoseStart("plug");beep(880,.08,"sine",.2);setTimeout(()=>beep(1320,.1,"sine",.2),120);toast(`Plugged in · ${T.phev?"Level 2, 7 kW (sped up)":"DC fast charging (sped up)"}`)}
+  else if(c.a==="stopP"||c.a==="stopC"){sys.fuel=null;sys.hose=null;tick(1);toast(c.a==="stopP"?`Done: ${Math.round(H.fuel/H.tank*100)}% fuel`:`Unplugged at ${Math.round(H.soc*100)}%`)}
+  else if(c.a==="in"){if(st.locked){st.locked=false;beep(1500,.06,"square",.14)}st.walk=null;FOOT.phone=false;renderPhone();tick(1);toast(sys.hose?(sys.hose.kind==="pump"?(sys.fuel?"Back in the car · still pumping":"Back in the car · the nozzle is still in"):(sys.fuel?"Back in the car · still charging":"Back in the car · still plugged in")):"Back in the car")}}
 
 // ======================================================================= Tesla: Autopilot, Full Self-Driving (Supervised), Smart Summon, navigation, the driving visualization, in-car upgrades
 // Purchases belong to your car (they carry over between Model Y trims, like an account-linked upgrade)
@@ -4868,7 +4893,8 @@ const TERR={};
 function terrDrawn(x,y){const {N,NY,h}=TERR,fx=(x-WORLD.x0)/(WORLD.x1-WORLD.x0)*N,fy=(y-WORLD.y0)/(WORLD.y1-WORLD.y0)*NY,i=Math.floor(fx),j=Math.floor(fy),a=fx-i,b=fy-j,W=N+1;if(i<0||j<0||i>=N||j>=NY)return -9;
   const h00=h[j*W+i],h10=h[j*W+i+1],h01=h[(j+1)*W+i],h11=h[(j+1)*W+i+1];return a+b<=1?h00+(h10-h00)*a+(h01-h00)*b:h11+(h01-h11)*(1-a)+(h10-h11)*(1-b)}
 function terrainMesh(){const N=360,X0=WORLD.x0,X1=WORLD.x1,Y0=WORLD.y0,Y1=WORLD.y1,P=[],Nn=[],I=[];const NY=Math.round(N*(Y1-Y0)/(X1-X0));
-  const H=(x,y)=>{if(inCity(x,y)||inTC(x,y,4)||inExtra(x,y,6))return -0.14;const d=dfAt(x,y);let z=Math.max(d<45?hillZ(x,y)+riverCut(x,y):terrainH(x,y,d),embZ(x,y));
+  const onPad=(x,y)=>Math.abs(x-PAD.cx)<PAD.rad+8&&Math.abs(y-PAD.cy)<PAD.rad+8&&[[0,0],[7,0],[-7,0],[0,7],[0,-7]].some(([a,b])=>padHit(x+a,y+b));
+  const H=(x,y)=>{if(inCity(x,y)||inTC(x,y,4)||inExtra(x,y,6)||onPad(x,y))return -0.14;const d=dfAt(x,y);let z=Math.max(d<45?hillZ(x,y)+riverCut(x,y):terrainH(x,y,d),embZ(x,y));
     for(const n of gAt(GRID.n,x,y)){if(n.pr){const dn=Math.hypot(x-n.x,y-n.y)-n.pr;if(dn<14)z=Math.min(z,n.z-0.25+Math.max(0,dn)*0.12)}}
     if(d<70){let best=1e9,rz=null,zc=1e9;for(const e of edgesNear(x,y,34)){const p=eProj(e,x,y);if(p.u<-6||p.u>e.L+6)continue;const dd=Math.abs(p.t)-e.W-auxW(e,p.u,p.t),zz=e.hz?ez(e,clamp(p.u,0,e.L)):0;
         if(e.dip&&onDip(e,p.u)||e.ov&&overDeck(e,p.u)){if(!(e.ov&&overDeck(e,p.u)))zc=Math.min(zc,zz-0.35+Math.max(0,dd-16)*0.42);continue}if(dd<best){best=dd;rz=zz}if(dd<40){const b=Math.max(0,dd-1.2);z=Math.min(z,zz-0.3+(b<12?b*0.1:1.2+(b-12)*0.3))}}   // every road nearby pulls the ground down under it, not just the nearest
@@ -6283,7 +6309,7 @@ function dynBuild(eye,cm){if(dynFrame===GFX.frame)return;dynFrame=GFX.frame;CHAR
     if(charQueue(p.mk,p.wx,p.wy,p.wz||0,p.wh,Math.abs(p.v??1.2),p.sd)){if(p.dog){const c=Math.cos(p.wh),s_=Math.sin(p.wh);charQueue(p.dog,p.wx+c*0.9-s_*0.5,p.wy+s_*0.9+c*0.5,p.wz||0,p.wh,Math.abs(p.v??1.2),p.sd+0.3)}continue}}personInto(p.wx,p.wy,p.wz,p.wh,p.ph,p,p.mode==="down"?"down":"walk")}
   for(const c of cars){if(!near(c.wx,c.wy,220))continue;if(c.kind==="bike")riderInto(c);else if(c.kind==="cone")coneInto(c)}
   for(const d of EV.crit)if(near(d.wx,d.wy,250))deerInto(d);
-  for(const g of Object.values(GATE)){if(!near(g.isl,g.gy,160))continue;const px=g.isl+(g.dir<0?-0.42:0.42),py=g.gy+(g.dir<0?0.25:-0.25),yaw=g.dir<0?Math.PI:0,ca=Math.cos(g.a),sa=Math.sin(g.a);
+  try{hoseDraw()}catch(e){}for(const g of Object.values(GATE)){if(!near(g.isl,g.gy,160))continue;const px=g.isl+(g.dir<0?-0.42:0.42),py=g.gy+(g.dir<0?0.25:-0.25),yaw=g.dir<0?Math.PI:0,ca=Math.cos(g.a),sa=Math.sin(g.a);
     oBox("gateP",px,py,0.6,0.32,0.32,1.2,yaw,0);for(let i=0;i<6;i++){const d=0.35+0.75*i+0.375;oBox(i%2?"gateR":"gateW",px+g.dir*d*ca,py,1.05+d*sa,0.75,0.07,0.09,yaw,-g.a)}}
   koDraw();dmgSmoke();
   // broken-down cars: bonnet up and the driver standing by the kerb side
@@ -6812,7 +6838,7 @@ function act(a){ {const T0=TRIMS[st.trim];if(T0.real&&!has(a)){toast(`The real $
   }
   hudT=0; if(!$("drawer").hidden)renderTab();
 }
-function shiftTo(g){const v=car.vx,from=st.gear;if(g===from)return;if(st.power!==true&&st.power!==undefined&&g!=="P"&&!sys.pa){toast(isEVT()?"Press the brake and the start button first":"Start the engine first: hold S and press F");beep(500,.12,"square",.15);return}
+function shiftTo(g){const v=car.vx,from=st.gear;if(g===from)return;if(sys.hose&&sys.hose.kind==="plug"&&g!=="P"){toast("Unplug the charge cable first: the car stays in Park while it's plugged in");tick(1);return}if(st.power!==true&&st.power!==undefined&&g!=="P"&&!sys.pa){toast(isEVT()?"Press the brake and the start button first":"Start the engine first: hold S and press F");beep(500,.12,"square",.15);return}
   if(g==="P"&&Math.abs(v)>0.8){toast("Stop before shifting to Park");beep(500,.12,"square",.15);return}
   if(from==="P"&&inp.brk<0.2&&!sys.hold&&!sys.pa&&PC.on){toast("Press the brake to shift out of Park");beep(500,.12,"square",.15);return}
   if((g==="R"&&v>2)||(g==="D"&&v<-2)){toast("Slow down before changing direction");beep(500,.12,"square",.15);return}
@@ -7006,7 +7032,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(/SwiftShader|llvmpipe|Microsoft Basic/i.test(gpu))return "low";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="60";try{if(localStorage.getItem("strata.ver")!==APP_VER){for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="61";try{if(localStorage.getItem("strata.ver")!==APP_VER){for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){return GQ[GFX.q==="auto"?GFX.eff:GFX.q]}
 function setGfx(q){GFX.q=q;GFX.dyn=1;try{localStorage.setItem("strata.gfx",q)}catch(e){}}
@@ -7268,7 +7294,7 @@ let last=performance.now(), acc=0;
 function fpsCap(){const c=st.fpsCap??0;return c===-1?0:c===0?(G().cap||0):c}
 function frame(now){{const c=fpsCap();if(c&&now-last<1000/c-2){requestAnimationFrame(frame);return}}gfxTick(Math.min(0.1,(now-last)/1000));
   const dt=Math.min(0.05,(now-last)/1000);last=now;
-  if(st.started){controls(dt);assist(dt);updateTraffic(dt);updatePark(dt);enforcePkgs();weatherTick(dt);try{hapTick(dt)}catch(e){}if(!!car.swayOff!==!!sys.swayWas){sys.swayWas=!!car.swayOff;toast(car.swayOff?"Front sway bar disconnected: more wheel travel for the trail":"Front sway bar reconnected")}
+  if(st.started){controls(dt);assist(dt);updateTraffic(dt);updatePark(dt);enforcePkgs();weatherTick(dt);try{hapTick(dt)}catch(e){}try{hoseTick()}catch(e){}if(!!car.swayOff!==!!sys.swayWas){sys.swayWas=!!car.swayOff;toast(car.swayOff?"Front sway bar disconnected: more wheel travel for the trail":"Front sway bar reconnected")}
     if(sys.hillDemo){sys.hillT+=dt;if(sys.hillT>6){sys.hillT=0;st.leveling=!st.leveling;toast(st.leveling?"Active levelling ON: beam hugs the ground":"Active levelling OFF: beam fixed to the body")}if(!car.offroad&&Math.abs(car.vx)>3)sys.hillDemo=false}
     if(sys.aim!=null){sys.levT=(sys.levT||0)+dt;if(sys.levT>5){sys.levT=0;st.leveling=!st.leveling;toast(st.leveling?"Levelling ON: beam back down on the road":"Levelling OFF: the loaded car aims the beam high")}
       if(Math.hypot(car.px-sys.aim.x,car.py-sys.aim.y)>40){sys.aim=null;car.cargo=0;st.leveling=true}}acc+=dt;const h=1/G().hz;while(acc>=h){physics(h);acc-=h}if(car.crashed>0)car.crashed-=dt;updateAudio()}
