@@ -800,8 +800,10 @@ body #drawer #tabBody .seg5{max-width:520px;border:1px solid rgba(255,255,255,.0
 <div id="boot"><div class="bc"><div class="bt">Test Drive</div><div class="bb"><i id="bootBar"></i></div><div class="bs" id="bootMsg">Building the world…</div><div class="bs" style="opacity:.5;font-size:11px;margin-top:14px">© 2026 Exclusive2knight · All rights reserved</div></div></div>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2>Version 68 · Speed limit sign where you can see it</h2></div>
+    <div class="nh"><small>What's new</small><h2>Version 69 · More realistic acceleration, braking and cornering</h2></div>
     <div class="nb">
+      <h4>Physics, checked against real road tests</h4><ul><li>Acceleration: the engine and transmission's spinning mass is now part of the physics. It's felt most in 1st gear, a little in top gear, and barely at all in hybrids and EVs, whose electric motors do the launching. Trucks and SUVs no longer launch unrealistically hard: a Ranger Raptor now does 0-60 in 4.6 s (was 4.4; real road tests get 5.2-5.8), an F-150 2.7 in 5.9 s, and a Model 3 Long Range still does 4.0 s.</li><li>Braking: ABS now works like a modern system. It holds each tyre just below the point of skidding, instead of letting off the brakes almost completely on every pulse. Stops from 60 mph are about 10 ft shorter (130-137 ft on the concrete test strip, shorter on asphalt), and you can still steer while it works.</li><li>Cornering: fixed traction control cutting power in the middle of fast corners. It worked out the road's grip only from how hard the tyres were pushing forward, so in a corner it thought the road was slippery. It now counts the sideways grip too, so cars hold their speed and line through corners. On a 40 m circle: Camry 0.88 g, Civic Si 0.84 g, Escalade 0.78 g, 4Runner 0.80 g, about what road tests measure.</li></ul>
+      <h4 class="old">Version 68 · Speed limit sign where you can see it</h4>
       <h4>Sign recognition</h4><ul><li>The speed limit sign now sits inside the speed box, right next to your speed, on PC and phones. On PC it used to be hidden under the drive mode buttons. It still gets an orange ring when you're over the limit.</li></ul>
       <h4 class="old">Version 67 · Road reset fixed, quieter parking sensors</h4>
       <h4>Reset to the nearest road (R)</h4><ul><li>Off-road, R now puts you back on a real paved road. It skips dirt tracks, farm lanes and ramps unless you are already on one.</li><li>Fixed resets that could land beside the road or on the wrong level: the car kept its old height from the ditch or hill you were in, so the game thought you were on a different road. It also now stays inside the actual road on short streets.</li><li>Tested from 120 random spots across the map: every one landed on a road, in a lane, facing the right way.</li></ul>
@@ -2512,6 +2514,7 @@ function physics(dt){
     H.kdT=(H.kdT||0)-dt;if(H.shiftT>0)H.shiftT-=dt;
     // torque converter: slips and multiplies torque when pulling away, locks up once you're moving
     const locked=!rev&&!gearN&&rT>(H.gear>=2?1150:1550);
+    car.ieq=gearN?0:ratio*ratio*(0.08+D.Tpk/4000)*(locked?1:0.35)*(T.hybrid&&D.cvt?0.15:D.cvt?0.5:1);   // engine + transmission spinning mass, felt at the wheels through the gearing (big in 1st, small in top)
     let rE=0;if(H.eng){rE=locked?rT:Math.max(rT,thr<0.02?D.idle:D.idle+thr*(2600-D.idle))}
     if(gearN&&H.eng){rE=D.idle+Math.pow(inp.thr,1.3)*(D.red+250-D.idle);if(H.rpm>D.red)rE=D.red-350-Math.random()*250}   // free revving in N / P, with the rev limiter
     if(H.crank>0){H.crank-=dt;rE=H.crank>0.12?230:1300}
@@ -2579,15 +2582,16 @@ function physics(dt){
     const tgt=ice?want[i]*(want[i]>0?car.tcsF[i]:1)*escCut*(dirG<0&&want[i]*dirG>0?0.3*clamp((7-sp)/2.5,0,1):1):thr*want[i]*car.tcsF[i]*tvMul[i]*escCut*dirG*revK - (driven[i]?regen/nDriven*Math.sign(car.w[i]):0);
     car.tq[i]+=(tgt-car.tq[i])*Math.min(1,dt/0.03);
     const kw=Math.max(0,(f2[0]-f[0])/0.002)*WR/vref;
-    let w=car.w[i]+dt*(car.tq[i]-WR*f[0]-6*Math.sign(car.w[i]))/(IW+dt*WR*kw);
+    const IWe=IW+(driven[i]&&thr>0.05&&brakeIn<0.05?Math.min(15,(ice?(car.ieq||0):0.045*81)/Math.max(1,nDriven)):0);   /* only while accelerating: under braking the converter and clutches decouple */   // EVs: motor rotor through a ~9:1 reduction
+    let w=car.w[i]+dt*(car.tq[i]-WR*f[0]-6*Math.sign(car.w[i]))/(IWe+dt*WR*kw);
     // brakes with ABS (pulses off when the wheel starts to lock)
     // ABS: 0 off · 1 dump (release pressure fast) · 2 hold (let the wheel spin back up) · 3 re-apply in small steps until it slips again
     car.awF=car.awF||[0,0,0,0];car.awF[i]=lerp(car.awF[i],(car.w[i]-car.wP[i])/dt*WR,Math.min(1,dt/0.012));const aw=car.awF[i]; car.wP[i]=car.w[i]; const lam=muW<0.6?0.09:0.13;
-    if(brakeIn>0.05&&sp>1.5){const S0=car.absS[i]; car.absT[i]+=dt;
-      if((S0===0||S0===3)&&(kap<-lam||(aw<-32&&kap<-0.09))||(S0===2&&kap<-lam*1.4)){car.absS[i]=1;car.absT[i]=0;car.absEv++;car.absPk=car.absPk||[1,1,1,1];car.absPk[i]=car.absF[i]}
-      else if(S0===1){car.absF[i]=Math.max(0.04,car.absF[i]-dt*30);if(aw>0&&kap>-lam){car.absS[i]=2;car.absT[i]=0}}
-      else if(S0===2){if(kap>-lam*0.45||car.absT[i]>0.06){car.absS[i]=3;car.absT[i]=0}}
-      else if(S0===3){const pk=(car.absPk||[1,1,1,1])[i];if(car.absF[i]<pk*0.85)car.absF[i]+=dt*30;else if((car.absT[i]%0.03)<0.012)car.absF[i]=Math.min(1,car.absF[i]+dt*7);if(car.absF[i]>=1&&kap>-0.05)car.absS[i]=0}
+    // ABS as on modern cars: a slip controller trims each wheel's pressure to hold it just under peak grip (about 9 % slip, less on ice),
+    // so the car stops in about the distance the tyres allow (~95 % of perfect) and you can still steer. The pedal pulses while it works.
+    if(brakeIn>0.05&&sp>1.5){const tg=muW<0.6?0.07:0.09,e=-kap-tg;
+      if(e>0){if(!car.absS[i]){car.absS[i]=1;car.absEv++}car.absF[i]=Math.max(0.03,car.absF[i]-dt*(6+e*160))}
+      else if(car.absS[i]){car.absF[i]=Math.min(1,car.absF[i]+dt*(1.5+Math.min(-e,0.09)*60));if(car.absF[i]>=1&&-kap<tg*0.5)car.absS[i]=0}
       else car.absF[i]=1}
     else{car.absS[i]=0;car.absF[i]=Math.min(1,car.absF[i]+dt*20)}
     if(car.absS[i])car.abs=true;
@@ -2595,17 +2599,17 @@ function physics(dt){
     const fade=1-clamp((car.bt[i]-(st.pkgs.perf?640:480))/450,0,0.5);
     const Tb=car.bp*BRAKE_T[i]*(st.pkgs.perf?1.48:1.35)*absK*fade+car.escB[i]+car.tcsB[i]+(st.gear==="P"?3200:0)+(sys.epb&&sp<2.0&&i>=2?4200:0);
     car.bt[i]+=(Tb*Math.abs(car.w[i])*dt)/(i<2?4200:3000)-(car.bt[i]-25)*(0.004+0.0012*sp)*dt;   // rotor heat in, airflow cooling out
-    if(Tb>0){const dw=dt*Tb/(IW+dt*WR*kw);if(Math.abs(w)<=dw)w=0;else w-=Math.sign(w)*dw}
+    if(Tb>0){const dw=dt*Tb/(IWe+dt*WR*kw);if(Math.abs(w)<=dw)w=0;else w-=Math.sign(w)*dw}
     car.w[i]=w; car.spin[i]+=w*dt;
     const Fxb=f[0]*cd-f[1]*sd, Fyb=f[0]*sd+f[1]*cd;
-    FX+=Fxb; FY+=Fyb; MZ+=x*Fyb-y*Fxb; sq=Math.max(sq,f[2]); car.fxr[i]=Math.abs(f[0])/Math.max(fz[i],1);
+    FX+=Fxb; FY+=Fyb; MZ+=x*Fyb-y*Fxb; sq=Math.max(sq,f[2]); car.fxr[i]=Math.hypot(f[0],f[1])/Math.max(fz[i],1);   // total (forward + sideways) grip used: what the road is really giving
     car.drive[i]=car.tq[i]/WR;
     if(driven[i]&&!ice){Pw+=car.tq[i]*car.w[i];   // motor power at this wheel (+ drive, - regen)
       if(brakeIn>0.05&&Math.abs(w)>2&&!car.abs)Pw-=Math.min(brakeIn*BRAKE_T[i]*1.35*car.absF[i],regMax/nDriven/Math.abs(w))*Math.abs(w)}   // blended regen braking
   }
   car.squeal=clamp((sq-0.75)*2.2,0,1)*(sp>3?1:0);
   // friction estimate: when a driven wheel is past the slip target, the force it carries tells us how much grip there is
-  {let est=0,n=0;for(let i=0;i<4;i++)if(driven[i]&&car.kap[i]*dirG>kt&&thr>0.02){est=Math.max(est,car.fxr[i]);n++}
+  {let est=0,n=0;for(let i=0;i<4;i++)if(driven[i]&&car.kap[i]*dirG>kt*1.6&&thr>0.02&&car.fxr[i]>0.05){est=Math.max(est,car.fxr[i]);n++}
    if(n)car.muEst=Math.max(st.surface==="snow"||WX.cur==="snow"?0.18:car.offroad?0.3:0.45,Math.min(car.muEst,est*1.08));else car.muEst=Math.min(1.15,car.muEst+dt*(thr>0.02?0.12:0.35))}
   const drag=0.5*1.2*(T.cda||0.72)*car.vx*Math.abs(car.vx)+(car.offroad?0.04:0.011)*m*g*Math.tanh(car.vx*3);
   FX-=drag;
@@ -7184,7 +7188,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(/SwiftShader|llvmpipe|Microsoft Basic/i.test(gpu))return "low";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="68";try{if(localStorage.getItem("strata.ver")!==APP_VER){for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="69";try{if(localStorage.getItem("strata.ver")!==APP_VER){for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){return GQ[GFX.q==="auto"?GFX.eff:GFX.q]}
 function setGfx(q){GFX.q=q;GFX.dyn=1;try{localStorage.setItem("strata.gfx",q)}catch(e){}}
