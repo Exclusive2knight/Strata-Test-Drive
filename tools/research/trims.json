@@ -1,0 +1,599 @@
+{
+"Lincoln MKC \u00b7 2019": [
+[
+"mkc19_std",
+"2019 Lincoln MKC Standard FWD",
+"2.0 L EcoBoost \u00b7 6-speed \u00b7 FWD \u00b7 245 hp"
+],
+[
+"mkc19_sel",
+"2019 Lincoln MKC Select AWD",
+"2.0 L EcoBoost \u00b7 6-speed \u00b7 AWD \u00b7 245 hp"
+],
+[
+"mkc19_res",
+"2019 Lincoln MKC Reserve AWD",
+"2.0 L EcoBoost \u00b7 6-speed \u00b7 AWD \u00b7 245 hp"
+],
+[
+"mkc19_bl",
+"2019 Lincoln MKC Black Label 2.3L AWD",
+"2.3 L EcoBoost \u00b7 6-speed \u00b7 AWD \u00b7 285 hp"
+]
+],
+"Lexus GX \u00b7 2026": [
+[
+"lex_gx_prem",
+"2026 Lexus GX Premium",
+"3.4 L twin-turbo V6 \u00b7 10-speed \u00b7 4WD \u00b7 349 hp"
+],
+[
+"lex_gx_op",
+"2026 Lexus GX Overtrail",
+"3.4 L twin-turbo V6 \u00b7 10-speed \u00b7 4WD \u00b7 349 hp"
+],
+[
+"lex_gx_lux",
+"2026 Lexus GX Luxury",
+"3.4 L twin-turbo V6 \u00b7 10-speed \u00b7 4WD \u00b7 349 hp"
+]
+],
+"Lexus LX \u00b7 2026": [
+[
+"lex_lx_prem",
+"2026 Lexus LX LX 600 Premium",
+"3.4 L twin-turbo V6 \u00b7 10-speed \u00b7 4WD \u00b7 409 hp"
+],
+[
+"lex_lx_700h",
+"2026 Lexus LX LX 700h F Sport",
+"3.4 L twin-turbo V6 hybrid \u00b7 10-speed \u00b7 4WD \u00b7 457 hp"
+]
+],
+"Lexus NX \u00b7 2026": [
+[
+"lex_nx_350",
+"2026 Lexus NX NX 350 AWD",
+"2.4 L turbo \u00b7 8-speed \u00b7 AWD \u00b7 275 hp"
+],
+[
+"lex_nx_350h",
+"2026 Lexus NX NX 350h Premium",
+"2.5 L hybrid \u00b7 eCVT \u00b7 AWD \u00b7 240 hp"
+],
+[
+"lex_nx_450h",
+"2026 Lexus NX NX 450h+ Luxury",
+"2.5 L plug-in hybrid \u00b7 eCVT \u00b7 AWD \u00b7 304 hp \u00b7 37 mi EV"
+]
+],
+"Lexus RZ \u00b7 2026": [
+[
+"lex_rz_350e",
+"2026 Lexus RZ RZ 350e FWD",
+"Single motor \u00b7 FWD \u00b7 221 hp \u00b7 74.7 kWh \u00b7 about 266 mi"
+],
+[
+"lex_rz_450e",
+"2026 Lexus RZ RZ 450e Premium",
+"Dual motor \u00b7 AWD \u00b7 308 hp \u00b7 74.7 kWh \u00b7 about 220 mi"
+],
+[
+"lex_rz_550e",
+"2026 Lexus RZ RZ 550e F Sport",
+"Dual motor \u00b7 AWD \u00b7 402 hp \u00b7 74.7 kWh \u00b7 about 220 mi"
+]
+],
+"Lexus TX \u00b7 2026": [
+[
+"lex_tx_350",
+"2026 Lexus TX TX 350 Premium AWD",
+"2.4 L turbo \u00b7 8-speed \u00b7 AWD \u00b7 275 hp"
+],
+[
+"lex_tx_500h",
+"2026 Lexus TX TX 500h F Sport Performance",
+"2.4 L turbo hybrid \u00b7 6-speed \u00b7 AWD \u00b7 366 hp"
+],
+[
+"lex_tx_550h",
+"2026 Lexus TX TX 550h+ Luxury",
+"3.5 L V6 plug-in hybrid \u00b7 eCVT \u00b7 AWD \u00b7 404 hp \u00b7 33 mi EV"
+]
+],
+"Lexus UX \u00b7 2026": [
+[
+"lex_ux_base",
+"2026 Lexus UX UX 300h AWD",
+"2.0 L hybrid \u00b7 eCVT \u00b7 AWD \u00b7 196 hp"
+],
+[
+"lex_ux_prem",
+"2026 Lexus UX UX 300h Premium AWD",
+"2.0 L hybrid \u00b7 eCVT \u00b7 AWD \u00b7 196 hp"
+],
+[
+"lex_ux_fsh",
+"2026 Lexus UX UX 300h F SPORT Handling AWD",
+"2.0 L hybrid \u00b7 eCVT \u00b7 AWD \u00b7 196 hp"
+]
+],
+"Lexus TZ \u00b7 2027": [
+[
+"lex_tz_prem",
+"2027 Lexus TZ TZ 450e Premium",
+"Dual motor \u00b7 AWD \u00b7 308 hp \u00b7 77 kWh \u00b7 about 253 mi"
+],
+[
+"lex_tz_lux",
+"2027 Lexus TZ TZ 450e Luxury",
+"Dual motor \u00b7 AWD \u00b7 308 hp \u00b7 95.8 kWh \u00b7 about 315 mi"
+]
+],
+"Toyota 4Runner \u00b7 2026": [
+[
+"toy_4runner_sr5",
+"2026 Toyota 4Runner SR5 4x2",
+"2.4 L turbo \u00b7 8-speed \u00b7 RWD \u00b7 278 hp"
+],
+[
+"toy_4runner_trd",
+"2026 Toyota 4Runner TRD Off-Road 4x4",
+"2.4 L turbo \u00b7 8-speed \u00b7 4WD \u00b7 278 hp"
+],
+[
+"toy_4runner_lim",
+"2026 Toyota 4Runner Limited 4x4",
+"2.4 L turbo \u00b7 8-speed \u00b7 4WD \u00b7 278 hp"
+],
+[
+"toy_4runner_limh",
+"2026 Toyota 4Runner Limited 4x4 i-FORCE MAX",
+"2.4 L turbo i-FORCE MAX hybrid \u00b7 8-speed \u00b7 4x4 \u00b7 326 hp"
+],
+[
+"toy_4runner_pro",
+"2026 Toyota 4Runner TRD Pro",
+"2.4 L turbo i-FORCE MAX hybrid \u00b7 8-speed \u00b7 4x4 \u00b7 326 hp \u00b7 TRD Pro"
+],
+[
+"toy_4runner_tr",
+"2026 Toyota 4Runner Trailhunter",
+"2.4 L turbo i-FORCE MAX hybrid \u00b7 8-speed \u00b7 4x4 \u00b7 326 hp \u00b7 Trailhunter"
+]
+],
+"Toyota bZ \u00b7 2027": [
+[
+"toy_bz_xle",
+"2027 Toyota bZ XLE FWD",
+"Single motor \u00b7 FWD \u00b7 221 hp \u00b7 74.7 kWh \u00b7 about 314 mi"
+],
+[
+"toy_bz_xleawd",
+"2027 Toyota bZ XLE AWD",
+"Dual motor \u00b7 AWD \u00b7 338 hp \u00b7 74.7 kWh \u00b7 about 288 mi"
+],
+[
+"toy_bz_lim",
+"2027 Toyota bZ Limited FWD",
+"Single motor \u00b7 FWD \u00b7 221 hp \u00b7 74.7 kWh \u00b7 about 314 mi"
+],
+[
+"toy_bz_limawd",
+"2027 Toyota bZ Limited AWD",
+"Dual motor \u00b7 AWD \u00b7 338 hp \u00b7 74.7 kWh \u00b7 about 278 mi"
+]
+],
+"Toyota bZ Woodland \u00b7 2026": [
+[
+"toy_bzw_base",
+"2026 Toyota bZ Woodland bZ Woodland AWD",
+"Dual motor \u00b7 AWD \u00b7 375 hp \u00b7 74.7 kWh \u00b7 about 260 mi"
+],
+[
+"toy_bzw_prem",
+"2026 Toyota bZ Woodland bZ Woodland Premium AWD",
+"Dual motor \u00b7 AWD \u00b7 375 hp \u00b7 74.7 kWh \u00b7 about 260 mi"
+]
+],
+"Toyota C-HR \u00b7 2027": [
+[
+"toy_chr_se",
+"2027 Toyota C-HR SE AWD",
+"Dual motor \u00b7 AWD \u00b7 338 hp \u00b7 74.7 kWh \u00b7 about 273 mi"
+],
+[
+"toy_chr_xse",
+"2027 Toyota C-HR XSE AWD",
+"Dual motor \u00b7 AWD \u00b7 338 hp \u00b7 74.7 kWh \u00b7 about 273 mi"
+]
+],
+"Toyota Corolla Hatchback \u00b7 2026": [
+[
+"toy_corolla_hb_se",
+"2026 Toyota Corolla Hatchback SE",
+"2.0 L 4-cyl \u00b7 CVT \u00b7 FWD \u00b7 169 hp"
+],
+[
+"toy_corolla_hb_fx",
+"2026 Toyota Corolla Hatchback FX Edition",
+"2.0 L 4-cyl \u00b7 CVT \u00b7 FWD \u00b7 169 hp"
+],
+[
+"toy_corolla_hb_xse",
+"2026 Toyota Corolla Hatchback XSE",
+"2.0 L 4-cyl \u00b7 CVT \u00b7 FWD \u00b7 169 hp"
+]
+],
+"Toyota Corolla Cross \u00b7 2026": [
+[
+"toy_corolla_cross_l",
+"2026 Toyota Corolla Cross L (2.0 L)",
+"2.0 L 4-cyl \u00b7 CVT \u00b7 FWD \u00b7 169 hp"
+],
+[
+"toy_corolla_cross_hs",
+"2026 Toyota Corolla Cross Hybrid S AWD",
+"2.0 L hybrid \u00b7 eCVT \u00b7 AWD \u00b7 196 hp"
+],
+[
+"toy_corolla_cross_hse",
+"2026 Toyota Corolla Cross Hybrid SE AWD",
+"2.0 L hybrid \u00b7 eCVT \u00b7 AWD \u00b7 196 hp"
+],
+[
+"toy_corolla_cross_hxse",
+"2026 Toyota Corolla Cross Hybrid XSE AWD",
+"2.0 L hybrid \u00b7 eCVT \u00b7 AWD \u00b7 196 hp"
+]
+],
+"Toyota Crown Signia \u00b7 2026": [
+[
+"toy_crown_signia_xle",
+"2026 Toyota Crown Signia XLE",
+"2.5 L hybrid \u00b7 eCVT \u00b7 AWD \u00b7 240 hp"
+],
+[
+"toy_crown_signia_lim",
+"2026 Toyota Crown Signia Limited",
+"2.5 L hybrid \u00b7 eCVT \u00b7 AWD \u00b7 240 hp"
+]
+],
+"Toyota Grand Highlander \u00b7 2026": [
+[
+"toy_grand_highlander_xle",
+"2026 Toyota Grand Highlander XLE AWD (2.4T)",
+"2.4 L turbo \u00b7 8-speed \u00b7 AWD \u00b7 265 hp"
+],
+[
+"toy_grand_highlander_hxle",
+"2026 Toyota Grand Highlander Hybrid XLE AWD",
+"2.5 L hybrid \u00b7 eCVT \u00b7 AWD \u00b7 245 hp"
+],
+[
+"toy_grand_highlander_hlim",
+"2026 Toyota Grand Highlander Hybrid Limited AWD",
+"2.5 L hybrid \u00b7 eCVT \u00b7 AWD \u00b7 245 hp"
+],
+[
+"toy_grand_highlander_max",
+"2026 Toyota Grand Highlander Hybrid MAX Platinum",
+"2.4 L turbo Hybrid MAX \u00b7 6-speed \u00b7 AWD \u00b7 362 hp"
+]
+],
+"Toyota Highlander \u00b7 2026": [
+[
+"toy_highlander_xle",
+"2026 Toyota Highlander XLE AWD",
+"2.4 L turbo \u00b7 8-speed \u00b7 AWD \u00b7 265 hp"
+],
+[
+"toy_highlander_hxle",
+"2026 Toyota Highlander Hybrid XLE AWD",
+"2.5 L hybrid \u00b7 eCVT \u00b7 AWD \u00b7 243 hp"
+],
+[
+"toy_highlander_plat",
+"2026 Toyota Highlander Hybrid Platinum AWD",
+"2.5 L hybrid \u00b7 eCVT \u00b7 AWD \u00b7 243 hp"
+]
+],
+"Toyota Land Cruiser \u00b7 2026": [
+[
+"toy_land_cruiser_1958",
+"2026 Toyota Land Cruiser 1958",
+"2.4 L turbo i-FORCE MAX hybrid \u00b7 8-speed \u00b7 4WD \u00b7 326 hp"
+],
+[
+"toy_land_cruiser_lc",
+"2026 Toyota Land Cruiser Land Cruiser",
+"2.4 L turbo i-FORCE MAX hybrid \u00b7 8-speed \u00b7 4WD \u00b7 326 hp"
+]
+],
+"Toyota Prius \u00b7 2026": [
+[
+"toy_prius_le",
+"2026 Toyota Prius LE",
+"2.0 L hybrid \u00b7 eCVT \u00b7 FWD \u00b7 196 hp"
+],
+[
+"toy_prius_xle",
+"2026 Toyota Prius XLE",
+"2.0 L hybrid \u00b7 eCVT \u00b7 FWD \u00b7 196 hp"
+],
+[
+"toy_prius_lim",
+"2026 Toyota Prius Limited AWD",
+"2.0 L hybrid \u00b7 eCVT \u00b7 AWD \u00b7 196 hp"
+],
+[
+"toy_prius_prime",
+"2026 Toyota Prius Prius Plug-in XSE",
+"2.0 L plug-in hybrid \u00b7 eCVT \u00b7 FWD \u00b7 220 hp \u00b7 44 mi EV"
+]
+],
+"Toyota Sequoia \u00b7 2026": [
+[
+"toy_sequoia_sr5",
+"2026 Toyota Sequoia SR5 4x4",
+"3.4 L twin-turbo i-FORCE MAX hybrid \u00b7 10-speed \u00b7 4x4 \u00b7 437 hp"
+],
+[
+"toy_sequoia_lim",
+"2026 Toyota Sequoia Limited 4x4",
+"3.4 L twin-turbo i-FORCE MAX hybrid \u00b7 10-speed \u00b7 4x4 \u00b7 437 hp"
+],
+[
+"toy_sequoia_plat",
+"2026 Toyota Sequoia Platinum 4x4",
+"3.4 L twin-turbo i-FORCE MAX hybrid \u00b7 10-speed \u00b7 4x4 \u00b7 437 hp"
+],
+[
+"toy_sequoia_trd",
+"2026 Toyota Sequoia TRD Pro",
+"3.4 L twin-turbo i-FORCE MAX hybrid \u00b7 10-speed \u00b7 4x4 \u00b7 437 hp"
+],
+[
+"toy_sequoia_cap",
+"2026 Toyota Sequoia Capstone",
+"3.4 L twin-turbo i-FORCE MAX hybrid \u00b7 10-speed \u00b7 4x4 \u00b7 437 hp"
+]
+],
+"Toyota Sienna \u00b7 2026": [
+[
+"toy_sienna_le",
+"2026 Toyota Sienna LE FWD",
+"2.5 L hybrid \u00b7 eCVT \u00b7 FWD \u00b7 245 hp"
+],
+[
+"toy_sienna_xle",
+"2026 Toyota Sienna XLE AWD",
+"2.5 L hybrid \u00b7 eCVT \u00b7 AWD \u00b7 245 hp"
+],
+[
+"toy_sienna_wood",
+"2026 Toyota Sienna Woodland AWD",
+"2.5 L hybrid \u00b7 eCVT \u00b7 AWD \u00b7 245 hp"
+],
+[
+"toy_sienna_plat",
+"2026 Toyota Sienna Platinum AWD",
+"2.5 L hybrid \u00b7 eCVT \u00b7 AWD \u00b7 245 hp"
+]
+],
+"Toyota Tacoma \u00b7 2026": [
+[
+"toy_tacoma_sr",
+"2026 Toyota Tacoma SR 4x2",
+"2.4 L turbo \u00b7 8-speed \u00b7 RWD \u00b7 228 hp"
+],
+[
+"toy_tacoma_trdsport",
+"2026 Toyota Tacoma TRD Sport 4x4",
+"2.4 L turbo \u00b7 8-speed \u00b7 4x4 \u00b7 278 hp"
+],
+[
+"toy_tacoma_trdor",
+"2026 Toyota Tacoma TRD Off-Road 4x4",
+"2.4 L turbo \u00b7 8-speed \u00b7 4x4 \u00b7 278 hp"
+],
+[
+"toy_tacoma_lim",
+"2026 Toyota Tacoma Limited 4x4 i-FORCE MAX",
+"2.4 L turbo i-FORCE MAX hybrid \u00b7 8-speed \u00b7 4x4 \u00b7 326 hp"
+],
+[
+"toy_tacoma_pro",
+"2026 Toyota Tacoma TRD Pro i-FORCE MAX",
+"2.4 L turbo i-FORCE MAX hybrid \u00b7 8-speed \u00b7 4x4 \u00b7 326 hp \u00b7 TRD Pro"
+]
+],
+"Toyota Tundra \u00b7 2026": [
+[
+"toy_tundra_sr5",
+"2026 Toyota Tundra SR5 CrewMax 4x2",
+"3.4 L twin-turbo V6 \u00b7 10-speed \u00b7 RWD \u00b7 389 hp"
+],
+[
+"toy_tundra_lim",
+"2026 Toyota Tundra Limited CrewMax 4x4",
+"3.4 L twin-turbo V6 \u00b7 10-speed \u00b7 4x4 \u00b7 389 hp"
+],
+[
+"toy_tundra_plat",
+"2026 Toyota Tundra Platinum i-FORCE MAX",
+"3.4 L twin-turbo i-FORCE MAX hybrid \u00b7 10-speed \u00b7 4x4 \u00b7 437 hp"
+],
+[
+"toy_tundra_trdpro",
+"2026 Toyota Tundra TRD Pro i-FORCE MAX",
+"3.4 L twin-turbo i-FORCE MAX hybrid \u00b7 10-speed \u00b7 4x4 \u00b7 437 hp \u00b7 TRD Pro"
+],
+[
+"toy_tundra_cap",
+"2026 Toyota Tundra Capstone",
+"3.4 L twin-turbo i-FORCE MAX hybrid \u00b7 10-speed \u00b7 4x4 \u00b7 437 hp \u00b7 Capstone"
+]
+],
+"Subaru Impreza \u00b7 2026": [
+[
+"sub_impreza_sport",
+"2026 Subaru Impreza Sport",
+"2.0 L boxer \u00b7 CVT \u00b7 AWD \u00b7 152 hp"
+],
+[
+"sub_impreza_rs",
+"2026 Subaru Impreza RS",
+"2.5 L boxer \u00b7 CVT \u00b7 AWD \u00b7 180 hp"
+]
+],
+"Subaru Crosstrek \u00b7 2026": [
+[
+"sub_crosstrek_base",
+"2026 Subaru Crosstrek Base",
+"2.5 L boxer \u00b7 CVT \u00b7 AWD \u00b7 180 hp"
+],
+[
+"sub_crosstrek_prem",
+"2026 Subaru Crosstrek Premium",
+"2.5 L boxer \u00b7 CVT \u00b7 AWD \u00b7 180 hp"
+],
+[
+"sub_crosstrek_sport",
+"2026 Subaru Crosstrek Sport",
+"2.5 L boxer \u00b7 CVT \u00b7 AWD \u00b7 180 hp"
+],
+[
+"sub_crosstrek_wild",
+"2026 Subaru Crosstrek Wilderness",
+"2.5 L boxer \u00b7 CVT \u00b7 AWD \u00b7 180 hp \u00b7 Wilderness"
+],
+[
+"sub_crosstrek_hyb",
+"2026 Subaru Crosstrek Sport Hybrid",
+"2.5 L boxer hybrid \u00b7 eCVT \u00b7 AWD \u00b7 194 hp"
+]
+],
+"Subaru Forester \u00b7 2026": [
+[
+"sub_forester_base",
+"2026 Subaru Forester Base",
+"2.5 L boxer \u00b7 CVT \u00b7 AWD \u00b7 180 hp"
+],
+[
+"sub_forester_prem",
+"2026 Subaru Forester Premium",
+"2.5 L boxer \u00b7 CVT \u00b7 AWD \u00b7 180 hp"
+],
+[
+"sub_forester_sport",
+"2026 Subaru Forester Sport",
+"2.5 L boxer \u00b7 CVT \u00b7 AWD \u00b7 180 hp"
+],
+[
+"sub_forester_wild",
+"2026 Subaru Forester Wilderness",
+"2.5 L boxer \u00b7 CVT \u00b7 AWD \u00b7 180 hp"
+],
+[
+"sub_forester_tour",
+"2026 Subaru Forester Touring",
+"2.5 L boxer \u00b7 CVT \u00b7 AWD \u00b7 180 hp"
+],
+[
+"sub_forester_hyb",
+"2026 Subaru Forester Sport Hybrid",
+"2.5 L boxer hybrid \u00b7 eCVT \u00b7 AWD \u00b7 194 hp"
+]
+],
+"Subaru Outback \u00b7 2026": [
+[
+"sub_outback_prem",
+"2026 Subaru Outback Premium",
+"2.5 L boxer \u00b7 CVT \u00b7 AWD \u00b7 180 hp"
+],
+[
+"sub_outback_lim",
+"2026 Subaru Outback Limited",
+"2.5 L boxer \u00b7 CVT \u00b7 AWD \u00b7 180 hp"
+],
+[
+"sub_outback_tourxt",
+"2026 Subaru Outback Touring XT",
+"2.4 L turbo boxer \u00b7 CVT \u00b7 AWD \u00b7 260 hp"
+],
+[
+"sub_outback_wild",
+"2026 Subaru Outback Wilderness",
+"2.4 L turbo boxer \u00b7 CVT \u00b7 AWD \u00b7 260 hp \u00b7 Wilderness"
+]
+],
+"Subaru Ascent \u00b7 2027": [
+[
+"sub_ascent_prem",
+"2027 Subaru Ascent Premium",
+"2.4 L turbo boxer \u00b7 CVT \u00b7 AWD \u00b7 260 hp"
+],
+[
+"sub_ascent_onyx",
+"2027 Subaru Ascent Onyx Edition",
+"2.4 L turbo boxer \u00b7 CVT \u00b7 AWD \u00b7 260 hp"
+],
+[
+"sub_ascent_tour",
+"2027 Subaru Ascent Touring",
+"2.4 L turbo boxer \u00b7 CVT \u00b7 AWD \u00b7 260 hp"
+]
+],
+"Subaru Solterra \u00b7 2026": [
+[
+"sub_solterra_prem",
+"2026 Subaru Solterra Premium",
+"Dual motor \u00b7 AWD \u00b7 233 hp \u00b7 74.7 kWh \u00b7 about 288 mi"
+],
+[
+"sub_solterra_lim",
+"2026 Subaru Solterra Limited",
+"Dual motor \u00b7 AWD \u00b7 233 hp \u00b7 74.7 kWh \u00b7 about 288 mi"
+],
+[
+"sub_solterra_xt",
+"2026 Subaru Solterra Touring XT",
+"Dual motor \u00b7 AWD \u00b7 338 hp \u00b7 74.7 kWh \u00b7 about 275 mi"
+]
+],
+"Subaru Trailseeker \u00b7 2027": [
+[
+"sub_trailseeker_prem",
+"2027 Subaru Trailseeker Premium",
+"Dual motor \u00b7 AWD \u00b7 375 hp \u00b7 74.7 kWh \u00b7 about 260 mi"
+],
+[
+"sub_trailseeker_lim",
+"2027 Subaru Trailseeker Limited",
+"Dual motor \u00b7 AWD \u00b7 375 hp \u00b7 74.7 kWh \u00b7 about 260 mi"
+],
+[
+"sub_trailseeker_tour",
+"2027 Subaru Trailseeker Touring",
+"Dual motor \u00b7 AWD \u00b7 375 hp \u00b7 74.7 kWh \u00b7 about 260 mi"
+]
+],
+"Subaru Uncharted \u00b7 2027": [
+[
+"sub_uncharted_prem",
+"2027 Subaru Uncharted Premium FWD",
+"Single motor \u00b7 FWD \u00b7 221 hp \u00b7 74.7 kWh \u00b7 about 290 mi"
+],
+[
+"sub_uncharted_sport",
+"2027 Subaru Uncharted Sport AWD",
+"Dual motor \u00b7 AWD \u00b7 338 hp \u00b7 74.7 kWh \u00b7 about 260 mi"
+],
+[
+"sub_uncharted_gt",
+"2027 Subaru Uncharted GT AWD",
+"Dual motor \u00b7 AWD \u00b7 338 hp \u00b7 74.7 kWh \u00b7 about 260 mi"
+]
+]
+}

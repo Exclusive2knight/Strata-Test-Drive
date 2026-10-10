@@ -1,0 +1,1730 @@
+{
+ "toy_4runner_sr5": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle response and favors early upshifts and economy climate use."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default balance of throttle response, shift timing and steering weight."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Sharper throttle, holds lower gears longer and adds steering weight."
+   },
+   {
+    "name": "TOW/HAUL",
+    "type": "tow",
+    "does": "Separate button: holds gears longer and adds engine braking when towing or loaded."
+   }
+  ],
+  "terrain": [
+   "Auto LSD: brake-based limited-slip on rear axle"
+  ],
+  "susp": {
+   "type": "passive",
+   "name": "Double wishbone front / multilink coil rear, passive",
+   "height": false
+  },
+  "notes": "Drive Mode Select confirmed on i-FORCE MAX; non-hybrid grade assumed Eco/Normal/Sport."
+ },
+ "toy_4runner_trd": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle response and favors early upshifts and economy climate use."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default balance of throttle response, shift timing and steering weight."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Sharper throttle, holds lower gears longer and adds steering weight."
+   },
+   {
+    "name": "TOW/HAUL",
+    "type": "tow",
+    "does": "Separate button: holds gears longer and adds engine braking when towing or loaded."
+   }
+  ],
+  "terrain": [
+   "Part-time 4WD with 2-speed transfer case",
+   "Multi-Terrain Select: 4H Auto/Dirt/Sand/Mud/Deep Snow; 4L Auto/Sand/Mud/Rock",
+   "CRAWL Control: low-speed off-road cruise, 5 speeds",
+   "Downhill Assist Control: limits descent speed",
+   "Electronic locking rear differential",
+   "Active Traction Control (A-TRAC): brake-based wheel-slip control"
+  ],
+  "susp": {
+   "type": "tuned",
+   "name": "Bilstein monotube remote-reservoir shocks (ESCV)",
+   "height": false
+  },
+  "notes": "SDM only on TRD Off-Road Premium (i-FORCE MAX)."
+ },
+ "toy_4runner_lim": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle response and favors early upshifts and economy climate use."
+   },
+   {
+    "name": "COMFORT",
+    "type": "comfort",
+    "does": "Softens AVS damping for a smoother ride with normal powertrain response."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default balance of throttle response, shift timing and steering weight."
+   },
+   {
+    "name": "SPORT S",
+    "type": "sport",
+    "does": "Sharper throttle and shift mapping with firmer AVS damping."
+   },
+   {
+    "name": "SPORT S+",
+    "type": "sportplus",
+    "does": "Most aggressive throttle/shift map plus firmest AVS damping and heavier steering."
+   },
+   {
+    "name": "CUSTOM",
+    "type": "custom",
+    "does": "Lets driver mix powertrain, chassis (AVS) and climate settings individually."
+   },
+   {
+    "name": "TOW/HAUL",
+    "type": "tow",
+    "does": "Separate button: holds gears longer and adds engine braking when towing or loaded."
+   }
+  ],
+  "terrain": [
+   "Full-time 4WD with locking center differential",
+   "Downhill Assist Control: limits descent speed",
+   "Active Traction Control (A-TRAC): brake-based wheel-slip control"
+  ],
+  "susp": {
+   "type": "adaptive",
+   "name": "Adaptive Variable Suspension (AVS)",
+   "height": false
+  }
+ },
+ "toy_4runner_limh": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle response and favors early upshifts and economy climate use."
+   },
+   {
+    "name": "COMFORT",
+    "type": "comfort",
+    "does": "Softens AVS damping for a smoother ride with normal powertrain response."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default balance of throttle response, shift timing and steering weight."
+   },
+   {
+    "name": "SPORT S",
+    "type": "sport",
+    "does": "Sharper throttle and shift mapping with firmer AVS damping."
+   },
+   {
+    "name": "SPORT S+",
+    "type": "sportplus",
+    "does": "Most aggressive throttle/shift map plus firmest AVS damping and heavier steering."
+   },
+   {
+    "name": "CUSTOM",
+    "type": "custom",
+    "does": "Lets driver mix powertrain, chassis (AVS) and climate settings individually."
+   },
+   {
+    "name": "TOW/HAUL",
+    "type": "tow",
+    "does": "Separate button: holds gears longer and adds engine braking when towing or loaded."
+   }
+  ],
+  "terrain": [
+   "Full-time 4WD with electronic locking center differential",
+   "Downhill Assist Control: limits descent speed",
+   "Active Traction Control (A-TRAC): brake-based wheel-slip control"
+  ],
+  "susp": {
+   "type": "adaptive",
+   "name": "Adaptive Variable Suspension (AVS)",
+   "height": false
+  },
+  "notes": "i-FORCE MAX hybrid; no separate EV Mode button."
+ },
+ "toy_4runner_pro": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle response and favors early upshifts and economy climate use."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default balance of throttle response, shift timing and steering weight."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Sharper throttle, holds lower gears longer and adds steering weight."
+   },
+   {
+    "name": "TOW/HAUL",
+    "type": "tow",
+    "does": "Separate button: holds gears longer and adds engine braking when towing or loaded."
+   }
+  ],
+  "terrain": [
+   "Part-time 4WD with 2-speed transfer case",
+   "Multi-Terrain Select: 4H Auto/Dirt/Sand/Mud/Deep Snow; 4L Auto/Sand/Mud/Rock",
+   "CRAWL Control: low-speed off-road cruise, 5 speeds",
+   "Downhill Assist Control: limits descent speed",
+   "Electronic locking rear differential",
+   "Stabilizer Disconnect Mechanism: front sway-bar disconnect"
+  ],
+  "susp": {
+   "type": "tuned",
+   "name": "FOX QS3 3-way adjustable internal bypass shocks w/ rear remote reservoirs",
+   "height": false
+  }
+ },
+ "toy_4runner_tr": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle response and favors early upshifts and economy climate use."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default balance of throttle response, shift timing and steering weight."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Sharper throttle, holds lower gears longer and adds steering weight."
+   },
+   {
+    "name": "TOW/HAUL",
+    "type": "tow",
+    "does": "Separate button: holds gears longer and adds engine braking when towing or loaded."
+   }
+  ],
+  "terrain": [
+   "Part-time 4WD with 2-speed transfer case",
+   "Multi-Terrain Select: 4H Auto/Dirt/Sand/Mud/Deep Snow; 4L Auto/Sand/Mud/Rock",
+   "CRAWL Control: low-speed off-road cruise, 5 speeds",
+   "Downhill Assist Control: limits descent speed",
+   "Electronic locking rear differential",
+   "Stabilizer Disconnect Mechanism: front sway-bar disconnect"
+  ],
+  "susp": {
+   "type": "tuned",
+   "name": "Old Man Emu 2.5-in forged monotube shocks w/ rear remote reservoirs",
+   "height": false
+  }
+ },
+ "toy_bz_xle": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Dulls accelerator response and limits climate output to maximize range."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default accelerator response and climate behavior."
+   }
+  ],
+  "terrain": [],
+  "susp": {
+   "type": "passive",
+   "name": "MacPherson strut / multilink rear, passive",
+   "height": false
+  },
+  "notes": "Regen adjustable via steering paddles; reviewers note no Sport mode."
+ },
+ "toy_bz_xleawd": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Dulls accelerator response and limits climate output to maximize range."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default accelerator response and climate behavior."
+   }
+  ],
+  "terrain": [
+   "Dual-motor AWD",
+   "X-MODE (Snow/Dirt, Deep Snow/Mud) with Grip-Control",
+   "Downhill Assist via X-MODE: holds descent speed"
+  ],
+  "susp": {
+   "type": "passive",
+   "name": "MacPherson strut / multilink rear, passive",
+   "height": false
+  },
+  "notes": "Regen adjustable via steering paddles; reviewers note no Sport mode."
+ },
+ "toy_bz_lim": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Dulls accelerator response and limits climate output to maximize range."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default accelerator response and climate behavior."
+   }
+  ],
+  "terrain": [],
+  "susp": {
+   "type": "passive",
+   "name": "MacPherson strut / multilink rear, passive",
+   "height": false
+  },
+  "notes": "Regen adjustable via steering paddles; reviewers note no Sport mode."
+ },
+ "toy_bz_limawd": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Dulls accelerator response and limits climate output to maximize range."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default accelerator response and climate behavior."
+   }
+  ],
+  "terrain": [
+   "Dual-motor AWD",
+   "X-MODE (Snow/Dirt, Deep Snow/Mud) with Grip-Control",
+   "Downhill Assist via X-MODE: holds descent speed"
+  ],
+  "susp": {
+   "type": "passive",
+   "name": "MacPherson strut / multilink rear, passive",
+   "height": false
+  },
+  "notes": "Regen adjustable via steering paddles; reviewers note no Sport mode."
+ },
+ "toy_bzw_base": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Dulls accelerator response and limits climate output to maximize range."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default accelerator response and climate behavior."
+   }
+  ],
+  "terrain": [
+   "Dual-motor AWD, 8.3-in ground clearance",
+   "X-MODE (Snow/Dirt, Deep Snow/Mud) with Grip-Control",
+   "Downhill Assist via X-MODE: holds descent speed"
+  ],
+  "susp": {
+   "type": "passive",
+   "name": "MacPherson strut / multilink rear, raised passive",
+   "height": false
+  },
+  "notes": "Off-road hardware same on base and Premium."
+ },
+ "toy_bzw_prem": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Dulls accelerator response and limits climate output to maximize range."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default accelerator response and climate behavior."
+   }
+  ],
+  "terrain": [
+   "Dual-motor AWD, 8.3-in ground clearance",
+   "X-MODE (Snow/Dirt, Deep Snow/Mud) with Grip-Control",
+   "Downhill Assist via X-MODE: holds descent speed"
+  ],
+  "susp": {
+   "type": "passive",
+   "name": "MacPherson strut / multilink rear, raised passive",
+   "height": false
+  },
+  "notes": "Off-road hardware same on base and Premium."
+ },
+ "toy_chr_se": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Dulls accelerator response and limits climate output to maximize range."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default accelerator response and climate behavior."
+   }
+  ],
+  "terrain": [
+   "Dual-motor eAxle AWD"
+  ],
+  "susp": {
+   "type": "tuned",
+   "name": "MacPherson strut / multilink rear, C-HR-specific spring/damper tune",
+   "height": false
+  },
+  "notes": "X-MODE not confirmed for C-HR; regen via 4-level paddles. XSE rides on 20-in wheels."
+ },
+ "toy_chr_xse": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Dulls accelerator response and limits climate output to maximize range."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default accelerator response and climate behavior."
+   }
+  ],
+  "terrain": [
+   "Dual-motor eAxle AWD"
+  ],
+  "susp": {
+   "type": "tuned",
+   "name": "MacPherson strut / multilink rear, C-HR-specific spring/damper tune",
+   "height": false
+  },
+  "notes": "X-MODE not confirmed for C-HR; regen via 4-level paddles. XSE rides on 20-in wheels."
+ },
+ "toy_corolla_hb_se": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle response and favors early upshifts and economy climate use."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default balance of throttle response, shift timing and steering weight."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Sharper throttle, holds lower gears longer and adds steering weight."
+   }
+  ],
+  "terrain": [],
+  "susp": {
+   "type": "passive",
+   "name": "MacPherson strut / multilink rear, passive",
+   "height": false
+  }
+ },
+ "toy_corolla_hb_fx": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle response and favors early upshifts and economy climate use."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default balance of throttle response, shift timing and steering weight."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Sharper throttle, holds lower gears longer and adds steering weight."
+   }
+  ],
+  "terrain": [],
+  "susp": {
+   "type": "passive",
+   "name": "MacPherson strut / multilink rear, passive",
+   "height": false
+  }
+ },
+ "toy_corolla_hb_xse": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle response and favors early upshifts and economy climate use."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default balance of throttle response, shift timing and steering weight."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Sharper throttle, holds lower gears longer and adds steering weight."
+   }
+  ],
+  "terrain": [],
+  "susp": {
+   "type": "passive",
+   "name": "MacPherson strut / multilink rear, passive",
+   "height": false
+  }
+ },
+ "toy_corolla_cross_l": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle response and favors early upshifts and economy climate use."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default balance of throttle response, shift timing and steering weight."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Sharper throttle, holds lower gears longer and adds steering weight."
+   }
+  ],
+  "terrain": [],
+  "susp": {
+   "type": "passive",
+   "name": "MacPherson strut / torsion-beam rear (FWD), passive",
+   "height": false
+  }
+ },
+ "toy_corolla_cross_hs": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle and moderates climate to favor hybrid efficiency."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default hybrid power delivery and climate behavior."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Quicker throttle response and more electric boost; heavier steering."
+   },
+   {
+    "name": "EV MODE",
+    "type": "ev",
+    "does": "Separate button: drives on battery only at low speed when charge allows."
+   }
+  ],
+  "terrain": [
+   "Electronic On-Demand AWD (AWD-e) rear motor"
+  ],
+  "susp": {
+   "type": "tuned",
+   "name": "Sport-tuned MacPherson strut / double-wishbone rear",
+   "height": false
+  }
+ },
+ "toy_corolla_cross_hse": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle and moderates climate to favor hybrid efficiency."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default hybrid power delivery and climate behavior."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Quicker throttle response and more electric boost; heavier steering."
+   },
+   {
+    "name": "EV MODE",
+    "type": "ev",
+    "does": "Separate button: drives on battery only at low speed when charge allows."
+   }
+  ],
+  "terrain": [
+   "Electronic On-Demand AWD (AWD-e) rear motor"
+  ],
+  "susp": {
+   "type": "tuned",
+   "name": "Sport-tuned MacPherson strut / double-wishbone rear",
+   "height": false
+  }
+ },
+ "toy_corolla_cross_hxse": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle and moderates climate to favor hybrid efficiency."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default hybrid power delivery and climate behavior."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Quicker throttle response and more electric boost; heavier steering."
+   },
+   {
+    "name": "EV MODE",
+    "type": "ev",
+    "does": "Separate button: drives on battery only at low speed when charge allows."
+   }
+  ],
+  "terrain": [
+   "Electronic On-Demand AWD (AWD-e) rear motor"
+  ],
+  "susp": {
+   "type": "tuned",
+   "name": "Sport-tuned MacPherson strut / double-wishbone rear",
+   "height": false
+  }
+ },
+ "toy_crown_signia_xle": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle and moderates climate to favor hybrid efficiency."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default hybrid power delivery and climate behavior."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Quicker throttle response and more electric boost; heavier steering."
+   }
+  ],
+  "terrain": [
+   "Electronic On-Demand AWD (AWD-e) rear motor"
+  ],
+  "susp": {
+   "type": "passive",
+   "name": "MacPherson strut / multilink rear, passive",
+   "height": false
+  }
+ },
+ "toy_crown_signia_lim": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle and moderates climate to favor hybrid efficiency."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default hybrid power delivery and climate behavior."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Quicker throttle response and more electric boost; heavier steering."
+   }
+  ],
+  "terrain": [
+   "Electronic On-Demand AWD (AWD-e) rear motor"
+  ],
+  "susp": {
+   "type": "passive",
+   "name": "MacPherson strut / multilink rear, passive",
+   "height": false
+  }
+ },
+ "toy_grand_highlander_xle": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle response and favors early upshifts and economy climate use."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default balance of throttle response, shift timing and steering weight."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Sharper throttle, holds lower gears longer and adds steering weight."
+   }
+  ],
+  "terrain": [
+   "AWD with rear driveline disconnect"
+  ],
+  "susp": {
+   "type": "passive",
+   "name": "MacPherson strut / multilink rear, passive",
+   "height": false
+  }
+ },
+ "toy_grand_highlander_hxle": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle and moderates climate to favor hybrid efficiency."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default hybrid power delivery and climate behavior."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Quicker throttle response and more electric boost; heavier steering."
+   },
+   {
+    "name": "EV MODE",
+    "type": "ev",
+    "does": "Separate button: drives on battery only at low speed when charge allows."
+   }
+  ],
+  "terrain": [
+   "Electronic On-Demand AWD (AWD-e) rear motor"
+  ],
+  "susp": {
+   "type": "passive",
+   "name": "MacPherson strut / multilink rear, passive",
+   "height": false
+  }
+ },
+ "toy_grand_highlander_hlim": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle and moderates climate to favor hybrid efficiency."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default hybrid power delivery and climate behavior."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Quicker throttle response and more electric boost; heavier steering."
+   },
+   {
+    "name": "EV MODE",
+    "type": "ev",
+    "does": "Separate button: drives on battery only at low speed when charge allows."
+   }
+  ],
+  "terrain": [
+   "Electronic On-Demand AWD (AWD-e) rear motor"
+  ],
+  "susp": {
+   "type": "passive",
+   "name": "MacPherson strut / multilink rear, passive",
+   "height": false
+  }
+ },
+ "toy_grand_highlander_max": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle and moderates climate to favor hybrid efficiency."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default hybrid power delivery and climate behavior."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Quicker throttle response and more electric boost; heavier steering."
+   }
+  ],
+  "terrain": [
+   "Full-time AWD-e, up to 80% torque to rear"
+  ],
+  "susp": {
+   "type": "passive",
+   "name": "MacPherson strut / multilink rear, passive",
+   "height": false
+  },
+  "notes": "Hybrid MAX: no separate EV Mode button."
+ },
+ "toy_highlander_xle": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle response and favors early upshifts and economy climate use."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default balance of throttle response, shift timing and steering weight."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Sharper throttle, holds lower gears longer and adds steering weight."
+   }
+  ],
+  "terrain": [
+   "AWD with rear driveline disconnect"
+  ],
+  "susp": {
+   "type": "passive",
+   "name": "MacPherson strut / multilink rear, passive",
+   "height": false
+  }
+ },
+ "toy_highlander_hxle": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle and moderates climate to favor hybrid efficiency."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default hybrid power delivery and climate behavior."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Quicker throttle response and more electric boost; heavier steering."
+   },
+   {
+    "name": "EV MODE",
+    "type": "ev",
+    "does": "Separate button: drives on battery only at low speed when charge allows."
+   }
+  ],
+  "terrain": [
+   "Electronic On-Demand AWD (AWD-e) rear motor"
+  ],
+  "susp": {
+   "type": "passive",
+   "name": "MacPherson strut / multilink rear, passive",
+   "height": false
+  }
+ },
+ "toy_highlander_plat": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle and moderates climate to favor hybrid efficiency."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default hybrid power delivery and climate behavior."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Quicker throttle response and more electric boost; heavier steering."
+   },
+   {
+    "name": "EV MODE",
+    "type": "ev",
+    "does": "Separate button: drives on battery only at low speed when charge allows."
+   }
+  ],
+  "terrain": [
+   "Electronic On-Demand AWD (AWD-e) rear motor"
+  ],
+  "susp": {
+   "type": "passive",
+   "name": "MacPherson strut / multilink rear, passive",
+   "height": false
+  }
+ },
+ "toy_land_cruiser_1958": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle response and favors early upshifts and economy climate use."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default balance of throttle response, shift timing and steering weight."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Sharper throttle, holds lower gears longer and adds steering weight."
+   }
+  ],
+  "terrain": [
+   "Full-time 4WD with locking center differential",
+   "Electronic locking rear differential",
+   "CRAWL Control: low-speed off-road cruise, 5 speeds",
+   "Downhill Assist Control: limits descent speed"
+  ],
+  "susp": {
+   "type": "passive",
+   "name": "Double wishbone front / multilink coil rear, passive",
+   "height": false
+  }
+ },
+ "toy_land_cruiser_lc": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle response and favors early upshifts and economy climate use."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default balance of throttle response, shift timing and steering weight."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Sharper throttle, holds lower gears longer and adds steering weight."
+   }
+  ],
+  "terrain": [
+   "Full-time 4WD with locking center differential",
+   "Electronic locking rear differential",
+   "CRAWL Control: low-speed off-road cruise, 5 speeds",
+   "Downhill Assist Control: limits descent speed",
+   "Multi-Terrain Select: Auto/Dirt/Sand/Mud/Deep Snow (4H), Auto/Sand/Mud/Rock (4L)",
+   "Stabilizer Disconnect Mechanism (optional Premium pkg)"
+  ],
+  "susp": {
+   "type": "passive",
+   "name": "Double wishbone front / multilink coil rear, passive",
+   "height": false
+  }
+ },
+ "toy_prius_le": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle and moderates climate to favor hybrid efficiency."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default hybrid power delivery and climate behavior."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Quicker throttle response and more electric boost; heavier steering."
+   }
+  ],
+  "terrain": [],
+  "susp": {
+   "type": "passive",
+   "name": "MacPherson strut / double-wishbone rear, passive",
+   "height": false
+  },
+  "notes": "No dedicated EV Mode button on US 2023+ Prius."
+ },
+ "toy_prius_xle": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle and moderates climate to favor hybrid efficiency."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default hybrid power delivery and climate behavior."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Quicker throttle response and more electric boost; heavier steering."
+   }
+  ],
+  "terrain": [],
+  "susp": {
+   "type": "passive",
+   "name": "MacPherson strut / double-wishbone rear, passive",
+   "height": false
+  },
+  "notes": "No dedicated EV Mode button on US 2023+ Prius."
+ },
+ "toy_prius_lim": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle and moderates climate to favor hybrid efficiency."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default hybrid power delivery and climate behavior."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Quicker throttle response and more electric boost; heavier steering."
+   }
+  ],
+  "terrain": [
+   "Electronic On-Demand AWD (AWD-e) rear motor"
+  ],
+  "susp": {
+   "type": "passive",
+   "name": "MacPherson strut / double-wishbone rear, passive",
+   "height": false
+  },
+  "notes": "No dedicated EV Mode button on US 2023+ Prius."
+ },
+ "toy_prius_prime": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle and moderates climate to favor hybrid efficiency."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default hybrid power delivery and climate behavior."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Quicker throttle response and more electric boost; heavier steering."
+   },
+   {
+    "name": "EV",
+    "type": "ev",
+    "does": "EV/HV button: forces battery-only driving up to ~84 mph while charge lasts."
+   }
+  ],
+  "terrain": [],
+  "susp": {
+   "type": "passive",
+   "name": "MacPherson strut / double-wishbone rear, passive",
+   "height": false
+  },
+  "notes": "EV/HV button also offers Auto EV/HV, HV and Battery Charge modes."
+ },
+ "toy_sequoia_sr5": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle response and favors early upshifts and economy climate use."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default balance of throttle response, shift timing and steering weight."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Sharper throttle, holds lower gears longer and adds steering weight."
+   },
+   {
+    "name": "TOW/HAUL",
+    "type": "tow",
+    "does": "Separate button: holds gears longer and adds engine braking when towing or loaded."
+   }
+  ],
+  "terrain": [
+   "Part-time 4WD with 2-speed transfer case",
+   "Auto LSD: brake-based limited-slip on rear axle"
+  ],
+  "susp": {
+   "type": "passive",
+   "name": "Double wishbone front / multilink coil rear, passive",
+   "height": false
+  },
+  "notes": "TRD Off-Road pkg adds MTS, CRAWL, DAC, rear locker, Bilstein shocks."
+ },
+ "toy_sequoia_lim": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle response and favors early upshifts and economy climate use."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default balance of throttle response, shift timing and steering weight."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Sharper throttle, holds lower gears longer and adds steering weight."
+   },
+   {
+    "name": "TOW/HAUL",
+    "type": "tow",
+    "does": "Separate button: holds gears longer and adds engine braking when towing or loaded."
+   }
+  ],
+  "terrain": [
+   "Part-time 4WD with 2-speed transfer case",
+   "Auto LSD: brake-based limited-slip on rear axle"
+  ],
+  "susp": {
+   "type": "passive",
+   "name": "Double wishbone front / multilink coil rear, passive",
+   "height": false
+  },
+  "notes": "TRD Off-Road pkg adds MTS, CRAWL, DAC, rear locker, Bilstein shocks."
+ },
+ "toy_sequoia_plat": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle response and favors early upshifts and economy climate use."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default balance of throttle response, shift timing and steering weight."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Sharper throttle, holds lower gears longer and adds steering weight."
+   },
+   {
+    "name": "TOW/HAUL",
+    "type": "tow",
+    "does": "Separate button: holds gears longer and adds engine braking when towing or loaded."
+   }
+  ],
+  "terrain": [
+   "Part-time 4WD with 2-speed transfer case",
+   "Auto LSD: brake-based limited-slip on rear axle"
+  ],
+  "susp": {
+   "type": "passive",
+   "name": "Double wishbone front / multilink coil rear, passive",
+   "height": false
+  },
+  "notes": "Optional AVS + rear load-leveling air adds Comfort, Sport S, Sport S+, Custom modes."
+ },
+ "toy_sequoia_trd": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle response and favors early upshifts and economy climate use."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default balance of throttle response, shift timing and steering weight."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Sharper throttle, holds lower gears longer and adds steering weight."
+   },
+   {
+    "name": "TOW/HAUL",
+    "type": "tow",
+    "does": "Separate button: holds gears longer and adds engine braking when towing or loaded."
+   }
+  ],
+  "terrain": [
+   "Part-time 4WD with 2-speed transfer case",
+   "Multi-Terrain Select: Auto, Mud, Sand, Rock (i-FORCE MAX)",
+   "CRAWL Control: low-speed off-road cruise, 5 speeds",
+   "Downhill Assist Control: limits descent speed",
+   "Electronic locking rear differential"
+  ],
+  "susp": {
+   "type": "tuned",
+   "name": "FOX 2.5-in internal bypass coilovers w/ rear remote-reservoir shocks",
+   "height": false
+  }
+ },
+ "toy_sequoia_cap": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle response and favors early upshifts and economy climate use."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default balance of throttle response, shift timing and steering weight."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Sharper throttle, holds lower gears longer and adds steering weight."
+   },
+   {
+    "name": "TOW/HAUL",
+    "type": "tow",
+    "does": "Separate button: holds gears longer and adds engine braking when towing or loaded."
+   }
+  ],
+  "terrain": [
+   "Part-time 4WD with 2-speed transfer case",
+   "Auto LSD: brake-based limited-slip on rear axle"
+  ],
+  "susp": {
+   "type": "passive",
+   "name": "Double wishbone front / multilink coil rear, passive",
+   "height": false
+  },
+  "notes": "Optional AVS + rear load-leveling air adds Comfort, Sport S, Sport S+, Custom modes."
+ },
+ "toy_sienna_le": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle and moderates climate to favor hybrid efficiency."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default hybrid power delivery and climate behavior."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Quicker throttle response and more electric boost; heavier steering."
+   },
+   {
+    "name": "EV MODE",
+    "type": "ev",
+    "does": "Separate button: drives on battery only at low speed when charge allows."
+   }
+  ],
+  "terrain": [],
+  "susp": {
+   "type": "passive",
+   "name": "MacPherson strut / torsion-beam rear, passive",
+   "height": false
+  }
+ },
+ "toy_sienna_xle": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle and moderates climate to favor hybrid efficiency."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default hybrid power delivery and climate behavior."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Quicker throttle response and more electric boost; heavier steering."
+   },
+   {
+    "name": "EV MODE",
+    "type": "ev",
+    "does": "Separate button: drives on battery only at low speed when charge allows."
+   }
+  ],
+  "terrain": [
+   "Electronic On-Demand AWD (AWD-e) rear motor"
+  ],
+  "susp": {
+   "type": "passive",
+   "name": "MacPherson strut / torsion-beam rear, passive",
+   "height": false
+  }
+ },
+ "toy_sienna_wood": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle and moderates climate to favor hybrid efficiency."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default hybrid power delivery and climate behavior."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Quicker throttle response and more electric boost; heavier steering."
+   },
+   {
+    "name": "EV MODE",
+    "type": "ev",
+    "does": "Separate button: drives on battery only at low speed when charge allows."
+   }
+  ],
+  "terrain": [
+   "Electronic On-Demand AWD (AWD-e) rear motor"
+  ],
+  "susp": {
+   "type": "passive",
+   "name": "Passive suspension raised 0.6 in (Woodland)",
+   "height": false
+  }
+ },
+ "toy_sienna_plat": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle and moderates climate to favor hybrid efficiency."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default hybrid power delivery and climate behavior."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Quicker throttle response and more electric boost; heavier steering."
+   },
+   {
+    "name": "EV MODE",
+    "type": "ev",
+    "does": "Separate button: drives on battery only at low speed when charge allows."
+   }
+  ],
+  "terrain": [
+   "Electronic On-Demand AWD (AWD-e) rear motor"
+  ],
+  "susp": {
+   "type": "passive",
+   "name": "MacPherson strut / torsion-beam rear, passive",
+   "height": false
+  }
+ },
+ "toy_tacoma_sr": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle response and favors early upshifts and economy climate use."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default balance of throttle response, shift timing and steering weight."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Sharper throttle, holds lower gears longer and adds steering weight."
+   },
+   {
+    "name": "TOW/HAUL",
+    "type": "tow",
+    "does": "Separate button: holds gears longer and adds engine braking when towing or loaded."
+   }
+  ],
+  "terrain": [
+   "Auto LSD: brake-based limited-slip on rear axle"
+  ],
+  "susp": {
+   "type": "passive",
+   "name": "Double wishbone front / multilink coil rear, passive",
+   "height": false
+  },
+  "notes": "Drive Mode Select on non-hybrid grades assumed Eco/Normal/Sport."
+ },
+ "toy_tacoma_trdsport": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle response and favors early upshifts and economy climate use."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default balance of throttle response, shift timing and steering weight."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Sharper throttle, holds lower gears longer and adds steering weight."
+   },
+   {
+    "name": "TOW/HAUL",
+    "type": "tow",
+    "does": "Separate button: holds gears longer and adds engine braking when towing or loaded."
+   }
+  ],
+  "terrain": [
+   "Part-time 4WD with 2-speed transfer case",
+   "Active Traction Control (A-TRAC): brake-based wheel-slip control",
+   "Downhill Assist Control: limits descent speed"
+  ],
+  "susp": {
+   "type": "tuned",
+   "name": "Sport-tuned shocks",
+   "height": false
+  }
+ },
+ "toy_tacoma_trdor": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle response and favors early upshifts and economy climate use."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default balance of throttle response, shift timing and steering weight."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Sharper throttle, holds lower gears longer and adds steering weight."
+   },
+   {
+    "name": "TOW/HAUL",
+    "type": "tow",
+    "does": "Separate button: holds gears longer and adds engine braking when towing or loaded."
+   }
+  ],
+  "terrain": [
+   "Part-time 4WD with 2-speed transfer case",
+   "Multi-Terrain Select: 4H Auto/Dirt/Sand/Mud/Deep Snow; 4L Auto/Sand/Mud/Rock",
+   "CRAWL Control: low-speed off-road cruise, 5 speeds",
+   "Downhill Assist Control: limits descent speed",
+   "Electronic locking rear differential"
+  ],
+  "susp": {
+   "type": "tuned",
+   "name": "Bilstein monotube piggyback-reservoir shocks",
+   "height": false
+  },
+  "notes": "SDM available on TRD Off-Road (Premium)."
+ },
+ "toy_tacoma_lim": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle response and favors early upshifts and economy climate use."
+   },
+   {
+    "name": "COMFORT",
+    "type": "comfort",
+    "does": "Softens AVS damping for a smoother ride with normal powertrain response."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default balance of throttle response, shift timing and steering weight."
+   },
+   {
+    "name": "SPORT S",
+    "type": "sport",
+    "does": "Sharper throttle and shift mapping with firmer AVS damping."
+   },
+   {
+    "name": "SPORT S+",
+    "type": "sportplus",
+    "does": "Most aggressive throttle/shift map plus firmest AVS damping and heavier steering."
+   },
+   {
+    "name": "CUSTOM",
+    "type": "custom",
+    "does": "Lets driver mix powertrain, chassis (AVS) and climate settings individually."
+   },
+   {
+    "name": "TOW/HAUL",
+    "type": "tow",
+    "does": "Separate button: holds gears longer and adds engine braking when towing or loaded."
+   }
+  ],
+  "terrain": [
+   "Part-time 4WD with 2-speed transfer case",
+   "Active Traction Control (A-TRAC): brake-based wheel-slip control",
+   "Downhill Assist Control: limits descent speed"
+  ],
+  "susp": {
+   "type": "adaptive",
+   "name": "Adaptive Variable Suspension (AVS)",
+   "height": false
+  },
+  "notes": "i-FORCE MAX; no separate EV Mode button."
+ },
+ "toy_tacoma_pro": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle response and favors early upshifts and economy climate use."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default balance of throttle response, shift timing and steering weight."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Sharper throttle, holds lower gears longer and adds steering weight."
+   },
+   {
+    "name": "TOW/HAUL",
+    "type": "tow",
+    "does": "Separate button: holds gears longer and adds engine braking when towing or loaded."
+   }
+  ],
+  "terrain": [
+   "Part-time 4WD with 2-speed transfer case",
+   "Multi-Terrain Select: 4H Auto/Dirt/Sand/Mud/Deep Snow; 4L Auto/Sand/Mud/Rock",
+   "CRAWL Control: low-speed off-road cruise, 5 speeds",
+   "Downhill Assist Control: limits descent speed",
+   "Electronic locking rear differential",
+   "Stabilizer Disconnect Mechanism: front sway-bar disconnect"
+  ],
+  "susp": {
+   "type": "tuned",
+   "name": "TRD-tuned FOX QS3 3-way adjustable internal bypass shocks, rear piggyback reservoirs",
+   "height": false
+  },
+  "notes": "IsoDynamic Performance Seats."
+ },
+ "toy_tundra_sr5": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle response and favors early upshifts and economy climate use."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default balance of throttle response, shift timing and steering weight."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Sharper throttle, holds lower gears longer and adds steering weight."
+   },
+   {
+    "name": "TOW/HAUL",
+    "type": "tow",
+    "does": "Separate button: holds gears longer and adds engine braking when towing or loaded."
+   }
+  ],
+  "terrain": [
+   "Auto LSD: brake-based limited-slip on rear axle"
+  ],
+  "susp": {
+   "type": "passive",
+   "name": "Double wishbone front / multilink coil rear, passive",
+   "height": false
+  }
+ },
+ "toy_tundra_lim": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle response and favors early upshifts and economy climate use."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default balance of throttle response, shift timing and steering weight."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Sharper throttle, holds lower gears longer and adds steering weight."
+   },
+   {
+    "name": "TOW/HAUL",
+    "type": "tow",
+    "does": "Separate button: holds gears longer and adds engine braking when towing or loaded."
+   }
+  ],
+  "terrain": [
+   "Part-time 4WD with 2-speed transfer case",
+   "Auto LSD: brake-based limited-slip on rear axle",
+   "Active Traction Control (A-TRAC): brake-based wheel-slip control"
+  ],
+  "susp": {
+   "type": "passive",
+   "name": "Double wishbone front / multilink coil rear, passive",
+   "height": false
+  },
+  "notes": "TRD Off-Road pkg adds MTS (Mud/Sand/Rock/Mogul), CRAWL, rear locker, Bilstein shocks."
+ },
+ "toy_tundra_plat": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle response and favors early upshifts and economy climate use."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default balance of throttle response, shift timing and steering weight."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Sharper throttle, holds lower gears longer and adds steering weight."
+   },
+   {
+    "name": "TOW/HAUL",
+    "type": "tow",
+    "does": "Separate button: holds gears longer and adds engine braking when towing or loaded."
+   }
+  ],
+  "terrain": [
+   "Part-time 4WD with 2-speed transfer case",
+   "Auto LSD: brake-based limited-slip on rear axle",
+   "Active Traction Control (A-TRAC): brake-based wheel-slip control"
+  ],
+  "susp": {
+   "type": "passive",
+   "name": "Double wishbone front / multilink coil rear, passive",
+   "height": false
+  },
+  "notes": "Optional AVS + rear load-leveling air adds Comfort, Sport S, Sport S+, Custom modes."
+ },
+ "toy_tundra_trdpro": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle response and favors early upshifts and economy climate use."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default balance of throttle response, shift timing and steering weight."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Sharper throttle, holds lower gears longer and adds steering weight."
+   },
+   {
+    "name": "TOW/HAUL",
+    "type": "tow",
+    "does": "Separate button: holds gears longer and adds engine braking when towing or loaded."
+   }
+  ],
+  "terrain": [
+   "Part-time 4WD with 2-speed transfer case",
+   "Multi-Terrain Select: Auto, Mud, Sand, Rock",
+   "CRAWL Control: low-speed off-road cruise, 5 speeds",
+   "Downhill Assist Control: limits descent speed",
+   "Electronic locking rear differential"
+  ],
+  "susp": {
+   "type": "tuned",
+   "name": "FOX 2.5-in internal bypass coilovers w/ rear remote-reservoir shocks, 1.1-in front lift",
+   "height": false
+  }
+ },
+ "toy_tundra_cap": {
+  "modes": [
+   {
+    "name": "ECO",
+    "type": "eco",
+    "does": "Softens throttle response and favors early upshifts and economy climate use."
+   },
+   {
+    "name": "NORMAL",
+    "type": "normal",
+    "does": "Default balance of throttle response, shift timing and steering weight."
+   },
+   {
+    "name": "SPORT",
+    "type": "sport",
+    "does": "Sharper throttle, holds lower gears longer and adds steering weight."
+   },
+   {
+    "name": "TOW/HAUL",
+    "type": "tow",
+    "does": "Separate button: holds gears longer and adds engine braking when towing or loaded."
+   }
+  ],
+  "terrain": [
+   "Part-time 4WD with 2-speed transfer case",
+   "Auto LSD: brake-based limited-slip on rear axle",
+   "Active Traction Control (A-TRAC): brake-based wheel-slip control"
+  ],
+  "susp": {
+   "type": "passive",
+   "name": "Double wishbone front / multilink coil rear, passive",
+   "height": false
+  },
+  "notes": "Optional AVS + rear load-leveling air adds Comfort, Sport S, Sport S+, Custom modes."
+ }
+}

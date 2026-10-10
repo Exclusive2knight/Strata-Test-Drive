@@ -1,0 +1,3 @@
+(()=>{setTrim("camry25",true);cars=[];st.power=true;st.started=true;sys.epb=false;st.gear="P";car.zw=null;resetCar(STARTS.city);car.zw=null;const o=[];
+for(let s=0;s<6;s++){SIM(0.25);o.push(`t${((s+1)*0.25).toFixed(2)} zb ${(car.zb).toFixed(3)} th ${(car.th*57.3).toFixed(2)} phi ${(car.phi*57.3).toFixed(2)} defl ${car.defl.map(d=>d.toFixed(3)).join(",")} zw ${car.zw.map(d=>d.toFixed(3)).join(",")} gnd ${car.gnd.map(g=>(g.h||0).toFixed(3)).join(",")}`)}
+const T=TRIMS.camry25;o.push(JSON.stringify(T.sus));o.push("mass "+T.mass+" WPOS "+JSON.stringify(WPOS)+" A "+A+" B "+B);return o.join("\n")})()

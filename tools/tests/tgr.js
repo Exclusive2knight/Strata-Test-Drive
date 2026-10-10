@@ -1,0 +1,3 @@
+(()=>{const bad=new Map();let n=0;for(const e of EDGES){if(e.ov&&false)continue;const hw=e.m/2+e.n*LANE;for(let u=e.p0+2;u<e.L-e.p1-2;u+=4){for(const f of [-1,-0.5,0,0.5,1]){const t=f*Math.max(0.5,hw-0.3);if(e.m>0&&Math.abs(t)<e.m/2)continue;const p=ePt(e,u,t),rz=e.hz?ez(e,u):0;if(e.ov&&overDeck(e,u))continue;const tz=terrDrawn(p[0],p[1]);n++;
+  if(tz>rz+0.01){const k=e.name+"@"+Math.round(u/50)*50;const v=bad.get(k)||{c:0,max:0,x:p[0]|0,y:p[1]|0};v.c++;v.max=Math.max(v.max,tz-rz);bad.set(k,v)}}}}
+return n+" samples, bad "+[...bad.values()].reduce((a,v)=>a+v.c,0)+"\n"+[...bad].sort((a,b)=>b[1].max-a[1].max).slice(0,30).map(([k,v])=>`${k} n${v.c} max ${v.max.toFixed(2)} at ${v.x},${v.y}`).join("\n")})()

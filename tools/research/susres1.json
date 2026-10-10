@@ -1,0 +1,1842 @@
+{
+ "rav4_19": {
+  "fr": "macpherson",
+  "rr": "double_wishbone",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "XSE sport-tuned dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 206,
+  "travel": [
+   165,
+   185
+  ],
+  "tune": "firm",
+  "conf": "confirmed"
+ },
+ "rav4h_le": {
+  "fr": "macpherson",
+  "rr": "double_wishbone",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 206,
+  "travel": [
+   170,
+   190
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "rav4h_xle": {
+  "fr": "macpherson",
+  "rr": "double_wishbone",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 206,
+  "travel": [
+   170,
+   190
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "rav4h_lim": {
+  "fr": "macpherson",
+  "rr": "double_wishbone",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 206,
+  "travel": [
+   170,
+   190
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "rav4g_xle": {
+  "fr": "macpherson",
+  "rr": "double_wishbone",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 213,
+  "travel": [
+   170,
+   190
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "rav4g_adv": {
+  "fr": "macpherson",
+  "rr": "double_wishbone",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Adventure-specific tuned dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 218,
+  "travel": [
+   175,
+   195
+  ],
+  "tune": "balanced",
+  "conf": "confirmed"
+ },
+ "rav4g_lim": {
+  "fr": "macpherson",
+  "rr": "double_wishbone",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 213,
+  "travel": [
+   170,
+   190
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "naut_prem": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 198,
+  "travel": [
+   170,
+   185
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "naut_res": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "adaptive",
+  "dname": "Lincoln Adaptive Suspension (CCD)",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 198,
+  "travel": [
+   170,
+   185
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "naut_resh": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "adaptive",
+  "dname": "Lincoln Adaptive Suspension (CCD)",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 198,
+  "travel": [
+   170,
+   185
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "naut_bl": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "adaptive",
+  "dname": "Adaptive Suspension with Road Preview (CCD)",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 198,
+  "travel": [
+   170,
+   185
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "naut_blg": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "adaptive",
+  "dname": "Adaptive Suspension with Road Preview (CCD)",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 198,
+  "travel": [
+   170,
+   185
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "esc_active": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 191,
+  "travel": [
+   160,
+   175
+  ],
+  "tune": "balanced",
+  "conf": "confirmed"
+ },
+ "esc_elite": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "ST-Line sport-tuned dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 191,
+  "travel": [
+   155,
+   170
+  ],
+  "tune": "firm",
+  "conf": "estimate"
+ },
+ "esc_hyb": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 191,
+  "travel": [
+   160,
+   175
+  ],
+  "tune": "balanced",
+  "conf": "confirmed"
+ },
+ "esc_phev": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 191,
+  "travel": [
+   160,
+   175
+  ],
+  "tune": "balanced",
+  "conf": "confirmed"
+ },
+ "ms_awd": {
+  "fr": "double_wishbone",
+  "rr": "multilink",
+  "spring": "air",
+  "damper": "adaptive",
+  "dname": "Adaptive air suspension (Comfort/Standard/Sport)",
+  "arb": "front_rear",
+  "ride": [
+   -25,
+   40
+  ],
+  "ground": 117,
+  "travel": [
+   160,
+   170
+  ],
+  "tune": "balanced",
+  "conf": "confirmed"
+ },
+ "ms_plaid": {
+  "fr": "double_wishbone",
+  "rr": "multilink",
+  "spring": "air",
+  "damper": "adaptive",
+  "dname": "Adaptive air suspension (Comfort/Standard/Sport/Track)",
+  "arb": "front_rear",
+  "ride": [
+   -25,
+   40
+  ],
+  "ground": 117,
+  "travel": [
+   155,
+   165
+  ],
+  "tune": "sport",
+  "conf": "confirmed"
+ },
+ "ford_maverick_xl": {
+  "fr": "macpherson",
+  "rr": "torsion_beam",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 211,
+  "travel": [
+   170,
+   175
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "ford_maverick_xlt": {
+  "fr": "macpherson",
+  "rr": "torsion_beam",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 211,
+  "travel": [
+   170,
+   175
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "ford_maverick_lar": {
+  "fr": "macpherson",
+  "rr": "torsion_beam",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 211,
+  "travel": [
+   170,
+   175
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "ford_maverick_trem": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Tremor off-road twin-tube dampers (1-in lift)",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 218,
+  "travel": [
+   185,
+   190
+  ],
+  "tune": "offroad",
+  "conf": "confirmed"
+ },
+ "ford_maverick_lobo": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Lobo lowered street-tuned dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 183,
+  "travel": [
+   150,
+   155
+  ],
+  "tune": "sport",
+  "conf": "estimate"
+ },
+ "chrysler_pacifica_sel": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers (twist-blade rear)",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 130,
+  "travel": [
+   165,
+   170
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "chrysler_pacifica_lim": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers (twist-blade rear)",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 130,
+  "travel": [
+   165,
+   170
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "chrysler_pacifica_pin": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers (twist-blade rear)",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 130,
+  "travel": [
+   165,
+   170
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "chrysler_pacifica_phev": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers (twist-blade rear)",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 130,
+  "travel": [
+   165,
+   170
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "jeep_grand_wagoneer_s1": {
+  "fr": "double_wishbone",
+  "rr": "multilink",
+  "spring": "air",
+  "damper": "adaptive",
+  "dname": "Quadra-Lift air with semi-active damping",
+  "arb": "front_rear",
+  "ride": [
+   -50,
+   60
+  ],
+  "ground": 208,
+  "travel": [
+   200,
+   210
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "jeep_grand_wagoneer_s2": {
+  "fr": "double_wishbone",
+  "rr": "multilink",
+  "spring": "air",
+  "damper": "adaptive",
+  "dname": "Quadra-Lift air with semi-active damping",
+  "arb": "front_rear",
+  "ride": [
+   -50,
+   60
+  ],
+  "ground": 208,
+  "travel": [
+   200,
+   210
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "jeep_grand_wagoneer_ob": {
+  "fr": "double_wishbone",
+  "rr": "multilink",
+  "spring": "air",
+  "damper": "adaptive",
+  "dname": "Quadra-Lift air with semi-active damping",
+  "arb": "front_rear",
+  "ride": [
+   -50,
+   60
+  ],
+  "ground": 208,
+  "travel": [
+   200,
+   210
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "jeep_grand_wagoneer_s3": {
+  "fr": "double_wishbone",
+  "rr": "multilink",
+  "spring": "air",
+  "damper": "adaptive",
+  "dname": "Quadra-Lift air with semi-active damping",
+  "arb": "front_rear",
+  "ride": [
+   -50,
+   60
+  ],
+  "ground": 208,
+  "travel": [
+   200,
+   210
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "ram_2500_tr": {
+  "fr": "solid_axle",
+  "rr": "solid_axle_coil",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 226,
+  "travel": [
+   200,
+   230
+  ],
+  "tune": "balanced",
+  "conf": "confirmed"
+ },
+ "ram_2500_bh": {
+  "fr": "solid_axle",
+  "rr": "solid_axle_coil",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 226,
+  "travel": [
+   200,
+   230
+  ],
+  "tune": "balanced",
+  "conf": "confirmed"
+ },
+ "ram_2500_lar": {
+  "fr": "solid_axle",
+  "rr": "solid_axle_air",
+  "spring": "air_rear",
+  "damper": "passive",
+  "dname": "Rear auto-level air suspension",
+  "arb": "front_rear",
+  "ride": [
+   -50,
+   0
+  ],
+  "ground": 226,
+  "travel": [
+   200,
+   230
+  ],
+  "tune": "balanced",
+  "conf": "confirmed"
+ },
+ "ram_2500_pw": {
+  "fr": "solid_axle",
+  "rr": "solid_axle_coil",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Bilstein monotube shocks (2-in lift)",
+  "arb": "disconnect",
+  "ride": null,
+  "ground": 363,
+  "travel": [
+   270,
+   290
+  ],
+  "tune": "offroad",
+  "conf": "confirmed"
+ },
+ "ram_2500_lim": {
+  "fr": "solid_axle",
+  "rr": "solid_axle_air",
+  "spring": "air_rear",
+  "damper": "passive",
+  "dname": "Rear auto-level air suspension",
+  "arb": "front_rear",
+  "ride": [
+   -50,
+   0
+  ],
+  "ground": 226,
+  "travel": [
+   200,
+   230
+  ],
+  "tune": "balanced",
+  "conf": "confirmed"
+ },
+ "ram_promaster_1500": {
+  "fr": "macpherson",
+  "rr": "solid_axle_leaf",
+  "spring": "leaf_rear",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_only",
+  "ride": null,
+  "ground": 150,
+  "travel": [
+   160,
+   180
+  ],
+  "tune": "firm",
+  "conf": "confirmed"
+ },
+ "ram_promaster_2500": {
+  "fr": "macpherson",
+  "rr": "solid_axle_leaf",
+  "spring": "leaf_rear",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_only",
+  "ride": null,
+  "ground": 150,
+  "travel": [
+   160,
+   180
+  ],
+  "tune": "firm",
+  "conf": "confirmed"
+ },
+ "ram_promaster_3500": {
+  "fr": "macpherson",
+  "rr": "solid_axle_leaf",
+  "spring": "leaf_rear",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_only",
+  "ride": null,
+  "ground": 150,
+  "travel": [
+   160,
+   180
+  ],
+  "tune": "firm",
+  "conf": "confirmed"
+ },
+ "acura_rdx_base": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Amplitude-reactive dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 208,
+  "travel": [
+   165,
+   180
+  ],
+  "tune": "balanced",
+  "conf": "confirmed"
+ },
+ "acura_rdx_tech": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Amplitude-reactive dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 208,
+  "travel": [
+   165,
+   180
+  ],
+  "tune": "balanced",
+  "conf": "confirmed"
+ },
+ "acura_rdx_as": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Amplitude-reactive dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 208,
+  "travel": [
+   165,
+   180
+  ],
+  "tune": "balanced",
+  "conf": "confirmed"
+ },
+ "acura_rdx_asa": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "adaptive",
+  "dname": "Adaptive Damper System",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 208,
+  "travel": [
+   165,
+   180
+  ],
+  "tune": "sport",
+  "conf": "confirmed"
+ },
+ "honda_odyssey_exl": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 115,
+  "travel": [
+   160,
+   170
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "honda_odyssey_tsp": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 115,
+  "travel": [
+   160,
+   170
+  ],
+  "tune": "balanced",
+  "conf": "confirmed"
+ },
+ "honda_odyssey_tour": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 115,
+  "travel": [
+   160,
+   170
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "honda_odyssey_elite": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 115,
+  "travel": [
+   160,
+   170
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "honda_ridgeline_sp": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 193,
+  "travel": [
+   175,
+   190
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "honda_ridgeline_rtl": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 193,
+  "travel": [
+   175,
+   190
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "honda_ridgeline_ts": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "TrailSport-tuned springs, dampers and anti-roll bars",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 211,
+  "travel": [
+   180,
+   195
+  ],
+  "tune": "offroad",
+  "conf": "confirmed"
+ },
+ "honda_ridgeline_bl": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 193,
+  "travel": [
+   175,
+   190
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "nissan_murano_sv": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 185,
+  "travel": [
+   165,
+   175
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "nissan_murano_sl": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 185,
+  "travel": [
+   165,
+   175
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "nissan_murano_plat": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 185,
+  "travel": [
+   165,
+   175
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "buick_enclave_pref": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 191,
+  "travel": [
+   170,
+   180
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "buick_enclave_st": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 191,
+  "travel": [
+   170,
+   180
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "buick_enclave_av": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "adaptive",
+  "dname": "Continuous Damping Control",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 191,
+  "travel": [
+   170,
+   180
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "chv_blazer_ev_lt": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 188,
+  "travel": [
+   155,
+   165
+  ],
+  "tune": "balanced",
+  "conf": "confirmed"
+ },
+ "chv_blazer_ev_rs": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 188,
+  "travel": [
+   155,
+   165
+  ],
+  "tune": "balanced",
+  "conf": "confirmed"
+ },
+ "chv_blazer_ev_ss": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "SS performance dampers, stiffer springs and anti-roll bars",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 178,
+  "travel": [
+   145,
+   155
+  ],
+  "tune": "sport",
+  "conf": "estimate"
+ },
+ "chv_silverado_1500_wt": {
+  "fr": "double_wishbone",
+  "rr": "solid_axle_leaf",
+  "spring": "leaf_rear",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_only",
+  "ride": null,
+  "ground": 226,
+  "travel": [
+   190,
+   230
+  ],
+  "tune": "balanced",
+  "conf": "confirmed"
+ },
+ "chv_silverado_1500_cus": {
+  "fr": "double_wishbone",
+  "rr": "solid_axle_leaf",
+  "spring": "leaf_rear",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_only",
+  "ride": null,
+  "ground": 226,
+  "travel": [
+   190,
+   230
+  ],
+  "tune": "balanced",
+  "conf": "confirmed"
+ },
+ "chv_silverado_1500_lt": {
+  "fr": "double_wishbone",
+  "rr": "solid_axle_leaf",
+  "spring": "leaf_rear",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_only",
+  "ride": null,
+  "ground": 226,
+  "travel": [
+   190,
+   230
+  ],
+  "tune": "balanced",
+  "conf": "confirmed"
+ },
+ "chv_silverado_1500_rst": {
+  "fr": "double_wishbone",
+  "rr": "solid_axle_leaf",
+  "spring": "leaf_rear",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_only",
+  "ride": null,
+  "ground": 226,
+  "travel": [
+   190,
+   230
+  ],
+  "tune": "balanced",
+  "conf": "confirmed"
+ },
+ "chv_silverado_1500_tb": {
+  "fr": "double_wishbone",
+  "rr": "solid_axle_leaf",
+  "spring": "leaf_rear",
+  "damper": "passive",
+  "dname": "Rancho monotube shocks (2-in lift)",
+  "arb": "front_only",
+  "ride": null,
+  "ground": 272,
+  "travel": [
+   210,
+   240
+  ],
+  "tune": "offroad",
+  "conf": "confirmed"
+ },
+ "chv_silverado_1500_ltz": {
+  "fr": "double_wishbone",
+  "rr": "solid_axle_leaf",
+  "spring": "leaf_rear",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_only",
+  "ride": null,
+  "ground": 226,
+  "travel": [
+   190,
+   230
+  ],
+  "tune": "balanced",
+  "conf": "confirmed"
+ },
+ "chv_silverado_1500_hc": {
+  "fr": "double_wishbone",
+  "rr": "solid_axle_leaf",
+  "spring": "leaf_rear",
+  "damper": "adaptive",
+  "dname": "Adaptive Ride Control",
+  "arb": "front_only",
+  "ride": null,
+  "ground": 226,
+  "travel": [
+   190,
+   230
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "chv_silverado_1500_zr2": {
+  "fr": "double_wishbone",
+  "rr": "solid_axle_leaf",
+  "spring": "leaf_rear",
+  "damper": "dssv",
+  "dname": "Multimatic DSSV spool-valve dampers",
+  "arb": "front_only",
+  "ride": null,
+  "ground": 284,
+  "travel": [
+   240,
+   270
+  ],
+  "tune": "offroad",
+  "conf": "confirmed"
+ },
+ "chv_silverado_1500_dsl": {
+  "fr": "double_wishbone",
+  "rr": "solid_axle_leaf",
+  "spring": "leaf_rear",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_only",
+  "ride": null,
+  "ground": 226,
+  "travel": [
+   190,
+   230
+  ],
+  "tune": "balanced",
+  "conf": "confirmed"
+ },
+ "chv_trailblazer_ls": {
+  "fr": "macpherson",
+  "rr": "torsion_beam",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_only",
+  "ride": null,
+  "ground": 173,
+  "travel": [
+   150,
+   160
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "chv_trailblazer_activ": {
+  "fr": "macpherson",
+  "rr": "torsion_beam",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "ACTIV-tuned dampers (Watt's link rear)",
+  "arb": "front_only",
+  "ride": null,
+  "ground": 183,
+  "travel": [
+   155,
+   165
+  ],
+  "tune": "offroad",
+  "conf": "confirmed"
+ },
+ "chv_trailblazer_rs": {
+  "fr": "macpherson",
+  "rr": "torsion_beam",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional dampers (Watt's link rear)",
+  "arb": "front_only",
+  "ride": null,
+  "ground": 173,
+  "travel": [
+   150,
+   160
+  ],
+  "tune": "balanced",
+  "conf": "confirmed"
+ },
+ "audi_q4_etron_pr": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Sport suspension with passive dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 170,
+  "travel": [
+   150,
+   160
+  ],
+  "tune": "firm",
+  "conf": "confirmed"
+ },
+ "audi_q4_etron_pp": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Sport suspension with passive dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 170,
+  "travel": [
+   150,
+   160
+  ],
+  "tune": "firm",
+  "conf": "confirmed"
+ },
+ "audi_q4_etron_ps": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Sport suspension with passive dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 170,
+  "travel": [
+   150,
+   160
+  ],
+  "tune": "firm",
+  "conf": "confirmed"
+ },
+ "audi_q8_pp": {
+  "fr": "multilink",
+  "rr": "multilink",
+  "spring": "air",
+  "damper": "adaptive",
+  "dname": "Adaptive air suspension",
+  "arb": "front_rear",
+  "ride": [
+   -30,
+   60
+  ],
+  "ground": 220,
+  "travel": [
+   180,
+   190
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "audi_q8_ps": {
+  "fr": "multilink",
+  "rr": "multilink",
+  "spring": "air",
+  "damper": "adaptive",
+  "dname": "Adaptive air suspension",
+  "arb": "front_rear",
+  "ride": [
+   -30,
+   60
+  ],
+  "ground": 220,
+  "travel": [
+   180,
+   190
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "audi_q8_sq8": {
+  "fr": "multilink",
+  "rr": "multilink",
+  "spring": "air",
+  "damper": "adaptive",
+  "dname": "Adaptive air suspension sport (eAWS optional)",
+  "arb": "front_rear",
+  "ride": [
+   -30,
+   60
+  ],
+  "ground": 210,
+  "travel": [
+   175,
+   185
+  ],
+  "tune": "sport",
+  "conf": "confirmed"
+ },
+ "audi_q8_rsq8": {
+  "fr": "multilink",
+  "rr": "multilink",
+  "spring": "air",
+  "damper": "adaptive",
+  "dname": "Adaptive air suspension sport with 48 V active roll stabilization",
+  "arb": "active",
+  "ride": [
+   -30,
+   60
+  ],
+  "ground": 200,
+  "travel": [
+   170,
+   180
+  ],
+  "tune": "sport",
+  "conf": "confirmed"
+ },
+ "kia_ev9_light": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 198,
+  "travel": [
+   160,
+   170
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "kia_ev9_wind": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Self-leveling rear dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 198,
+  "travel": [
+   160,
+   170
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "kia_ev9_land": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Self-leveling rear dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 198,
+  "travel": [
+   160,
+   170
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "kia_ev9_gtl": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Self-leveling rear dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 198,
+  "travel": [
+   160,
+   170
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "kia_ev9_gt": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "adaptive",
+  "dname": "Electronically Controlled Suspension (ECS)",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 190,
+  "travel": [
+   155,
+   165
+  ],
+  "tune": "sport",
+  "conf": "confirmed"
+ },
+ "kia_sorento_lx": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 198,
+  "travel": [
+   165,
+   175
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "kia_sorento_ex": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 198,
+  "travel": [
+   165,
+   175
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "kia_sorento_xl": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers (X-Line)",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 208,
+  "travel": [
+   165,
+   175
+  ],
+  "tune": "balanced",
+  "conf": "confirmed"
+ },
+ "kia_sorento_hev": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 198,
+  "travel": [
+   165,
+   175
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "kia_sorento_phev": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Self-leveling rear dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 183,
+  "travel": [
+   165,
+   175
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "lex_lx_prem": {
+  "fr": "double_wishbone",
+  "rr": "solid_axle_coil",
+  "spring": "air",
+  "damper": "adaptive",
+  "dname": "Active Height Control + Adaptive Variable Suspension",
+  "arb": "front_rear",
+  "ride": [
+   -50,
+   50
+  ],
+  "ground": 226,
+  "travel": [
+   230,
+   250
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "lex_lx_700h": {
+  "fr": "double_wishbone",
+  "rr": "solid_axle_coil",
+  "spring": "air",
+  "damper": "adaptive",
+  "dname": "AHC + F SPORT-tuned Adaptive Variable Suspension, rear stabilizer",
+  "arb": "front_rear",
+  "ride": [
+   -50,
+   50
+  ],
+  "ground": 226,
+  "travel": [
+   225,
+   245
+  ],
+  "tune": "firm",
+  "conf": "confirmed"
+ },
+ "lex_tz_prem": {
+  "fr": "macpherson",
+  "rr": "double_wishbone",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Monotube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 203,
+  "travel": [
+   160,
+   170
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "lex_tz_lux": {
+  "fr": "macpherson",
+  "rr": "double_wishbone",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Monotube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 203,
+  "travel": [
+   160,
+   170
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "toy_corolla_hb_se": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 135,
+  "travel": [
+   140,
+   150
+  ],
+  "tune": "balanced",
+  "conf": "confirmed"
+ },
+ "toy_corolla_hb_fx": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 135,
+  "travel": [
+   140,
+   150
+  ],
+  "tune": "balanced",
+  "conf": "confirmed"
+ },
+ "toy_corolla_hb_xse": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 135,
+  "travel": [
+   140,
+   150
+  ],
+  "tune": "balanced",
+  "conf": "confirmed"
+ },
+ "toy_land_cruiser_1958": {
+  "fr": "double_wishbone",
+  "rr": "solid_axle_coil",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 221,
+  "travel": [
+   200,
+   240
+  ],
+  "tune": "offroad",
+  "conf": "confirmed"
+ },
+ "toy_land_cruiser_lc": {
+  "fr": "double_wishbone",
+  "rr": "solid_axle_coil",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional dampers with Stabilizer Disconnect Mechanism",
+  "arb": "disconnect",
+  "ride": null,
+  "ground": 221,
+  "travel": [
+   200,
+   250
+  ],
+  "tune": "offroad",
+  "conf": "confirmed"
+ },
+ "toy_tundra_sr5": {
+  "fr": "double_wishbone",
+  "rr": "solid_axle_coil",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 239,
+  "travel": [
+   200,
+   230
+  ],
+  "tune": "balanced",
+  "conf": "confirmed"
+ },
+ "toy_tundra_lim": {
+  "fr": "double_wishbone",
+  "rr": "solid_axle_coil",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 239,
+  "travel": [
+   200,
+   230
+  ],
+  "tune": "balanced",
+  "conf": "confirmed"
+ },
+ "toy_tundra_plat": {
+  "fr": "double_wishbone",
+  "rr": "solid_axle_coil",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 239,
+  "travel": [
+   200,
+   230
+  ],
+  "tune": "balanced",
+  "conf": "confirmed"
+ },
+ "toy_tundra_trdpro": {
+  "fr": "double_wishbone",
+  "rr": "solid_axle_coil",
+  "spring": "coil",
+  "damper": "bypass",
+  "dname": "FOX 2.5 internal bypass coilovers / rear remote-reservoir",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 272,
+  "travel": [
+   240,
+   270
+  ],
+  "tune": "offroad",
+  "conf": "confirmed"
+ },
+ "toy_tundra_cap": {
+  "fr": "double_wishbone",
+  "rr": "solid_axle_air",
+  "spring": "air_rear",
+  "damper": "adaptive",
+  "dname": "Adaptive Variable Suspension + rear load-leveling air",
+  "arb": "front_rear",
+  "ride": [
+   -25,
+   0
+  ],
+  "ground": 239,
+  "travel": [
+   200,
+   230
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "sub_ascent_prem": {
+  "fr": "macpherson",
+  "rr": "double_wishbone",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 220,
+  "travel": [
+   170,
+   185
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "sub_ascent_onyx": {
+  "fr": "macpherson",
+  "rr": "double_wishbone",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 220,
+  "travel": [
+   170,
+   185
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "sub_ascent_tour": {
+  "fr": "macpherson",
+  "rr": "double_wishbone",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 220,
+  "travel": [
+   170,
+   185
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "ex30cc": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Cross Country raised suspension (+19 mm)",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 194,
+  "travel": [
+   150,
+   160
+  ],
+  "tune": "balanced",
+  "conf": "confirmed"
+ },
+ "xc40": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Conventional dampers",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 211,
+  "travel": [
+   160,
+   170
+  ],
+  "tune": "balanced",
+  "conf": "confirmed"
+ },
+ "canyon": {
+  "fr": "double_wishbone",
+  "rr": "solid_axle_leaf",
+  "spring": "leaf_rear",
+  "damper": "passive",
+  "dname": "Conventional twin-tube dampers",
+  "arb": "front_only",
+  "ride": null,
+  "ground": 234,
+  "travel": [
+   200,
+   230
+  ],
+  "tune": "balanced",
+  "conf": "confirmed"
+ },
+ "canyon_at4x": {
+  "fr": "double_wishbone",
+  "rr": "solid_axle_leaf",
+  "spring": "leaf_rear",
+  "damper": "dssv",
+  "dname": "Multimatic DSSV spool-valve dampers",
+  "arb": "front_only",
+  "ride": null,
+  "ground": 272,
+  "travel": [
+   240,
+   265
+  ],
+  "tune": "offroad",
+  "conf": "confirmed"
+ },
+ "yukonxl": {
+  "fr": "double_wishbone",
+  "rr": "multilink",
+  "spring": "air",
+  "damper": "magnetic",
+  "dname": "Air Ride Adaptive Suspension with Magnetic Ride Control",
+  "arb": "front_rear",
+  "ride": [
+   -51,
+   51
+  ],
+  "ground": 203,
+  "travel": [
+   190,
+   200
+  ],
+  "tune": "comfort",
+  "conf": "confirmed"
+ },
+ "civic_si": {
+  "fr": "macpherson",
+  "rr": "multilink",
+  "spring": "coil",
+  "damper": "passive",
+  "dname": "Si sport-tuned dampers, stiffer springs/bars",
+  "arb": "front_rear",
+  "ride": null,
+  "ground": 124,
+  "travel": [
+   130,
+   140
+  ],
+  "tune": "sport",
+  "conf": "confirmed"
+ }
+}

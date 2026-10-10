@@ -1,0 +1,256 @@
+{
+ "mkc19_std": {
+  "modes": [
+   {"name": "Comfort", "type": "comfort", "does": "Softest Continuously Controlled Damping setting and relaxed steering for a smoother ride."},
+   {"name": "Normal", "type": "normal", "does": "Balanced damping, steering effort and throttle/shift calibration."},
+   {"name": "Sport", "type": "sport", "does": "Firmer CCD damping, heavier steering, sharper throttle and later, quicker shifts (with S gear)."}
+  ],
+  "terrain": ["Traction control and AdvanceTrac with RSC stability control", "Torque Vectoring Control via brakes"],
+  "susp": {"type": "adaptive", "name": "Lincoln Drive Control with Continuously Controlled Damping (CCD)", "height": false},
+  "notes": "FWD; Lincoln Drive Control modes selected via SYNC 3 screen."
+ },
+ "mkc19_sel": {
+  "modes": [
+   {"name": "Comfort", "type": "comfort", "does": "Softest Continuously Controlled Damping setting and relaxed steering for a smoother ride."},
+   {"name": "Normal", "type": "normal", "does": "Balanced damping, steering effort and throttle/shift calibration."},
+   {"name": "Sport", "type": "sport", "does": "Firmer CCD damping, heavier steering, sharper throttle and later, quicker shifts (with S gear)."}
+  ],
+  "terrain": ["Intelligent AWD: automatic on-demand rear torque", "AdvanceTrac with RSC stability control", "Torque Vectoring Control via brakes"],
+  "susp": {"type": "adaptive", "name": "Lincoln Drive Control with Continuously Controlled Damping (CCD)", "height": false}
+ },
+ "mkc19_res": {
+  "modes": [
+   {"name": "Comfort", "type": "comfort", "does": "Softest Continuously Controlled Damping setting and relaxed steering for a smoother ride."},
+   {"name": "Normal", "type": "normal", "does": "Balanced damping, steering effort and throttle/shift calibration."},
+   {"name": "Sport", "type": "sport", "does": "Firmer CCD damping, heavier steering, sharper throttle and later, quicker shifts (with S gear)."}
+  ],
+  "terrain": ["Intelligent AWD: automatic on-demand rear torque", "AdvanceTrac with RSC stability control", "Torque Vectoring Control via brakes"],
+  "susp": {"type": "adaptive", "name": "Lincoln Drive Control with Continuously Controlled Damping (CCD)", "height": false}
+ },
+ "mkc19_bl": {
+  "modes": [
+   {"name": "Comfort", "type": "comfort", "does": "Softest Continuously Controlled Damping setting and relaxed steering for a smoother ride."},
+   {"name": "Normal", "type": "normal", "does": "Balanced damping, steering effort and throttle/shift calibration."},
+   {"name": "Sport", "type": "sport", "does": "Firmer CCD damping, heavier steering, sharper throttle and later, quicker shifts (with S gear)."}
+  ],
+  "terrain": ["Intelligent AWD: automatic on-demand rear torque", "AdvanceTrac with RSC stability control", "Torque Vectoring Control via brakes"],
+  "susp": {"type": "adaptive", "name": "Lincoln Drive Control with Continuously Controlled Damping (CCD)", "height": false},
+  "notes": "2.3L EcoBoost; same drive-mode set as other trims."
+ },
+ "lex_gx_prem": {
+  "modes": [
+   {"name": "ECO", "type": "eco", "does": "Softer throttle, early upshifts and reduced climate output to save fuel."},
+   {"name": "NORMAL", "type": "normal", "does": "Default balance of throttle response, shift timing and steering."},
+   {"name": "SPORT", "type": "sport", "does": "Sharper throttle, holds lower gears longer and weightier steering."}
+  ],
+  "terrain": ["Full-time 4WD, Torsen locking center differential", "Two-speed transfer case with low range (L4)", "Multi-Terrain Select: H4 Dirt/Sand/Mud/Deep Snow; L4 Sand/Mud/Rock", "Crawl Control: low-speed off-road cruise (L4)", "Downhill Assist Control"],
+  "susp": {"type": "passive", "name": "Double wishbone front / 4-link solid rear axle, passive", "height": false},
+  "notes": "No AVS on Premium, so no Comfort/Sport S+ modes."
+ },
+ "lex_gx_op": {
+  "modes": [
+   {"name": "ECO", "type": "eco", "does": "Softer throttle, early upshifts and reduced climate output to save fuel."},
+   {"name": "NORMAL", "type": "normal", "does": "Default balance of throttle response, shift timing and steering."},
+   {"name": "SPORT", "type": "sport", "does": "Sharper throttle, holds lower gears longer and weightier steering."}
+  ],
+  "terrain": ["Full-time 4WD, Torsen locking center differential", "Two-speed transfer case with low range (L4)", "Multi-Terrain Select: H4 Dirt/Sand/Mud/Deep Snow; L4 Sand/Mud/Rock", "Crawl Control: low-speed off-road cruise (L4)", "Electronic locking rear differential", "E-KDSS front/rear stabilizer disconnect", "Downhill Assist Control", "33-in all-terrain tires, 1-in lift for 2026"],
+  "susp": {"type": "kdss", "name": "E-KDSS (Electronic Kinetic Dynamic Suspension System), passive dampers", "height": false},
+  "notes": "Overtrail has no AVS; 9.84 in ground clearance for 2026."
+ },
+ "lex_gx_lux": {
+  "modes": [
+   {"name": "ECO", "type": "eco", "does": "Softer throttle, early upshifts and reduced climate output to save fuel."},
+   {"name": "NORMAL", "type": "normal", "does": "Default balance of throttle, shifts, steering and AVS damping."},
+   {"name": "COMFORT", "type": "comfort", "does": "Softest AVS damping for maximum ride comfort."},
+   {"name": "SPORT S", "type": "sport", "does": "Sharper throttle and shift timing with normal damping."},
+   {"name": "SPORT S+", "type": "sportplus", "does": "Sport S powertrain plus firmest AVS damping and heavier steering."},
+   {"name": "CUSTOM", "type": "custom", "does": "Driver-set mix of powertrain, chassis (AVS) and climate settings."}
+  ],
+  "terrain": ["Full-time 4WD, Torsen locking center differential", "Two-speed transfer case with low range (L4)", "Multi-Terrain Select: H4 Dirt/Sand/Mud/Deep Snow; L4 Sand/Mud/Rock", "Crawl Control: low-speed off-road cruise (L4)", "Downhill Assist Control"],
+  "susp": {"type": "adaptive", "name": "Adaptive Variable Suspension (AVS)", "height": false}
+ },
+ "lex_lx_prem": {
+  "modes": [
+   {"name": "ECO", "type": "eco", "does": "Softer throttle, early upshifts and reduced climate output to save fuel."},
+   {"name": "NORMAL", "type": "normal", "does": "Default balance of throttle, shifts, steering and AVS damping."},
+   {"name": "COMFORT", "type": "comfort", "does": "Softest AVS damping for a plush ride."},
+   {"name": "SPORT S", "type": "sport", "does": "Sharper throttle and shift timing; AHC lowers body at speed."},
+   {"name": "SPORT S+", "type": "sportplus", "does": "Sport S powertrain plus firmest AVS damping and heavier steering."},
+   {"name": "CUSTOM", "type": "custom", "does": "Driver-set mix of powertrain, chassis (AVS) and climate settings."}
+  ],
+  "terrain": ["Full-time 4WD, Torsen locking center differential", "Two-speed transfer case with low range (L4)", "Multi-Terrain Select: Auto/Dirt/Sand/Mud/Deep Snow/Rock (H4/L4)", "Crawl Control: five-speed low-speed off-road cruise", "Downhill Assist Control", "Multi-Terrain Monitor cameras"],
+  "susp": {"type": "airadaptive", "name": "Active Height Control (AHC) hydropneumatic with Adaptive Variable Suspension (AVS)", "height": true}
+ },
+ "lex_lx_700h": {
+  "modes": [
+   {"name": "ECO", "type": "eco", "does": "Softer throttle, more motor assist and reduced climate output to save fuel."},
+   {"name": "NORMAL", "type": "normal", "does": "Default balance of throttle, shifts, steering and AVS damping."},
+   {"name": "COMFORT", "type": "comfort", "does": "Softest AVS damping for a plush ride."},
+   {"name": "SPORT S", "type": "sport", "does": "Sharper throttle and shift timing with more hybrid boost."},
+   {"name": "SPORT S+", "type": "sportplus", "does": "Sport S powertrain plus F SPORT-tuned firm AVS damping and heavier EPS."},
+   {"name": "CUSTOM", "type": "custom", "does": "Driver-set mix of powertrain, chassis (AVS) and climate settings."}
+  ],
+  "terrain": ["Full-time 4WD, Torsen locking center differential", "Two-speed transfer case with low range (L4)", "Multi-Terrain Select: Auto/Dirt/Sand/Mud/Deep Snow/Rock (H4/L4)", "Crawl Control: five-speed low-speed off-road cruise", "Downhill Assist Control", "Motor-only drive in low range for quiet trail crawling", "Torsen limited-slip rear differential (F SPORT)"],
+  "susp": {"type": "airadaptive", "name": "Active Height Control (AHC) with F SPORT-tuned AVS, performance dampers, rear stabilizer", "height": true},
+  "notes": "Hybrid has no separate EV-mode button; motor-only operation is automatic in L4."
+ },
+ "lex_nx_350": {
+  "modes": [
+   {"name": "ECO", "type": "eco", "does": "Softer throttle, early upshifts and reduced climate output to save fuel."},
+   {"name": "NORMAL", "type": "normal", "does": "Default balance of throttle response, shift timing and steering."},
+   {"name": "SPORT", "type": "sport", "does": "Sharper throttle, holds gears longer and heavier steering."},
+   {"name": "CUSTOM", "type": "custom", "does": "Driver-set mix of powertrain, steering and climate settings."}
+  ],
+  "terrain": ["Dynamic Torque Control AWD, up to 50% rear", "Trail Mode: brakes slipping wheel for low-traction surfaces"],
+  "susp": {"type": "passive", "name": "MacPherson strut / trailing-arm double wishbone rear, passive", "height": false},
+  "notes": "SPORT S/S+ and AVS only on F SPORT Handling grade."
+ },
+ "lex_nx_350h": {
+  "modes": [
+   {"name": "ECO", "type": "eco", "does": "Softer throttle, maximizes EV operation and reduces climate output."},
+   {"name": "NORMAL", "type": "normal", "does": "Default balance of throttle response, hybrid power and steering."},
+   {"name": "SPORT", "type": "sport", "does": "Sharper throttle with more hybrid power and heavier steering."},
+   {"name": "CUSTOM", "type": "custom", "does": "Driver-set mix of powertrain, steering and climate settings."},
+   {"name": "EV Mode", "type": "ev", "does": "Separate button: electric-only driving at low speed while battery charge allows."}
+  ],
+  "terrain": ["Electronic on-demand AWD (E-Four rear motor)", "Trail Mode: brakes slipping wheel for low-traction surfaces"],
+  "susp": {"type": "passive", "name": "MacPherson strut / trailing-arm double wishbone rear, passive", "height": false}
+ },
+ "lex_nx_450h": {
+  "modes": [
+   {"name": "ECO", "type": "eco", "does": "Softer throttle, maximizes electric operation and reduces climate output."},
+   {"name": "NORMAL", "type": "normal", "does": "Default balance of throttle response, hybrid power and steering."},
+   {"name": "SPORT", "type": "sport", "does": "Sharper throttle with full system power and heavier steering."},
+   {"name": "CUSTOM", "type": "custom", "does": "Driver-set mix of powertrain, steering and climate settings."},
+   {"name": "EV/HV Mode", "type": "ev", "does": "Separate button cycling Auto EV/HV, EV (all-electric up to ~84 mph), HV and battery Charge."}
+  ],
+  "terrain": ["Electronic on-demand AWD (E-Four rear motor)", "Trail Mode: brakes slipping wheel for low-traction surfaces"],
+  "susp": {"type": "passive", "name": "MacPherson strut / trailing-arm double wishbone rear, passive", "height": false},
+  "notes": "PHEV; 37 mi EV range."
+ },
+ "lex_rz_350e": {
+  "modes": [
+   {"name": "ECO", "type": "eco", "does": "Softer accelerator response and reduced climate output to extend range."},
+   {"name": "NORMAL", "type": "normal", "does": "Default balance of motor response and steering."},
+   {"name": "SPORT", "type": "sport", "does": "Sharper accelerator response and heavier steering."},
+   {"name": "RANGE", "type": "range", "does": "Maximizes efficiency: limits power and focuses climate on occupied seats."},
+   {"name": "CUSTOM", "type": "custom", "does": "Driver-set mix of powertrain, steering and climate settings."}
+  ],
+  "terrain": ["Traction control and VSC (FWD)"],
+  "susp": {"type": "passive", "name": "MacPherson strut / multi-link rear, passive (retuned 2026)", "height": false},
+  "notes": "Regen adjustable via paddles separately from drive mode."
+ },
+ "lex_rz_450e": {
+  "modes": [
+   {"name": "ECO", "type": "eco", "does": "Softer accelerator response and reduced climate output to extend range."},
+   {"name": "NORMAL", "type": "normal", "does": "Default balance of motor response, steering and DIRECT4 torque split."},
+   {"name": "SPORT", "type": "sport", "does": "Sharper response, heavier steering and more rear-biased DIRECT4 split."},
+   {"name": "RANGE", "type": "range", "does": "Maximizes efficiency: fixes AWD split at 50:50 and limits power/climate."},
+   {"name": "CUSTOM", "type": "custom", "does": "Driver-set mix of powertrain, steering and climate settings."}
+  ],
+  "terrain": ["DIRECT4 dual-motor AWD torque control"],
+  "susp": {"type": "passive", "name": "MacPherson strut / multi-link rear, passive (retuned 2026)", "height": false}
+ },
+ "lex_rz_550e": {
+  "modes": [
+   {"name": "ECO", "type": "eco", "does": "Softer accelerator response and reduced climate output to extend range."},
+   {"name": "NORMAL", "type": "normal", "does": "Default balance of motor response, steering and DIRECT4 torque split."},
+   {"name": "SPORT", "type": "sport", "does": "Sharper response, heavier steering and more rear-biased DIRECT4 split."},
+   {"name": "RANGE", "type": "range", "does": "Maximizes efficiency: fixes AWD split at 50:50 and limits power/climate."},
+   {"name": "CUSTOM", "type": "custom", "does": "Driver-set mix of powertrain, steering and climate settings."}
+  ],
+  "terrain": ["DIRECT4 dual-motor AWD torque control", "M Mode: simulated 8-speed manual via paddles"],
+  "susp": {"type": "tuned", "name": "F SPORT-tuned springs and dampers, MacPherson strut / multi-link", "height": false},
+  "notes": "M Mode adds simulated shifts and engine sound; separate from drive modes."
+ },
+ "lex_tx_350": {
+  "modes": [
+   {"name": "ECO", "type": "eco", "does": "Softer throttle, early upshifts and reduced climate output to save fuel."},
+   {"name": "NORMAL", "type": "normal", "does": "Default balance of throttle response, shift timing and steering."},
+   {"name": "SPORT", "type": "sport", "does": "Sharper throttle, holds gears longer and heavier steering."},
+   {"name": "CUSTOM", "type": "custom", "does": "Driver-set mix of powertrain, chassis and climate settings."}
+  ],
+  "terrain": ["Dynamic Torque Control AWD", "Trail Mode: AWD, braking and drive force cut wheel slip"],
+  "susp": {"type": "passive", "name": "MacPherson strut / five-arm multi-link rear, passive", "height": false}
+ },
+ "lex_tx_500h": {
+  "modes": [
+   {"name": "ECO", "type": "eco", "does": "Softer throttle, early upshifts and reduced climate output to save fuel."},
+   {"name": "NORMAL", "type": "normal", "does": "Default balance of throttle, shifts, steering and AVS damping."},
+   {"name": "SPORT S", "type": "sport", "does": "Sharper throttle and shift timing with more rear-biased DIRECT4 torque."},
+   {"name": "SPORT S+", "type": "sportplus", "does": "Sport S powertrain plus firmest AVS damping, heavier steering, sharper DRS."},
+   {"name": "CUSTOM", "type": "custom", "does": "Driver-set mix of powertrain, chassis (AVS) and climate settings."}
+  ],
+  "terrain": ["DIRECT4 AWD with rear e-axle (up to 80% rear)", "Trail Mode: AWD, braking and drive force cut wheel slip", "Dynamic Rear Steering (DRS)"],
+  "susp": {"type": "adaptive", "name": "Adaptive Variable Suspension (AVS) with Dynamic Rear Steering", "height": false},
+  "notes": "No EV-mode button on the 500h turbo hybrid."
+ },
+ "lex_tx_550h": {
+  "modes": [
+   {"name": "ECO", "type": "eco", "does": "Softer throttle, maximizes electric operation and reduces climate output."},
+   {"name": "NORMAL", "type": "normal", "does": "Default balance of throttle response, hybrid power and steering."},
+   {"name": "SPORT", "type": "sport", "does": "Sharper throttle with full system power and heavier steering."},
+   {"name": "CUSTOM", "type": "custom", "does": "Driver-set mix of powertrain, chassis and climate settings."},
+   {"name": "EV/HV Mode", "type": "ev", "does": "Separate button cycling Auto EV/HV, EV, HV and battery Charge modes."}
+  ],
+  "terrain": ["Electronic on-demand AWD (E-Four rear motor)", "Trail Mode: AWD, braking and drive force cut wheel slip"],
+  "susp": {"type": "passive", "name": "MacPherson strut / five-arm multi-link rear, passive", "height": false},
+  "notes": "PHEV; 33 mi EV range."
+ },
+ "lex_ux_base": {
+  "modes": [
+   {"name": "ECO", "type": "eco", "does": "Softer throttle, maximizes EV operation and reduces climate output."},
+   {"name": "NORMAL", "type": "normal", "does": "Default balance of throttle response, hybrid power and steering."},
+   {"name": "SPORT", "type": "sport", "does": "Sharper throttle with more hybrid power and heavier steering."},
+   {"name": "EV Mode", "type": "ev", "does": "Separate button: electric-only driving at low speed while battery charge allows."}
+  ],
+  "terrain": ["E-Four electric AWD (rear motor)"],
+  "susp": {"type": "passive", "name": "MacPherson strut / double wishbone rear, passive", "height": false}
+ },
+ "lex_ux_prem": {
+  "modes": [
+   {"name": "ECO", "type": "eco", "does": "Softer throttle, maximizes EV operation and reduces climate output."},
+   {"name": "NORMAL", "type": "normal", "does": "Default balance of throttle response, hybrid power and steering."},
+   {"name": "SPORT", "type": "sport", "does": "Sharper throttle with more hybrid power and heavier steering."},
+   {"name": "EV Mode", "type": "ev", "does": "Separate button: electric-only driving at low speed while battery charge allows."}
+  ],
+  "terrain": ["E-Four electric AWD (rear motor)"],
+  "susp": {"type": "passive", "name": "MacPherson strut / double wishbone rear, passive", "height": false}
+ },
+ "lex_ux_fsh": {
+  "modes": [
+   {"name": "ECO", "type": "eco", "does": "Softer throttle, maximizes EV operation and reduces climate output."},
+   {"name": "NORMAL", "type": "normal", "does": "Default balance of throttle, hybrid power, steering and AVS damping."},
+   {"name": "SPORT S", "type": "sport", "does": "Sharper throttle with more hybrid power and heavier steering."},
+   {"name": "SPORT S+", "type": "sportplus", "does": "Sport S powertrain plus firmest AVS damping and heaviest steering."},
+   {"name": "CUSTOM", "type": "custom", "does": "Driver-set mix of powertrain, chassis (AVS) and climate settings."},
+   {"name": "EV Mode", "type": "ev", "does": "Separate button: electric-only driving at low speed while battery charge allows."}
+  ],
+  "terrain": ["E-Four electric AWD (rear motor)"],
+  "susp": {"type": "adaptive", "name": "Adaptive Variable Suspension (AVS), F SPORT-tuned", "height": false}
+ },
+ "lex_tz_prem": {
+  "modes": [
+   {"name": "ECO", "type": "eco", "does": "Softer accelerator response and reduced climate output to extend range."},
+   {"name": "NORMAL", "type": "normal", "does": "Default balance of motor response, steering and AWD torque split."},
+   {"name": "SPORT", "type": "sport", "does": "Sharper accelerator response, heavier steering, more rear-biased torque."},
+   {"name": "RANGE", "type": "range", "does": "Maximizes efficiency: 50:50 AWD split, limited power and focused climate."},
+   {"name": "REAR COMFORT", "type": "comfort", "does": "Coordinates rear steer, braking and drive force to cut pitch and sway for rear rows."}
+  ],
+  "terrain": ["DIRECT4 dual-motor AWD torque control"],
+  "susp": {"type": "tuned", "name": "MacPherson strut / multi-link rear, comfort-tuned for large wheels", "height": false},
+  "notes": "Dynamic Rear Steering (up to 4 deg) available; grade fitment not confirmed."
+ },
+ "lex_tz_lux": {
+  "modes": [
+   {"name": "ECO", "type": "eco", "does": "Softer accelerator response and reduced climate output to extend range."},
+   {"name": "NORMAL", "type": "normal", "does": "Default balance of motor response, steering and AWD torque split."},
+   {"name": "SPORT", "type": "sport", "does": "Sharper accelerator response, heavier steering, more rear-biased torque."},
+   {"name": "RANGE", "type": "range", "does": "Maximizes efficiency: 50:50 AWD split, limited power and focused climate."},
+   {"name": "REAR COMFORT", "type": "comfort", "does": "Coordinates rear steer, braking and drive force to cut pitch and sway for rear rows."}
+  ],
+  "terrain": ["DIRECT4 dual-motor AWD torque control", "Dynamic Rear Steering, up to 4 degrees"],
+  "susp": {"type": "tuned", "name": "MacPherson strut / multi-link rear, comfort-tuned, with Dynamic Rear Steering", "height": false},
+  "notes": "Larger 95.8 kWh pack."
+ }
+}

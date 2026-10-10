@@ -1,0 +1,133 @@
+{
+ "Lincoln MKC \u00b7 2019": [
+  [
+   "mkc19_std",
+   "2019 Lincoln MKC Standard FWD",
+   "2.0 L EcoBoost \u00b7 6-speed \u00b7 FWD \u00b7 245 hp"
+  ],
+  [
+   "mkc19_sel",
+   "2019 Lincoln MKC Select AWD",
+   "2.0 L EcoBoost \u00b7 6-speed \u00b7 AWD \u00b7 245 hp"
+  ],
+  [
+   "mkc19_res",
+   "2019 Lincoln MKC Reserve AWD",
+   "2.0 L EcoBoost \u00b7 6-speed \u00b7 AWD \u00b7 245 hp"
+  ],
+  [
+   "mkc19_bl",
+   "2019 Lincoln MKC Black Label 2.3L AWD",
+   "2.3 L EcoBoost \u00b7 6-speed \u00b7 AWD \u00b7 285 hp"
+  ]
+ ],
+ "Lexus GX \u00b7 2026": [
+  [
+   "lex_gx_prem",
+   "2026 Lexus GX Premium",
+   "3.4 L twin-turbo V6 \u00b7 10-speed \u00b7 4WD \u00b7 349 hp"
+  ],
+  [
+   "lex_gx_op",
+   "2026 Lexus GX Overtrail",
+   "3.4 L twin-turbo V6 \u00b7 10-speed \u00b7 4WD \u00b7 349 hp"
+  ],
+  [
+   "lex_gx_lux",
+   "2026 Lexus GX Luxury",
+   "3.4 L twin-turbo V6 \u00b7 10-speed \u00b7 4WD \u00b7 349 hp"
+  ]
+ ],
+ "Lexus LX \u00b7 2026": [
+  [
+   "lex_lx_prem",
+   "2026 Lexus LX LX 600 Premium",
+   "3.4 L twin-turbo V6 \u00b7 10-speed \u00b7 4WD \u00b7 409 hp"
+  ],
+  [
+   "lex_lx_700h",
+   "2026 Lexus LX LX 700h F Sport",
+   "3.4 L twin-turbo V6 hybrid \u00b7 10-speed \u00b7 4WD \u00b7 457 hp"
+  ]
+ ],
+ "Lexus NX \u00b7 2026": [
+  [
+   "lex_nx_350",
+   "2026 Lexus NX NX 350 AWD",
+   "2.4 L turbo \u00b7 8-speed \u00b7 AWD \u00b7 275 hp"
+  ],
+  [
+   "lex_nx_350h",
+   "2026 Lexus NX NX 350h Premium",
+   "2.5 L hybrid \u00b7 eCVT \u00b7 AWD \u00b7 240 hp"
+  ],
+  [
+   "lex_nx_450h",
+   "2026 Lexus NX NX 450h+ Luxury",
+   "2.5 L plug-in hybrid \u00b7 eCVT \u00b7 AWD \u00b7 304 hp \u00b7 37 mi EV"
+  ]
+ ],
+ "Lexus RZ \u00b7 2026": [
+  [
+   "lex_rz_350e",
+   "2026 Lexus RZ RZ 350e FWD",
+   "Single motor \u00b7 FWD \u00b7 221 hp \u00b7 74.7 kWh \u00b7 about 266 mi"
+  ],
+  [
+   "lex_rz_450e",
+   "2026 Lexus RZ RZ 450e Premium",
+   "Dual motor \u00b7 AWD \u00b7 308 hp \u00b7 74.7 kWh \u00b7 about 220 mi"
+  ],
+  [
+   "lex_rz_550e",
+   "2026 Lexus RZ RZ 550e F Sport",
+   "Dual motor \u00b7 AWD \u00b7 402 hp \u00b7 74.7 kWh \u00b7 about 220 mi"
+  ]
+ ],
+ "Lexus TX \u00b7 2026": [
+  [
+   "lex_tx_350",
+   "2026 Lexus TX TX 350 Premium AWD",
+   "2.4 L turbo \u00b7 8-speed \u00b7 AWD \u00b7 275 hp"
+  ],
+  [
+   "lex_tx_500h",
+   "2026 Lexus TX TX 500h F Sport Performance",
+   "2.4 L turbo hybrid \u00b7 6-speed \u00b7 AWD \u00b7 366 hp"
+  ],
+  [
+   "lex_tx_550h",
+   "2026 Lexus TX TX 550h+ Luxury",
+   "3.5 L V6 plug-in hybrid \u00b7 eCVT \u00b7 AWD \u00b7 404 hp \u00b7 33 mi EV"
+  ]
+ ],
+ "Lexus UX \u00b7 2026": [
+  [
+   "lex_ux_base",
+   "2026 Lexus UX UX 300h AWD",
+   "2.0 L hybrid \u00b7 eCVT \u00b7 AWD \u00b7 196 hp"
+  ],
+  [
+   "lex_ux_prem",
+   "2026 Lexus UX UX 300h Premium AWD",
+   "2.0 L hybrid \u00b7 eCVT \u00b7 AWD \u00b7 196 hp"
+  ],
+  [
+   "lex_ux_fsh",
+   "2026 Lexus UX UX 300h F SPORT Handling AWD",
+   "2.0 L hybrid \u00b7 eCVT \u00b7 AWD \u00b7 196 hp"
+  ]
+ ],
+ "Lexus TZ \u00b7 2027": [
+  [
+   "lex_tz_prem",
+   "2027 Lexus TZ TZ 450e Premium",
+   "Dual motor \u00b7 AWD \u00b7 308 hp \u00b7 77 kWh \u00b7 about 253 mi"
+  ],
+  [
+   "lex_tz_lux",
+   "2027 Lexus TZ TZ 450e Luxury",
+   "Dual motor \u00b7 AWD \u00b7 308 hp \u00b7 95.8 kWh \u00b7 about 315 mi"
+  ]
+ ]
+}

@@ -1,0 +1,247 @@
+{
+ "sub_impreza_sport": {
+  "modes": [
+   {"name": "Intelligent (I)", "type": "eco", "does": "SI-DRIVE default: softer throttle map and efficiency-biased CVT ratios for smooth, economical driving."},
+   {"name": "Sport (S)", "type": "sport", "does": "SI-DRIVE Sport: quicker throttle response and stepped, higher-rpm CVT shift logic for passing and merging."}
+  ],
+  "terrain": ["Active Torque Vectoring: brakes inside front wheel in corners", "Symmetrical AWD with VDC traction/stability control"],
+  "susp": {"type": "passive", "name": "MacPherson strut front / double wishbone rear, passive", "height": false},
+  "notes": "SI-DRIVE and CVT paddle shifters standard; no X-MODE on Impreza."
+ },
+ "sub_impreza_rs": {
+  "modes": [
+   {"name": "Intelligent (I)", "type": "eco", "does": "SI-DRIVE default: softer throttle map and efficiency-biased CVT ratios for smooth, economical driving."},
+   {"name": "Sport (S)", "type": "sport", "does": "SI-DRIVE Sport: quicker throttle response and stepped, higher-rpm CVT shift logic for passing and merging."}
+  ],
+  "terrain": ["Active Torque Vectoring: brakes inside front wheel in corners", "Symmetrical AWD with VDC traction/stability control"],
+  "susp": {"type": "passive", "name": "MacPherson strut front / double wishbone rear, passive", "height": false},
+  "notes": "SI-DRIVE and CVT paddle shifters standard; no X-MODE on Impreza."
+ },
+ "sub_crosstrek_base": {
+  "modes": [
+   {"name": "Intelligent (I)", "type": "eco", "does": "SI-DRIVE default: softer throttle map and efficiency-biased CVT ratios for smooth, economical driving."},
+   {"name": "Sport (S)", "type": "sport", "does": "SI-DRIVE Sport: quicker throttle response and more aggressive CVT ratio control."}
+  ],
+  "terrain": ["X-MODE Dual Mode (Snow/Dirt, Deep Snow/Mud) with Hill Descent Control", "Symmetrical AWD with VDC traction/stability control", "8.7-in ground clearance"],
+  "susp": {"type": "passive", "name": "MacPherson strut front / double wishbone rear, passive", "height": false},
+  "notes": "For 2026 Subaru lists dual-mode X-MODE and SI-DRIVE as standard on all Crosstrek trims."
+ },
+ "sub_crosstrek_prem": {
+  "modes": [
+   {"name": "Intelligent (I)", "type": "eco", "does": "SI-DRIVE default: softer throttle map and efficiency-biased CVT ratios for smooth, economical driving."},
+   {"name": "Sport (S)", "type": "sport", "does": "SI-DRIVE Sport: quicker throttle response and more aggressive CVT ratio control."}
+  ],
+  "terrain": ["X-MODE Dual Mode (Snow/Dirt, Deep Snow/Mud) with Hill Descent Control", "Symmetrical AWD with VDC traction/stability control", "8.7-in ground clearance"],
+  "susp": {"type": "passive", "name": "MacPherson strut front / double wishbone rear, passive", "height": false}
+ },
+ "sub_crosstrek_sport": {
+  "modes": [
+   {"name": "Intelligent (I)", "type": "eco", "does": "SI-DRIVE default: softer throttle map and efficiency-biased CVT ratios for smooth, economical driving."},
+   {"name": "Sport (S)", "type": "sport", "does": "SI-DRIVE Sport: quicker throttle response and more aggressive CVT ratio control."}
+  ],
+  "terrain": ["X-MODE Dual Mode (Snow/Dirt, Deep Snow/Mud) with Hill Descent Control", "Active Torque Vectoring: brakes inside front wheel", "8.7-in ground clearance"],
+  "susp": {"type": "passive", "name": "MacPherson strut front / double wishbone rear, passive", "height": false}
+ },
+ "sub_crosstrek_wild": {
+  "modes": [
+   {"name": "Intelligent (I)", "type": "eco", "does": "SI-DRIVE default: softer throttle map and efficiency-biased CVT ratios for smooth, economical driving."},
+   {"name": "Sport (S)", "type": "sport", "does": "SI-DRIVE Sport: quicker throttle response and more aggressive CVT ratio control."}
+  ],
+  "terrain": ["X-MODE Dual Mode (Snow/Dirt, Deep Snow/Mud) with Hill Descent Control", "Shorter CVT final drive for low-speed crawling", "Yokohama GEOLANDAR all-terrain tires, 9.3-in clearance"],
+  "susp": {"type": "tuned", "name": "Wilderness raised suspension: taller front/rear components, off-road tuned", "height": false},
+  "notes": "9.3 in ground clearance; 3,500-lb towing."
+ },
+ "sub_crosstrek_hyb": {
+  "modes": [
+   {"name": "Intelligent (I)", "type": "eco", "does": "Default hybrid calibration: favors electric drive at light throttle for efficiency."},
+   {"name": "Sport (S)", "type": "sport", "does": "S button on wheel: brings in motor torque boost sooner for sharper throttle response."}
+  ],
+  "terrain": ["X-MODE Dual Mode (Snow/Dirt, Deep Snow/Mud) with Hill Descent Control", "Front view monitor shown when X-MODE engaged", "8.7-in ground clearance"],
+  "susp": {"type": "passive", "name": "MacPherson strut front / double wishbone rear, passive", "height": false},
+  "notes": "Series-parallel hybrid; paddles simulate 6 steps; no separate EV-mode button confirmed."
+ },
+ "sub_forester_base": {
+  "modes": [
+   {"name": "Intelligent (I)", "type": "eco", "does": "SI-DRIVE default: softer throttle map and efficiency-biased CVT ratios for smooth, economical driving."},
+   {"name": "Sport (S)", "type": "sport", "does": "SI-DRIVE Sport: quicker throttle response and more aggressive CVT ratio control."}
+  ],
+  "terrain": ["Symmetrical AWD with VDC traction/stability control", "8.7-in ground clearance"],
+  "susp": {"type": "passive", "name": "MacPherson strut front / double wishbone rear, passive", "height": false},
+  "notes": "Subaru brochure lists X-MODE from Premium up, not on Base."
+ },
+ "sub_forester_prem": {
+  "modes": [
+   {"name": "Intelligent (I)", "type": "eco", "does": "SI-DRIVE default: softer throttle map and efficiency-biased CVT ratios for smooth, economical driving."},
+   {"name": "Sport (S)", "type": "sport", "does": "SI-DRIVE Sport: quicker throttle response and more aggressive CVT ratio control."}
+  ],
+  "terrain": ["X-MODE (single mode) with Hill Descent Control", "8.7-in ground clearance"],
+  "susp": {"type": "passive", "name": "MacPherson strut front / double wishbone rear, passive", "height": false}
+ },
+ "sub_forester_sport": {
+  "modes": [
+   {"name": "Intelligent (I)", "type": "eco", "does": "SI-DRIVE default: softer throttle map and efficiency-biased CVT ratios for smooth, economical driving."},
+   {"name": "Sport (S)", "type": "sport", "does": "SI-DRIVE Sport: quicker throttle response and more aggressive CVT ratio control."}
+  ],
+  "terrain": ["Dual-Function X-MODE (Snow/Dirt, Deep Snow/Mud) with Hill Descent Control", "8.7-in ground clearance"],
+  "susp": {"type": "tuned", "name": "Sport re-tuned suspension (passive)", "height": false},
+  "notes": "8-speed manual mode with paddle shifters."
+ },
+ "sub_forester_wild": {
+  "modes": [
+   {"name": "Intelligent (I)", "type": "eco", "does": "SI-DRIVE default: softer throttle map and efficiency-biased CVT ratios for smooth, economical driving."},
+   {"name": "Sport (S)", "type": "sport", "does": "SI-DRIVE Sport: quicker throttle response and more aggressive CVT ratio control."}
+  ],
+  "terrain": ["Enhanced Dual-Function X-MODE (Snow/Dirt, Deep Snow/Mud) with HDC", "Faster center-diff lockup, shorter final drive", "All-terrain tires, 9.3-in clearance, front view monitor"],
+  "susp": {"type": "tuned", "name": "Wilderness-tuned raised suspension (passive)", "height": false},
+  "notes": "9.3 in clearance; 23.5/21/25.5 deg approach/breakover/departure; 3,500-lb towing."
+ },
+ "sub_forester_tour": {
+  "modes": [
+   {"name": "Intelligent (I)", "type": "eco", "does": "SI-DRIVE default: softer throttle map and efficiency-biased CVT ratios for smooth, economical driving."},
+   {"name": "Sport (S)", "type": "sport", "does": "SI-DRIVE Sport: quicker throttle response and more aggressive CVT ratio control."}
+  ],
+  "terrain": ["Dual-Function X-MODE (Snow/Dirt, Deep Snow/Mud) with Hill Descent Control", "8.7-in ground clearance"],
+  "susp": {"type": "passive", "name": "MacPherson strut front / double wishbone rear, passive", "height": false}
+ },
+ "sub_forester_hyb": {
+  "modes": [
+   {"name": "Intelligent (I)", "type": "eco", "does": "Default hybrid calibration: favors electric drive at light throttle for efficiency."},
+   {"name": "Sport (S)", "type": "sport", "does": "S button on wheel: brings in motor torque boost sooner for sharper throttle response."}
+  ],
+  "terrain": ["Dual-Function X-MODE (Snow/Dirt, Deep Snow/Mud) with Hill Descent Control", "8.7-in ground clearance"],
+  "susp": {"type": "tuned", "name": "Sport re-tuned suspension (passive)", "height": false},
+  "notes": "Series-parallel hybrid; no separate EV-mode button confirmed."
+ },
+ "sub_outback_prem": {
+  "modes": [],
+  "terrain": ["X-MODE (single mode) with Hill Descent Control, wheel-mounted switch", "Active Torque Vectoring", "8.7-in ground clearance"],
+  "susp": {"type": "passive", "name": "4-wheel independent raised suspension, passive", "height": false},
+  "notes": "No SI-DRIVE or drive-mode selector on 2026 Outback; dual-function X-MODE is Wilderness-only."
+ },
+ "sub_outback_lim": {
+  "modes": [],
+  "terrain": ["X-MODE (single mode) with Hill Descent Control, wheel-mounted switch", "Active Torque Vectoring", "8.7-in ground clearance"],
+  "susp": {"type": "passive", "name": "4-wheel independent raised suspension, passive", "height": false},
+  "notes": "No SI-DRIVE or drive-mode selector on 2026 Outback."
+ },
+ "sub_outback_tourxt": {
+  "modes": [],
+  "terrain": ["X-MODE (single mode) with Hill Descent Control, wheel-mounted switch", "Active Torque Vectoring", "8.7-in ground clearance"],
+  "susp": {"type": "passive", "name": "4-wheel independent raised suspension, passive", "height": false},
+  "notes": "No SI-DRIVE or drive-mode selector on 2026 Outback; 8-speed manual mode via paddles."
+ },
+ "sub_outback_wild": {
+  "modes": [],
+  "terrain": ["Dual-function X-MODE (Snow/Dirt, Deep Snow/Mud) with Hill Descent Control", "Faster center-diff lockup, reduced off-road wheelspin", "Bridgestone Dueler all-terrain tires, 9.5-in clearance"],
+  "susp": {"type": "adaptive", "name": "Raised suspension with electronically controlled dampers (skyhook-type)", "height": false},
+  "notes": "No SI-DRIVE; dampers adjust automatically, not driver-selectable. 9.5 in clearance."
+ },
+ "sub_ascent_prem": {
+  "modes": [],
+  "terrain": ["X-MODE (single mode) with Hill Descent Control", "Symmetrical AWD with VDC traction/stability control", "8.7-in ground clearance"],
+  "susp": {"type": "passive", "name": "MacPherson strut front / double wishbone rear, passive", "height": false},
+  "notes": "No SI-DRIVE or drive-mode selector on Ascent."
+ },
+ "sub_ascent_onyx": {
+  "modes": [],
+  "terrain": ["Dual-Function X-MODE (Snow/Dirt, Deep Snow/Mud) with Hill Descent Control", "Symmetrical AWD with VDC traction/stability control", "8.7-in ground clearance"],
+  "susp": {"type": "passive", "name": "MacPherson strut front / double wishbone rear, passive", "height": false},
+  "notes": "No SI-DRIVE or drive-mode selector on Ascent."
+ },
+ "sub_ascent_tour": {
+  "modes": [],
+  "terrain": ["Dual-Function X-MODE (Snow/Dirt, Deep Snow/Mud) with Hill Descent Control", "Symmetrical AWD with VDC traction/stability control", "8.7-in ground clearance"],
+  "susp": {"type": "passive", "name": "MacPherson strut front / double wishbone rear, passive", "height": false},
+  "notes": "No SI-DRIVE or drive-mode selector on Ascent."
+ },
+ "sub_solterra_prem": {
+  "modes": [
+   {"name": "ECO", "type": "eco", "does": "Softens accelerator response and limits climate power to extend range."},
+   {"name": "Normal", "type": "normal", "does": "Default balance of accelerator response and efficiency."},
+   {"name": "Power", "type": "sport", "does": "Sharper accelerator mapping for quicker response to pedal inputs."}
+  ],
+  "terrain": ["X-MODE Dual Mode (Snow/Dirt, Deep Snow/Mud)", "Grip Control: low-speed off-road cruise control", "Downhill Assist Control: steady descent speed"],
+  "susp": {"type": "passive", "name": "MacPherson strut front / double wishbone rear, passive", "height": false},
+  "notes": "4-level regen via steering-wheel paddles."
+ },
+ "sub_solterra_lim": {
+  "modes": [
+   {"name": "ECO", "type": "eco", "does": "Softens accelerator response and limits climate power to extend range."},
+   {"name": "Normal", "type": "normal", "does": "Default balance of accelerator response and efficiency."},
+   {"name": "Power", "type": "sport", "does": "Sharper accelerator mapping for quicker response to pedal inputs."}
+  ],
+  "terrain": ["X-MODE Dual Mode (Snow/Dirt, Deep Snow/Mud)", "Grip Control: low-speed off-road cruise control", "Downhill Assist Control: steady descent speed"],
+  "susp": {"type": "passive", "name": "MacPherson strut front / double wishbone rear, passive", "height": false},
+  "notes": "4-level regen via steering-wheel paddles."
+ },
+ "sub_solterra_xt": {
+  "modes": [
+   {"name": "ECO", "type": "eco", "does": "Softens accelerator response and limits climate power to extend range."},
+   {"name": "Normal", "type": "normal", "does": "Default balance of accelerator response and efficiency."},
+   {"name": "Power", "type": "sport", "does": "Sharper accelerator mapping for quicker response to pedal inputs."}
+  ],
+  "terrain": ["X-MODE Dual Mode (Snow/Dirt, Deep Snow/Mud)", "Grip Control: low-speed off-road cruise control", "Downhill Assist Control: steady descent speed"],
+  "susp": {"type": "passive", "name": "MacPherson strut front / double wishbone rear, passive", "height": false},
+  "notes": "338 hp; 4-level regen via steering-wheel paddles."
+ },
+ "sub_trailseeker_prem": {
+  "modes": [
+   {"name": "Normal", "type": "normal", "does": "Default balance of accelerator response and efficiency."},
+   {"name": "Power", "type": "sport", "does": "Sharper accelerator mapping for quicker response to pedal inputs."},
+   {"name": "Eco", "type": "eco", "does": "Softens accelerator response and limits climate power to extend range."}
+  ],
+  "terrain": ["X-MODE Dual Mode (Snow/Dirt, Deep Snow/Mud)", "Grip Control: low-speed off-road cruise control", "Downhill Assist Control: steady descent speed"],
+  "susp": {"type": "passive", "name": "MacPherson strut front / double wishbone rear, raised, passive", "height": false},
+  "notes": "8.5 in clearance; 5-level regen via paddles."
+ },
+ "sub_trailseeker_lim": {
+  "modes": [
+   {"name": "Normal", "type": "normal", "does": "Default balance of accelerator response and efficiency."},
+   {"name": "Power", "type": "sport", "does": "Sharper accelerator mapping for quicker response to pedal inputs."},
+   {"name": "Eco", "type": "eco", "does": "Softens accelerator response and limits climate power to extend range."}
+  ],
+  "terrain": ["X-MODE Dual Mode (Snow/Dirt, Deep Snow/Mud)", "Grip Control: low-speed off-road cruise control", "Downhill Assist Control: steady descent speed"],
+  "susp": {"type": "passive", "name": "MacPherson strut front / double wishbone rear, raised, passive", "height": false},
+  "notes": "8.5 in clearance; 5-level regen via paddles."
+ },
+ "sub_trailseeker_tour": {
+  "modes": [
+   {"name": "Normal", "type": "normal", "does": "Default balance of accelerator response and efficiency."},
+   {"name": "Power", "type": "sport", "does": "Sharper accelerator mapping for quicker response to pedal inputs."},
+   {"name": "Eco", "type": "eco", "does": "Softens accelerator response and limits climate power to extend range."}
+  ],
+  "terrain": ["X-MODE Dual Mode (Snow/Dirt, Deep Snow/Mud)", "Grip Control: low-speed off-road cruise control", "Downhill Assist Control: steady descent speed"],
+  "susp": {"type": "passive", "name": "MacPherson strut front / double wishbone rear, raised, passive", "height": false},
+  "notes": "8.5 in clearance; 5-level regen via paddles."
+ },
+ "sub_uncharted_prem": {
+  "modes": [
+   {"name": "Normal", "type": "normal", "does": "Default balance of accelerator response and efficiency."},
+   {"name": "Power", "type": "sport", "does": "Sharper accelerator mapping for quicker response to pedal inputs."},
+   {"name": "Eco", "type": "eco", "does": "Softens accelerator response and limits climate power to extend range."}
+  ],
+  "terrain": ["Traction control / VDC only (FWD)"],
+  "susp": {"type": "passive", "name": "MacPherson strut front / double wishbone rear, passive", "height": false},
+  "notes": "FWD; X-MODE, Grip Control and Downhill Assist not listed for this trim. 4-level regen paddles."
+ },
+ "sub_uncharted_sport": {
+  "modes": [
+   {"name": "Normal", "type": "normal", "does": "Default balance of accelerator response and efficiency."},
+   {"name": "Power", "type": "sport", "does": "Sharper accelerator mapping for quicker response to pedal inputs."},
+   {"name": "Eco", "type": "eco", "does": "Softens accelerator response and limits climate power to extend range."}
+  ],
+  "terrain": ["X-MODE Dual Mode (Snow/Dirt, Deep Snow/Mud)", "Grip Control: low-speed off-road cruise control", "Downhill Assist Control: steady descent speed"],
+  "susp": {"type": "passive", "name": "MacPherson strut front / double wishbone rear, passive", "height": false},
+  "notes": "4-level regen via steering-wheel paddles."
+ },
+ "sub_uncharted_gt": {
+  "modes": [
+   {"name": "Normal", "type": "normal", "does": "Default balance of accelerator response and efficiency."},
+   {"name": "Power", "type": "sport", "does": "Sharper accelerator mapping for quicker response to pedal inputs."},
+   {"name": "Eco", "type": "eco", "does": "Softens accelerator response and limits climate power to extend range."}
+  ],
+  "terrain": ["X-MODE Dual Mode (Snow/Dirt, Deep Snow/Mud)", "Grip Control: low-speed off-road cruise control", "Downhill Assist Control: steady descent speed"],
+  "susp": {"type": "passive", "name": "MacPherson strut front / double wishbone rear, passive", "height": false},
+  "notes": "4-level regen via steering-wheel paddles."
+ }
+}

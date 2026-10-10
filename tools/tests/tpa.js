@@ -1,0 +1,5 @@
+(async()=>{const out=[];setTrim("camry25",true);cars=[];st.power=true;st.started=true;sys.epb=false;
+const R=RETAIL[0];out.push("stalls "+R.S.stalls.length);resetCar({free:true,x:R.a0+12,y:R.s*(RB0+3.5),h:0});st.gear="D";car.vx=0;st.parkAssist=true;PA.mode="perp";PA.side=R.s>0?-1:1;PA.found=false;
+let found=null;SIM(25,t=>{inp.thrT=car.vx<1.8?0.12:0;inp.brkT=car.vx>2.3?0.2:0;paScan();if(sys.paSpot&&!found){found=t;return false}});out.push("found at "+found+" x "+car.px.toFixed(1)+" spot "+JSON.stringify(sys.paSpot&&sys.paSpot.type));
+if(sys.paSpot){inp.thrT=0;paStart();let done=null;SIM(60,t=>{if(!sys.pa){done=t;return false}if(Math.round(t*50)%250===0)out.push(` t${t.toFixed(0)} ${sys.pa.ph} ${sys.pa.msg} tries ${sys.pa.tries} stuck ${sys.pa.stuck} v ${car.vx.toFixed(2)} gear ${st.gear} xy ${car.px.toFixed(1)},${car.py.toFixed(1)} psi ${(car.psi*57.3).toFixed(0)}`)});out.push("parked in "+done+" s gear "+st.gear+" hits "+hits+" final "+car.px.toFixed(1)+","+car.py.toFixed(1)+" psi "+(car.psi*180/Math.PI).toFixed(0)+" msg "+(LOG.slice(-1)[0]||""))}
+return out.join("\n")})()

@@ -1,0 +1,2450 @@
+{
+ "acc_lx": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Default calibration balancing response, comfort and efficiency."
+   ],
+   [
+    "ECON",
+    "eco",
+    "Softens throttle mapping and climate control output to save fuel."
+   ]
+  ],
+  "t": [],
+  "s": [
+   "passive",
+   "MacPherson front / multi-link rear passive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "acc_exl": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Default calibration balancing response, comfort and efficiency."
+   ],
+   [
+    "ECON",
+    "eco",
+    "Softens throttle mapping and climate control output to save fuel."
+   ]
+  ],
+  "t": [],
+  "s": [
+   "passive",
+   "MacPherson front / multi-link rear passive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "acc_sport20": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Balanced throttle, steering and 10-speed shift calibration."
+   ],
+   [
+    "ECON",
+    "eco",
+    "Relaxed throttle and reduced climate control output for efficiency."
+   ],
+   [
+    "Sport",
+    "sport",
+    "Sharper throttle, quicker 10-speed shifts, heavier steering and sportier Active Sound Control."
+   ]
+  ],
+  "t": [],
+  "s": [
+   "tuned",
+   "Sport-tuned passive suspension with 19-inch wheels",
+   false
+  ],
+  "ev": null
+ },
+ "acc_touring20": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Balanced throttle, steering and 10-speed shift calibration."
+   ],
+   [
+    "ECON",
+    "eco",
+    "Relaxed throttle and reduced climate control output for efficiency."
+   ],
+   [
+    "Sport",
+    "sport",
+    "Firms the Adaptive Damper System, sharpens throttle, shifts and steering, and adds sportier engine sound."
+   ]
+  ],
+  "t": [],
+  "s": [
+   "adaptive",
+   "Adaptive Damper System (Normal/Sport damping)",
+   false
+  ],
+  "ev": null
+ },
+ "acc_hyb": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Default two-motor hybrid calibration."
+   ],
+   [
+    "ECON",
+    "eco",
+    "Gentler throttle and reduced climate output to maximize mpg."
+   ],
+   [
+    "SPORT",
+    "sport",
+    "Sharper accelerator response and more engine assist with sportier sound."
+   ]
+  ],
+  "t": [],
+  "s": [
+   "passive",
+   "MacPherson front / multi-link rear passive suspension",
+   false
+  ],
+  "ev": {
+   "btn": "EV",
+   "modes": [
+    [
+     "ev",
+     "EV"
+    ]
+   ]
+  }
+ },
+ "f150_xlt": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Default on-road calibration for throttle, shifting, steering and 4WD."
+   ],
+   [
+    "Eco",
+    "eco",
+    "Softer throttle and early upshifts to improve fuel economy."
+   ],
+   [
+    "Sport",
+    "sport",
+    "Quicker throttle response, holds gears longer and firmer steering."
+   ],
+   [
+    "Tow/Haul",
+    "tow",
+    "Adjusts shift points and grade braking for trailers and heavy loads."
+   ],
+   [
+    "Slippery",
+    "snow",
+    "Reduces throttle and adjusts traction control for snow, ice or wet roads."
+   ],
+   [
+    "Deep Snow/Sand",
+    "sand",
+    "Allows more wheelspin and holds gears for deep snow or sand."
+   ],
+   [
+    "Mud/Rut",
+    "mud",
+    "Permits wheelspin and keeps momentum in mud and deep ruts."
+   ]
+  ],
+  "t": [
+   "Two-speed transfer case with 4WD Low",
+   "Electronic locking rear axle (available)",
+   "Hill Descent Control (available)"
+  ],
+  "s": [
+   "passive",
+   "Independent front / leaf-spring rear passive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "f150_lariat": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Default on-road calibration for throttle, shifting, steering and 4WD."
+   ],
+   [
+    "Eco",
+    "eco",
+    "Softer throttle and early upshifts to improve fuel economy."
+   ],
+   [
+    "Sport",
+    "sport",
+    "Quicker throttle response, holds gears longer and firmer steering."
+   ],
+   [
+    "Tow/Haul",
+    "tow",
+    "Adjusts shift points and grade braking for trailers and heavy loads."
+   ],
+   [
+    "Slippery",
+    "snow",
+    "Reduces throttle and adjusts traction control for snow, ice or wet roads."
+   ],
+   [
+    "Deep Snow/Sand",
+    "sand",
+    "Allows more wheelspin and holds gears for deep snow or sand."
+   ],
+   [
+    "Mud/Rut",
+    "mud",
+    "Permits wheelspin and keeps momentum in mud and deep ruts."
+   ]
+  ],
+  "t": [
+   "Two-speed transfer case with 4WD Low",
+   "Electronic locking rear axle (available)",
+   "Hill Descent Control (available)"
+  ],
+  "s": [
+   "passive",
+   "Independent front / leaf-spring rear passive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "f150_tremor": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Default on-road calibration for throttle, shifting, steering and 4WD."
+   ],
+   [
+    "Eco",
+    "eco",
+    "Softer throttle and early upshifts to improve fuel economy."
+   ],
+   [
+    "Sport",
+    "sport",
+    "Quicker throttle response, holds gears longer and firmer steering."
+   ],
+   [
+    "Tow/Haul",
+    "tow",
+    "Adjusts shift points and grade braking for trailers and heavy loads."
+   ],
+   [
+    "Slippery",
+    "snow",
+    "Reduces throttle and adjusts traction control for snow, ice or wet roads."
+   ],
+   [
+    "Deep Snow/Sand",
+    "sand",
+    "Allows more wheelspin and holds gears for deep snow or sand."
+   ],
+   [
+    "Mud/Rut",
+    "mud",
+    "Permits wheelspin and keeps momentum in mud and deep ruts."
+   ],
+   [
+    "Rock Crawl",
+    "rock",
+    "Very gentle throttle and max traction for slow crawling in 4WD Low."
+   ]
+  ],
+  "t": [
+   "Trail Control with Trail 1-Pedal Drive",
+   "Trail Turn Assist",
+   "3.73 electronic locking rear axle",
+   "Torsen front differential (available)",
+   "Two-speed transfer case with 4WD Low",
+   "Hill Descent Control",
+   "Steel skid plates"
+  ],
+  "s": [
+   "tuned",
+   "Tremor-tuned off-road suspension with increased ride height and 33-in A/T tires",
+   false
+  ],
+  "ev": null
+ },
+ "f150_pb": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Default on-road calibration for throttle, shifting, steering and 4WD."
+   ],
+   [
+    "Eco",
+    "eco",
+    "Softer throttle and early upshifts to improve fuel economy."
+   ],
+   [
+    "Sport",
+    "sport",
+    "Quicker throttle response, holds gears longer and firmer steering."
+   ],
+   [
+    "Tow/Haul",
+    "tow",
+    "Adjusts shift points and grade braking for trailers and heavy loads."
+   ],
+   [
+    "Slippery",
+    "snow",
+    "Reduces throttle and adjusts traction control for snow, ice or wet roads."
+   ],
+   [
+    "Deep Snow/Sand",
+    "sand",
+    "Allows more wheelspin and holds gears for deep snow or sand."
+   ],
+   [
+    "Mud/Rut",
+    "mud",
+    "Permits wheelspin and keeps momentum in mud and deep ruts."
+   ]
+  ],
+  "t": [
+   "Two-speed transfer case with 4WD Low",
+   "Electronic locking rear axle (available)"
+  ],
+  "s": [
+   "passive",
+   "Independent front / leaf-spring rear passive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "f150_plat": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Default on-road calibration for throttle, shifting, steering and 4WD."
+   ],
+   [
+    "Eco",
+    "eco",
+    "Softer throttle and early upshifts to improve fuel economy."
+   ],
+   [
+    "Sport",
+    "sport",
+    "Quicker throttle response, holds gears longer and firmer steering."
+   ],
+   [
+    "Tow/Haul",
+    "tow",
+    "Adjusts shift points and grade braking for trailers and heavy loads."
+   ],
+   [
+    "Slippery",
+    "snow",
+    "Reduces throttle and adjusts traction control for snow, ice or wet roads."
+   ],
+   [
+    "Deep Snow/Sand",
+    "sand",
+    "Allows more wheelspin and holds gears for deep snow or sand."
+   ],
+   [
+    "Mud/Rut",
+    "mud",
+    "Permits wheelspin and keeps momentum in mud and deep ruts."
+   ]
+  ],
+  "t": [
+   "Two-speed transfer case with 4WD Low",
+   "Electronic locking rear axle (available)",
+   "Hill Descent Control (available)"
+  ],
+  "s": [
+   "passive",
+   "Independent front / leaf-spring rear passive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "av_std": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Effortless, balanced ride for everyday driving."
+   ],
+   [
+    "Conserve",
+    "eco",
+    "Softens throttle and transmission for maximum efficiency."
+   ],
+   [
+    "Excite",
+    "sport",
+    "Sharper throttle, steering and firmer damping for a responsive, engaging ride."
+   ],
+   [
+    "Slippery",
+    "snow",
+    "Puts traction, stability control and AWD on alert for snow, ice and rain."
+   ]
+  ],
+  "t": [],
+  "s": [
+   "adaptive",
+   "Adaptive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "av_res": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Effortless, balanced ride for everyday driving."
+   ],
+   [
+    "Conserve",
+    "eco",
+    "Softens throttle and transmission for maximum efficiency."
+   ],
+   [
+    "Excite",
+    "sport",
+    "Sharper throttle, steering and firmer damping for a responsive, engaging ride."
+   ],
+   [
+    "Slippery",
+    "snow",
+    "Puts traction, stability control and AWD on alert for snow, ice and rain."
+   ],
+   [
+    "Deep Conditions",
+    "deepsnow",
+    "Full traction, stability and AWD calibration for deep snow and loose surfaces."
+   ]
+  ],
+  "t": [
+   "Intelligent AWD"
+  ],
+  "s": [
+   "adaptive",
+   "Adaptive suspension (air suspension with Road Preview available)",
+   false
+  ],
+  "ev": null
+ },
+ "av_gt": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Effortless, balanced ride for everyday driving."
+   ],
+   [
+    "Conserve",
+    "eco",
+    "Softens throttle and transmission for maximum efficiency."
+   ],
+   [
+    "Excite",
+    "sport",
+    "Sharper throttle, steering and firmer damping for a responsive, engaging ride."
+   ],
+   [
+    "Slippery",
+    "snow",
+    "Puts traction, stability control and AWD on alert for snow, ice and rain."
+   ],
+   [
+    "Deep Conditions",
+    "deepsnow",
+    "Full traction, stability and AWD calibration for deep snow and loose surfaces."
+   ]
+  ],
+  "t": [
+   "Intelligent AWD"
+  ],
+  "s": [
+   "adaptive",
+   "Adaptive suspension",
+   false
+  ],
+  "ev": {
+   "btn": "Lincoln Drive Modes",
+   "modes": [
+    [
+     "hyb",
+     "Normal"
+    ],
+    [
+     "ev",
+     "Pure EV"
+    ],
+    [
+     "save",
+     "Preserve EV"
+    ]
+   ]
+  }
+ },
+ "av_blgt": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Effortless, balanced ride for everyday driving."
+   ],
+   [
+    "Conserve",
+    "eco",
+    "Softens throttle and transmission for maximum efficiency."
+   ],
+   [
+    "Excite",
+    "sport",
+    "Sharper throttle, steering and firmer damping for a responsive, engaging ride."
+   ],
+   [
+    "Slippery",
+    "snow",
+    "Puts traction, stability control and AWD on alert for snow, ice and rain."
+   ],
+   [
+    "Deep Conditions",
+    "deepsnow",
+    "Full traction, stability and AWD calibration for deep snow and loose surfaces."
+   ]
+  ],
+  "t": [
+   "Intelligent AWD"
+  ],
+  "s": [
+   "airadaptive",
+   "Adaptive air suspension with Road Preview",
+   true
+  ],
+  "ev": {
+   "btn": "Lincoln Drive Modes",
+   "modes": [
+    [
+     "hyb",
+     "Normal"
+    ],
+    [
+     "ev",
+     "Pure EV"
+    ],
+    [
+     "save",
+     "Preserve EV"
+    ]
+   ]
+  }
+ },
+ "av_bl": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Effortless, balanced ride for everyday driving."
+   ],
+   [
+    "Conserve",
+    "eco",
+    "Softens throttle and transmission for maximum efficiency."
+   ],
+   [
+    "Excite",
+    "sport",
+    "Sharper throttle, steering and firmer damping for a responsive, engaging ride."
+   ],
+   [
+    "Slippery",
+    "snow",
+    "Puts traction, stability control and AWD on alert for snow, ice and rain."
+   ],
+   [
+    "Deep Conditions",
+    "deepsnow",
+    "Full traction, stability and AWD calibration for deep snow and loose surfaces."
+   ]
+  ],
+  "t": [
+   "Intelligent AWD"
+  ],
+  "s": [
+   "airadaptive",
+   "Adaptive air suspension with Road Preview",
+   true
+  ],
+  "ev": null
+ },
+ "ford_expedition_act": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Default calibration for everyday driving."
+   ],
+   [
+    "Eco",
+    "eco",
+    "Softer throttle and shift strategy to save fuel."
+   ],
+   [
+    "Sport",
+    "sport",
+    "Quicker throttle and shifts with firmer steering."
+   ],
+   [
+    "Tow/Haul",
+    "tow",
+    "Adjusts shifting and grade braking for towing and heavy loads."
+   ],
+   [
+    "Slippery",
+    "snow",
+    "Gentler throttle and traction calibration for snow, ice and wet roads."
+   ],
+   [
+    "Off-Road",
+    "offroad",
+    "Off-road throttle, traction and 4WD calibration for dirt, gravel and sand."
+   ]
+  ],
+  "t": [
+   "Intelligent 4WD with Torque on Demand",
+   "Two-speed transfer case with 4WD Low (available)"
+  ],
+  "s": [
+   "passive",
+   "Independent front and rear passive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "ford_expedition_plat": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Default calibration for everyday driving."
+   ],
+   [
+    "Eco",
+    "eco",
+    "Softer throttle and shift strategy to save fuel."
+   ],
+   [
+    "Sport",
+    "sport",
+    "Quicker throttle and shifts with firmer steering."
+   ],
+   [
+    "Tow/Haul",
+    "tow",
+    "Adjusts shifting and grade braking for towing and heavy loads."
+   ],
+   [
+    "Slippery",
+    "snow",
+    "Gentler throttle and traction calibration for snow, ice and wet roads."
+   ],
+   [
+    "Off-Road",
+    "offroad",
+    "Off-road throttle, traction and 4WD calibration for dirt, gravel and sand."
+   ]
+  ],
+  "t": [
+   "Intelligent 4WD with Torque on Demand",
+   "Two-speed transfer case with 4WD Low (available)"
+  ],
+  "s": [
+   "adaptive",
+   "Continuously Controlled Damping adaptive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "ford_expedition_trem": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Default calibration for everyday driving."
+   ],
+   [
+    "Eco",
+    "eco",
+    "Softer throttle and shift strategy to save fuel."
+   ],
+   [
+    "Sport",
+    "sport",
+    "Quicker throttle and shifts with firmer steering."
+   ],
+   [
+    "Tow/Haul",
+    "tow",
+    "Adjusts shifting and grade braking for towing and heavy loads."
+   ],
+   [
+    "Slippery",
+    "snow",
+    "Gentler throttle and traction calibration for snow, ice and wet roads."
+   ],
+   [
+    "Off-Road",
+    "offroad",
+    "Off-road throttle, traction and 4WD calibration for dirt, gravel and sand."
+   ],
+   [
+    "Rock Crawl",
+    "rock",
+    "Very gentle throttle and max traction for slow rock crawling in 4WD Low."
+   ]
+  ],
+  "t": [
+   "Two-speed transfer case with 4WD Low",
+   "3.73 electronic locking rear differential",
+   "Trail Control with Trail 1-Pedal Drive",
+   "Trail Turn Assist",
+   "Steel skid plates"
+  ],
+  "s": [
+   "tuned",
+   "Tremor off-road suspension with ~2-in lift and 33-in A/T tires",
+   false
+  ],
+  "ev": null
+ },
+ "ford_expedition_ki": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Default calibration for everyday driving."
+   ],
+   [
+    "Eco",
+    "eco",
+    "Softer throttle and shift strategy to save fuel."
+   ],
+   [
+    "Sport",
+    "sport",
+    "Quicker throttle and shifts with firmer steering."
+   ],
+   [
+    "Tow/Haul",
+    "tow",
+    "Adjusts shifting and grade braking for towing and heavy loads."
+   ],
+   [
+    "Slippery",
+    "snow",
+    "Gentler throttle and traction calibration for snow, ice and wet roads."
+   ],
+   [
+    "Off-Road",
+    "offroad",
+    "Off-road throttle, traction and 4WD calibration for dirt, gravel and sand."
+   ]
+  ],
+  "t": [
+   "Intelligent 4WD with Torque on Demand",
+   "Two-speed transfer case with 4WD Low (available)"
+  ],
+  "s": [
+   "passive",
+   "Independent front and rear passive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "chrysler_pacifica_sel": {
+  "m": [],
+  "t": [],
+  "s": [
+   "passive",
+   "MacPherson front / twist-blade rear passive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "chrysler_pacifica_lim": {
+  "m": [],
+  "t": [],
+  "s": [
+   "passive",
+   "MacPherson front / twist-blade rear passive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "chrysler_pacifica_pin": {
+  "m": [],
+  "t": [
+   "On-demand AWD with rear axle disconnect"
+  ],
+  "s": [
+   "passive",
+   "MacPherson front / twist-blade rear passive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "chrysler_pacifica_phev": {
+  "m": [],
+  "t": [],
+  "s": [
+   "passive",
+   "MacPherson front / twist-blade rear passive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "jeep_recon_moab": {
+  "m": [
+   [
+    "Auto",
+    "normal",
+    "Default mode that automatically balances torque between motors for on-road driving."
+   ],
+   [
+    "Sport",
+    "sport",
+    "Quicker throttle response and rear-biased torque."
+   ],
+   [
+    "Snow",
+    "snow",
+    "Gentler torque delivery and traction control for snow and ice."
+   ],
+   [
+    "Sand",
+    "sand",
+    "Allows more wheelspin and torque for soft sand."
+   ],
+   [
+    "Rock",
+    "rock",
+    "Smooth low-speed throttle and hill hold for crawling over rocks."
+   ]
+  ],
+  "t": [
+   "Selec-Terrain traction management",
+   "Electronic locking rear differential",
+   "Selec-Speed Control",
+   "33-in all-terrain tires",
+   "9.1-in ground clearance"
+  ],
+  "s": [
+   "tuned",
+   "Off-road tuned SLA front / integral link rear suspension",
+   false
+  ],
+  "ev": null
+ },
+ "ram_3500_chassis_cab_tr": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Default calibration."
+   ],
+   [
+    "Tow/Haul",
+    "tow",
+    "Holds gears longer and adds engine/exhaust braking for heavy loads and trailers."
+   ]
+  ],
+  "t": [
+   "Part-time 4WD with 4WD Low (4x4 models)"
+  ],
+  "s": [
+   "passive",
+   "Heavy-duty solid front axle / leaf-spring rear passive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "ram_3500_chassis_cab_slt": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Default calibration."
+   ],
+   [
+    "Tow/Haul",
+    "tow",
+    "Holds gears longer and adds engine/exhaust braking for heavy loads and trailers."
+   ]
+  ],
+  "t": [
+   "Part-time 4WD with 4WD Low (4x4 models)"
+  ],
+  "s": [
+   "passive",
+   "Heavy-duty solid front axle / leaf-spring rear passive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "acura_integra_base": {
+  "m": [
+   [
+    "Comfort",
+    "comfort",
+    "Softer steering and relaxed throttle for a smooth ride."
+   ],
+   [
+    "Normal",
+    "normal",
+    "Everyday balance of steering weight and throttle response."
+   ],
+   [
+    "Sport",
+    "sport",
+    "Sharper throttle and steering with enhanced engine sound."
+   ]
+  ],
+  "t": [],
+  "s": [
+   "passive",
+   "MacPherson front / multi-link rear passive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "acura_integra_as": {
+  "m": [
+   [
+    "Comfort",
+    "comfort",
+    "Softer steering and relaxed throttle for a smooth ride."
+   ],
+   [
+    "Normal",
+    "normal",
+    "Everyday balance of steering weight and throttle response."
+   ],
+   [
+    "Sport",
+    "sport",
+    "Sharper throttle and steering with enhanced engine sound."
+   ],
+   [
+    "Individual",
+    "custom",
+    "Lets the driver mix engine, steering, damper and sound settings."
+   ]
+  ],
+  "t": [],
+  "s": [
+   "adaptive",
+   "Adaptive Damper System",
+   false
+  ],
+  "ev": null
+ },
+ "acura_integra_tys": {
+  "m": [
+   [
+    "Comfort",
+    "comfort",
+    "Softest damper and steering settings for daily driving."
+   ],
+   [
+    "Sport",
+    "sport",
+    "Firmer dampers, sharper throttle and heavier steering."
+   ],
+   [
+    "Sport+",
+    "sportplus",
+    "Most aggressive calibration with active exhaust valve open and yellow gauges."
+   ],
+   [
+    "Individual",
+    "custom",
+    "Driver-configured mix of engine, steering, damper and sound settings."
+   ]
+  ],
+  "t": [
+   "Helical limited-slip differential"
+  ],
+  "s": [
+   "adaptive",
+   "Adaptive Damper System with dual-axis strut front suspension",
+   false
+  ],
+  "ev": null
+ },
+ "honda_hr_v_lx": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Default balance of performance and efficiency."
+   ],
+   [
+    "ECON",
+    "eco",
+    "Softer throttle and reduced climate output to save fuel."
+   ],
+   [
+    "Snow",
+    "snow",
+    "Gentler throttle and CVT calibration for slippery roads."
+   ]
+  ],
+  "t": [
+   "Hill Descent Control"
+  ],
+  "s": [
+   "passive",
+   "MacPherson front / multi-link rear passive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "honda_hr_v_sp": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Default balance of performance and efficiency."
+   ],
+   [
+    "ECON",
+    "eco",
+    "Softer throttle and reduced climate output to save fuel."
+   ],
+   [
+    "Snow",
+    "snow",
+    "Gentler throttle and CVT calibration for slippery roads."
+   ]
+  ],
+  "t": [
+   "Hill Descent Control"
+  ],
+  "s": [
+   "passive",
+   "MacPherson front / multi-link rear passive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "honda_hr_v_exl": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Default balance of performance and efficiency."
+   ],
+   [
+    "ECON",
+    "eco",
+    "Softer throttle and reduced climate output to save fuel."
+   ],
+   [
+    "Snow",
+    "snow",
+    "Gentler throttle and CVT calibration for slippery roads."
+   ]
+  ],
+  "t": [
+   "Real Time AWD with Intelligent Control System",
+   "Hill Descent Control"
+  ],
+  "s": [
+   "passive",
+   "MacPherson front / multi-link rear passive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "honda_ridgeline_sp": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Default i-VTM4 AWD and throttle calibration."
+   ],
+   [
+    "ECON",
+    "eco",
+    "Softer throttle and reduced climate output for efficiency."
+   ],
+   [
+    "Snow",
+    "snow",
+    "Gentler throttle and early upshifts to limit wheelspin on snow and ice."
+   ],
+   [
+    "Mud",
+    "mud",
+    "Allows more wheelspin and holds gears to keep momentum in mud."
+   ],
+   [
+    "Sand",
+    "sand",
+    "Aggressive throttle and torque to the rear wheels for soft sand."
+   ]
+  ],
+  "t": [
+   "Intelligent Traction Management",
+   "i-VTM4 torque-vectoring AWD"
+  ],
+  "s": [
+   "passive",
+   "Independent front and rear passive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "honda_ridgeline_rtl": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Default i-VTM4 AWD and throttle calibration."
+   ],
+   [
+    "ECON",
+    "eco",
+    "Softer throttle and reduced climate output for efficiency."
+   ],
+   [
+    "Snow",
+    "snow",
+    "Gentler throttle and early upshifts to limit wheelspin on snow and ice."
+   ],
+   [
+    "Mud",
+    "mud",
+    "Allows more wheelspin and holds gears to keep momentum in mud."
+   ],
+   [
+    "Sand",
+    "sand",
+    "Aggressive throttle and torque to the rear wheels for soft sand."
+   ]
+  ],
+  "t": [
+   "Intelligent Traction Management",
+   "i-VTM4 torque-vectoring AWD"
+  ],
+  "s": [
+   "passive",
+   "Independent front and rear passive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "honda_ridgeline_ts": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Default i-VTM4 AWD and throttle calibration."
+   ],
+   [
+    "ECON",
+    "eco",
+    "Softer throttle and reduced climate output for efficiency."
+   ],
+   [
+    "Snow",
+    "snow",
+    "Gentler throttle and early upshifts to limit wheelspin on snow and ice."
+   ],
+   [
+    "Mud",
+    "mud",
+    "Allows more wheelspin and holds gears to keep momentum in mud."
+   ],
+   [
+    "Sand",
+    "sand",
+    "Aggressive throttle and torque to the rear wheels for soft sand."
+   ]
+  ],
+  "t": [
+   "Intelligent Traction Management",
+   "i-VTM4 torque-vectoring AWD",
+   "Trail Torque Logic",
+   "Steel skid plates",
+   "All-terrain tires"
+  ],
+  "s": [
+   "tuned",
+   "Off-road tuned TrailSport suspension",
+   false
+  ],
+  "ev": null
+ },
+ "honda_ridgeline_bl": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Default i-VTM4 AWD and throttle calibration."
+   ],
+   [
+    "ECON",
+    "eco",
+    "Softer throttle and reduced climate output for efficiency."
+   ],
+   [
+    "Snow",
+    "snow",
+    "Gentler throttle and early upshifts to limit wheelspin on snow and ice."
+   ],
+   [
+    "Mud",
+    "mud",
+    "Allows more wheelspin and holds gears to keep momentum in mud."
+   ],
+   [
+    "Sand",
+    "sand",
+    "Aggressive throttle and torque to the rear wheels for soft sand."
+   ]
+  ],
+  "t": [
+   "Intelligent Traction Management",
+   "i-VTM4 torque-vectoring AWD"
+  ],
+  "s": [
+   "passive",
+   "Independent front and rear passive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "nissan_pathfinder_s": {
+  "m": [
+   [
+    "Standard",
+    "normal",
+    "Default calibration for everyday driving."
+   ],
+   [
+    "Sport",
+    "sport",
+    "Quicker throttle and transmission response."
+   ],
+   [
+    "Eco",
+    "eco",
+    "Softer throttle and shift strategy to save fuel."
+   ],
+   [
+    "Snow",
+    "snow",
+    "Gentler throttle and traction control for slippery roads."
+   ],
+   [
+    "Tow",
+    "tow",
+    "Adjusts shifting and stability for towing a trailer."
+   ]
+  ],
+  "t": [],
+  "s": [
+   "passive",
+   "Independent front and rear passive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "nissan_pathfinder_sv": {
+  "m": [
+   [
+    "Standard",
+    "normal",
+    "Default calibration for everyday driving."
+   ],
+   [
+    "Sport",
+    "sport",
+    "Quicker throttle and transmission response."
+   ],
+   [
+    "Eco",
+    "eco",
+    "Softer throttle and shift strategy to save fuel."
+   ],
+   [
+    "Snow",
+    "snow",
+    "Gentler throttle and traction control for slippery roads."
+   ],
+   [
+    "Tow",
+    "tow",
+    "Adjusts shifting and stability for towing a trailer."
+   ]
+  ],
+  "t": [],
+  "s": [
+   "passive",
+   "Independent front and rear passive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "nissan_pathfinder_sl": {
+  "m": [
+   [
+    "Standard",
+    "normal",
+    "Default calibration for everyday driving."
+   ],
+   [
+    "Sport",
+    "sport",
+    "Quicker throttle and transmission response."
+   ],
+   [
+    "Eco",
+    "eco",
+    "Softer throttle and shift strategy to save fuel."
+   ],
+   [
+    "Snow",
+    "snow",
+    "Gentler throttle and traction control for slippery roads."
+   ],
+   [
+    "Tow",
+    "tow",
+    "Adjusts shifting and stability for towing a trailer."
+   ]
+  ],
+  "t": [],
+  "s": [
+   "passive",
+   "Independent front and rear passive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "nissan_pathfinder_rs": {
+  "m": [
+   [
+    "Standard",
+    "normal",
+    "Default calibration for everyday driving."
+   ],
+   [
+    "Sport",
+    "sport",
+    "Quicker throttle and transmission response."
+   ],
+   [
+    "Eco",
+    "eco",
+    "Softer throttle and shift strategy to save fuel."
+   ],
+   [
+    "Snow",
+    "snow",
+    "Gentler throttle and traction control for slippery roads."
+   ],
+   [
+    "Sand",
+    "sand",
+    "Allows more wheelspin and torque for sand."
+   ],
+   [
+    "Mud/Rut",
+    "mud",
+    "Keeps momentum and allows controlled wheelspin in mud and ruts."
+   ],
+   [
+    "Tow",
+    "tow",
+    "Adjusts shifting and stability for towing a trailer."
+   ]
+  ],
+  "t": [
+   "Intelligent 4WD",
+   "Hill Descent Control",
+   "All-terrain tires"
+  ],
+  "s": [
+   "tuned",
+   "Off-road tuned suspension with raised ride height",
+   false
+  ],
+  "ev": null
+ },
+ "nissan_pathfinder_plat": {
+  "m": [
+   [
+    "Standard",
+    "normal",
+    "Default calibration for everyday driving."
+   ],
+   [
+    "Sport",
+    "sport",
+    "Quicker throttle and transmission response."
+   ],
+   [
+    "Eco",
+    "eco",
+    "Softer throttle and shift strategy to save fuel."
+   ],
+   [
+    "Snow",
+    "snow",
+    "Gentler throttle and traction control for slippery roads."
+   ],
+   [
+    "Sand",
+    "sand",
+    "Allows more wheelspin and torque for sand."
+   ],
+   [
+    "Mud/Rut",
+    "mud",
+    "Keeps momentum and allows controlled wheelspin in mud and ruts."
+   ],
+   [
+    "Tow",
+    "tow",
+    "Adjusts shifting and stability for towing a trailer."
+   ]
+  ],
+  "t": [
+   "Intelligent 4WD with lockable center coupling",
+   "Hill Descent Control"
+  ],
+  "s": [
+   "passive",
+   "Independent front and rear passive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "buick_envision_pref": {
+  "m": [
+   [
+    "Tour",
+    "normal",
+    "Default everyday mode balancing comfort and efficiency."
+   ],
+   [
+    "Sport",
+    "sport",
+    "More responsive throttle and enhanced handling."
+   ],
+   [
+    "Off-Road",
+    "offroad",
+    "Off-road throttle, ABS and traction calibration; engages AWD automatically."
+   ],
+   [
+    "Snow/Ice",
+    "snow",
+    "Softer throttle mapping for traction on snow and ice."
+   ],
+   [
+    "All-Wheel Drive",
+    "trail",
+    "Locks in AWD torque to all four wheels for gravel, wet pavement, snow and ice."
+   ]
+  ],
+  "t": [
+   "Active AWD"
+  ],
+  "s": [
+   "passive",
+   "MacPherson front / multi-link rear passive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "buick_envision_st": {
+  "m": [
+   [
+    "Tour",
+    "normal",
+    "Default everyday mode balancing comfort and efficiency."
+   ],
+   [
+    "Sport",
+    "sport",
+    "More responsive throttle and enhanced handling."
+   ],
+   [
+    "Off-Road",
+    "offroad",
+    "Off-road throttle, ABS and traction calibration; engages AWD automatically."
+   ],
+   [
+    "Snow/Ice",
+    "snow",
+    "Softer throttle mapping for traction on snow and ice."
+   ],
+   [
+    "All-Wheel Drive",
+    "trail",
+    "Locks in AWD torque to all four wheels for gravel, wet pavement, snow and ice."
+   ]
+  ],
+  "t": [
+   "Active AWD"
+  ],
+  "s": [
+   "passive",
+   "MacPherson front / multi-link rear passive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "buick_envision_av": {
+  "m": [
+   [
+    "Tour",
+    "normal",
+    "Default everyday mode balancing comfort and efficiency."
+   ],
+   [
+    "Sport",
+    "sport",
+    "More responsive throttle and enhanced handling."
+   ],
+   [
+    "Off-Road",
+    "offroad",
+    "Off-road throttle, ABS and traction calibration; engages AWD automatically."
+   ],
+   [
+    "Snow/Ice",
+    "snow",
+    "Softer throttle mapping for traction on snow and ice."
+   ],
+   [
+    "All-Wheel Drive",
+    "trail",
+    "Locks in AWD torque to all four wheels for gravel, wet pavement, snow and ice."
+   ]
+  ],
+  "t": [
+   "Active AWD"
+  ],
+  "s": [
+   "passive",
+   "MacPherson front / multi-link rear passive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "chv_equinox_ev_lt": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Default balance of comfort, efficiency and handling."
+   ],
+   [
+    "Sport",
+    "sport",
+    "Quicker pedal response, heavier steering and enhanced propulsion sound."
+   ],
+   [
+    "Snow/Ice",
+    "snow",
+    "Softer pedal response to limit wheel slip on slippery roads."
+   ],
+   [
+    "My Mode",
+    "custom",
+    "Driver-configured acceleration, brake feel, steering and sound settings."
+   ]
+  ],
+  "t": [],
+  "s": [
+   "passive",
+   "MacPherson front / five-link rear passive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "chv_equinox_ev_2rs": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Default balance of comfort, efficiency and handling."
+   ],
+   [
+    "Sport",
+    "sport",
+    "Quicker pedal response, heavier steering and enhanced propulsion sound."
+   ],
+   [
+    "Snow/Ice",
+    "snow",
+    "Softer pedal response to limit wheel slip on slippery roads."
+   ],
+   [
+    "My Mode",
+    "custom",
+    "Driver-configured acceleration, brake feel, steering and sound settings."
+   ]
+  ],
+  "t": [],
+  "s": [
+   "passive",
+   "MacPherson front / five-link rear passive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "chv_equinox_ev_3rs": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Default balance of comfort, efficiency and handling."
+   ],
+   [
+    "Sport",
+    "sport",
+    "Quicker pedal response, heavier steering and enhanced propulsion sound."
+   ],
+   [
+    "Snow/Ice",
+    "snow",
+    "Softer pedal response to limit wheel slip on slippery roads."
+   ],
+   [
+    "My Mode",
+    "custom",
+    "Driver-configured acceleration, brake feel, steering and sound settings."
+   ]
+  ],
+  "t": [
+   "eAWD dual-motor"
+  ],
+  "s": [
+   "passive",
+   "MacPherson front / five-link rear passive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "chv_tahoe_ls": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Default balance of comfort, handling and efficiency."
+   ],
+   [
+    "Sport",
+    "sport",
+    "Sharper throttle and transmission response and more steering precision."
+   ],
+   [
+    "Snow/Ice",
+    "snow",
+    "Softer throttle to reduce wheel slip on snow and ice."
+   ],
+   [
+    "Off-Road",
+    "offroad",
+    "Off-road throttle, traction control and ride-height calibration for dirt and gravel."
+   ],
+   [
+    "Tow/Haul",
+    "tow",
+    "Changes shift pattern, steering and StabiliTrak for towing."
+   ]
+  ],
+  "t": [
+   "Autotrac 4WD (4WD models)"
+  ],
+  "s": [
+   "passive",
+   "Independent front and rear passive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "chv_tahoe_lt": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Default balance of comfort, handling and efficiency."
+   ],
+   [
+    "Sport",
+    "sport",
+    "Sharper throttle and transmission response and more steering precision."
+   ],
+   [
+    "Snow/Ice",
+    "snow",
+    "Softer throttle to reduce wheel slip on snow and ice."
+   ],
+   [
+    "Off-Road",
+    "offroad",
+    "Off-road throttle, traction control and ride-height calibration for dirt and gravel."
+   ],
+   [
+    "Tow/Haul",
+    "tow",
+    "Changes shift pattern, steering and StabiliTrak for towing."
+   ]
+  ],
+  "t": [
+   "Autotrac 4WD (4WD models)"
+  ],
+  "s": [
+   "passive",
+   "Independent front and rear passive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "chv_tahoe_z71": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Default balance of comfort, handling and efficiency."
+   ],
+   [
+    "Sport",
+    "sport",
+    "Sharper throttle and transmission response and more steering precision."
+   ],
+   [
+    "Snow/Ice",
+    "snow",
+    "Softer throttle to reduce wheel slip on snow and ice."
+   ],
+   [
+    "Off-Road",
+    "offroad",
+    "Off-road throttle, traction control and ride-height calibration for dirt and gravel."
+   ],
+   [
+    "Tow/Haul",
+    "tow",
+    "Changes shift pattern, steering and StabiliTrak for towing."
+   ],
+   [
+    "Terrain",
+    "rock",
+    "Low-speed off-road mode with one-pedal-style braking, lower gear hold and eLSD calibration."
+   ]
+  ],
+  "t": [
+   "Two-speed Autotrac transfer case with 4WD Low",
+   "Electronic limited-slip rear differential",
+   "Hill Descent Control",
+   "Aluminum skid plates"
+  ],
+  "s": [
+   "air",
+   "Off-road suspension; Air Ride Adaptive Suspension available",
+   true
+  ],
+  "ev": null
+ },
+ "chv_tahoe_rst": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Default balance of comfort, handling and efficiency."
+   ],
+   [
+    "Sport",
+    "sport",
+    "Sharper throttle and transmission response and more steering precision."
+   ],
+   [
+    "Snow/Ice",
+    "snow",
+    "Softer throttle to reduce wheel slip on snow and ice."
+   ],
+   [
+    "Off-Road",
+    "offroad",
+    "Off-road throttle, traction control and ride-height calibration for dirt and gravel."
+   ],
+   [
+    "Tow/Haul",
+    "tow",
+    "Changes shift pattern, steering and StabiliTrak for towing."
+   ]
+  ],
+  "t": [
+   "Autotrac 4WD (4WD models)"
+  ],
+  "s": [
+   "passive",
+   "Independent front and rear passive suspension (Magnetic Ride Control with Performance Edition)",
+   false
+  ],
+  "ev": null
+ },
+ "chv_tahoe_prem": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Default balance of comfort, handling and efficiency."
+   ],
+   [
+    "Sport",
+    "sport",
+    "Sharper throttle and transmission response and more steering precision."
+   ],
+   [
+    "Snow/Ice",
+    "snow",
+    "Softer throttle to reduce wheel slip on snow and ice."
+   ],
+   [
+    "Off-Road",
+    "offroad",
+    "Off-road throttle, traction control and ride-height calibration for dirt and gravel."
+   ],
+   [
+    "Tow/Haul",
+    "tow",
+    "Changes shift pattern, steering and StabiliTrak for towing."
+   ]
+  ],
+  "t": [
+   "Autotrac 4WD (4WD models)"
+  ],
+  "s": [
+   "adaptive",
+   "Magnetic Ride Control (Air Ride available)",
+   false
+  ],
+  "ev": null
+ },
+ "chv_tahoe_hc": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Default balance of comfort, handling and efficiency."
+   ],
+   [
+    "Sport",
+    "sport",
+    "Sharper throttle and transmission response and more steering precision."
+   ],
+   [
+    "Snow/Ice",
+    "snow",
+    "Softer throttle to reduce wheel slip on snow and ice."
+   ],
+   [
+    "Off-Road",
+    "offroad",
+    "Off-road throttle, traction control and ride-height calibration for dirt and gravel."
+   ],
+   [
+    "Tow/Haul",
+    "tow",
+    "Changes shift pattern, steering and StabiliTrak for towing."
+   ]
+  ],
+  "t": [
+   "Autotrac 4WD (4WD models)"
+  ],
+  "s": [
+   "airadaptive",
+   "Magnetic Ride Control with Air Ride Adaptive Suspension",
+   true
+  ],
+  "ev": null
+ },
+ "audi_q4_etron_pr": {
+  "m": [
+   [
+    "efficiency",
+    "eco",
+    "Reduced power delivery and climate output to maximize range."
+   ],
+   [
+    "comfort",
+    "comfort",
+    "Light steering and relaxed response for a smooth ride."
+   ],
+   [
+    "auto",
+    "normal",
+    "Default mode that adapts steering and response to driving style."
+   ],
+   [
+    "dynamic",
+    "sport",
+    "Sharper accelerator response and firmer steering."
+   ],
+   [
+    "individual",
+    "custom",
+    "Driver-configured drive, steering and climate settings."
+   ]
+  ],
+  "t": [
+   "quattro dual-motor AWD"
+  ],
+  "s": [
+   "tuned",
+   "Sport suspension",
+   false
+  ],
+  "ev": null
+ },
+ "audi_q4_etron_pp": {
+  "m": [
+   [
+    "efficiency",
+    "eco",
+    "Reduced power delivery and climate output to maximize range."
+   ],
+   [
+    "comfort",
+    "comfort",
+    "Light steering and relaxed response for a smooth ride."
+   ],
+   [
+    "auto",
+    "normal",
+    "Default mode that adapts steering and response to driving style."
+   ],
+   [
+    "dynamic",
+    "sport",
+    "Sharper accelerator response and firmer steering."
+   ],
+   [
+    "individual",
+    "custom",
+    "Driver-configured drive, steering and climate settings."
+   ]
+  ],
+  "t": [
+   "quattro dual-motor AWD"
+  ],
+  "s": [
+   "tuned",
+   "Sport suspension",
+   false
+  ],
+  "ev": null
+ },
+ "audi_q4_etron_ps": {
+  "m": [
+   [
+    "efficiency",
+    "eco",
+    "Reduced power delivery and climate output to maximize range."
+   ],
+   [
+    "comfort",
+    "comfort",
+    "Light steering and relaxed response for a smooth ride."
+   ],
+   [
+    "auto",
+    "normal",
+    "Default mode that adapts steering and response to driving style."
+   ],
+   [
+    "dynamic",
+    "sport",
+    "Sharper accelerator response and firmer steering."
+   ],
+   [
+    "individual",
+    "custom",
+    "Driver-configured drive, steering and climate settings."
+   ]
+  ],
+  "t": [
+   "quattro dual-motor AWD"
+  ],
+  "s": [
+   "tuned",
+   "Sport suspension",
+   false
+  ],
+  "ev": null
+ },
+ "audi_q9_pp": {
+  "m": [
+   [
+    "efficiency",
+    "eco",
+    "Softer throttle and lowered air suspension for maximum fuel economy."
+   ],
+   [
+    "comfort",
+    "comfort",
+    "Softest air suspension and light steering for a relaxed ride."
+   ],
+   [
+    "auto",
+    "normal",
+    "Default mode that adapts suspension and powertrain to driving style."
+   ],
+   [
+    "dynamic",
+    "sport",
+    "Lowered, firmer air suspension with sharper throttle and shifts."
+   ],
+   [
+    "allroad",
+    "trail",
+    "Raises the air suspension for gravel and rough roads."
+   ],
+   [
+    "offroad",
+    "offroad",
+    "Maximum ride height and off-road traction calibration with hill descent control."
+   ],
+   [
+    "individual",
+    "custom",
+    "Driver-configured suspension, steering and powertrain settings."
+   ]
+  ],
+  "t": [
+   "quattro AWD",
+   "Hill descent control"
+  ],
+  "s": [
+   "airadaptive",
+   "Standard adaptive air suspension",
+   true
+  ],
+  "ev": null
+ },
+ "audi_q9_ps": {
+  "m": [
+   [
+    "efficiency",
+    "eco",
+    "Softer throttle and lowered air suspension for maximum fuel economy."
+   ],
+   [
+    "comfort",
+    "comfort",
+    "Softest air suspension and light steering for a relaxed ride."
+   ],
+   [
+    "auto",
+    "normal",
+    "Default mode that adapts suspension and powertrain to driving style."
+   ],
+   [
+    "dynamic",
+    "sport",
+    "Lowered, firmer air suspension with sharper throttle and shifts."
+   ],
+   [
+    "allroad",
+    "trail",
+    "Raises the air suspension for gravel and rough roads."
+   ],
+   [
+    "offroad",
+    "offroad",
+    "Maximum ride height and off-road traction calibration with hill descent control."
+   ],
+   [
+    "individual",
+    "custom",
+    "Driver-configured suspension, steering and powertrain settings."
+   ]
+  ],
+  "t": [
+   "quattro AWD",
+   "Hill descent control"
+  ],
+  "s": [
+   "airadaptive",
+   "Standard adaptive air suspension",
+   true
+  ],
+  "ev": null
+ },
+ "kia_niro_ev_wind": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Default balance of efficiency and response."
+   ],
+   [
+    "Eco",
+    "eco",
+    "Softer motor response and climate output to maximize range."
+   ],
+   [
+    "Sport",
+    "sport",
+    "Sharper accelerator response and heavier steering."
+   ],
+   [
+    "Snow",
+    "snow",
+    "Gentler torque delivery for slippery roads (hold the button)."
+   ]
+  ],
+  "t": [],
+  "s": [
+   "passive",
+   "MacPherson front / multi-link rear passive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "kia_niro_ev_wave": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Default balance of efficiency and response."
+   ],
+   [
+    "Eco",
+    "eco",
+    "Softer motor response and climate output to maximize range."
+   ],
+   [
+    "Sport",
+    "sport",
+    "Sharper accelerator response and heavier steering."
+   ],
+   [
+    "Snow",
+    "snow",
+    "Gentler torque delivery for slippery roads (hold the button)."
+   ]
+  ],
+  "t": [],
+  "s": [
+   "passive",
+   "MacPherson front / multi-link rear passive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "ex30_sm": {
+  "m": [],
+  "t": [],
+  "s": [
+   "passive",
+   "MacPherson front / multi-link rear passive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "ex30_tm": {
+  "m": [],
+  "t": [
+   "Dual-motor AWD"
+  ],
+  "s": [
+   "passive",
+   "MacPherson front / multi-link rear passive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "xc40": {
+  "m": [
+   [
+    "Comfort",
+    "comfort",
+    "Default mode with light steering and soft, smooth calibration."
+   ],
+   [
+    "Eco",
+    "eco",
+    "Activates start/stop and reduces climate output for efficiency."
+   ],
+   [
+    "Off Road",
+    "offroad",
+    "Low-speed mode that engages AWD and Hill Descent Control on rough terrain."
+   ],
+   [
+    "Dynamic",
+    "sport",
+    "Faster throttle response, quicker shifts and firmer steering."
+   ],
+   [
+    "Individual",
+    "custom",
+    "Driver-configured steering, powertrain and display settings."
+   ]
+  ],
+  "t": [
+   "AWD",
+   "Hill Descent Control (in Off Road mode)"
+  ],
+  "s": [
+   "passive",
+   "MacPherson front / multi-link rear passive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "sierra_elev": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Default calibration for everyday driving."
+   ],
+   [
+    "Sport",
+    "sport",
+    "Sharper throttle and shift response on dry pavement."
+   ],
+   [
+    "Snow/Ice",
+    "snow",
+    "Softer throttle input for slippery surfaces."
+   ],
+   [
+    "Off-Road",
+    "offroad",
+    "Adjusts throttle, ABS, stability and traction control for dirt and gravel."
+   ],
+   [
+    "Tow/Haul",
+    "tow",
+    "Changes shift pattern, steering and trailer sway control for towing."
+   ]
+  ],
+  "t": [
+   "Autotrac 4WD with 4WD Low"
+  ],
+  "s": [
+   "passive",
+   "Independent front / leaf-spring rear passive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "sierra_at4": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Default calibration for everyday driving."
+   ],
+   [
+    "Sport",
+    "sport",
+    "Sharper throttle and shift response on dry pavement."
+   ],
+   [
+    "Snow/Ice",
+    "snow",
+    "Softer throttle input for slippery surfaces."
+   ],
+   [
+    "Off-Road",
+    "offroad",
+    "Adjusts throttle, ABS, stability and traction control for dirt and gravel."
+   ],
+   [
+    "Tow/Haul",
+    "tow",
+    "Changes shift pattern, steering and trailer sway control for towing."
+   ],
+   [
+    "Terrain",
+    "rock",
+    "Low-speed 4WD crawl mode with one-pedal-style braking (Drive/L2/L1), below 50 mph."
+   ]
+  ],
+  "t": [
+   "Two-speed Autotrac transfer case with 4WD Low",
+   "Automatic locking rear differential",
+   "Hill Descent Control",
+   "Skid plates"
+  ],
+  "s": [
+   "tuned",
+   "2-in factory lift with Rancho monotube shocks",
+   false
+  ],
+  "ev": null
+ },
+ "sierra_den": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Default calibration for everyday driving."
+   ],
+   [
+    "Sport",
+    "sport",
+    "Sharper throttle and shift response on dry pavement."
+   ],
+   [
+    "Snow/Ice",
+    "snow",
+    "Softer throttle input for slippery surfaces."
+   ],
+   [
+    "Off-Road",
+    "offroad",
+    "Adjusts throttle, ABS, stability and traction control for dirt and gravel."
+   ],
+   [
+    "Tow/Haul",
+    "tow",
+    "Changes shift pattern, steering and trailer sway control for towing."
+   ]
+  ],
+  "t": [
+   "Two-speed Autotrac transfer case with 4WD Low"
+  ],
+  "s": [
+   "airadaptive",
+   "Adaptive Ride Control with Air Ride Adaptive Suspension",
+   true
+  ],
+  "ev": null
+ },
+ "hummerpu": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Everyday on-road calibration."
+   ],
+   [
+    "Off-Road",
+    "offroad",
+    "Recreational off-road calibration for dirt, gravel, grass and snow."
+   ],
+   [
+    "Tow/Haul",
+    "tow",
+    "Adjusts throttle, steering, suspension and traction for towing."
+   ],
+   [
+    "Terrain",
+    "rock",
+    "Low-speed rough-trail mode with one-pedal driving and tuned rear steer."
+   ],
+   [
+    "My Mode",
+    "custom",
+    "Driver-configured throttle, steering, suspension and sound."
+   ],
+   [
+    "Watts to Freedom",
+    "sportplus",
+    "Launch mode that lowers the suspension and unleashes maximum power."
+   ]
+  ],
+  "t": [
+   "e4WD tri-motor",
+   "CrabWalk",
+   "King Crab",
+   "Extract Mode",
+   "4-wheel steer",
+   "Front and rear eLockers (Extreme Off-Road Package)",
+   "UltraVision underbody cameras"
+  ],
+  "s": [
+   "airadaptive",
+   "Adaptive Air Suspension with Extract Mode",
+   true
+  ],
+  "ev": null
+ },
+ "altima_s": {
+  "m": [],
+  "t": [],
+  "s": [
+   "passive",
+   "MacPherson front / multi-link rear passive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "altima_sv": {
+  "m": [],
+  "t": [],
+  "s": [
+   "passive",
+   "MacPherson front / multi-link rear passive suspension",
+   false
+  ],
+  "ev": null
+ },
+ "altima_sr": {
+  "m": [
+   [
+    "Normal",
+    "normal",
+    "Default CVT and throttle calibration."
+   ],
+   [
+    "Sport",
+    "sport",
+    "Sport mode switch sharpens throttle and CVT step-shift logic."
+   ]
+  ],
+  "t": [],
+  "s": [
+   "tuned",
+   "Sport-tuned passive suspension",
+   false
+  ],
+  "ev": null
+ }
+}
