@@ -458,6 +458,13 @@ body.incab #ui2 .u2tr{opacity:.28;transform:scale(.8);transform-origin:top right
 #ui2 #u2haz.on{background:#5a1612}
 #ui2 #u2epb.on{background:#4a1210}
 #ui2 .u2mid{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 6px);width:min(440px,46vw);display:flex;flex-direction:column;gap:5px;z-index:6;pointer-events:none}
+#ui2 #u2nav{position:fixed;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top,0px) + 10px);display:flex;align-items:center;gap:10px;background:#0f5e3a;color:#fff;border-radius:14px;padding:6px 14px 6px 8px;z-index:7;pointer-events:none;box-shadow:0 4px 14px rgba(0,0,0,.35);max-width:min(420px,60vw)}
+#ui2 #u2nav[hidden]{display:none}#ui2 #u2nav i{font-style:normal;font:800 30px system-ui;width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.14);border-radius:10px}
+#ui2 #u2nav span{display:flex;flex-direction:column;min-width:0}#ui2 #u2nav b{font:800 19px var(--f-hud,system-ui);line-height:1.1}#ui2 #u2nav small{font:600 13px var(--f-ui,system-ui);opacity:.9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#ui2 #u2lim{position:absolute;left:-50px;bottom:8px;width:40px;height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#f4f4f0;color:#111;border-radius:6px;box-shadow:inset 0 0 0 2.5px #111,0 2px 8px rgba(0,0,0,.4)}
+#ui2 #u2lim[hidden]{display:none}#ui2 #u2lim small{font:800 7px system-ui;line-height:1.05;text-align:center}#ui2 #u2lim b{font:800 20px var(--f-hud,system-ui);line-height:1}#ui2 #u2lim.over{box-shadow:inset 0 0 0 2.5px #111,0 0 0 3px #ffb340}
+body.onfoot #ui2 #u2lim,body.onfoot #ui2 #u2nav{display:none!important}
+@media (max-height:430px){#ui2 #u2nav{top:calc(env(safe-area-inset-top,0px) + 6px);padding:4px 12px 4px 6px}#ui2 #u2nav i{width:32px;height:32px;font-size:24px}#ui2 #u2nav b{font-size:16px}#ui2 #u2nav small{font-size:12px}#ui2 #u2lim{left:-44px;width:36px;height:46px}#ui2 #u2lim b{font-size:17px}}
 #ui2 .u2row{display:flex;gap:8px;align-items:center;pointer-events:auto}#ui2 .u2row .sp{flex:1}
 #ui2 .u2row button{height:40px;min-width:46px;border-radius:10px;background:rgba(18,18,20,.92);display:flex;align-items:center;justify-content:center}
 #ui2 .u2row button.red svg{stroke:#ff3b30}
@@ -760,8 +767,8 @@ body #drawer #tabBody .seg5{max-width:520px;border:1px solid rgba(255,255,255,.0
     <button id="u2comfort" aria-label="Comfort (I)"><svg viewBox="0 0 24 24"><path d="M7 21h10M8 17c-2-3 2-5 0-8s1-5 1-5M12 17c-2-3 2-5 0-8s1-5 1-5M16 17c-2-3 2-5 0-8s1-5 1-5"/></svg></button>
     <button id="u2assist" aria-label="Assists (G)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v6M12 15v6M3 12h6M15 12h6"/></svg></button>
   </div>
-  <div id="u2msg"></div>
-  <div class="u2mid">
+  <div id="u2msg"></div><div id="u2nav" hidden></div>
+  <div class="u2mid"><div id="u2lim" hidden><small>SPEED<br>LIMIT</small><b>30</b></div>
     <div class="u2row"><button id="u2vol" aria-label="Volume"><svg viewBox="0 0 24 24"><path d="M4 10v4h4l6 4V6L8 10z" class="f"/><path d="M17 9a4 4 0 0 1 0 6"/></svg></button><button id="u2gearsel" aria-label="Gear selector"><svg viewBox="0 0 24 24"><path d="M6 4v16M12 4v16M18 4v8M6 12h12"/></svg></button><button id="u2up" aria-label="Shift up (E)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button><button id="u2dn" aria-label="Shift down (Q)"><svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button><span class="sp"></span><button id="u2exit" class="red" aria-label="Get out (O)"><svg viewBox="0 0 24 24"><path d="M14 4h5v16h-5"/><path d="M10 8l-4 4 4 4M6 12h9"/></svg></button></div>
     <div class="u2line"><i id="u2thr"></i><i id="u2brk"></i></div>
     <div class="u2cells"><div><b id="u2spd">0</b><small id="u2unit">mph</small></div><div class="car" id="u2carbtn" title="Energy, hybrid flow, lane and suspension views"><svg viewBox="0 0 24 44" id="u2carico"><rect x="4" y="2" width="16" height="40" rx="7"/><rect x="6.5" y="11" width="11" height="8" rx="2" class="g"/><rect x="6.5" y="27" width="11" height="6" rx="2" class="g"/></svg></div><div><b id="u2gear">P</b><small>gear</small></div></div>
@@ -787,8 +794,13 @@ body #drawer #tabBody .seg5{max-width:520px;border:1px solid rgba(255,255,255,.0
 <div id="boot"><div class="bc"><div class="bt">Test Drive</div><div class="bb"><i id="bootBar"></i></div><div class="bs" id="bootMsg">Building the world…</div><div class="bs" style="opacity:.5;font-size:11px;margin-top:14px">© 2026 Exclusive2knight · All rights reserved</div></div></div>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2>Version 64 · Car builder fixes</h2></div>
+    <div class="nh"><small>What's new</small><h2>Version 65 · Real turn-by-turn navigation, smoother screens, better walking</h2></div>
     <div class="nb">
+      <h4>Navigation</h4><ul><li>Routes are now always the fastest way, from any road in either direction. Before, some roads got no route at all, and passing your destination ended the route. Now it takes you round the block.</li><li>Turn-by-turn directions: a green card on the car's screen shows the turn arrow, distance and the road you turn onto, plus miles left, minutes and arrival time. A green banner at the top of your screen shows the next turn in any view, and the cluster shows it at the top when a turn is close.</li><li>Voice guidance, like a real nav: "In half a mile, turn right onto Main St", again closer up, then "Turn right now". Tap 🔊 Voice on the map to mute it.</li><li>Take a wrong turn and it says "Rerouting" and picks a new way. It tells you when you've arrived and ends the route.</li></ul>
+      <h4>Smoother screens and cluster</h4><ul><li>The gauge cluster now redraws every frame, so the needles and numbers move smoothly. The center screen and map redraw 2 to 4 times more often (every frame on Medium and High).</li><li>On Low and Lowest graphics, the screen and cluster are drawn a little softer so the extra redraws don't cause lag. Zooming in to them keeps them sharp.</li><li>On slow devices the game keeps real-time speed down to 15 fps. Before, it slowed down below 20 fps, which made driving feel sluggish.</li></ul>
+      <h4>Speed limit sign is back</h4><ul><li>The speed limit sign from sign recognition was missing from the new HUD. It now sits next to your speed and gets an orange ring when you're over.</li><li>On roads with no sign in sight, the limit now comes from the navigation map a couple of seconds after you turn onto the road, like real cars. Every road shows a limit now.</li></ul>
+      <h4>Walking</h4><ul><li>You speed up and stop with a short, natural step instead of starting and stopping dead.</li><li>You stay on the ground going down slopes, ramps and stairs instead of hopping, and you can't climb straight up walls or ledges taller than a step.</li><li>You can't walk through other cars anymore, parked or driving. If you get out next to a wall, you can always walk away from it.</li><li>The camera moves in when a wall or building is behind you, instead of showing the inside of the wall.</li></ul>
+      <h4 class="old">Version 64 · Car builder fixes</h4>
       <h4>Freezing and cars not loading</h4><ul><li>Fixed the game freezing in the car builder. Picking one of the new real paint colors (added in version 62) crashed the drawing every frame, so the car never showed up and the screen froze. Every real paint color now works, on every car.</li><li>The game can no longer freeze from one bad frame: it keeps drawing and carries on.</li><li>If a car's files fail to download (a weak connection), you now get a message and can tap the car again to retry, instead of it never loading.</li><li>Cars you park with "Spawn another car" keep their real paint color instead of turning white, and switching to a parked car loads it first.</li></ul>
       <h4>Builder look</h4><ul><li>The tab bar keeps the tab you're on in view, so Accessories no longer hides off the edge on phones and small windows. The bar fades at the edge to show there's more.</li><li>Options no longer repeat their own name in italics underneath.</li></ul>
       <h4 class="old">Version 63 · Smooth pedals on Shift, full 10% hill</h4>
@@ -3238,7 +3250,7 @@ function ui2Init(){document.body.classList.add("ui2");const on=(id,fn)=>{const e
   on("u2ev",()=>act("evMode"));on("u2start",()=>ignition(!PC.on||inp.brkT>0.2||inp.brk>0.2||inp.keys.s||st.power===true?"start":"acc"));
   for(const [id,dir] of [["u2al",-1],["u2ar",1]]){const b=$(id);const dn=e=>{e.preventDefault();b.setPointerCapture&&b.setPointerCapture(e.pointerId);inp.steerT=dir;inp.arrowSteer=dir;b.classList.add("on")},up=()=>{if(inp.arrowSteer===dir){inp.steerT=0;inp.arrowSteer=0}b.classList.remove("on")};
     b.addEventListener("pointerdown",dn);b.addEventListener("pointerup",up);b.addEventListener("pointercancel",up)}}
-function ui2Tick(){if(!document.body.classList.contains("ui2")||GFX.frame%4)return;document.body.classList.toggle("incab",st.cam===1&&!st.walk);document.body.classList.toggle("onfoot",!!st.walk);const T=TRIMS[st.trim],H=car.hyb,v=Math.abs(car.vx),set=(id,t)=>{const el=$(id);if(el&&el.textContent!==t)el.textContent=t},tog=(id,c,on)=>{const el=$(id);if(el)el.classList.toggle(c,!!on)};
+function ui2Tick(){if(!document.body.classList.contains("ui2")||GFX.frame%4)return;{const L=$("u2lim");if(L){const on=!!sys.limit&&!st.walk;if(L.hidden===on)L.hidden=!on;if(on){const t=String(st.units==="mph"?sys.limit:Math.round(sys.limit*1.609/5)*5);if(L.lastChild.textContent!==t)L.lastChild.textContent=t;L.classList.toggle("over",!!sys.over)}}}document.body.classList.toggle("incab",st.cam===1&&!st.walk);document.body.classList.toggle("onfoot",!!st.walk);const T=TRIMS[st.trim],H=car.hyb,v=Math.abs(car.vx),set=(id,t)=>{const el=$(id);if(el&&el.textContent!==t)el.textContent=t},tog=(id,c,on)=>{const el=$(id);if(el)el.classList.toggle(c,!!on)};
   set("u2cash",Math.floor(ECON.cash).toLocaleString());const now=gDate(),hh=now.getHours();set("u2clock",gtClock());
   set("u2l0",String(ECON.lvl));set("u2l1",String(ECON.lvl+1));set("u2xpt",`${ECON.xp}/${xpNeed(ECON.lvl)}`);$("u2xpf").style.width=(ECON.xp/xpNeed(ECON.lvl)*100).toFixed(1)+"%";
   set("u2spd",String(Math.round(spdUnit(v))));set("u2unit",st.units==="mph"?"mph":"km/h");set("u2gear",st.gear==="D"&&T.ice&&!T.cvt?"D"+(H.gear||1):st.gear);
@@ -3301,22 +3313,54 @@ function teslaApply(){for(const k in TRIMS){const T=TRIMS[k];if(!T.tesla)continu
 // ---- navigation: best route from every road and direction to the destination (time on each road plus a cost for each turn)
 const NAV={dest:null,next:new Map(),name:""};
 const skey=(e,dir)=>e.i*2+(dir>0?1:0);
-function navTo(place){if(!place){NAV.dest=null;NAV.next=new Map();return}
-  const f=findFrame(place.x,place.y,place.h,null);NAV.dest={e:f.e,dir:f.dir,s:f.s,name:place.name};NAV.name=place.name;
-  const dist=new Map(),next=new Map(),tgt=skey(f.e,f.dir);dist.set(tgt,0);
-  const states=[];for(const e of EDGES)for(const dir of [1,-1])states.push([e,dir]);
-  for(let it=0;it<80;it++){let ch=false;
-    for(const [e,dir] of states){const k=skey(e,dir);if(k===tgt)continue;const n=endNode(e,dir),L=arrLeg(e,dir);if(!L)continue;
-      for(const m of movesFrom(n,L)){const dn=dist.get(skey(m.e,m.dir));if(dn===undefined)continue;
-        const c=dn+m.e.L/(m.e.lim/2.237)+({S:0,R:6,L:12,U:18}[m.t])+(n.ctrl==="signal"?10:n.ctrl==="allstop"?8:0),cur=dist.get(k);
-        if(cur===undefined||c<cur-1e-6){dist.set(k,c+e.L/(e.lim/2.237)*0);next.set(k,skey(m.e,m.dir));ch=true}}}
-    if(!ch)break}
-  NAV.next=next;toast(`Navigating to ${place.name}`)}
+function navTo(place){if(!place){NAV.dest=null;NAV.next=new Map();NAV.loop=undefined;NAV.g=null;NAV.said={};NAV.expect=undefined;$("u2nav")&&($("u2nav").hidden=true);return}
+  const f=findFrame(place.x,place.y,place.h,null);NAV.dest={e:f.e,dir:f.dir,s:f.s,name:place.name};NAV.name=place.name;NAV.said={};NAV.expect=undefined;
+  // fastest route from every road and direction, by Dijkstra over (road, direction) states on the reversed graph:
+  // cost = time to drive the next road at its limit + a cost for the turn + a cost for a signal or all-way stop
+  const tgt=skey(f.e,f.dir),rev=new Map(),add=(b,a,w)=>{let L=rev.get(b);if(!L)rev.set(b,L=[]);L.push([a,w])};
+  for(const e of EDGES)for(const dir of [1,-1]){if(e.n<1||(e.ow&&dir!==1))continue;const n=endNode(e,dir),L=arrLeg(e,dir);if(!L)continue;
+    for(const m of movesFrom(n,L))add(skey(m.e,m.dir),skey(e,dir),m.e.L/(Math.max(10,m.e.lim)/2.237)+({S:0,R:6,L:12,U:18}[m.t])+(n.ctrl==="signal"?10:n.ctrl==="allstop"?8:0))}
+  const dist=new Map([[tgt,0]]),next=new Map(),H=[[0,tgt]],push=x=>{H.push(x);let i=H.length-1;while(i>0){const q=(i-1)>>1;if(H[q][0]<=H[i][0])break;[H[q],H[i]]=[H[i],H[q]];i=q}},
+    pop=()=>{const top=H[0],last=H.pop();if(H.length){H[0]=last;let i=0;for(;;){const l=2*i+1,r=l+1;let m=i;if(l<H.length&&H[l][0]<H[m][0])m=l;if(r<H.length&&H[r][0]<H[m][0])m=r;if(m===i)break;[H[m],H[i]]=[H[i],H[m]];i=m}}return top};
+  while(H.length){const [d,b]=pop();if(d>(dist.get(b)??Infinity))continue;for(const [a,w] of rev.get(b)||[]){const c=d+w;if(c<(dist.get(a)??Infinity)){dist.set(a,c);next.set(a,b);push([c,a])}}}
+  // past the destination on its own road: go round the block
+  {const n=endNode(f.e,f.dir),L=arrLeg(f.e,f.dir);let best=Infinity;NAV.loop=undefined;if(L)for(const m of movesFrom(n,L)){const k=skey(m.e,m.dir),c=(dist.get(k)??Infinity)+({S:0,R:6,L:12,U:18}[m.t]);if(k!==tgt&&c<best){best=c;NAV.loop=k}}}
+  NAV.next=next;NAV.dist=dist;toast(`Navigating to ${place.name}`);navSay(`Starting route to ${place.name}`)}
+// the next road after (e,dir) on the route; on the destination road past the destination, the way round the block
+function navNextKey(e,dir,s){const k=skey(e,dir);if(NAV.dest&&e===NAV.dest.e&&dir===NAV.dest.dir&&s>NAV.dest.s+3)return NAV.loop;return NAV.next.get(k)}
 // the route as world points (for the map), starting from your road
 function navPoints(M){const pts=[];if(!NAV.dest)return pts;let e=M.e,dir=M.dir,s=M.s;
-  for(let h=0;h<40;h++){const last=e===NAV.dest.e&&dir===NAV.dest.dir;const s1=last?NAV.dest.s:e.L;for(let d=s;d<=s1;d+=10){const p=fpt(e,dir,d,laneOff(e,0));pts.push(p)}
-    if(last)break;const nk=NAV.next.get(skey(e,dir));if(nk===undefined)break;e=EDGES[nk>>1];dir=nk&1?1:-1;s=0}
+  for(let h=0;h<40;h++){const last=e===NAV.dest.e&&dir===NAV.dest.dir&&s<=NAV.dest.s+3;const s1=last?NAV.dest.s:e.L;for(let d=s;d<=s1;d+=10){const p=fpt(e,dir,d,laneOff(e,0));pts.push(p)}
+    if(last)break;const nk=navNextKey(e,dir,s);if(nk===undefined)break;e=EDGES[nk>>1];dir=nk&1?1:-1;s=0}
   return pts}
+// turn-by-turn: the next maneuver on the route (skipping plain bends and straight-through junctions), and the distance and time left
+function navGuide(M){if(!NAV.dest||!M)return null;let e=M.e,dir=M.dir,s=M.s,d=0,first=null,tt=0;
+  for(let h=0;h<80;h++){const isDest=e===NAV.dest.e&&dir===NAV.dest.dir&&s<=NAV.dest.s+3;
+    if(isDest){d+=Math.max(0,NAV.dest.s-s);tt+=Math.max(0,NAV.dest.s-s)/(e.lim/2.237);if(!first)first={t:"A",d,name:NAV.dest.name};return {...first,left:d,eta:tt}}
+    const rest=Math.max(0,e.L-s);d+=rest;tt+=rest/(e.lim/2.237);const nk=navNextKey(e,dir,s);if(nk===undefined)return first?{...first,left:d,eta:tt}:null;
+    const n=endNode(e,dir),L=arrLeg(e,dir),ms=L?movesFrom(n,L):[],m=ms.find(x=>skey(x.e,x.dir)===nk);if(!m)return first?{...first,left:d,eta:tt}:null;
+    const choices=ms.filter(x=>x.t!=="U").length,named=m.e.name&&m.e.name!==e.name;
+    if(!first&&(m.t==="U"||(choices>1&&(m.t!=="S"||named)))){const exit=e.type==="xway"&&m.e.type!=="xway",onto=e.type!=="xway"&&m.e.type==="xway";
+      first={t:exit?"X":onto?"M":m.t,d,name:m.e.name||"",key:nk,node:n}}
+    e=m.e;dir=m.dir;s=0;tt+=({S:0,R:6,L:12,U:18}[m.t])+(n.ctrl==="signal"?10:n.ctrl==="allstop"?8:0)}
+  return first?{...first,left:d,eta:tt}:null}
+const NAV_ARROW={L:"↰",R:"↱",S:"↑",U:"⮌",X:"↗",M:"↗",A:"⚑"};
+function navText(G,now){const onto=G.name?` onto ${G.name}`:"";return G.t==="A"?(now?`You have arrived at ${G.name}`:`Your destination, ${G.name}, is ahead`):G.t==="X"?`Take the exit${G.name?" to "+G.name:""}`:G.t==="M"?`Take the ramp${onto}`:G.t==="U"?"Make a U-turn":G.t==="S"?`Continue${onto}`:`Turn ${G.t==="L"?"left":"right"}${onto}`}
+function navSay(t){if(st.navVoice===false||!("speechSynthesis" in window))return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.rate=1.05;u.volume=0.9;speechSynthesis.speak(u)}catch(e){}}
+// every frame while navigating: prompts at a distance that suits your speed, rerouting when you leave the route, arrival
+function navTick(dt){if(!NAV.dest||st.walk||!st.started){const b=$("u2nav");if(b&&!b.hidden&&!NAV.dest)b.hidden=true;return}
+  const M=me();if(!M)return;const k=skey(M.e,M.dir);
+  if(NAV.cur!==k&&NAV.cand!==k){NAV.cand=k;NAV.candT=0}if(NAV.cand===k&&NAV.cur!==k){NAV.candT+=dt}   // a new road only counts after a second on it (not while crossing a junction)
+  if(NAV.cur!==k&&NAV.candT>0.9){if(NAV.expect!==undefined&&k!==NAV.expect&&NAV.cur!==undefined){const ok=navNextKey(M.e,M.dir,M.s)!==undefined||(M.e===NAV.dest.e&&M.dir===NAV.dest.dir);toast(ok?"Rerouting…":"No route from here: turn around when you can");navSay(ok?"Rerouting":"Make a U-turn when possible");NAV.said={}}NAV.cur=k;NAV.expect=navNextKey(M.e,M.dir,M.s)}
+  else if(M.e===NAV.dest.e&&M.dir===NAV.dest.dir)NAV.expect=navNextKey(M.e,M.dir,M.s);
+  const G=navGuide(M);NAV.g=G;if(!G)return;const v=Math.abs(car.vx),id=(G.key??"A")+":"+G.t;
+  if(G.t==="A"&&G.d<18+v*0.6){toast(`You have arrived: ${NAV.dest.name}`);navSay(`You have arrived at ${NAV.dest.name}`);logResult(`Arrived at ${NAV.dest.name}`);navTo(null);return}
+  const far=v>20?1600:v>12?800:400,near=Math.max(70,v*7),now=Math.max(25,v*2.6),S=NAV.said[id]||(NAV.said[id]={});
+  if(!S.far&&G.d<far&&G.d>near*1.6){S.far=true;navSay(`In ${distSay(G.d)}, ${navText(G).replace(/^Your destination, (.*), is ahead$/,"your destination is on the right")}`)}
+  else if(!S.near&&G.d<near&&G.d>now){S.near=S.far=true;navSay(G.t==="A"?navText(G):`In ${distSay(G.d)}, ${navText(G)}`)}
+  else if(!S.now&&G.d<=now&&G.t!=="A"&&G.t!=="S"){S.now=S.near=S.far=true;navSay(navText(G).replace(/ onto .*$/,"")+(G.t==="L"||G.t==="R"?" now":""))}
+  const b=$("u2nav");if(b){b.hidden=false;const a=NAV_ARROW[G.t]||"↑",dt_=distTxt(G.d),sub=G.t==="A"?G.name:G.name||navText(G);if(b.dataset.k!==a+dt_+sub){b.dataset.k=a+dt_+sub;b.innerHTML=`<i>${a}</i><span><b>${dt_}</b><small>${sub}</small></span>`}}}
+function distSay(m){if(st.units!=="mph")return m<1000?`${Math.round(m/50)*50} meters`:`${(m/1000).toFixed(1)} kilometers`;const ft=m*3.281;if(ft<1000)return `${Math.round(ft/100)*100||100} feet`;const mi=m/1609;return mi<0.4?"a quarter mile":mi<0.65?"half a mile":mi<0.9?"three quarters of a mile":`${mi.toFixed(1).replace(/\.0$/,"")} miles`}
 
 // ---- Full Self-Driving (Supervised): your car drives like the AI cars do: route, lane choice, signals, stop signs, turns, people
 const FSD={a:null,lcT:0,passT:0,backT:0,arrived:false};
@@ -3324,7 +3368,7 @@ function fsdObstacles(){const OB=[];for(const o of cars)if(o.wx!==undefined)OB.p
   for(const o of parked)if(!o.fixed&&Math.abs((o.wz||0)-(car.zb||0))<2)OB.push({x:o.wx,y:o.wy,h:o.wh,v:0,o});
   for(const p of peds)OB.push({x:p.wx,y:p.wy,h:p.wh,v:p.v||0,o:p,t2:4.4});for(const d of EV.crit)OB.push({x:d.wx,y:d.wy,h:d.wh,v:d.v,o:d,t2:4.4});return OB}
 function fsdPlan(A){const n=endNode(A.e,A.dir),L=arrLeg(A.e,A.dir);A.mv=null;A.stopDone=false;A.stopT=0;A.waitT=0;A.goYellow=false;A.needLane=null;if(!L)return;
-  const ms=movesFrom(n,L);if(!ms.length)return;let pick=null;const nk=NAV.dest&&NAV.next.get(skey(A.e,A.dir));
+  const ms=movesFrom(n,L);if(!ms.length)return;let pick=null;const nk=NAV.dest&&navNextKey(A.e,A.dir,A.s);
   if(nk!==undefined&&nk!==null)pick=ms.find(m=>skey(m.e,m.dir)===nk);if(!pick)pick=ms.find(m=>m.t==="S")||ms.find(m=>m.t!=="U")||ms[0];
   A.mv=pick;A.mvNode=n;A.mvLeg=L;A.needLane=pick.t==="R"?0:(pick.t==="L"||pick.t==="U")?A.e.n-1:null}
 function fsdReset(){FSD.a=null;FSD.lcT=0;FSD.arrived=false;FSD.around=null;FSD.waitAround=0;FSD.lcDoing=false;sys.fsdThr=0;sys.fsdBrk=0;sys.fsdPts=null}
@@ -3603,7 +3647,10 @@ function cluCommon(){const T=TRIMS[st.trim],H=car.hyb,P=car.tq.reduce((a,q,i)=>a
   const ev=isEVT(),hyb=!!T.hybrid&&!ev,ready=st.power===true&&(ev||hyb),mph=st.units==="mph",unit=mph?"MPH":"km/h",rng=v=>mph?Math.round(v):Math.round(v*1.609),ru=mph?"mi":"km";
   return {T,H,P,pf,clock:`${hh}:${mm}`,ev,hyb,ready,unit,rng,ru,fuelF:T.ice||hyb||T.plug?clamp(H.fuel/H.tank,0,1):0,soc:clamp(H.soc,0,1),evMode:(ev||(hyb&&!H.eng)),sig:s=>(st.signal===s||st.hazard)&&st.blink}}
 function cluArrows(g,C,xl,xr,y){g.fillStyle="#3ee06a";g.font=FONT(22);g.textAlign="center";g.textBaseline="middle";if(C.sig(-1))g.fillText("◀",xl,y);if(C.sig(1))g.fillText("▶",xr,y)}
-function cluUpload(){gl.bindTexture(gl.TEXTURE_2D,CLU.tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,CLU.cv);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false)}
+// navigation on the cluster: a turn arrow, distance and road at the top centre when a turn is coming up (like real clusters)
+function cluNav(g,W,H){const G=NAV.dest&&NAV.g;if(!G||G.d>2400||st.power===false)return;const t=`${distTxt(G.d)}  ${G.t==="A"?"Destination":G.name||navText(G)}`;g.save();g.font=FONT(13);let tx=t;while(g.measureText(tx).width>200&&tx.length>4)tx=tx.slice(0,-2)+"…";
+  const w=Math.min(250,g.measureText(tx).width+48),x=W/2-w/2,y=6;g.fillStyle="rgba(10,70,44,.95)";rr2(g,x,y,w,28,8);g.fill();g.fillStyle="#fff";g.textBaseline="middle";g.textAlign="left";g.font="800 18px system-ui";g.fillText(NAV_ARROW[G.t]||"↑",x+9,y+15);g.font=FONT(13);g.fillText(tx,x+34,y+15);g.restore()}
+function cluUpload(){cluNav(CLU.g,CLU.W,CLU.H);gl.bindTexture(gl.TEXTURE_2D,CLU.tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,CLU.cv);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false)}
 function cluMsg(C){if(sys.pa)return "Parking Assist Active";if(st.acc&&st.pilot)return C.T.pilotName||"Lane Tracing Assist";if(st.acc)return "Radar Cruise Ready";if(!st.belt&&Math.abs(car.vx)>2.5)return "Fasten Seatbelt";if(SCR.radioOn)return `FM ${fmOf(au.station||0).toFixed(1)}`;return ""}
 function drawToyotaCluster(g,W,H,v){const C=cluCommon(),F=FONT,t=performance.now()/1000;
   const bg=g.createLinearGradient(0,0,0,H);bg.addColorStop(0,"#151a3a");bg.addColorStop(0.55,"#232a55");bg.addColorStop(1,"#0e1229");g.fillStyle=bg;g.fillRect(0,0,W,H);
@@ -4083,16 +4130,21 @@ function walkUpdate(dt){const W=st.walk;if(W.cyBase===undefined){W.cyBase=W.h;lo
   const [jx,jy,slow]=footInput(),cy=W.cyBase+look.yaw,fx=Math.cos(cy),fy=Math.sin(cy),rx=Math.sin(cy),ry=-Math.cos(cy);
   const mx=fx*jy+rx*jx,my=fy*jy+ry*jx,mag=Math.hypot(mx,my),spd=(slow?1.7:4.3)*Math.min(1,mag);
   if(mag>0.05)W.h=wrapPi(W.h+clamp(wrapPi(Math.atan2(my,mx)-W.h),-11*dt,11*dt));
-  W.v=W.v+(spd-W.v)*Math.min(1,dt*12);
-  const vx=mag>0.05?mx/mag*W.v:Math.cos(W.h)*W.v*0.0,vy=mag>0.05?my/mag*W.v:0;
-  const blocked=(nx,ny)=>{{const c=Math.cos(car.psi),s=Math.sin(car.psi),dx=nx-car.px,dy=ny-car.py,lx=dx*c+dy*s,ly=-dx*s+dy*c;if(Math.abs(lx)<BODY_HL+0.3&&Math.abs(ly)<BODY_HW+0.3&&W.z<(car.zb||0)+1.5)return true}
+  // velocity eases toward where you push (quick to start, a short natural step to stop) instead of snapping
+  {const tx=mag>0.05?mx/mag*spd:0,ty=mag>0.05?my/mag*spd:0;W.vx=W.vx||0;W.vy=W.vy||0;const ac=(mag>0.05?16:22)*dt,dx=tx-W.vx,dy=ty-W.vy,dm=Math.hypot(dx,dy);
+   if(dm<=ac){W.vx=tx;W.vy=ty}else{W.vx+=dx/dm*ac;W.vy+=dy/dm*ac}if(W.air){W.vx=lerp(W.vx,tx,0.15);W.vy=lerp(W.vy,ty,0.15)}}
+  W.v=Math.hypot(W.vx,W.vy);const vx=W.vx,vy=W.vy;
+  const boxHit=(nx,ny,x,y,h,hl,hw)=>{const c=Math.cos(h),s=Math.sin(h),dx=nx-x,dy=ny-y;return Math.abs(dx*c+dy*s)<hl&&Math.abs(-dx*s+dy*c)<hw};
+  const blocked=(nx,ny)=>{if(boxHit(nx,ny,car.px,car.py,car.psi,BODY_HL+0.3,BODY_HW+0.3)&&W.z<(car.zb||0)+1.5)return true;
+    for(const L of [cars,parked])for(const o of L){if(o.wx===undefined||o.kind==="cone"||o.kind==="xing"||Math.abs(o.wx-nx)>7||Math.abs(o.wy-ny)>7||Math.abs((o.wz||0)-W.z)>1.6)continue;if(boxHit(nx,ny,o.wx,o.wy,o.wh||0,o.kind==="bike"?1.0:2.45,o.kind==="bike"?0.45:1.05))return true}
+    {GREF=W.z+0.4;const gz2=groundAt(nx,ny).h,g0=groundAt(W.x,W.y).h;GREF=car.zb||0;if(gz2>Math.max(W.z,g0)+0.55&&!W.air)return true}   // a wall or a ledge too high to step up
     for(const o of collNear(nx,ny)){if(o.z1!==undefined&&(W.z<o.z0-0.6||W.z>o.z1))continue;if(o.t==="c"){if(Math.hypot(nx-o.x,ny-o.y)<o.r+0.3)return true}
       else{const c=Math.cos(o.h),s=Math.sin(o.h),dx=nx-o.x,dy=ny-o.y;if(Math.abs(dx*c+dy*s)<o.hl+0.3&&Math.abs(-dx*s+dy*c)<o.hw+0.3)return true}}return false};
   let nx=W.x+vx*dt,ny=W.y+vy*dt;
-  if(blocked(nx,ny)){if(!blocked(nx,W.y))ny=W.y;else if(!blocked(W.x,ny))nx=W.x;else{nx=W.x;ny=W.y}}   // slide along walls
+  if(!blocked(W.x,W.y)&&blocked(nx,ny)){if(!blocked(nx,W.y))ny=W.y;else if(!blocked(W.x,ny))nx=W.x;else{nx=W.x;ny=W.y}}   // slide along walls
   W.x=nx;W.y=ny;GREF=W.z+0.4;const gz=groundAt(W.x,W.y).h;GREF=car.zb||0;
   // jumping and falling
-  const onGround=W.z<=gz+0.02;if(onGround){W.z=gz;W.vz=0;if(FOOT.jump){W.vz=5.6;W.air=true;beep(520,.05,"sine",.08)}}else{W.vz-=18*dt}
+  const onGround=W.z<=gz+0.02||(!W.air&&W.vz<=0&&W.z<=gz+0.4);if(onGround){W.z=gz;W.vz=0;if(FOOT.jump){W.vz=5.6;W.air=true;beep(520,.05,"sine",.08)}}else{W.vz-=18*dt}
   W.z+=W.vz*dt;if(W.z<gz){W.z=gz;W.vz=0;if(W.air){W.air=false}}FOOT.jump=false;W.ph+=W.v*dt*3.2;
   // walk-away lock, like most new cars
   const d=Math.hypot(W.x-car.px,W.y-car.py);if(d<5)W.armed=true;if(W.armed&&!st.locked&&d>9&&!sys.summon){W.armed=false;st.locked=true;sys.flashT=0.5;beep(1250,.05,"square",.12);toast("Walk-away lock: car locked")}}
@@ -4429,6 +4481,8 @@ function assist(dt){
   // ---- traffic sign recognition: the camera reads speed-limit signs ~50 m ahead; speed assist moves the cruise set speed to match
   for(const sg of SIGNS){if(sg.e!==M.e||sg.dir!==M.dir)continue;const d=sg.s-M.s,mph=sg.mph;if(d>0&&d<50&&M.off<M.lEdge+1&&sys.limitS!==sg){sys.limitS=sg;const was=sys.limit;sys.limit=mph;
     if(was!==mph){tick(1);if(st.isa&&(st.acc||st.pilot)){st.accSet=mph/2.23694;toast(`Speed limit ${mph} mph · cruise set to ${mph}`)}else toast(`Speed limit ${mph} mph`);logResult(`Sign recognised: ${mph} mph`)}}}
+  // with no sign in view, the limit comes from the navigation map data a couple of seconds after you turn onto a road (like real speed-limit info)
+  if(M.e!==sys.limE){sys.limE=M.e;sys.limET=0}else if(sys.limET<99){sys.limET+=dt;if(sys.limET>2){sys.limET=99;if(M.e.lim&&(!sys.limitS||sys.limitS.e!==M.e)&&M.off<M.lEdge+1&&sys.limit!==M.e.lim){sys.limit=M.e.lim;if(st.isa&&(st.acc||st.pilot))st.accSet=M.e.lim/2.23694}}}
   {const lim=sys.limit?sys.limit/2.23694:99,over=sp>lim+2.2;if(over&&!sys.over)beep(1500,.08,"sine",.15);sys.over=over}
   // ---- auto high beam: high whenever it is dark, you are above ~25 mph and nobody would be dazzled (matrix keeps it on and shades them)
   if(st.autoHigh&&st.night){let blocked=false;
@@ -5378,7 +5432,7 @@ function setMap(k){const S=STARTS[k]||STARTS.city;st.map=k;sys.pa=null;resetCar(
 // ======================================================================= centre screen: a live UI drawn on a canvas, mapped onto the 3D dash screen
 // Tap it in the interior view (or press "Screen" to lean in). Pages: Map · Camera · Energy · Media · Controls.
 const SCR={W:680,H:400,page:"map",prevPage:"map",cam:"rear",focus:false,fz:0,hits:[],t:0,info:null,quad:null,scale:1.2,radioOn:false};
-const SS=2;SCR.cv=document.createElement("canvas");SCR.cv.width=SCR.W*SS;SCR.cv.height=SCR.H*SS;SCR.g=SCR.cv.getContext("2d");
+let SS=2;SCR.cv=document.createElement("canvas");SCR.cv.width=SCR.W*SS;SCR.cv.height=SCR.H*SS;SCR.g=SCR.cv.getContext("2d");
 SCR.camCv=document.createElement("canvas");SCR.camCv.width=480;SCR.camCv.height=288;SCR.camG=SCR.camCv.getContext("2d");SCR.camCv2=document.createElement("canvas");SCR.camCv2.width=480;SCR.camCv2.height=288;SCR.camG2=SCR.camCv2.getContext("2d");SCR.camCv3=document.createElement("canvas");SCR.camCv3.width=480;SCR.camCv3.height=288;SCR.camG3=SCR.camCv3.getContext("2d");
 SCR.tex=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,SCR.tex);
 gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
@@ -5415,6 +5469,9 @@ function volvoBezel(P,q,sz){if(q.h>q.w*1.15)return;const u=sub(q.br,q.bl),v=sub(
   const bc=q.bl.map((x,i)=>x+u[i]/2),sx=sz[0]/lu,sy=sz[1]/lv;
   for(let i=0;i<P.length;i+=3){const d=[P[i]-bc[0],P[i+1]-bc[1],P[i+2]-bc[2]],a=d[0]*U[0]+d[1]*U[1]+d[2]*U[2],b=d[0]*V[0]+d[1]*V[1]+d[2]*V[2],n=d[0]*N[0]+d[1]*N[1]+d[2]*N[2];
     if(Math.abs(a)>lu/2+0.035||b<-0.035||b>lv+0.035||Math.abs(n)>0.07)continue;const a2=a*sx,b2=b<0?b:b*sy;for(let j=0;j<3;j++)P[i+j]=bc[j]+U[j]*a2+V[j]*b2+N[j]*n}}
+// screen and cluster sharpness: full on Medium/High, a bit softer on Low/Lowest (or when zoomed in, always full) so they can redraw every frame without lag
+function scrRes(){const lo=(GFX.eff==="lowest"||GFX.eff==="low")&&!SCR.focus&&!SCR.focusClu,s=lo?1.25:2;
+  if(s!==SS){SS=s;SCR.cv.width=SCR.W*SS;SCR.cv.height=SCR.H*SS}if(s!==CLU.k){CLU.k=s;CLU.cv.width=CLU.W*s;CLU.cv.height=CLU.H*s}}
 function setScreenFrame(){const s=VEH.screen;let q=VEH.scr;if(isVolvo()&&q&&!q.vp){q=VEH.scr=Object.assign(volvoPortrait(q,TRIMS[st.trim].model),{vp:1})}{const portrait=q&&q.h>q.w*1.15,W_=portrait?420:680,H_=portrait?620:400;if(SCR.W!==W_){SCR.W=W_;SCR.H=H_;SCR.cv.width=W_*SS;SCR.cv.height=H_*SS}}SCR_N=[0,0.2419,0.9703];if(q){const f=fitQuad(q,SCR.W/SCR.H);SCR_BL=f.bl;SCR_BR=f.br;SCR_TL=f.tl;SCR_C=q.c;SCR_N=q.n}else if(!s){SCR_BL=[-0.17,0.9405,-0.5111];SCR_BR=[0.17,0.9405,-0.5111];SCR_TL=[-0.17,1.1346,-0.5595];SCR_C=[0,1.0375,-0.5353]}
   else{const [x,y,z]=s;SCR_BL=[x-0.17,y-0.097,z+0.024];SCR_BR=[x+0.17,y-0.097,z+0.024];SCR_TL=[x-0.17,y+0.097,z-0.024];SCR_C=[x,y,z]}
   SCN.scrQuad=meshFrom([...SCR_BL,...SCR_BR,...SCR_BR.map((v,i)=>v+SCR_TL[i]-SCR_BL[i]),...SCR_TL],[0,0.24,0.97,0,0.24,0.97,0,0.24,0.97,0,0.24,0.97],[0,1,2,0,2,3])}
@@ -5562,10 +5619,12 @@ function scrMap(g,top,bot,W,M){
   g.fillStyle="#35c2bf";g.strokeStyle="#fff";g.lineWidth=2;g.beginPath();g.moveTo(cx,cy-14);g.lineTo(cx+10,cy+10);g.lineTo(cx,cy+5);g.lineTo(cx-10,cy+10);g.closePath();g.fill();g.stroke();
   g.restore();
   // next junction + plaza distance
-  if(CP){scrLimit(g,12,bot-86);g.fillStyle="rgba(255,255,255,.95)";rr2(g,W-96,bot-42,84,32,9);g.fill();g.fillStyle="#333";g.font=FONT(12);g.textAlign="center";g.fillText(`${SCR.scale>1?"City":"Hwy"} zoom`,W-54,bot-26);for(const [y,t,f] of [[top+58,"+",1.3],[top+98,"−",1/1.3]]){g.fillStyle="rgba(255,255,255,.95)";rr2(g,W-50,y,38,36,9);g.fill();g.fillStyle="#333";g.font=FONT(20);g.fillText(t,W-31,y+19);hit(W-50,y,38,36,()=>{SCR.zm=clamp((SCR.zm||1)*f,0.35,2.5)})}return}
-  const nj=nextJunction(M);g.fillStyle="rgba(8,14,16,.88)";rr2(g,12,top+10,262,66,12);g.fill();
+  if(CP){if(NAV.dest&&NAV.g)navCard(g,12,top+10,W,true);scrLimit(g,12,bot-86);g.fillStyle="rgba(255,255,255,.95)";rr2(g,W-96,bot-42,84,32,9);g.fill();g.fillStyle="#333";g.font=FONT(12);g.textAlign="center";g.fillText(`${SCR.scale>1?"City":"Hwy"} zoom`,W-54,bot-26);for(const [y,t,f] of [[top+58,"+",1.3],[top+98,"−",1/1.3]]){g.fillStyle="rgba(255,255,255,.95)";rr2(g,W-50,y,38,36,9);g.fill();g.fillStyle="#333";g.font=FONT(20);g.fillText(t,W-31,y+19);hit(W-50,y,38,36,()=>{SCR.zm=clamp((SCR.zm||1)*f,0.35,2.5)})}return}
+  if(NAV.dest&&NAV.g)navCard(g,12,top+10,W);
+  else{const nj=nextJunction(M);g.fillStyle="rgba(8,14,16,.88)";rr2(g,12,top+10,262,66,12);g.fill();
   g.fillStyle="#fff";g.textAlign="left";g.font=FONT(15);g.fillStyle="#9fb4b7";g.fillText(M.name,26,top+30);
-  if(nj){g.fillStyle="#fff";g.font=FONT(19);g.fillText(`${nj.name} · ${distTxt(nj.d)}`,26,top+56)}
+  if(nj){g.fillStyle="#fff";g.font=FONT(19);g.fillText(`${nj.name} · ${distTxt(nj.d)}`,26,top+56)}}
+  {const on=st.navVoice!==false,lab=on?"🔊 Voice":"🔇 Voice";g.font=FONT(13);g.fillStyle="rgba(8,14,16,.85)";rr2(g,W-104,bot-86,92,34,9);g.fill();g.fillStyle=on?"#cfe0e2":"#7d8b8e";g.textAlign="center";g.fillText(lab,W-58,bot-69);hit(W-104,bot-86,92,34,()=>{st.navVoice=!on;if(!on)navSay("Voice guidance on");else try{speechSynthesis.cancel()}catch(e){}})}
   const ds=Math.hypot(PAD.cx-car.px,PAD.cy-car.py);if(ds<4000){g.fillStyle="rgba(8,14,16,.88)";rr2(g,W-212,top+10,200,40,10);g.fill();g.fillStyle="#5fe0dc";g.font=FONT(14);g.textAlign="left";g.fillText(`⚡ Service plaza · ${distTxt(ds)}`,W-200,top+30)}
   scrLimit(g,16,bot-92);
   {const lab=NAV.dest?"✕ "+NAV.dest.name:"Navigate";g.font=FONT(14);const bw=g.measureText(lab).width+26;g.fillStyle=NAV.dest?"#3e6ae1":"rgba(8,14,16,.88)";rr2(g,W-bw-12,top+58,bw,34,9);g.fill();g.fillStyle="#fff";g.textAlign="center";g.fillText(lab,W-bw/2-12,top+76);
@@ -5573,6 +5632,12 @@ function scrMap(g,top,bot,W,M){
   if(SCR.pick){const L=Object.values(STARTS);g.fillStyle="rgba(8,14,16,.94)";rr2(g,W-232,top+96,220,L.length*30+10,10);g.fill();L.forEach((p,i)=>{const y=top+104+i*30;g.fillStyle="#cfe0e2";g.font=FONT(14);g.textAlign="left";g.fillText(p.name,W-218,y+17);hit(W-232,y,220,30,()=>{SCR.pick=false;navTo(p)})})}
   g.fillStyle="rgba(8,14,16,.85)";rr2(g,W-104,bot-44,92,34,9);g.fill();g.fillStyle="#cfe0e2";g.font=FONT(13);g.textAlign="center";g.fillText(`${SCR.scale>1?"City":"Hwy"} zoom`,W-58,bot-27);
 }
+// the turn-by-turn card on the car's screen: arrow, distance, the road you turn onto, and time and distance to go
+function navCard(g,x,y,W,small){const G=NAV.g,w=small?Math.min(230,W*0.5):Math.min(300,W*0.48),h=small?58:80;g.fillStyle="#0f5e3a";rr2(g,x,y,w,h,12);g.fill();
+  g.fillStyle="rgba(255,255,255,.14)";rr2(g,x+8,y+8,h-16,h-16,9);g.fill();g.fillStyle="#fff";g.textAlign="center";g.textBaseline="middle";g.font=`800 ${small?26:36}px system-ui`;g.fillText(NAV_ARROW[G.t]||"↑",x+h/2,y+h/2+1);
+  g.textAlign="left";g.textBaseline="alphabetic";g.font=FONT(small?17:22);g.fillText(distTxt(G.d),x+h+2,y+(small?26:34));g.font=FONT(small?12:14);g.fillStyle="#d8f3e4";
+  let t=G.t==="A"?G.name:(G.name||navText(G));while(g.measureText(t).width>w-h-10&&t.length>4)t=t.slice(0,-2)+"…";g.fillText(t,x+h+2,y+(small?44:56));
+  if(!small){g.fillStyle="#bfe3cf";g.font=FONT(12);const m=Math.max(1,Math.round(G.eta/60)),ar=new Date(gDate().getTime()+G.eta*1000),hh=ar.getHours()%12||12,mm=String(ar.getMinutes()).padStart(2,"0");g.fillText(`${distTxt(G.left)} · ${m} min · arrive ${hh}:${mm}`,x+h+2,y+73)}}
 function scrLimit(g,x,y){if(!sys.limit)return;g.fillStyle="#f4f4f0";rr2(g,x,y,58,74,7);g.fill();g.strokeStyle="#111";g.lineWidth=2.5;rr2(g,x+4,y+4,50,66,5);g.stroke();
   g.fillStyle="#111";g.textAlign="center";g.font=FONT(10);g.fillText("SPEED",x+29,y+17);g.fillText("LIMIT",x+29,y+28);g.font=FONT(26);g.fillText(sys.limit,x+29,y+52);
   if(sys.over){g.strokeStyle="#ffb340";g.lineWidth=4;rr2(g,x-3,y-3,64,80,9);g.stroke()}}
@@ -6023,7 +6088,7 @@ function interiorTap(cx,cy){const I=SCR.info,Q=SCR.quad;if(!I||!Q)return false;
   return false}
 
 // ======================================================================= driver's instrument cluster: a live canvas on each car's gauge display
-const CLU={W:640,H:240};CLU.cv=document.createElement("canvas");CLU.cv.width=CLU.W*2;CLU.cv.height=CLU.H*2;CLU.g=CLU.cv.getContext("2d");
+const CLU={W:640,H:240};CLU.cv=document.createElement("canvas");CLU.k=2;CLU.cv.width=CLU.W*2;CLU.cv.height=CLU.H*2;CLU.g=CLU.cv.getContext("2d");
 CLU.tex=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,CLU.tex);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
 gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
 gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,1,1,0,gl.RGBA,gl.UNSIGNED_BYTE,new Uint8Array([0,0,0,255]));
@@ -6192,14 +6257,14 @@ function drawEVRingCluster(g,W,H,T,Hy,v){const F=FONT;g.textBaseline="alphabetic
   if((st.signal===-1||st.hazard)&&st.blink){g.fillStyle="#3ee06a";g.font=F(22);g.textAlign="center";g.fillText("◀",W/2-112,32)}if((st.signal===1||st.hazard)&&st.blink){g.fillStyle="#3ee06a";g.font=F(22);g.textAlign="center";g.fillText("▶",W/2+112,32)}
   cluUpload()}
 function drawCluster(){
-  const g=CLU.g,W=CLU.W,H=CLU.H,T=TRIMS[st.trim],Hy=car.hyb,D=DRIVES[st.trim],v=Math.abs(car.vx),F=FONT;g.setTransform(2,0,0,2,0,0);
+  scrRes();const g=CLU.g,W=CLU.W,H=CLU.H,T=TRIMS[st.trim],Hy=car.hyb,D=DRIVES[st.trim],v=Math.abs(car.vx),F=FONT;g.setTransform(CLU.k,0,0,CLU.k,0,0);
   g.fillStyle="#020405";g.fillRect(0,0,W,H);
   if(st.power===false){gl.bindTexture(gl.TEXTURE_2D,CLU.tex);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,CLU.cv);return}
-  if(isTesla()){vizTesla(g,0,0,W,H,false);gl.bindTexture(gl.TEXTURE_2D,CLU.tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,CLU.cv);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);return}
-  if(ANALOG.has(st.trim)||isVolvo()){if(ANALOG.has(st.trim))drawAnalogCluster(g,W,H,T,Hy,D,v);else drawVolvoCluster(g,W,H,T,Hy,v);gl.bindTexture(gl.TEXTURE_2D,CLU.tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,CLU.cv);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);return}
+  if(isTesla()){vizTesla(g,0,0,W,H,false);cluNav(g,W,H);gl.bindTexture(gl.TEXTURE_2D,CLU.tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,CLU.cv);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);return}
+  if(ANALOG.has(st.trim)||isVolvo()){if(ANALOG.has(st.trim))drawAnalogCluster(g,W,H,T,Hy,D,v);else drawVolvoCluster(g,W,H,T,Hy,v);cluNav(g,W,H);gl.bindTexture(gl.TEXTURE_2D,CLU.tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,CLU.cv);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);return}
   {const br=brandS();if(br==="Ford"){drawFordCluster(g,W,H,v);cluUpload();return}if(br==="Lexus"){drawLexusCluster(g,W,H,v);cluUpload();return}if(br==="Toyota"){drawToyotaCluster(g,W,H,v);cluUpload();return}}
   if(!T.ice&&!T.hybrid){drawEVRingCluster(g,W,H,T,Hy,v);return}
-  if(isSync()){drawLincolnCluster(g,W,H,T,Hy,D,v);gl.bindTexture(gl.TEXTURE_2D,CLU.tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,CLU.cv);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);return}
+  if(isSync()){drawLincolnCluster(g,W,H,T,Hy,D,v);cluNav(g,W,H);gl.bindTexture(gl.TEXTURE_2D,CLU.tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,CLU.cv);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);return}
   const toyota=/Toyota/.test(T.name),ford=/Ford|Lincoln/.test(T.name),acc=/Honda/.test(T.name),ac=ford?"#3d8bff":acc?"#e6eef0":toyota?"#5fd0ff":/Audi/.test(T.name)?"#ff4b3e":"#35c2bf";
   // left dial: tach (gas) or power meter (hybrid / electric)
   const cx=120,cy=128,R=88;g.lineCap="round";
@@ -6235,7 +6300,7 @@ function drawCluster(){
   const tt=[[st.lights||st.night,"#55d68c","LIGHTS"],[st.high&&(st.lights||st.night),"#3d8bff","HIGH"],[sys.epb,"#ff4d40","(P)"],[sys.hold,"#55d68c","HOLD"],[car.tcsOn&&performance.now()%300<150,"#ffb340","TCS"],[car.abs,"#ffb340","ABS"],[sys.bsmL||sys.bsmR,"#ffb340","BSM"]];
   g.font=F(12);let x=16;for(const [on,c,l] of tt){if(!on)continue;g.fillStyle=c;g.textAlign="left";g.fillText(l,x,22);x+=g.measureText(l).width+12}
   if((st.signal===-1||st.hazard)&&st.blink){g.fillStyle="#55d68c";g.font=F(22);g.fillText("◀",W/2-100,40)}if((st.signal===1||st.hazard)&&st.blink){g.fillStyle="#55d68c";g.font=F(22);g.fillText("▶",W/2+86,40)}
-  gl.bindTexture(gl.TEXTURE_2D,CLU.tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,CLU.cv);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);
+  cluNav(g,W,H);gl.bindTexture(gl.TEXTURE_2D,CLU.tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,CLU.cv);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);
 }
 // keep a screen image undistorted on a display of any shape: use the largest centred area with the image's aspect ratio
 // screens sit a few millimetres in front of their glass, toward the driver, so the glass can never hide them
@@ -6397,7 +6462,10 @@ function render(dt){
   const cy=Math.cos(look.yaw),sy=Math.sin(look.yaw), fl=[cf[0]*cy+cf[2]*sy,0,-cf[0]*sy+cf[2]*cy];   // forward turned by the look yaw
   const inGar=inGarage(car.px,car.py)&&!st.walk;
   if(st.walk&&st.started){const W=st.walk;const inH=insideHouse(W.x,W.y,W.z),yaw=(W.cyBase===undefined?W.h:W.cyBase)+look.yaw,el=inH?clamp(0.12+look.pitch,0.02,0.5):clamp(0.3+look.pitch,0.05,1.2),dd=inH?0.9:Math.min(look.dist,4.2)*0.8;const wp=[W.x,W.z+1.0,-W.y],f2=[Math.cos(yaw),0,-Math.sin(yaw)];
-    const want=[wp[0]-f2[0]*dd*Math.cos(el),wp[1]+0.5+dd*Math.sin(el),wp[2]-f2[2]*dd*Math.cos(el)];if(Math.hypot(camPos[0]-want[0],camPos[2]-want[2])>20)camPos=want.slice();camPos=camPos.map((v,i)=>lerp(v,want[i],Math.min(1,dt*7)));eye=camPos;tgt=[wp[0]+f2[0]*1.5,wp[1]+0.3,wp[2]+f2[2]*1.5];up=[0,1,0];fov=Math.PI/2.8;
+    let dd2=dd;if(!inH){const hx=W.x,hy=W.y;for(let t=0.4;t<=dd;t+=0.25){const qx=hx-Math.cos(yaw)*t*Math.cos(el),qy=hy-Math.sin(yaw)*t*Math.cos(el),qz=W.z+1.5+t*Math.sin(el);let hitW=false;
+      for(const o of collNear(qx,qy)){if(o.z1!==undefined&&(qz<o.z0||qz>o.z1))continue;if(o.t==="c"?Math.hypot(qx-o.x,qy-o.y)<o.r+0.2:(()=>{const c=Math.cos(o.h),s=Math.sin(o.h),dx=qx-o.x,dy=qy-o.y;return Math.abs(dx*c+dy*s)<o.hl+0.2&&Math.abs(-dx*s+dy*c)<o.hw+0.2})()){hitW=true;break}}
+      if(hitW){dd2=Math.max(0.5,t-0.3);break}}W.camD=lerp(W.camD??dd2,dd2,dd2<(W.camD??dd2)?0.5:Math.min(1,dt*3));dd2=W.camD}
+    const want=[wp[0]-f2[0]*dd2*Math.cos(el),wp[1]+0.5+dd2*Math.sin(el),wp[2]-f2[2]*dd2*Math.cos(el)];if(Math.hypot(camPos[0]-want[0],camPos[2]-want[2])>20)camPos=want.slice();camPos=camPos.map((v,i)=>lerp(v,want[i],Math.min(1,dt*(dd2<dd-0.2?20:7))));eye=camPos;tgt=[wp[0]+f2[0]*1.5,wp[1]+0.3,wp[2]+f2[2]*1.5];up=[0,1,0];fov=Math.PI/2.8;
     if(inH){eye=[wp[0]+f2[0]*0.1,W.z+1.62,wp[2]+f2[2]*0.1];tgt=[wp[0]+f2[0]*3,W.z+1.55+look.pitch*2.5,wp[2]+f2[2]*3];camPos=eye.slice();fov=Math.PI/2.3}}
   else if(st.cam===0){const el=inGar?Math.min(clamp(0.36+look.pitch,0.04,1.35),0.26):clamp(0.36+look.pitch,0.04,1.35),dd=inGar?Math.min(look.dist,5.6):look.dist;
     const CH=VEH.camH||0.9,want=[cp[0]-fl[0]*dd*Math.cos(el),cp[1]+CH+dd*Math.sin(el),cp[2]-fl[2]*dd*Math.cos(el)];
@@ -6545,7 +6613,8 @@ function render(dt){
   if(mirOn()&&GFX.frame%(G().camEvery||2)===0){gl.bindFramebuffer(gl.FRAMEBUFFER,MIR.fbo);gl.viewport(0,0,MIR.w,MIR.h);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
     const E=VEH.eye,e2=M4.p(cm,[0,E[1]+0.1,VEH.tail[2]+0.12]),t2=M4.p(cm,[0,E[1]-0.6,VEH.tail[2]+40]);pass(M4.mul(M4.persp(0.62,MIR.w/MIR.h,0.15,900),M4.look(e2,t2,M4.d(cm,[0,1,0]))),e2,t2,"rear");
     gl.bindFramebuffer(gl.FRAMEBUFFER,null);gl.viewport(0,0,W,H);MIR.fresh=true}
-  if(st.cam===1&&GFX.frame%G().scrEvery===0){drawScreen(dt);if(CLU_BL)drawCluster();if(VEH.xs&&(GFX.frame/G().scrEvery|0)%2===0)xsDraw();if(PANO.on&&(GFX.frame/G().scrEvery|0)%2===1)panoDraw()}
+  if(st.cam===1&&CLU_BL)drawCluster();   // the cluster redraws every frame: needles and numbers move smoothly
+  if(st.cam===1&&GFX.frame%G().scrEvery===0){drawScreen(dt*G().scrEvery);if(VEH.xs&&(GFX.frame/G().scrEvery|0)%2===0)xsDraw();if(PANO.on&&(GFX.frame/G().scrEvery|0)%2===1)panoDraw()}
   pass(VP,eye,tgt,false);
 }
 
@@ -7037,8 +7106,8 @@ $("sensorBox").onclick=()=>{const hy=isHybT(st.trim),tc=has("tech");st.panel=(hy
 $("dPilot").onclick=()=>act("pilot");$("dSigL").onclick=()=>act("sigL"); $("dSigR").onclick=()=>act("sigR");
 
 // ---- graphics quality. Auto picks from the device, then lowers the render resolution by itself if the frame rate drops
-const GQ={lowest:{cullD:1300,res:0.5,fullCars:3,traffic:6,onc:5,lod:38,hz:300,trees:false,shadow:false,aiSnd:false,scrEvery:4,camEvery:4,label:"Lowest",cap:30},low:{cullD:1900,res:0.62,fullCars:6,traffic:9,onc:8,lod:60,hz:400,trees:false,shadow:false,aiSnd:false,scrEvery:3,camEvery:3,label:"Low"},
-  medium:{cullD:2800,res:1.0,fullCars:10,traffic:16,onc:16,lod:120,hz:600,trees:true,shadow:true,aiSnd:true,scrEvery:2,camEvery:2,label:"Medium"},
+const GQ={lowest:{cullD:1300,res:0.5,fullCars:3,traffic:6,onc:5,lod:38,hz:300,trees:false,shadow:false,aiSnd:false,scrEvery:2,camEvery:4,label:"Lowest",cap:30},low:{cullD:1900,res:0.62,fullCars:6,traffic:9,onc:8,lod:60,hz:400,trees:false,shadow:false,aiSnd:false,scrEvery:2,camEvery:3,label:"Low"},
+  medium:{cullD:2800,res:1.0,fullCars:10,traffic:16,onc:16,lod:120,hz:600,trees:true,shadow:true,aiSnd:true,scrEvery:1,camEvery:2,label:"Medium"},
   high:{res:2,fullCars:18,traffic:40,onc:32,lod:260,hz:1000,trees:true,shadow:true,aiSnd:true,scrEvery:1,camEvery:2,label:"High"}};
 const GFX={q:"auto",eff:"medium",dyn:1,fps:60,t:0,slow:0,frame:0};
 function gpuName(){try{const c=document.createElement("canvas").getContext("webgl"),e=c&&c.getExtension("WEBGL_debug_renderer_info");return e?String(c.getParameter(e.UNMASKED_RENDERER_WEBGL)):""}catch(_){return ""}}
@@ -7048,7 +7117,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(/SwiftShader|llvmpipe|Microsoft Basic/i.test(gpu))return "low";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="64";try{if(localStorage.getItem("strata.ver")!==APP_VER){for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="65";try{if(localStorage.getItem("strata.ver")!==APP_VER){for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){return GQ[GFX.q==="auto"?GFX.eff:GFX.q]}
 function setGfx(q){GFX.q=q;GFX.dyn=1;try{localStorage.setItem("strata.gfx",q)}catch(e){}}
@@ -7312,9 +7381,9 @@ let last=performance.now(), acc=0;
 // frame-rate cap: steadier and cooler on weak or hot laptops (Auto caps at 30 fps on the Lowest graphics)
 function fpsCap(){const c=st.fpsCap??0;return c===-1?0:c===0?(G().cap||0):c}
 function frame(now){{const c=fpsCap();if(c&&now-last<1000/c-2){requestAnimationFrame(frame);return}}gfxTick(Math.min(0.1,(now-last)/1000));
-  const dt=Math.min(0.05,(now-last)/1000);last=now;
+  const dt=Math.min(0.067,(now-last)/1000);last=now;
   requestAnimationFrame(frame);   // schedule the next frame first, so one bad frame can never freeze the game
-  if(st.started){controls(dt);assist(dt);updateTraffic(dt);updatePark(dt);enforcePkgs();weatherTick(dt);try{hapTick(dt)}catch(e){}try{hoseTick()}catch(e){}if(!!car.swayOff!==!!sys.swayWas){sys.swayWas=!!car.swayOff;toast(car.swayOff?"Front sway bar disconnected: more wheel travel for the trail":"Front sway bar reconnected")}
+  if(st.started){controls(dt);assist(dt);updateTraffic(dt);updatePark(dt);enforcePkgs();weatherTick(dt);try{hapTick(dt)}catch(e){}try{hoseTick()}catch(e){}try{navTick(dt)}catch(e){console.error(e)}if(!!car.swayOff!==!!sys.swayWas){sys.swayWas=!!car.swayOff;toast(car.swayOff?"Front sway bar disconnected: more wheel travel for the trail":"Front sway bar reconnected")}
     if(sys.hillDemo){sys.hillT+=dt;if(sys.hillT>6){sys.hillT=0;st.leveling=!st.leveling;toast(st.leveling?"Active levelling ON: beam hugs the ground":"Active levelling OFF: beam fixed to the body")}if(!car.offroad&&Math.abs(car.vx)>3)sys.hillDemo=false}
     if(sys.aim!=null){sys.levT=(sys.levT||0)+dt;if(sys.levT>5){sys.levT=0;st.leveling=!st.leveling;toast(st.leveling?"Levelling ON: beam back down on the road":"Levelling OFF: the loaded car aims the beam high")}
       if(Math.hypot(car.px-sys.aim.x,car.py-sys.aim.y)>40){sys.aim=null;car.cargo=0;st.leveling=true}}acc+=dt;const h=1/G().hz;while(acc>=h){physics(h);acc-=h}if(car.crashed>0)car.crashed-=dt;updateAudio()}
