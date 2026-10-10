@@ -515,9 +515,9 @@ body.ui2 #tabBody h3{font:800 14px var(--f-ui,system-ui)!important;letter-spacin
 body.ui2 #tabBody .opt,body.ui2 #tabBody .cRow{border-radius:22px!important;border:1.5px solid rgba(255,255,255,.3)!important;background:rgba(255,255,255,.04)!important}
 body.ui2 #tabBody .opt.on,body.ui2 #tabBody .cRow.on{border-color:#fff!important;background:rgba(255,255,255,.1)!important}
 #setSearch{flex:1;min-width:120px;max-width:340px;margin:0 10px;border-radius:999px;border:1.5px solid rgba(255,255,255,.3);background:rgba(0,0,0,.25);color:#fff;padding:8px 16px;font:600 14px var(--f-ui,system-ui)}
-.cfgTabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid rgba(255,255,255,.12);margin:4px -16px 8px;padding:0 16px;position:sticky;top:0;z-index:3;background:#0b1214;box-shadow:0 6px 10px -6px rgba(0,0,0,.6)}
+.cfgTabs{display:flex;gap:2px;overflow-x:auto;-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent);scrollbar-width:none;border-bottom:1px solid rgba(255,255,255,.12);margin:4px -16px 8px;padding:0 16px;position:sticky;top:0;z-index:3;background:#0b1214;box-shadow:0 6px 10px -6px rgba(0,0,0,.6)}
 #start.site .cfgTabs{background:#fff;box-shadow:0 6px 10px -8px rgba(0,0,0,.25);border-bottom-color:#e3e6e8}#start.site .cfgTabs button{color:#6b7680}#start.site .cfgTabs button.on{color:#111}
-.cfgTabs button{flex:none;border:0;background:transparent;color:#9fb0b4;font:600 14px var(--f-ui,system-ui);padding:10px 12px;border-bottom:3px solid transparent}
+.cfgTabs button{flex:none;border:0;background:transparent;color:#9fb0b4;font:600 14px var(--f-ui,system-ui);padding:10px 9px;border-bottom:3px solid transparent}
 .cfgTabs button.on{color:#fff;border-bottom-color:#2f7df6}
 #players{margin-left:10px;font:600 12px var(--f-ui,system-ui);letter-spacing:0;color:#cfe0e2;background:rgba(53,194,191,.14);border:1px solid var(--line);border-radius:999px;padding:3px 10px;vertical-align:middle}#players[hidden]{display:none}
 .rb.wide{width:auto!important;min-width:44px;padding:0 9px;border-radius:999px!important;font-size:11px}
@@ -787,8 +787,11 @@ body #drawer #tabBody .seg5{max-width:520px;border:1px solid rgba(255,255,255,.0
 <div id="boot"><div class="bc"><div class="bt">Test Drive</div><div class="bb"><i id="bootBar"></i></div><div class="bs" id="bootMsg">Building the world…</div><div class="bs" style="opacity:.5;font-size:11px;margin-top:14px">© 2026 Exclusive2knight · All rights reserved</div></div></div>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2>Version 63 · Smooth pedals on Shift, full 10% hill</h2></div>
+    <div class="nh"><small>What's new</small><h2>Version 64 · Car builder fixes</h2></div>
     <div class="nb">
+      <h4>Freezing and cars not loading</h4><ul><li>Fixed the game freezing in the car builder. Picking one of the new real paint colors (added in version 62) crashed the drawing every frame, so the car never showed up and the screen froze. Every real paint color now works, on every car.</li><li>The game can no longer freeze from one bad frame: it keeps drawing and carries on.</li><li>If a car's files fail to download (a weak connection), you now get a message and can tap the car again to retry, instead of it never loading.</li><li>Cars you park with "Spawn another car" keep their real paint color instead of turning white, and switching to a parked car loads it first.</li></ul>
+      <h4>Builder look</h4><ul><li>The tab bar keeps the tab you're on in view, so Accessories no longer hides off the edge on phones and small windows. The bar fades at the edge to show there's more.</li><li>Options no longer repeat their own name in italics underneath.</li></ul>
+      <h4 class="old">Version 63 · Smooth pedals on Shift, full 10% hill</h4>
       <h4>Smooth pedals</h4><ul><li>Shift+W is back: hold Shift with W for a gentle, smooth throttle. It squeezes on slowly (about 3 seconds to full) and eases off slowly when you let go, so you can creep, pull away gently or hold a steady speed.</li><li>New: Shift+S does the same for the brake. It squeezes on gently and gets firmer the longer you hold it (about 2 seconds to full), then releases smoothly, for soft, chauffeur-style stops.</li><li>A quick tap of Shift on its own still sets the parking brake, and P does too.</li></ul>
       <h4>Proving ground</h4><ul><li>The 10% hill, the biggest one, was cut off near the bottom: the way down ended in a 1 m drop. The section is now 20 m longer, so the hill comes all the way back down to the pad. The hills also start without a small lip at the edge.</li></ul>
       <h4>Protection</h4><ul><li>The game is now copyrighted and the code on the website is scrambled (minified with every internal name changed), so it can't be read or edited easily. A copy downloaded or put on another website won't run: it shows a notice pointing to the real site.</li><li>Saves reset with this version.</li></ul>
@@ -4226,7 +4229,7 @@ function ownF(f,k=st.trim){const B=bdOf(k);if(B&&B.std[k]&&B.std[k].includes(f))
 function visSet(k=st.trim){const s=bdSel(k),v=new Set();for(const o of s.op)if(o[6])v.add(o[6]);for(const a of s.ac)if(a[3])v.add(a[3]);return v}
 function bdFeatName(f,k){const B=bdOf(k);return FEAT_NAMES[f]||(B&&B.nf[f]&&B.nf[f][0])||f.replace(/([A-Z])/g," $1").replace(/^./,c=>c.toUpperCase())}
 function bdTabs(tab,T,row,price){const k=st.trim,B=bdOf(k),C=cfgOf(k);let h="";
-  const opRow=(o,i)=>row(C.op&&C.op[i],`data-bop="${i}"`,o[1],o[4]+(o[5].length?` <em class="ft">${o[5].map(f=>bdFeatName(f,k)).join(" · ")}</em>`:""),price(o[2]));
+  const nz=x=>String(x).toLowerCase().replace(/[^a-z0-9]/g,""),opRow=(o,i)=>{const fs=o[5].map(f=>bdFeatName(f,k)).filter(n=>{const a=nz(n),b=nz(o[1])+nz(o[4]);return a&&!b.includes(a)&&!a.includes(nz(o[1]))});return row(C.op&&C.op[i],`data-bop="${i}"`,o[1],o[4]+(fs.length?` <em class="ft">${fs.join(" · ")}</em>`:""),price(o[2]))};
   if(tab==="ext"){const W=B.wh.map((w,i)=>[w,i]).filter(([w])=>bdIn(w[2],k));
     const wsel=C.wh!=null&&C.wh>=0?C.wh:(W.find(([w])=>!w[1])||W[0]||[])[1];
     h+=`<h3>Wheels</h3>${W.length?W.map(([w,i])=>row(wsel===i,`data-bwh="${i}"`,w[0],"",price(w[1]))).join(""):row(true,`data-bwh="-1"`,"Standard wheels","","Included")}
@@ -6242,7 +6245,9 @@ function fitQuad0(q,aspect){const BL=q.bl,U=q.br.map((v,i)=>v-BL[i]),V=q.tl.map(
   const P=(s,t)=>BL.map((v,i)=>v+U[i]*s+V[i]*t);return {bl:P(s0,t0),br:P(s1,t0),tl:P(s0,t1),c:q.c,n:q.n}}
 
 let rimDark=false;
-function myPaint(){rimDark=st.rimBlack!==undefined?st.rimBlack:(st.wheel==="21"||!!st.pkgs.perf);kitNext=kitOf(TRIMS[st.trim].model);return PAINTS[st.paint]}
+function myPaint(){rimDark=st.rimBlack!==undefined?st.rimBlack:(st.wheel==="21"||!!st.pkgs.perf);kitNext=kitOf(TRIMS[st.trim].model);return paintRGB(st.paint)}
+// any "c:#rrggbb" paint resolves on the fly; anything unknown falls back to white instead of breaking the frame
+function paintRGB(p){let c=PAINTS[p];if(!c&&typeof p==="string"&&/^c:#[0-9a-f]{6}$/i.test(p))c=PAINTS[p]=lin(p.slice(2));return c||PAINTS.white}
 function carMats(paint,lit){const z=[0,0,0],dk=rimDark;rimDark=false;return{
   paint:{c:paint,sp:0.9,sh:70},glass:{c:[0.012,0.017,0.022],sp:1.4,sh:140,a:0.38},trim:{c:[0.028,0.028,0.03],sp:0.3,sh:30},
   underbody:{c:[0.04,0.04,0.04]},interior:{c:[0.07,0.07,0.075],sp:0.1,sh:12},seat:{c:[0.1,0.095,0.09],sp:0.1,sh:10},
@@ -6495,7 +6500,7 @@ function render(dt){
   for(const [dist,c] of vis){
     const om=aiMat(c);const sOn=(c.sig||c.haz)&&st.blink;
     const fl=c.flashT>0&&(c.flashT%0.55)>0.25,lc={head:fl?[4.2,4.2,3.9]:lampsOn?[1.2,1.2,1.1]:[0.3,0.3,0.32],tail:c.kind==="parked"?OFF:c.brk||c.v<0.1?[1.3,0.04,0.02]:(lampsOn?[0.4,0.01,0.01]:OFF),sigL:sOn&&(c.haz||c.sig<0)?AMB:OFF,sigR:sOn&&(c.haz||c.sig>0)?AMB:OFF};
-    if(dist<lodD&&nFull<capFull&&(c.mdl===undefined||KITS[c.mdl]||nFull<2)){nFull++;kitNext=kitOf(trafficModel(c));drawCar(om,PAINTS[c.paint],lc,[c.spin,c.spin,c.spin,c.spin],0,0,false,0,true);drawn.push([om,c])}else drawProxy(om,PAINTS[c.paint],c.brk)}
+    if(dist<lodD&&nFull<capFull&&(c.mdl===undefined||KITS[c.mdl]||nFull<2)){nFull++;kitNext=kitOf(trafficModel(c));drawCar(om,paintRGB(c.paint),lc,[c.spin,c.spin,c.spin,c.spin],0,0,false,0,true);drawn.push([om,c])}else drawProxy(om,paintRGB(c.paint),c.brk)}
   if(cam2!=="rear"&&cam2!=="dash"){dentOn(true);drawCar(cm,myPaint(),lit,car.spin,car.dF,car.dR,false,car.height,false,car.defl.map(d=>d));dentOn(false)}
   if(!cam2&&mirOn()&&MIR.fresh){gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,MIR.tex);bind(SCN.box);
     for(const [c,hw,hh,[u0,u1,v0,v1]] of mirrorGlass()){const Og=M4.p(cm,[c[0]+hw,c[1]-hh,c[2]]),Ug=M4.d(cm,[-2*hw,0,0]),Vg=M4.d(cm,[0,2*hh,0]),du=u1-u0,dv=v1-v0;
@@ -6520,7 +6525,7 @@ function render(dt){
     mat([0,0,0],null,0,1,1,3);gl.drawElements(gl.TRIANGLES,6,gl.UNSIGNED_SHORT,0)};
   if(!night&&G().shadow&&!inGar){const g_=car.gnd||[];shadow(car.px,car.py,car.psi,g_[3]&&g_[3].h!==undefined?(g_[0].h+g_[1].h+g_[2].h+g_[3].h)/4:0);for(const [,c] of drawn)shadow(c.wx,c.wy,c.wh,c.wz||0)}
   if(sys.aim){const a=[sys.aim.x,sys.aim.y,sys.aim.h];gl.disable(gl.BLEND);gl.depthMask(true);gl.uniformMatrix4fv(U.uM,false,chain(M4.T(a[0],1.2,-a[1]),M4.rY(a[2]-Math.PI/2),M4.S(3.2,2.2,0.1)));bind(SCN.box);mat([0.85,0.85,0.85],null,0.05,8);gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_SHORT,0);gl.enable(gl.BLEND);gl.depthMask(false)}
-  for(const [om,c] of drawn){kitNext=kitOf(trafficModel(c));drawCar(om,PAINTS[c.paint],{},[0,0,0,0],0,0,true,0,true)}
+  for(const [om,c] of drawn){kitNext=kitOf(trafficModel(c));drawCar(om,paintRGB(c.paint),{},[0,0,0,0],0,0,true,0,true)}
   if(cam2!=="rear"&&cam2!=="dash"){dentOn(true);drawCar(cm,myPaint(),lit,car.spin,car.dF,car.dR,true,car.height,false);dentOn(false)}
   gl.depthMask(true);gl.disable(gl.BLEND);
   if(cam2!=="dash"||true){try{accModelsDraw(cm,false);charsDraw()}catch(e){}}
@@ -6990,14 +6995,15 @@ function loadKg(){return (st.cargoKg||0)+(st.dummies||0)*(st.dummyKg||75)}
 
 // ---- your own cars: park the one you're in and spawn another, T switches between them
 st.fleet=[];
-function fleetObj(f){return {fixed:true,kind:"parked",mine:true,wx:f.wx,wy:f.wy,wh:f.wh,wz:0,v:0,spin:0,sig:0,head:0,paint:PAINTS[f.paint]?f.paint:"white",mdl:TRIMS[f.trim].model,fleet:f}}
+function fleetObj(f){return {fixed:true,kind:"parked",mine:true,wx:f.wx,wy:f.wy,wh:f.wh,wz:0,v:0,spin:0,sig:0,head:0,paint:PAINTS[f.paint]||/^c:#[0-9a-f]{6}$/i.test(f.paint||"")?f.paint:"white",mdl:TRIMS[f.trim].model,fleet:f}}
 function fleetParkHere(){const f={trim:st.trim,paint:st.paint,wx:car.px,wy:car.py,wh:car.psi};st.fleet.push(f);parked.push(fleetObj(f));return f}
 function spawnAnother(){if(!st.started||st.walk){toast("Get in a car first");return}if(Math.abs(car.vx)>1){toast("Stop first, then spawn another car");return}if(st.fleet.length>=6){toast("You can keep up to 7 cars: switch with T");return}
   fleetParkHere();toast(`${TRIMS[st.trim].short||TRIMS[st.trim].name} parked here. Build your next car`);redoCar()}
 async function fleetSwitch(){if(st.walk||!st.started)return;if(!st.fleet.length){toast(PC.on?"Only one car: spawn another from the menu (Spawn → Spawn another car)":"Only one car: spawn another from the menu");return}if(Math.abs(car.vx)>1){toast("Stop first to switch cars");return}
+  {const t0=st.fleet[0];if(!MODELS[TRIMS[t0.trim].model]){toast("Loading that car…");try{await loadModel(TRIMS[t0.trim].model)}catch(e){toast("Couldn't load that car. Check your connection and try again.");return}}}
   const t=st.fleet.shift(),i=parked.findIndex(o=>o.fleet===t);if(i>=0)parked.splice(i,1);
   const cur={trim:st.trim,paint:st.paint,wx:car.px,wy:car.py,wh:car.psi};st.fleet.push(cur);parked.push(fleetObj(cur));
-  if(!MODELS[TRIMS[t.trim].model]){toast("Loading that car…");await loadModel(TRIMS[t.trim].model)}
+
   setTrim(t.trim,true);st.paint=t.paint;try{fitPaint()}catch(e){}applyBuild(t.trim);applyVehicle(TRIMS[t.trim]);resetCar({free:true,x:t.wx,y:t.wy,h:t.wh});
   const ev=isEVT()||TRIMS[st.trim].tesla;st.gear="P";sys.epb=true;st.belt=false;if(ev){st.power=true;document.body.classList.remove("carOff")}else{st.power=false;document.body.classList.add("carOff")}
   toast(`Now driving: ${TRIMS[st.trim].name} · ${st.fleet.length+1} cars · T to switch`)}
@@ -7016,7 +7022,7 @@ function openDrawer(){renderTab();$("drawer").hidden=false}
 function closeDrawer(){$("drawer").hidden=true}
 $("tabs").addEventListener("click",e=>{const t=e.target.closest(".tab");if(t){st.tab=t.dataset.tab;renderTab()}});
 $("tabBody").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;const d=b.dataset;
-  if(d.map){setMap(d.map);closeDrawer()}else if(d.trim){const k=d.trim;if(!MODELS[TRIMS[k].model]){toast("Loading that car…");loadModel(TRIMS[k].model).then(()=>{setTrim(k);renderTab()});return}setTrim(k)}else if(d.mode){st.mode=+d.mode;toast(`Drive mode: ${modeName()}`)}else if(d.tog)act(d.tog);else if(d.a)act(d.a);
+  if(d.map){setMap(d.map);closeDrawer()}else if(d.trim){const k=d.trim;if(!MODELS[TRIMS[k].model]){toast("Loading that car…");loadModel(TRIMS[k].model).then(()=>{setTrim(k);renderTab()}).catch(()=>{toast("Couldn't load that car. Check your connection and tap it again.");try{renderCfg()}catch(e){}});return}setTrim(k)}else if(d.mode){st.mode=+d.mode;toast(`Drive mode: ${modeName()}`)}else if(d.tog)act(d.tog);else if(d.a)act(d.a);
   else if(d.spawn!==undefined){const n=+d.spawn;if(n===0){cars=cars.filter(c=>c.kind!=="ai");toast("Traffic cleared")}else{spawnTraffic(n);toast(`${n} AI cars added`)}}
   else if(d.aebs){st.aebSens=d.aebs;toast(`Collision warning: ${d.aebs}`)}
   else if(d.set){const [k,v]=d.set.split(":"),n=+v,H=car.hyb,T=TRIMS[st.trim];if(k==="fuel"){H.fuel=H.tank*n;toast(`Fuel set to ${n*100}%`)}else if(k==="chg"){if(T.plug)H.pb=n;else H.soc=n;toast(`Charge set to ${n*100}%`)}else{st[k]=n;if(k==="wheelUI")document.body.classList.toggle("wheelMode",!!n)}
@@ -7042,7 +7048,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(/SwiftShader|llvmpipe|Microsoft Basic/i.test(gpu))return "low";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="63";try{if(localStorage.getItem("strata.ver")!==APP_VER){for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="64";try{if(localStorage.getItem("strata.ver")!==APP_VER){for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){return GQ[GFX.q==="auto"?GFX.eff:GFX.q]}
 function setGfx(q){GFX.q=q;GFX.dyn=1;try{localStorage.setItem("strata.gfx",q)}catch(e){}}
@@ -7307,13 +7313,13 @@ let last=performance.now(), acc=0;
 function fpsCap(){const c=st.fpsCap??0;return c===-1?0:c===0?(G().cap||0):c}
 function frame(now){{const c=fpsCap();if(c&&now-last<1000/c-2){requestAnimationFrame(frame);return}}gfxTick(Math.min(0.1,(now-last)/1000));
   const dt=Math.min(0.05,(now-last)/1000);last=now;
+  requestAnimationFrame(frame);   // schedule the next frame first, so one bad frame can never freeze the game
   if(st.started){controls(dt);assist(dt);updateTraffic(dt);updatePark(dt);enforcePkgs();weatherTick(dt);try{hapTick(dt)}catch(e){}try{hoseTick()}catch(e){}if(!!car.swayOff!==!!sys.swayWas){sys.swayWas=!!car.swayOff;toast(car.swayOff?"Front sway bar disconnected: more wheel travel for the trail":"Front sway bar reconnected")}
     if(sys.hillDemo){sys.hillT+=dt;if(sys.hillT>6){sys.hillT=0;st.leveling=!st.leveling;toast(st.leveling?"Active levelling ON: beam hugs the ground":"Active levelling OFF: beam fixed to the body")}if(!car.offroad&&Math.abs(car.vx)>3)sys.hillDemo=false}
     if(sys.aim!=null){sys.levT=(sys.levT||0)+dt;if(sys.levT>5){sys.levT=0;st.leveling=!st.leveling;toast(st.leveling?"Levelling ON: beam back down on the road":"Levelling OFF: the loaded car aims the beam high")}
       if(Math.hypot(car.px-sys.aim.x,car.py-sys.aim.y)>40){sys.aim=null;car.cargo=0;st.leveling=true}}acc+=dt;const h=1/G().hz;while(acc>=h){physics(h);acc-=h}if(car.crashed>0)car.crashed-=dt;updateAudio()}
   shopTick();homeTick(dt);if(st.walk){footTick(dt);openHouseTick()}else if(sys.flashT>0)sys.flashT-=dt;gtTick(dt);phTick();revChime(dt);beltTick(dt);econTick(dt);ui2Tick();trainTick(dt);gateTick(dt);mpTick(dt);teslaTrip(dt);launchTick(dt);
   render(dt);hud(dt);
-  requestAnimationFrame(frame);
 }
 // ---- on foot: stick, jump, key fob and phone
 (()=>{const pad=$("walkPad"),kn=$("walkKnob");let id=null;const mv=e=>{const r=pad.getBoundingClientRect(),R=r.width/2;let x=(e.clientX-r.left-R)/R,y=(e.clientY-r.top-R)/R;const m=Math.hypot(x,y);if(m>1){x/=m;y/=m}FOOT.jx=x;FOOT.jy=-y;kn.style.transform=`translate(${x*R*0.6}px,${y*R*0.6}px)`};
@@ -7504,7 +7510,7 @@ function koDraw(){const now=performance.now(),dt=Math.min(0.1,(now-(KO.t||now))/
 // ---- multiplayer: everyone playing shares their car through room presence (about 10 times a second); other players' cars drive in your town
 const MP={room:null,objs:new Map(),sendT:0,last:"",lastT:0,gp:null};
 function mpTick(dt){const R_=MP.room;if(!R_)return;MP.sendT+=dt;
-  if(MP.sendT>0.1&&st.started){MP.sendT=0;const pc=(PAINTS[st.paint]||PAINTS.white).map(v=>+v.toFixed(3));
+  if(MP.sendT>0.1&&st.started){MP.sendT=0;const pc=paintRGB(st.paint).map(v=>+v.toFixed(3));
     const p={x:+car.px.toFixed(2),y:+car.py.toFixed(2),z:+(car.zb||0).toFixed(2),h:+car.psi.toFixed(3),v:+car.vx.toFixed(2),m:TRIMS[st.trim].model||"",pc,b:(inp.brk>0.1||st.gear==="P")?1:0,sg:st.hazard?2:(st.signal||0),w:st.walk?1:0};
     const key=JSON.stringify(p),now=performance.now();if(key!==MP.last||now-MP.lastT>1000){MP.last=key;MP.lastT=now;R_.presence({car:p}).catch(()=>{})}}
   const now=performance.now(),seen=new Set();let peers=[];try{peers=R_.peers()}catch(e){}
@@ -7602,7 +7608,9 @@ function cfgGoLabel(){const g=$("go");if(!g)return;const step=st.cfgStep||"model
 function cfgAdvance(){const step=st.cfgStep||"model";if(step==="model"){st.cfgStep="color";st.cfgTab="color"}else{const i=CFG_TABK.indexOf(st.cfgTab||"color");st.cfgTab=CFG_TABK[Math.min(i+1,CFG_TABK.length-1)]}renderCfg();const t=document.querySelector(".cfgTabs .on");if(t)t.scrollIntoView({block:"nearest",inline:"center"})}
 function cfgPrevTab(){const T=TRIMS[st.trim];if((st.cfgStep||"model")==="model"||!T.real)return false;const i=CFG_TABK.indexOf(st.cfgTab||"color");if(i<=0)return false;st.cfgTab=CFG_TABK[i-1];renderCfg();return true}
 document.addEventListener("click",e=>{if(e.target&&e.target.closest&&e.target.closest("#go")&&!$("start").hidden){if(!cfgAtEnd()){e.stopPropagation();e.preventDefault();cfgAdvance()}else if(!buyProcess()){e.stopPropagation();e.preventDefault();renderCfg()}}},true);
-function renderCfg(){fitPaint();const b=$("cfgBody"),T=TRIMS[st.trim],step=st.cfgStep||"model";
+// keep the selected builder tab in view (the tab bar scrolls sideways on narrow screens)
+function cfgTabsScroll(){const tb=document.querySelector(".cfgTabs"),on=tb&&tb.querySelector(".on");if(on&&tb.scrollWidth>tb.clientWidth)tb.scrollLeft=Math.max(0,on.offsetLeft-tb.offsetLeft-(tb.clientWidth-on.offsetWidth)/2)}
+function renderCfg(){queueMicrotask(cfgTabsScroll);fitPaint();const b=$("cfgBody"),T=TRIMS[st.trim],step=st.cfgStep||"model";
   const groups=[];const brandOf=t=>t.concept||!t.real?"Concept":(t.group||"Strata").split(" ")[0];for(const k of ORDER){const g=TRIMS[k].group;let G=groups.find(x=>x.g===g);if(!G)groups.push(G={g,brand:brandOf(TRIMS[k]),keys:[]});G.keys.push(k)}
   const brands=[...new Set(groups.map(G=>G.brand))],brand=st.cfgBrand&&brands.includes(st.cfgBrand)?st.cfgBrand:brandOf(T);
   const BL=["Car","Trim","Paint","Options","Summary"],STEPS=[["model","1  Choose your car"],["color","2  Make it yours"]],TES1=false;
@@ -7616,7 +7624,7 @@ function renderCfg(){fitPaint();const b=$("cfgBody"),T=TRIMS[st.trim],step=st.cf
     <div class="mGrid">${groups.filter(G=>G.brand===brand).map(G=>{const lo=Math.min(...G.keys.map(k=>PRICE[k])),on=G.g===T.group,t0=TRIMS[G.keys[0]];const [name,yr]=G.g.split(" · ");
       return `<button class="mCard ${on?"on":""}" data-cmod="${G.g}"><small>${yr||""}</small><b>${name.replace(brand+" ","")}</b><span>${G.keys.length} trim${G.keys.length>1?"s":""} · from ${money(lo)}</span><em>${t0.real?"":"Concept"}</em></button>`}).join("")}</div>`}}
   else if(step==="trim"){const G=groups.find(G=>G.g===T.group);h=`<h3>${T.group}</h3>${G.keys.map(k=>{const t=TRIMS[k];return `<button class="cRow tRow ${st.trim===k?"on":""}" data-ct="${k}"><span><b>${short(t)}</b><small>${t.desc}${t.ws4?" · 4-wheel steering":""}${t.crab?" · crab walk":""}</small>${t.feat?`<small class="ft">${t.feat}</small>`:""}</span><span class="pr">${money(PRICE[k])}</span></button>`}).join("")}`}
-  else if(step==="color"){const L=carColors();h=`<h3>${BL[2]} · ${paintName()}</h3><div class="sw big">${L?L.map(([n,hx])=>`<button class="${st.paint==="c:"+hx?"on":""}" data-cp="c:${hx}" aria-label="${n}" title="${n}" style="background:${hx}"></button>`).join(""):Object.keys(PAINT_NAMES).map(p=>`<button class="${st.paint===p?"on":""}" data-cp="${p}" aria-label="${PAINT_NAMES[p]}" style="background:rgb(${PAINTS[p].map(v=>Math.round(Math.pow(v,0.4545)*255)).join(",")})"></button>`).join("")}</div>
+  else if(step==="color"){const L=carColors();h=`<h3>${BL[2]} · ${paintName()}</h3><div class="sw big">${L?L.map(([n,hx])=>`<button class="${st.paint==="c:"+hx?"on":""}" data-cp="c:${hx}" aria-label="${n}" title="${n}" style="background:${hx}"></button>`).join(""):Object.keys(PAINT_NAMES).map(p=>`<button class="${st.paint===p?"on":""}" data-cp="${p}" aria-label="${PAINT_NAMES[p]}" style="background:rgb(${paintRGB(p).map(v=>Math.round(Math.pow(v,0.4545)*255)).join(",")})"></button>`).join("")}</div>
     <div id="swName">${paintPrice()===0?"Included":money(paintPrice())}</div>
     ${T.real?`<h3>Wheel finish</h3>${[[false,"Silver","Bright painted / machined finish"],[true,"Black","Gloss black finish"]].map(([v,n,d])=>`<button class="cRow ${(st.rimBlack??false)===v?"on":""}" data-crim="${v?1:0}"><span><b>${n}</b><small>${d}</small></span></button>`).join("")}`:""}${T.real?"":`<h3>Wheels</h3>${[["19","19-inch Aero","Silver, efficient, quieter",0],["21","21-inch Sport","Dark finish, sharper look",1500]].map(([k,n,d,p])=>`<button class="cRow ${(st.wheel===k&&!(k==="19"&&st.pkgs.perf))||(k==="21"&&st.pkgs.perf)?"on":""}" data-cw="${k}"><span><b>${n}</b><small>${d}${k==="21"&&st.pkgs.perf?" · included with Performance":""}</small></span><span class="pr">${p&&!st.pkgs.perf?money(p):"Incl."}</span></button>`).join("")}`}`}
   else if(step==="options"){h=`${T.tesla?`<h3>Autopilot & upgrades</h3>${[["fsd","Full Self-Driving (Supervised)","Drives itself through town and on the highway, Smart Summon, Autopark. Without it you get Autopilot (hands on)",8000],...(st.trim==="ty_lrawd"?[["boost","Acceleration Boost","0-60 in about 4.2 s",2000]]:[])].map(([k,n,d,p])=>`<button class="cRow ${TSL[k]?"on":""}" data-tsl="${k}"><span class="ck"></span><span style="flex:1"><b>${n}</b><small>${d}</small></span><span class="pr">${money(p)}</span></button>`).join("")}`:""}
@@ -7650,8 +7658,8 @@ $("cfgBody").addEventListener("click",e=>{const b=e.target.closest("button");if(
   if(d.cty){st.tyre=d.cty;renderCfg();return}
   if(d.crim!==undefined){st.rimBlack=d.crim==="1";renderCfg();return}
   if(d.cmod){const k=TRIMS[st.trim].group===d.cmod?st.trim:ORDER.find(k=>TRIMS[k].group===d.cmod);const go=()=>{setTrim(k,true);if(!st.built)st.paint=TRIMS[k].paint;fitPaint();st.cfgStep="model";st.cfgModel=d.cmod;renderCfg()};
-    if(!MODELS[TRIMS[k].model]){b.classList.add("on");b.querySelector("span").textContent="Loading…";loadModel(TRIMS[k].model).then(go);return}go();return}
-  if(d.ct){const k=d.ct;if(!MODELS[TRIMS[k].model]){b.classList.add("on");b.querySelector("small").textContent="Loading this car…";loadModel(TRIMS[k].model).then(()=>{setTrim(k);if(!st.built)st.paint=TRIMS[k].paint;renderCfg()});return}setTrim(k);if(!st.built)st.paint=TRIMS[k].paint}else if(d.cp){st.paint=d.cp;st.built=true}else if(d.cw){st.wheel=d.cw;st.rimBlack=undefined}
+    if(!MODELS[TRIMS[k].model]){b.classList.add("on");b.querySelector("span").textContent="Loading…";loadModel(TRIMS[k].model).then(go).catch(()=>{toast("Couldn't load that car. Check your connection and tap it again.");try{renderCfg()}catch(e){}});return}go();return}
+  if(d.ct){const k=d.ct;if(!MODELS[TRIMS[k].model]){b.classList.add("on");b.querySelector("small").textContent="Loading this car…";loadModel(TRIMS[k].model).then(()=>{setTrim(k);if(!st.built)st.paint=TRIMS[k].paint;renderCfg()}).catch(()=>{toast("Couldn't load that car. Check your connection and tap it again.");try{renderCfg()}catch(e){}});return}setTrim(k);if(!st.built)st.paint=TRIMS[k].paint}else if(d.cp){st.paint=d.cp;st.built=true}else if(d.cw){st.wheel=d.cw;st.rimBlack=undefined}
   else if(d.opk){st.opk=st.opk||{};const S=st.opk[st.trim]=st.opk[st.trim]||{},P=(OPT_PKGS[st.trim]||[]).find(p=>p.id===d.opk);S[d.opk]=!S[d.opk];if(S[d.opk]&&P){for(const x of P.x||[])S[x]=false;for(const f of P.adds)if(typeof st[f]==="boolean")st[f]=true;toast(`${P.name} added`)}enforcePkgs();renderCfg();return}
   else if(d.cpk){st.pkgs[d.cpk]=!st.pkgs[d.cpk];if(st.pkgs[d.cpk]&&d.cpk==="assist")st.esa=true;if(st.pkgs[d.cpk]&&d.cpk==="light"){st.matrix=st.cornering=st.leveling=st.autoHigh=true}if(d.cpk==="assist"&&st.pkgs.assist)st.elk=true}
   else if(d.gfx)setGfx(d.gfx);
@@ -7663,7 +7671,7 @@ function openBuilder(){if(st.everStarted&&!st.walk)st.buildFrom={x:car.px,y:car.
 // ---- loading in stages: the world, then the car you're looking at, then the rest of the cars in the background
 const LOADING={};
 function loadModel(k){if(MODELS[k])return Promise.resolve(MODELS[k]);
-  if(!LOADING[k])LOADING[k]=fetch("models/"+k+".json").then(r=>{if(!r.ok)throw new Error(r.status);return r.json()}).then(d=>{MODELS[k]=d;return d});return LOADING[k]}
+  if(!LOADING[k])LOADING[k]=fetch("models/"+k+".json").then(r=>{if(!r.ok)throw new Error(r.status);return r.json()}).then(d=>{MODELS[k]=d;return d}).catch(e=>{delete LOADING[k];throw e});return LOADING[k]}
 function bootStep(p,msg){$("bootBar").style.width=(p*100)+"%";$("bootMsg").textContent=msg}
 const idle=f=>("requestIdleCallback" in window)?requestIdleCallback(f,{timeout:400}):setTimeout(f,60);
 async function boot(){
