@@ -7,7 +7,7 @@ async def main():
   async with async_playwright() as p:
     b=await p.chromium.launch(args=["--use-gl=angle","--use-angle=swiftshader","--enable-unsafe-swiftshader"])
     pg=await b.new_page(viewport={"width":480,"height":260});errs=[];pg.on("pageerror",lambda e:errs.append(str(e)+" :: "+(e.stack or "")[:300]))
-    await pg.goto("http://127.0.0.1:8765/index.html",timeout=120000);await pg.wait_for_function("document.getElementById('boot').hidden",timeout=120000)
+    await pg.goto("http://127.0.0.1:8765/dev.html",timeout=120000);await pg.wait_for_function("document.getElementById('boot').hidden",timeout=120000)
     await pg.click("#newsGo");await pg.evaluate("st.cfgStep='color';st.cfgTab='acc'");await pg.click("#go");await pg.wait_for_timeout(800)
     await pg.evaluate(open(os.path.join(HERE,"tests","h.js")).read())
     src=open(sys.argv[1]).read()

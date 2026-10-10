@@ -710,8 +710,8 @@ body #drawer #tabBody .seg5{max-width:520px;border:1px solid rgba(255,255,255,.0
   <div class="pcHint" id="pcHint">Keyboard · press <kbd>?</kbd> for controls</div></div>
 <div id="pcHelp"><div class="ph"><h2>Controls</h2>
   <div class="cols"><div><h4>Start the car</h4><p><kbd>F</kbd> accessory mode</p><p>Hold <kbd>S</kbd> + press <kbd>F</kbd> start the ignition (press <kbd>F</kbd> again to switch off)</p><p>Teslas and other EVs are on as soon as you get in</p>
-  <h4>Gears</h4><p><kbd>E</kbd> shift up (P → R → N → D) · <kbd>Q</kbd> shift down</p><p><kbd>Shift</kbd> / <kbd>P</kbd> parking brake on / off</p></div>
-  <div><h4>Drive</h4><p><kbd>B</kbd> seatbelt (put it on first)</p><p><kbd>W</kbd> accelerator · <kbd>S</kbd> brake</p><p><kbd>A</kbd> steer left · <kbd>D</kbd> steer right</p>
+  <h4>Gears</h4><p><kbd>E</kbd> shift up (P → R → N → D) · <kbd>Q</kbd> shift down</p><p><kbd>P</kbd> (or tap <kbd>Shift</kbd>) parking brake on / off</p></div>
+  <div><h4>Drive</h4><p><kbd>B</kbd> seatbelt (put it on first)</p><p><kbd>W</kbd> accelerator · <kbd>S</kbd> brake</p><p><kbd>Shift</kbd>+<kbd>W</kbd> smooth, gentle throttle · <kbd>Shift</kbd>+<kbd>S</kbd> smooth, gentle braking</p><p><kbd>A</kbd> steer left · <kbd>D</kbd> steer right</p>
   <h4>Vehicle</h4><p><kbd>Z</kbd> left signal · <kbd>C</kbd> right signal · <kbd>X</kbd> hazards</p><p><kbd>L</kbd> headlights · <kbd>J</kbd> high beams · <kbd>K</kbd> fog lights · <kbd>H</kbd> horn</p><p><kbd>V</kbd> inside view / first person</p></div>
   <div><h4>Safety assists</h4><p><kbd>G</kbd> assist menu (turn features on and off; 1–9 to pick)</p><p><kbd>U</kbd> emergency braking (AEB) on / off</p><p><kbd>\</kbd> cruise control · <kbd>+</kbd> / <kbd>-</kbd> set speed up / down by 5</p><p><kbd>Y</kbd> park assist</p>
   <h4>Other</h4><p><kbd>R</kbd> reset the car like new on the nearest road</p><p><kbd>Y</kbd> phone (bank, wallet, maps, music…) · <kbd>N</kbd> zoom into the cluster</p><p><kbd>T</kbd> switch between your cars · <kbd>I</kbd> comfort features (heated seats, ambient light…)</p><p><kbd>O</kbd> get out / use the pump or charger / get back in</p><p><kbd>M</kbd> lean in to the screen · <kbd>Tab</kbd> menu · <kbd>?</kbd> this help</p></div>
@@ -784,11 +784,15 @@ body #drawer #tabBody .seg5{max-width:520px;border:1px solid rgba(255,255,255,.0
   </div>
 </div>
 
-<div id="boot"><div class="bc"><div class="bt">Test Drive</div><div class="bb"><i id="bootBar"></i></div><div class="bs" id="bootMsg">Building the world…</div></div></div>
+<div id="boot"><div class="bc"><div class="bt">Test Drive</div><div class="bb"><i id="bootBar"></i></div><div class="bs" id="bootMsg">Building the world…</div><div class="bs" style="opacity:.5;font-size:11px;margin-top:14px">© 2026 Exclusive2knight · All rights reserved</div></div></div>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2>Version 62 · Real car builders</h2></div>
+    <div class="nh"><small>What's new</small><h2>Version 63 · Smooth pedals on Shift, full 10% hill</h2></div>
     <div class="nb">
+      <h4>Smooth pedals</h4><ul><li>Shift+W is back: hold Shift with W for a gentle, smooth throttle. It squeezes on slowly (about 3 seconds to full) and eases off slowly when you let go, so you can creep, pull away gently or hold a steady speed.</li><li>New: Shift+S does the same for the brake. It squeezes on gently and gets firmer the longer you hold it (about 2 seconds to full), then releases smoothly, for soft, chauffeur-style stops.</li><li>A quick tap of Shift on its own still sets the parking brake, and P does too.</li></ul>
+      <h4>Proving ground</h4><ul><li>The 10% hill, the biggest one, was cut off near the bottom: the way down ended in a 1 m drop. The section is now 20 m longer, so the hill comes all the way back down to the pad. The hills also start without a small lip at the edge.</li></ul>
+      <h4>Protection</h4><ul><li>The game is now copyrighted and the code on the website is scrambled (minified with every internal name changed), so it can't be read or edited easily. A copy downloaded or put on another website won't run: it shows a notice pointing to the real site.</li><li>Saves reset with this version.</li></ul>
+      <h4 class="old">Version 62 · Real car builders</h4>
       <h4>Build a car, like the real websites</h4><ul><li>Every real car's builder now follows its maker's own build-and-price site: real starting prices (MSRP) for all 541 trims, the real paint colors with their real extra cost (and which trims they're offered on), the real wheels, interior colors and materials, factory packages, stand-alone options and dealer accessories with their prices.</li><li>Interior tab: pick from the car's real interior colors, like Black or Light Gray fabric on a Camry LE, or Black and White on a Model 3.</li><li>Powertrain tab: shows the trim's engine and drivetrain, plus the real mechanical options, like AWD on a Camry, the 3.5 L EcoBoost upgrade on an F-150 XLT, or the tow hitch on a Model 3. Picking AWD or a locking axle changes how the car drives.</li><li>Tires only show up where the maker actually offers a tire choice, like all-terrains on the F-150 and bZ Woodland or summer tires on the Civic Si. Off-road wheel packages like the Ranger Raptor's BFGoodrich KO2s fit all-terrain tires automatically.</li></ul>
       <h4>Removed (not on the real builders)</h4><ul><li>The made-up wheel finish picker, the generic tire picker, generic seat upgrade tiers, and the dashcam and head-up display add-ons are gone from real cars. Strata cars keep their own builder.</li><li>Paint and interior choices no longer show up twice with two prices.</li></ul>
       <h4>Heads up</h4><ul><li>A few trims in the game aren't sold for real: Durango SRT 392 (2026), Silverado EV RST, Compass Sport, Transit Trail, Bronco Sport Sasquatch (it's a package), the Grand Wagoneer Series trims and the ADX Technology. They stay drivable with estimated pricing. Most prices and options are researched estimates; check the maker's site before buying.</li><li>Saves reset with this version.</li></ul>
@@ -1432,7 +1436,7 @@ const TCS=[   // [lane, y0, y1, name, what it tests]
   [1,-1280,-1180,"Articulation","22 cm humps left and right, staggered: axle twist and wheel travel"],[1,-1160,-1060,"Speed humps","7.5 cm hump, 10 cm table, 15 cm speed bump: take them at 15 mph"],
   [1,-1040,-960,"Curb drop","A 15 cm step up and back down on the right: one-wheel impact"],[1,-940,-860,"Rough road","Random 5 cm bumps everywhere: ride comfort"],
   [1,-840,-700,"Gravel","Loose gravel with ruts and washboard: traction and ABS"],
-  [2,-1280,-1180,"10% hill","5 m up and down at 10%: hill start and hill hold"],[2,-1160,-1060,"20% hill","4 m up and down at 20%"],[2,-1040,-940,"30% ramp","3 m at 30%: off-road climb, try Downhill Assist"],
+  [2,-1300,-1180,"10% hill","5 m up and down at 10%: hill start and hill hold"],[2,-1160,-1060,"20% hill","4 m up and down at 20%"],[2,-1040,-940,"30% ramp","3 m at 30%: off-road climb, try Downhill Assist"],
   [3,-1300,-1150,"Brake strip","Brake hard from 60 mph between the cones"]];
 const TC_SKID={x:-1880,y:-1000,R:40};const TC_SIGNS=[];
 const inTC=(x,y,m=0)=>x>TC.x0-m&&x<TC.x1+m&&y>TC.y0-m&&y<TC.y1+m||x>TC.dw[0]-m&&x<TC.dw[1]+m&&y>TC.dw[2]-m&&y<TC.dw[3]+m;
@@ -1449,7 +1453,7 @@ function tcSignsDraw(){const e=CULL.eye;if(!TC_SIGNS.length||Math.hypot(e[0]-(TC
   gl.activeTexture(gl.TEXTURE0);gl.uniformMatrix4fv(U.uM,false,M4.id());
   TC_TEX.forEach((T,i)=>{const g=TC_SIGNS[i];if(Math.hypot(e[0]-g.x,-e[2]-g.y)>140)return;gl.bindTexture(gl.TEXTURE_2D,T.t);gl.uniform3fv(U.uSO,T.O);gl.uniform3fv(U.uSU,T.U);gl.uniform3fv(U.uSV,T.V);mat([0.95,0,0],null,0,1,1,5);draw(T.m)})}
 // hill profile with real vertical curves: the grade eases in and out over T metres at every break, like a built test hill
-function tcHill(nm,v){const g=nm[0]==="1"?0.1:nm[0]==="2"?0.2:0.3,H=nm[0]==="1"?5:nm[0]==="2"?4:3,run=H/g,top=10,T=nm[0]==="3"?2.2:3;
+function tcHill(nm,v){const g=nm[0]==="1"?0.1:nm[0]==="2"?0.2:0.3,H=nm[0]==="1"?5:nm[0]==="2"?4:3,run=H/g,top=10,T=nm[0]==="3"?2.2:3;v-=T/2;   // start the curve at the section edge (no lip)
   const I=(a)=>{const t=(v-a)/T;return t<=0?0:t>=1?T/2+(v-a-T):T*(t*t*t-t*t*t*t/2)};
   return Math.max(0,g*(I(-T/2)-I(run-T/2)-I(run+top-T/2)+I(2*run+top-T/2)))}
 function tcSec(x,y){for(const S of TCS){if(Math.abs(x-TCL[S[0]])<3.5&&y>=S[1]&&y<=S[2])return S}return null}
@@ -5020,7 +5024,8 @@ function buildWorld(){retailSites();placeExtras();
   worldScenery();
 }
 // the proving ground: concrete pad, the test sections as real height-mapped surfaces, paint, cones and section boards
-function tcMesh(){const collAdd=o=>{COLL_KEEP.push(o);window.collAdd(o)};COLL_KEEP.length=0;const M_=()=>({P:[],N:[],I:[]}),out={conc:M_(),sec:M_(),asph:M_(),cob:M_(),grav:M_(),paint:M_(),dark:M_(),board:M_(),post:M_(),rail:M_()};TC_SIGNS.length=0;
+function collAddRaw(o){return collAdd(o)}
+function tcMesh(){const collAdd=o=>{COLL_KEEP.push(o);collAddRaw(o)};COLL_KEEP.length=0;const M_=()=>({P:[],N:[],I:[]}),out={conc:M_(),sec:M_(),asph:M_(),cob:M_(),grav:M_(),paint:M_(),dark:M_(),board:M_(),post:M_(),rail:M_()};TC_SIGNS.length=0;
   const hmap=(B,x0,x1,y0,y1,dx,dy,lift)=>{const nx=Math.max(1,Math.round((x1-x0)/dx)),ny=Math.max(1,Math.round((y1-y0)/dy)),k0=B.P.length/3,H=(x,y)=>tcH(x,y).h+lift;
     for(let j=0;j<=ny;j++)for(let i=0;i<=nx;i++){const x=x0+(x1-x0)*i/nx,y=y0+(y1-y0)*j/ny,h=H(x,y),hx=H(x+0.05,y)-H(x-0.05,y),hy=H(x,y+0.05)-H(x,y-0.05);B.P.push(x,h,-y);B.N.push(...norm([-hx/0.1,1,hy/0.1]))}
     for(let j=0;j<ny;j++)for(let i=0;i<nx;i++){const a=k0+j*(nx+1)+i;B.I.push(a,a+1,a+nx+2,a,a+nx+2,a+nx+1)}};
@@ -7037,7 +7042,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(/SwiftShader|llvmpipe|Microsoft Basic/i.test(gpu))return "low";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="62";try{if(localStorage.getItem("strata.ver")!==APP_VER){for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="63";try{if(localStorage.getItem("strata.ver")!==APP_VER){for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){return GQ[GFX.q==="auto"?GFX.eff:GFX.q]}
 function setGfx(q){GFX.q=q;GFX.dyn=1;try{localStorage.setItem("strata.gfx",q)}catch(e){}}
@@ -7064,7 +7069,7 @@ function pedal(el,key){let id=null;el.fill=el.querySelector(".fill");
   el.addEventListener("pointermove",e=>{if(id===e.pointerId)inp[key+"T"]=val(e)});
   const up=e=>{if(id===e.pointerId){id=null;inp[key+"T"]=0}};el.addEventListener("pointerup",up);el.addEventListener("pointercancel",up)}
 pedal($("accel"),"thr");pedal($("brake"),"brk");
-window.addEventListener("keydown",e=>{const k=e.key.toLowerCase();inp.keys[k]=true;if(!matchMedia("(pointer:coarse)").matches)setPC(true);if(e.repeat)return;
+window.addEventListener("keydown",e=>{const k=e.key.toLowerCase();inp.keys[k]=true;if(k==="shift"&&!e.repeat){inp.shT=performance.now();inp.shUsed=false}else if(inp.keys.shift)inp.shUsed=true;if(!matchMedia("(pointer:coarse)").matches)setPC(true);if(e.repeat)return;
   if(document.body.classList.contains("help")&&(k==="escape"||k==="?"||k==="/")){document.body.classList.remove("help");return}
   if(k==="?"||k==="/"||k==="f1"){document.body.classList.toggle("help");e.preventDefault();return}
   if(k==="escape"){if(RADIAL.open){radialToggle(false);return}closeDrawer();if(SCR.focus)SCR.focus=false;return}
@@ -7080,9 +7085,9 @@ window.addEventListener("keydown",e=>{const k=e.key.toLowerCase();inp.keys[k]=tr
   if(k==="r"&&st.started){resetNearest();return}if(k==="u"){act("aeb");return}if(k==="v"){st.cam=st.cam===1?0:1;$("screen").hidden=true;SCR.focus=false;toast(st.cam===1?"Inside view":"Outside view");return}
   if(k==="b"){st.belt=!st.belt;beep(st.belt?1400:700,.05,"square",.1);toast(st.belt?"Seatbelt fastened":"Seatbelt unfastened");return}
   if(k==="k"){st.fog=!st.fog;tick(1);toast(st.fog?"Fog lights on":"Fog lights off");return}
-  const KM={j:"high",l:"lights",z:"sigL",c:"sigR",x:"hazard",e:"shiftDn",q:"shiftUp",p:"epb",shift:"epb","\\":"acc","+":"accUp","=":"accUp","-":"accDown","_":"accDown"};if(KM[k]&&!(st.walk&&["shiftUp","shiftDn","epb"].includes(KM[k])))act(KM[k]);
+  const KM={j:"high",l:"lights",z:"sigL",c:"sigR",x:"hazard",e:"shiftDn",q:"shiftUp",p:"epb","\\":"acc","+":"accUp","=":"accUp","-":"accDown","_":"accDown"};if(KM[k]&&!(st.walk&&["shiftUp","shiftDn","epb"].includes(KM[k])))act(KM[k]);
   if([" ","arrowup","arrowdown","arrowleft","arrowright"].includes(k))e.preventDefault()});
-window.addEventListener("keyup",e=>{const k=e.key.toLowerCase();inp.keys[k]=false;if(k==="h")hornOff()});
+window.addEventListener("keyup",e=>{const k=e.key.toLowerCase();inp.keys[k]=false;if(k==="h")hornOff();if(k==="shift"){const tap=!inp.shUsed&&performance.now()-(inp.shT||0)<400;inp.shUsed=false;if(tap&&!st.walk)act("epb")}});
 document.addEventListener("gesturestart",e=>e.preventDefault());
 // look around: drag on the view to look, pinch to zoom, double-tap to reset
 const ptrs=new Map(); let pinch0=0, lastTap=0;
@@ -7268,7 +7273,7 @@ function controls(dt){
       knob.style.transform=st.wheelUI?`rotate(${inp.steer*135}deg)`:`translateX(${inp.steer*(pad.clientWidth/2-30)}px) rotate(${inp.steer*90}deg)`;$("accel").fill.style.height=(inp.thr*100)+"%";$("brake").fill.style.height=(inp.brk*100)+"%";return}}}
   let keySteer=false,analog=false;const v_=Math.abs(car.vx);
   if(!inp.padActive){const kl=K.arrowleft||K.a,kr=K.arrowright||K.d;if(kl||kr){keySteer=true;s=((kr?1:0)-(kl?1:0))*clamp(1/(1+v_*v_/500),0.3,1)}}   // less lock at speed, like a real driver's hands
-  if(K.arrowup||K.w)thr=1; if(K.arrowdown||K.s)brk=1;
+  if(K.arrowup||K.w){thr=1;inp.gThr=!!K.shift}else if(inp.thr<0.02)inp.gThr=false; if(K.arrowdown||K.s){brk=1;inp.gBrk=!!K.shift}else if(inp.brk<0.02)inp.gBrk=false;   // Shift+W / Shift+S: gentle squeeze
   // gamepad (standard mapping): analog steer and pedals, buttons for the common controls
   const gp=navigator.getGamepads?[...navigator.getGamepads()].find(g=>g&&g.connected&&g.mapping==="standard")||[...navigator.getGamepads()].find(g=>g&&g.connected):null;
   if(gp){const ax=gp.axes[0]||0,dz=0.08;if(Math.abs(ax)>dz){s=Math.sign(ax)*Math.pow((Math.abs(ax)-dz)/(1-dz),1.5);analog=true}
@@ -7282,7 +7287,10 @@ function controls(dt){
   else{// smooth turning: a critically damped hand on the wheel, no jerk when you start or stop turning
     const w=(inp.padActive?15:analog?18:keySteer?6.5:7.5)*((st.pedalS??1)===2?0.75:1),k=Math.min(dt,0.033);inp.steerV=(inp.steerV||0)+(w*w*(s-inp.steer)-2*w*(inp.steerV||0))*k;inp.steerV=clamp(inp.steerV,-rate*1.25,rate*1.25);inp.steer=clamp(inp.steer+inp.steerV*k,-1,1)}
   {const PS=[[10,12,14,14],[2.4,4,4.5,5],[1.3,2.4,2.4,3.2]][st.pedalS??1],an=gp||PC.analog;   // [throttle on, off, brake on, off] in full pedal per second
-   inp.thr+=clamp(thr-inp.thr,-(an?12:PS[1])*dt,(an?10:PS[0])*dt); inp.brk+=clamp(brk-inp.brk,-(an?12:PS[3])*dt,(an?12:PS[2])*dt)}
+   const gT=inp.gThr&&!an&&thr<=1,gB=inp.gBrk&&!an;
+   // gentle: throttle builds to full over about 3 s and lifts off over 1.5 s; brake builds over 2.5 s, firmer as it goes, and releases over 1.2 s
+   const gbOn=gB?0.25+0.45*inp.brk:0;
+   inp.thr+=clamp(thr-inp.thr,-(gT?0.65:an?12:PS[1])*dt,(gT?0.33:an?10:PS[0])*dt); inp.brk+=clamp(brk-inp.brk,-(gB?0.85:an?12:PS[3])*dt,(gB?gbOn:an?12:PS[2])*dt)}
   if(st.walk){walkUpdate(dt);inp.thr=0;inp.brk=0;if(sys.summon)summonUpdate(dt)}else sys.summon=null
   if(PC.on){$("pcS").style.left=`calc(${(inp.steer*0.5+0.5)*100}% - 4px)`;$("pcT").style.width=(Math.max(inp.thr,sys.accThr)*100)+"%";$("pcB").style.width=(Math.max(inp.brk,sys.aebBrake,sys.accBrk)*100)+"%";
     $("pcHint").innerHTML=gp?"Gamepad · Start for menu · <kbd>?</kbd> controls":"Keyboard · press <kbd>?</kbd> for controls"}

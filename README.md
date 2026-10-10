@@ -4,6 +4,4 @@ A realistic driving simulator that runs in your browser: 541 real trims with the
 
 **Play:** https://exclusive2knight.github.io/Strata-Test-Drive/
 
-## Working on it
-
-The game source is `src/app_template.html`. Run `python3 build.py` to rebuild `index.html`, which GitHub Pages serves. See `CLAUDE.md` for the full workflow, tests and screenshot tools.
+Copyright (c) 2026 Exclusive2knight. All rights reserved. This is not open source: copying, modifying or re-hosting the game is not permitted. See `LICENSE`.

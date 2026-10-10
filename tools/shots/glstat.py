@@ -11,7 +11,7 @@ async def main():
     b=await p.chromium.launch(args=["--use-gl=angle","--use-angle=swiftshader","--enable-unsafe-swiftshader"])
     for scen in sys.argv[1:]:
       pg=await b.new_page(viewport={"width":1000,"height":560});await pg.add_init_script(WRAP)
-      await pg.goto("http://127.0.0.1:8765/index.html",wait_until="domcontentloaded",timeout=120000);await pg.wait_for_function("document.getElementById('boot').hidden",timeout=120000)
+      await pg.goto("http://127.0.0.1:8765/dev.html",wait_until="domcontentloaded",timeout=120000);await pg.wait_for_function("document.getElementById('boot').hidden",timeout=120000)
       await pg.click("#newsGo");await pg.evaluate("st.cfgStep='color';st.cfgTab='acc'");await pg.click("#go");await pg.wait_for_timeout(1500)
       await pg.evaluate(SETUP[scen]);await pg.wait_for_timeout(4000)
       r=await pg.evaluate("""(()=>{const S=__gs;for(const k in S)S[k]=0;S.big=null;const t0=performance.now();let js=0;for(let i=0;i<5;i++){const a=performance.now();render(0.016);js+=performance.now()-a}gl.finish();const T=(performance.now()-t0)/5;S.big=[];render(0.016);const agg={};for(const [n,w] of S.big){agg[w]=(agg[w]||0)+n}const top=Object.entries(agg).sort((a,b)=>b[1]-a[1]).slice(0,12).map(([w,n])=>`\n   ${(n/1000).toFixed(0)}k ${w}`).join('');S.big=null;
