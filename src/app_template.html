@@ -465,6 +465,12 @@ body.incab #ui2 .u2tr{opacity:.28;transform:scale(.8);transform-origin:top right
 #ui2 #u2lim[hidden]{display:none}#ui2 #u2lim small{font:800 7px system-ui;line-height:1.05;text-align:center}#ui2 #u2lim b{font:800 20px var(--f-hud,system-ui);line-height:1}#ui2 #u2lim.over{box-shadow:inset 0 0 0 2.5px #111,0 0 0 3px #ffb340}
 body.onfoot #ui2 #u2lim,body.onfoot #ui2 #u2nav{display:none!important}
 @media (max-height:430px){#ui2 #u2nav{top:calc(env(safe-area-inset-top,0px) + 6px);padding:4px 12px 4px 6px}#ui2 #u2nav i{width:32px;height:32px;font-size:24px}#ui2 #u2nav b{font-size:16px}#ui2 #u2nav small{font-size:12px}#ui2 #u2lim{left:-44px;width:36px;height:46px}#ui2 #u2lim b{font-size:17px}}
+#spot{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 70px);transform:translateX(-50%);width:min(380px,94vw);background:#121212;color:#fff;border-radius:14px;padding:10px;z-index:30;box-shadow:0 10px 30px rgba(0,0,0,.5);font:500 13px var(--f-ui,system-ui);transition:transform .25s,opacity .25s}
+#spot.hide{transform:translate(-50%,-140%);opacity:0;pointer-events:none}#spot .sh{display:flex;align-items:center;gap:6px;margin-bottom:8px}#spot .sh b{color:#1ed760;font-size:15px}#spot .sh .sp{flex:1}
+#spot .sh button{width:30px;height:30px;border-radius:15px;border:0;background:#2a2a2a;color:#fff;font-size:15px}#spot .chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:8px}
+#spot .chips button{flex:none;border:0;border-radius:15px;background:#2a2a2a;color:#fff;padding:6px 11px;font:600 12px var(--f-ui,system-ui)}#spot .lnk{display:flex;gap:6px;margin-bottom:8px}
+#spot .lnk input{flex:1;min-width:0;border:0;border-radius:8px;background:#2a2a2a;color:#fff;padding:8px;font:500 13px var(--f-ui,system-ui)}#spot .lnk button{border:0;border-radius:8px;background:#1ed760;color:#000;font-weight:700;padding:0 12px}
+#spot #spotEmb{border-radius:12px;overflow:hidden;min-height:152px;background:#282828}#spot .note{display:block;margin-top:6px;opacity:.6;font-size:11px}
 #ui2 .u2row{display:flex;gap:8px;align-items:center;pointer-events:auto}#ui2 .u2row .sp{flex:1}
 #ui2 .u2row button{height:40px;min-width:46px;border-radius:10px;background:rgba(18,18,20,.92);display:flex;align-items:center;justify-content:center}
 #ui2 .u2row button.red svg{stroke:#ff3b30}
@@ -794,8 +800,12 @@ body #drawer #tabBody .seg5{max-width:520px;border:1px solid rgba(255,255,255,.0
 <div id="boot"><div class="bc"><div class="bt">Test Drive</div><div class="bb"><i id="bootBar"></i></div><div class="bs" id="bootMsg">Building the world…</div><div class="bs" style="opacity:.5;font-size:11px;margin-top:14px">© 2026 Exclusive2knight · All rights reserved</div></div></div>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2>Version 65 · Real turn-by-turn navigation, smoother screens, better walking</h2></div>
+    <div class="nh"><small>What's new</small><h2>Version 66 · Spotify in the car, camera spin fix, better road reset</h2></div>
     <div class="nb">
+      <h4>Spotify</h4><ul><li>Spotify is now a source on the car's screen: pick Sources → Spotify (Ford SYNC has the same Sources button, and Volvo has a Spotify card under the stations). It's Spotify's real player.</li><li>The screen shows the song, cover art, a progress bar, play/pause and restart, and 8 playlists to tap: Today's Top Hits, Songs to Sing in the Car, RapCaviar, Hot Country, Rock Classics, Chill Hits, lofi beats and All Out 2000s.</li><li>Tap Show player for the full Spotify player. You can skip songs there or paste any Spotify link: a playlist, album, song, artist or podcast. Hide it and the music keeps playing.</li><li>Sign in at open.spotify.com in the same browser to get full songs. Without signing in, Spotify only plays 30-second previews. The radio pauses Spotify and Spotify stops the radio. Switching the car off pauses it.</li></ul>
+      <h4>Camera spinning on PC</h4><ul><li>Fixed the camera spinning by itself with no way to stop it. If a mouse click was released outside the game (or you alt-tabbed), the game thought you were still dragging, so just moving the mouse turned the camera. It now checks the button is really held, and switching windows lets go of everything, including keys.</li><li>Game controllers whose triggers rest at -1, and laptops that report built-in sensors as a controller, could spin the camera or steer by themselves. Sticks now only count once you actually move them.</li></ul>
+      <h4>Reset to the nearest road (R)</h4><ul><li>It now checks every road, not just the ones right around you. Off-road it used to send you to a random road across the map.</li><li>You land in the right-hand lane, facing the way you were going, out of intersections, on your level (bridges and overpasses), and it slides along to a gap so you don't land on another car.</li><li>In the proving ground and the parking garage it sets you upright right where you are, instead of sending you out to the highway.</li></ul>
+      <h4 class="old">Version 65 · Real turn-by-turn navigation, smoother screens, better walking</h4>
       <h4>Navigation</h4><ul><li>Routes are now always the fastest way, from any road in either direction. Before, some roads got no route at all, and passing your destination ended the route. Now it takes you round the block.</li><li>Turn-by-turn directions: a green card on the car's screen shows the turn arrow, distance and the road you turn onto, plus miles left, minutes and arrival time. A green banner at the top of your screen shows the next turn in any view, and the cluster shows it at the top when a turn is close.</li><li>Voice guidance, like a real nav: "In half a mile, turn right onto Main St", again closer up, then "Turn right now". Tap 🔊 Voice on the map to mute it.</li><li>Take a wrong turn and it says "Rerouting" and picks a new way. It tells you when you've arrived and ends the route.</li></ul>
       <h4>Smoother screens and cluster</h4><ul><li>The gauge cluster now redraws every frame, so the needles and numbers move smoothly. The center screen and map redraw 2 to 4 times more often (every frame on Medium and High).</li><li>On Low and Lowest graphics, the screen and cluster are drawn a little softer so the extra redraws don't cause lag. Zooming in to them keeps them sharp.</li><li>On slow devices the game keeps real-time speed down to 15 fps. Before, it slowed down below 20 fps, which made driving feel sluggish.</li></ul>
       <h4>Speed limit sign is back</h4><ul><li>The speed limit sign from sign recognition was missing from the new HUD. It now sits next to your speed and gets an orange ring when you're over.</li><li>On roads with no sign in sight, the limit now comes from the navigation map a couple of seconds after you turn onto the road, like real cars. Every road shows a limit now.</li></ul>
@@ -3621,7 +3631,7 @@ function scrPhone(g,top,bot,W){g.fillStyle="#f2f5fb";g.textAlign="center";g.text
 function scrApps(g,top,bot,W){const A=[["energy","⚡","Energy"],["camera","◉","Cameras"],...(has("autopark")?[["park","P","Park Assist"]]:[]),["controls","☷","Vehicle"],["media","♫","Radio"],["phone","✆","Phone"],["map","Ⓐ","Navigation"]];
   const cols=4,p=12,tw=(W-p*(cols+1))/cols,th=Math.min(92,(bot-top-p*3)/2);A.forEach(([k,ic,n],i)=>{const x=p+(i%cols)*(tw+p),y=top+p+Math.floor(i/cols)*(th+p);syncTile(g,x,y,tw,th);
     g.fillStyle="#f2f5fb";g.textAlign="center";g.textBaseline="middle";g.font=FONT(24);g.fillText(ic,x+tw/2,y+th/2-10);g.font=FONT(13);g.fillText(n,x+tw/2,y+th/2+18);hit(x,y,tw,th,()=>{SCR.page=k;SCR.autoCam=false})})}
-function scrSyncAudio(g,top,bot,W){const i=au.station||0,h=bot-top;const pill=(x,w,t,fn)=>{syncTile(g,x,top+8,w,30);g.fillStyle="#f2f5fb";g.font=FONT(13);g.textAlign="center";g.textBaseline="middle";g.fillText(t,x+w/2,top+23);hit(x,top+8,w,30,fn)};
+function scrSyncAudio(g,top,bot,W){if(SCR.src==="spotify"){spotScreen(g,top+44,bot,W);g.fillStyle="#1d2433";rr2(g,10,top+6,110,30,8);g.fill();g.fillStyle="#f2f5fb";g.font=FONT(13);g.textAlign="center";g.fillText("((•))  Sources",65,top+26);hit(10,top+6,110,30,()=>{SCR.srcMenu=!SCR.srcMenu});mediaSources(g,150,top+2,W,bot,true);return}const i=au.station||0,h=bot-top;const pill=(x,w,t,fn)=>{syncTile(g,x,top+8,w,30);g.fillStyle="#f2f5fb";g.font=FONT(13);g.textAlign="center";g.textBaseline="middle";g.fillText(t,x+w/2,top+23);hit(x,top+8,w,30,fn)};
   pill(10,110,"((•))  Sources",()=>{SCR.srcMenu=!SCR.srcMenu});pill(W-120,110,"Direct Tune",()=>toast("Direct Tune: pick a preset below"));
   g.fillStyle="#fff";g.font=FONT(46);g.textAlign="center";g.fillText(SCR.radioOn?fmOf(i).toFixed(1):"Radio off",W/2,top+h*0.4);g.font=FONT(13);g.fillStyle="#b8c4da";g.fillText(SCR.radioOn?`${RADIO[i].name} · ${RADIO[i].genre}`:"Tap a preset",W/2,top+h*0.4+34);
   const n=5,pw=(W-24)/n,y=bot-62;for(let k=0;k<n;k++){const on=SCR.radioOn&&k===i,x=12+k*pw;g.fillStyle=on?"rgba(150,175,215,.35)":"rgba(120,150,200,.08)";g.fillRect(x,y,pw-2,40);if(on){g.strokeStyle="#dfe7f6";g.lineWidth=1.5;g.strokeRect(x+.5,y+.5,pw-3,39)}
@@ -3896,7 +3906,7 @@ function volvoScreen(g,W,H,M){const K=volKind(),T=TRIMS[st.trim],Hy=car.hyb,F=FO
   else if(SCR.page==="apps"){const A=[["camera","◉","Camera"],["map","➤","Maps"],["media","♫","Media"],["phone","✆","Phone"],["controls","⚙","Car"],...(!T.ice||isHybT(st.trim)?[["energy","⚡","Energy"]]:[]),...(has("autopark")?[["park","P","Park Pilot"]]:[])];
     A.forEach(([k,ic,n],i)=>{const x=20+(i%3)*((W-40)/3),y=top+20+Math.floor(i/3)*100;vCard(g,x,y,(W-40)/3-12,86);g.fillStyle="#284e80";g.font=F(26);g.textAlign="center";g.fillText(ic,x+((W-40)/3-12)/2,y+34);g.fillStyle="#222";g.font=F(12);g.fillText(n,x+((W-40)/3-12)/2,y+66);hit(x,y,(W-40)/3-12,86,()=>{SCR.page=k;SCR.autoCam=false})})}
   else if(SCR.page==="controls"||SCR.page==="park"||SCR.page==="energy"){g.fillStyle="#0a1013";g.fillRect(0,top,W,bot-top);({controls:scrVehSettings,park:scrPark,energy:scrEnergy})[SCR.page](g,top,bot,W,M)}
-  else if(SCR.page==="media"){g.fillStyle="#222";g.textAlign="center";g.font=F(16);g.fillText(SCR.radioOn?RADIO[au.station||0].name:"Nothing playing",W/2,top+40);RADIO.forEach((r,i)=>{const y=top+80+i*70;vCard(g,20,y,W-40,58);g.fillStyle=SCR.radioOn&&au.station===i?"#284e80":"#222";g.font=F(15);g.textAlign="left";g.fillText(r.name,36,y+22);g.fillStyle="#777";g.font=F(12);g.fillText(r.genre,36,y+40);hit(20,y,W-40,58,()=>radioPlay(i))})}
+  else if(SCR.page==="media"){g.fillStyle="#222";g.textAlign="center";g.font=F(16);g.fillText(SCR.radioOn?RADIO[au.station||0].name:"Nothing playing",W/2,top+40);RADIO.forEach((r,i)=>{const y=top+80+i*70;vCard(g,20,y,W-40,58);g.fillStyle=SCR.radioOn&&au.station===i?"#284e80":"#222";g.font=F(15);g.textAlign="left";g.fillText(r.name,36,y+22);g.fillStyle="#777";g.font=F(12);g.fillText(r.genre,36,y+40);hit(20,y,W-40,58,()=>radioPlay(i))});{const y=top+80+RADIO.length*70;vCard(g,20,y,W-40,58);g.fillStyle="#1db954";g.font=F(15);g.textAlign="left";g.fillText("● Spotify",36,y+24);g.fillStyle="#777";g.font=F(12);g.fillText(SCR.src==="spotify"?(SPOT.paused?"Paused · tap to play":"Playing · tap to pause"):"Playlists, albums and podcasts",36,y+42);hit(20,y,W-40,58,()=>{if(SCR.src!=="spotify"){SCR.src="spotify";radioStop();spotOpen()}else spotToggle()})}}
   else if(K==="ex90"&&(SCR.page==="home"||SCR.page==="phone")){const h=d.getHours();g.fillStyle="#666";g.font=F(12);g.textAlign="center";g.fillText(d.toLocaleDateString([],{day:"numeric",month:"long"}),W/2,top+16);g.fillStyle="#111";g.font=F(19);g.fillText(`Good ${h<12?"morning":h<18?"afternoon":"evening"}.`,W/2,top+42);
     const cx=W/2,cy=top+(bot-top)*0.42,cw=74,ch=160;g.fillStyle="#c9ccd2";rr2(g,cx-cw/2,cy-ch/2,cw,ch,30);g.fill();g.fillStyle="#2b2f36";rr2(g,cx-cw/2+10,cy-ch/2+34,cw-20,ch-70,12);g.fill();
     for(const [x,y,ic,fn] of [[cx-80,cy-40,"❄",()=>{sys.climate=!sys.climate}],[cx-80,cy,"♨",()=>{SCR.seatL=((SCR.seatL||0)+1)%4;toast(SCR.seatL?`Seat heat ${SCR.seatL}`:"Seat heat off")}],[cx+80,cy-40,"⇪",()=>{SCR.trunk=!SCR.trunk}],[cx+80,cy+50,"🔒",()=>{st.locked=!st.locked}],[cx-80,cy+50,"◉",()=>{SCR.page="camera"}]]){g.fillStyle="#fff";g.beginPath();g.arc(x,y,16,0,7);g.fill();g.fillStyle="#284e80";g.font=F(14);g.fillText(ic,x,y+1);hit(x-16,y-16,32,32,fn)}
@@ -4078,10 +4088,14 @@ function scrUpgrades(g,top,bot,W){g.textAlign="left";g.fillStyle="#cfe0e2";g.fon
 // Move relative to the camera (drag to turn the camera), your character turns to face where it walks, Space / Jump to jump.
 const FOOT={jx:0,jy:0,jump:false,phone:false,panic:0};
 st.locked=false;
+// gamepad sticks: an axis only counts once it has moved away from where it rested when first seen, and never if it rests off-centre
+// (triggers reported as axes rest at -1, and some laptops expose sensors as "gamepads": both used to spin the camera or steer by themselves)
+const GPC={};function gpAxis(gp,i){const k=gp.index+":"+gp.id;let c=GPC[k];if(!c)c=GPC[k]={b:[...gp.axes],live:gp.axes.map(()=>false)};const v=gp.axes[i]||0,b=c.b[i]||0;
+  if(!c.live[i]&&Math.abs(b)<0.2&&Math.abs(v-b)>0.35)c.live[i]=true;return c.live[i]?v:0}
 function footInput(){const K=inp.keys||{};let x=FOOT.jx,y=FOOT.jy;
   if(K.w||K.arrowup)y+=1;if(K.s||K.arrowdown)y-=1;if(K.d||K.arrowright)x+=1;if(K.a||K.arrowleft)x-=1;
   const gp=navigator.getGamepads?[...navigator.getGamepads()].find(g=>g&&g.connected):null;
-  if(gp){const ax=gp.axes[0]||0,ay=gp.axes[1]||0;if(Math.abs(ax)>0.12)x+=ax;if(Math.abs(ay)>0.12)y-=ay;if(gp.buttons[0]&&gp.buttons[0].pressed)FOOT.jump=true}
+  if(gp){const ax=gpAxis(gp,0),ay=gpAxis(gp,1);if(Math.abs(ax)>0.12)x+=ax;if(Math.abs(ay)>0.12)y-=ay;if(gp.buttons[0]&&gp.buttons[0].pressed)FOOT.jump=true}
   const m=Math.hypot(x,y);if(m>1){x/=m;y/=m}return [x,y,K.shift]}
 function insideHouse(x,y,z){for(const H of STORES){const dx=x-H.x,dy=y-H.y;if(Math.abs(dx*H.U[0]+dy*H.U[1])<H.w/2-0.1&&Math.abs(dx*H.N[0]+dy*H.N[1])<H.d/2-0.1&&z<H.hh-0.5)return H}for(const H of OPEN_HOUSES){const dx=x-H.x,dy=y-H.y;if(Math.abs(dx*H.U[0]+dy*H.U[1])<H.w/2-0.1&&Math.abs(dx*H.N[0]+dy*H.N[1])<H.d/2-0.1&&z<H.hh-0.5)return H}return null}
 // ---- shopping: walk into a store (or drive into a tire bay) and a button opens what they sell; you pay with your card
@@ -5711,13 +5725,52 @@ function scrEnergy(g,top,bot,W){const T_=TRIMS[st.trim];if(isHybT(st.trim)){scrH
 }
 // ---- Media: three generated radio stations
 // audio sources, like a real head unit: radio, Bluetooth audio from your phone, USB
-function mediaSrcName(){return SCR.src==="bt"?`Bluetooth · ${PHONE.name()}`:SCR.src==="usb"?"USB":"FM Radio"}
+function mediaSrcName(){return SCR.src==="spotify"?"Spotify":SCR.src==="bt"?`Bluetooth · ${PHONE.name()}`:SCR.src==="usb"?"USB":"FM Radio"}
 function mediaSetSrc(k){if(k==="bt"&&!st.phoneConn){toast(`Pairing with your ${PHONE.name()}…`);setTimeout(()=>{phoneConnect(true);SCR.src="bt";SCR.proj=false;radioPlay(au.station||0);toast(`Bluetooth audio: playing from your ${PHONE.name()}`)},1400);SCR.srcMenu=false;return}
-  if(k==="usb"){toast("No USB device connected");SCR.srcMenu=false;return}SCR.src=k;SCR.srcMenu=false;radioPlay(au.station||0);toast(k==="bt"?`Bluetooth audio: ${PHONE.name()}`:"FM radio")}
+  if(k==="usb"){toast("No USB device connected");SCR.srcMenu=false;return}if(k==="spotify"){SCR.srcMenu=false;SCR.src="spotify";radioStop();spotOpen();if(SPOT.ctl&&SPOT.paused)spotToggle();return}if(SCR.src==="spotify")spotOff();SCR.src=k;SCR.srcMenu=false;radioPlay(au.station||0);toast(k==="bt"?`Bluetooth audio: ${PHONE.name()}`:"FM radio")}
 function mediaSources(g,x,y,W,H,noBtn){const F=FONT;if(!noBtn){g.fillStyle="#1a2a30";rr2(g,x,y,118,34,10);g.fill();g.fillStyle="#e6eef0";g.font=FONT(14);g.textAlign="center";g.fillText("Sources ▾",x+59,y+18);hit(x,y,118,34,()=>{SCR.srcMenu=!SCR.srcMenu})}
-  if(!SCR.srcMenu)return;const L=[["fm","FM Radio","📻"],["bt",st.phoneConn?`Bluetooth · ${PHONE.name()}`:"Bluetooth Audio (pair phone)","ᛒ"],["usb","USB","⌁"]];
+  if(!SCR.srcMenu)return;const L=[["fm","FM Radio","📻"],["spotify","Spotify","●"],["bt",st.phoneConn?`Bluetooth · ${PHONE.name()}`:"Bluetooth Audio (pair phone)","ᛒ"],["usb","USB","⌁"]];
   g.fillStyle="rgba(10,18,22,.97)";rr2(g,x-140,y+40,258,L.length*48+10,12);g.fill();L.forEach(([k,n,ic],i)=>{const yy=y+46+i*48,on=(SCR.src||"fm")===k;if(on){g.fillStyle="rgba(53,194,191,.2)";rr2(g,x-134,yy,246,42,8);g.fill()}g.fillStyle=on?"#5fe0dc":"#e6eef0";g.font=F(15);g.textAlign="left";g.fillText(`${ic}  ${n}`,x-120,yy+22);hit(x-134,yy,246,42,()=>mediaSetSrc(k))})}
-function scrMedia(g,top,bot,W){
+// ---- Spotify: the real Spotify player (Spotify's own embed), controlled from the car's screen. Signed in to Spotify in this browser you get full songs;
+// otherwise Spotify plays 30-second previews. Pick a playlist on the screen, or paste any Spotify link (playlist, album, song, artist, podcast) in the player.
+const SPOT_LISTS=[["Today's Top Hits","37i9dQZF1DXcBWIGoYBM5M"],["Songs to Sing in the Car","37i9dQZF1DWWMOmoXKqHTD"],["RapCaviar","37i9dQZF1DX0XUsuxWHRQd"],["Hot Country","37i9dQZF1DX1lVhptIYRda"],["Rock Classics","37i9dQZF1DWXRqgorJj26U"],["Chill Hits","37i9dQZF1DX4WYpdgoIcn6"],["lofi beats","37i9dQZF1DWWQRwui0ExPn"],["All Out 2000s","37i9dQZF1DX4o1oenSJRJd"]];
+const SPOT={api:null,ctl:null,loading:false,uri:null,name:"",paused:true,pos:0,dur:0,track:"",art:null,artImg:null,shown:false,failed:false};
+function spotUri(x){x=String(x||"").trim();let m=x.match(/^spotify:(playlist|album|track|artist|episode|show):([A-Za-z0-9]+)$/);if(m)return `spotify:${m[1]}:${m[2]}`;
+  m=x.match(/open\.spotify\.com\/(?:intl-[a-z-]+\/)?(?:embed\/)?(playlist|album|track|artist|episode|show)\/([A-Za-z0-9]+)/);return m?`spotify:${m[1]}:${m[2]}`:null}
+function spotPanel(){let el=$("spot");if(el)return el;el=document.createElement("div");el.id="spot";el.innerHTML=`<div class="sh"><b>● Spotify</b><span class="sp"></span><button data-sp="min" aria-label="Hide player">–</button><button data-sp="close" aria-label="Turn Spotify off">✕</button></div>
+  <div class="chips">${SPOT_LISTS.map(([n,id])=>`<button data-spl="${id}">${n}</button>`).join("")}</div>
+  <form class="lnk"><input placeholder="Paste a Spotify link (playlist, album, song…)" aria-label="Spotify link"><button>Play</button></form><div id="spotEmb"><div id="spotHost"></div></div>
+  <small class="note">Sign in at open.spotify.com in this browser for full songs. Without signing in, Spotify plays 30-second previews.</small>`;document.body.appendChild(el);
+  el.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;if(b.dataset.sp==="min"){spotShow(false)}else if(b.dataset.sp==="close"){spotOff()}else if(b.dataset.spl){const L=SPOT_LISTS.find(x=>x[1]===b.dataset.spl);spotLoad("spotify:playlist:"+b.dataset.spl,L&&L[0])}});
+  el.querySelector("form").addEventListener("submit",e=>{e.preventDefault();const i=el.querySelector("input"),u=spotUri(i.value);if(!u){toast("That isn't a Spotify link: copy one with Share → Copy link");return}spotLoad(u,"Your link");i.value=""});
+  el.addEventListener("keydown",e=>e.stopPropagation());el.addEventListener("pointerdown",e=>e.stopPropagation());return el}
+function spotShow(on){const el=spotPanel();SPOT.shown=on;el.classList.toggle("hide",!on)}
+function spotOpen(){spotPanel();spotShow(true);if(SPOT.ctl||SPOT.loading)return;SPOT.loading=true;
+  window.onSpotifyIframeApiReady=API=>{SPOT.api=API;API.createController($("spotHost"),{uri:SPOT.uri||"spotify:playlist:"+SPOT_LISTS[0][1],width:"100%",height:152},ctl=>{SPOT.ctl=ctl;SPOT.loading=false;if(!SPOT.uri){SPOT.uri="spotify:playlist:"+SPOT_LISTS[0][1];SPOT.name=SPOT_LISTS[0][0]}
+    ctl.addListener("playback_update",e=>{const d=e.data||{};SPOT.paused=!!d.isPaused;SPOT.pos=d.position||0;SPOT.dur=d.duration||0;if(!SPOT.paused&&SCR.radioOn)radioStop();if(d.playingURI&&d.playingURI!==SPOT.track){SPOT.track=d.playingURI;spotMeta(d.playingURI)}});
+    ctl.addListener("playback_started",e=>{const u=e.data&&e.data.playingURI;if(u&&u!==SPOT.track){SPOT.track=u;spotMeta(u)}})})};
+  const sc=document.createElement("script");sc.src="https://open.spotify.com/embed/iframe-api/v1";sc.async=true;sc.onerror=()=>spotFallback();document.head.appendChild(sc);
+  setTimeout(()=>{if(!SPOT.ctl)spotFallback()},8000)}
+// if Spotify's control script can't load (blocked), still show the real player; the car's buttons then just open it
+function spotFallback(){if(SPOT.ctl||SPOT.failed)return;SPOT.failed=true;SPOT.loading=false;const u=(SPOT.uri||"spotify:playlist:"+SPOT_LISTS[0][1]).split(":");$("spotHost").outerHTML=`<iframe id="spotHost" src="https://open.spotify.com/embed/${u[1]}/${u[2]}" width="100%" height="152" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen" loading="lazy"></iframe>`;if(!SPOT.uri){SPOT.uri=u.join(":");SPOT.name=SPOT_LISTS[0][0]}}
+function spotLoad(uri,name){SPOT.uri=uri;SPOT.name=name||"Spotify";SPOT.track="";SPOT.art=null;SPOT.artImg=null;SCR.src="spotify";radioStop();
+  if(SPOT.ctl){try{SPOT.ctl.loadUri(uri);setTimeout(()=>{try{SPOT.ctl.play()}catch(e){}},400)}catch(e){}}else if(SPOT.failed){const u=uri.split(":");const f=$("spotHost");if(f)f.src=`https://open.spotify.com/embed/${u[1]}/${u[2]}`}else spotOpen();toast(`Spotify: ${SPOT.name}`)}
+// the song name and cover art for the car's screen (Spotify's public oEmbed); quietly skipped if the browser blocks it
+function spotMeta(uri){const u=uri.split(":");if(u.length<3)return;fetch(`https://open.spotify.com/oembed?url=https://open.spotify.com/${u[1]}/${u[2]}`).then(r=>r.ok?r.json():null).then(j=>{if(!j||SPOT.track!==uri)return;SPOT.trackName=j.title||"";if(j.thumbnail_url){const im=new Image();im.crossOrigin="anonymous";im.onload=()=>{SPOT.artImg=im};im.src=j.thumbnail_url}}).catch(()=>{SPOT.trackName=""})}
+function spotToggle(){if(SPOT.ctl){try{SPOT.ctl.togglePlay()}catch(e){}if(SCR.radioOn)radioStop()}else if(SPOT.failed)spotShow(true);else spotOpen()}
+function spotOff(){try{SPOT.ctl&&SPOT.ctl.pause()}catch(e){}spotShow(false);if(SCR.src==="spotify")SCR.src="fm"}
+// Spotify on the car's own screen: what's playing, a progress bar, play/pause, restart, playlists, and a button for the full player
+function spotScreen(g,top,bot,W){const F=FONT;g.fillStyle="#121212";g.fillRect(0,top,W,bot-top);g.textBaseline="alphabetic";
+  const ax=16,ay=top+14,as=Math.min(120,bot-top-120);g.fillStyle="#282828";rr2(g,ax,ay,as,as,8);g.fill();if(SPOT.artImg){try{g.drawImage(SPOT.artImg,ax,ay,as,as)}catch(e){}}else{g.fillStyle="#1ed760";g.font=F(40);g.textAlign="center";g.fillText("♫",ax+as/2,ay+as/2+14)}
+  const tx=ax+as+16;g.textAlign="left";g.fillStyle="#1ed760";g.font=F(12);g.fillText("SPOTIFY",tx,ay+14);g.fillStyle="#fff";g.font=F(20);let t=SPOT.trackName||(SPOT.ctl?(SPOT.paused?"Paused":"Playing"):SPOT.failed?"Use the player to play":"Loading Spotify…");while(g.measureText(t).width>W-tx-150&&t.length>4)t=t.slice(0,-2)+"…";g.fillText(t,tx,ay+40);
+  g.fillStyle="#b3b3b3";g.font=F(13);g.fillText(SPOT.name||"",tx,ay+60);
+  if(SPOT.dur>0){const bw=W-tx-150,f=clamp(SPOT.pos/SPOT.dur,0,1),mm=v=>`${Math.floor(v/60000)}:${String(Math.floor(v/1000)%60).padStart(2,"0")}`;g.fillStyle="#535353";rr2(g,tx,ay+76,bw,4,2);g.fill();g.fillStyle="#fff";rr2(g,tx,ay+76,bw*f,4,2);g.fill();g.fillStyle="#b3b3b3";g.font=F(11);g.fillText(mm(SPOT.pos),tx,ay+94);g.textAlign="right";g.fillText(mm(SPOT.dur),tx+bw,ay+94);g.textAlign="left";
+    if(!SPOT.paused)SPOT.pos=Math.min(SPOT.dur,SPOT.pos+16)}
+  const cb=(x,y,w,h,lab,fn,green)=>{g.fillStyle=green?"#1ed760":"#2a2a2a";rr2(g,x,y,w,h,h/2);g.fill();g.fillStyle=green?"#000":"#fff";g.font=F(16);g.textAlign="center";g.fillText(lab,x+w/2,y+h/2+6);hit(x,y,w,h,fn)};
+  cb(tx,ay+104,46,46,"⟲",()=>{try{SPOT.ctl&&SPOT.ctl.restart()}catch(e){}});cb(tx+56,ay+100,54,54,SPOT.ctl&&!SPOT.paused?"❚❚":"▶",spotToggle,true);cb(tx+120,ay+104,110,46,SPOT.shown?"Hide player":"Show player",()=>spotShow(!SPOT.shown));
+  const py=Math.max(ay+as+14,ay+164),cols=W>560?4:2,cw=(W-32-(cols-1)*8)/cols;g.fillStyle="#b3b3b3";g.font=F(12);g.textAlign="left";g.fillText("PLAYLISTS",16,py-4);
+  SPOT_LISTS.forEach(([n,id],i)=>{const x=16+(i%cols)*(cw+8),y=py+4+Math.floor(i/cols)*40;if(y+34>bot-4)return;const on=SPOT.uri==="spotify:playlist:"+id;g.fillStyle=on?"#1f3b2a":"#242424";rr2(g,x,y,cw,34,6);g.fill();g.fillStyle=on?"#1ed760":"#fff";g.font=F(13);let tt=n;while(g.measureText(tt).width>cw-16&&tt.length>4)tt=tt.slice(0,-2)+"…";g.fillText(tt,x+10,y+22);hit(x,y,cw,34,()=>spotLoad("spotify:playlist:"+id,n))})}
+function scrMedia(g,top,bot,W){if(SCR.src==="spotify"){spotScreen(g,top,bot,W);mediaSources(g,W-134,top+10,W,bot);return}
   if(SCR.src==="bt"&&!st.phoneConn)SCR.src="fm";const BT=SCR.src==="bt";
   RADIO.forEach((r,i)=>{const y=top+12+i*62,on=SCR.radioOn&&au.station===i;g.fillStyle=on?"rgba(53,194,191,.18)":"#132026";rr2(g,16,y,250,54,10);g.fill();
     g.fillStyle=on?"#5fe0dc":"#e6eef0";g.font=FONT(16);g.textAlign="left";g.fillText(BT?`${r.genre.split(" · ")[0]} playlist`:r.name,30,y+20);g.fillStyle="#9fb4b7";g.font=FONT(12);g.fillText(r.genre,30,y+40);
@@ -6057,7 +6110,7 @@ const RADIO=[{name:"Halden FM",genre:"Night drive · synthwave",bpm:96,kind:"syn
 function radioInit(){const c=au.ctx;if(!c||au.radioG)return;au.radioG=c.createGain();au.radioG.gain.value=0;au.an=c.createAnalyser();au.an.fftSize=64;au.radioG.connect(au.an);au.an.connect(au.master);
   au.noiseBuf=c.createBuffer(1,c.sampleRate*0.5,c.sampleRate);const d=au.noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1}
 function radioVol(){if(au.radioG)au.radioG.gain.setTargetAtTime(SCR.radioOn?0.32*(au.vol??0.5):0,au.ctx.currentTime,0.1)}
-function radioPlay(i){if(!au.ctx){toast("Tap Start first so sound can play");return}radioInit();au.station=i;SCR.radioOn=true;au.step=0;au.nextT=au.ctx.currentTime+0.05;radioVol();
+function radioPlay(i){if(!au.ctx){toast("Tap Start first so sound can play");return}if(SPOT.ctl&&!SPOT.paused){try{SPOT.ctl.pause()}catch(e){}}if(SCR.src==="spotify")SCR.src="fm";radioInit();au.station=i;SCR.radioOn=true;au.step=0;au.nextT=au.ctx.currentTime+0.05;radioVol();
   if(!au.radioTimer)au.radioTimer=setInterval(radioTick,60);toast(`${RADIO[i].name} · ${RADIO[i].genre}`)}
 function radioStop(){SCR.radioOn=false;radioVol()}
 function mtof(m){return 440*Math.pow(2,(m-69)/12)}
@@ -7080,7 +7133,16 @@ function fsToggle(){const d=document;try{if(d.fullscreenElement||d.webkitFullscr
 function redoCar(){const T=TRIMS[st.trim];st.extras={rack:false,flaps:false,defl:false,dashcam:false,hud:false};st.opk={};for(const k in st.pkgs)st.pkgs[k]=false;st.tyre="allseason";st.rimBlack=undefined;st.wheel="19";
   TSL.fsd=false;TSL.sub=false;TSL.boost=false;st.built=false;st.paint=T.paint;st.cfgStep="model";st.cfgModel=null;closeDrawer();openBuilder();toast("Start over: pick a brand, a model and a trim")}
 // R: put the car back on the nearest road, in the nearest lane, facing along it (keeps damage, fuel and gear safe)
-function resetNearest(){if(st.walk)return;const g=st.gear;try{resetCar({x:car.px,y:car.py,h:car.psi})}catch(e){resetPos();return}try{dmgReset()}catch(e){}DENTS.list=[];dentsSync();const H=car.hyb,T=TRIMS[st.trim];if(H.tank)H.fuel=H.tank;if(!T.ice)H.soc=Math.max(H.soc,T.hybrid?0.6:0.9);if(T.plug||(DRIVES[st.trim]||{}).par)H.pb=1;st.gear=g==="R"?"D":g;car.vx=0;toast("Car reset like new, on the nearest road")}
+// the nearest drivable spot: checks every road (not just the ones in your grid square), prefers your level (bridges, garage decks),
+// stays out of intersections, uses the right-hand lane in the direction you were facing, and moves along until no car is in the way
+function nearestRoadSpot(px,py,psi,zc){let best=null;
+  for(const e of EDGES){if(e.n<1)continue;const q=eProj(e,px,py);if(!q)continue;const pad=Math.min(8,e.L*0.3),u=clamp(q.u,(e.r0||0)+pad,e.L-(e.r1||0)-pad);if(!(u>=0&&u<=e.L))continue;
+    const pt=eAt(e,u),zr=e.hz?ez(e,u):hillZ(pt.x,pt.y)*0,dh=Math.hypot(pt.x-px,pt.y-py),dz=Math.abs((e.hz?zr:0)-(zc||0)),sc=dh+dz*6;if(!best||sc<best.sc)best={e,u,sc,h:q.h}}
+  if(!best)return null;const e=best.e;let dir=Math.cos(psi-best.h)>=0?1:-1;if(e.ow)dir=1;
+  let sAlong=dir>0?best.u:e.L-best.u;const lo=(e.r0||0)+4,hi=e.L-(e.r1||0)-4,clear=s_=>{const q=fpt(e,dir,s_,laneOff(e,0));return !cars.some(c=>c.wx!==undefined&&Math.hypot(c.wx-q[0],c.wy-q[1])<9)&&!parked.some(o=>o.wx!==undefined&&o.kind!=="xing"&&Math.hypot(o.wx-q[0],o.wy-q[1])<5)};
+  for(let k=0;k<24&&!clear(sAlong);k++){const t=sAlong+(k%2?-1:1)*Math.ceil((k+1)/2)*6;if(t>lo&&t<hi){if(clear(t)){sAlong=t;break}}}
+  const p=fpt(e,dir,clamp(sAlong,Math.min(lo,hi),Math.max(lo,hi)),laneOff(e,0)),u=dir>0?sAlong:e.L-sAlong;return {x:p[0],y:p[1],h:p[2],z:e.hz?ez(e,clamp(u,0,e.L)):0,free:true}}
+function resetNearest(){if(st.walk)return;const g=st.gear;try{const here=(inTC(car.px,car.py)||inGarage(car.px,car.py))?{free:true,x:car.px,y:car.py,h:car.psi,z:car.zb||0}:null,S=here||nearestRoadSpot(car.px,car.py,car.psi,car.zb||0);if(!S)throw 0;cars=cars.filter(c=>c.kind!=="wreck");resetCar(S);RF=null;RFkey=""}catch(e){resetPos();return}try{dmgReset()}catch(e){}DENTS.list=[];dentsSync();const H=car.hyb,T=TRIMS[st.trim];if(H.tank)H.fuel=H.tank;if(!T.ice)H.soc=Math.max(H.soc,T.hybrid?0.6:0.9);if(T.plug||(DRIVES[st.trim]||{}).par)H.pb=1;st.gear=g==="R"?"D":g;car.vx=0;toast(inTC(car.px,car.py)||inGarage(car.px,car.py)?"Car reset like new, right here":"Car reset like new, on the nearest road")}
 function resetPos(){closeDrawer();setMap(st.map||"city");car.vx=0;st.gear="P";toast("Car put back at the start point")}
 TABS.spawn=()=>`<div class="grid2"><button class="opt" data-a="resetPos"><b>↺ Reset car position</b><small>Back on the road at this start point</small></button><button class="opt" data-a="redoCar"><b>Redo your car</b><small>Back to the builder with everything reset</small></button><button class="opt" data-a="spawnAnother"><b>＋ Spawn another car</b><small>Parks this car here and opens the builder for a new one</small></button><button class="opt" data-a="fleetSwitch"><b>⇄ Switch car (T)</b><small>${st.fleet.length?`${st.fleet.length+1} cars: jump into the next one`:"Spawn another car first"}</small></button></div>`+ALLS().filter(p=>secOf(p)==="spawn").join("").replace("<h3>Go to","<h3>Spawn at")+TABS.traffic();
 function slSet(k,n){const H=car.hyb,T=TRIMS[st.trim];if(k==="fuel")H.fuel=H.tank*n;else if(k==="chg"){if(T.plug)H.pb=n;else H.soc=n}}
@@ -7117,7 +7179,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(/SwiftShader|llvmpipe|Microsoft Basic/i.test(gpu))return "low";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="65";try{if(localStorage.getItem("strata.ver")!==APP_VER){for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="66";try{if(localStorage.getItem("strata.ver")!==APP_VER){for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){return GQ[GFX.q==="auto"?GFX.eff:GFX.q]}
 function setGfx(q){GFX.q=q;GFX.dyn=1;try{localStorage.setItem("strata.gfx",q)}catch(e){}}
@@ -7171,12 +7233,13 @@ cv.addEventListener("touchmove",e=>{if(e.cancelable)e.preventDefault()},{passive
 cv.addEventListener("pointerdown",e=>{if(st.cam===1&&st.started&&interiorTap(e.clientX,e.clientY))return;if(st.cam===1&&SCR.focus)return;try{cv.setPointerCapture(e.pointerId)}catch(_){};ptrs.set(e.pointerId,[e.clientX,e.clientY]);look.drag=true;look.idle=0;
   if(ptrs.size===2){const [a,b]=[...ptrs.values()];pinch0=Math.hypot(a[0]-b[0],a[1]-b[1])}
   const now=performance.now();if(now-lastTap<300&&ptrs.size===1){look.yaw=0;look.pitch=0;look.dist=VEH.camD||7.2}lastTap=now});
-cv.addEventListener("pointermove",e=>{if(!ptrs.has(e.pointerId))return;const p0=ptrs.get(e.pointerId);
+cv.addEventListener("pointermove",e=>{if(!ptrs.has(e.pointerId))return;if(e.pointerType==="mouse"&&e.buttons===0){ptrUp(e);return}const p0=ptrs.get(e.pointerId);
   if(ptrs.size===1){look.yaw=wrapPi(look.yaw-(e.clientX-p0[0])*0.008);look.pitch=clamp(look.pitch+(e.clientY-p0[1])*0.005,-0.6,0.9)}
   ptrs.set(e.pointerId,[e.clientX,e.clientY]);
   if(ptrs.size===2){const [a,b]=[...ptrs.values()];const d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(pinch0>0)look.dist=clamp(look.dist*pinch0/d,3.5,22);pinch0=d}
   look.idle=0});
-const ptrUp=e=>{ptrs.delete(e.pointerId);if(!ptrs.size)look.drag=false;pinch0=0};cv.addEventListener("pointerup",ptrUp);cv.addEventListener("pointercancel",ptrUp);
+function ptrUp(e){ptrs.delete(e.pointerId);if(!ptrs.size)look.drag=false;pinch0=0}cv.addEventListener("pointerup",ptrUp);cv.addEventListener("pointercancel",ptrUp);cv.addEventListener("lostpointercapture",ptrUp);
+window.addEventListener("pointerup",ptrUp);window.addEventListener("blur",()=>{ptrs.clear();look.drag=false;pinch0=0;for(const k in inp.keys)inp.keys[k]=false});   // released outside the game, or alt-tab: nothing stays held
 cv.addEventListener("wheel",e=>{look.dist=clamp(look.dist*(1+e.deltaY*0.001),3.5,22);e.preventDefault()},{passive:false});
 function invSteer(dF){const sIn=clamp(-dF/0.576,-1,1),a=Math.abs(sIn);return Math.sign(sIn)*(-0.35+Math.sqrt(0.1225+2.6*a))/1.3}
 // ======================================================================= park assist: pick Parallel / Perpendicular / Park exit, it searches while you creep along,
@@ -7351,11 +7414,11 @@ function controls(dt){
   if(K.arrowup||K.w){thr=1;inp.gThr=!!K.shift}else if(inp.thr<0.02)inp.gThr=false; if(K.arrowdown||K.s){brk=1;inp.gBrk=!!K.shift}else if(inp.brk<0.02)inp.gBrk=false;   // Shift+W / Shift+S: gentle squeeze
   // gamepad (standard mapping): analog steer and pedals, buttons for the common controls
   const gp=navigator.getGamepads?[...navigator.getGamepads()].find(g=>g&&g.connected&&g.mapping==="standard")||[...navigator.getGamepads()].find(g=>g&&g.connected):null;
-  if(gp){const ax=gp.axes[0]||0,dz=0.08;if(Math.abs(ax)>dz){s=Math.sign(ax)*Math.pow((Math.abs(ax)-dz)/(1-dz),1.5);analog=true}
+  if(gp){const ax=gpAxis(gp,0),dz=0.08;if(Math.abs(ax)>dz){s=Math.sign(ax)*Math.pow((Math.abs(ax)-dz)/(1-dz),1.5);analog=true}
     const rt=gp.buttons[7]?gp.buttons[7].value:0,lt=gp.buttons[6]?gp.buttons[6].value:0;if(rt>0.03)thr=Math.max(thr,rt);if(lt>0.03)brk=Math.max(brk,lt);
     const MAP={0:"acc",1:"epb",2:"cam",3:"gear",4:"sigL",5:"sigR",8:"lights",10:"high",11:"pilot",12:"accUp",13:"accDown",14:"mode"};
     gp.buttons.forEach((b,i)=>{const p=b.pressed;if(p&&!PC.prev[i]){if(i===9){$("drawer").hidden?openDrawer():closeDrawer()}else if(MAP[i])act(MAP[i])}PC.prev[i]=p});
-    const rx=gp.axes[2]||0,ry=gp.axes[3]||0;if(Math.abs(rx)>0.15||Math.abs(ry)>0.15){look.yaw=wrapPi(look.yaw-rx*dt*2.2);look.pitch=clamp(look.pitch+ry*dt*1.4,-0.6,0.9);look.idle=0}}
+    const rx=gpAxis(gp,2),ry=gpAxis(gp,3);if(Math.abs(rx)>0.15||Math.abs(ry)>0.15){look.yaw=wrapPi(look.yaw-rx*dt*2.2);look.pitch=clamp(look.pitch+ry*dt*1.4,-0.6,0.9);look.idle=0}}
   if(st.walk){s=inp.steer;thr=0;brk=0}   // on foot your keys, stick and pad move you, not the car
   const rate=inp.padActive?8:analog?10:keySteer?2.6:(Math.abs(s)<Math.abs(inp.steer)?4.5:3.2);
   if((st.pedalS??1)===0)inp.steer+=clamp(s-inp.steer,-rate*dt,rate*dt);
@@ -7383,7 +7446,7 @@ function fpsCap(){const c=st.fpsCap??0;return c===-1?0:c===0?(G().cap||0):c}
 function frame(now){{const c=fpsCap();if(c&&now-last<1000/c-2){requestAnimationFrame(frame);return}}gfxTick(Math.min(0.1,(now-last)/1000));
   const dt=Math.min(0.067,(now-last)/1000);last=now;
   requestAnimationFrame(frame);   // schedule the next frame first, so one bad frame can never freeze the game
-  if(st.started){controls(dt);assist(dt);updateTraffic(dt);updatePark(dt);enforcePkgs();weatherTick(dt);try{hapTick(dt)}catch(e){}try{hoseTick()}catch(e){}try{navTick(dt)}catch(e){console.error(e)}if(!!car.swayOff!==!!sys.swayWas){sys.swayWas=!!car.swayOff;toast(car.swayOff?"Front sway bar disconnected: more wheel travel for the trail":"Front sway bar reconnected")}
+  if(st.started){controls(dt);assist(dt);updateTraffic(dt);updatePark(dt);enforcePkgs();weatherTick(dt);try{hapTick(dt)}catch(e){}try{hoseTick()}catch(e){}if(st.power===false&&SPOT.ctl&&!SPOT.paused){try{SPOT.ctl.pause()}catch(e){}SPOT.paused=true}try{navTick(dt)}catch(e){console.error(e)}if(!!car.swayOff!==!!sys.swayWas){sys.swayWas=!!car.swayOff;toast(car.swayOff?"Front sway bar disconnected: more wheel travel for the trail":"Front sway bar reconnected")}
     if(sys.hillDemo){sys.hillT+=dt;if(sys.hillT>6){sys.hillT=0;st.leveling=!st.leveling;toast(st.leveling?"Active levelling ON: beam hugs the ground":"Active levelling OFF: beam fixed to the body")}if(!car.offroad&&Math.abs(car.vx)>3)sys.hillDemo=false}
     if(sys.aim!=null){sys.levT=(sys.levT||0)+dt;if(sys.levT>5){sys.levT=0;st.leveling=!st.leveling;toast(st.leveling?"Levelling ON: beam back down on the road":"Levelling OFF: the loaded car aims the beam high")}
       if(Math.hypot(car.px-sys.aim.x,car.py-sys.aim.y)>40){sys.aim=null;car.cargo=0;st.leveling=true}}acc+=dt;const h=1/G().hz;while(acc>=h){physics(h);acc-=h}if(car.crashed>0)car.crashed-=dt;updateAudio()}
