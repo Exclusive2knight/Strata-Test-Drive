@@ -17,6 +17,7 @@ https://exclusive2knight.github.io/Strata-Test-Drive/
 
 ## Workflow for every change
 
+0. Before starting work on an update: `sh tools/maint.sh on` (players see the yellow "Under maintenance" screen; it expires on its own after 3 hours).
 1. Edit `src/app_template.html`.
 2. `python3 build.py`, then syntax-check the game script:
    `python3 -c "import re;open('/tmp/c.js','w').write(max(re.findall(r'<script>(.*?)</script>',open('dev.html').read(),re.S),key=len))" && node --check /tmp/c.js`
@@ -24,7 +25,7 @@ https://exclusive2knight.github.io/Strata-Test-Drive/
 4. Release:
    - Add a changelog entry: in the "What's new" panel, the newest version gets an `<h2>Version N · title</h2>` header, and the previous header becomes `<h4 class="old">…</h4>` inside the same `.nb` block.
    - Bump `const APP_VER="N"` (this resets players' saved games; that's expected).
-   - Commit and push to `main`. GitHub Pages updates the site in a minute or two.
+   - `sh tools/maint.sh off N` (N = the new APP_VER; turns maintenance off and tells older open copies to reload), then commit and push to `main`. GitHub Pages updates the site in a minute or two.
 5. Write changelog text in plain, specific words for a player (what changed and what they'll notice).
 
 ## Testing
