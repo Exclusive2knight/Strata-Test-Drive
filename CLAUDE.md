@@ -1,4 +1,4 @@
-# Strata Test Drive — notes for Claude
+# Mission Strata (formerly Strata Test Drive) — notes for Claude
 
 A realistic driving simulator in one HTML page, hosted on GitHub Pages:
 https://exclusive2knight.github.io/Strata-Test-Drive/
