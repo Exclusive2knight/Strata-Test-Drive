@@ -194,6 +194,8 @@ body.pc #pcHud{display:flex;flex-direction:column;gap:5px;position:fixed;left:16
 .pcHint{font-size:11.5px;color:var(--dim);margin-top:2px}
 kbd{font-family:var(--f-hud);font-size:12px;padding:1px 6px;border-radius:5px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);color:var(--ink)}
 body.pc #steerPad,body.pc #pedals{display:none}
+/* looking at the car's screen: hide the driving HUD so only the screen shows (the zoom button stays to get back out) */
+body.scrview #cluster,body.scrview #sensorBox,body.scrview #bsmL,body.scrview #bsmR,body.scrview #assist,body.scrview #sumBtn,body.scrview #alert,body.scrview #pcB,body.scrview #pcHelp,body.scrview #controls,body.scrview #ui2,body.scrview #paBtn,body.scrview #gateBtn{display:none!important}
 body.pc #dock{position:fixed;left:50%;transform:translateX(-50%);bottom:16px}
 body.pc.help #pcHelp{display:flex;position:fixed;inset:0;z-index:30;align-items:center;justify-content:center;background:rgba(4,8,10,.6)}
 #pcHelp .ph{width:min(900px,92vw);background:#0b1316;border:1px solid var(--line);border-radius:18px;padding:18px 22px}
@@ -804,15 +806,18 @@ body #drawer #tabBody .seg5{max-width:520px;border:1px solid rgba(255,255,255,.0
 <div id="boot"><div class="bc"><img class="blogo" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwQDAwQEBAQFBQQFBwsHBwYGBw4KCggLEA4RERAOEA8SFBoWEhMYEw8QFh8XGBsbHR0dERYgIh8cIhocHRz/2wBDAQUFBQcGBw0HBw0cEhASHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBz/wAARCADAAMADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD4DooooAXtQKSigB1FIKWgApc0lFAC0UlKKADFLRRQAUvakpRQAUtJSigAooooAKdSCloAKKKKAAUGig9KAK2aBSUooAWiiigApRSUUALS02loAWikzS0ALS02loAWl59KTrRQA6jB7ClEjKcg5+vNPScLjdEje4yD+YoAjoq5HNbNks00bY9A4NWUslnBMZt5gP4UbY/5GgDLBoq/LYxwnE3nWzk8LIuRj696Y2mzbd8ZSVRzlGoAqUUro0TbXUq3XDDBpKACjNFIaAK1FFFAC0tJS0AFFFFABS0lFAC0ZopKAHUUUUALSikooAWlpKKAHUfzFJmloA0LXWru2wpfzY/7svzfhnqK1LR9N1A5RpLC76gRthWOffg/TiubFFAHT3VpeWa+XcQpdwDl5IiSw+o7/wCeaqNY2V/EXtCEk6FQ2AD/ALp5A9xml0XXpLeRYLmaRrduPmy30HXpWlq2h7ybqzja1kQHKEbMHvk/kMjrnmgDm7vTrmywZUG0/wASHcv0yKqV0GmamkziK7j3v0KsXJk9e/Xjp3qLUtKjLPLaOh5AEEaNnpk+uPXBoA5yiiigBaMUUtACUtFKBmgBKOPUfnX6AfshfssWMGjJ458faRb3lxqMX/Es0q+hEiRQsP8AXyIwwXYfdBHCnPUjH1N/wp/4df8AQheFv/BTB/8AE0Afi1RX6O/tcfszaRrfgc+J/BGg2OnazoCNJcWenWqxC9ter/KgALpyw7ldw7CvzjoAKKAM19A/CX9kD4hfE4W99c2g8O6BLhhf6mhV5F9Y4fvv7E7V96APn6lyPUfnX6yfDD9k34afDW1DNo8fiDVWXbJf6zGs/wBdkRGxB+BPvXo6/C3wLn5fBPhnJ4wNJt//AIigD8VBj1H50uR6j86+7PFHhjRP2lvjVH4K8F6LpWl/D7wnJ5mt6xpljFC13JkqVSRFGQcFEHTh35AFfXVv8Jfh/aW8MEXgjw0sMKBEB0uBiFAwMkqSeO55NAH4sgj+8Pzpcj+8v51+1J+F/gT/AKEzwz/4Krf/AOIpv/CsfAnbwZ4Z5/6hNv8A/EUAfixkf3l/OjcP7w/Ov1a+Kfi/4FfCGF18RaH4XbUwuU0qz0i2mu344ygXCA+rlR9a+H/ij+0F/wALAebTfCngfwx4V0aXKb4dOt2u5FP96fYAn0QD6mgDwbrXp1lZLBCplYpiJFcFdo6fNgqSD7ng9KwdJ0yz0xmkmlD3yHMbKVaMexVh+px7Ve1PXLW0iZMbFkB3wLCBvJHYHjae5/IUActrylL6OZTh5ollyoIwT35J54zmujSI3Nlb3Kk5l2Kwhk3N8w4yTyG3c9ccmuWtLWbW78R740LcszHCov4/kBXaSBk8qyYBoYGWRlCZb5RgJjPOTg8dB6ZoA80ooooAWgUlLmgBa+sP2Pv2cB8QNVi8b+KLTd4U06b/AES2lX5dRnU9x3iQ/e/vH5f71eZfs7fAu++NXi9YZRLb+GNOKy6leKOQvaFD/wA9HwQPQZY9MH9VdJ0+y0HSrPS9MtYrPTrKJYLe3hXCRIowFA/znrQBt+bgZz1rg9I+M/hHW/iXq3w9stRWTxDpluJ5VGPLZgfniVu8iDBYdsn+62PI/wBqj9opPhJ4eOh6DcqfGmrRZhKnP2CE5BnI/vnkIPXLdAM/m/4c8W6v4U8T2HiTS72SHWbG4F1FcEktvByd394HJBB6gnPWgD9t2mIPWvhX4j/sLal4h+Kt5deF77TtJ8Gah/pbtKSzWcjE74Y4hywz8y8gANjPFfUXwn+Kem/FvwPpviXTtsbTjyrm1DZNtcLjfGfxOQe6lTWR8Tv2iPAvwnSSPXNXWXVFXK6XY4muj9VBwn1cr+NAFX4Ufsv/AA7+ExhurTTf7W12PB/tTVFWWRG9Y0xsj/AFv9qvRNW+I/h3SfEVh4cm1JJ/El++2HTLb97c4xku6j/VoACSzkAAd+lfnf8AFD9tTx146eXTvC6nwzpUp2D7I/mXswPHM2PlzxwgH1NfUf7LXwSb4WeHJde19Gk8b6+okvJJiXktYidwg3HncThnPc4H8PIB9JiQDJ7V84ftOfFjVrdtO+FHgPdP478WgQs0LYNjbPkFiR9xmG7n+FAzd1r0P4w/FvTPhD4Ev/Ed/slnQeTY2ZbBurgg7U+nBZj2UHvivh74HftJ+EfAWveJPGfjLTNe13x7r0zebfQJD5cEJIOyPc4IzgA8ABVVRwDkA+8fg38K9I+DXgax8NaZtllX97e3m3DXdwQN0h9BxtUdlAHXNcz+0FbfFvWtI07SvhWYLGWSTzb3VGvo4JUA+7FGG5wTyzewHc15J/w8G8Bn/mWPE/5W/wD8cpP+Hg3gT/oWPE/5W/8A8coA5UfDb9r3n/is7j/wfRf4VDcfC/8Aa4uIJYZPGdyUkUowGvxqcH3HIrsf+Hg3gP8A6FjxP+Vv/wDHKT/h4N4Ezn/hF/E35W//AMcoA8Bm/Yl+MNxPJNPZ6TLNIxd3fV42ZyepJPJNSR/sS/GBOVsNHH01aIV+gHgHx0PH/hLTvEcek32lW2oKZYIL/YJmi/hkIUkAN1HOcYPcV0pvAiszMFC5JLHAA9T6CgD8xPGH7MHxO8BeGNT17Wk0Ox0iyi3zSHUomPoFUdSzHAAHJJrwm1tvPkHmMcHtkZPtzX0J+1b+0Afiv4mGhaLdE+DtGlPlMh4vpxwZz6qOQg9Mnq3Hz5FfG3KmJRkHOW5BoA6uz22dq0OFaFDvAAUeWfdu59z7VjalqlsuRaAySEEGR1GEJ7rxnPuayLi7munLSuWJxnjA44HFRUAV6KKKACuv+Gfw51n4p+L7Hw3okQNxcHdLMw/d20Q+/K57KB+ZwByRXP6Lot/4i1az0rS7WS61C8kEUMMfV2P6AepPAHJr7y+GviP4Tfsv+FGsNQ8T2F/4qu9r6m2mj7VK0g6RLs4VFycbmGTlj1AAB9GfDrwDonwt8IWHhrQ4itpbDMkrAeZcynG+Vz/eYj8AABwKwvjR8YtK+Dvg6fW70JcX8uYdPsd2DdTY6HuEXqx7DjqRXzL4z/b1LGSLwj4W65C3Wry5/Hyoz/N6+WviN8UPEvxV1tNW8S3wuJ4o/KhjjQRxQJnO1EHA5OSep7k0AZHivxTqvjTxDqOv63dvd6pqEpmmmbuT0AHZQMAAcAACsbNJRQB1nhb4meLvBGl6rpnh3X77TLPVtv2pLV9hfbnBDdVOCRlSCRweK5aSWSaR5JHZ5HJZmY5LE9ST3NMooA+vv2OPgauq30XxE8Q22dPspP8AiUQSLkTzqcGYg9VQ8L6tz/Dz9z3uq29jaT3VzOkMEEbSyyyHCoijLMT2AAJNfmDp37VPxP0jTrXTrDWrS2sbSJYYYItNtwsaKMBQNnTArN8WftG/EjxtoN5oesa/5mm3gAnjitYojIoOdpZFBxkDIzzjmgDpfjD498SftL/E2PT/AAzYXl/p1oWg0mxiQ58vPzTv2UuQCScBQFGeK96+Ef7FOh6XbLf/ABClGrahIvGmWsrJbwZ/vSKQ0jD2wo/2q+VPBHx28a/DnS207wze2On27ndIyadA0kp9XkZCzficDtXU/wDDXXxb4/4qOD/wXW//AMRQB9sf8MrfB7jHgyA/9vlz/wDHKd/wyv8AB0D/AJEyD8by4/8AjlfE3/DXnxc/6GOD/wAF1v8A/EUp/a9+Lp6+I4OP+odb/wDxFAH2wv7LXwdzz4Lt/wDwLuP/AI5UkX7L3weikSRfBVoWRgwDXNwwJB7gyYI9jXxAP2uvi5z/AMVLD/4Lrf8A+Ipf+Gu/i4Rj/hJIf/Bdb/8AxFAH6deeoARAoCgBVUYAA7ADtivjH9q39piCSxvfAHg++WZ58xatqMD5RU728bDqT/Gw4x8o6mvnbxR+0b8TfGGmy6bqfiq5FjMNssVpHHb+YPRjGoJHtnFeXUALmlptOFACijpSUUAQ0UUUAOV2QkqxUkEHBxweor1T9nn4PXPxr+JFhoJ82PR4B9r1O4j4MVupGQD0DMSEX3bPY15UBmvrb4NftA+A/gX8FNZtdBF/dfErVkMryvZhYI5uViXeW5SIEv0+ZifWgDoP2kv2TvB/gr4ZXHi74fzX1w2kXnlaik12LhRFuMb4wow0cm0MO2TnpXm3wb/ZA8VfENbHV/Esy+FPC9zKkcVxfLtubxmPCQQtgkt2LYHcBqb8Ev2stW+EXhLxRot1pa+IG1Kf7ZZ/bpSY4Z24laQcl1bCttGMsvXk12Pwc/ad0ebx3qPj34v65q+pa1boYNGsrSzD21irg+ZIibgqMVOwHrgsSTxQBV/av+DXws+COh6Ppnh4atP4t1MiQfar4SLDbJw0jIEHLt8oHThj2qb4D/s1+EdS+EOt/E34oyaha6LGjz2UdrOIWaCPIaQ5B3F3wiDjJHuK8R8YfEKD4w/GCXxL4yurmy0a/vFEot0817SzU4WKNcjJCDH1JJ716/8AtP8A7SugfELwr4f8DfD+G7s/CdkiPcJND5O/yxthhCgn5EA3c9SR/doA8v8Agr8H5Pjt8Tn0TTBLpWhIZLy6mJ85rO1DcLk43OSVQE4yTnoDX1L4i/Zo+E/hPVJNJHw7+LevNbKgbUNMjWS3mJUH5W+UHGcHAxnI7V4d8Edf+EXgrRINT1bxx8QtF8Yzh0uW8OBYYkiLfLHuIJfoGJPGT04zXrY+OnwpB5+MfxtI9PtCc/8AjlAGN4r+G3wR8F6NNq2ufC74xadYx/L9ovI0jiDn7qs+4hcnAyfWvHf2dPgQ3x78c31q0s+meGdOT7RfXEOHkjVmIjhQtwXbB5I4CscHpXoP7T37V1j8U/D1r4N8HwajD4fV0kvby/wJr0oBsXaCcKD8xJOWYA4GOc/4OeKfg94D8O2tzP8AED4laN4ovIR/aR8PhYIGOSQgBB3BQcZPfJGM4oA9b1v9nT4TaDqt3pifDD4waqLRzEb6xiV4JyP4kYldyn1wM9q4L4i+BPgv4B8N3GoX3wy+K+m3MqPHYvq4WC2kuNpKK0gJwM8nvgHArsbb49fCi3uYZn+L3xpnWNw5ilnXbJg52nCg4PQ4NeTftT/tOxfG6XTtF8P2t3ZeFtPkNwVucLJdz4IDsqkhVVSQoyT8xJ9AAYn7K/wGT44eN7iPVFuE8L6TF5t9JA2x5HbIiiVsHBY5bp91D6isb4k+BvDer/Gs+B/hVbXdza/aU0yGS4ufONzcbiHcNgYjByM+iFu9eu6B+0X4J+E/7Os3g7wE+pSeNtSjJvL+W08lEnlGJZVfcSdiDYnHYN6155+yj8TvBXwo+IF5r/jG1vnf7E0NjdWsQm+zSMQHYpkHJTKgjpk8c5AB698QPgt+z/8As/WmjaX47uvFWu+Ir+EzP/ZkqIAoO0v5fGxCwIXJYnB9Kf8ACT4dfs4/GjxNLoPhzw748S4ht3upZ7u6VIYkXA+ZlLYJJAHHJNZ/xJ8W/s0/FXxhf+KNf8RfEA6heBFMcNugiiRVCqiKVJCgDpnqT61c8MftCfBr9n/wlrdv8KrDxDq3iPVcEXWsxIiqyghN7DGUUsW2KvJPJ9ADxj45/CfQdB+OZ8AfDl73UHka3tTbzyCRoryT70QcAZAyuSeh3A9K+qLv9h/4XS6c3hW28RXsXxATS0ujI14rjOdhnNvtz5RkUjAOQO+cV84fsyfE3wN4C8e6t46+IN1ql1rmG+xeRa+efNlJ86dmLDDYJUf77HsK4jxT8dPFGt/GK8+Jen302n6v9p8yz2HIt4F+VIcdCuzCsDw2TnrQBp+Fv2dvFWpfG+z+GOsWcljfLNvvJl5RLRfmedGxhlKj5T3JA4ORWp+1L4I+H/w08dw+E/BCX7XFhCG1Oa7u/OCyvgrEvyjBVcE9eXx2NfTNn+3d4Fl8Krrl3oFzF8QotPkt0hS0DwmTOQgn3bhCzqrlSOOnJGT+f2r6te6/q19quo3D3OoX0z3E8znLSSOSzMfqSaAKdFFFAEQBYgDkmrqWgjUFgHkbgL2z9ajsFBmJzhgOPl3Z/wAPrWnDDmbcQmfKY7U9c8496AM+aLyyqnljnC8Y/wD1VCYTz1468dK02g2anJGyhTsGwPgDGO9J9n3RFAcdVzn15HfpQBjnrx0r6p+BPwu+Eup/DKXxD4s1jw7qXiu6uWSDRdU8R/2VHaxK23LlQXLMMsOCMbR6mvldlKMVPUHBr2m1/aw+KVlawWtvrGmR29vGsUcY0SywqKAFA/ddgBQB6z8Xvhp4K8DfC+TxXafDXwzJZ6g32Ox1PTfGl1eqkrhgsioY1WUKUbIDdRzxmvkjR57G11axn1OzkvdOimR7i1jm8ppowQWQPg7SRxnBxmuu+Ifxl8bfFRLGLxTrb3lrYljb20cMcEMRPBIjjVVycdcZrhKAPtK48MfBXR/gRB8T9c+FE1g+pXf2bStJ/wCEhuWe8Gf9ZvONq4WQ/dPCj+8K+X/iH4i8I+Iryybwh4L/AOEXtIY2WaJtSlvWncnhiz42gDAAA9SfZfGvxW8V/ELTNB0vX9SWfTdBh+z6fbRW8cMcCYVcBUUZ4RRk5PFcYOKAPs34O/s36C3wTt/GHiTwlH4l8S67ch9L0u41waUq2udu/wAwsAS3LYwTgpjGSavfEH4TfC/wP8KfE2q+MPh/b+DvFflmLRdOg8Uvf3NzIwwsm3OAit1yCMK3Q4r5W8efFTxX8SxpC+JNSW6h0a3+y2MMdvHDHbx8cKqKB0VRnrhR6VN46+Lvi/4l6fpFl4p1JNSXSI/KtZpLaJZ0TAG0yqoZgcAncTzz1yaAOKjieaRY41Lu5CqqjJJPQAV9jfC39lKz8OaVous/E/wx4g1e98QXEVrZ6FpcM2LCJ3UNdXksf+rCg52ZB9ec7flfwZ4y1bwD4gtte0N7aLVbXJgmnto5xE395VkBAYdjjI7Vsah8Y/iBqmr3Gq3PjLXWvZ5TO7JfSIm7OeEUhQPYDA6YoA6H9pL4c2Pws+MXiHw9pVu0GjIYriyjaQvthkjVgNxJJwdwyT2rpP2Z9B8GePPFGneDNZ+Hs3iDVdRumkfVP7XltksrVVBY+VGPm24JyTyWA4rzD4h/EvxL8VNcj1vxVfpfanHAtsJlt44f3akkAhAAcFjz1qT4e/FLxT8K76+v/CmoJp99e25tZbj7PHK/lk5IUup28gHIweB6UAew/FrXvgd4P8T+JvDHh34WNqEmnNJZw6s/iC5Efnhdpfyudyq+f4vm29s14n4C8A+IPiX4nsvDvhrT5L3U7o8KvCRqOsjt0VB3J/U4Fc2zNIxZ2LMxySTkk12/hP4ueL/Avh3VdC8N6oNKs9W4u5bWCNbmUdl8/b5gA7AMMZPqaAPsTQv2SPA0WieKfCd1oOv3/i/S9IkuB4mnjuLWxkvSp2w24OFkCEKcnOcn0wPgXB79a9G8JfHv4k+CdUbUtJ8YaoblojCRezG7j2kg/cl3Lngc4z+dee3Fw91cTTykeZK5dtqgDJOTgDgdaAIwKcBSCloAKQ0ppKAC2uHtpVkjOGU9cZrbjuZLkRzi4jEyn5BxuHqT0Ht+Nc+Ku6fqdxp0haFhtP3lYZDD0oA1Ln7PqQBt1lS8iXdhVJ+bOcden4Utvcm5cJcFoL4DaquhIkz2I68+la2l3NrrLRKZIo7mMNJkAq6kcgjOQef0HSpb23s71EXUXt90g/dXkLEqB7jPHXvx70AZV1o7XO1Z5QkqbgAsJGeMgfT9awJ7Ce3Zg8b7VGS204A9/Sunki1LQoTFdQLe2Byd0bncgPfcOn45HvVuxa3v7bFrItyMF5bWeZgw9AO54+ooA4TFGK6248Ow3TptaKzlcl2DsQqjsAMYP4GsO+0W7sDH5iBhKCyGMhsj6DkUAZ2KMUuKMUAFFLijFABijFLRQAmKWijFABRiloNABijiiigBaKKKACiiigCGiilFAADW3petw2hk+1WMNw7jAlIwV+o6EfrWJRQB6PpuLlf+JY9sScGRSSYn6Z+XaCp6dOPrWdqfh+K5Zd0MOnTl9rSAsYnOccHoD7HFcbFNJA2+KRkbGMqcHFdLpvi5YLd7e7s0ljYlv3QC5J9QeD65oAmupdR0WFLfULe2u9PzkOiqSQDxz16+v51fs9ZgupIUsbwRSuu3y5bfJAHON2fX61NFrUzrEILRcyjARJ0ZARyQR1Wsy902C8jMlxp/2OeRiftEcuYs89sHH6UAWNT03T5t0l7BPYybdq7YCFZuxLd/0rD1Dw3PbODbGS5iK7g3lMvGffg/hV9odf0y2Vlla606MhwytuQgenfH0qePxHY3jAtJdafMxwwhYeW314/mKAOTmglgO2WJ0Poy4qKu+mhExjeW3F7bn93HIk6fvCecbSTyfUGsyfw1b3DQparLbuzYfznHycZ+71oA5SlrWvvDl/YhnaMPCrY3hh+ZHYVlFSrEHqKAEpeopKWgAoNGKSgBe1GKBS0AFFFFABRS0cYoAgoopcUAFHaiigApaSloAkgnktpVlhdo5F5DKcEVt2fiSRd/217uUt/FFOUP5dKwKKAOttdRs1ulex+1LOV3blBbDf3SvIx6mlvbsXzr/aGlSSdT58KlWb0xx+ma5IMV6Ej6VoWesXFoe0gwR8xOQD1GaALR06WO5hbTDMJeSVcqGiI9T/iBVi41y8j/AHOq2kc+Bxu+X+XBqL+04b1mDQwRsTwzuVbH1Ap7SzrmUSLJFtMeTljj645/GgCWzurCa3YNKkUhGWjmJZCfT5u341EXZQkRsYGwCMjBLD1zjOBVZrOycNnz7dyBtV+mfrVcwXNmVlhnViRgGNsnFAFltJWQLKrhIpPukZOfU4PbNVJNLuYkZigKg4yCOfpUo1JWIFxbguON6Eh6mtp45YWVZETGQI3JII/Hv+NAGUVZeGBGOOaStVhsA3WysD0ZT+VQNBC7tglGOAF7A9+tAFEUtTtZumTUJUjqDQAlFFFABRRSnpQBBS0lLQAUdaSloAKOlFHWgApaSloAKWkooAKkWaRV2h2C5zjPFR0vagC7Hfbc5TG7hmyTx+JoD7X2wFtvYjv+FU6BxyKANRpDs2yxoR7AAj86qvFC7Yjbbx36VAHyfm+YU9TGFJz8/ZSOCKADbImQpyPan/adw2vGpx3A5FAcx4CyhfWkLh2+b5vegBy+Wyghgr+h5H5045BBwr8fw9qhZF27gw+lMGRyOgoAndV6MNntjkVGyDI29D60hlLdQPwFG89j17UANKkGkNSbjxnHHf1pMg8nrQB//9k=" alt="Mission Strata"><div class="bt">Mission Strata</div><div class="bb"><i id="bootBar"></i></div><div class="bs" id="bootMsg">Building the world…</div><div class="bs" style="opacity:.5;font-size:11px;margin-top:14px">© 2026 Exclusive2knight · All rights reserved</div></div></div>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2>Version 73 · Mission Strata</h2></div>
+    <div class="nh"><small>What's new</small><h2>Version 74 · Online servers that work, smoother freeway merges</h2></div>
     <div class="nb">
+      <h4>Online servers, rebuilt</h4><ul><li>The server list and joining didn't work in version 72. Servers now run through two public messaging services at once, so public servers show up in the Online tab and private codes work. If one service is down, the other keeps you connected.</li><li>Nothing connects straight between players any more, so strict home, school or phone networks can't block you from joining.</li><li>If the host's game closes or crashes, its server leaves the list by itself. If the host leaves while others are still playing, the next player takes over.</li></ul>
+      <h4>Freeway merges</h4><ul><li>Entrance ramps now run alongside the freeway as a proper acceleration lane and blend in over a long, gentle taper, instead of cutting in at a sharp angle. Exits get a matching deceleration lane before they curve away.</li><li>The interchanges are longer to make room, and AI traffic merges more smoothly too.</li></ul>
+      <h4>Car screen</h4><ul><li>When you zoom in on the car's centre screen, the driving buttons and gauges get out of the way so you only see the screen. They come back when you zoom out.</li></ul>
+      <h4>Removed</h4><ul><li>Discord Activity support.</li></ul>
+      <h4 class="old">Version 73 · Mission Strata</h4>
       <h4>New name</h4><ul><li>Test Drive is now <b>Mission Strata</b>, with a new logo on the loading screen, in the browser tab and on your home screen if you add it there.</li></ul>
       <h4 class="old">Version 72 · Online servers</h4>
       <h4>Play online</h4><ul><li>New <b>Online</b> tab in the menu (☰). Create a public server that anyone can find in the server list, or a private one that friends join with a 6-letter code. Up to 8 players.</li><li>You see everyone's cars driving around with their real model and paint, as blue dots on the map. Join and leave messages show each player's name, which you can set at the top of the tab.</li><li>Everyone in a server shares the host's time of day and weather.</li><li>If the host leaves or loses connection, the player who joined first takes over automatically, and everyone else reconnects to them.</li><li>Cars connect straight to each other (peer-to-peer). A few strict school or work networks block that. If joining fails there, try another network.</li></ul>
       <h4>Camera</h4><ul><li>The outside camera stays locked to your car at speed. It used to fall several metres behind on the highway and catch up in jerks. It still swings smoothly round corners, and bumps no longer shake it.</li><li>The on-foot camera follows you the same way.</li></ul>
       <h4>Fixes</h4><ul><li>Each car's researched suspension and drive modes were never loading (since version 62). They do now: cars lean in corners like the real ones, about 3–7° per g instead of feeling stiff, and the drive mode lists match each real car.</li></ul>
-      <h4 class="old">Version 71 · Play it inside Discord</h4>
-      <h4>Discord</h4><ul><li>The game can now run as a Discord Activity: launch it inside Discord, and your profile shows "Playing Strata Test Drive" while you drive. Friends in the voice channel can see it too.</li></ul>
       <h4 class="old">Version 70 · Spotify skip buttons, remembers your music, phone pairing</h4>
       <h4>Spotify</h4><ul><li>⏮ and ⏭ buttons on the car's Spotify screen. ⏭ jumps to the next song. ⏮ goes back to the start of the song, and tapping it again within 2 seconds starts the playlist over from the first song.</li><li>Spotify now shows up everywhere music does: Ford and Lincoln home screens, CarPlay and Android Auto (with play/pause and skip), and the Volvo and Lincoln cluster media panels. They used to say "Audio off" or "Not playing".</li></ul>
       <h4>Remembers what you were playing</h4><ul><li>The game remembers your audio: Spotify and the playlist, or the radio station, plus your volume and whether your phone was connected. This stays even when a new version comes out. Spotify waits for you to tap ▶ (browsers don't let pages play sound on their own); the radio comes back at your first tap.</li></ul>
@@ -1210,7 +1215,7 @@ const laneOff=(e,i)=>(loOf(e.n)+i)*LANE;
   const R=400,X=1700,Y=1100;
   // Hwy 7: a 65 mph freeway loop. No junctions or crossovers on it: four diamond interchanges, with the cross street on a bridge
   // over the freeway, one-lane ramps that leave and join at a shallow angle, and signals where the ramps meet the cross street
-  const IC=[{c:[500,-Y],F:[1,0],Ld:200,Dt:[165,135],name:"Woodward Ave"},{c:[X,0],F:[0,1],Ld:200,Dt:[160,160],name:"Maple Blvd"},{c:[500,Y],F:[-1,0],Ld:180,Dt:[165,135],name:"Woodward Ave"},{c:[-X,0],F:[0,-1],Ld:200,Dt:[160,160],name:"Grand River Ave"}];
+  const IC=[{c:[500,-Y],F:[1,0],Ld:420,Dt:[165,135],name:"Woodward Ave"},{c:[X,0],F:[0,1],Ld:420,Dt:[160,160],name:"Maple Blvd"},{c:[500,Y],F:[-1,0],Ld:420,Dt:[165,135],name:"Woodward Ave"},{c:[-X,0],F:[0,-1],Ld:420,Dt:[160,160],name:"Grand River Ave"}];
   for(const I of IC){const [cx,cy]=I.c,[fx,fy]=I.F,nx=-fy,ny=fx;I.P=(u,t,r)=>{const p=[Math.round((cx+fx*u+nx*t)*100)/100,Math.round((cy+fy*u+ny*t)*100)/100];if(r)p.push(r);return p};
     for(const u of [-I.Ld,I.Ld])N(...I.P(u,0),{ctrl:"merge"});I.T=sg=>sg<0?-I.Dt[0]:I.Dt[1];for(const sg of [-1,1])N(...I.P(0,I.T(sg)),{ctrl:"signal"})}
   const icN=(k,u)=>IC[k].P(u*IC[k].Ld,0);
@@ -1218,8 +1223,9 @@ const laneOff=(e,i)=>(loOf(e.n)+i)*LANE;
   for(const I of IC)for(const d of [1,-1]){const sg=-d,L=I.Ld;
     // ramps leave at a shallow angle, sweep out and meet the cross street square on, at the signal
     const Tt=I.T(sg),Ta=Math.abs(Tt);
-    E("ramp",I.name+" exit",[I.P(-d*L,0),I.P(-d*(L-62),sg*26.6),I.P(-d*(L-98),sg*Ta*0.5,80),I.P(-d*30,Tt,40),I.P(0,Tt)]);
-    E("ramp",I.name+" entrance",[I.P(0,Tt),I.P(d*30,Tt,40),I.P(d*(L-98),sg*Ta*0.5,80),I.P(d*(L-62),sg*26.6),I.P(d*L,0)])}
+    // a long parallel lane beside the freeway (deceleration lane on exits, acceleration lane on entrances) and a gentle taper, instead of cutting in at 23°
+    E("ramp",I.name+" exit",[I.P(-d*L,0),I.P(-d*(L-230),sg*27.6),I.P(-d*(L-300),sg*27.9,80),I.P(-d*105,sg*Ta*0.5,90),I.P(-d*30,Tt,40),I.P(0,Tt)]);
+    E("ramp",I.name+" entrance",[I.P(0,Tt),I.P(d*30,Tt,40),I.P(d*105,sg*Ta*0.5,90),I.P(d*(L-300),sg*27.9,80),I.P(d*(L-230),sg*27.6),I.P(d*L,0)])}
   BUILD_IC=IC;
   // downtown: 6 x 5 grid of 150 m blocks, signals on the busy streets, all-way stops on the quiet corners
   const DX=[-1300,-1150,-1000,-850,-700,-550],DY=[-300,-150,0,150,300];
@@ -1417,7 +1423,7 @@ function inCity(x,y){const [x0,x1,y0,y1]=CITY_BOX;return x>x0&&x<x1&&y>y0&&y<y1}
 function cityW(x,y){let w=0;for(const [x0,x1,y0,y1] of FLAT)w=Math.max(w,1-smooth01(0,150,Math.hypot(Math.max(x0-x,0,x-x1),Math.max(y0-y,0,y-y1))));return w}
 function zoneName(x,y){for(const [x0,x1,y0,y1,n] of FLAT)if(x>x0&&x<x1&&y>y0&&y<y1)return n;return "rural"}
 // the service plaza (fuel + fast chargers) sits beside Hwy 7 on the north side; the parallel-parking block is on Main St
-const PAD={e:ePick(320,1100,-1700,200),dir:1,s0:760,s1:842,o0:-42,o1:-7};
+const PAD={e:ePick(80,1100,-1700,420),dir:1,s0:520,s1:602,o0:-42,o1:-7};
 const PARK={e:ePick(-1000,0,-850,0),dir:1,s0:24,s1:126,oP:-3.1,oA:-0.1,o0:-4.4};
 const padPt=(u,o)=>fpt(PAD.e,PAD.dir,PAD.s0+u,o);
 // signs for traffic sign recognition: a limit sign after every junction where the limit applies (both directions)
@@ -5352,9 +5358,10 @@ function worldScenery(){
   // ---- bridges over the Rouge River: girders, piers, parapets you can hit
   const gird=M_(),para=M_(),water=M_(),gSlab=M_(),gWall=M_(),gLight=M_(),gBlue=M_();
   for(const e of EDGES){if(!e.br)continue;const uc=e.br.uc,hf=e.br.half,Wt=e.m/2+e.n*LANE+e.side;
-    for(let u=uc-hf-34;u<=uc+hf+34;u+=6){const z=ez(e,u),p=ePt(e,u,0);boxInto(gird,p[0],z-0.85,-p[1],6.1,1.2,2*Wt+0.6,p[2])}
-    for(const du of [-hf+5,0,hf-5])for(const sd of [1,-1]){const p=ePt(e,uc+du,sd*Wt*0.55),z=ez(e,uc+du);boxInto(gird,p[0],(z-1.4-3.6)/2,-p[1],1.6,z-1.4+3.6,2.2,p[2])}
-    for(let u=uc-hf-BRIDGE_RAMP*0.7;u<=uc+hf+BRIDGE_RAMP*0.7;u+=4){const z=ez(e,u);if(z<0.9)continue;
+    const inJ=u=>u<(e.p0||0)+2||u>e.L-(e.p1||0)-2;   // the part of a ramp that has merged into the freeway is freeway, not bridge
+    for(let u=uc-hf-34;u<=uc+hf+34;u+=6){if(inJ(u))continue;const z=ez(e,u),p=ePt(e,u,0);boxInto(gird,p[0],z-0.85,-p[1],6.1,1.2,2*Wt+0.6,p[2])}
+    for(const du of [-hf+5,0,hf-5])for(const sd of [1,-1]){if(inJ(uc+du))continue;const p=ePt(e,uc+du,sd*Wt*0.55),z=ez(e,uc+du);boxInto(gird,p[0],(z-1.4-3.6)/2,-p[1],1.6,z-1.4+3.6,2.2,p[2])}
+    for(let u=uc-hf-BRIDGE_RAMP*0.7;u<=uc+hf+BRIDGE_RAMP*0.7;u+=4){const z=ez(e,u);if(z<0.9||inJ(u)||inJ(u+4))continue;
       for(const sd of [1,-1]){const p=ePt(e,u+2,sd*(Wt+0.25));boxInto(para,p[0],z+0.45,-p[1],4.05,0.9,0.35,p[2]);collAdd({t:"b",x:p[0],y:p[1],h:p[2],hl:2.02,hw:0.18,z0:z-0.3,z1:z+1.6,what:"the bridge railing"})}}}
   // ---- the sides of the freeway cut under each bridge: sloped grass from the shoulder up to the ground
   for(const e of EDGES){if(!e.dip)continue;for(const o of e.dip){const u0=o.uc-o.half-o.rA,u1=o.uc+o.half+o.rB;for(const sg of [1,-1]){const k0=green.P.length/3;let q=0;
@@ -6538,6 +6545,7 @@ function render(dt){
   const dpr=Math.max(0.5,Math.min(window.devicePixelRatio||1,G().res)*GFX.dyn), W=Math.floor(cv.clientWidth*dpr), H=Math.floor(cv.clientHeight*dpr);
   if(cv.width!==W||cv.height!==H){cv.width=W;cv.height=H}
   gl.viewport(0,0,W,H);
+  if((st.cam!==1||st.walk)&&SCR.uiHid){SCR.uiHid=false;SCR.fz=0;document.body.classList.remove("scrview")}
   const night=st.night, wk=WX.cur, ww=WX.w, wsky=night?{rain:[0.005,0.006,0.008],snow:[0.012,0.013,0.016],fog:[0.01,0.011,0.013]}[wk]:{rain:[0.33,0.36,0.40],snow:[0.62,0.65,0.70],fog:[0.62,0.64,0.66]}[wk];
   const D_=GT.D??(night?0:1),tw=Math.max(0,1-Math.abs(D_-0.42)*3.2)*0.55,sky=[0.004,0.006,0.012].map((v,i)=>lerp(lerp(v,[0.42,0.60,0.78][i],D_),[0.62,0.36,0.24][i]*Math.max(0.25,D_),tw)).map((v,i)=>wsky?lerp(v,wsky[i]*(night?1:Math.max(0.2,D_)),ww):v), skyS=sky.map(v=>Math.pow(v,0.4545));
   gl.clearColor(skyS[0],skyS[1],skyS[2],1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
@@ -6568,7 +6576,7 @@ function render(dt){
     const kO=1-Math.exp(-dt*(look.drag?22:11));camOff=camOff.map((v,i)=>v+(off[i]-v)*kO);camPos=[cp[0]+camOff[0],cp[1]+camOff[1],cp[2]+camOff[2]];eye=camPos;tgt=[cp[0]+fl[0]*3*Math.max(0,cy),cp[1]+CH,cp[2]+fl[2]*3*Math.max(0,cy)]}
   else if(st.cam===1){const pt=clamp(look.pitch,-0.6,0.5);const E_=[VEH.eye[0],VEH.eye[1]+(st.seatH||0),VEH.eye[2]+(st.seatZ||0)];eye=M4.p(cm,E_);
     tgt=M4.p(cm,[E_[0]-Math.sin(look.yaw)*6*Math.cos(pt),E_[1]+Math.sin(-pt)*6-0.16-Math.max(TRIMS[st.trim].eyeTilt||0,VEH.tilt||0)*6,E_[2]-Math.cos(look.yaw)*6*Math.cos(pt)]);up=M4.d(cm,[0,1,0]);fov=asp<1?Math.PI/2:Math.PI/2.6;
-    SCR.fz=lerp(SCR.fz,SCR.focus?1:0,Math.min(1,dt*6));
+    SCR.fz=lerp(SCR.fz,SCR.focus?1:0,Math.min(1,dt*6));{const on=SCR.fz>0.4;if(on!==SCR.uiHid){SCR.uiHid=on;document.body.classList.toggle("scrview",on)}}
     if(SCR.fz>0.002){const k=0.46,eF=M4.p(cm,[SCR_C[0]+SCR_N[0]*k,SCR_C[1]+SCR_N[1]*k,SCR_C[2]+SCR_N[2]*k]),hwS=Math.hypot(SCR_BR[0]-SCR_BL[0],SCR_BR[1]-SCR_BL[1],SCR_BR[2]-SCR_BL[2])/2*1.12,hS=Math.hypot(SCR_TL[0]-SCR_BL[0],SCR_TL[1]-SCR_BL[1],SCR_TL[2]-SCR_BL[2])/2*1.15,fF=Math.max(2*Math.atan(hS/k),2*Math.atan(hwS/k/asp)),sh_=0,tF=M4.p(cm,[SCR_C[0],SCR_C[1]-0.97*sh_,SCR_C[2]+0.242*sh_]);
       eye=eye.map((v,i)=>lerp(v,eF[i],SCR.fz));tgt=tgt.map((v,i)=>lerp(v,tF[i],SCR.fz));fov=lerp(fov,fF,SCR.fz)}
     SCR.fzc=lerp(SCR.fzc||0,SCR.focusClu&&CLU_BL?1:0,Math.min(1,dt*6));
@@ -7222,7 +7230,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(/SwiftShader|llvmpipe|Microsoft Basic/i.test(gpu))return "low";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="73";try{if(localStorage.getItem("strata.ver")!==APP_VER){for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="74";try{if(localStorage.getItem("strata.ver")!==APP_VER){for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){return GQ[GFX.q==="auto"?GFX.eff:GFX.q]}
 function setGfx(q){GFX.q=q;GFX.dyn=1;try{localStorage.setItem("strata.gfx",q)}catch(e){}}
@@ -7690,7 +7698,7 @@ function mpTick(dt){const R_=MP.room;if(!R_)return;MP.sendT+=dt;
     const key=JSON.stringify(p),now=performance.now();if(key!==MP.last||now-MP.lastT>1000){MP.last=key;MP.lastT=now;R_.presence({car:p}).catch(()=>{})}}
   const now=performance.now(),seen=new Set();let peers=[];try{peers=R_.peers()}catch(e){}
   for(const pr of peers){if(pr.sameTab||pr.kind!=="viewer")continue;const c=pr.presence&&pr.presence.car;if(!c||typeof c.x!=="number"||!isFinite(c.x)||!isFinite(c.y))continue;seen.add(pr.peer);
-    let o=MP.objs.get(pr.peer);if(!o){o={kind:"remote",peer:pr.peer,wx:c.x,wy:c.y,wz:c.z||0,wh:c.h||0,v:0,spin:0,sig:0,head:0,paint:"white",occ:{pax:false,a:{skin:Math.floor(Math.random()*3),shirt:Math.floor(Math.random()*6)},b:{skin:0,shirt:0}}};MP.objs.set(pr.peer,o);if(MP.ready&&NET.role!=="host")toast(`${netClean(pr.presence.n,20)||"Another player"} joined the drive`)}o.name=netClean(pr.presence.n,20)||o.name;
+    let o=MP.objs.get(pr.peer);if(!o){o={kind:"remote",peer:pr.peer,wx:c.x,wy:c.y,wz:c.z||0,wh:c.h||0,v:0,spin:0,sig:0,head:0,paint:"white",occ:{pax:false,a:{skin:Math.floor(Math.random()*3),shirt:Math.floor(Math.random()*6)},b:{skin:0,shirt:0}}};MP.objs.set(pr.peer,o);if(MP.ready)toast(`${netClean(pr.presence.n,20)||"Another player"} joined the drive`)}o.name=netClean(pr.presence.n,20)||o.name;
     if(o.src!==c){o.src=c;o.rt=now}
     const age=Math.min(0.6,(now-o.rt)/1000),v=+c.v||0,h=+c.h||0,tx=c.x+Math.cos(h)*v*age,ty=c.y+Math.sin(h)*v*age,k=Math.min(1,dt*10);
     if(Math.hypot(tx-o.wx,ty-o.wy)>15){o.wx=tx;o.wy=ty;o.wh=h}else{o.wx+=(tx-o.wx)*k;o.wy+=(ty-o.wy)*k;o.wh+=wrapPi(h-o.wh)*k}
@@ -7698,159 +7706,125 @@ function mpTick(dt){const R_=MP.room;if(!R_)return;MP.sendT+=dt;
     if(Array.isArray(c.pc)&&c.pc.length===3){const key="rp_"+pr.peer;PAINTS[key]=c.pc.map(x=>clamp(+x||0,0,1));o.paint=key}
     const m=String(c.m||"");if(MODELS[m])o.mdl=m;else if(m&&/^[a-z0-9_]+$/.test(m)&&!o.loading&&!o.failed){o.loading=true;loadModel(m).then(()=>{o.loading=false}).catch(()=>{o.loading=false;o.failed=true})}
     if(!parked.includes(o))parked.push(o)}
-  for(const [k,o] of MP.objs)if(!seen.has(k)){MP.objs.delete(k);if(MP.room===NETROOM&&NET.role==="client"&&o.name&&NET.hostL)toast(`${o.name} left`);const i=parked.indexOf(o);if(i>=0)parked.splice(i,1)}
+  for(const [k,o] of MP.objs)if(!seen.has(k)){MP.objs.delete(k);if(MP.room===NETROOM&&o.name&&NET.on)toast(`${o.name} left`);const i=parked.indexOf(o);if(i>=0)parked.splice(i,1)}
   MP.ready=true}
 
 (async()=>{try{if(!window.claude||!window.claude.use)return;const user=await window.claude.use("user");const owner=user?await user.isOwner():false;const room=await window.claude.use("room");if(!room)return;
   MP.room=room;room.presence({playing:true,ver:+APP_VER}).catch(()=>{});const el=$("players");el.hidden=false;
   const upd=()=>{try{const nv=Math.max(0,...room.peers().map(p=>+(p.presence&&p.presence.ver)||0));if(nv>+APP_VER){let done="";try{done=sessionStorage.getItem("strata.reloadFor")||""}catch(e){}if(done!==String(nv)){try{sessionStorage.setItem("strata.reloadFor",String(nv))}catch(e){}toast(`Version ${nv} is out: restarting the game`);setTimeout(()=>location.reload(),2500)}}}catch(e){}const n=new Set(room.peers().filter(p=>p.kind==="viewer").map(p=>p.peer)).size;el.textContent=`👥 ${n} online`;el.title="Players online right now, worldwide"};room.onPeers(upd,()=>{});upd()}catch(e){}})();
 
-// ======================================================================= online servers (GitHub site): WebRTC peer-to-peer, signalling through the free PeerJS cloud server.
-// No game server: whoever creates a server hosts it in their browser and relays everyone's car positions. Public servers sit in 16 well-known
-// slots so anyone can list them; private ones get a 6-letter code. If the host leaves, the player who joined first takes over automatically.
-const NET={host:"0.peerjs.com",port:443,secure:true,key:"peerjs",pre:"mstrata1-",slots:16,max:8,
-  ice:[{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun1.l.google.com:19302"},{urls:"stun:stun.cloudflare.com:3478"}],
-  me:null,role:null,srv:null,slotS:null,links:new Map(),players:new Map(),roster:[],hostPid:null,hostL:null,lastR:0,order:0,
-  list:[],scanning:false,scanT:0,pres:{},busy:"",err:"",name:"",bcT:0,envT:0,pending:null,migr:0};
+// ======================================================================= online servers (GitHub site): two free public MQTT brokers carry the server list and
+// everyone's car positions (pub/sub over a WebSocket). No game server and nothing peer-to-peer, so home, school and phone networks can't block it. A server is a
+// topic: a retained "listing" message makes it show in the server list (and a last-will clears it if the host's tab crashes); players publish their car on the
+// server's topic. The player who joined first is the host (posts the listing, the time of day and weather); if they leave, the next one takes over by itself.
+const netRid=n=>{const A="ABCDEFGHJKMNPQRSTUVWXYZ23456789";let s="";for(let i=0;i<n;i++)s+=A[Math.floor(Math.random()*A.length)];return s};
+const netClean=(s,n)=>String(s||"").replace(/[<>&"`\\]/g,"").replace(/\s+/g," ").trim().slice(0,n);
+const NET={brokers:["wss://broker.hivemq.com:8884/mqtt","wss://broker.emqx.io:8084/mqtt"],pre:"mstrata/v1/",max:8,
+  G:null,on:false,sid:null,code:null,pub:false,srvName:"",listTopic:"",gameTopic:"",listing:null,joinT:0,me:netRid(12),seq:0,last:new Map(),peers:new Map(),
+  list:[],scanning:false,scanT:0,pres:{},busy:"",err:"",name:"",sentT:0,hbT:0,listT:0,envT:0,wasHost:false,lastN:0};
 try{NET.name=localStorage.getItem("strata.name")||""}catch(e){}
 if(!NET.name)NET.name="Driver "+Math.floor(1000+Math.random()*9000);
-{const q=new URLSearchParams(location.search).get("sig");if(q&&/^(127\.0\.0\.1|localhost):\d+$/.test(q)){const [h,p]=q.split(":");NET.host=h;NET.port=+p;NET.secure=false;NET.pre="mstratatest-"}}
-const netRid=n=>{const A="ABCDEFGHJKMNPQRSTUVWXYZ23456789";let s="";for(let i=0;i<n;i++)s+=A[Math.floor(Math.random()*A.length)];return s};
-const netClean=(s,n)=>String(s||"").replace(/[<>&"'`\\]/g,"").replace(/\s+/g," ").trim().slice(0,n);
-function netSig(id,on){return new Promise((res,rej)=>{let ws;const url=`${NET.secure?"wss":"ws"}://${NET.host}:${NET.port}/peerjs?key=${NET.key}&id=${id}&token=${Math.random().toString(36).slice(2)}&version=1.5.4`;
-  try{ws=new WebSocket(url)}catch(e){rej(e);return}
-  const S={id,ws,open:false,on:on||null,onclose:null,send(type,dst,payload){if(ws.readyState===1)ws.send(JSON.stringify(dst?{type,dst,payload}:{type}))},close(){S.open=false;S.onclose=null;clearInterval(S.hb);try{ws.close()}catch(e){}}};
-  const to=setTimeout(()=>{S.close();rej(new Error("timeout"))},10000);
-  ws.onmessage=e=>{let m;try{m=JSON.parse(e.data)}catch(_){return}if(!m||typeof m!=="object")return;
-    if(m.type==="OPEN"){if(S.open)return;clearTimeout(to);S.open=true;S.hb=setInterval(()=>S.send("HEARTBEAT"),5000);res(S)}
-    else if(m.type==="ID-TAKEN"||m.type==="INVALID-KEY"||(m.type==="ERROR"&&!S.open)){clearTimeout(to);S.close();rej(new Error(m.type))}
-    else if(S.on)try{S.on(m,S)}catch(err){console.warn(err)}};
-  ws.onerror=()=>{};ws.onclose=()=>{clearTimeout(to);clearInterval(S.hb);if(!S.open){rej(new Error("closed"));return}S.open=false;if(S.onclose)S.onclose()}})}
-// a WebRTC link: "r" reliable channel for joins/leaves, "u" unreliable for positions (a late position is worse than a lost one)
-function netLink(S,remote,cid,init,onOpen){const pc=new RTCPeerConnection({iceServers:NET.ice}),L={pc,S,remote,cid,r:null,u:null,q:[],buf:[],ok:false,dead:false,seen:performance.now(),onmsg:null,onclose:null};
-  pc.onicecandidate=e=>{if(e.candidate)S.send("CANDIDATE",remote,{cid,c:e.candidate.toJSON()})};
-  const chk=()=>{if(!L.ok&&L.r&&L.u&&L.r.readyState==="open"&&L.u.readyState==="open"){L.ok=true;L.seen=performance.now();onOpen(L)}};
-  const wire=ch=>{ch.onmessage=e=>{L.seen=performance.now();let m;try{m=JSON.parse(e.data)}catch(_){return}if(!m)return;if(!L.onmsg){if(L.buf.length<50)L.buf.push(m);return}try{L.onmsg(m,L)}catch(err){console.warn(err)}};ch.onclose=()=>netDown(L);ch.onopen=chk;if(ch.readyState==="open")chk()};
-  if(init){L.r=pc.createDataChannel("r");L.u=pc.createDataChannel("u",{ordered:false,maxRetransmits:0});wire(L.r);wire(L.u)}
-  else pc.ondatachannel=e=>{if(e.channel.label==="r")L.r=e.channel;else L.u=e.channel;wire(e.channel)};
-  pc.onconnectionstatechange=()=>{if(pc.connectionState==="failed"||pc.connectionState==="closed")netDown(L)};
-  NET.links.set(cid,L);return L}
-async function netCand(L,c){if(!c)return;if(!L.pc.remoteDescription){L.q.push(c);return}try{await L.pc.addIceCandidate(c)}catch(e){}}
-async function netRemote(L,sdp){await L.pc.setRemoteDescription(sdp);for(const c of L.q.splice(0))try{await L.pc.addIceCandidate(c)}catch(e){}}
-function netDown(L){if(L.dead)return;L.dead=true;NET.links.delete(L.cid);try{L.pc.close()}catch(e){}if(L.onclose)L.onclose(L)}
-function netSend(L,m,rel){const ch=rel?L&&L.r:L&&L.u;if(ch&&ch.readyState==="open")try{ch.send(JSON.stringify(m))}catch(e){}}
-function netInfo(){const s=NET.srv;return{name:s.name,n:NET.players.size,max:NET.max,ver:+APP_VER,pub:s.pub}}
-// signalling messages that reach either of my ids (my player id, and the server slot id when I host)
-function netOnSig(m,S){const p=m.payload||{};
-  if(m.type==="OFFER"){
-    if(p.q==="info"){if(NET.role==="host"&&S===NET.slotS)S.send("ANSWER",m.src,{info:netInfo()});return}
-    if(!p.sdp||!p.cid)return;
-    if(NET.role!=="host"){S.send("ANSWER",m.src,{cid:p.cid,deny:"That player isn't hosting a server"});return}
-    if(+p.ver!==+APP_VER){S.send("ANSWER",m.src,{cid:p.cid,deny:+p.ver<+APP_VER?"This server runs a newer version. Refresh the page to update.":"This server runs an older version"});return}
-    if(NET.players.size>=NET.max){S.send("ANSWER",m.src,{cid:p.cid,deny:"That server is full"});return}
-    const pid=String(m.src).slice(0,64),name=netClean(p.name,20)||"Driver";
-    const L=netLink(S,m.src,String(p.cid).slice(0,24),false,L=>{const old=NET.players.get(pid);if(old&&old.L&&old.L!==L)netDown(old.L);
-      NET.players.set(pid,{name,pres:{},j:++NET.order,L});netSend(L,{t:"W",srv:{...netInfo(),code:NET.srv.code},you:pid},true);toast(`${name} joined ${NET.srv.name}`);netUI()});
-    L.pid=pid;L.onmsg=(mm,L)=>{const P=NET.players.get(pid);if(!P||P.L!==L)return;if(mm.t==="P"&&mm.c&&typeof mm.c==="object"){P.pres=mm.c;const fw={t:"U",i:pid,c:mm.c};for(const [k,Q] of NET.players)if(k!==pid&&Q.L)netSend(Q.L,fw)}else if(mm.t==="B")netDown(L)};
-    L.onclose=L=>{const P=NET.players.get(pid);if(P&&P.L===L){NET.players.delete(pid);toast(`${P.name} left`);netUI()}};
-    (async()=>{try{await netRemote(L,p.sdp);const a=await L.pc.createAnswer();await L.pc.setLocalDescription(a);S.send("ANSWER",m.src,{cid:L.cid,sdp:L.pc.localDescription})}catch(e){netDown(L)}})();
-    setTimeout(()=>{if(!L.ok)netDown(L)},20000);return}
-  if(m.type==="ANSWER"){
-    if(p.info&&NET.scanning&&typeof p.info==="object"){const i=p.info;NET.list=NET.list.filter(x=>x.id!==m.src);NET.list.push({id:m.src,name:netClean(i.name,32)||"Server",n:+i.n||1,max:+i.max||8,ver:+i.ver||0});netUI();return}
-    const J=NET.pending;if(!J||p.cid!==J.cid)return;
-    if(p.deny){J.fail(netClean(p.deny,90));return}
-    if(p.sdp)netRemote(J.L,p.sdp).catch(()=>J.fail("Couldn't connect"));return}
-  if(m.type==="CANDIDATE"){const L=NET.links.get(p.cid);if(L&&L.remote===m.src)netCand(L,p.c);return}
-  if(m.type==="EXPIRE"){const J=NET.pending;if(J&&m.src===J.target)J.fail("That server isn't running any more")}}
-async function netMe(){if(NET.me&&NET.me.open)return NET.me;for(let i=0;i<3;i++){try{const S=await netSig(NET.pre+"u"+netRid(10),netOnSig);S.onclose=()=>{NET.me=null;if(NET.role)netReconnectMe()};NET.me=S;return S}catch(e){if(i===2)throw e}}}
-async function netReconnectMe(){for(let i=0;i<5&&NET.role;i++){await new Promise(r=>setTimeout(r,1500*(i+1)));try{await netMe();return}catch(e){}}}
+{const q=new URLSearchParams(location.search).get("mq");if(q&&/^(127\.0\.0\.1|localhost):\d+$/.test(q)){NET.brokers=["ws://"+q+"/"];NET.pre="mstratatest/v1/"}}
+// ---- a minimal MQTT 3.1.1 client over WebSocket (QoS 0, retained messages, last will)
+function mqOpen(url,will,onmsg){return new Promise((res,rej)=>{let ws;try{ws=new WebSocket(url,["mqtt"])}catch(e){rej(e);return}ws.binaryType="arraybuffer";
+  const E=new TextEncoder(),D=new TextDecoder();
+  const cat=a=>{let n=0;for(const x of a)n+=x.length;const o=new Uint8Array(n);let i=0;for(const x of a){o.set(x,i);i+=x.length}return o};
+  const s2=s=>{const b=typeof s==="string"?E.encode(s):s,o=new Uint8Array(2+b.length);o[0]=b.length>>8;o[1]=b.length&255;o.set(b,2);return o};
+  const pk=(h,body)=>{const L=[];let n=body.length;do{let d=n%128;n=Math.floor(n/128);if(n>0)d|=128;L.push(d)}while(n>0);return cat([Uint8Array.of(h,...L),body])};
+  const C={ws,open:false,pid:1,onclose:null,
+    pub(t,obj,ret){if(ws.readyState!==1)return;const p=obj==null?new Uint8Array(0):E.encode(JSON.stringify(obj));try{ws.send(pk(0x30|(ret?1:0),cat([s2(t),p])))}catch(e){}},
+    sub(f){if(ws.readyState!==1)return;const id=(C.pid++%65000)+1;try{ws.send(pk(0x82,cat([Uint8Array.of(id>>8,id&255),s2(f),Uint8Array.of(0)])))}catch(e){}},
+    close(){C.open=false;C.onclose=null;clearInterval(C.ping);try{if(ws.readyState===1)ws.send(Uint8Array.of(0xE0,0))}catch(e){}try{ws.close()}catch(e){}}};
+  let flags=0x02;const parts=[s2("MQTT"),Uint8Array.of(4),null,Uint8Array.of(0,120),s2("ms"+netRid(14))];
+  if(will){flags|=0x04|(will.r?0x20:0);parts.push(s2(will.t),s2(will.p||""))}parts[2]=Uint8Array.of(flags);
+  let buf=new Uint8Array(0);const to=setTimeout(()=>{try{ws.close()}catch(e){}rej(new Error("timeout"))},9000);
+  ws.onopen=()=>{try{ws.send(pk(0x10,cat(parts)))}catch(e){}};
+  ws.onmessage=e=>{if(!(e.data instanceof ArrayBuffer))return;buf=cat([buf,new Uint8Array(e.data)]);
+    for(;;){if(buf.length<2)return;let i=1,mul=1,L=0,b;do{if(i>=buf.length)return;b=buf[i++];L+=(b&127)*mul;mul*=128}while((b&128)&&i<5);if(buf.length<i+L)return;
+      const h=buf[0],P=buf.slice(i,i+L);buf=buf.slice(i+L);const t=h>>4;
+      if(t===2){clearTimeout(to);if(P[1]===0){C.open=true;C.ping=setInterval(()=>{if(ws.readyState===1)try{ws.send(Uint8Array.of(0xC0,0))}catch(e){}},30000);res(C)}else{try{ws.close()}catch(e){}rej(new Error("refused"))}}
+      else if(t===3){const tl=(P[0]<<8)|P[1],topic=D.decode(P.subarray(2,2+tl));let o=2+tl;if((h>>1)&3)o+=2;const raw=P.subarray(o);let m=null;
+        if(raw.length){if(raw.length>8000)continue;try{m=JSON.parse(D.decode(raw))}catch(_){continue}}try{onmsg(topic,m)}catch(err){console.warn(err)}}}};
+  ws.onerror=()=>{};ws.onclose=()=>{clearTimeout(to);clearInterval(C.ping);if(!C.open){rej(new Error("closed"));return}C.open=false;if(C.onclose)C.onclose()}})}
+// the same connection to every broker at once: publish to all, receive from all (duplicates are dropped by sequence number), and survive one broker being down
+async function netGroup(will,onmsg,subs){const G={cs:new Map(),subs:subs.slice(),dead:false,onup:null,
+    pub(t,o,r){for(const c of G.cs.values())if(c.open)c.pub(t,o,r)},sub(f){G.subs.push(f);for(const c of G.cs.values())if(c.open)c.sub(f)},
+    up(){for(const c of G.cs.values())if(c.open)return true;return false},close(){G.dead=true;for(const c of G.cs.values())c.close();G.cs.clear()}};
+  const one=async(url,tries)=>{try{const c=await mqOpen(url,will,onmsg);if(G.dead){c.close();return}G.cs.set(url,c);for(const f of G.subs)c.sub(f);
+      c.onclose=()=>{G.cs.delete(url);if(!G.dead)setTimeout(()=>{if(!G.dead)one(url,0)},2500)};if(G.onup)G.onup()}
+    catch(e){if(!G.dead)setTimeout(()=>{if(!G.dead&&!G.cs.has(url))one(url,tries+1)},Math.min(30000,4000*(tries+1)))}};
+  await Promise.all(NET.brokers.map(u=>one(u,0)));return G}
+const netHostId=()=>{let best=NET.me,bj=NET.joinT;for(const [id,p] of NET.peers)if(p.j<bj||(p.j===bj&&id<best)){best=id;bj=p.j}return best};
+const netIsHost=()=>NET.on&&netHostId()===NET.me;
+function netSend(k,extra){if(NET.G)NET.G.pub(NET.gameTopic,{i:NET.me,q:++NET.seq,v:+APP_VER,k,...extra})}
+function netSendP(){NET.sentT=performance.now();netSend("P",{n:NET.name,j:NET.joinT,c:NET.pres.car||null})}
+function netPubListing(){if(!NET.G)return;NET.listT=performance.now();NET.lastN=NET.peers.size+1;
+  NET.G.pub(NET.listTopic,{name:NET.srvName,n:NET.peers.size+1,max:NET.max,ver:+APP_VER,t:Date.now(),pub:NET.pub},true)}
+function netOnMsg(topic,m){
+  if(topic===NET.listTopic){if(!m){if(netIsHost()&&NET.on)setTimeout(()=>{if(netIsHost())netPubListing()},300)}else if(typeof m==="object"){NET.listing=m;if(m.name)NET.srvName=netClean(m.name,32)||NET.srvName}return}
+  if(topic!==NET.gameTopic||!m||typeof m!=="object")return;
+  const id=typeof m.i==="string"?m.i.slice(0,16):"";if(!id||id===NET.me)return;const q=+m.q||0;if(q<=(NET.last.get(id)||0))return;NET.last.set(id,q);if(+m.v!==+APP_VER)return;
+  if(m.k==="P"){let p=NET.peers.get(id);if(!p){if(NET.peers.size>=NET.max+2)return;p={j:+m.j||Date.now()};NET.peers.set(id,p);netUI()}
+    p.n=netClean(m.n,20)||"Driver";if(+m.j)p.j=+m.j;p.c=m.c&&typeof m.c==="object"&&typeof m.c.x==="number"?m.c:null;p.t=performance.now()}
+  else if(m.k==="B"){if(NET.peers.delete(id))netUI()}
+  else if(m.k==="E"&&id===netHostId()){if(typeof m.min==="number"&&isFinite(m.min)&&Math.abs(GT.min-m.min)>3)GT.min=m.min;
+    if(typeof m.wx==="string"&&["clear","rain","snow","fog"].includes(m.wx)&&WX.cur!==m.wx&&WX.next!==m.wx)setWeather(m.wx,false)}}
 // ---- the room interface the game's multiplayer code already uses (same shape as the Claude artifact room)
-const NETROOM={presence(o){Object.assign(NET.pres,o);if(NET.role==="client"&&NET.hostL)netSend(NET.hostL,{t:"P",c:NET.pres});else if(NET.role==="host"&&NET.me){const fw={t:"U",i:NET.me.id,c:NET.pres};for(const [,Q] of NET.players)if(Q.L)netSend(Q.L,fw)}return Promise.resolve()},
-  peers(){const me=NET.me&&NET.me.id,out=[];
-    if(NET.role==="host"){for(const [pid,P] of NET.players)if(pid!==me&&P.pres)out.push({peer:pid,kind:"viewer",presence:{...P.pres,n:P.name}})}
-    else for(const r of NET.roster)if(r[0]!==me)out.push({peer:r[0],kind:"viewer",presence:{...(r[3]||{}),n:r[1]}});return out},onPeers(){}};
-function netStartRoom(){MP.room=NETROOM;MP.ready=false;netUI()}
-function netStopRoom(){if(MP.room===NETROOM){MP.room=null;{const el=$("players");if(el)el.hidden=true}for(const o of MP.objs.values()){const i=parked.indexOf(o);if(i>=0)parked.splice(i,1)}MP.objs.clear()}}
-async function netClaimSlot(){const s=NET.srv;if(!s)return false;
-  const ids=s.pub?(s.slot!=null?[s.slot]:[]).concat([...Array(NET.slots).keys()].sort(()=>Math.random()-0.5)).map(i=>NET.pre+"s"+i):[NET.pre+"p"+s.code];
-  for(const id of ids){if(NET.role!=="host"||NET.srv!==s)return false;try{const S=await netSig(id,netOnSig);if(NET.role!=="host"||NET.srv!==s){S.close();return false}
-      S.onclose=()=>{if(NET.slotS===S){NET.slotS=null;setTimeout(()=>{if(NET.role==="host"&&!NET.slotS)netClaimSlot()},2000)}};NET.slotS=S;if(s.pub)s.slot=+id.slice((NET.pre+"s").length);return true}catch(e){if(e.message!=="ID-TAKEN"&&e.message!=="closed")throw e}}
-  return false}
-async function netCreate(pub,name){if(NET.role){toast("Leave this server first");return}if(MP.room&&MP.room!==NETROOM){toast("You're already in the shared online room");return}
-  NET.busy="Creating your server…";NET.err="";netUI();
-  try{await netMe();NET.srv={name:netClean(name,32)||`${NET.name}'s server`,pub,code:pub?null:netRid(6),slot:null};NET.role="host";NET.players.clear();NET.order=0;
-    NET.players.set(NET.me.id,{name:NET.name,pres:NET.pres,j:0,L:null});NET.hostPid=NET.me.id;
-    let ok=false;for(let t=0;t<3&&!ok;t++){ok=await netClaimSlot();if(!ok&&!pub)NET.srv.code=netRid(6)}
-    if(!ok){netLeave(true);NET.err=pub?"All 16 public server slots are taken. Make a private server instead.":"Couldn't create a server. Try again.";netUI();return}
-    netStartRoom();toast(pub?`Server "${NET.srv.name}" is up: others can find it under Online`:`Private server up: your code is ${NET.srv.code}`)}
-  catch(e){netLeave(true);NET.err="Couldn't reach the multiplayer service. Check your connection and try again."}
-  NET.busy="";netUI()}
-function netJoinOnce(target){return new Promise(async(res,rej)=>{let S;try{S=await netMe()}catch(e){rej(new Error("Couldn't reach the multiplayer service"));return}
-  const cid=netRid(10);let done=false;const J={cid,target,L:null,fail:msg=>{if(done)return;done=true;NET.pending=null;clearTimeout(J.to);if(J.L)netDown(J.L);rej(new Error(msg))}};
-  J.L=netLink(S,target,cid,true,L=>{if(done)return;done=true;NET.pending=null;clearTimeout(J.to);res(L)});NET.pending=J;
-  J.to=setTimeout(()=>J.fail("Couldn't connect: the server didn't answer, or your network blocks peer-to-peer"),16000);
-  try{const o=await J.L.pc.createOffer();await J.L.pc.setLocalDescription(o);S.send("OFFER",target,{cid,sdp:J.L.pc.localDescription,name:NET.name,ver:+APP_VER})}catch(e){J.fail("Couldn't connect")}})}
-function netAttach(L){NET.hostL=L;NET.hostPid=L.remote;NET.lastR=performance.now();
-  L.onmsg=(m,L)=>{if(NET.hostL!==L)return;
-    if(m.t==="R"&&Array.isArray(m.p)){NET.roster=m.p.filter(r=>Array.isArray(r)&&typeof r[0]==="string").slice(0,NET.max+2);NET.hostPid=m.h||NET.hostPid;NET.lastR=performance.now();if(m.s&&NET.srv)NET.srv.name=netClean(m.s,32)||NET.srv.name}
-    else if(m.t==="U"&&typeof m.i==="string"&&m.c&&typeof m.c==="object"){const r=NET.roster.find(r=>r[0]===m.i);if(r)r[3]=m.c}
-    else if(m.t==="W"){const c=m.srv&&typeof m.srv.code==="string"?m.srv.code.replace(/[^A-Z0-9]/g,"").slice(0,6):null;NET.srv={name:netClean(m.srv&&m.srv.name,32)||"Server",pub:!!(m.srv&&m.srv.pub),code:c||(NET.srv&&NET.srv.code)||null};if(!NET.welcomed){NET.welcomed=true;toast(`Joined ${NET.srv.name}`)}netUI()}
-    else if(m.t==="E"){if(typeof m.min==="number"&&Math.abs(GT.min-m.min)>3&&isFinite(m.min))GT.min=m.min;if(typeof m.wx==="string"&&["clear","rain","snow","fog"].includes(m.wx)&&WX.cur!==m.wx&&WX.next!==m.wx)setWeather(m.wx,false)}
-    else if(m.t==="M"&&typeof m.to==="string"){NET.migr=performance.now();netDown(L)}};
-  L.onclose=L=>{if(NET.hostL===L){NET.hostL=null;if(NET.role==="client")netMigrate()}};
-  for(const m of L.buf.splice(0))try{L.onmsg(m,L)}catch(e){}}
-async function netJoin(target,code){if(NET.role){toast("Leave this server first");return}if(MP.room&&MP.room!==NETROOM){toast("You're already in the shared online room");return}
-  NET.busy="Joining…";NET.err="";netUI();
-  try{NET.srv={name:"Server",pub:!code,code:code||null};NET.welcomed=false;const L=await netJoinOnce(target);NET.role="client";NET.roster=[];netAttach(L);netStartRoom()}
-  catch(e){NET.srv=null;NET.err=e.message||"Couldn't join"}NET.busy="";netUI()}
-// host gone: the earliest joiner still here takes over on their own player id; everyone else reconnects to them
-async function netMigrate(){const me=NET.me&&NET.me.id,old=NET.hostPid,left=NET.roster.filter(r=>r[0]!==old).sort((a,b)=>(+a[2]||0)-(+b[2]||0));
-  const succ=left.length?left[0][0]:me;NET.roster=[];
-  if(succ===me){NET.role="host";NET.players.clear();NET.order=0;NET.players.set(me,{name:NET.name,pres:NET.pres,j:0,L:null});NET.hostPid=me;toast(`The host left: you're hosting ${NET.srv?NET.srv.name:"the server"} now`);netUI();
-    for(let i=0;i<30&&NET.role==="host"&&!NET.slotS;i++){try{if(await netClaimSlot())break}catch(e){}await new Promise(r=>setTimeout(r,3000))}return}
-  toast("The host left: moving to the new host…");NET.role="client";
-  for(let i=0;i<6&&NET.role==="client"&&!NET.hostL;i++){await new Promise(r=>setTimeout(r,i?2000:900));try{const L=await netJoinOnce(succ);if(NET.role!=="client"){netDown(L);return}netAttach(L);toast("Reconnected");netUI();return}catch(e){}}
-  if(NET.role==="client"&&!NET.hostL){toast("Lost the server");netLeave(true)}}
-function netLeave(quiet){const was=NET.role;
-  if(was==="host"){const left=[...NET.players.entries()].filter(([k])=>k!==(NET.me&&NET.me.id)).sort((a,b)=>a[1].j-b[1].j);if(left.length){const to=left[0][0];for(const [,P] of left)if(P.L)netSend(P.L,{t:"M",to},true)}}
-  if(was==="client"&&NET.hostL)netSend(NET.hostL,{t:"B"},true);
-  NET.role=null;if(NET.slotS){NET.slotS.close();NET.slotS=null}
-  setTimeout(()=>{for(const L of [...NET.links.values()])netDown(L)},was==="host"?250:60);
-  NET.hostL=null;NET.players.clear();NET.roster=[];NET.srv=null;NET.pending=null;netStopRoom();if(!quiet)toast("Left the server");netUI()}
-async function netScan(){if(NET.scanning)return;NET.scanning=true;NET.err="";netUI();
-  try{const S=await netMe();for(let i=0;i<NET.slots;i++){const id=NET.pre+"s"+i;if(NET.slotS&&NET.slotS.id===id)continue;S.send("OFFER",id,{q:"info"})}NET.list=[];
-    await new Promise(r=>setTimeout(r,2600))}catch(e){NET.err="Couldn't reach the multiplayer service. Check your connection."}
-  NET.scanning=false;NET.scanT=performance.now();if(!NET.role&&!NET.pending&&NET.me&&!NET.busy){NET.me.close();NET.me=null}netUI()}
-setInterval(()=>{if(!NET.role)return;const now=performance.now(),dt=Math.min(2,(now-(NET.tT||now))/1000)||0.1;NET.tT=now;
-  if(NET.role==="host"){NET.bcT+=dt;if(NET.bcT>=0.25){NET.bcT=0;const me=NET.me&&NET.me.id;const R=[];for(const [pid,P] of NET.players)R.push([pid,P.name,P.j,pid===me?NET.pres:P.pres]);const msg={t:"R",p:R,h:me,s:NET.srv&&NET.srv.name};
-      for(const [,P] of NET.players)if(P.L)netSend(P.L,msg)}
-    NET.envT+=dt;if(NET.envT>2){NET.envT=0;for(const [,P] of NET.players)if(P.L)netSend(P.L,{t:"E",min:GT.min,wx:WX.next||WX.cur},true)}
-    for(const [pid,P] of NET.players)if(P.L&&now-P.L.seen>15000)netDown(P.L)}
-  else if(NET.role==="client"&&NET.hostL&&now-NET.hostL.seen>15000)netDown(NET.hostL)},100);
-function netTick(dt){if(!NET.role)return;
-  {const el=$("players");if(el&&MP.room===NETROOM){const n=NET.role==="host"?NET.players.size:Math.max(1,NET.roster.length);el.hidden=false;el.textContent=`🌐 ${n} · ${NET.srv?NET.srv.name:""}`;el.title="Players in your server"}}}
-addEventListener("pagehide",()=>{if(NET.role)netLeave(true);if(NET.me)NET.me.close()});
+const NETROOM={presence(o){Object.assign(NET.pres,o);if(NET.on&&performance.now()-NET.sentT>140)netSendP();return Promise.resolve()},
+  peers(){const out=[];for(const [id,p] of NET.peers)if(p.c)out.push({peer:id,kind:"viewer",presence:{car:p.c,n:p.n}});return out},onPeers(){}};
+async function netEnter(sid,pub,code,name,create){if(NET.on||NET.busy){toast("Leave this server first");return}if(MP.room&&MP.room!==NETROOM){toast("You're already in the shared online room");return}
+  NET.busy=create?"Creating your server…":"Joining…";NET.err="";netUI();
+  NET.sid=sid;NET.pub=pub;NET.code=code;NET.listTopic=NET.pre+(pub?"s/":"c/")+sid;NET.gameTopic=NET.pre+"g/"+sid;NET.listing=null;NET.peers.clear();NET.last.clear();
+  NET.srvName=create?(netClean(name,32)||`${NET.name}'s server`):"Server";
+  let G;try{G=await netGroup({t:NET.listTopic,p:"",r:true},netOnMsg,[NET.listTopic,NET.gameTopic])}catch(e){G=null}
+  const fail=msg=>{if(G)G.close();NET.G=null;NET.busy="";NET.err=msg;netUI()};
+  if(!G||!G.up())return fail("Couldn't reach the multiplayer service. Check your connection and try again.");
+  NET.G=G;G.onup=()=>{if(NET.on){netSendP();if(netIsHost())netPubListing()}};
+  if(!create){for(let i=0;i<20&&!NET.listing&&!NET.peers.size;i++)await new Promise(r=>setTimeout(r,200));
+    const L=NET.listing;if(!L&&!NET.peers.size)return fail(code?"No server with that code is running":"That server isn't running any more");
+    if(L&&+L.ver!==+APP_VER)return fail(+L.ver>+APP_VER?"That server runs a newer version. Refresh the page to update.":"That server runs an older version");
+    if(L&&+L.n>=NET.max)return fail("That server is full")}
+  NET.joinT=Date.now();NET.on=true;NET.busy="";NET.wasHost=create;MP.room=NETROOM;MP.ready=false;netSendP();
+  if(create){netPubListing();toast(pub?`Server "${NET.srvName}" is up: others can find it in the Online tab`:`Private server up: your code is ${code}`)}
+  else toast(`Joined ${NET.srvName}`);netUI()}
+function netLeave(quiet){if(!NET.on&&!NET.G)return;const host=netIsHost(),alone=NET.peers.size===0;
+  if(NET.on){netSend("B",{});if(host&&alone&&NET.G)NET.G.pub(NET.listTopic,null,true)}
+  const G=NET.G;NET.G=null;NET.on=false;setTimeout(()=>{if(G)G.close()},150);NET.peers.clear();NET.listing=null;
+  if(MP.room===NETROOM){MP.room=null;for(const o of MP.objs.values()){const i=parked.indexOf(o);if(i>=0)parked.splice(i,1)}MP.objs.clear()}
+  {const el=$("players");if(el)el.hidden=true}if(!quiet)toast("Left the server");netUI()}
+async function netScan(){if(NET.scanning)return;NET.scanning=true;NET.err="";netUI();const found=new Map(),pre=NET.pre+"s/";
+  let G=null;try{G=await netGroup(null,(t,m)=>{if(!t.startsWith(pre))return;const sid=t.slice(pre.length).slice(0,16);
+      if(!m||typeof m!=="object"||Math.abs(Date.now()-(+m.t||0))>600000){found.delete(sid);return}
+      found.set(sid,{id:sid,name:netClean(m.name,32)||"Server",n:Math.max(1,+m.n||1),max:+m.max||NET.max,ver:+m.ver||0})},[pre+"+"])}catch(e){}
+  if(!G||!G.up())NET.err="Couldn't reach the multiplayer service. Check your connection and try again.";else await new Promise(r=>setTimeout(r,2500));
+  if(G)G.close();NET.list=[...found.values()].filter(s=>s.id!==NET.sid||!NET.on);NET.scanning=false;NET.scanT=performance.now();netUI()}
+setInterval(()=>{if(!NET.on)return;const now=performance.now();
+  for(const [id,p] of NET.peers)if(now-p.t>10000){NET.peers.delete(id);netUI()}
+  if(now-NET.sentT>2000)netSendP();
+  const host=netIsHost();if(host!==NET.wasHost){NET.wasHost=host;if(host){toast(`You're hosting ${NET.srvName} now`);netPubListing()}netUI()}
+  if(host){if(now-NET.listT>15000||NET.peers.size+1!==NET.lastN)netPubListing();if(now-NET.envT>2000){NET.envT=now;netSend("E",{min:GT.min,wx:WX.next||WX.cur})}}},200);
+addEventListener("pagehide",()=>{if(NET.on)netLeave(true)});
+function netTick(dt){if(!NET.on)return;const el=$("players");if(el&&MP.room===NETROOM){el.hidden=false;el.textContent=`🌐 ${NET.peers.size+1} · ${NET.srvName}`;el.title="Players in your server"}}
 function netUI(){if(st.tab==="online"&&!$("drawer").hidden){const a=document.activeElement;if(a&&a.tagName==="INPUT"&&$("tabBody").contains(a))return;renderTab()}}
 function netAct(a,v){
-  if(a==="create"){const n=$("mpSrv");netCreate(v==="pub",n?n.value:"")}
-  else if(a==="join")netJoin(v);
-  else if(a==="code"){const c=(($("mpCode")||{}).value||"").toUpperCase().replace(/[^A-Z0-9]/g,"");if(c.length!==6){toast("Server codes are 6 letters and numbers");return}netJoin(NET.pre+"p"+c,c)}
+  if(a==="create"){const n=$("mpSrv"),pub=v==="pub",code=pub?null:netRid(6);netEnter(pub?netRid(10):"p"+code,pub,code,n?n.value:"",true)}
+  else if(a==="join"){const s=NET.list.find(x=>x.id===v);if(s)NET.srvName=s.name;netEnter(String(v).slice(0,16),true,null,"",false)}
+  else if(a==="code"){const c=(($("mpCode")||{}).value||"").toUpperCase().replace(/[^A-Z0-9]/g,"");if(c.length!==6){toast("Server codes are 6 letters and numbers");return}netEnter("p"+c,false,c,"",false)}
   else if(a==="scan")netScan();
   else if(a==="leave")netLeave();
-  else if(a==="name"){const n=$("mpName");const v2=netClean(n&&n.value,20);if(v2){NET.name=v2;try{localStorage.setItem("strata.name",v2)}catch(e){}if(NET.role==="host"&&NET.players.has(NET.me&&NET.me.id))NET.players.get(NET.me.id).name=v2;toast(`Your name is ${v2}`)}}}
-TABS.online=()=>{const esc=s=>String(s).replace(/[<>&"]/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;",'"':"&quot;"}[c]));
-  const inp='style="flex:1;min-width:0;padding:10px 12px;border-radius:10px;border:1px solid #2a3438;background:#0d1417;color:#fff;font:inherit"',row='style="display:flex;gap:8px;align-items:center;margin-bottom:6px"';
-  if(!NET.role&&!NET.scanning&&!NET.busy&&(!NET.scanT||performance.now()-NET.scanT>20000))setTimeout(netScan,0);
+  else if(a==="name"){const n=$("mpName");const v2=netClean(n&&n.value,20);if(v2){NET.name=v2;try{localStorage.setItem("strata.name",v2)}catch(e){}if(NET.on)netSendP();toast(`Your name is ${v2}`)}}}
+TABS.online=()=>{const esc=s=>String(s).replace(/[<>&"']/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;",'"':"&quot;","'":"&#39;"}[c]));
   if(MP.room&&MP.room!==NETROOM)return `<h3>Online</h3><p style="opacity:.8">You're in the shared online room: everyone playing this page drives together.</p>`;
+  if(!NET.on&&!NET.scanning&&!NET.busy&&(!NET.scanT||performance.now()-NET.scanT>20000))setTimeout(netScan,0);
+  const inp='style="flex:1;min-width:0;padding:10px 12px;border-radius:10px;border:1px solid #2a3438;background:#0d1417;color:#fff;font:inherit"',row='style="display:flex;gap:8px;align-items:center;margin-bottom:6px"';
   let h=`<h3>Your name</h3><div ${row}><input id="mpName" maxlength="20" value="${esc(NET.name)}" ${inp}><button class="opt" data-mp="name" style="flex:0 0 auto;padding:10px 14px">Save</button></div>`;
   if(NET.busy)h+=`<p style="opacity:.85">${esc(NET.busy)}</p>`;if(NET.err)h+=`<p style="color:#ff8a7a">${esc(NET.err)}</p>`;
-  if(NET.role){const host=NET.role==="host",me=NET.me&&NET.me.id;
-    const ps=host?[...NET.players.entries()].map(([k,P])=>[k,P.name,P.j]):NET.roster.map(r=>[r[0],r[1],r[2]]);ps.sort((a,b)=>a[2]-b[2]);
-    h+=`<h3>${esc(NET.srv?NET.srv.name:"Server")}</h3><p style="opacity:.85">${host?"You're hosting. Keep this tab open: if you leave, the next player takes over.":"Connected."} ${ps.length}/${NET.max} players${NET.srv&&NET.srv.code?` · code <b style="letter-spacing:.15em">${esc(NET.srv.code)}</b>`:NET.srv&&NET.srv.pub?" · public":""}</p>`;
-    h+=`<div class="grid2">${ps.map(p=>`<div class="opt"><b>${esc(p[1])}${p[0]===me?" (you)":""}</b><small>${p[0]===(host?me:NET.hostPid)?"Host":"Player"}</small></div>`).join("")}</div>`;
+  if(NET.on){const hid=netHostId(),ps=[[NET.me,NET.name,NET.joinT],...[...NET.peers.entries()].map(([k,p])=>[k,p.n,p.j])].sort((a,b)=>a[2]-b[2]);
+    h+=`<h3>${esc(NET.srvName)}</h3><p style="opacity:.85">${hid===NET.me?"You're hosting. If you leave, the next player takes over.":"Connected."} ${ps.length}/${NET.max} players${NET.code?` · code <b style="letter-spacing:.15em">${esc(NET.code)}</b>`:" · public"}</p>`;
+    h+=`<div class="grid2">${ps.map(p=>`<div class="opt"><b>${esc(p[1])}${p[0]===NET.me?" (you)":""}</b><small>${p[0]===hid?"Host":"Player"}</small></div>`).join("")}</div>`;
     h+=`<div class="grid2" style="margin-top:8px"><button class="opt" data-mp="leave"><b>Leave server</b><small>Back to driving alone</small></button></div>`;return h}
   h+=`<h3>Create a server</h3><div ${row}><input id="mpSrv" maxlength="32" placeholder="${esc(NET.name)}'s server" ${inp}></div><div class="grid2"><button class="opt" data-mp="create" data-v="pub"><b>＋ Public server</b><small>Anyone can find it in the list · up to ${NET.max} players</small></button><button class="opt" data-mp="create" data-v="priv"><b>＋ Private server</b><small>Only people with your 6-letter code can join</small></button></div>`;
-  h+=`<h3>Join with a code</h3><div ${row}><input id="mpCode" maxlength="6" placeholder="ABC123" autocapitalize="characters" ${inp} style="flex:1;min-width:0;padding:10px 12px;border-radius:10px;border:1px solid #2a3438;background:#0d1417;color:#fff;font:inherit;letter-spacing:.2em;text-transform:uppercase"><button class="opt" data-mp="code" style="flex:0 0 auto;padding:10px 14px">Join</button></div>`;
+  h+=`<h3>Join with a code</h3><div ${row}><input id="mpCode" maxlength="6" placeholder="ABC123" autocapitalize="characters" style="flex:1;min-width:0;padding:10px 12px;border-radius:10px;border:1px solid #2a3438;background:#0d1417;color:#fff;font:inherit;letter-spacing:.2em;text-transform:uppercase"><button class="opt" data-mp="code" style="flex:0 0 auto;padding:10px 14px">Join</button></div>`;
   h+=`<h3>Public servers</h3><div class="grid2">`+(NET.list.length?NET.list.slice().sort((a,b)=>b.n-a.n).map(s=>{const bad=s.ver!==+APP_VER,full=s.n>=s.max;return `<button class="opt" data-mp="join" data-v="${esc(s.id)}"${bad||full?" disabled style=\"opacity:.5\"":""}><b>${esc(s.name)}</b><small>${s.n}/${s.max} players${bad?` · version ${s.ver}, ${s.ver>+APP_VER?"refresh to update":"older"}`:full?" · full":""}</small></button>`}).join(""):`<div class="opt"><b>${NET.scanning?"Looking for servers…":"No public servers right now"}</b><small>${NET.scanning?"This takes a couple of seconds":"Create one and invite your friends"}</small></div>`)+
     `<button class="opt" data-mp="scan"><b>↻ Refresh list</b><small>Look for servers again</small></button></div>`;
   return h};
@@ -8019,12 +7993,6 @@ $("go").onclick=()=>{initAudio();setTimeout(()=>{if(st.power===true)welcomeChime
   toast(`${TRIMS[st.trim].short} in ${paintName()}${pk?" with "+pk:""} · ${money(cfgTotal())}. Tap ☰ for tests.`)};
 spawnTraffic(0);
 try{audioRestore()}catch(e){}
-// ---- Discord Activity: when the game runs inside Discord (https://<app id>.discordsays.com), say hello to the Discord client so it
-// keeps the game open and shows "Playing Mission Strata" on your profile. (Same handshake as Discord's Embedded App SDK.)
-const DSC={on:false,ready:false};
-try{const q=new URLSearchParams(location.search),fid=q.get("frame_id");if(/\.discordsays\.com$/.test(location.hostname)&&fid){DSC.on=true;const cid=location.hostname.split(".")[0],src=window.parent.opener||window.parent,org=document.referrer||"*";
-  window.addEventListener("message",e=>{if(!/^https:\/\/(\w+\.)?discord(app)?\.com$/.test(e.origin)&&e.origin!==location.origin)return;const d=e.data;if(!Array.isArray(d))return;if(d[0]===1&&d[1]&&d[1].evt==="READY"){DSC.ready=true}});
-  src.postMessage([0,{v:1,encoding:"json",client_id:cid,frame_id:fid,sdk_version:"2.0.0"}],org)}}catch(e){}
 requestAnimationFrame(frame);
 window.__strata={SCR,step:(n,dt)=>{for(let k=0;k<n;k++){controls(dt);assist(dt);updateTraffic(dt);updatePark(dt);weatherTick(dt);const hz=window.TESTHZ||1000;for(let j=0;j<Math.round(dt*hz);j++)physics(1/hz)}},paStart,paUpdate,sys,parked:()=>parked,PAD:()=>PAD,stnWorld,paScan,onc:()=>onc,tp:fpt,me,frameProj,NET:{EDGES,NODES,PAD,PARK,STARTS,sigState},spawnTraffic,setMap,simFrame:(dt)=>{for(let k=0;k<Math.round(dt*1000);k++)physics(1/1000)},look,st,car,sys,act,placeTest,setTrim,inp,cars:()=>cars,setCars:c=>{cars=c},physics,assist,updateTraffic,spawnTraffic,me,
   openDrawer,renderTab};
