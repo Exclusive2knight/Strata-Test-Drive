@@ -17,7 +17,7 @@ https://exclusive2knight.github.io/Strata-Test-Drive/
 
 ## Workflow for every change
 
-0. Before starting work on an update: `sh tools/maint.sh on` (players see the yellow "Under maintenance" screen; it expires on its own after 3 hours).
+0. Before starting work on an update: `sh tools/maint.sh on` (players see the yellow "Under maintenance" screen; it expires on its own after 40 minutes, so a session that ends early never leaves the game locked).
 1. Edit `src/app_template.html`.
 2. `python3 build.py`, then syntax-check the game script:
    `python3 -c "import re;open('/tmp/c.js','w').write(max(re.findall(r'<script>(.*?)</script>',open('dev.html').read(),re.S),key=len))" && node --check /tmp/c.js`

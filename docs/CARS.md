@@ -917,6 +917,8 @@ Columns: power (hp), weight (kg), powertrain, drive modes as shown in the game, 
 | `nissan_kicks_s` | 2027 Nissan Kicks S | 141 | 1420 | gas | Eco/Standard/Sport | — | Conventional twin-tube dampers · MacPherson strut front, torsion beam rear | confirmed |
 | `nissan_kicks_sv` | 2027 Nissan Kicks SV AWD | 141 | 1420 | gas | Eco/Standard/Sport/Snow | — | Conventional twin-tube dampers · MacPherson strut front, multi-link rear | confirmed |
 | `nissan_kicks_sr` | 2027 Nissan Kicks SR AWD | 141 | 1420 | gas | Eco/Standard/Sport/Snow | — | Conventional twin-tube dampers · MacPherson strut front, multi-link rear | confirmed |
+| `nissan_kicks_ep_sv` | 2027 Nissan Kicks SV e-POWER | 134 | 1450 | e-POWER series hybrid, FWD (1.4 L I3 generator · 1.8 kWh) | Eco/Standard/Sport | — | Same as Kicks SV | estimate (US model planned, not confirmed; based on Japan Kicks e-POWER, June 2026) |
+| `nissan_kicks_ep_sr` | 2027 Nissan Kicks SR e-POWER | 134 | 1530 | e-POWER series hybrid, e-4ORCE AWD (front + rear motor) | Eco/Standard/Sport | — | Same as Kicks SR | estimate |
 
 ## Nissan LEAF · 2026
 
