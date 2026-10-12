@@ -960,6 +960,9 @@ Columns: power (hp), weight (kg), powertrain, drive modes as shown in the game, 
 | `nissan_rogue_rs` | 2027 Nissan Rogue Rock Creek | 201 | 1660 | gas | Standard/Eco/Sport/Off-Road/Snow | — | Rock Creek off-road-tuned springs/dampers · MacPherson strut front, multi-link rear | estimate |
 | `nissan_rogue_sl` | 2027 Nissan Rogue SL | 201 | 1660 | gas | Standard/Eco/Sport/Off-Road/Snow | — | Passive dampers · MacPherson strut front, multi-link rear | estimate |
 | `nissan_rogue_plat` | 2027 Nissan Rogue Platinum | 201 | 1660 | gas | Standard/Eco/Sport/Off-Road/Snow | — | Passive dampers · MacPherson strut front, multi-link rear | estimate |
+| `nissan_rogue_ep_sv` | 2027 Nissan Rogue SV e-POWER | 225 | 1844 | e-POWER series hybrid (1.5 L turbo I3 generator 148 hp · front motor 202 hp · rear 134 hp · 1.67 kWh) | Eco/Standard/Sport | — | Same as gas Rogue SV | researched (Jalopnik, Nissan, 2026) |
+| `nissan_rogue_ep_sr` | 2027 Nissan Rogue SR e-POWER | 225 | 1844 | e-POWER series hybrid (1.5 L turbo I3 generator 148 hp · front motor 202 hp · rear 134 hp · 1.67 kWh) | Eco/Standard/Sport | — | Same as gas Rogue SL | researched (Jalopnik, Nissan, 2026) |
+| `nissan_rogue_ep_plat` | 2027 Nissan Rogue Platinum e-POWER | 225 | 1844 | e-POWER series hybrid (1.5 L turbo I3 generator 148 hp · front motor 202 hp · rear 134 hp · 1.67 kWh) | Eco/Standard/Sport | — | Same as gas Rogue Platinum | researched (Jalopnik, Nissan, 2026) |
 
 ## Nissan Sentra · 2027
 
