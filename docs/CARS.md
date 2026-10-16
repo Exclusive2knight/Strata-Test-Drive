@@ -1439,3 +1439,26 @@ Specs: The Truth About Cars 2026 Grand Cherokee L review (trim prices incl. dest
 | `pal22_sel` | 2022 Hyundai Palisade SEL | 291 | 1918 | gas | Comfort/Eco/Sport/Smart | — | same | confirmed engine/price, estimated mass |
 | `pal22_lim` | 2022 Hyundai Palisade Limited HTRAC AWD | 291 | 1960 | gas | Comfort/Eco/Sport/Smart/Snow/Mud/Sand | — | Self-leveling rear dampers | confirmed engine/price, estimated mass |
 | `pal22_cal` | 2022 Hyundai Palisade Calligraphy HTRAC AWD | 291 | 1965 | gas | Comfort/Eco/Sport/Smart/Snow/Mud/Sand | — | Self-leveling rear dampers | confirmed engine/price, estimated mass |
+
+## Kia K4 sedan · 2026 (group "Kia K4 · 2026", model `kia_k4_sedan`)
+
+| Key | Trim | hp | kg | Power | Drive modes | EV modes | Suspension | Research |
+|---|---|---|---|---|---|---|---|---|
+| `k4s_lx` | 2026 Kia K4 LX | 147 | 1310 | gas | Normal/Eco/Sport | — | MacPherson front, torsion beam rear | confirmed price (kianewscenter/autoguide), estimated mass |
+| `k4s_lxs` | 2026 Kia K4 LXS | 147 | 1315 | gas | Normal/Eco/Sport | — | same | confirmed price, estimated mass |
+| `k4s_ex` | 2026 Kia K4 EX | 147 | 1330 | gas | Normal/Eco/Sport | — | same | confirmed price, estimated mass |
+| `k4s_gtl` | 2026 Kia K4 GT-Line | 147 | 1335 | gas | Normal/Eco/Sport | — | same | confirmed price, estimated mass |
+| `k4s_gtlt` | 2026 Kia K4 GT-Line Turbo | 190 | 1385 | gas | Normal/Eco/Sport | — | multi-link rear, sport-tuned | confirmed price, estimated mass |
+
+## Kia K5 · 2026 (model `kia_k5`)
+
+| Key | Trim | hp | kg | Power | Drive modes | EV modes | Suspension | Research |
+|---|---|---|---|---|---|---|---|---|
+| `k5_lxs` | 2026 Kia K5 LXS | 191 | 1465 | gas | Normal/Eco/Sport/Smart | — | MacPherson front, multi-link rear | confirmed price, engine, weight (Kia pricing release, dealer spec sheet) |
+| `k5_gtl` | 2026 Kia K5 GT-Line | 191 | 1493 | gas | Normal/Eco/Sport/Smart | — | same | confirmed |
+| `k5_gtl_awd` | 2026 Kia K5 GT-Line AWD | 191 | 1571 | gas | Normal/Eco/Sport/Smart/Snow | — | same | confirmed price/weight; Snow mode estimated |
+| `k5_gt` | 2026 Kia K5 GT | 290 | 1631 | gas | Normal/Eco/Sport/Smart/Custom | — | sport-tuned passive | confirmed; 0-60 in game ~5.8 s (real ~5.2-5.4 s) |
+| `k5_ex` | 2026 Kia K5 EX | 191 | 1540 | gas | Normal/Eco/Sport/Smart | — | MacPherson front, multi-link rear | confirmed |
+
+Kia bodies (v138): K4 hatchback, Seltos, Sportage, Sorento, Telluride, Carnival, Niro Hybrid, Niro EV, EV6 and EV9 were replaced with the Kia lineup pack (glass roofs tinted dark). The EV3, Soul, Optima and 2007 Sportage keep their old bodies.
+Kia Terrain Mode (Snow/Mud/Sand) added to the AWD Sorento, Sportage, EV6 and EV9 trims.
