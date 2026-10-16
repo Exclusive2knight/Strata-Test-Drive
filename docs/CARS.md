@@ -1409,3 +1409,33 @@ Models from the Rivian R1T/R1S/R2 pack. Specs: Edmunds 2027 pricing article, Not
 | `r2_std` | 2027 Rivian R2 Standard | 350 | 2150 | electric, Single motor RWD | All-Purpose/Conserve/Sport/Snow/(All-Terrain/Soft Sand/Rally/Towing) | — | Coil springs, passive dampers · MacPherson strut front, multi-link rear | confirmed |
 | `r2_prem` | 2027 Rivian R2 Premium | 450 | 2260 | electric, Dual motor | All-Purpose/Conserve/Sport/Snow/(All-Terrain/Soft Sand/Rally/Towing) | — | Coil springs, passive dampers · MacPherson strut front, multi-link rear | confirmed |
 | `r2_perf` | 2027 Rivian R2 Performance Launch Edition | 656 | 2270 | electric, Dual motor | All-Purpose/Conserve/Sport/Snow/(All-Terrain/Soft Sand/Rally/Towing) | — | Coil springs with semi-active dampers · MacPherson strut front, multi-link rear | confirmed |
+
+## Jeep L models and 2022 Palisade (v135)
+
+Specs: The Truth About Cars 2026 Grand Cherokee L review (trim prices incl. destination, engines), cars.com 2026 Grand Wagoneer L (trims, prices), Edmunds and Autotrader 2022 Palisade (specs, prices). Masses and drive-mode lists are estimates from typical published figures.
+
+## Jeep Grand Cherokee L · 2026
+
+| Key | Trim | hp | kg | Power | Drive modes | EV modes | Suspension | Research |
+|---|---|---|---|---|---|---|---|---|
+| `gcl_laredo` | 2026 Jeep Grand Cherokee L Laredo 4x2 | 293 | 2130 | gas | Auto/Sport/Snow | — | Coil springs with frequency-selective dampers · double wishbone front, multi-link rear | confirmed engine/price, estimated mass |
+| `gcl_limited` | 2026 Jeep Grand Cherokee L Limited 4x4 | 324 | 2190 | gas | Auto/Sport/Snow/Sand/Mud | — | same | confirmed engine/price, estimated mass |
+| `gcl_reserve` | 2026 Jeep Grand Cherokee L Limited Reserve 4x4 | 324 | 2200 | gas | Auto/Sport/Snow/Sand/Mud | — | same | confirmed engine/price, estimated mass |
+| `gcl_summit` | 2026 Jeep Grand Cherokee L Summit 4x4 | 324 | 2240 | gas | Auto/Sport/Snow/Sand/Mud | — | Quadra-Lift air suspension with Active Damping | confirmed engine/price, estimated mass |
+
+## Jeep Grand Wagoneer L · 2026
+
+| Key | Trim | hp | kg | Power | Drive modes | EV modes | Suspension | Research |
+|---|---|---|---|---|---|---|---|---|
+| `gwl_base` | 2026 Jeep Grand Wagoneer L 4x4 | 420 | 2900 | gas | Auto/Sport/Eco/Snow/Sand/Mud/Rock | — | Quadra-Lift air suspension with adaptive dampers | confirmed engine/price, estimated mass |
+| `gwl_limited` | 2026 Jeep Grand Wagoneer L Limited 4x4 | 420 | 2920 | gas | Auto/Sport/Eco/Snow/Sand/Mud/Rock | — | Quadra-Lift air suspension with adaptive dampers | confirmed engine/price, estimated mass |
+| `gwl_summit` | 2026 Jeep Grand Wagoneer L Summit Reserve 4x4 | 420 | 2950 | gas | Auto/Sport/Eco/Snow/Sand/Mud/Rock | — | Quadra-Lift air suspension with adaptive dampers | confirmed engine/price, estimated mass |
+
+## Hyundai Palisade · 2022
+
+| Key | Trim | hp | kg | Power | Drive modes | EV modes | Suspension | Research |
+|---|---|---|---|---|---|---|---|---|
+| `pal22_se` | 2022 Hyundai Palisade SE | 291 | 1872 | gas | Comfort/Eco/Sport/Smart | — | Coil springs, passive dampers · MacPherson strut front, multi-link rear | confirmed engine/price, estimated mass |
+| `pal22_sel` | 2022 Hyundai Palisade SEL | 291 | 1918 | gas | Comfort/Eco/Sport/Smart | — | same | confirmed engine/price, estimated mass |
+| `pal22_lim` | 2022 Hyundai Palisade Limited HTRAC AWD | 291 | 1960 | gas | Comfort/Eco/Sport/Smart/Snow/Mud/Sand | — | Self-leveling rear dampers | confirmed engine/price, estimated mass |
+| `pal22_cal` | 2022 Hyundai Palisade Calligraphy HTRAC AWD | 291 | 1965 | gas | Comfort/Eco/Sport/Smart/Snow/Mud/Sand | — | Self-leveling rear dampers | confirmed engine/price, estimated mass |
