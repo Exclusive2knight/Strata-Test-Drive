@@ -1373,3 +1373,11 @@ Columns: power (hp), weight (kg), powertrain, drive modes as shown in the game, 
 | `gas4` | Strata 2.0T AWD | 260 | 1880 | gas | — | — | — | — |
 | `v6` | Strata 3.6 V6 AWD | 310 | 1965 | gas | — | — | — | — |
 | `quad` | Strata Quad Motor 4WS | 1046 | 2717 | EV | — | — | — | — |
+
+## Oct 2026 packs (v106)
+- Mazda (mz_*): Mazda3 Hatchback, CX-30, CX-5 (2026 new gen), CX-50, CX-70, CX-90. Trims and MSRPs from Mazda USA 2026 pages; generator `tools/research/new_batch8.py`.
+- Volkswagen (vw_*): Jetta, Taos, Tiguan, Atlas (2027, est.), Atlas Cross Sport, ID.4, ID. Buzz.
+- Toyota RAV4 2026 (toy_rav4_26_*): hybrid LE–GR Sport, PHEV SE / XSE / GR Sport.
+- Tesla: Cybertruck (ct_awd, ct_beast), 2020 Model S / X (ms20_*, mx20_*). Model 3 / Y / S / X, RAV4 2019, Lincoln Aviator / Corsair / Nautilus re-skinned with the new pack meshes (Lincolns relabelled 2026).
+- Lincoln Navigator 2026: the upload was cut off, not imported.
+- City vehicles (city_*): traffic only, no trims.
