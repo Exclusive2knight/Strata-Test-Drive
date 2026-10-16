@@ -1381,3 +1381,31 @@ Columns: power (hp), weight (kg), powertrain, drive modes as shown in the game, 
 - Tesla: Cybertruck (ct_awd, ct_beast), 2020 Model S / X (ms20_*, mx20_*). Model 3 / Y / S / X, RAV4 2019, Lincoln Aviator / Corsair / Nautilus re-skinned with the new pack meshes (Lincolns relabelled 2026).
 - Lincoln Navigator 2026: the upload was cut off, not imported.
 - City vehicles (city_*): traffic only, no trims.
+
+## Rivian (v130)
+
+Models from the Rivian R1T/R1S/R2 pack. Specs: Edmunds 2027 pricing article, Notebookcheck (2027 R1 trims), InsideEVs / Wikipedia (R2), rivian.com suspension support page. Prices are MSRP without destination. Paint prices not confirmed (all $0).
+
+## Rivian R1T · 2027
+
+| Key | Trim | hp | kg | Power | Drive modes | EV modes | Suspension | Research |
+|---|---|---|---|---|---|---|---|---|
+| `r1t_prem` | 2027 Rivian R1T Premium | 533 | 3020 | electric, Dual motor | All-Purpose/Conserve/Sport/Snow/All-Terrain/(Soft Sand/Rock Crawl/Rally)/Towing | — | Air suspension with adaptive dampers and hydraulic roll control · double wishbone front, multi-link rear | confirmed layout, estimated heights |
+| `r1t_perf` | 2027 Rivian R1T Performance | 850 | 3200 | electric, Tri motor | All-Purpose/Conserve/Sport/Snow/All-Terrain/(Soft Sand/Rock Crawl/Rally)/Towing | — | Air suspension with adaptive dampers and hydraulic roll control · double wishbone front, multi-link rear | confirmed layout, estimated heights |
+| `r1t_quad` | 2027 Rivian R1T Quad | 1025 | 3240 | electric, Quad motor | All-Purpose/Conserve/Sport/Snow/All-Terrain/(Soft Sand/Rock Crawl/Rally)/Towing | — | Air suspension with adaptive dampers and hydraulic roll control · double wishbone front, multi-link rear | confirmed layout, estimated heights |
+
+## Rivian R1S · 2027
+
+| Key | Trim | hp | kg | Power | Drive modes | EV modes | Suspension | Research |
+|---|---|---|---|---|---|---|---|---|
+| `r1s_prem` | 2027 Rivian R1S Premium | 533 | 3040 | electric, Dual motor | All-Purpose/Conserve/Sport/Snow/All-Terrain/(Soft Sand/Rock Crawl/Rally)/Towing | — | Air suspension with adaptive dampers and hydraulic roll control · double wishbone front, multi-link rear | confirmed layout, estimated heights |
+| `r1s_perf` | 2027 Rivian R1S Performance | 850 | 3220 | electric, Tri motor | All-Purpose/Conserve/Sport/Snow/All-Terrain/(Soft Sand/Rock Crawl/Rally)/Towing | — | Air suspension with adaptive dampers and hydraulic roll control · double wishbone front, multi-link rear | confirmed layout, estimated heights |
+| `r1s_quad` | 2027 Rivian R1S Quad | 1025 | 3260 | electric, Quad motor | All-Purpose/Conserve/Sport/Snow/All-Terrain/(Soft Sand/Rock Crawl/Rally)/Towing | — | Air suspension with adaptive dampers and hydraulic roll control · double wishbone front, multi-link rear | confirmed layout, estimated heights |
+
+## Rivian R2 · 2027
+
+| Key | Trim | hp | kg | Power | Drive modes | EV modes | Suspension | Research |
+|---|---|---|---|---|---|---|---|---|
+| `r2_std` | 2027 Rivian R2 Standard | 350 | 2150 | electric, Single motor RWD | All-Purpose/Conserve/Sport/Snow/(All-Terrain/Soft Sand/Rally/Towing) | — | Coil springs, passive dampers · MacPherson strut front, multi-link rear | confirmed |
+| `r2_prem` | 2027 Rivian R2 Premium | 450 | 2260 | electric, Dual motor | All-Purpose/Conserve/Sport/Snow/(All-Terrain/Soft Sand/Rally/Towing) | — | Coil springs, passive dampers · MacPherson strut front, multi-link rear | confirmed |
+| `r2_perf` | 2027 Rivian R2 Performance Launch Edition | 656 | 2270 | electric, Dual motor | All-Purpose/Conserve/Sport/Snow/(All-Terrain/Soft Sand/Rally/Towing) | — | Coil springs with semi-active dampers · MacPherson strut front, multi-link rear | confirmed |
