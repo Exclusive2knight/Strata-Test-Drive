@@ -3762,7 +3762,7 @@ function rNoiseFx(t,dur,vol){const c=au.ctx;if(!au.fxBuf){au.fxBuf=c.createBuffe
 // still in it, or stays where it ended up with its hazards on
 const CRASHB=[];const DYN_I=2.14;   // yaw inertia per kg for a 4.7 x 1.9 m car
 function dynStart(o,dvx,dvy,dw){if(!o||o.wx===undefined||/cone|bike|remote|cop|xing|towed/.test(o.kind||""))return false;
-  if(!o.dyn){const v=o.v||0;o.dyn={vx:Math.cos(o.wh)*v,vy:Math.sin(o.wh)*v,w:0,vz:0,z:o.wz||0,still:0,pt:o.wp||0,rl:o.wr||0,t:0};if(!CRASHB.includes(o))CRASHB.push(o)}
+  if(!o.dyn){const v=o.v||0;o.dyn={vx:Math.cos(o.wh)*v,vy:Math.sin(o.wh)*v,w:0,vz:0,z:o.wz||0,still:0,pitch:o.wp||0,roll:o.wr||0,t:0};if(!CRASHB.includes(o))CRASHB.push(o)}
   const D=o.dyn;D.vx+=dvx;D.vy+=dvy;D.w=clamp(D.w+dw,-2.6,2.6);o.stunned=Math.max(o.stunned||0,20);o.haz=true;o.sig=0;return true}
 const dynGround=(x,y,z)=>{GREF=z;return groundAt(x,y).h||0};
 function dynTick(dt){if(!CRASHB.length)return;const g=9.81;
@@ -3775,10 +3775,8 @@ function dynTick(dt){if(!CRASHB.length)return;const g=9.81;
         D.z=gh;D.vz=Math.max(0,D.vz)}
       else{D.vz-=g*h;D.z+=D.vz*h;const g2=dynGround(o.wx,o.wy,D.z);if(D.z<=g2){if(D.vz<-5&&Math.hypot(o.wx-car.px,o.wy-car.py)<80)try{rNoiseFx(au.ctx.currentTime,0.25,0.4)}catch(e){}D.z=g2;D.vz=0}}
       o.wx+=D.vx*h;o.wy+=D.vy*h;o.wh=wrapPi(o.wh+D.w*h)}
-    // lean with the ground under the four corners (or nose down a little in the air)
-    {const c=Math.cos(o.wh),s=Math.sin(o.wh),gf=dynGround(o.wx+c*1.4,o.wy+s*1.4,D.z),gr=dynGround(o.wx-c*1.4,o.wy-s*1.4,D.z),gl=dynGround(o.wx-s*0.8,o.wy+c*0.8,D.z),gR=dynGround(o.wx+s*0.8,o.wy-c*0.8,D.z);
-      const air=D.z>dynGround(o.wx,o.wy,D.z)+0.05,tp=air?D.pt+0.25*dt:Math.atan((gf-gr)/2.8),tr=air?D.rl:Math.atan((gl-gR)/1.6);D.pt+=(tp-D.pt)*Math.min(1,dt*6);D.rl+=(tr-D.rl)*Math.min(1,dt*6)}
-    o.wz=D.z;o.wp=D.pt;o.wr=D.rl;o.v=Math.hypot(D.vx,D.vy);
+    dynLean(o,D,dt);
+    o.wz=D.z;o.wp=D.pitch;o.wr=D.roll;o.v=Math.hypot(D.vx,D.vy);
     // walls, buildings, barriers
     for(const b of collNear(o.wx,o.wy)){if(b.gone||b.t!=="b"&&b.t!=="c")continue;if(b.z1!==undefined&&(D.z+0.3<b.z0||D.z+0.3>b.z1))continue;
       const H=b.t==="c"?obbSAT(o.wx,o.wy,o.wh,2.3,0.95,b.x,b.y,0,b.r,b.r):obbSAT(o.wx,o.wy,o.wh,2.3,0.95,b.x,b.y,b.h||0,b.hl,b.hw);if(!H)continue;
@@ -3792,13 +3790,16 @@ function dynTick(dt){if(!CRASHB.length)return;const g=9.81;
     // settled: back into its lane if it is still in one, or left where it is with the hazards on
     const sp=o.v;D.still=sp<0.25&&Math.abs(D.w)<0.06&&D.vz===0?D.still+dt:0;if(D.still>1.2||D.t>40)dynEnd(o)}
   for(let i=parked.length-1;i>=0;i--){const p=parked[i];if(p.wreckT!==undefined){p.wreckT-=dt;if(p.wreckT<0&&Math.hypot(p.wx-car.px,p.wy-car.py)>160)parked.splice(i,1)}}}
+// lean with the ground under the four corners (or nose down a little in the air)
+function dynLean(o,D,dt){const c=Math.cos(o.wh),s=Math.sin(o.wh),z=D.z,G=[[1.4,0],[-1.4,0],[0,0.8],[0,-0.8]].map(([a,b])=>dynGround(o.wx+c*a-s*b,o.wy+s*a+c*b,z));
+  const air=z>dynGround(o.wx,o.wy,z)+0.05,wantP=air?D.pitch+0.25*dt:Math.atan((G[0]-G[1])/2.8),wantR=air?D.roll:Math.atan((G[2]-G[3])/1.6),k=Math.min(1,dt*6);D.pitch+=(wantP-D.pitch)*k;D.roll+=(wantR-D.roll)*k}
 function dynEnd(o){const D=o.dyn;o.dyn=null;const i=CRASHB.indexOf(o);if(i>=0)CRASHB.splice(i,1);o.v=0;
   if(o.kind==="parked"){o.fixed=true;o.wz=D.z;return}
   const ci=cars.indexOf(o);if(ci<0)return;let f=null;try{f=findFrame(o.wx,o.wy,o.wh,null,D.z)}catch(e){}
   const lanePos=f&&f.e&&!f.e.ov===!o.e?.ov?f:null;
   if(f&&f.e&&Math.abs(Math.cos(o.wh-(f.h??o.wh)))>0.85&&Math.abs(f.off-(f.lo??0)*LANE)<LANE*2.2&&Math.abs((f.e.hz?ez(f.e,f.dir>0?f.s:f.e.L-f.s):0)-D.z)<1){o.e=f.e;o.dir=f.dir;o.s=f.s;o.off=f.off;o.offT=f.off;o.jn=null;o.stunned=6;o.wp=0;o.wr=0;try{planMove(o)}catch(e){}return}
   // off the road, turned around or on another level: it stays as a wreck for a while
-  cars.splice(ci,1);parked.push({fixed:true,kind:"parked",wx:o.wx,wy:o.wy,wh:o.wh,wz:D.z,wp:D.pt,wr:D.rl,v:0,spin:0,sig:0,head:0,haz:true,paint:o.paint,mdl:o.mdl,wreckT:180})}
+  cars.splice(ci,1);parked.push({fixed:true,kind:"parked",wx:o.wx,wy:o.wy,wh:o.wh,wz:D.z,wp:D.pitch,wr:D.roll,v:0,spin:0,sig:0,head:0,haz:true,paint:o.paint,mdl:o.mdl,wreckT:180})}
 function bodyOf(o){if(o.wx===undefined)return null;if(o.dyn)return {x:o.wx,y:o.wy,h:o.wh,vx:o.dyn.vx,vy:o.dyn.vy};const v=o.v||0;return {x:o.wx,y:o.wy,h:o.wh,vx:Math.cos(o.wh)*v,vy:Math.sin(o.wh)*v}}
 
 function checkCollision(){
