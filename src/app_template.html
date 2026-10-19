@@ -559,14 +559,6 @@ body.navon:not(.pc) #toast,body.navon #toast{top:calc(env(safe-area-inset-top,0p
 .rcRow{margin:6px 0 12px}.rcRow>span{display:block;font-size:13px;opacity:.75;margin-bottom:5px}.rcRow>small{display:block;font-size:12px;opacity:.6;margin-top:5px}
 .seg5{display:grid;grid-template-columns:repeat(6,1fr);gap:0;border-radius:12px;overflow:hidden;background:rgba(255,255,255,.06)}.seg5 button{border:0;background:none;color:inherit;font:600 12px/1 Inter,system-ui,sans-serif;padding:11px 2px;border-right:1px solid rgba(255,255,255,.07);min-width:0}
 .seg5 button:last-child{border-right:0}.seg5 button.on{background:#2f6fe4;color:#fff}
-#dmvBtn{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 200px);z-index:8;background:#163a7a;color:#fff;border:0;border-radius:22px;padding:11px 18px;font:600 14px/1 Inter,system-ui,sans-serif;box-shadow:0 0 0 2px rgba(255,255,255,.25)}#dmvBtn[hidden]{display:none}
-#dmvHud{position:fixed;top:64px;left:50%;transform:translateX(-50%);z-index:9;background:rgba(10,24,52,.9);color:#fff;border:1px solid #3a6bd0;border-radius:14px;padding:8px 14px;font:500 13px var(--f-ui,system-ui);display:flex;flex-direction:column;align-items:center;gap:2px;max-width:calc(100vw - 28px);text-align:center;box-sizing:border-box}#dmvHud[hidden]{display:none}#dmvHud small{color:#8fb4ff;font-size:11px;letter-spacing:.08em}#dmvHud span{color:#ffd56b;font-weight:700}
-#dmv,#dmvRes{position:fixed;inset:0;z-index:99980;background:rgba(4,8,10,.72);display:flex;align-items:center;justify-content:center;padding:14px;box-sizing:border-box}#dmv[hidden],#dmvRes[hidden]{display:none}
-#dmv .dmvBox,#dmvRes .dmvBox{width:min(440px,100%);max-height:100%;overflow:auto;background:#0b1316;color:#e8eef0;border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:16px 18px;display:flex;flex-direction:column;gap:10px;font:500 14px var(--f-ui,system-ui);box-sizing:border-box}
-#dmv .dmvH,#dmv .dmvH2{display:flex;align-items:center;justify-content:space-between}#dmv .dmvH b{font-size:20px}#dmv .dmvH2{border-top:1px solid rgba(255,255,255,.1);padding-top:10px;margin-top:4px}#dmv p,#dmvRes p{margin:0}.dmvBox .fine{color:#9fb0b4;font-size:12.5px;line-height:1.4}
-.dmvBox button{background:#1f2c31;color:#fff;border:0;border-radius:10px;padding:10px 14px;font:600 14px var(--f-ui,system-ui);cursor:pointer}.dmvBox button:disabled{opacity:.5}#dmv .dmvH button{background:none;font-size:18px;padding:4px 8px}.dmvBox .dmvGo{background:#2f6fe0}#dmv .dmvR{display:flex;gap:8px;flex-wrap:wrap}#dmv .dmvR button{flex:1}
-#dmv input{font:800 22px "Arial Narrow",Inter,system-ui;letter-spacing:.08em;text-align:center;text-transform:uppercase;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.18);background:#060a0c;color:#fff}#dmvPv{display:flex;justify-content:center}#dmvPv canvas{width:200px;height:100px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.5)}
-#dmvRes .dmvBox{align-items:center;text-align:center}#dmvRes b{font-size:22px}#dmvRes .dmvSc{font:800 54px var(--f-ui,system-ui);color:#ff6b6b}#dmvRes .dmvSc.ok{color:#5be08a}#dmvRes .dmvSc small{font-size:20px;color:#9fb0b4}#dmvRes ul{text-align:left;margin:0;padding-left:18px;color:#cfd8db;font-size:13px}
 #shopBtn{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 150px);z-index:8;background:rgba(18,18,20,.92);color:#fff;border:0;border-radius:22px;padding:11px 18px;font:600 14px/1 Inter,system-ui,sans-serif;box-shadow:0 0 0 2px rgba(255,255,255,.2)}
 #shopSheet{position:fixed;inset:0;z-index:40;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.35)}#shopSheet[hidden]{display:none}
 #shopSheet .sc{background:#121316;color:#eef;border-radius:18px 18px 0 0;width:min(520px,100%);max-height:78vh;overflow:auto;padding:18px 16px calc(env(safe-area-inset-bottom,0px) + 16px);font:14px/1.35 Inter,system-ui,sans-serif}
@@ -3717,7 +3709,7 @@ function copTick(dt){if(st.police===false){if(COP.stars)copClear();return}if(!st
 function copInto(){copMats();const on=(performance.now()%500)<250;for(const c of COP.chase){if(!c.lights)continue;const M=aiMat(c),h=(MODELS.city_police?MODELS.city_police.meta.height:1.8)+0.04;
     dBoxM(on?"copR":"copOff",M,c.wh,[0.32,h,0.1],0.32,0.08,0.18);dBoxM(on?"copOff":"copB",M,c.wh,[-0.32,h,0.1],0.32,0.08,0.18)}
   for(const S of COP.spikes){for(let k=-3;k<=3;k++){const x=S.x-Math.sin(S.h)*k*0.6,y=S.y+Math.cos(S.h)*k*0.6;dBox(k%2?"spikeY":"spike",x,y,0.02,0.5,0.05,0.12,S.h+Math.PI/2)}}}
-function crashFx(v,what){const now=performance.now();if(v<0.6||now-(sys.lastHitT||0)<450)return;try{ACH.clean=0;if(VALET.on&&VALET.cur)VALET.ding=true;if(DMV.test&&v>1.2)dmvFail(`Crashed into ${what||"something"}`)}catch(e){}if(v>9)setTimeout(()=>{try{txt("Mom","I just saw a crash on the news. Was that you?? Call me!","crash"+(GT.day||1))}catch(e){}},9000);sys.lastHitT=now;if(st.dale){try{if(/pedestrian|deer|cyclist/.test(String(what)))daleGore(v);else if(v>6.5)daleBoom()}catch(e){}}try{if(/pedestrian|cyclist/.test(String(what))&&(copWatch(250)||Math.random()<0.4))copOffense(2,`Hit ${what}`)}catch(e){}haptic(Math.min(450,70+v*30),Math.min(1,0.4+v/10));if(v>1.5)dashClip("Impact: "+what);try{sfCrash(v)}catch(e){}
+function crashFx(v,what){const now=performance.now();if(v<0.6||now-(sys.lastHitT||0)<450)return;try{ACH.clean=0;if(VALET.on&&VALET.cur)VALET.ding=true;}catch(e){}if(v>9)setTimeout(()=>{try{txt("Mom","I just saw a crash on the news. Was that you?? Call me!","crash"+(GT.day||1))}catch(e){}},9000);sys.lastHitT=now;if(st.dale){try{if(/pedestrian|deer|cyclist/.test(String(what)))daleGore(v);else if(v>6.5)daleBoom()}catch(e){}}try{if(/pedestrian|cyclist/.test(String(what))&&(copWatch(250)||Math.random()<0.4))copOffense(2,`Hit ${what}`)}catch(e){}haptic(Math.min(450,70+v*30),Math.min(1,0.4+v/10));if(v>1.5)dashClip("Impact: "+what);try{sfCrash(v)}catch(e){}
   const sev=clamp(v/12,0.15,1);if(au.ctx){const c=au.ctx,t=c.currentTime;rNoiseFx(t,0.25+sev*0.4,0.25+sev*0.5);beep(90+sev*40,0.25+sev*0.3,"sawtooth",0.12+sev*0.2)}
   if(v>1.5){logResult(`Hit ${what} at ${fmtSpeed(v)}${st.aeb?"":" (AEB off)"}`);toast(`Impact: ${what} at ${fmtSpeed(v)}`)}
   if(navigator.vibrate)navigator.vibrate(Math.round(40+sev*120));if(v>3)car.crashed=1.0;dmgHit(v,what)}
@@ -4509,7 +4501,6 @@ function navPlaces(){const L=[],add=(name,sub,x,y,h,ic)=>{if(x==null||!isFinite(
   add("Service plaza","Gas and fast chargers on Hwy 7",PAD.cx,PAD.cy,0,"⚡");
   try{const P=fpt(PARK.e,PARK.dir,(PARK.s0+PARK.s1)/2,PARK.oP);add("Park & charge lot","Parking with chargers",P[0],P[1],0,"🅿️")}catch(e){}
   add("Fort St parking garage","Two-level parking garage",GAR.cx,GAR.cy+14,0,"🅿️");
-  try{const o=dmvSite();if(o){const [x,y]=o.P(0,34);add("Halden DMV","Driving test, license, custom plates",x,y,0,"🪪")}}catch(e){}
   try{const o=cwSite();if(o){const [x,y]=o.W(4,-28);add("Strata Car Wash","Conveyor wash · $12 · free vacuums",x,y,Math.atan2(o.N[1],o.N[0]),"🫧")}}catch(e){}
   if(VALET.stand)add("Halden Valet","Valet gig at the Cass Ave garage",VALET.stand.x,VALET.stand.y,VALET.stand.h,"🔑");
   if(STARTS.home)add(STARTS.home.name||"Home","Your house",STARTS.home.x,STARTS.home.y,STARTS.home.h,"🏠");
@@ -8157,7 +8148,6 @@ const ACH_DEF=[["first100","🏎️","Triple digits","Hit 100 mph"],["ton150","�
   ["firstCar","🔑","Keys in hand","Buy, finance or lease your first car"],["own10","🏢","Collector","Own 10 cars at once"],["millionaire","💰","Millionaire","Have $1,000,000 in the bank"],
   ["valetPerfect","🅿️","Perfect valet","Park at least 5 guest cars in one valet shift without a scratch"],["gigs10","📦","Hustler","Finish 10 gig jobs"],
   ["escape3","🚨","Ghost","Get away from the police at 3 stars or more"],["ticket","📸","Smile for the camera","Get a ticket from a speed or red-light camera"],
-  ["license","🪪","Licensed","Pass the driving test at the DMV"],["licensePerfect","💯","Model student","Pass the driving test with a perfect score"],["plate","🔤","Personalized","Put a custom license plate on your car"],
   ["auctionWin","🔨","Sold!","Win a car at the auction"],["flip","💸","The flip","Sell an auction car for more than you paid for it"],["carwash","🫧","Squeaky clean","Go through the car wash"],
   ["photo","📷","Photographer","Take a picture in photo mode"],["show","🎆","Showtime","Run a Tesla Light Show"],["boombox","🐐","Goat mode","Play a sound on the Tesla Boombox"],
   ["night3","🦉","Night owl","Be driving at 3 AM"],["vr","🥽","Into the matrix","Drive in VR"],["wheel","🎮","Sim racer","Drive with a steering wheel"]];
@@ -8190,7 +8180,7 @@ function dirtTick(dt){if(st.walk||!st.started)return;const v=Math.abs(car.vx);if
 // a 27 m tunnel with brushes, and 16 vacuum bays. Pay at a kiosk, follow the queue round, line up at the tunnel and shift to Neutral
 const CW={o:null,tried:false,run:null,paid:false,paidT:0,gate:[0,0,0],gOpen:[0,0,0],said:"",price:12,snd:null,coll:[],gc:[],loaded:false,spin:0};
 const CW_LANE=[-10,-13,-16],CW_W=4.4;
-function cwSite(){if(CW.o||CW.tried)return CW.o;if(!EDGES.length||!SCN.sm)return null;try{dmvSite()}catch(e){}CW.tried=true;let best=null;
+function cwSite(){if(CW.o||CW.tried)return CW.o;if(!EDGES.length||!SCN.sm)return null;CW.tried=true;let best=null;
   for(const e of EDGES){if(/xway|ramp|dirt|lane/.test(e.type||"")||e.ov||e.br||e.hz||e.L<110)continue;const hw=hwOf(e);
     for(let u=50;u<e.L-50;u+=25){const p=eAt(e,u),tx=Math.cos(p.h),ty=Math.sin(p.h);for(const sd of [1,-1]){const N=[-ty*sd,tx*sd],U=[-N[1],N[0]],O=[p.x+N[0]*(hw+2.5+26)-U[0]*10,p.y+N[1]*(hw+2.5+26)-U[1]*10];let ok=true;
       for(let x=-32;x<=52&&ok;x+=6)for(let z=-26;z<=26;z+=6.5){const wx=O[0]+U[0]*x+N[0]*z,wy=O[1]+U[1]*x+N[1]*z;if(!ptClear(wx,wy,1.5)){ok=false;break}GREF=0;const G=groundAt(wx,wy);if(G.kind!=="grass"||Math.abs(G.h||0)>0.4){ok=false;break}}
@@ -8233,115 +8223,6 @@ function cwDraw(eye,night){const o=CW.o;if(!o||!PROPS.carwash)return;const ex=ey
   if(PROPS.cw_brush){propDraw("cw_brush",chain(M,M4.T(4.25,1.4,9.98),M4.rY(CW.spin*2.2)),L);propDraw("cw_brush",chain(M,M4.T(4.25,1.4,14.02),M4.rY(-CW.spin*2.2)),L)}
   if(PROPS.cw_brush_top)propDraw("cw_brush_top",chain(M,M4.T(-0.17,3.08,12),M4.rZ(CW.spin*1.6)),L);
   if(PROPS.cw_gate)for(let i=0;i<3;i++)propDraw("cw_gate",chain(M,M4.T(11,1.13,-8.55-3*i),M4.rX(CW.gate[i]*1.45)),L)}
-// ---- v155 Halden DMV: a building with a test lot by Maple Blvd. The driving test (stop sign, three-point turn, parallel parking, a short drive
-// on the street), the license you need to buy cars, and custom license plates
-const LIC={has:false,day:0,score:0,tries:0};try{Object.assign(LIC,JSON.parse(localStorage.getItem("mstrata.lic")||"{}"))}catch(e){}
-const licSave=()=>{try{localStorage.setItem("mstrata.lic",JSON.stringify(LIC))}catch(e){}};
-const DMV={o:null,tried:false,cones:[],test:null,fee:25,plateFee:150};
-function dmvSite(){if(DMV.o||DMV.tried)return DMV.o;if(!EDGES.length||!SCN.sm)return null;DMV.tried=true;const L=70,D=52;let best=null;
-  for(const e of EDGES){if(/xway|ramp|dirt|lane/.test(e.type||"")||e.ov||e.br||e.hz||e.L<90)continue;const hw=hwOf(e);
-    for(let u=40;u<e.L-40;u+=30){const p=eAt(e,u),tx=Math.cos(p.h),ty=Math.sin(p.h);for(const sd of [1,-1]){const nx=-ty*sd,ny=tx*sd;let ok=true;
-      for(let a=-L/2;a<=L/2&&ok;a+=7)for(let n=0;n<=D;n+=6.5){const x=p.x+tx*a+nx*(hw+3+n),y=p.y+ty*a+ny*(hw+3+n);if(!ptClear(x,y,1.2)){ok=false;break}GREF=0;const G=groundAt(x,y);if(G.kind!=="grass"||Math.abs(G.h||0)>0.35){ok=false;break}}
-      const d=Math.hypot(p.x+500,p.y);if(ok&&(!best||d<best.d))best={d,x:p.x+nx*(hw+3),y:p.y+ny*(hw+3),U:[tx,ty],N:[nx,ny],h:p.h,lim:e.lim||35}}}}
-  if(!best)return null;const o=DMV.o=best,P=(u,n)=>[o.x+o.U[0]*u+o.N[0]*n,o.y+o.U[1]*u+o.N[1]*n];o.P=P;
-  // the paved lot (drives as pavement, shows on the map) and the building's walls
-  const c=P(0,18.5);XSITES.push({kind:"lot",custom:true,dmv:true,x:c[0],y:c[1],L:72,D:43,U:o.U,N:o.N,stalls:[]});
-  const b=P(0,46);const w={t:"b",x:b[0],y:b[1],h:Math.atan2(o.U[1],o.U[0]),hl:14,hw:6,z0:-1,z1:6};COLL_KEEP.push(w);collAdd(w);
-  dmvCones();return o}
-function dmvCones(){const o=DMV.o,C=[],P=o.P,add=(u,n)=>{const [x,y]=P(u,n);C.push({x,y,u,n,down:false})};
-  for(let u=14;u<=32;u+=2.25){add(u,3);add(u,13.5)}for(let n=5;n<=11.5;n+=2.2)add(33.2,n);   // three-point-turn lane
-  for(const u of [-1.2,8.7])for(const n of [30.2,32.2])add(u,n);                            // the "parked cars" at each end of the parallel space
-  DMV.cones=C}
-const dmvLocal=(x,y)=>{const o=DMV.o,dx=x-o.x,dy=y-o.y;return [dx*o.U[0]+dy*o.U[1],dx*o.N[0]+dy*o.N[1]]};
-const dmvHead=()=>{const o=DMV.o;return wrapPi(car.psi-Math.atan2(o.U[1],o.U[0]))};   // 0 = facing along +u (east along the lot)
-function dmvInto(){const o=DMV.o||(st.started?dmvSite():null);if(!o||(o.x-car.px)**2+(o.y-car.py)**2>400*400)return;GREF=0;const P=o.P,g=groundAt(o.x,o.y).h||0,hh=Math.atan2(o.U[1],o.U[0]);
-  if(!DMAT.dmvW){DMAT.dmvW=[[0.78,0.74,0.66],null,0.2,10];DMAT.dmvR=[[0.25,0.28,0.32],null,0.3,20];DMAT.dmvG=[[0.15,0.25,0.35],[0.1,0.18,0.28],0.9,80];DMAT.dmvS=[[0.08,0.22,0.6],[0.2,0.5,1.4],0.4,20];
-    DMAT.dmvL=[[0.95,0.95,0.92],[0.35,0.35,0.33],0.1,5];DMAT.dmvY=[[0.95,0.8,0.1],[0.5,0.4,0.05],0.1,5];DMAT.dmvStop=[[0.85,0.05,0.05],[0.9,0.05,0.05],0.3,10];DMAT.dmvP=[[0.4,0.41,0.43],null,0.05,4];DMAT.dmvC=[[0.7,0.7,0.68],null,0.1,4];DMAT.dmvFl=[[0.1,0.3,0.75],null,0.2,10]}
-  {const [x,y]=P(0,18.5);dBox("dmvP",x,y,g-0.015,72,0.03,43,hh)}
-  {const [x,y]=P(0,46);dBox("dmvW",x,y,g,28,5.4,12,hh);dBox("dmvR",x,y,g+5.4,28.6,0.35,12.6,hh);const [gx,gy]=P(0,39.95);dBox("dmvG",gx,gy,g+0.2,10,2.8,0.12,hh);dBox("dmvG",...P(-9,39.95),g+1.2,5,1.6,0.12,hh);dBox("dmvG",...P(9,39.95),g+1.2,5,1.6,0.12,hh);
-    dBox("dmvS",...P(0,39.85),g+3.7,9,1.0,0.15,hh);dBox("dmvW",...P(-15.5,40.5),g,0.25,8,0.25,hh);dBox("dmvFl",...P(-15.5,40.5),g+6.8,1.6,1.0,0.05,hh)}   // building, glass, sign, flag
-  // painted markings: start box, stop line and sign, the three-point lane, the parallel space and the curb, the finish spaces
-  const ln=(u,n,lu,ln_,k)=>{const [x,y]=P(u,n);dBox(k||"dmvL",x,y,g+0.005,lu,0.01,ln_,hh)};
-  ln(-31,8.5,0.15,5);ln(-25,8.5,0.15,5);ln(-28,6,6,0.15);ln(-28,11,6,0.15,"dmvY");ln(-12,8.5,0.5,11);
-  {const [x,y]=P(-12.5,15.2);dBox("gateP",x,y,g,0.08,2.2,0.08,hh);dBox("dmvStop",x,y,g+2.0,0.05,0.75,0.75,hh+Math.PI/2);dBox("dmvStop",x,y,g+2.0,0.05,0.75,0.75,hh+Math.PI/2+0.785)}
-  ln(3.75,30.2,9.5,0.12);ln(3.75,32.45,9.5,0.12,"dmvY");{const [x,y]=P(3.75,32.7);dBox("dmvC",x,y,g,10,0.16,0.3,hh)}
-  for(const u of [-6,-2,2,6])ln(u,36,0.12,6);
-  for(const C of DMV.cones){if(C.down){dBox("cone",C.x,C.y,g,0.7,0.2,0.24,hh+0.9);continue}dBox("cone",C.x,C.y,g,0.4,0.05,0.4,0);dBox("cone",C.x,C.y,g+0.05,0.26,0.55,0.26,0)}}
-// ---- the driving test
-const DMV_STEPS=[["start","Drive into the white start box by the street and stop"],["stop","Drive ahead and come to a full stop at the stop sign"],["turn","Drive into the coned lane and turn around with a three-point turn, without touching the cones"],
-  ["park","Drive past the space by the curb at the back, then parallel park in it"],["road","Pull out onto the street, drive at least 250 m, turn around safely and come back"],["finish","Park in one of the spaces in front of the DMV"]];
-function dmvStart(){if(!dmvSite()){toast0("The DMV isn't open on this map");return}if(st.walk){toast0("Get in a car first: you take the test in the car you came in");return}if(DMV.test)return;
-  if(ECON.cash<DMV.fee){toast0(`The test costs $${DMV.fee}`);return}ECON.cash-=DMV.fee;try{bankTx("Halden DMV · driving test",-DMV.fee);bankSave()}catch(e){}LIC.tries=(LIC.tries||0)+1;licSave();
-  for(const C of DMV.cones)C.down=false;DMV.test={i:0,score:100,t:0,notes:[],cones:0,spT:0,stopMin:99,revs:0,lastDir:0,far:0,parkT:0,stepT:0,sigOk:false};
-  if(!st.belt){DMV.test.score-=5;DMV.test.notes.push("Seatbelt not fastened at the start (-5)")}
-  dmvHud();toast0("📋 Examiner: \"Okay, let's begin. Follow my instructions and drive safely.\"");setTimeout(()=>{if(DMV.test)toast0("📋 "+DMV_STEPS[0][1])},2500)}
-function dmvMinus(n,why){const T=DMV.test;if(!T)return;T.score-=n;T.notes.push(`${why} (-${n})`);try{beep(330,0.15,"square",0.12)}catch(e){}toast0(`📋 ${why} (-${n})`);dmvHud()}
-function dmvFail(why){const T=DMV.test;if(!T)return;T.notes.push(why);DMV.test=null;dmvHud();dmvResult(false,T,why)}
-function dmvNext(){const T=DMV.test;T.i++;T.stepT=0;if(T.i>=DMV_STEPS.length){DMV.test=null;dmvHud();dmvResult(T.score>=80,T,T.score>=80?"":"Score below 80");return}try{beep(880,0.08,"sine",0.12)}catch(e){}toast0("📋 "+DMV_STEPS[T.i][1]);dmvHud()}
-function dmvResult(pass,T,why){const sc=Math.max(0,T.score);let el=$("dmvRes");if(!el){el=document.createElement("div");el.id="dmvRes";document.body.appendChild(el);el.addEventListener("click",e=>{if(e.target===el||e.target.closest("button"))el.hidden=true})}
-  if(pass){const first=!LIC.has;LIC.has=true;LIC.day=GT.day||1;LIC.score=Math.max(LIC.score||0,sc);licSave();try{achHit("license");if(sc>=100)achHit("licensePerfect")}catch(e){}if(first)try{bankMsg("Halden DMV","Congratulations! Your driver's license is valid now. You can buy, finance and lease cars.")}catch(e){}}
-  el.hidden=false;el.innerHTML=`<div class="dmvBox"><b>${pass?"🎉 You passed!":"❌ Not this time"}</b><div class="dmvSc ${pass?"ok":""}">${sc}<small>/100</small></div><p>${pass?"Your driver's license is valid. You can buy, finance and lease cars now.":why+". You can take the test again at the DMV ($"+DMV.fee+")."}</p>
-    ${T.notes.length?`<ul>${T.notes.map(n=>`<li>${acctEsc(n)}</li>`).join("")}</ul>`:"<p class='fine'>A clean drive. The examiner is impressed.</p>"}<button>OK</button></div>`}
-function dmvHud(){let el=$("dmvHud");const T=DMV.test;if(!T){if(el)el.hidden=true;return}if(!el){el=document.createElement("div");el.id="dmvHud";document.body.appendChild(el)}el.hidden=false;
-  el.innerHTML=`<small>DRIVING TEST · ${T.i+1}/${DMV_STEPS.length}</small><b>${DMV_STEPS[T.i][1]}</b><span>Score ${T.score}</span>`}
-function dmvTick(dt){const o=DMV.o||(st.started?dmvSite():null);if(!o)return;
-  // cones: knocked over by any part of the car (test or not)
-  if(!st.walk)for(const C of DMV.cones){if(C.down||Math.abs(C.x-car.px)>6||Math.abs(C.y-car.py)>6)continue;const c=Math.cos(car.psi),s=Math.sin(car.psi),dx=C.x-car.px,dy=C.y-car.py;if(Math.abs(dx*c+dy*s)<BODY_HL+0.15&&Math.abs(-dx*s+dy*c)<BODY_HW+0.15){C.down=true;if(DMV.test){DMV.test.cones++;if(DMV.test.cones>=3){dmvFail("Hit three cones");return}dmvMinus(10,"Touched a cone")}}}
-  dmvBtn();const T=DMV.test;if(!T)return;if(st.walk){dmvFail("Left the car during the test");return}T.t+=dt;T.stepT+=dt;if(T.t>600){dmvFail("Ran out of time");return}
-  const [u,n]=dmvLocal(car.px,car.py),v=Math.abs(car.vx),mph=v*2.237,hd=dmvHead(),inLot=u>-37&&u<37&&n>-3&&n<41;
-  // speed: 15 mph in the lot, the limit + 5 on the street
-  T.spT=Math.max(0,T.spT-dt);if(T.spT<=0){if(inLot&&mph>15){dmvMinus(5,"Too fast in the lot");T.spT=4}else if(!inLot){const lim=(sys.limit||o.lim||35);if(mph>lim+5){dmvMinus(5,`Over the speed limit (${Math.round(mph)} in a ${lim})`);T.spT=4}}}
-  const dir=st.gear==="R"?-1:st.gear==="D"?1:0;if(dir&&T.lastDir&&dir!==T.lastDir)T.revs++;if(dir)T.lastDir=dir;
-  const step=DMV_STEPS[T.i][0];
-  if(step==="start"){if(u>-31.5&&u<-24.5&&n>5.5&&n<11.5&&v<0.2&&Math.abs(hd)<0.5)dmvNext()}
-  else if(step==="stop"){if(u>-18&&u<-12&&n>2&&n<15)T.stopMin=Math.min(T.stopMin,v);if(u>=-11.5&&n>2&&n<15){if(T.stopMin>0.35){dmvFail("Rolled through the stop sign");return}dmvNext()}}
-  else if(step==="turn"){if(T.stepT<0.1)T.revs=0;if(u>14&&u<33&&n>3&&n<13.5&&Math.abs(Math.abs(hd)-Math.PI)<0.35&&st.gear==="D"){if(T.revs>4)dmvMinus(10,"Too many back-and-forths for a three-point turn");dmvNext()}}
-  else if(step==="park"){const inBox=u>0.6&&u<6.9&&n>29.9&&n<32.1,str=Math.min(Math.abs(hd),Math.abs(Math.abs(hd)-Math.PI))<0.22;T.parkT=inBox&&str&&v<0.15?T.parkT+dt:0;
-    if(T.parkT>1.5){if(T.stepT>120)dmvMinus(10,"The parallel parking took too long");dmvNext()}}
-  else if(step==="road"){if(!inLot&&!T.out){T.out=true;if(!T.sigOk)dmvMinus(5,"No turn signal pulling out")}if(inLot&&!T.out&&n<2&&st.signal)T.sigOk=true;const d=Math.hypot(car.px-o.x,car.py-o.y);T.far=Math.max(T.far,d);
-    if(T.out&&inLot){if(T.far<250){dmvMinus(10,"Didn't drive far enough before coming back")}dmvNext()}}
-  else if(step==="finish"){if(u>-8&&u<8&&n>32.5&&n<39.5&&v<0.1&&(st.gear==="P"||T.stepT>3))dmvNext()}}
-// the counter: walk up to the door, or stop in front of it
-function dmvBtn(){const o=DMV.o,b=$("dmvBtn");if(!o)return;let near=false;if(st.walk){const [u,n]=dmvLocal(st.walk.x,st.walk.y);near=Math.abs(u)<7&&n>36&&n<43}else{const [u,n]=dmvLocal(car.px,car.py);near=Math.abs(u)<10&&n>30&&n<41&&Math.abs(car.vx)<0.3&&!DMV.test}
-  if(!b){if(!near)return;const e=document.createElement("button");e.id="dmvBtn";e.textContent="🪪 Halden DMV";e.onclick=()=>dmvOpen();document.body.appendChild(e);return}b.hidden=!near||!!DMV.test||PM.on}
-function dmvOpen(){let el=$("dmv");if(!el){el=document.createElement("div");el.id="dmv";document.body.appendChild(el);el.addEventListener("click",e=>{if(e.target===el){el.hidden=true;return}const b=e.target.closest("button");if(!b)return;const a=b.dataset.d;
-    if(a==="x")el.hidden=true;else if(a==="test"){el.hidden=true;dmvStart()}else if(a==="plate"){plateBuy(($("dmvPl")||{}).value||"")}else if(a==="pclr"){plateClear()}});
-    el.addEventListener("input",e=>{if(e.target.id==="dmvPl"){const t=e.target,c=t.selectionStart;t.value=plateClean(t.value);t.setSelectionRange(c,c);const p=$("dmvPv");if(p){p.innerHTML="";p.appendChild(plateCanvas(t.value||plateDefault()))}}});
-    el.addEventListener("keydown",e=>e.stopPropagation());el.addEventListener("keyup",e=>e.stopPropagation())}
-  el.hidden=false;const mine=plateOwn();el.innerHTML=`<div class="dmvBox"><div class="dmvH"><b>🪪 Halden DMV</b><button data-d="x">✕</button></div>
-    <p>${LIC.has?`✅ Driver's license valid · passed on day ${LIC.day} with ${LIC.score}/100`:"You don't have a driver's license yet. You need one to buy, finance or lease a car."}</p>
-    <div class="dmvH2"><b>Driving test · $${DMV.fee}</b></div><p class="fine">In the car you came in: a stop sign, a three-point turn, parallel parking and a short drive on the street. 15 mph in the lot. 80 points to pass; three cones, a crash or rolling the stop sign fails it.</p>
-    <button class="dmvGo" data-d="test" ${st.walk?"disabled":""}>${st.walk?"Come back in a car to take the test":LIC.has?"Take the test again":"Start the driving test"}</button>
-    <div class="dmvH2"><b>Custom license plate · $${DMV.plateFee}</b></div>${mine?`<p class="fine">For your ${acctEsc(TRIMS[st.trim].short||TRIMS[st.trim].name)}. Up to 7 letters and numbers. Other players see it online.</p>
-    <div id="dmvPv"></div><input id="dmvPl" maxlength="7" placeholder="${plateDefault()}" value="${acctEsc(PLATE.m[st.trim]||"")}" autocomplete="off" spellcheck="false"><div class="dmvR"><button class="dmvGo" data-d="plate">Order plate</button>${PLATE.m[st.trim]?`<button data-d="pclr">Back to the standard plate</button>`:""}</div>`:`<p class="fine">Drive here in a car you own to order a plate for it.</p>`}</div>`;
-  const p=$("dmvPv");if(p)p.appendChild(plateCanvas(PLATE.m[st.trim]||plateDefault()))}
-// ---- license plates: a standard plate on every car you drive, or your custom one; drawn on the back and front of the car
-const PLATE={m:{},tex:{},geo:{}};try{PLATE.m=JSON.parse(localStorage.getItem("mstrata.plates")||"{}")}catch(e){}
-const plateClean=s=>String(s||"").toUpperCase().replace(/[^A-Z0-9 ]/g,"").replace(/ {2,}/g," ").slice(0,8);
-const PLATE_BAD=/FUCK|SHIT|CUNT|BITCH|NIGG|FAG|DICK|COCK|PUSS|SLUT|WHORE|RAPE|NAZI|KKK|HITLER|PENIS|ANUS|SEX|PORN|ASS(?!E)|TIT/;
-function plateDefault(k=st.trim){let h=7;for(const ch of String(k))h=(h*31+ch.charCodeAt(0))>>>0;const L="ABCDEFGHJKLMNPRSTUVWXYZ";return L[h%23]+L[(h>>>5)%23]+L[(h>>>10)%23]+" "+String(1000+(h>>>15)%9000)}
-const plateOwn=()=>{try{const G=garageCur();return !!(G&&G.trim===st.trim)&&!st.walk}catch(e){return false}};
-const plateTxt=()=>PLATE.m[st.trim]||plateDefault();
-function plateBuy(t){t=plateClean(t).trim();if(t.length<2){toast0("Type 2 to 7 letters or numbers");return}if(PLATE_BAD.test(t.replace(/ /g,""))){toast0("The DMV won't issue that plate. Try another");return}
-  if(Object.values(PLATE.m).includes(t)&&PLATE.m[st.trim]!==t){toast0("You already have that plate on another car");return}if(ECON.cash<DMV.plateFee){toast0(`A custom plate costs $${DMV.plateFee}`);return}
-  ECON.cash-=DMV.plateFee;try{bankTx(`Halden DMV · plate "${t}"`,-DMV.plateFee);bankSave()}catch(e){}PLATE.m[st.trim]=t;try{localStorage.setItem("mstrata.plates",JSON.stringify(PLATE.m))}catch(e){}toast0(`🔤 New plate "${t}" is on your car`);try{achHit("plate")}catch(e){}dmvOpen()}
-function plateClear(){delete PLATE.m[st.trim];try{localStorage.setItem("mstrata.plates",JSON.stringify(PLATE.m))}catch(e){}toast0("Standard plate back on");dmvOpen()}
-function plateCanvas(t){const c=document.createElement("canvas");c.width=256;c.height=128;const g=c.getContext("2d");g.fillStyle="#f4f5f0";g.fillRect(0,0,256,128);g.strokeStyle="#1d3a7a";g.lineWidth=6;g.strokeRect(5,5,246,118);
-  g.fillStyle="#1d3a7a";g.font="700 18px Inter,system-ui,sans-serif";g.textAlign="center";g.textBaseline="middle";g.fillText("HALDEN",128,22);g.font="600 12px Inter,system-ui,sans-serif";g.fillStyle="#3a5aa0";g.fillText("Great Lakes State",128,110);
-  g.fillStyle="#111a2e";const n=Math.max(4,t.length);g.font=`800 ${Math.round(Math.min(62,300/n))}px "Arial Narrow",Inter,system-ui,sans-serif`;g.fillText(t,128,68);return c}
-function plateTex(t){let x=PLATE.tex[t];if(x)return x;const c=plateCanvas(t);x=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,x);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,c);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);
-  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);PLATE.tex[t]=x;
-  const ks=Object.keys(PLATE.tex);if(ks.length>24){gl.deleteTexture(PLATE.tex[ks[0]]);delete PLATE.tex[ks[0]]}return x}
-// where the plates go on a model: the rearmost / frontmost flat spot of the body on the centre line, at bumper height
-function plateGeo(mk){if(PLATE.geo[mk]!==undefined)return PLATE.geo[mk];const M=MODELS[mk];if(!M||!M.objects)return null;if(!M.objects.body){PLATE.geo[mk]=null;return null}
-  try{const p16=b64(M.objects.body.p,Int16Array),bins={};for(let i=0;i<p16.length;i+=3){const x=p16[i]/1000,y=p16[i+1]/1000,z=p16[i+2]/1000;if(Math.abs(x)>0.16||y<0.35||y>1.15)continue;const b=Math.round(y*20);const B=bins[b]||(bins[b]={mx:-9,mn:9});B.mx=Math.max(B.mx,z);B.mn=Math.min(B.mn,z)}
-    let r=null,f=null;for(const [b,B] of Object.entries(bins)){const y=b/20;if(y>=0.5&&y<=1.0&&(!r||B.mx>r[1]))r=[y,B.mx];if(y>=0.35&&y<=0.62&&(!f||B.mn<f[1]))f=[y,B.mn]}
-    PLATE.geo[mk]={r:r&&[0,r[0],r[1]+0.012],f:f&&[0,f[0],f[1]-0.012]}}catch(e){PLATE.geo[mk]=null}return PLATE.geo[mk]}
-function plateDraw(cm,mk,t,night){const G=plateGeo(mk);if(!G)return;gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,plateTex(t));bind(SCN.box);const w=0.305,h=0.152;
-  for(const [c,s] of [[G.r,1],[G.f,-1]]){if(!c)continue;const Og=M4.p(cm,[c[0]-s*w/2,c[1]-h/2,c[2]]),Ug=M4.d(cm,[s*w,0,0]),Vg=M4.d(cm,[0,h,0]);gl.uniform3fv(U.uSO,Og);gl.uniform3fv(U.uSU,Ug);gl.uniform3fv(U.uSV,Vg);
-    gl.uniformMatrix4fv(U.uM,false,chain(cm,M4.T(c[0],c[1],c[2]),M4.S(w,h,0.008)));mat([night?0.55:0.95,0,0],null,0,1,1,5);gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_SHORT,0)}}
-
-function dmvNav(){const o=dmvSite();if(o){const [x,y]=o.P(0,34);navTo({x,y,h:Math.atan2(-o.N[1],-o.N[0]),name:"Halden DMV"})}}
 // ---- v155 traffic cameras: red-light cameras at some signals, speed cameras on some streets (with PHOTO ENFORCED signs).
 // They flash, take a picture of your car, and the ticket comes in the phone's Mail a day later (the fine is taken from your account)
 const TCAM={list:null,pend:[],mail:[],prev:null,shot:null,flashT:0};try{const o=JSON.parse(localStorage.getItem("mstrata.tcam")||"{}");TCAM.pend=o.pend||[];TCAM.mail=o.mail||[]}catch(e){}
@@ -8363,16 +8244,16 @@ function tcamRed(n,sp){const c=(tcamList()).find(c=>c.t==="red"&&c.n===n);if(c)t
 // the picture: drawn from the camera pole into the off-screen buffer, then stamped like a real enforcement photo
 function tcamDev(S){const W=480,H=288,c=document.createElement("canvas");c.width=W;c.height=H;const g=c.getContext("2d"),img=g.createImageData(W,H);for(let y=0;y<H;y++)img.data.set(SCR.px.subarray((H-1-y)*W*4,(H-y)*W*4),y*W*4);g.putImageData(img,0,0);
   g.fillStyle="rgba(0,0,0,.65)";g.fillRect(0,H-34,W,34);g.fillStyle="#fff";g.font="600 12px monospace";g.textAlign="left";g.fillText(`HALDEN PHOTO ENFORCEMENT · DAY ${GT.day||1} ${gtClock().toUpperCase()}`,8,H-20);
-  g.fillText(S.lim?`SPEED ${S.mph} MPH · LIMIT ${S.lim}`:`RED LIGHT · ${S.mph} MPH`,8,H-6);g.textAlign="right";g.fillText(plateTxt(),W-8,H-6);
+  g.fillText(S.lim?`SPEED ${S.mph} MPH · LIMIT ${S.lim}`:`RED LIGHT · ${S.mph} MPH`,8,H-6);
   const sm=document.createElement("canvas");sm.width=360;sm.height=216;sm.getContext("2d").drawImage(c,0,0,360,216);
-  TCAM.pend.push({why:S.why,fine:S.fine,day:GT.day||1,t:gtClock(),due:(GT.day||1)+1,img:sm.toDataURL("image/jpeg",0.7),car:TRIMS[st.trim].name,plate:plateTxt()});tcamSave()}
+  TCAM.pend.push({why:S.why,fine:S.fine,day:GT.day||1,t:gtClock(),due:(GT.day||1)+1,img:sm.toDataURL("image/jpeg",0.7),car:TRIMS[st.trim].name});tcamSave()}
 function tcamInto(){const L=TCAM.list;if(!L)return;if(!DMAT.tcP){DMAT.tcP=[[0.35,0.36,0.38],null,0.3,20];DMAT.tcB=[[0.85,0.85,0.8],null,0.4,30];DMAT.tcL=[[0.1,0.1,0.12],TCAM.flashT>0?[6,6,6]:[0.02,0.02,0.02],0.8,60];DMAT.tcS=[[0.95,0.95,0.95],[0.35,0.35,0.35],0.1,5];DMAT.tcSb=[[0.05,0.05,0.05],null,0.1,5]}
   DMAT.tcL[1]=TCAM.flashT>0?[8,8,8]:[0.02,0.02,0.02];
   for(const c of L){if((c.x-car.px)**2+(c.y-car.py)**2>300*300)continue;GREF=car.zb||0;const g=groundAt(c.x,c.y).h||0,h=c.h!=null?c.h:Math.atan2(c.n.y-c.y,c.n.x-c.x);
     dBox("tcP",c.x,c.y,g,0.16,4.2,0.16,h);dBox("tcB",c.x,c.y,g+4.0,0.7,0.45,0.4,h);dBox("tcL",c.x+Math.cos(h+Math.PI)*0.36,c.y+Math.sin(h+Math.PI)*0.36,g+4.15,0.05,0.18,0.25,h);
     if(c.t==="speed"){const sg=groundAt(c.sx,c.sy).h||0;dBox("tcP",c.sx,c.sy,sg,0.08,2.4,0.08,c.sh);dBox("tcS",c.sx,c.sy,sg+2.1,0.04,0.9,0.75,c.sh+Math.PI/2);dBox("tcSb",c.sx+Math.cos(c.sh+Math.PI)*0.03,c.sy+Math.sin(c.sh+Math.PI)*0.03,sg+2.3,0.02,0.25,0.6,c.sh+Math.PI/2)}}}
 function mailApp(){const s=PHONE.sub;const M=TCAM.mail;if(s!==null&&s!==undefined&&s!==""&&M[+s]){const T=M[+s];T.read=true;tcamSave();
-    return phHdr("Mail")+`<div class="card"><small>Halden Traffic Court · day ${T.day} · ${T.t}</small><b>${acctEsc(T.why)}</b></div>${T.img?`<img src="${T.img}" style="width:100%;border-radius:10px;display:block">`:""}<div class="card"><small>${acctEsc(T.car||"")} · plate ${acctEsc(T.plate||"")}</small><b>Fine: $${T.fine} · paid from your account</b></div><div class="chips"><button data-a="sub" data-v="">‹ All mail</button></div>`}
+    return phHdr("Mail")+`<div class="card"><small>Halden Traffic Court · day ${T.day} · ${T.t}</small><b>${acctEsc(T.why)}</b></div>${T.img?`<img src="${T.img}" style="width:100%;border-radius:10px;display:block">`:""}<div class="card"><small>${acctEsc(T.car||"")}</small><b>Fine: $${T.fine} · paid from your account</b></div><div class="chips"><button data-a="sub" data-v="">‹ All mail</button></div>`}
   return phHdr("Mail",`<span class="sc">${M.filter(m=>!m.read).length||""}</span>`)+(M.length?M.map((T,i)=>`<button class="card" data-a="sub" data-v="${i}" style="text-align:left;width:100%"><small>${T.read?"":"● "}Day ${T.day} · Halden Traffic Court</small><b>$${T.fine} · ${acctEsc(T.why)}</b></button>`).join(""):`<p class="fine">No mail. Tickets from speed and red-light cameras arrive here.</p>`)}
 // ---- v155 Halden Auto Auction: every 7th game day (8 AM to 8 PM) six lots go under the hammer: used cars, wrecks with salvage titles, and one rare car.
 // AI bidders each have their own limit; a late bid adds 10 minutes. Win it and it's in your garage (pay cash); fix it up and flip it
@@ -8405,7 +8286,7 @@ function aucTick(dt){if(!st.started)return;const L=aucLots(),live=aucLive(),d=GT
     if(l.who!=="ai"||Math.random()<0.25){const top=Math.max(...l.ai),far=l.bid<top*0.55?4:l.bid<top*0.8?2:1,nx=l.bid+aucInc(l.bid)*far,can=l.ai.filter(m=>m>=nx);if(can.length&&Math.random()<step*(left<20?1.2:left<60?0.5:0.22)){l.bid=nx;l.who="ai";l.aiN=1+l.ai.indexOf(can[Math.floor(Math.random()*can.length)]);if(left<10)l.end=GT.min+10;ch=true;if(l.mine&&$("phone")&&!PHONE.open)toast0(`🔨 Outbid on the ${TRIMS[l.trim].short||TRIMS[l.trim].name}: now ${money(l.bid)}`)}}}
   if(ch){aucSave();if(PHONE.open&&PHONE.app==="auction")phRender(true)}}
 function aucBid(id,mult){const l=(AUC.lots||[]).find(x=>x.id===id);if(!l||l.done)return;if(!aucLive()||aucDayOf(AUC.w)!==(GT.day||1)){toast0("Bidding opens on auction day at 8 AM");return}
-  if(!LIC.has){toast0("You need a driver's license to buy at the auction");return}if(l.who==="you"){toast0("You're already the high bidder");return}
+  if(l.who==="you"){toast0("You're already the high bidder");return}
   const nb=l.bid+aucInc(l.bid)*(mult||1);if(nb>ECON.cash){toast0(`You need ${money(nb)} in checking to bid that (the auction takes cash only)`);return}
   l.bid=nb;l.who="you";l.mine=1;if(l.end-GT.min<10)l.end=GT.min+10;aucSave();try{beep(990,0.06,"sine",0.12)}catch(e){}phRender(true)}
 function aucWin(l){const T=TRIMS[l.trim],nm=usedName(T,l.yr);if(ECON.cash<l.bid){toast0(`You won the ${nm} but couldn't pay: the auction resells it`);return}
@@ -8441,7 +8322,7 @@ function tutSteps(){const pc=PC.on;return [
   {t:pc?"Open your phone: press Y. Gig Jobs earns money, Maps sets a route.":"Open your phone: tap the phone button. Gig Jobs earns money, Maps sets a route.",ok:()=>PHONE.open},
   {t:"That's it! ☰ has settings, spawn points and tests. R puts you back on the road if you get stuck. Have fun!",next:true,last:true}]}
 function tutStart(force){if(!force){try{if(localStorage.getItem("mstrata.tut"))return}catch(e){}}TUT.steps=tutSteps();TUT.i=0;tutShow()}
-function tutEnd(){if(TUT.i>=0&&!LIC.has)setTimeout(()=>{toast("🪪 Final exam: get your driver's license at the Halden DMV. You need it to buy a car. The route is on your map");try{dmvNav()}catch(e){}},1500);TUT.i=-1;try{localStorage.setItem("mstrata.tut","1")}catch(e){}const el=$("tutFx");if(el)el.hidden=true}
+function tutEnd(){TUT.i=-1;try{localStorage.setItem("mstrata.tut","1")}catch(e){}const el=$("tutFx");if(el)el.hidden=true}
 function tutShow(){let el=$("tutFx");if(!el){el=document.createElement("div");el.id="tutFx";document.body.appendChild(el);el.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;if(b.dataset.t==="skip"||TUT.steps[TUT.i].last)tutEnd();else{TUT.i++;tutShow()}})}
   const S=TUT.steps[TUT.i];el.hidden=false;el.innerHTML=`<small>First drive · ${TUT.i+1}/${TUT.steps.length}</small><b>${S.t}</b><div>${S.next?`<button data-t="next">${S.last?"Let's go":"Next"}</button>`:""}<button data-t="skip" class="sk">${S.last?"":"Skip tutorial"}</button></div>`}
 setInterval(()=>{if(TUT.i<0||!TUT.steps)return;const S=TUT.steps[TUT.i];if(S&&S.ok&&S.ok()){beep(1318,.08,"sine",.1);TUT.i++;if(TUT.i>=TUT.steps.length)tutEnd();else tutShow()}},300);
@@ -8706,7 +8587,6 @@ function buyHtml(){const b=st.buy,q=buyQuote(),row=(k,n,d)=>`<button class="cRow
   if(b.how==="finance")h+=`<div class="chips">${[36,48,60,72].map(t=>`<button class="${b.term===t?"on":""}" data-bterm="${t}">${t} mo</button>`).join("")}${[0,0.1,0.2].map(d=>`<button class="${b.down===d?"on":""}" data-bdown="${d}">${d*100}% down</button>`).join("")}</div>`;
   return h}
 function buyProcess(){const b=st.buy;if(b&&b.how==="test"&&testBlocked()){const T=TRIMS[st.trim];toast(`You've already test driven this ${st.used?"used ":""}${T.short}. Buy, finance or lease it to drive it again`+(firstFree()?" (your first car is free!)":""));return false}if(!b||b.how==="test"){if(!st.siteKeep){const G=garageCur();if(!(G&&G.trim===st.trim)){st.used=null;st.garageId=null;car.fault=null}}st.siteKeep=false;return true}st.used=null;const T=TRIMS[st.trim],q=buyQuote(),name=`${T.group?T.group.split(" · ")[0]:T.name}`;
-  if(b.how!=="free"&&!LIC.has){toast("You need a driver's license first: take the test at the Halden DMV on Maple Blvd ($25). The route is on your map");try{dmvNav()}catch(e){}return false}
   if(b.how==="free"){if(!firstFree()){toast("You've already claimed your free car");st.buy.how="test";return false}firstFreeUse();bankTx(`Free first car · ${T.name}`,0);BANK.garage.push({trim:st.trim,how:"cash",price:0,day:GT.day||1});bankMsg("Strata Motors",`Your first car is on us. Enjoy your ${T.name}!`);garageAdd({trim:st.trim,name:T.name,how:"cash",price:q.tot,odoM:st.odo[st.trim]||0,build:buildSnap(),loanId:null,free:true});st.garageId=GARAGE[GARAGE.length-1].gid;st.buy={how:"test",term:60,down:0.1};bankSave();toast(`🎁 Free! The ${T.name} is yours · saved in My Garage`);return true}
   if(b.how==="cash"){if(ECON.cash<q.tot){toast(`Not enough in checking to buy it outright: it's ${money(q.tot)} out the door with tax and fees, you have ${money(ECON.cash)}. Finance it, or move money in the Bank app`);return false}ECON.cash-=q.tot;bankTx(`Bought ${T.name}`,-q.tot)}
   else{if(ECON.cash<q.down){toast(`You need ${money(q.down)} for the ${b.how==="lease"?"amount due at signing":"down payment"}`);return false}
@@ -9600,16 +9480,15 @@ function render(dt){
   // traffic: full model nearby, simple box far away, nothing behind the camera
   const view=norm(sub(tgt,eye)); const drawn=[];
   dynBuild(eye,cm);
-  const vis=[],plateQ=[];for(const c of cars.concat(parked)){if(c.wx===undefined||c.kind==="bike"||c.kind==="cone"||c.kind==="xing")continue;const pos=[c.wx,0.6,-c.wy];const d=sub(pos,eye);const dist=Math.hypot(d[0],d[1],d[2]);
+  const vis=[];for(const c of cars.concat(parked)){if(c.wx===undefined||c.kind==="bike"||c.kind==="cone"||c.kind==="xing")continue;const pos=[c.wx,0.6,-c.wy];const d=sub(pos,eye);const dist=Math.hypot(d[0],d[1],d[2]);
     if(dist>1400||(dot(d,view)<-8&&dist>12))continue;vis.push([dist,c])}
   // only the nearest few get the full model (fewer still in the camera and mirror views); the rest are simple boxes
   vis.sort((a,b)=>a[0]-b[0]);const capFull=cam2?4:(G().fullCars||10),lodD=cam2?G().lod*0.5:G().lod;let nFull=0;
   for(const [dist,c] of vis){
     const om=aiMat(c);const sOn=(c.sig||c.haz)&&st.blink;
     const fl=c.flashT>0&&(c.flashT%0.55)>0.25,rmt=c.kind==="remote",lc={head:rmt?(c.li===2?[4.2,4.2,3.9]:c.li?[1.2,1.2,1.1]:[0.3,0.3,0.32]):fl?[4.2,4.2,3.9]:lampsOn?[1.2,1.2,1.1]:[0.3,0.3,0.32],tail:c.kind==="parked"?OFF:c.brk||c.v<0.1?[1.3,0.04,0.02]:(lampsOn?[0.4,0.01,0.01]:OFF),sigL:sOn&&(c.haz||c.sig<0)?AMB:OFF,sigR:sOn&&(c.haz||c.sig>0)?AMB:OFF};
-    if(dist<lodD&&nFull<capFull&&(c.mdl===undefined||KITS[c.mdl]||nFull<2)){nFull++;kitNext=kitOf(trafficModel(c));drawCar(om,paintRGB(c.paint),lc,[c.spin,c.spin,c.spin,c.spin],c.kind==="remote"?(c.steer||0):0,0,false,0,true);drawn.push([om,c]);if(c.kind==="remote"&&c.plate&&c.mdl)plateQ.push([om,c.mdl,c.plate])}else drawProxy(om,paintRGB(c.paint),c.brk)}
-  if(cam2!=="rear"&&cam2!=="dash"){dentOn(true);WHL_ME=true;drawCar(cm,myPaint(),lit,car.spin,car.dF,car.dR,false,car.height-tuneLow(),false,car.defl.map(d=>d));WHL_ME=false;dentOn(false);try{if(!(st.cam===1&&!cam2&&!PM.on))plateDraw(cm,TRIMS[st.trim].model,plateTxt(),night)}catch(e){}}
-  try{for(const [om,mk,t] of plateQ)plateDraw(om,mk,t,night)}catch(e){}
+    if(dist<lodD&&nFull<capFull&&(c.mdl===undefined||KITS[c.mdl]||nFull<2)){nFull++;kitNext=kitOf(trafficModel(c));drawCar(om,paintRGB(c.paint),lc,[c.spin,c.spin,c.spin,c.spin],c.kind==="remote"?(c.steer||0):0,0,false,0,true);drawn.push([om,c])}else drawProxy(om,paintRGB(c.paint),c.brk)}
+  if(cam2!=="rear"&&cam2!=="dash"){dentOn(true);WHL_ME=true;drawCar(cm,myPaint(),lit,car.spin,car.dF,car.dR,false,car.height-tuneLow(),false,car.defl.map(d=>d));WHL_ME=false;dentOn(false);}
   if(!cam2&&mirOn()&&MIR.fresh){gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,MIR.tex);bind(SCN.box);
     for(const [c,hw,hh,[u0,u1,v0,v1]] of mirrorGlass()){const Og=M4.p(cm,[c[0]+hw,c[1]-hh,c[2]]),Ug=M4.d(cm,[-2*hw,0,0]),Vg=M4.d(cm,[0,2*hh,0]),du=u1-u0,dv=v1-v0;
       const O=Og.map((v,i)=>v-Ug[i]*u0/du-Vg[i]*v0/dv);gl.uniform3fv(U.uSO,O);gl.uniform3fv(U.uSU,Ug.map(v=>v/du));gl.uniform3fv(U.uSV,Vg.map(v=>v/dv));
@@ -10973,7 +10852,7 @@ function koDraw(){const now=performance.now(),dt=Math.min(0.1,(now-(KO.t||now))/
 const MP={room:null,objs:new Map(),sendT:0,last:"",lastT:0,gp:null};
 function mpTick(dt){const R_=MP.room;if(!R_)return;MP.sendT+=dt;
   if(MP.sendT>0.1&&st.started){MP.sendT=0;const pc=paintRGB(st.paint).map(v=>+v.toFixed(3));
-    const p={x:+car.px.toFixed(2),y:+car.py.toFixed(2),z:+(car.zb||0).toFixed(2),h:+car.psi.toFixed(3),v:+car.vx.toFixed(2),m:TRIMS[st.trim].model||"",pc,b:(inp.brk>0.1||st.gear==="P")?1:0,sg:st.hazard?2:(st.signal||0),w:st.walk?1:0,pl:plateTxt(),st:Math.round((car.dF||0)*25)/25,li:st.power===false?0:st.high?2:(st.lights||st.night)?1:0,rv:st.gear==="R"?1:0,pt:Math.round((car.pitch||0)*100)/100,rl:Math.round((car.roll||0)*100)/100,hn:st.hornAt&&(st.clock||0)-st.hornAt<0.6?1:0};
+    const p={x:+car.px.toFixed(2),y:+car.py.toFixed(2),z:+(car.zb||0).toFixed(2),h:+car.psi.toFixed(3),v:+car.vx.toFixed(2),m:TRIMS[st.trim].model||"",pc,b:(inp.brk>0.1||st.gear==="P")?1:0,sg:st.hazard?2:(st.signal||0),w:st.walk?1:0,st:Math.round((car.dF||0)*25)/25,li:st.power===false?0:st.high?2:(st.lights||st.night)?1:0,rv:st.gear==="R"?1:0,pt:Math.round((car.pitch||0)*100)/100,rl:Math.round((car.roll||0)*100)/100,hn:st.hornAt&&(st.clock||0)-st.hornAt<0.6?1:0};
     const key=JSON.stringify(p),now=performance.now();if(key!==MP.last||now-MP.lastT>1000){MP.last=key;MP.lastT=now;R_.presence({car:p}).catch(()=>{})}}
   const now=performance.now(),seen=new Set();let peers=[];try{peers=R_.peers()}catch(e){}
   for(const pr of peers){if(pr.sameTab||pr.kind!=="viewer")continue;const c=pr.presence&&pr.presence.car;if(!c||typeof c.x!=="number"||!isFinite(c.x)||!isFinite(c.y))continue;seen.add(pr.peer);
@@ -10982,7 +10861,7 @@ function mpTick(dt){const R_=MP.room;if(!R_)return;MP.sendT+=dt;
     const age=Math.min(0.6,(now-o.rt)/1000),v=+c.v||0,h=+c.h||0,tx=c.x+Math.cos(h)*v*age,ty=c.y+Math.sin(h)*v*age,k=Math.min(1,dt*10);
     if(Math.hypot(tx-o.wx,ty-o.wy)>15){o.wx=tx;o.wy=ty;o.wh=h}else{o.wx+=(tx-o.wx)*k;o.wy+=(ty-o.wy)*k;o.wh+=wrapPi(h-o.wh)*k}
     o.wz+=((+c.z||0)-o.wz)*k;o.v=v;o.brk=!!c.b;o.haz=c.sg===2;o.sig=c.sg===2?0:clamp(+c.sg||0,-1,1);o.spin+=v/0.36*dt;
-    o.plate=plateClean(c.pl||"")||null;o.steer=clamp(+c.st||0,-0.7,0.7);o.li=+c.li||0;o.rv=!!c.rv;o.wp=clamp(+c.pt||0,-0.3,0.3);o.wr=clamp(+c.rl||0,-0.3,0.3);
+    o.steer=clamp(+c.st||0,-0.7,0.7);o.li=+c.li||0;o.rv=!!c.rv;o.wp=clamp(+c.pt||0,-0.3,0.3);o.wr=clamp(+c.rl||0,-0.3,0.3);
     if(c.hn&&!o.hn&&Math.hypot(o.wx-car.px,o.wy-car.py)<150)try{mpHorn(o)}catch(e){}o.hn=!!c.hn;
     if(Array.isArray(c.pc)&&c.pc.length===3){const key="rp_"+pr.peer;PAINTS[key]=c.pc.map(x=>clamp(+x||0,0,1));o.paint=key}
     const m=String(c.m||"");if(MODELS[m])o.mdl=m;else if(m&&/^[a-z0-9_]+$/.test(m)&&!o.loading&&!o.failed){o.loading=true;loadModel(m).then(()=>{o.loading=false}).catch(()=>{o.loading=false;o.failed=true})}
@@ -11277,7 +11156,7 @@ async function garageLoad(G){garageSync();if(!MODELS[TRIMS[G.trim].model]){toast
   setTrim(G.trim,true);const B=G.build||{};if(B.paint)st.paint=B.paint;for(const f of ["rimBlack","wheel","tyre"])if(B[f]!==undefined)st[f]=B[f];if(B.extras)st.extras={...st.extras,...B.extras};if(B.pkgs)st.pkgs={...st.pkgs,...B.pkgs};if(B.opk)st.opk=B.opk;
   if(G.odoM)st.odo[G.trim]=G.odoM;st.used=G.used?{...G.used}:null;st.garageId=G.gid;if(G.wreck)setTimeout(()=>{if(st.garageId===G.gid&&G.wreck){car.dmg=Object.assign({f:0,r:0,l:0,rt:0,wheel:[0,0,0,0],lamp:[1,1,1,1],rad:0},JSON.parse(JSON.stringify(G.wreck)));try{dentsSync()}catch(e){}}},400);car.fault=G.fault?{...G.fault}:null;st.built=true;fitPaint&&fitPaint();try{wearRefresh();const due=wearDue(WEAR.w);if(due.length)setTimeout(()=>toast(`🔧 ${due.join(" · ")}: a tire shop can fix it`),2500)}catch(e){}return true}
 function siteDrive(){st.siteKeep=true;st.cfgStep="color";st.cfgTab="acc";st.buy={how:"test",term:60,down:0.1};st.site="new";const go=$("go");go.click()}
-async function usedBuy(u,how){const T=TRIMS[u.trim],q=usedQuote(u),nm=usedName(T,u.yr);const free=firstFree();if(!free&&!LIC.has){toast("You need a driver's license first: take the test at the Halden DMV on Maple Blvd. The route is on your map");try{dmvNav()}catch(e){}return}
+async function usedBuy(u,how){const T=TRIMS[u.trim],q=usedQuote(u),nm=usedName(T,u.yr);const free=firstFree();
   if(free){firstFreeUse();how="cash";bankTx(`Free first car · used ${nm}`,0)}
   else if(how==="cash"){if(ECON.cash<u.price){toast(`Not enough in checking (${money(ECON.cash)}). Finance it, or take a loan in the Bank app`);return}ECON.cash-=u.price;bankTx(`Bought used ${nm}`,-u.price)}
   else{if(ECON.cash<q.down){toast(`You need ${money(q.down)} for the down payment`);return}const r=bankLoan("auto",`${nm} loan`,q.amt,q.apr,q.wk);if(!r.ok){toast(r.why);return}st._loanId=r.loan&&r.loan.id;ECON.cash-=q.down;bankTx(`Down payment · used ${nm}`,-q.down)}
@@ -11651,12 +11530,12 @@ function revMatchShift(ng,og){const H=car.hyb,D=DRIVES[st.trim],G=D.gears;if(!H.
   if(inp.thr>0.3){H.rpm=Math.max(H.rpm,rpmT*0.9);return}OWN.pj={d:Math.max(0,rpmT-H.rpm)}}
 function lurchTick(){const J=OWN.pj;if(!J||manClutchIn())return;OWN.pj=null;if(J.d<900)return;const k=Math.min(1.4,J.d/3500);car.vx-=Math.sign(car.vx)*k;try{haptic(120,0.6)}catch(e){}beep(120,0.12,"sawtooth",0.15);if(!OWN.lrSaid){OWN.lrSaid=1;carMsg("Lurch! Blip the throttle while the clutch is in to match the revs on a downshift")}}
 // ---- the tick (once a frame, from the safety tick) and the daily jobs
-function ownTick(dt){if(!st.started)return;try{cwTick(dt);dirtTick(dt)}catch(e){console.error(e)}try{dmvTick(dt)}catch(e){console.error(e)}try{tcamTick(dt)}catch(e){console.error(e)}try{aucTick(dt)}catch(e){console.error(e)}try{heatTick(dt)}catch(e){}try{brakeHeatTick(dt)}catch(e){}try{alignTick(dt)}catch(e){}try{thiefTick(dt)}catch(e){}try{alarmTick(dt)}catch(e){}try{nearMissTick(dt)}catch(e){}try{otaTick(dt)}catch(e){}try{recallTick(dt)}catch(e){}try{offTick(dt)}catch(e){}try{lurchTick()}catch(e){}try{nvDraw()}catch(e){}try{airTick(dt)}catch(e){}try{tollTick(dt)}catch(e){console.error(e)}try{valetTick(dt)}catch(e){console.error(e)}try{orTick()}catch(e){}
+function ownTick(dt){if(!st.started)return;try{cwTick(dt);dirtTick(dt)}catch(e){console.error(e)}try{tcamTick(dt)}catch(e){console.error(e)}try{aucTick(dt)}catch(e){console.error(e)}try{heatTick(dt)}catch(e){}try{brakeHeatTick(dt)}catch(e){}try{alignTick(dt)}catch(e){}try{thiefTick(dt)}catch(e){}try{alarmTick(dt)}catch(e){}try{nearMissTick(dt)}catch(e){}try{otaTick(dt)}catch(e){}try{recallTick(dt)}catch(e){}try{offTick(dt)}catch(e){}try{lurchTick()}catch(e){}try{nvDraw()}catch(e){}try{airTick(dt)}catch(e){}try{tollTick(dt)}catch(e){console.error(e)}try{valetTick(dt)}catch(e){console.error(e)}try{orTick()}catch(e){}
   if(!OWN.otaApplied){OWN.otaApplied=1;otaApplyAll()}
   if(OWN.recEff&&OWN.recEff.hv&&sys.fuel==="plug"){const T_=TRIMS[st.trim],H_=car.hyb;if(!T_.plug&&H_.soc>=0.8){sys.fuel=null;sys.hose=null;carMsg("🔋 Charging stopped at 80% (open recall: high-voltage battery software)")}}
   const d=GT.day||1;if(d!==OWN.day){if(OWN.day){try{otaDayTick()}catch(e){}try{recallDayTick()}catch(e){}}OWN.day=d;recallFx()}
   OWN.icF=(OWN.icF||0)+1;if(OWN.icF%30===1){const e=$("u2fic");if(e){const P=portSideNow();const ic=(TRIMS[st.trim].ice||TRIMS[st.trim].hybrid)?"⛽":"⚡";e.textContent=P&&P.s?(P.s<0?"◂"+ic:ic+"▸"):ic}}}
-function ownInto(){brakeSmokeInto();try{cwInto()}catch(e){}try{dmvInto()}catch(e){}try{tcamInto()}catch(e){}try{valetInto()}catch(e){}try{airInto()}catch(e){}try{tollInto()}catch(e){}}
+function ownInto(){brakeSmokeInto();try{cwInto()}catch(e){}try{tcamInto()}catch(e){}try{valetInto()}catch(e){}try{airInto()}catch(e){}try{tollInto()}catch(e){}}
 // ---- tire air at gas stations: a red air machine by each station; $2.00 fills all four tires back to 35 psi (a slow leak still needs a patch)
 function ptClear(x,y,m){for(const o of collNear(x,y)){if(o.t==="c"){if(Math.hypot(o.x-x,o.y-y)<o.r+m)return false;continue}const c=Math.cos(o.h||0),s_=Math.sin(o.h||0),dx=x-o.x,dy=y-o.y,lx=dx*c+dy*s_,ly=-dx*s_+dy*c;if(Math.abs(lx)<(o.hl||0)+m&&Math.abs(ly)<(o.hw||0)+m)return false}return true}
 function airSpots(){if(OWN.airS)return OWN.airS;const P=stnWorld("pumps"),C=stations(),S=[];for(const c of C){const near=P.filter(q=>Math.hypot(q[0]-c.x,q[1]-c.y)<70);let best=null,bs=-1;
