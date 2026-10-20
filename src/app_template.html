@@ -8443,7 +8443,7 @@ function stkApp(){const sel=PHONE.sub;let val=0,cost=0;for(const k in STK.own){v
   h+=`<div class="list">${STK_LIST.map(([k,nm])=>{const p=STK.p[k],ch=(p/STK.open[k]-1)*100,col=ch>=0?"#16a34a":"#dc2626",O=STK.own[k];return `<button class="li" data-a="sub" data-v="${k}" style="width:100%;text-align:left"><span><b>${k}</b>${O?` · ${O.n} sh`:""}<small>${nm}</small></span>${stkSpark(STK.hist[k].slice(-30),56,22,col)}<b style="color:${col}">${money2(p)}<small style="display:block;text-align:right">${ch>=0?"+":""}${ch.toFixed(2)}%</small></b></button>`}).join("")}</div>
   <p class="fine">Prices move while you play. Buy and sell from checking. Dividend stocks pay out every game week. Prices can drop as well as rise.</p>`;return h}
 // ---- (internal) developer panel
-const ADM={n:0,t:0,ok:false},ADM_H=2623770017;
+const ADM={n:0,t:0,ok:false},ADM_H=1750766126;
 function admHash(s){let h=2166136261;for(const c of s){h^=c.charCodeAt(0);h=Math.imul(h,16777619)>>>0}return h}
 function admTap(){const now=performance.now();if(now-ADM.t>1500)ADM.n=0;ADM.t=now;if(++ADM.n<7)return;ADM.n=0;admOpen()}
 function admOpen(){let el=$("adm");if(!el){el=document.createElement("div");el.id="adm";document.body.appendChild(el);el.addEventListener("click",e=>{const b=e.target.closest("button");if(e.target===el){el.hidden=true;return}if(!b)return;admAct(b.dataset.ad);});
@@ -8456,7 +8456,7 @@ function admWear(mi,days){const G=garageCur();if(!G){toast("Drive one of your ow
   if(mi){S.tyreMi-=mi;S.brakeMi-=mi;S.oilMi-=mi}if(days){S.oilDay-=days;S.batDay-=days;G.day=(G.day||1)-days}garageSave();wearRefresh();const w=wearOf(G),pc=v=>Math.round(Math.max(0,1-v)*100)+"%";
   setTimeout(()=>toast(`Wear: tyres ${pc(w.tyre)} · brakes ${pc(w.brake)} left · oil ${w.oil>1?"overdue":pc(w.oil)+" left"} · battery ${(w.bat*5).toFixed(1)} yr${(due=>due.length?" · "+due.join(", "):"")(wearDue(w))}`),50)}
 function admAct(a){const el=$("adm");if(a==="close"){el.hidden=true;return}
-  if(a==="code"){const v=($("admCode")||{}).value||"";if(admHash(v.trim())===ADM_H){ADM.ok=true;el.innerHTML=admHtml()}else{toast("Wrong code");el.hidden=true}return}
+  if(a==="code"){const v=($("admCode")||{}).value||"";if(admHash(v.replace(/\s+/g,"").toUpperCase())===ADM_H){ADM.ok=true;el.innerHTML=admHtml()}else{toast("Wrong code");el.hidden=true}return}
   if(!ADM.ok)return;const add=n=>{ECON.cash+=n;bankTx("Adjustment",n)};
   ({c1k:()=>add(1000),c10k:()=>add(10000),c100k:()=>add(100000),c1m:()=>add(1000000),score:()=>{BANK.score=850},loans:()=>{BANK.loans=BANK.loans.filter(l=>l.kind==="lease");for(const l of BANK.loans){l.pastDue=0}},card:()=>{BANK.card.bal=0;BANK.card.minDue=0;BANK.card.pastDue=0},
     lvl:()=>{ECON.lvl+=5},free:()=>{try{localStorage.removeItem("mstrata.free1")}catch(e){}},fill:()=>{const H=car.hyb;if(H.tank)H.fuel=H.tank;H.soc=TRIMS[st.trim].hybrid?0.8:1},fix:()=>{car.fault=null;sys.overheat=0;sys.breakdown=null},wmi:()=>admWear(10000,0),wyr:()=>admWear(0,365),
