@@ -2056,6 +2056,9 @@ for(const n of NODES){if(n.ctrl!=="merge")continue;for(const l of n.legs){if(l.m
   for(const o of n.legs){if(!o.major)continue;const S=[];let sg=0;
     for(let d=0;d<=l.r+6;d+=3){const q=eAt(e,l.end===0?d:e.L-d),pp=eProj(o.e,q.x,q.y);if(pp.u<0||pp.u>o.e.L)continue;const need=Math.abs(pp.t)+LANE/2+e.side-(o.e.m/2+o.e.n*LANE+o.e.side);if(need<=0)continue;sg=Math.sign(pp.t);S.push([pp.u,need])}
     if(S.length<2)continue;S.sort((a,b)=>a[0]-b[0]);(o.e.aux=o.e.aux||[]).push({u0:S[0][0],u1:S[S.length-1][0],sg,S})}}}
+if(W2)for(const n of NODES){if(n.legs.length!==2||n.kind!=="cont")continue;const [A,B]=n.legs,wa=A.e.m/2+A.e.n*LANE+A.e.side,wb=B.e.m/2+B.e.n*LANE+B.e.side;if(Math.abs(wa-wb)<1)continue;
+  const nr=wa<wb?A:B,d=Math.abs(wa-wb),e=nr.e,L=Math.min(110,e.L*0.6),S=[];for(let k=0;k<=10;k++){const q=k/10,w=d*(1-q*q*(3-2*q));S.push(nr.end===0?[q*L,w]:[e.L-q*L,w])}if(nr.end===1)S.reverse();
+  for(const sg of [1,-1])(e.aux=e.aux||[]).push({u0:S[0][0],u1:S[S.length-1][0],sg,S:S.map(p=>p.slice()),drop:true});n.drop=true}
 function sigState(n,grp,t){const c=n.cyc,x=((t+c.off)%c.C+c.C)%c.C,a=c.g[0],b=a+c.Y,d=b+c.AR,e=d+c.g[1],f=e+c.Y;
   if(grp===0)return x<a?"green":x<b?"yellow":"red";return x>=d&&x<e?"green":x>=e&&x<f?"yellow":"red"}
 const legOf=(n,e,end)=>n.legs.find(l=>l.e===e&&l.end===end);
@@ -4243,6 +4246,7 @@ function planMove(c,prefer){const n=endNode(c.e,c.dir),inL=arrLeg(c.e,c.dir);c.m
   if(n.rbt){if(!inL.major)c.rbN=0;else{c.rbN=(c.rbN||0)+1;if(!pick&&!c.route&&c.rbN>=3)pick=ms.find(m=>m.t==="R")||null}}
   if(!pick){const W=c.kind==="bike"?{S:5,R:2.5,L:0.8,U:0}:n.rbt&&inL.major?{S:1.3,R:1.8,L:0,U:0}:{S:6,R:1.8,L:1.4,U:0.05};let tot=0;for(const m of ms)tot+=W[m.t];let x=rnd()*tot;for(const m of ms){x-=W[m.t];if(x<=0){pick=m;break}}pick=pick||ms[0]}
   c.mv=pick;c.mvNode=n;c.mvLeg=inL;c.lanePinned=false;c.needLane=pick.t==="R"||pick.e.ow&&n.ctrl==="merge"?0:(pick.t==="L"||pick.t==="U")?c.e.n-1:null;
+  if(c.needLane===null&&pick.e.n<c.e.n&&pick.t==="S"&&n.drop)c.needLane=c.e.n-1;   // right lane ends: merge left before the join
   if(c.needLane===null&&pick.e.n<c.e.n&&pick.t==="S"&&n.ctrl!=="merge"){const th=wrapPi(pick.o.h-(inL.h+Math.PI));if(Math.abs(th)>0.12)c.needLane=th>0?c.e.n-1:0}}
 function outLane(c,i){const m=c.mv,nO=m.e.n,nI=c.e.n;if(m.t==="R")return 0;if(m.t==="L"||m.t==="U")return nO-1;return nO>nI?i+(nO-nI):Math.max(0,i-(nI-nO))}
 function mvP(c){const i=laneIdx(c);return mvPath(c.mvNode,c.e,c.dir,c.mv,i,outLane(c,i))}
@@ -7621,7 +7625,7 @@ function buildWorld(){retailSites();placeExtras();
     if(tp)stripInto(yellow,e,0.08,0.2,0.012,l0,e.tp[0]),stripInto(yellow,e,-0.08,-0.2,0.012,l0,e.tp[0])}
   // junctions: paved box, stop lines, crosswalks downtown and in the subdivisions
   for(const n of NODES){const col=n.legs.some(l=>l.e.T.col==="h")&&!n.legs.some(l=>l.e.T.col==="c")?"h":"c";
-    if(n.pr)discInto(road[col],n.x,n.y,n.pr,n.z);
+    if(n.pr)discInto(road[col],n.x,n.y,n.pr,n.z+(W2?0.006:0));
     if(n.xo){quadInto(road.h,n.x,n.y,n.xo.h,n.xo.len,n.xo.w,n.z)}
     if(n.kind!=="x"||n.ctrl==="merge")continue;
     for(const l of n.legs){if(l.r<=0)continue;const e=l.e,dir=l.end===1?1:-1,L=e.L,m2=mAt(e,l.end===0?0:e.L)/2,W=m2+e.n*LANE;
@@ -7678,7 +7682,7 @@ function terrDrawn0(x,y){const {N,NY}=TERR,h=TERR.h0,fx=(x-WORLD.x0)/(WORLD.x1-W
   const h00=h[j*W+i],h10=h[j*W+i+1],h01=h[(j+1)*W+i],h11=h[(j+1)*W+i+1];return a+b<=1?h00+(h10-h00)*a+(h01-h00)*b:h11+(h01-h11)*(1-a)+(h10-h11)*(1-b)}
 // the ground without boulders, slabs or logs: terrain, the hill, the staging lot, the trail crown and ruts, the bog and the off-camber tilt
 function orSurf(x,y){let h=orBase0(x,y);const Hh=ORP.hill,dh=Math.hypot(x-Hh.x,y-Hh.y);if(dh<Hh.R)h+=Hh.H*Math.pow(Math.cos(Math.PI*dh/(2*Hh.R)),2);
-  const L=ORP.lot;if(x>L.x0-12&&y>L.y0-12&&y<L.y1+12){const e=Math.min(x-(L.x0),y-L.y0,L.y1-y),w=smooth01(-12,0,e);h=lerp(h,0,w)}
+  const L=ORP.lot;if(x>L.x0-12&&y>L.y0-12&&y<L.y1+12){const e=Math.min(x-(L.x0),y-L.y0,L.y1-y),w=smooth01(-12,0,e);if(L.z===undefined)L.z=W2?orBase0((L.x0+L.x1)/2,(L.y0+L.y1)/2):0;h=lerp(h,L.z,w)}
   let kind="grass",mu=MAP.offMu;const T=orTrailD(x,y);
   if(T[0]<4.2){const lat=T[1],tw=smooth01(4.2,3.2,T[0]);const rut=Math.abs(Math.abs(lat)-0.85);h+=tw*(0.06-0.05*Math.max(0,1-rut/0.3)+0.012*Math.sin(T[3]*1.7+lat));
     if(T[2]===13){const z=ORP.zones.find(q=>q.seg===13),Ls=Math.hypot(ORP.trail[14][0]-ORP.trail[13][0],ORP.trail[14][1]-ORP.trail[13][1]),f=smooth01(0,10,T[3]-Ls*z.t0)*smooth01(0,10,Ls*z.t1-T[3]);h+=lat*0.27*f*tw}
@@ -7709,7 +7713,7 @@ function orMesh(){orBuild();const M_=()=>({P:[],N:[],I:[]}),O={trail:M_(),mud:M_
       for(let k=0;k<=n;k++){const t=k/n*L;for(const l of lats){const x=a[0]+dx*t+nxv*l,y=a[1]+dy*t+nyv*l,h=orSurf(x,y).h,e=0.3,hx=orSurf(x+e,y).h-orSurf(x-e,y).h,hy=orSurf(x,y+e).h-orSurf(x,y-e).h;vtx(O.trail,x,y,h+0.025,norm([-hx/(2*e),1,hy/(2*e)]))}rows++}
       const W=lats.length;for(let k=0;k<rows-1;k++)for(let m=0;m<W-1;m++){const p=base+k*W+m,cx=a[0]+dx*(k+0.5)/n*L+nxv*lats[m],cy=a[1]+dy*(k+0.5)/n*L+nyv*lats[m];if(orBogQ(cx,cy)<0.98)continue;O.trail.I.push(p,p+1,p+W+1,p,p+W+1,p+W)}}}
   // the staging lot
-  {const L=ORP.lot;boxInto(O.lot,(L.x0+L.x1)/2,-0.03,-(L.y0+L.y1)/2,L.x1-L.x0,0.08,L.y1-L.y0,0)}
+  {const L=ORP.lot;boxInto(O.lot,(L.x0+L.x1)/2,(L.z||0)-0.03,-(L.y0+L.y1)/2,L.x1-L.x0,0.08,L.y1-L.y0,0)}
   // boulders, slabs and logs: fine height-mapped meshes, only where the feature stands up
   // boulders: polar meshes that follow each outline, flat-shaded so the faces read as chipped stone; slabs and logs height-mapped
   const tri=(B,a,b,c)=>{const u=[b[0]-a[0],b[1]-a[1],b[2]-a[2]],v=[c[0]-a[0],c[1]-a[1],c[2]-a[2]],n=norm([u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]]);const k=B.P.length/3;for(const q of [a,b,c]){B.P.push(q[0],q[1],q[2]);B.N.push(n[0],n[1],n[2])}B.I.push(k,k+1,k+2)};
@@ -8247,6 +8251,8 @@ function stationInto(pad,chg,stall){
 function spawnParked(){parked=[];const K=PARK;let i=0;
   {let sd=17;const r=()=>(sd=(sd*16807)%2147483647)/2147483647;for(const S of XSITES)if(S.kind==="lot")for(const t of S.stalls){if(r()>0.45)continue;parked.push({fixed:true,kind:"parked",wx:t.p[0],wy:t.p[1],wh:t.h+(r()<0.3?Math.PI:0),wz:0,v:0,spin:0,sig:0,head:0,paint:TRAFFIC_PAINTS[Math.floor(r()*TRAFFIC_PAINTS.length)]})}}
   for(let s=K.s0+3.4;s<K.s1-2.5;s+=6.4,i++){if(i===4||i===10)continue;parked.push({e:K.e,dir:K.dir,s,off:K.oP,offT:K.oP,head:0,v:0,spin:0,sig:0,kind:"parked",paint:TRAFFIC_PAINTS[(i*5)%TRAFFIC_PAINTS.length]})}
+  if(W2){let sd=29;const r=()=>(sd=(sd*16807)%2147483647)/2147483647;for(const S of METER.spaces){if(r()>0.42)continue;const e=S.e,dir=S.sd<0?1:-1,uc=(S.u0+S.u1)/2,s=dir>0?uc:e.L-uc,off=dir*S.off-shiftOf(e,uc);
+    parked.push({e,dir,s,off,offT:off,head:0,v:0,spin:0,sig:0,kind:"parked",paint:TRAFFIC_PAINTS[Math.floor(r()*TRAFFIC_PAINTS.length)]})}}
   for(const p of parked)carPose(p);
   {let sd=5;const r=()=>(sd=(sd*16807)%2147483647)/2147483647;let n=0;
    for(const t of garStalls()){const x=t.x,y=t.y,h=(t.uy>0?Math.PI/2:-Math.PI/2)+(r()<0.5?Math.PI:0);if(r()>0.22||n>=30)continue;n++;
@@ -10112,7 +10118,7 @@ function render(dt){
   // traffic: full model nearby, simple box far away, nothing behind the camera
   const view=norm(sub(tgt,eye)); const drawn=[];
   dynBuild(eye,cm);
-  const vis=[];for(const c of cars.concat(parked)){if(c.wx===undefined||c.kind==="bike"||c.kind==="cone"||c.kind==="xing")continue;const pos=[c.wx,0.6,-c.wy];const d=sub(pos,eye);const dist=Math.hypot(d[0],d[1],d[2]);
+  const vis=[];for(const c of cars.concat(parked)){if(c.wx===undefined||c.kind==="bike"||c.kind==="cone"||c.kind==="xing")continue;const pos=[c.wx,(c.wz||0)+0.6,-c.wy];const d=sub(pos,eye);const dist=Math.hypot(d[0],d[1],d[2]);
     if(dist>1400||(dot(d,view)<-8&&dist>12))continue;if(dist>12&&!sphVis(pos[0],pos[1],pos[2],3.5,CULL.sec?300:Math.min(900,CULL.maxD)))continue;vis.push([dist,c])}
   // only the nearest few get the full model (fewer still in the camera and mirror views); the rest are simple boxes
   vis.sort((a,b)=>a[0]-b[0]);const capFull=cam2?4:(G().fullCars||10),lodD=cam2?G().lod*0.5:G().lod;let nFull=0;
@@ -10909,15 +10915,17 @@ function paOpenMenu(){if(!st.started||st.walk)return;if(!has("autopark")){toast(
   if(PA.mode){PA.mode=null;PA.found=false;SCR.paMenu=false;return}SCR.paMenu=true;PA.prevCam=st.cam;st.cam=1;SCR.focus=true;tick(1)}
 function paChoose(k){$("paMenu").hidden=true;SCR.paMenu=false;SCR.focus=false;if(!k){PA.mode=null;return}st.acc=false;st.pilot=false;
   if(k==="exit"){paStartExit();return}PA.mode=k;PA.found=false;PA.side=st.signal||1;tick(1)}
+// a parallel-parking stretch: Halden's Main St block, or (new world) whichever parking street you're driving along
+function paK(M){if(W2&&M.e.T.park&&M.e.mtr){const lo=loOf(M.e.n)*LANE;return {e:M.e,dir:M.dir,s0:rStart(M.e,M.dir)+9,s1:M.L-rEnd(M.e,M.dir)-9,oP:lo-LANE/2-M.e.T.park/2,oA:lo-0.1}}return PARK}
 function paScan(){sys.paSpot=null;if(!PA.mode||sys.pa)return;if(st.signal)PA.side=st.signal;const sp=Math.abs(car.vx),M=me();PA.fast=sp>8.5;if(PA.fast||st.gear==="R")return;
-  if(PA.mode==="par"){const K=PARK;if(PA.side>0&&M.e===K.e&&M.dir===K.dir&&M.off<1.2){const xs=parked.filter(p=>p.e===K.e).map(p=>p.s).sort((a,b)=>a-b),edges=[K.s0-2.4,...xs,K.s1+2.4];
-      for(let i=0;i<edges.length-1;i++){const g0=edges[i]+2.4,g1=edges[i+1]-2.4,len=g1-g0,c=(g0+g1)/2,d=relS(M.s,c);if(len>VEH.len+1.6&&d>-6&&d<14){sys.paSpot={type:"par",s:c,len};break}}}}
+  if(PA.mode==="par"){const K=paK(M);if(PA.side>0&&M.e===K.e&&M.dir===K.dir&&M.off<1.2+(K.oA+0.1)){const xs=parked.filter(p=>p.e===K.e&&(p.dir===K.dir||p.dir===undefined)).map(p=>p.s).sort((a,b)=>a-b),edges=[K.s0-2.4,...xs,K.s1+2.4];
+      for(let i=0;i<edges.length-1;i++){const g0=edges[i]+2.4,g1=edges[i+1]-2.4,len=g1-g0,c=(g0+g1)/2,d=relS(M.s,c);if(len>VEH.len+1.6&&d>-6&&d<14){sys.paSpot={type:"par",s:c,len,K};break}}}}
   else{if(M.e===PAD.e&&M.dir===PAD.dir){const db=PAD.s0-M.s;if(db>4&&db<160&&M.off<1&&M.off>-8&&PA.side>0){sys.paSpot={type:"bay"}}}
     if(!sys.paSpot){const now=performance.now();if(now-(PA.scanT||0)>250||!PA.last){PA.scanT=now;PA.last=scanPerp()}const sp_=PA.last;
       if(sp_&&sp_.type==="perp")sys.paSpot=sp_;else if(sp_&&sp_.type==="perpTight")PA.tight=true}}
   if(sys.paSpot&&!PA.found){PA.found=true;beep(880,.08,"sine",.18);setTimeout(()=>beep(1175,.12,"sine",.18),110)}if(!sys.paSpot)PA.found=false}
 function paStart(){const sp=sys.paSpot;if(!sp)return;const M=me();
-  if(sp.type==="par"){sys.pa={type:"par",ph:"pos",sT:sp.s,o0:PARK.oA,oT:PARK.oP,posD:TRIMS[st.trim].ws4&&st.ws4?5.9:6.5,msg:"Positioning"}}
+  if(sp.type==="par"){const K=sp.K||PARK;sys.pa={type:"par",ph:"pos",K,sT:sp.s,o0:K.oA,oT:K.oP,posD:TRIMS[st.trim].ws4&&st.ws4?5.9:6.5,msg:"Positioning"}}
   else if(sp.type==="perp"&&sp.hplan){const L=planPerpH(sp.t,150000);if(!L){toast("Not enough room to park there: creep on to the next stall");return}sys.pa={type:"perpH",segs:L.segs,si:0,idx:0,t:sp.t,u:L.u,moves:L.moves,stuck:0,replans:0,msg:"Positioning"}}
   else if(sp.type==="perp"&&sp.plan){const L=sp.plan;sys.pa={type:"perp",ph:"pos",...L,idx:0,tries:0,msg:"Positioning"};{const r0=rearAx();let bi=0,bd=1e9;L.fp.forEach((p,i)=>{const d=Math.hypot(p[0]-r0[0],p[1]-r0[1]);if(d<bd){bd=d;bi=i}});sys.pa.idx=bi}}
   else if(sp.type==="perp"){const t=sp.t,u=[t.ux,t.uy],c=Math.cos(car.psi),s=Math.sin(car.psi);let a=[c,s];const dd=a[0]*u[0]+a[1]*u[1];a=[a[0]-dd*u[0],a[1]-dd*u[1]];const n=Math.hypot(a[0],a[1]);a=[a[0]/n,a[1]/n];
@@ -10939,8 +10947,8 @@ function paStart(){const sp=sys.paSpot;if(!sp)return;const M=me();
     for(let o=oE-R_;o>=-37.6;o-=0.4)add(ub,o);
     sys.pa={type:"bay",path:pts,cum:cumOf(pts),idx:0,msg:"Pulling into bay "+(k+1),bay:k}}
   st.acc=false;st.pilot=false;tick(1)}
-function paStartExit(){const M=me(),K=PARK;
-  if(M.e===K.e&&M.dir===K.dir&&Math.abs(M.off-K.oP)<0.8&&Math.abs(car.vx)<0.3){sys.pa={type:"exit",ph:"back",s0:M.s,msg:"Making room"};st.acc=false;tick(1);return}
+function paStartExit(){const M=me(),K=paK(M);
+  if(M.e===K.e&&M.dir===K.dir&&Math.abs(M.off-K.oP)<0.8&&Math.abs(car.vx)<0.3){sys.pa={type:"exit",ph:"back",K,s0:M.s,msg:"Making room"};st.acc=false;tick(1);return}
   {let best=null,bd=2.6;for(const t of perpSpots()){const d=Math.hypot(t.x-car.px,t.y-car.py);if(d<bd&&Math.abs((t.z||0)-(car.zb||0))<1.5){bd=d;best=t}}
    if(best){const t=best,h0=Math.atan2(-t.uy,-t.ux),noseOut=Math.cos(car.psi-h0)>0,side=st.signal===1?-1:1;
     sys.epb=false;sys.hold=false;st.acc=false;
@@ -10987,9 +10995,9 @@ function paUpdate(dt){const A=sys.pa;if(!A)return null;
   else if(A.type==="exit"){
     if(A.ph==="back"){st.gear="R";steer=0;vt=0.5;A.msg="Making room";if(rr<0.6||relS(M.s,A.s0)<-1.2){vt=0;if(Math.abs(v)<0.03)A.ph="out"}}
     else if(A.ph==="out"){st.gear="D";steer=-1;A.msg="Steering out";vt=steerReady(-1)?0.8:0;if(fr<0.45){vt=0;if(Math.abs(v)<0.03)A.ph="back2"}
-      if(he>0.42||M.off>PARK.oP+1.6)A.ph="str"}
+      if(he>0.42||M.off>(A.K||PARK).oP+1.6)A.ph="str"}
     else if(A.ph==="back2"){st.gear="R";steer=1;vt=steerReady(1)?0.6:0;A.msg="Making room";if(rr<0.5||he<0.05){vt=0;if(Math.abs(v)<0.03)A.ph="out"}}
-    else{st.gear="D";steer=clamp(2.2*he+0.25*(M.off-PARK.oA),-0.8,0.8);vt=1.4;A.msg="Straightening";if(Math.abs(he)<0.06&&M.off>PARK.oP+1.8){paStop("Park exit done: you have control",true,true);return null}}}
+    else{st.gear="D";steer=clamp(2.2*he+0.25*(M.off-(A.K||PARK).oA),-0.8,0.8);vt=1.4;A.msg="Straightening";if(Math.abs(he)<0.06&&M.off>(A.K||PARK).oP+1.8){paStop("Park exit done: you have control",true,true);return null}}}
   else if(A.type==="exitG"){// straight out until the nose (or tail) clears the cars beside us, then swing into the aisle toward the signal
     const fw=A.fwd;st.gear=fw?"D":"R";const out=-((car.px-A.M[0])*A.u[0]+(car.py-A.M[1])*A.u[1]),err=wrapPi(A.hT-car.psi);
     if(A.ph==="out"){steer=0;vt=0.8;A.msg="Pulling out";if(out>(fw?-0.6:2.2))A.ph="turn"}
@@ -11023,7 +11031,7 @@ function paTopView(g,W,H){const sc=Math.min(W,H)/16.5,c=Math.cos(car.psi),sn=Mat
   if(PA.mode==="perp")for(const t of perpSpots()){if(Math.hypot(t.x-car.px,t.y-car.py)>14)continue;const p=P(t.x,t.y);g.strokeStyle="rgba(200,220,222,.35)";g.lineWidth=1;box(t.x,t.y,Math.atan2(t.uy,t.ux),5.6,2.6,"rgba(255,255,255,.04)")}
   for(const p of parked){if(p.wx===undefined||Math.hypot(p.wx-car.px,p.wy-car.py)>14||(p.fixed&&Math.abs((p.wz||0)-(car.zb||0))>1.5))continue;box(p.wx,p.wy,p.wh,4.6,1.9,"#5d6b70")}
   const S=sys.paSpot;if(S&&S.type==="perp")box(S.t.x,S.t.y,Math.atan2(S.t.uy,S.t.ux),5.2,2.4,"rgba(85,214,140,.55)");
-  if(S&&S.type==="par"){const q=fpt(PARK.e,PARK.dir,S.s,PARK.oP);box(q[0],q[1],q[2],S.len,2.1,"rgba(85,214,140,.55)")}
+  if(S&&S.type==="par"){const K=S.K||PARK,q=fpt(K.e,K.dir,S.s,K.oP);box(q[0],q[1],q[2],S.len,2.1,"rgba(85,214,140,.55)")}
   g.fillStyle="#e8eef0";g.fillRect(W/2-VEH.width*sc/2,H/2+16-VEH.len*sc/2,VEH.width*sc,VEH.len*sc);g.fillStyle="#35c2bf";g.fillRect(W/2-VEH.width*sc/2+3,H/2+16-VEH.len*sc/2+4,VEH.width*sc-6,8);
   if(!sys.pa&&PA.mode&&PA.mode!=="exit"){g.fillStyle="#35c2bf";g.font="600 16px sans-serif";g.textAlign="center";g.fillText(PA.side>0?"▶":"◀",PA.side>0?W-14:14,H/2+20)}}
 // ---- steering wheels: any wheel and pedals through the Gamepad API (G29, G920, G923, Thrustmaster, Fanatec, Moza…),
