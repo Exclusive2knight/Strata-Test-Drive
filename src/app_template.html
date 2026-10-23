@@ -4248,7 +4248,7 @@ function planMove(c,prefer){const n=endNode(c.e,c.dir),inL=arrLeg(c.e,c.dir);c.m
   c.mv=pick;c.mvNode=n;c.mvLeg=inL;c.lanePinned=false;c.needLane=pick.t==="R"||pick.e.ow&&n.ctrl==="merge"?0:(pick.t==="L"||pick.t==="U")?c.e.n-1:null;
   if(c.needLane===null&&pick.e.n<c.e.n&&pick.t==="S"&&n.drop)c.needLane=c.e.n-1;   // right lane ends: merge left before the join
   if(c.needLane===null&&pick.e.n<c.e.n&&pick.t==="S"&&n.ctrl!=="merge"){const th=wrapPi(pick.o.h-(inL.h+Math.PI));if(Math.abs(th)>0.12)c.needLane=th>0?c.e.n-1:0}}
-function outLane(c,i){const m=c.mv,nO=m.e.n,nI=c.e.n;if(m.t==="R")return 0;if(m.t==="L"||m.t==="U")return nO-1;return nO>nI?i+(nO-nI):Math.max(0,i-(nI-nO))}
+function outLane(c,i){const m=c.mv,nO=m.e.n,nI=c.e.n;if(m.t==="R")return 0;if(c.mvNode&&c.mvNode.ctrl==="merge"&&c.mvLeg&&!c.mvLeg.major)return 0;/* a ramp joins the right-hand lane, not the fast lane */if(m.t==="L"||m.t==="U")return nO-1;return nO>nI?i+(nO-nI):Math.max(0,i-(nI-nO))}
 function mvP(c){const i=laneIdx(c);return mvPath(c.mvNode,c.e,c.dir,c.mv,i,outLane(c,i))}
 function newCar(e,dir,s,i,kind){const vf=0.92+rnd()*0.16,off=laneOff(e,i);
   const c={id:++CAR_ID,kind:kind||"ai",e,dir,s,off,offT:off,vf,v0:e.lim/2.23694*vf,v:e.lim/2.23694*vf*0.8,paint:TRAFFIC_PAINTS[Math.floor(rnd()*TRAFFIC_PAINTS.length)],sig:0,lcT:2+rnd()*6,spin:0,head:0,jn:null,idle:0};
@@ -4320,13 +4320,16 @@ function gapClear(c,n,L,mv){   // a gap in the traffic you have to cross or join
   for(const l of n.legs)if(l!==L&&(l.major||n.ctrl!=="minor")&&approaching(n,l,withinFor(l.e),c))return false;return true}
 // joining the freeway from a ramp: is the right lane clear beside and just behind the merge point?
 function mergeClear(c,n,mv){const e=mv.e,dir=mv.dir,inc=n.legs.find(l=>l.major&&l.e!==e&&(l.end===1?1:-1)===dir&&l.e.type===e.type)||null,v=Math.max(c.v,8);
+  // the freeway coming up to the merge, back through short pieces between closely spaced ramps (up to 160 m): edge -> distance from its end to the merge
+  const up=new Map();if(inc){let L=inc,acc=0;for(let k=0;k<4&&L;k++){const ld=L.end===1?1:-1;up.set(L.e,{acc,dir:ld});acc+=L.e.L;if(acc>160)break;const n0=startNode(L.e,ld);L=n0.legs.find(l=>l.major&&l.e!==L.e&&l.e.type===e.type&&(l.end===1?1:-1)===ld)||null}}
   for(const o of cars){if(o===c||o.jn&&o.jn.n!==n)continue;let d=null;
     if(o.jn&&o.jn.n===n&&o.jn.mv.e===e&&o.jn.mv.dir===dir)d=0;
     else if(!o.jn&&o.e===e&&o.dir===dir&&laneIdx(o)===0)d=-o.s;            // already past the merge point: d < 0
-    else if(!o.jn&&inc&&o.e===inc.e&&o.dir===dir&&laneIdx(o)===0)d=inc.e.L-o.s;   // still coming: d > 0
+    else if(!o.jn&&up.has(o.e)&&o.dir===up.get(o.e).dir&&laneIdx(o)===0)d=up.get(o.e).acc+o.e.L-o.s;   // still coming: d > 0
+    else if(o.jn&&o.jn.n!==n)continue
     if(d===null)continue;const tA=d/Math.max(o.v,1),tMe=(c.mv&&c.mvNode===n?Math.max(0,(mvP(c).s0-c.s)/v):0)+40/v;
     if(d>-14&&d<20+o.v*1.2&&Math.abs(tA-tMe)<2.4)return false}
-  const M=me();if(!st.walk&&(M.e===e||inc&&M.e===inc.e)&&M.dir===dir&&laneOf(M.off)-loOf(M.n)===0){const d=M.e===e?-M.s:M.L-M.s;if(d>-14&&d<20+car.vx*1.2)return false}
+  const M=me();if(!st.walk&&(M.e===e||up.has(M.e)&&M.dir===up.get(M.e).dir)&&(M.e!==e||M.dir===dir)&&laneOf(M.off)-loOf(M.n)===0){const d=M.e===e?-M.s:up.get(M.e).acc+M.L-M.s;if(d>-14&&d<20+car.vx*1.2)return false}
   return true}
 function jnConflict(c,Pc){const n=c.jn?c.jn.n:c.mvNode;if(!n)return null;const P=c.jn?c.jn.P:Pc,d0=c.jn?c.jn.d:-(Pc.s0-c.s);let best=null;
   for(const o of cars){if(o===c||!o.jn||o.jn.n!==n||o.kind==="wreck")continue;if(c.jn&&o.jn.inLeg===c.jn.inLeg&&o.jn.mv===c.jn.mv)continue;const Q=o.jn.P;
@@ -7871,10 +7874,10 @@ const W2_FP={b_auto_parts_shop:[-7.8,7.8,-6.2,7.3],b_auto_service_4_bay:[-12.3,1
   b_modern_house:[-6.3,6.3,-6.3,7.2],b_neighborhood_market:[-8.2,8.2,-6.7,7.8],b_pharmacy:[-6.8,6.8,-5.2,6.3],b_quick_service_2_bay:[-6.3,6.3,-7.3,7.5],b_ranch_house:[-8.4,8.4,-5.4,6.6],
   b_restaurant:[-7.2,7.2,-5.7,6.8],b_suburban_two_story:[-7.4,7.4,-6.4,7.2],b_tesla_dealership:[-14.3,14.3,-12.3,15.2],b_tire_center_3_bay:[-9.3,9.3,-8.3,8.4],b_townhouse_row:[-10.6,10.6,-5.9,6.8],
   b_toyota_dealership:[-14.3,14.3,-11.3,14.2],t_autumn_maple:[-3.3,3,-3.1,2.8],t_maple_street:[-2.1,3.1,-2.4,2.4],t_oak_large:[-4,4.5,-3.9,4],t_oak_sapling:[-1.1,1,-1.1,1.1],
-  t_ornamental_tree:[-1.5,1.8,-1.8,1.7],t_palm:[-4.6,4.6,-4.6,4.6],t_pine_small:[-1.8,1.8,-1.7,1.7],t_pine_tall:[-3.8,3.8,-3.7,3.7]};
+  t_ornamental_tree:[-1.5,1.8,-1.8,1.7],f_mcdonalds:[-22.5,22.5,-22.5,24.5],f_burger_king:[-23.5,23.5,-22.5,24.5],f_wendys:[-22,22,-22,24],f_taco_bell:[-21.5,21.5,-22,24],f_chick_fil_a:[-23.5,23.5,-23.5,25.5],f_kfc:[-22,22,-22.5,24.5],t_palm:[-4.6,4.6,-4.6,4.6],t_pine_small:[-1.8,1.8,-1.7,1.7],t_pine_tall:[-3.8,3.8,-3.7,3.7]};
 const W2P=[];       // placed copies: {k, x, y, a (the way the front faces), z}
 // put a model down facing heading a; it also blocks that ground for anything placed later
-function w2Put(k,x,y,a,z){const f=W2_FP[k];if(!f)return null;const o={k,x,y,a,z:z??hillZ(x,y)};W2P.push(o);if(k[0]==="b")BLD_LIST.push([x,y,Math.max(-f[0],f[1],-f[2],f[3]),Math.max(-f[0],f[1],-f[2],f[3])]);return o}
+function w2Put(k,x,y,a,z){const f=W2_FP[k];if(!f)return null;const o={k,x,y,a,z:z??hillZ(x,y)};W2P.push(o);if(k[0]==="b"||k[0]==="f")BLD_LIST.push([x,y,Math.max(-f[0],f[1],-f[2],f[3]),Math.max(-f[0],f[1],-f[2],f[3])]);return o}
 // is this circle clear of every model already placed?
 function w2Free(x,y,r){for(const o of W2P){const f=W2_FP[o.k],R=Math.max(-f[0],f[1],-f[2],f[3]);if(Math.hypot(o.x-x,o.y-y)<R+r)return false}return true}
 // local model point -> world: front (+z) along heading a, +x to its left, +y up
@@ -7939,17 +7942,21 @@ function worldScenery(){W2P.length=0;
     const route=EDGES.filter(e=>e.name==="Route 20").sort((a,b)=>b.L-a.L)[0];
     if(route){const W=hwOf(route),DL=["b_ford_dealership","b_toyota_dealership","b_chevrolet_dealership","b_bmw_dealership","b_mercedes_dealership","b_tesla_dealership"],SV=["b_tire_center_3_bay","b_quick_service_2_bay","b_auto_service_4_bay"];
       const put=(k,u,sd,lotD)=>{const f=W2_FP[k],w=f[1]-f[0],back=W+3+lotD+f[3],p=ePt(route,u,sd*back),rp=ePt(route,u,0),a=Math.atan2(rp[1]-p[1],rp[0]-p[0]);if(!fits(k,p[0],p[1],a)||!w2Free(p[0],p[1],w/2))return false;
-        if(lotD>0){const c=ePt(route,u,sd*(W+3+lotD/2)),hh=c[2],U=[Math.cos(hh),Math.sin(hh)],N=[-Math.sin(hh)*sd,Math.cos(hh)*sd];XSITES.push({kind:"lot",x:c[0],y:c[1],L:w,D:lotD,U,N,e:route,u,a:hh})}
+        if(lotD>0){const c=ePt(route,u,sd*(W+0.2+(lotD+2.8)/2)),hh=c[2],U=[Math.cos(hh),Math.sin(hh)],N=[-Math.sin(hh)*sd,Math.cos(hh)*sd];XSITES.push({kind:"lot",x:c[0],y:c[1],L:w,D:lotD+2.8,U,N,e:route,u,a:hh})}
         w2Put(k,p[0],p[1],a);return true};
       DL.forEach((k,i)=>put(k,140+Math.floor(i/2)*230,i%2?1:-1,22));
       SV.forEach((k,i)=>put(k,820+i*70,i%2?1:-1,16))}
     // empty lots kept for fast-food places: paved, kerbed, a "coming soon" board
-    const ffl=[["Commerce Pkwy",760,0,-1],["Commerce Pkwy",760,0,1],["Route 20",3700,0,1],["Grand River Ave",-3050,0,1],["County Rd 15",-1000,-2000,1],["Kestrel Rd",-1600,1500,-1],["Woodward Ave",-1000,-900,1]];
-    W2C.ffLots=[];for(const [nm,x,y,sd] of ffl){let best=null;for(const e of EDGES){if(e.name!==nm)continue;const q=eProj(e,x,y);if(q.u<0||q.u>e.L)continue;if(!best||q.d<best.q.d)best={e,q}}if(!best)continue;
-      const e=best.e,W=hwOf(e)+(e.T.walk||0),c=ePt(e,best.q.u,sd*(W+4+16)),hh=c[2],U=[Math.cos(hh),Math.sin(hh)],N=[-Math.sin(hh)*sd,Math.cos(hh)*sd],S={kind:"lot",custom:true,ff:true,x:c[0],y:c[1],L:40,D:30,U,N,stalls:[]};
-      let ok=true;for(let a=-20;a<=20&&ok;a+=5)for(let b=-15;b<=15;b+=5){const wx=c[0]+U[0]*a+N[0]*b,wy=c[1]+U[1]*a+N[1]*b;if(roadDist(wx,wy,2)<0.5||riverD(wx,wy)<RIVER.w/2+5||!w2Free(wx,wy,1)){ok=false;break}}if(!ok)continue;
-      XSITES.push(S);W2C.ffLots.push(S);const z=hillZ(c[0],c[1]);boxInto(lot,c[0],z+0.015,-c[1],40,0.03,30,Math.atan2(U[1],U[0]));
-      const bd=xLocal(S,-15,13);B(post,bd[0],bd[1],z,2.6,0.12,0.12);B(post,bd[0]+U[0]*3,bd[1]+U[1]*3,z,2.6,0.12,0.12);B(signGW,bd[0]+U[0]*1.5,bd[1]+U[1]*1.5,z+1.6,1.3,3.6,0.12,Math.atan2(U[1],U[0]));collAdd({t:"b",x:bd[0]+U[0]*1.5,y:bd[1]+U[1]*1.5,h:Math.atan2(U[1],U[0]),hl:1.8,hw:0.15,z0:z-0.3,z1:z+3,what:"a sign"})}
+    // fast-food restaurants (the owner's full sites: building, parking, drive-thru), each with a paved apron from the road to its lot
+    const FF=["f_mcdonalds","f_burger_king","f_wendys","f_taco_bell","f_chick_fil_a","f_kfc"];let ffi=0;
+    const ffl=[["Commerce Pkwy",760,0,-1],["Commerce Pkwy",820,0,1],["Route 20",3700,0,1],["Grand River Ave",-3050,0,1],["County Rd 15",-1000,-2000,1],["Kestrel Rd",-1600,1500,-1],["Woodward Ave",-1000,-900,1],["Commerce Pkwy",1550,0,1]];
+    W2C.ffLots=[];for(const [nm,x,y,sd] of ffl){if(ffi>=FF.length)break;let best=null;for(const e of EDGES){if(e.name!==nm)continue;const q=eProj(e,x,y);if(q.u<0||q.u>e.L)continue;if(!best||q.d<best.q.d)best={e,q}}if(!best)continue;
+      const k=FF[ffi],f=W2_FP[k],e=best.e,W=hwOf(e)+(e.T.walk||0),back=W+3+f[3],c=ePt(e,best.q.u,sd*back),rp=ePt(e,best.q.u,0),a=Math.atan2(rp[1]-c[1],rp[0]-c[0]),hh=c[2],U=[Math.cos(hh),Math.sin(hh)],N=[-Math.sin(hh)*sd,Math.cos(hh)*sd];
+      if(!fits(k,c[0],c[1],a,0.3)||!w2Free(c[0],c[1],22))continue;ffi++;w2Put(k,c[0],c[1],a);
+      const S={kind:"lot",custom:true,ff:true,x:c[0],y:c[1],L:f[1]-f[0],D:f[3]-f[2],U,N,stalls:[]};XSITES.push(S);W2C.ffLots.push(S);
+      // the apron: from the edge of the road (across the sidewalk) to the front of the lot
+      const ap=ePt(e,best.q.u,sd*(hwOf(e)+(W+3-hwOf(e))/2)),z=hillZ(c[0],c[1]);boxInto(drive,ap[0],z+0.012,-ap[1],f[1]-f[0]-2,0.03,W+3-hwOf(e)+0.4,hh);
+      XSITES.push({kind:"lot",custom:true,drive:true,x:ap[0],y:ap[1],L:f[1]-f[0]-2,D:W+3-hwOf(e)+0.6,U,N,stalls:[]})}
     // Kestrel Estates gatehouse: a booth on the island and barrier arms (up: residents' cars come and go)
     {const g=EDGES.find(e=>e.name==="Estates Dr"&&Math.abs(e.a.x+1000)<1&&Math.abs(e.a.y-1000)<1);if(g){const u=g.L*0.55,W=hwOf(g),z=hillZ(...ePt(g,u,0).slice(0,2));
       for(const sd of [1,-1]){const p=ePt(g,u,sd*(W+2.2));B(bld[2],p[0],p[1],z,3.0,3.2,2.6,p[2]);B(roofs,p[0],p[1],z+3,0.35,4.0,3.4,p[2]);collAdd({t:"b",x:p[0],y:p[1],h:p[2],hl:1.6,hw:1.3,what:"the gatehouse"});
@@ -8049,6 +8056,11 @@ function worldScenery(){W2P.length=0;
     for(const l of n.legs){if(!l.major||l.e.type!=="xway")continue;if(Math.cos(wrapPi(l.h+Math.PI-hx))<0.7)continue;const e=l.e,dir=l.end===1?1:-1;for(const s of [e.L-330,e.L-40]){if(s<rStart(e,dir)+30)continue;
     const o=-LANE*1.5-e.side-2.2,p=TE(signK,e,dir,s,o,0,7.2,0.3,0.3);collAdd({t:"c",x:p[0],y:p[1],r:0.25});TE(signK,e,dir,s,o+1.8,6.6,0.25,0.25,3.6);
     TE(signG,e,dir,s,o+3.6,5.0,2.4,0.12,7.2);TE(signGW,e,dir,s-0.08,o+3.6+2.6,5.5,1.3,0.01,1.1);TE(signGW,e,dir,s-0.08,o+3.4,6.75,0.28,0.01,3.8);TE(signGW,e,dir,s-0.08,o+3.2,6.3,0.2,0.01,3.0);TE(signGW,e,dir,s-0.08,o+0.9,5.45,0.6,0.01,0.12)}}}
+  // ---- freeway lighting (new world): a pole in the middle of the median every 75 m, an arm and a lamp out over each carriageway
+  const fwH=M_(),fwP=M_();if(W2)for(const e of EDGES){if(e.type!=="xway")continue;for(let u=(e.r0||0)+40;u<e.L-(e.r1||0)-20;u+=75){if(e.br&&Math.abs(u-e.br.uc)<e.br.half+e.br.rp*0.5||e.ov&&Math.abs(u-e.ov.uc)<e.ov.half+30)continue;
+      const p=ePt(e,u,0),z=ez(e,u),a=p[2];B(post,p[0],p[1],z,12.5,0.32,0.32,a);collAdd({t:"c",x:p[0],y:p[1],r:0.3,z0:z-0.3,z1:z+12,what:"a light pole"});
+      for(const sd of [1,-1]){const q=ePt(e,u,sd*(e.m/2+2.8)),g=ePt(e,u,sd*(e.m/2+5));tubeInto(post,[p[0],p[1],z+12.3],[q[0],q[1],z+12.6],0.09,0.07,6);B(fwH,q[0],q[1],z+12.3,0.3,1.6,0.7,a+Math.PI/2);discInto(fwP,g[0],g[1],11,z+0.05,20);discInto(fwP,g[0],g[1],6.5,z+0.055,16)}}}
+  SCN.fwHead=fwH.I.length?meshFrom(fwH.P,fwH.N,fwH.I):null;SCN.fwPool=fwP.I.length?meshFrom(fwP.P,fwP.N,fwP.I):null;
   // ---- roundabout islands
   const rbK=M_(),rbG=M_();for(const b of W2_RB){const z=hillZ(b.x,b.y),ri=b.R-3.0;discInto(rbK,b.x,b.y,ri,z+0.12,40);discInto(rbG,b.x,b.y,ri-0.4,z+0.16,40);
     for(let k=0;k<5;k++){const a=k/5*Math.PI*2+0.4,rr=ri*0.55;treeAt(b.x+Math.cos(a)*rr,b.y+Math.sin(a)*rr,z+0.16,false)}collAdd({t:"c",x:b.x,y:b.y,r:ri-0.2,z0:z-0.5,z1:z+3,what:"the roundabout island"})}
@@ -10110,7 +10122,7 @@ function render(dt){
     mat([0.9,0.9,0.85],night?[2.2,2.1,1.9]:[0.5,0.5,0.45]);draw(S_.glow);mat([0.4,0.35,0.25],night?[1.5,1.15,0.6]:[0.25,0.2,0.12]);draw(S_.warm);
     mat([0.03,0.3,0.32],night?[0.1,1.3,1.25]:[0.03,0.25,0.25],0.5,40);draw(S_.teal)}
   for(const [u,o] of STN.chargers){const b=padPt(u,o+0.25);gl.uniformMatrix4fv(U.uM,false,chain(M4.T(b[0],1.45,-b[1]),M4.rY(b[2]-Math.PI/2),M4.S(0.02,0.4,0.36)));bind(SCN.box);
-    mat([0.02,0.1,0.05],car.hyb.charging?[0.2,1.6,0.6]:[0.05,0.5,0.25],0.6,40);gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_SHORT,0)} mat([0.9,0.85,0.7],night?[1.6,1.4,1.0]:[0.1,0.1,0.08]);draw(SCN.head);
+    mat([0.02,0.1,0.05],car.hyb.charging?[0.2,1.6,0.6]:[0.05,0.5,0.25],0.6,40);gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_SHORT,0)} gl.uniformMatrix4fv(U.uM,false,M4.id());mat([0.9,0.85,0.7],night?[1.6,1.4,1.0]:[0.1,0.1,0.08]);draw(SCN.head);if(SCN.fwHead){mat([0.95,0.7,0.35],night?[3.2,1.5,0.35]:[0.12,0.08,0.03]);draw(SCN.fwHead);if(night&&SCN.fwPool){gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE);gl.depthMask(false);mat([0,0,0],[0.5,0.24,0.05],0,1,0.28);draw(SCN.fwPool);gl.depthMask(true);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.disable(gl.BLEND)}}
   gl.enable(gl.CULL_FACE);
   const flash=sys.flashT>0&&((sys.flashT*6|0)%2===0),sigOn=((st.signal||st.hazard)&&st.blink)||flash, AMB=[2.2,1.0,0.08], OFF=[0,0,0];
   const LS=lightShow(),fogOn=st.fog&&st.power!==false,hk=car.dmg&&car.dmg.lamp?(car.dmg.lamp[0]+car.dmg.lamp[1])/2:1;const lit=LS||{head:lampsOn?[1.6*hk,1.6*hk,1.5*hk]:fogOn?[1.1*hk,1.1*hk,1.0*hk]:[0.35,0.36,0.38],tail:braking?[1.4,0.04,0.02]:(lampsOn?[0.45,0.01,0.01]:OFF),
