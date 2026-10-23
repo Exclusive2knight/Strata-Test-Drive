@@ -2128,6 +2128,7 @@ for(const e of EDGES){if(W2){let a=null;for(let u=0;u<=e.L+2;u+=2){const p=eAt(e
       if(e.T.dirt)e.ford={uc,half:(u-a.u)/2+2};    // a low-water crossing: the gravel dips through the creek
       else{e.br={uc,half,H:a.B.bh,rp:a.B.rp};e.br.style=e.name==="Old Mill Rd"?"covered":e.name==="Ridge Rd"?"truss":e.name==="Mill St"?"stone":null}break}}continue}
   let prev=null;for(let u=0;u<=e.L;u+=2){const p=eAt(e,u),sg=Math.sign(p.x-riverX(p.y));if(prev!==null&&sg!==prev){e.br={uc:u-1,half:BRIDGE_HALF,H:BRIDGE_H,rp:BRIDGE_RAMP};break}prev=sg}}
+if(W2){const e=EDGES.find(e=>e.name==="Jefferson Ave"&&e.br);if(e){e.gap=[e.br.uc-13,e.br.uc+13];const c=eAt(e,e.br.uc);W2C.db={e,cx:c.x,cy:c.y}}}   // the Jefferson Ave drawbridge: two 13 m leaves over the river
 function ez(e,u){let z;if(e.zp){const f=clamp(u,0,e.L)/4,i=Math.min(e.zp.length-2,Math.floor(f)),a=f-i;z=e.zp[i]*(1-a)+e.zp[i+1]*a}else{const p=eAt(e,clamp(u,0,e.L));z=hillZ(p.x,p.y)}
   // raised roads (the new world): a profile of its own, or a smooth climb between raised junctions
   if(e.zo)z+=e.zo(clamp(u,0,e.L));else if(e.a.zo||e.b.zo){const t=smooth01(e.r0||0,e.L-(e.r1||0),u);z+=(e.a.zo||0)*(1-t)+(e.b.zo||0)*t}
@@ -2300,6 +2301,22 @@ const inOR=(x,y,m=0)=>(!W2||W2C.orp)&&x>ORP.x0-m&&x<ORP.x1+m&&y>ORP.y0-m&&y<ORP.
 const orBogQ=(x,y)=>{const B=ORP.bog;return Math.hypot((x-B.x)/B.a,(y-B.y)/B.b)};
 const tcHash=(i,j)=>{let h=(i*374761393+j*668265263)|0;h=(h^(h>>>13))*1274126177|0;return ((h^(h>>>16))>>>0)/4294967296};
 // section boards: white text on blue, drawn as a texture on the front of each board when you're near
+// ---- boards with painted text (highway guide signs, mile markers, other signs): a canvas texture each, made when you first get near
+const TXB=[];
+// a board centred at (x, y, z), w x h metres, read by someone travelling along heading hd; paint(ctx, W, H) draws it
+function txbAdd(x,y,z,w,h,hd,paint,range=420,px=512){TXB.push({x,y,z,w,h,hd,paint,range,px,T:null})}
+function txbDraw(){if(!TXB.length)return;const e=CULL.eye;gl.activeTexture(gl.TEXTURE0);gl.uniformMatrix4fv(U.uM,false,M4.id());
+  for(const B of TXB){if(Math.abs(e[0]-B.x)>B.range||Math.abs(-e[2]-B.y)>B.range)continue;if(!B.T){const c=document.createElement("canvas"),W=B.px,H=Math.max(32,Math.round(B.px*B.h/B.w));c.width=W;c.height=H;const x=c.getContext("2d");B.paint(x,W,H);
+      const t=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,c);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);
+      gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+      const rx=Math.sin(B.hd),ry=-Math.cos(B.hd),Uv=[rx*B.w,0,-ry*B.w],Vv=[0,B.h,0],O=[B.x-rx*B.w/2,B.z-B.h/2,-(B.y-ry*B.w/2)],n=[-Math.cos(B.hd),0,Math.sin(B.hd)];
+      B.T={t,O,U:Uv,V:Vv,m:meshFrom([O[0],O[1],O[2],O[0]+Uv[0],O[1],O[2]+Uv[2],O[0]+Uv[0],O[1]+B.h,O[2]+Uv[2],O[0],O[1]+B.h,O[2]],[...n,...n,...n,...n],[0,1,2,0,2,3,0,2,1,0,3,2])}}
+    gl.bindTexture(gl.TEXTURE_2D,B.T.t);gl.uniform3fv(U.uSO,B.T.O);gl.uniform3fv(U.uSU,B.T.U);gl.uniform3fv(U.uSV,B.T.V);mat([0.95,0,0],null,0,1,1,5);draw(B.T.m)}}
+// a highway guide sign: green, white border, an exit tab, the destination and a distance line
+function guidePaint(no,to,dist){return (x,W,H)=>{x.fillStyle="#0b6b3a";x.fillRect(0,0,W,H);x.strokeStyle="#fff";x.lineWidth=H*0.035;x.strokeRect(H*0.04,H*0.04,W-H*0.08,H-H*0.08);x.fillStyle="#fff";x.textAlign="center";x.textBaseline="middle";
+  if(no){x.font=`800 ${H*0.13}px Inter,system-ui,sans-serif`;const tw=x.measureText("EXIT "+no).width+H*0.14;x.fillStyle="#fff";x.fillRect(W-tw-H*0.07,H*0.07,tw,H*0.2);x.fillStyle="#0b6b3a";x.fillText("EXIT "+no,W-tw/2-H*0.07,H*0.175)}
+  x.fillStyle="#fff";let f=H*0.27;x.font=`700 ${f}px Inter,system-ui,sans-serif`;while(x.measureText(to).width>W*0.86&&f>H*0.12){f-=2;x.font=`700 ${f}px Inter,system-ui,sans-serif`}x.fillText(to,W/2,H*0.53);
+  x.font=`700 ${H*0.15}px Inter,system-ui,sans-serif`;x.fillText(dist,W/2,H*0.82)}}
 let TC_TEX=null;
 function tcSignsDraw(){const e=CULL.eye;if(!TC_SIGNS.length||Math.hypot(e[0]-(TC.x0+TC.x1)/2,-e[2]-(TC.y0+TC.y1)/2)>700)return;
   if(!TC_TEX){TC_TEX=TC_SIGNS.map(g=>{const c=document.createElement("canvas");c.width=512;c.height=256;const x=c.getContext("2d");x.fillStyle="#1e5bb8";x.fillRect(0,0,512,256);x.strokeStyle="#fff";x.lineWidth=10;x.strokeRect(12,12,488,232);
@@ -2407,6 +2424,7 @@ function groundAt0(x,y){
   // where roads cross on a bridge there are two surfaces here: take the one you are on (the highest one not above you)
   const pick=g=>{if(!hits)hits=[];hits.push(g)};
   for(const e of gAt(GRID.e,x,y)){const p=eProj(e,x,y);if(p.u<e.p0-0.5||p.u>e.L-e.p1+0.5)continue;
+    if(e.gap&&p.u>e.gap[0]&&p.u<e.gap[1]){if(Math.abs(p.t)>hwOf(e)+(e.T.walk||0)+0.5)continue;const hh=dbLeafH(e,p.u);if(hh!==null)pick({h:hh,mu:0.95,kind:"road"});continue}
     const mm=mAt(e,p.u),a=Math.abs(p.t),m2=mm/2,outer=m2+e.n*LANE+e.side+auxW(e,p.u,p.t),inner=mm>0.8?m2-e.shL:-1;
     if(a<=outer&&a>=inner){const rum=e.T.rumble&&(Math.abs(a-(m2+e.n*LANE+0.5))<0.2||Math.abs(a-(m2-0.6))<0.2)&&(p.u%0.6)<0.3;
       {const hb=roadBumps(e,p.u,p.t)+(e.br&&e.br.style?brJank(e,p.u,p.t):0);if(e.T.dirt){const fd=e.ford&&Math.abs(p.u-e.ford.uc)<e.ford.half;pick({h:(e.hz||e.ford?ez(e,p.u):0)+hb+dirtH(e,p.u,p.t),mu:fd?0.5:0.74,kind:fd?"ford":"dirt",hole:RB_HOLE});continue}
@@ -4502,7 +4520,7 @@ function pudBuild(){const G_=new Map();let n=0;for(const e of EDGES){if(/dirt|la
       const key=Math.floor(p[0]/25)+","+Math.floor(p[1]/25);let L=G_.get(key);if(!L)G_.set(key,L=[]);L.push({x:p[0],y:p[1],z,r,h:p[2]});n++}}PUD.grid=G_;PUD.n=n}
 function pudAt(x,y){if(!PUD.grid)return null;const cx=Math.floor(x/25),cy=Math.floor(y/25);for(let i=-1;i<=1;i++)for(let j=-1;j<=1;j++){const L=PUD.grid.get((cx+i)+","+(cy+j));if(!L)continue;for(const q of L)if((q.x-x)**2+(q.y-y)**2<q.r*q.r)return q}return null}
 function onDeckAt(x,y){for(const e of gAt(GRID.e,x,y)){if(!e.br&&!e.ov)continue;const p=eProj(e,x,y);if(Math.abs(p.t)<e.W+1&&(e.br?Math.abs(p.u-e.br.uc)<e.br.half+20:overDeck(e,p.u)))return true}return false}
-function wxWheels(){const rain=WX.cur==="rain"&&WX.w>0.4,snow=WX.cur==="snow"&&WX.w>0.55;car.wxMu=car.wxMu||[1,1,1,1];if(!rain&&!snow||st.walk){car.wxMu.fill(1);car.aqua=0;return}if(!PUD.grid)pudBuild();
+function wxWheels(){const rain=WX.cur==="rain"&&WX.w>0.4,snow=WX.cur==="snow"&&WX.w>0.55,hi=summitIce();car.wxMu=car.wxMu||[1,1,1,1];if(hi&&!st.walk){car.wxMu.fill(hi);car.aqua=0;const now=performance.now();if(now-(PUD.seen.s||0)>20000){PUD.seen.s=now;toast(hi<0.4?"🧊 Ice on the summit road: chains or winter tyres, and go gently":"❄️ Frost on the mountain this early: careful on the bends")}return}if(!rain&&!snow||st.walk){car.wxMu.fill(1);car.aqua=0;return}if(!PUD.grid)pudBuild();
   const c=Math.cos(car.psi),s_=Math.sin(car.psi),v=Math.abs(car.vx);let aq=0,ice=0;
   for(let i=0;i<4;i++){const [x,y]=WPOS[i],wx=car.px+c*x-s_*y,wy=car.py+s_*x+c*y,q=pudAt(wx,wy);let m=1;
     if(rain&&q){m=v>17?Math.max(0.1,1-(v-17)/9*WX.w):0.88;if(m<0.6)aq++}
@@ -4684,6 +4702,10 @@ function rwTick(){if(!st.started)return;const day=GT.day||1;if(RW.day===day)retu
     it.push(evStatic("wreck",e,dir,s0+90,lo*LANE,{haz:true,paint:"yellow"}));RW.items.push(...it);const p=fpt(e,dir,Math.max(2,s0-90),lo*LANE-LANE/2-1.6);RW.zones.push({e,dir,s0,x:it[0].wx,y:it[0].wy,sign:p,label:"ROAD WORK"})}
   if(two.length){const e=pick(two);RW.closed.add(e);for(const dir of [1,-1]){const s0=rStart(e,dir)+12,it=[];for(let t=-1;t<=1;t+=0.5)it.push(evStatic("cone",e,dir,s0,t*LANE));RW.items.push(...it);
       const p=fpt(e,dir,s0,0);RW.zones.push({e,dir,s0,x:p[0],y:p[1],barrier:p,label:"ROAD CLOSED"})}}
+  // the new world: a long-running lane closure on I-38 eastbound, with a flagger and a 45 mph limit
+  if(W2){const Z=wzSpot();if(Z){const {e,dir,s0,s1}=Z,lo=loOf(e.n),it=[];for(let d=0;d<=80;d+=10)it.push(evStatic("cone",e,dir,s0+d,lo*LANE-1.7+d/80*3.3));for(let d=95;d<=s1-s0;d+=16)it.push(evStatic("cone",e,dir,s0+d,(lo+0.5)*LANE-0.25));
+      it.push(evStatic("wreck",e,dir,s0+(s1-s0)/2,lo*LANE,{haz:true,paint:"orange"}));RW.items.push(...it);const p=fpt(e,dir,Math.max(2,s0-250),lo*LANE-LANE/2-2.2);RW.zones.push({e,dir,s0,x:it[0].wx,y:it[0].wy,sign:p,label:"ROAD WORK"});
+      const f=fpt(e,dir,s0-30,lo*LANE-LANE/2-1.8);W2L.wz={e,dir,s0,s1,fx:f[0],fy:f[1],fz:ez(e,dir>0?s0-30:e.L-s0+30),fh:f[2]}}}
   try{if(NAV.dest&&NAV.place)navTo(NAV.place)}catch(e){}}
 function rwInto(ex,ey){for(const z of RW.zones){if((z.x-ex)**2+(z.y-ey)**2>350*350)continue;
     if(z.sign){const [x,y,h]=z.sign,g=groundAt(x,y).h||0;dBox("gateP",x,y,g,0.08,1.6,0.08,h);dBox("cone",x,y,g+1.25,0.9,0.9,0.05,h+0.785)}
@@ -4821,6 +4843,162 @@ function brTick(dt){floodTick(dt||0.016);if(!W2||st.walk)return;const M=me(),b=M
   if(sys.brSaid===M.e)return;sys.brSaid=M.e;const heavy=(TRIMS[st.trim].mass||1800)>2400;
   if(b.style==="truss")toast(heavy?"🌉 The old truss bridge groans and sags under you · weight limit 10 tons":"🌉 Old steel truss bridge · it creaks as you cross");
   else if(b.style==="covered")toast("🌉 Covered bridge · one lane, loose planks, take it slow")}
+// ======================================================================= the new world's life: drive-thrus, dealerships, the Kestrel Estates gate, school buses,
+// the Kestrel hill climb, ice at the summit, the I-38 work zone, the Jefferson Ave drawbridge and the Friday-night car meet
+const W2L={btn:null,act:null,dt:null,hill:null,busT:0,wzTold:null,meetOn:false,gateTold:0};
+// one big action button over the dashboard (drive-thru, dealership, gate); null hides it
+function plBtn(label,fn){let b=W2L.btn;if(!b){b=W2L.btn=document.createElement("button");b.id="plBtn";
+    b.style.cssText="position:fixed;left:50%;bottom:calc(150px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:58;background:#0f7a4a;color:#fff;border:0;border-radius:999px;padding:11px 18px;font:700 15px system-ui,sans-serif;box-shadow:0 6px 18px rgba(0,0,0,.35);display:none;max-width:90vw";
+    b.onclick=()=>{const f=W2L.act;if(f)f()};document.body.appendChild(b)}
+  if(!label){if(b.style.display!=="none")b.style.display="none";W2L.act=null;return}if(b.textContent!==label)b.textContent=label;if(b.style.display==="none")b.style.display="";W2L.act=fn}
+// a small menu card: items are [label, price or null]
+function plMenu(title,items,cb){let m=document.getElementById("plMenu");if(!m){m=document.createElement("div");m.id="plMenu";
+    m.style.cssText="position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:70;background:rgba(14,18,24,.96);color:#fff;border-radius:16px;padding:16px;width:min(360px,90vw);font:500 14px system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.5)";document.body.appendChild(m)}
+  const esc=t=>String(t).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+  m.innerHTML=`<div style="font:800 17px system-ui,sans-serif;margin-bottom:10px">${esc(title)}</div>`+items.map((it,i)=>`<button data-i="${i}" style="display:flex;justify-content:space-between;gap:12px;width:100%;margin:6px 0;padding:10px 12px;border:0;border-radius:10px;background:#232a33;color:#fff;font:600 14px system-ui,sans-serif"><span>${esc(it[0])}</span><span>${it[1]!=null?money(it[1]):""}</span></button>`).join("")+
+    `<button data-i="-1" style="width:100%;margin-top:6px;padding:9px;border:0;border-radius:10px;background:transparent;color:#aab;font:600 14px system-ui,sans-serif">Cancel</button>`;
+  m.hidden=false;m.querySelectorAll("button").forEach(b=>b.onclick=()=>{m.hidden=true;const i=+b.dataset.i;if(i>=0)cb(items[i])})}
+// above the tree line on Mount Kestrel: ice when it rains or snows, frost early in the morning (0 = no change)
+function summitIce(){if(!W2||st.walk||(car.zb||0)<195)return 0;const h=hourNow();if(WX.cur==="snow"&&WX.w>0.3||WX.cur==="rain"&&WX.w>0.3)return 0.32;return h>=4&&h<8.5?0.55:0}
+// ---- drive-thrus: the order speaker and the pickup window of each restaurant (from its site plan)
+const DT_PTS={f_mcdonalds:[[-14,-1.8],[14,0]],f_burger_king:[[-15,-1.8],[15,0]],f_wendys:[[-13.5,-1.7],[13.5,0]],f_taco_bell:[[-13,-1.7],[13,0]],f_chick_fil_a:[[-15,-2],[15,0]],f_kfc:[[-13.5,-1.8],[13.5,0]]};
+const DT_NAME={f_mcdonalds:"McDonald's",f_burger_king:"Burger King",f_wendys:"Wendy's",f_taco_bell:"Taco Bell",f_chick_fil_a:"Chick-fil-A",f_kfc:"KFC"};
+const DT_MENU={f_mcdonalds:[["Double cheeseburger meal",9.49],["10-piece nuggets",5.99],["Large fries",3.79],["Iced coffee",2.49]],
+  f_burger_king:[["Flame-grilled burger meal",9.29],["Chicken fries",4.99],["Onion rings",3.49],["Shake",3.99]],
+  f_wendys:[["Square burger combo",9.69],["Spicy chicken sandwich",6.49],["Frosty",2.89],["Chili",3.29]],
+  f_taco_bell:[["Crunchy taco box",8.99],["Burrito",4.49],["Nachos",3.99],["Freeze drink",2.79]],
+  f_chick_fil_a:[["Chicken sandwich meal",9.99],["8-count nuggets",5.79],["Waffle fries",2.99],["Lemonade",2.69]],
+  f_kfc:[["2-piece chicken meal",9.49],["Chicken tenders",6.99],["Mashed potatoes",2.99],["Biscuits",2.49]]};
+function dtTick(dt){if(st.walk)return null;const v=Math.abs(car.vx);let N=null;
+  for(const o of W2P){if(o.k[0]!=="f"||Math.abs(o.x-car.px)>55||Math.abs(o.y-car.py)>55)continue;const P=DT_PTS[o.k];N={o,op:w2Xf(o,P[0][0],0,P[0][1]),pp:w2Xf(o,P[1][0],0,P[1][1])};break}
+  if(!N)return null;const D=W2L.dt&&W2L.dt.o===N.o?W2L.dt:null,dO=Math.hypot(car.px-N.op[0],car.py-N.op[1]),dP=Math.hypot(car.px-N.pp[0],car.py-N.pp[1]),nm=DT_NAME[N.o.k];
+  if((!D||D.done)&&dO<4.5&&v<0.8)return [`🎙️ Order at the ${nm} drive-thru`,()=>plMenu(`${nm} · drive-thru`,DT_MENU[N.o.k],it=>{if(ECON.cash<it[1]){toast("Your card was declined");return}
+      ECON.cash-=it[1];try{bankTx(`${nm} · ${it[0]}`,-it[1]);bankSave()}catch(e){}W2L.dt={o:N.o,item:it[0],t:0};beep(990,.06,"sine",.12);toast(`🎙️ "That's ${money(it[1])}, please pull up to the window"`)})];
+  if(D&&!D.done&&dP<4.5&&v<0.8){D.t+=dt;if(D.t>2.5){D.done=true;toast(`🛍️ "Here's your ${D.item}. Have a great day!"`);try{ECON.xp+=5}catch(e){}beep(1320,.08,"sine",.12)}else return ["⏳ Waiting at the window…",()=>{}]}
+  return null}
+// ---- dealerships and service centres
+const DEAL_BR={b_ford_dealership:"Ford",b_toyota_dealership:"Toyota",b_chevrolet_dealership:"Chevrolet",b_bmw_dealership:"BMW",b_mercedes_dealership:"Mercedes-Benz",b_tesla_dealership:"Tesla"};
+function dealTick(){const px=st.walk?st.walk.x:car.px,py=st.walk?st.walk.y:car.py;if(!st.walk&&Math.abs(car.vx)>0.5)return null;
+  for(const o of W2P){if(Math.abs(o.x-px)>60||Math.abs(o.y-py)>60)continue;const br=DEAL_BR[o.k],f=W2_FP[o.k];
+    if(br){const c=w2Xf(o,0,0,f[3]+11);if(Math.hypot(px-c[0],py-c[1])<22)return [`🚗 Shop at the ${br} dealership`,()=>{st.cfgBrand=br;st.cfgModel=null;redoCar()}]}
+    else if(/service|tire_center/.test(o.k)){const c=w2Xf(o,0,0,f[3]+8);if(Math.hypot(px-c[0],py-c[1])<15)return ["🔧 Service center: recall repairs and software updates",()=>{try{dealerVisit()}catch(e){toast("Nothing to do today")}}]}}
+  return null}
+// ---- Kestrel Estates: the barrier arms lift for residents (and anyone with a guest pass)
+const gateRes=()=>{if(HOME.i==null)return false;const H=OPEN_HOUSES[HOME.i];return !!H&&zoneName(H.x,H.y)==="gated"};
+function estGateTick(dt){const G=W2C.gate;if(!G)return null;let want=false;const pd=st.walk?1e9:Math.hypot(car.px-G.x,car.py-G.y),inward=Math.cos(car.psi-G.hIn)>0.3&&car.vx>0||Math.cos(car.psi-G.hIn)<-0.3&&car.vx<0;
+  for(const c of cars)if(c.kind==="ai"&&Math.abs(c.wx-G.x)<26&&Math.abs(c.wy-G.y)<26){want=true;break}
+  const ok=gateRes()||G.pass>st.clock;if(pd<32&&(ok||!inward))want=true;G.a=clamp((G.a||0)+(want?dt:-dt)*1.1,0,1);
+  if(pd<10&&inward&&!ok&&G.a<0.6){car.vx*=Math.max(0,1-dt*3);if(st.clock-W2L.gateTold>12){W2L.gateTold=st.clock;toast("🔒 Kestrel Estates · residents only. Buy a house here, or a guest pass at the gatehouse")}
+    return ["🎫 Guest pass for Kestrel Estates · $20",()=>{if(ECON.cash<20){toast("Not enough money");return}ECON.cash-=20;try{bankTx("Kestrel Estates guest pass",-20);bankSave()}catch(e){}G.pass=st.clock+240;beep(1100,.06,"sine",.12);toast("🎫 Welcome to Kestrel Estates · pass good for 4 minutes")}]}
+  return null}
+// ---- school buses: on neighbourhood streets in the morning and mid-afternoon; they stop with red lights flashing, and passing one is a ticket
+function busTick(dt){const h=hourNow(),on=h>=7&&h<9.5||h>=14.5&&h<16.5;let n=0;for(const c of cars)if(c.bus)n++;
+  if(on&&!MODELS.city_bus&&!W2L.busLoad){W2L.busLoad=1;try{loadModel("city_bus").catch(()=>{})}catch(e){}}
+  if(on&&n<2&&st.started&&MODELS.city_bus){W2L.busT-=dt;if(W2L.busT<=0){W2L.busT=25;const p=randomSpot(150,700);if(p&&/res|col|st/.test(p.e.type)&&p.e.n===1){const c=newCar(p.e,p.dir,p.s,0),m=MODELS.city_bus.meta;c.bus=true;c.mdl="city_bus";c.len=m.length;c.wid=m.width;c.paint="yellow";c.v0=Math.min(c.v0,11);c.stopIn=40+Math.random()*100;cars.push(c)}}}
+  if(!on)for(const c of cars)if(c.bus&&!c.flash&&Math.hypot(c.wx-car.px,c.wy-car.py)>400)c.bus=false;   // done for the day: just a bus
+  for(const c of cars){if(!c.bus)continue;
+    if(c.stopT>0){c.stopT-=dt;c.v0=0.01;if(c.stopT<=0){c.v0=10;c.stopIn=90+Math.random()*160;c.flash=false}}
+    else if(!c.jn&&/res|col|st/.test(c.e.type)){c.stopIn-=c.v*dt;if(c.stopIn<=0&&c.s>20&&c.s<c.e.L-30){c.stopT=14;c.flash=true;c.passed=false}}
+    if(c.flash&&c.v<0.6&&!st.walk&&!c.passed){const dx=car.px-c.wx,dy=car.py-c.wy;if(Math.hypot(dx,dy)<13&&Math.abs(car.vx)>2.5&&dx*Math.cos(c.wh)+dy*Math.sin(c.wh)>-4){c.passed=true;const fine=250;ECON.cash-=fine;
+        try{bankTx("Ticket · passed a stopped school bus",-fine);bankSave()}catch(e){}toast(`🚌 You passed a stopped school bus with its red lights flashing: ${money(fine)} ticket`);beep(520,.2,"square",.15)}}}}
+// ---- the Kestrel hill climb: a timer from the foot of the switchbacks to the summit loop, best times kept on this device
+let HILLB=[];try{HILLB=JSON.parse(localStorage.getItem("strata.hill")||"[]").filter(b=>isFinite(b.t))}catch(e){}
+const fmtT=s=>`${Math.floor(s/60)}:${(s%60).toFixed(1).padStart(4,"0")}`;
+function hillTick(){const H=W2C.hc;if(!H||st.walk){if(W2L.hill)hillEnd(null);return}const M=me(),ds=Math.hypot(car.px-H.s[0],car.py-H.s[1]),df=Math.hypot(car.px-H.f[0],car.py-H.f[1]);
+  if(!W2L.hill&&ds<14&&car.vx>1&&M.e.name==="Kestrel Switchbacks"){W2L.hill={t0:st.clock||0};beep(880,.1,"square",.15);toast("⏱️ Kestrel hill climb: go! The finish is at the summit loop")}
+  const R=W2L.hill;if(!R)return;const el=(st.clock||0)-R.t0;let p=document.getElementById("hcT");if(!p){p=document.createElement("div");p.id="hcT";p.style.cssText="position:fixed;top:calc(48px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:59;background:rgba(10,16,24,.85);color:#ffd54a;font:800 18px/1 system-ui,sans-serif;padding:8px 16px;border-radius:999px";document.body.appendChild(p)}
+  p.hidden=false;p.textContent=`⏱️ ${fmtT(el)}${HILLB[0]?` · best ${fmtT(HILLB[0].t)}`:""}`;
+  if(df<20){const car_=TRIMS[st.trim].short||TRIMS[st.trim].name;HILLB.push({t:el,c:car_,d:GT.day||1});HILLB.sort((a,b)=>a.t-b.t);HILLB=HILLB.slice(0,5);try{localStorage.setItem("strata.hill",JSON.stringify(HILLB))}catch(e){}
+    const rank=HILLB.findIndex(b=>b.t===el)+1;toast(`🏁 Summit in ${fmtT(el)}${rank?` · #${rank} on your board`:""}\n`+HILLB.map((b,i)=>`${i+1}. ${fmtT(b.t)} ${b.c}`).join(" · "));beep(1320,.12,"sine",.15);hillEnd(el)}
+  else if(el>900||!/Kestrel Switchbacks|Summit Loop/.test(M.e.name)&&ds>40)hillEnd(null)}
+function hillEnd(t){W2L.hill=null;const p=document.getElementById("hcT");if(p)p.hidden=true}
+// ---- the I-38 work zone: a lane closed with cones, a flagger, 45 mph and fines doubled
+function wzTick(){const Z=W2L.wz;if(!Z||st.walk)return;const M=me();if(M.e!==Z.e||M.dir!==Z.dir){W2L.wzIn=false;return}if(M.s<Z.s0-200||M.s>Z.s1)return;
+  if(!W2L.wzIn){W2L.wzIn=true;W2L.wzT=false;toast("🚧 Work zone ahead · 45 mph · fines doubled")}
+  if(!W2L.wzT&&M.s>Z.s0-20&&Math.abs(car.vx)*2.237>56){W2L.wzT=true;const mph=Math.round(Math.abs(car.vx)*2.237),fine=300;ECON.cash-=fine;try{bankTx(`Work zone speeding · ${mph} in a 45`,-fine);bankSave()}catch(e){}toast(`📸 Work zone speed camera: ${mph} mph in a 45 · ${money(fine)} (fines doubled)`)}}
+// ---- the Jefferson Ave drawbridge: every 4 minutes the bells ring, the gates drop, both leaves lift and a boat goes through
+var DBR={a:0,ph:"down",cones:[],t0:0};
+function dbTick(dt){const D=W2C.db;if(!D)return;const e=D.e,c=eAt(e,(e.gap[0]+e.gap[1])/2),near=Math.hypot(car.px-c.x,car.py-c.y)<1300;
+  const T=near?((st.clock%240)+240)%240:100,ph=T<10?"bells":T<16?"gates":T<34?"up":T<58?"open":T<78?"down2":T<84?"gatesUp":"down";
+  const tgt=ph==="up"||ph==="open"?1.15:0;DBR.a=ph==="up"?Math.min(tgt,DBR.a+dt*0.07):ph==="down2"?Math.max(0,DBR.a-dt*0.07):ph==="open"?tgt:ph==="down"?0:DBR.a;
+  const closed=ph!=="down"&&ph!=="bells";
+  if(closed&&!DBR.cones.length){for(const dir of [1,-1]){const s0=dir>0?e.gap[0]-26:e.L-e.gap[1]-26;for(let t=-1.2;t<=1.2;t+=0.8)DBR.cones.push(evStatic("cone",e,dir,s0,t*LANE))}}
+  if(!closed&&DBR.cones.length){const S=new Set(DBR.cones);cars=cars.filter(c=>!S.has(c));DBR.cones=[]}
+  if(near&&ph==="bells"&&!DBR.told){DBR.told=true;if(Math.hypot(car.px-c.x,car.py-c.y)<400)toast("🔔 Jefferson Ave drawbridge opening: stop at the gates")}if(ph==="down")DBR.told=false;
+  const gDown=ph==="gates"||ph==="up"||ph==="open"||ph==="down2";DBR.gA=clamp((DBR.gA||0)+(gDown?dt:-dt)*0.35,0,1);DBR.ph=ph;DBR.T=T;if(ph==="bells"||ph==="gates"){DBR.bell=(DBR.bell||0)-dt;if(DBR.bell<=0&&Math.hypot(car.px-c.x,car.py-c.y)<250){DBR.bell=0.6;beep(1750,.05,"square",.06)}}}
+// the deck under a wheel: each leaf is hinged at its end of the gap; past a leaf's tip there is nothing but river
+function dbLeafH(e,u){const g=e.gap,hl=(g[1]-g[0])/2,left=u<g[0]+hl,x=left?u-g[0]:g[1]-u,zh=ez(e,left?g[0]:g[1]);if(!DBR||DBR.a<0.01)return ez(e,u);if(x>hl*Math.cos(DBR.a))return null;return zh+x*Math.tan(DBR.a)}
+// a box from a centre and three half-axis vectors (render coordinates), for things that tilt (bridge leaves, barrier arms)
+function obbInto(B,c,ax,ay,az){const k=B.P.length/3,s=[-1,1],V=[];for(const i of s)for(const j of s)for(const l of s)V.push([c[0]+ax[0]*i+ay[0]*j+az[0]*l,c[1]+ax[1]*i+ay[1]*j+az[1]*l,c[2]+ax[2]*i+ay[2]*j+az[2]*l]);
+  const F=[[0,1,3,2,ax,-1],[4,6,7,5,ax,1],[0,4,5,1,ay,-1],[2,3,7,6,ay,1],[0,2,6,4,az,-1],[1,5,7,3,az,1]];
+  for(const [a,b,c2,d,n,sg] of F){const L=Math.hypot(...n)||1,nn=[n[0]/L*sg,n[1]/L*sg,n[2]/L*sg],q=B.P.length/3;for(const v of [a,b,c2,d]){B.P.push(...V[v]);B.N.push(...nn)}B.I.push(q,q+1,q+2,q,q+2,q+3,q,q+2,q+1,q,q+3,q+2)}}
+// moving things drawn each frame: the bridge leaves and the boat, barrier arms, the school buses, the flagger
+function w2Dyn(near){
+  const D=W2C.db;if(D&&near(D.cx,D.cy,700)){const e=D.e,g=e.gap,hl=(g[1]-g[0])/2,W=hwOf(e)+(e.T.walk||0)+0.4;
+    for(const left of [true,false]){const u=left?g[0]:g[1],p=eAt(e,u),zh=ez(e,u),sd=left?1:-1,fx=Math.cos(p.h)*sd,fy=Math.sin(p.h)*sd,ca=Math.cos(DBR.a),sa=Math.sin(DBR.a),len=hl;
+      const mid=[p.x+fx*len/2*ca,zh+len/2*sa-0.15,-(p.y+fy*len/2*ca)],ax=[fx*len/2*ca,len/2*sa,-fy*len/2*ca],ay=[-Math.sin(DBR.a)*fx*0.15,ca*0.15,Math.sin(DBR.a)*fy*0.15],az=[-fy*W,0,-fx*W];
+      obbInto(dB("dbDeck"),mid,ax,ay,az)}
+    // gates and warning lights at both approaches
+    for(const dir of [1,-1]){const s0=(dir>0?g[0]:e.L-g[1])-22,q=fpt(e,dir,s0,loOf(e.n)*LANE-LANE/2-e.side-0.6),z=ez(e,dir>0?s0:e.L-s0),h=q[2],L=e.n*LANE+e.side+0.3,A=(DBR.gA||0)*1.45,ca=Math.cos(A),sa=Math.sin(A);
+      dBox("gateW",q[0],q[1],z,0.3,1.2,0.3,0);const fl=DBR.ph!=="down"&&Math.floor(st.clock*2)%2===0;dBox(fl?"dbLit":"busR",q[0],q[1],z+1.3,0.2,0.32,0.32,h);dBox(!fl&&DBR.ph!=="down"?"dbLit":"busR",q[0],q[1],z+1.7,0.2,0.32,0.32,h);
+      const ex=-Math.sin(h),ey=Math.cos(h);obbInto(dB("gateR"),[q[0]+ex*L/2*sa,z+1.05+L/2*ca,-(q[1]+ey*L/2*sa)],[ex*L/2*sa,L/2*ca,-ey*L/2*sa],[ex*ca*0.06,-sa*0.06,-ey*ca*0.06],[Math.cos(h)*0.05,0,-Math.sin(h)*0.05])}
+    // the boat: up the river through the open bridge
+    if(DBR.ph==="open"){const f=(DBR.T-34)/24,R=W2_WATER[0].pts,yy=D.cy-160+f*320;let x=R[0][0];for(let i=0;i<R.length-1;i++){const a=R[i],b=R[i+1];if((yy-a[1])*(yy-b[1])<=0){x=a[0]+(b[0]-a[0])*(yy-a[1])/(b[1]-a[1]);break}}
+      dBox("boatW",x,yy,RIVER.water-0.4,3.2,1.6,12,Math.PI/2);dBox("boatB",x,yy-1,RIVER.water+1.2,2.4,1.8,4.5,Math.PI/2);dBox("boatW",x,yy-0.5,RIVER.water+3.0,0.15,4,0.15,0)}}
+  const G=W2C.gate;if(G&&near(G.x,G.y,250))for(const lp of G.posts){const A=(G.a||0)*Math.PI*0.47,h=lp.h,ux=Math.cos(h),uy=Math.sin(h),L=lp.L;
+    dBox("gateW",lp.x,lp.y,lp.z,0.35,1.0,0.35,0);const c0=[lp.x+ux*L/2*Math.cos(A),lp.z+1.0+L/2*Math.sin(A),-(lp.y+uy*L/2*Math.cos(A))];obbInto(dB("gateR"),c0,[ux*L/2*Math.cos(A),L/2*Math.sin(A),-uy*L/2*Math.cos(A)],[-ux*Math.sin(A)*0.06,Math.cos(A)*0.06,uy*Math.sin(A)*0.06],[-uy*0.05,0,-ux*0.05])}
+  for(const c of cars){if(!c.bus||!near(c.wx,c.wy,300))continue;const h=c.wh,fx=Math.cos(h),fy=Math.sin(h),z=c.wz||0,hl=(c.len||9.7)/2+0.02;
+    const on=c.flash&&Math.floor(st.clock*2.5)%2===0;for(const s of [hl,-hl])for(const l of [-0.75,0.75]){const ox=c.wx+fx*s-fy*l,oy=c.wy+fy*s+fx*l;dBox(on&&l*(Math.floor(st.clock*2.5)%4<2?1:-1)>0?"busRL":"busR",ox,oy,z+2.62,0.3,0.3,0.1,h+Math.PI/2)}
+    for(const s of [hl-0.25,-hl+0.25])dBox("busY",c.wx+fx*s,c.wy+fy*s,z+2.45,2.0,0.4,0.12,h+Math.PI/2);
+    // the stop arm swings out from the driver's side
+    const A=c.flash?1:0,ax=c.wx+fx*(hl-2.2)-fy*(1.25+A*0.45),ay=c.wy+fy*(hl-2.2)+fx*(1.25+A*0.45);dBox(on?"busRL":"busR",ax,ay,z+1.35,A?0.06:0.55,0.55,A?0.55:0.06,h+Math.PI/2)}
+  for(const [x,y,z,h] of W2L.posts||[])if(near(x,y,300))dBox("gateP",x,y,z,0.12,h,0.12,0);
+  const Z=W2L.wz;if(Z&&near(Z.fx,Z.fy,400)){const z=Z.fz;dBox("pants0",Z.fx,Z.fy,z,0.4,0.85,0.25,0);dBox("vest",Z.fx,Z.fy,z+0.85,0.48,0.62,0.3,0);dBox("skin1",Z.fx,Z.fy,z+1.5,0.22,0.24,0.22,0);dBox("gateW",Z.fx+0.35,Z.fy,z+0.9,0.04,1.2,0.04,0);dBox("busR",Z.fx+0.35,Z.fy,z+2.0,0.05,0.42,0.42,Z.fh)}}
+// ---- the Friday-night car meet: the big lot on Fairhaven Blvd fills up after 8 pm
+function meetTick(){const M=W2C.meet;if(!M)return;const h=hourNow(),night=h>=20||h<2,near=Math.hypot(car.px-M.x,car.py-M.y)<400;
+  if(night&&near&&!W2L.meetOn){W2L.meetOn=true;let sd=91;const r=()=>(sd=(sd*16807)%2147483647)/2147483647,P=["red","blue","white","black","yellow","orange","green","silver","graphite"];
+    W2L.meetCars=M.S.stalls.filter(()=>r()<0.85).map(t=>({fixed:true,kind:"parked",meet:true,wx:t.p[0],wy:t.p[1],wh:t.h+(r()<0.5?Math.PI:0),wz:hillZ(t.p[0],t.p[1]),v:0,spin:0,sig:0,head:0,haz:r()<0.15,paint:P[Math.floor(r()*P.length)]}));
+    parked.push(...W2L.meetCars);toast("🏁 Car meet tonight in the Fairhaven Blvd lot")}
+  if((!night||!near)&&W2L.meetOn){W2L.meetOn=false;const S=new Set(W2L.meetCars||[]);parked=parked.filter(p=>!S.has(p));W2L.meetCars=[]}}
+function w2LifeTick(dt){if(!W2)return;let b=null;
+  try{dbTick(dt)}catch(e){console.error(e)}try{meetTick()}catch(e){console.error(e)}if(!st.started){plBtn(null);return}
+  try{busTick(dt)}catch(e){console.error(e)}try{hillTick()}catch(e){console.error(e)}try{wzTick()}catch(e){console.error(e)}
+  try{b=dtTick(dt)||dealTick()||estGateTick(dt)}catch(e){console.error(e)}plBtn(b&&b[0],b&&b[1])}
+Object.assign(DMAT,{dbLit:[[1,0.12,0.08],[1.6,0.1,0.05]],busRL:[[1,0.12,0.08],[1.8,0.12,0.06]],busR:[[0.45,0.05,0.04],null,0.6,40],busY:[[0.98,0.72,0.05],null,0.4,30],
+  boatW:[[0.93,0.93,0.9],null,0.5,40],boatB:[[0.12,0.22,0.42],null,0.4,30],vest:[[1,0.55,0.05],[0.25,0.12,0]],dbDeck:[[0.32,0.33,0.35],null,0.15,10]});
+// a plain board: lines of [text, size]
+const boardPaint=(bg,fg,lines)=>(x,W,H)=>{x.fillStyle=bg;x.fillRect(0,0,W,H);x.strokeStyle=fg;x.lineWidth=H*0.035;x.strokeRect(H*0.05,H*0.05,W-H*0.1,H-H*0.1);x.fillStyle=fg;x.textAlign="center";x.textBaseline="middle";
+  const tot=lines.reduce((a,l)=>a+(l[1]||1),0);let y=H*0.08;for(const [t,k] of lines){const h=(H*0.84)*(k||1)/tot;x.font=`800 ${Math.round(h*0.72)}px system-ui,sans-serif`;x.fillText(t,W/2,y+h/2,W*0.9);y+=h}};
+// a board on a post beside the road (u along the edge, t sideways), read by people driving along heading hd
+function w2Board(e,u,t,w,h,lines,bg,fg,hd){const p=ePt(e,u,t),z=(e.hz||e.zp?ez(e,u):hillZ(p[0],p[1])),H=hd===undefined?p[2]:hd;txbAdd(p[0],p[1],z+1.6+h/2,w,h,H,boardPaint(bg,fg,lines),380);W2L.posts.push([p[0],p[1],z,1.6+h*0.5,H])}
+// the work zone on I-38: the longest plain stretch of freeway, eastbound
+function wzSpot(){const e=EDGES.filter(e=>e.name==="I-38"&&e.type==="xway"&&!e.br&&!e.ov).sort((a,b)=>b.L-a.L)[0];if(!e||e.L<1300)return null;const dir=1,s0=rStart(e,dir)+520,s1=Math.min(s0+650,e.L-rEnd(e,dir)-250);return s1>s0+200?{e,dir,s0,s1}:null}
+function w2LifeSetup(){if(W2L.set)return;W2L.set=true;W2L.posts=[];
+  // Kestrel Estates barrier arms, on the gatehouse posts
+  {const g=EDGES.find(e=>e.name==="Estates Dr"&&Math.abs(e.a.x+1000)<1&&Math.abs(e.a.y-1000)<1);if(g){const u=g.L*0.55+2.5,W=hwOf(g),c=ePt(g,u,0),z=hillZ(c[0],c[1]);
+    W2C.gate={x:c[0],y:c[1],hIn:c[2],a:0,pass:-1,posts:[1,-1].map(sd=>{const q=ePt(g,u,sd*(W+0.4));return {x:q[0],y:q[1],z,h:c[2]-sd*Math.PI/2,L:W+0.25}})};
+    w2Board(g,u-30,-(W+2.2),3.2,1.6,[["KESTREL ESTATES",1.2],["Residents and guests only",0.8],["Guest passes at the gatehouse",0.7]],"#1f3b2c","#f2ead3")}}
+  // the hill climb: start at the foot of the switchbacks, finish at the summit loop
+  {const SW=EDGES.filter(e=>e.name==="Kestrel Switchbacks"),first=SW.find(e=>!SW.some(f=>f.b===e.a)),last=SW.find(e=>!SW.some(f=>f.a===e.b));
+    if(first&&last){W2C.hc={s:[first.a.x,first.a.y],f:[last.b.x,last.b.y]};const W=hwOf(first);
+      w2Board(first,22,-(W+2.4),3.0,1.8,[["KESTREL HILL CLIMB",1.1],["⏱ timed run starts here",0.8],["finish at the summit",0.8]],"#14181f","#ffd54a");
+      w2Board(first,60,-(W+2.4),2.4,1.8,[["CHAINS",1.2],["REQUIRED",1.0],["WHEN SNOWING",0.8]],"#ffffff","#111111");
+      const W1=hwOf(last);w2Board(last,Math.max(8,last.L-18),-(W1+2.4),3.0,1.6,[["🏁 FINISH",1.2],[`Kestrel summit · ${Math.round(ez(last,last.L)*3.281)} ft`,0.8]],"#14181f","#ffffff")}}
+  // the work zone signs
+  {const Z=wzSpot();if(Z){const {e,s0}=Z,W=hwOf(e);for(const [d,lines,bg,fg] of [[900,[["ROAD WORK",1.1],["1/2 MILE",0.9]],"#ff8a00","#111"],[420,[["WORK ZONE",1],["SPEED LIMIT 45",1.2],["FINES DOUBLED",0.8]],"#ffffff","#111"],[160,[["RIGHT LANE",1],["CLOSED AHEAD",1]],"#ff8a00","#111"]])
+      w2Board(e,s0-d,-(W+3.0),3.2,2.2,lines,bg,fg)}}
+  // the car-meet lot on Fairhaven Blvd, south of downtown
+  {const fb=EDGES.filter(e=>e.name==="Fairhaven Blvd"&&e.type!=="ramp"&&Math.abs(e.a.x-e.b.x)<1&&e.L>500).sort((a,b)=>b.L-a.L)[0];
+    if(fb){const W=hwOf(fb),L=64,D=26;outer:for(const u of [fb.L*0.5,fb.L*0.38,fb.L*0.62,fb.L*0.28,fb.L*0.72])for(const sd of [1,-1]){const c=ePt(fb,u,sd*(W+0.2+D/2)),hh=c[2],U=[Math.cos(hh),Math.sin(hh)],N=[-Math.sin(hh)*sd,Math.cos(hh)*sd];
+        const S={kind:"lot",x:c[0],y:c[1],L,D,U,N,e:fb,u,a:hh,meet:true,stalls:[]},pts=[[-L/2,D/2],[L/2,D/2],[0,D/2],[0,0]].map(([a,b])=>xLocal(S,a,b));
+        if(!pts.every(([x,y])=>roadDist(x,y,4)>3&&!inExtra(x,y,2)&&riverD(x,y)>RIVER.w/2+6&&Math.abs(hillZ(x,y))<2.5)||!w2Free(c[0],c[1],40))continue;
+        XSITES.push(S);W2C.meet={x:c[0],y:c[1],S};w2Board(fb,u-L/2-6,sd*(W+2.4),2.8,1.4,[["PUBLIC LOT",1],["car meet nightly after 8 PM",0.7]],"#14306b","#ffffff",hh+(sd>0?0:Math.PI));break outer}}}}
+function w2NavPlaces(add){
+  for(const o of W2P){if(o.k[0]==="f")add(DT_NAME[o.k],"Fast food · drive-thru",o.x,o.y,0,"🍔");else if(DEAL_BR[o.k])add(`${DEAL_BR[o.k]} dealership`,"Shop, test drive, trade in · Route 20",o.x,o.y,0,"🚗");else if(o.k==="b_auto_service_4_bay")add("Route 20 Auto Service","Recalls, software updates, alignment",o.x,o.y,0,"🔧")}
+  if(W2C.meet)add("Fairhaven Blvd lot","Car meet · nightly after 8 PM",W2C.meet.x,W2C.meet.y,0,"🏁");
+  if(W2C.hc)add("Kestrel Hill Climb","Timed run to the summit",W2C.hc.s[0],W2C.hc.s[1],0,"⏱️");
+  if(W2C.db)add("Jefferson Ave drawbridge","Opens every 4 minutes for boats",W2C.db.cx,W2C.db.cy,0,"🌉")}
+
 // ---- start / stop button: the car can be switched off (in P, stopped) and on again
 st.power=true;
 
@@ -4958,6 +5136,7 @@ function navPlaces(){const L=[],add=(name,sub,x,y,h,ic)=>{if(x==null||!isFinite(
   if(STARTS.proving)add("Proving ground","Test track, hills and skidpad",STARTS.proving.x,STARTS.proving.y,STARTS.proving.h,"🏁");
   add("Rosedale","Neighborhood",STARTS.suburb.x,STARTS.suburb.y,STARTS.suburb.h,"🏘️");
   if(W2){for(const k of ["mountain","millbrook","fairhaven","oakridge"])if(STARTS[k])add(STARTS[k].name,STARTS[k].nav||"",STARTS[k].x,STARTS[k].y,STARTS[k].h,STARTS[k].ic||"📍")}
+  if(W2)try{w2NavPlaces(add)}catch(e){}
   return L.sort((a,b)=>a.d-b.d)}
 // fastest route to frame f from every (road, direction): Dijkstra over the reversed graph. Used by the navigation and by the tow truck
 function navBuild(f){let loop;
@@ -4991,11 +5170,11 @@ function navGuide(M){if(!NAV.dest||!M)return null;let e=M.e,dir=M.dir,s=M.s,d=0,
     const n=endNode(e,dir),L=arrLeg(e,dir),ms=L?movesFrom(n,L):[],m=ms.find(x=>skey(x.e,x.dir)===nk);if(!m)return first?{...first,left:d,eta:tt}:null;
     const choices=ms.filter(x=>x.t!=="U").length,named=m.e.name&&m.e.name!==e.name;
     if(!first&&(m.t==="U"||(choices>1&&(m.t!=="S"||named)))){const exit=e.type==="xway"&&m.e.type!=="xway",onto=e.type!=="xway"&&m.e.type==="xway";
-      first={t:exit?"X":onto?"M":m.t,d,name:m.e.name||"",key:nk,node:n}}
+      first={t:exit?"X":onto?"M":m.t,d,name:exit&&m.e.exitTo?m.e.exitTo:m.e.name||"",no:exit?m.e.exitNo:null,key:nk,node:n}}
     e=m.e;dir=m.dir;s=0;tt+=({S:0,R:6,L:12,U:18}[m.t])+(n.ctrl==="signal"?10:n.ctrl==="allstop"?8:0)}
   return first?{...first,left:d,eta:tt}:null}
 const NAV_ARROW={L:"↰",R:"↱",S:"↑",U:"⮌",X:"↗",M:"↗",A:"⚑"};
-function navText(G,now){const onto=G.name?` onto ${G.name}`:"";return G.t==="A"?(now?`You have arrived at ${G.name}`:`Your destination, ${G.name}, is ahead`):G.t==="X"?`Take the exit${G.name?" to "+G.name:""}`:G.t==="M"?`Take the ramp${onto}`:G.t==="U"?"Make a U-turn":G.t==="S"?`Continue${onto}`:`Turn ${G.t==="L"?"left":"right"}${onto}`}
+function navText(G,now){const onto=G.name?` onto ${G.name}`:"";return G.t==="A"?(now?`You have arrived at ${G.name}`:`Your destination, ${G.name}, is ahead`):G.t==="X"?`Take ${G.no?"exit "+G.no:"the exit"}${G.name?" to "+G.name:""}`:G.t==="M"?`Take the ramp${onto}`:G.t==="U"?"Make a U-turn":G.t==="S"?`Continue${onto}`:`Turn ${G.t==="L"?"left":"right"}${onto}`}
 function navSay(t){if(st.navVoice===false||!("speechSynthesis" in window))return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.rate=1.05;u.volume=0.9;speechSynthesis.speak(u)}catch(e){}}
 // every frame while navigating: prompts at a distance that suits your speed, rerouting when you leave the route, arrival
 function navTick(dt){if(!NAV.dest||st.walk||!st.started){const b=$("u2nav");if(b&&!b.hidden&&!NAV.dest)b.hidden=true;if(document.body.classList.contains("navon")&&(!NAV.dest||st.walk))document.body.classList.remove("navon");return}
@@ -7468,7 +7647,7 @@ function boxInto(B,cx,cy,cz,sx,sy,sz,rot){
 const SCN={};
 function uSamples(e,u0,u1,step){const out=[u0];if(e.tp||e.hz)for(let u=u0+step;u<u1;u+=step)out.push(u);for(const g of e.S){const a=g.s0,b=g.s0+g.len;if(b<=u0||a>=u1)continue;if(a>u0)out.push(a);if(g.t===1)for(let u=Math.max(a,u0)+step;u<Math.min(b,u1);u+=step)out.push(u)}out.push(u1);return out.sort((a,b)=>a-b)}
 // a flat strip along an edge between sideways positions t0..t1 (raw, + = left of the edge direction)
-function stripInto(B,e,t0,t1,y,u0,u1){if(u1-u0<0.05)return;const us=uSamples(e,u0,u1,e.tp||e.hz?4:3);let k=B.P.length/3;const T0=typeof t0==="function"?t0:()=>t0,T1=typeof t1==="function"?t1:()=>t1;
+function stripInto(B,e,t0,t1,y,u0,u1){if(u1-u0<0.05)return;if(e.gap&&u1>e.gap[0]&&u0<e.gap[1]){stripInto(B,e,t0,t1,y,u0,Math.min(u1,e.gap[0]));stripInto(B,e,t0,t1,y,Math.max(u0,e.gap[1]),u1);return}const us=uSamples(e,u0,u1,e.tp||e.hz?4:3);let k=B.P.length/3;const T0=typeof t0==="function"?t0:()=>t0,T1=typeof t1==="function"?t1:()=>t1;
   us.forEach((u,q)=>{const a=ePt(e,u,T0(u)),b=ePt(e,u,T1(u)),yy=y+(e.hz?ez(e,u):0);B.P.push(a[0],yy,-a[1],b[0],yy,-b[1]);B.N.push(0,1,0,0,1,0);if(q>0)B.I.push(k-2,k-1,k,k-1,k+1,k);k+=2})}
 function dashInto(B,e,t,w,y,u0,u1,per,on){for(let u=u0+((-u0%per)+per)%per;u<u1;u+=per)stripInto(B,e,t-w/2,t+w/2,y,u,Math.min(u+on,u1))}
 function discInto(B,x,y,r,yy,seg=28){const k=B.P.length/3;B.P.push(x,yy,-y);B.N.push(0,1,0);for(let i=0;i<=seg;i++){const a=i/seg*Math.PI*2;B.P.push(x+Math.cos(a)*r,yy,-(y+Math.sin(a)*r));B.N.push(0,1,0);if(i>0)B.I.push(k,k+i,k+i+1)}}
@@ -7960,8 +8139,9 @@ function worldScenery(){W2P.length=0;
     // Kestrel Estates gatehouse: a booth on the island and barrier arms (up: residents' cars come and go)
     {const g=EDGES.find(e=>e.name==="Estates Dr"&&Math.abs(e.a.x+1000)<1&&Math.abs(e.a.y-1000)<1);if(g){const u=g.L*0.55,W=hwOf(g),z=hillZ(...ePt(g,u,0).slice(0,2));
       for(const sd of [1,-1]){const p=ePt(g,u,sd*(W+2.2));B(bld[2],p[0],p[1],z,3.0,3.2,2.6,p[2]);B(roofs,p[0],p[1],z+3,0.35,4.0,3.4,p[2]);collAdd({t:"b",x:p[0],y:p[1],h:p[2],hl:1.6,hw:1.3,what:"the gatehouse"});
-        const q=ePt(g,u+2.5,sd*(W+0.4));B(post,q[0],q[1],z,1.1,0.25,0.25);const t=ePt(g,u+2.5,sd*(W+0.2));B(signGW,t[0],t[1],z+1.1+2.2,4.4,0.12,0.12)}
+        const q=ePt(g,u+2.5,sd*(W+0.4));B(post,q[0],q[1],z,1.1,0.25,0.25)}
       const w=ePt(g,u-12,-(W+6));B(signGW,w[0],w[1],z+0.3,1.2,6,0.4,w[2]);B(bld[0],w[0],w[1],z,0.35,6.4,0.6,w[2])}}
+    try{w2LifeSetup()}catch(e){console.error(e)}
     // roundabout islands get a real tree; Mount Kestrel gets a pine forest (instead of the plain cone trees)
     for(const b of W2_RB)w2Put(b.cul?"t_ornamental_tree":"t_oak_large",b.x,b.y,0,hillZ(b.x,b.y)+0.16);
     // houses round each turning circle, facing it (leaving the street in clear)
@@ -8055,11 +8235,14 @@ function worldScenery(){W2P.length=0;
   for(const n of NODES){if(n.ctrl!=="merge")continue;const ex=n.legs.find(l=>!l.major&&l.end===0&&l.e.ow);if(!ex)continue;const hx=ex.h;
     for(const l of n.legs){if(!l.major||l.e.type!=="xway")continue;if(Math.cos(wrapPi(l.h+Math.PI-hx))<0.7)continue;const e=l.e,dir=l.end===1?1:-1;for(const s of [e.L-330,e.L-40]){if(s<rStart(e,dir)+30)continue;
     const o=-LANE*1.5-e.side-2.2,p=TE(signK,e,dir,s,o,0,7.2,0.3,0.3);collAdd({t:"c",x:p[0],y:p[1],r:0.25});TE(signK,e,dir,s,o+1.8,6.6,0.25,0.25,3.6);
-    TE(signG,e,dir,s,o+3.6,5.0,2.4,0.12,7.2);TE(signGW,e,dir,s-0.08,o+3.6+2.6,5.5,1.3,0.01,1.1);TE(signGW,e,dir,s-0.08,o+3.4,6.75,0.28,0.01,3.8);TE(signGW,e,dir,s-0.08,o+3.2,6.3,0.2,0.01,3.0);TE(signGW,e,dir,s-0.08,o+0.9,5.45,0.6,0.01,0.12)}}}
+    TE(signG,e,dir,s,o+3.6,5.0,2.4,0.12,7.2);if(W2){const pp=fpt(e,dir,s-0.09,o+3.6),nb=ex.e.b,mi=e.name==="I-38"?(nb.x+4400)/1609:(nb.y+3300)/1609,no=ex.e.exitNo||(ex.e.exitNo=Math.max(1,Math.round(mi))+(/ to I-\d+ [NE]$/.test(ex.e.name)?"A":/ to I-\d+ [SW]$/.test(ex.e.name)?"B":"")),to=ex.e.exitTo||(ex.e.exitTo=/ to (I-\d+) ([NSEW])/.test(ex.e.name)?ex.e.name.replace(/.* to (I-\d+) ([NSEW])$/,(m,a,b)=>a+" "+{N:"North",S:"South",E:"East",W:"West"}[b]):ex.e.name.replace(/ exit$/,""));txbAdd(pp[0],pp[1],6.2+(e.hz?ez(e,dir>0?s:e.L-s):0),7.0,2.3,pp[2],guidePaint(no,to,s<e.L-200?"1/4 MILE":"EXIT ONLY ↗"),520)}TE(signGW,e,dir,s-0.08,o+3.6+2.6,5.5,1.3,0.01,1.1);TE(signGW,e,dir,s-0.08,o+3.4,6.75,0.28,0.01,3.8);TE(signGW,e,dir,s-0.08,o+3.2,6.3,0.2,0.01,3.0);TE(signGW,e,dir,s-0.08,o+0.9,5.45,0.6,0.01,0.12)}}}
   // ---- freeway lighting (new world): a pole in the middle of the median every 75 m, an arm and a lamp out over each carriageway
   const fwH=M_(),fwP=M_();if(W2)for(const e of EDGES){if(e.type!=="xway")continue;for(let u=(e.r0||0)+40;u<e.L-(e.r1||0)-20;u+=75){if(e.br&&Math.abs(u-e.br.uc)<e.br.half+e.br.rp*0.5||e.ov&&Math.abs(u-e.ov.uc)<e.ov.half+30)continue;
       const p=ePt(e,u,0),z=ez(e,u),a=p[2];B(post,p[0],p[1],z,12.5,0.32,0.32,a);collAdd({t:"c",x:p[0],y:p[1],r:0.3,z0:z-0.3,z1:z+12,what:"a light pole"});
       for(const sd of [1,-1]){const q=ePt(e,u,sd*(e.m/2+2.8)),g=ePt(e,u,sd*(e.m/2+5));tubeInto(post,[p[0],p[1],z+12.3],[q[0],q[1],z+12.6],0.09,0.07,6);B(fwH,q[0],q[1],z+12.3,0.3,1.6,0.7,a+Math.PI/2);discInto(fwP,g[0],g[1],11,z+0.05,20);discInto(fwP,g[0],g[1],6.5,z+0.055,16)}}}
+  if(W2)for(const [nm,ax] of [["I-38",0],["I-61",1]]){const FE=EDGES.filter(e=>e.name===nm);for(let m=1;m<6;m++){const tgt=ax?[-2300,-3300+m*1609]:[-4400+m*1609,-1500];let best=null;for(const e of FE){const q=eProj(e,tgt[0],tgt[1]);if(q.u>=0&&q.u<=e.L&&(!best||q.d<best.q.d))best={e,q}}if(!best)continue;
+    for(const dir of [1,-1]){const e=best.e,sP=dir>0?best.q.u:e.L-best.q.u,o=loOf(e.n)*LANE-LANE/2-e.side-1.2,p=fpt(e,dir,sP,o),z=(e.hz?ez(e,best.q.u):0);B(post,p[0],p[1],z,1.6,0.08,0.08);
+      txbAdd(p[0],p[1],z+1.75,0.55,0.9,p[2],(x,W,H)=>{x.fillStyle="#0b6b3a";x.fillRect(0,0,W,H);x.strokeStyle="#fff";x.lineWidth=W*0.05;x.strokeRect(W*0.06,W*0.06,W-W*0.12,H-W*0.12);x.fillStyle="#fff";x.textAlign="center";x.textBaseline="middle";x.font=`800 ${W*0.22}px Inter,system-ui,sans-serif`;x.fillText("MILE",W/2,H*0.3);x.font=`800 ${W*0.42}px Inter,system-ui,sans-serif`;x.fillText(String(m),W/2,H*0.65)},220,128)}}}
   SCN.fwHead=fwH.I.length?meshFrom(fwH.P,fwH.N,fwH.I):null;SCN.fwPool=fwP.I.length?meshFrom(fwP.P,fwP.N,fwP.I):null;
   // ---- roundabout islands
   const rbK=M_(),rbG=M_();for(const b of W2_RB){const z=hillZ(b.x,b.y),ri=b.R-3.0;discInto(rbK,b.x,b.y,ri,z+0.12,40);discInto(rbG,b.x,b.y,ri-0.4,z+0.16,40);
@@ -8100,9 +8283,10 @@ function worldScenery(){W2P.length=0;
   const gird=M_(),para=M_(),water=M_(),gSlab=M_(),gWall=M_(),gLight=M_(),gBlue=M_();
   for(const e of EDGES){if(!e.br)continue;const uc=e.br.uc,hf=e.br.half,Wt=e.m/2+e.n*LANE+e.side;
     const inJ=u=>u<(e.p0||0)+2||u>e.L-(e.p1||0)-2;   // the part of a ramp that has merged into the freeway is freeway, not bridge
-    for(let u=uc-hf-34;u<=uc+hf+34;u+=6){if(inJ(u))continue;const z=ez(e,u),p=ePt(e,u,0);boxInto(gird,p[0],z-0.85,-p[1],6.1,1.2,2*Wt+0.6,p[2])}
-    for(const du of [-hf+5,0,hf-5])for(const sd of [1,-1]){if(inJ(uc+du))continue;const p=ePt(e,uc+du,sd*Wt*0.55),z=ez(e,uc+du);boxInto(gird,p[0],(z-1.4-3.6)/2,-p[1],1.6,z-1.4+3.6,2.2,p[2])}
-    for(let u=uc-hf-e.br.rp*0.7;u<=uc+hf+e.br.rp*0.7;u+=4){const z=ez(e,u);if(z<0.9||inJ(u)||inJ(u+4))continue;if(e.br.style&&Math.abs(u+2-uc)<hf+2)continue;   // old bridges have their own sides
+    const inGap=u=>e.gap&&u>e.gap[0]-3&&u<e.gap[1]+3;
+    for(let u=uc-hf-34;u<=uc+hf+34;u+=6){if(inJ(u)||inGap(u))continue;const z=ez(e,u),p=ePt(e,u,0);boxInto(gird,p[0],z-0.85,-p[1],6.1,1.2,2*Wt+0.6,p[2])}
+    for(const du of e.gap?[-hf+5,e.gap[0]-uc-2,e.gap[1]-uc+2,hf-5]:[-hf+5,0,hf-5])for(const sd of [1,-1]){if(inJ(uc+du))continue;const p=ePt(e,uc+du,sd*Wt*0.55),z=ez(e,uc+du);boxInto(gird,p[0],(z-1.4-3.6)/2,-p[1],1.6,z-1.4+3.6,2.2,p[2])}
+    for(let u=uc-hf-e.br.rp*0.7;u<=uc+hf+e.br.rp*0.7;u+=4){const z=ez(e,u);if(z<0.9||inJ(u)||inJ(u+4)||inGap(u)||inGap(u+4))continue;if(e.br.style&&Math.abs(u+2-uc)<hf+2)continue;   // old bridges have their own sides
       for(const sd of [1,-1]){const p=ePt(e,u+2,sd*(Wt+0.25));
         // an acceleration / deceleration lane shares the freeway's deck: no railing between them (the ramp's outer railing is the edge)
         if(e.type==="xway"&&(auxW(e,u+2,sd)>0.3||gAt(GRID.e,p[0],p[1]).some(f=>f.type==="ramp"&&(()=>{const q=eProj(f,p[0],p[1]);return q.u>=(f.p0||0)&&q.u<=f.L-(f.p1||0)&&Math.abs(q.t)<f.m/2+f.n*LANE+f.side+0.6})())))continue;
@@ -8261,7 +8445,7 @@ function stationInto(pad,chg,stall){
   const K=PARK;SCN.parkLane=null;for(let s=K.s0+0.2;s<=K.s1;s+=6.4){const q=fpt(K.e,K.dir,s,K.oP-0.2);boxInto(stall,q[0],0.008,-q[1],0.12,0.012,1.5,q[2])}
 }
 function spawnParked(){parked=[];const K=PARK;let i=0;
-  {let sd=17;const r=()=>(sd=(sd*16807)%2147483647)/2147483647;for(const S of XSITES)if(S.kind==="lot")for(const t of S.stalls){if(r()>0.45)continue;parked.push({fixed:true,kind:"parked",wx:t.p[0],wy:t.p[1],wh:t.h+(r()<0.3?Math.PI:0),wz:0,v:0,spin:0,sig:0,head:0,paint:TRAFFIC_PAINTS[Math.floor(r()*TRAFFIC_PAINTS.length)]})}}
+  {let sd=17;const r=()=>(sd=(sd*16807)%2147483647)/2147483647;for(const S of XSITES)if(S.kind==="lot"&&!S.meet)for(const t of S.stalls){if(r()>0.45)continue;parked.push({fixed:true,kind:"parked",wx:t.p[0],wy:t.p[1],wh:t.h+(r()<0.3?Math.PI:0),wz:0,v:0,spin:0,sig:0,head:0,paint:TRAFFIC_PAINTS[Math.floor(r()*TRAFFIC_PAINTS.length)]})}}
   for(let s=K.s0+3.4;s<K.s1-2.5;s+=6.4,i++){if(i===4||i===10)continue;parked.push({e:K.e,dir:K.dir,s,off:K.oP,offT:K.oP,head:0,v:0,spin:0,sig:0,kind:"parked",paint:TRAFFIC_PAINTS[(i*5)%TRAFFIC_PAINTS.length]})}
   if(W2){let sd=29;const r=()=>(sd=(sd*16807)%2147483647)/2147483647;for(const S of METER.spaces){if(r()>0.42)continue;const e=S.e,dir=S.sd<0?1:-1,uc=(S.u0+S.u1)/2,s=dir>0?uc:e.L-uc,off=dir*S.off-shiftOf(e,uc);
     parked.push({e,dir,s,off,offT:off,head:0,v:0,spin:0,sig:0,kind:"parked",paint:TRAFFIC_PAINTS[Math.floor(r()*TRAFFIC_PAINTS.length)]})}}
@@ -9273,6 +9457,7 @@ function phLoanQuote(){const amt=PHONE.amt||10000,wk=PHONE.term||260,apr=bankApr
 // Pay = base + per mile + tip; food has a delivery deadline, riders rate your driving (hard braking and crashes cost stars and tips).
 var GIG=(()=>{let g=null;try{g=JSON.parse(localStorage.getItem("strata.gig")||"null")}catch(e){}return Object.assign({svc:"food",online:false,offer:null,job:null,earned:0,trips:0,rating:5,ratings:0,week:0},g||{},{online:false,offer:null,job:null})})();
 const GIG_SVC={valet:{name:"Halden Valet",short:"Valet",ic:"🔑",col:"#b8860b",desc:"Park guests' cars in the Cass Ave garage and bring them back"},pkg:{name:"Package Delivery",short:"Packages",ic:"📦",col:"#ff9900",desc:"Blocks of 3 to 5 packages, paid per block"},food:{name:"Food Delivery",short:"Food",ic:"🍔",col:"#ff3008",desc:"Pick up at a restaurant, deliver before the food gets cold"},ride:{name:"Rideshare",short:"Rides",ic:"🚘",col:"#111",desc:"Pick up riders and drive them; they rate the ride"},taxi:{name:"Halden Taxi",short:"Taxi",ic:"🚕",col:"#f5c400",desc:"Metered fares: you're paid for every mile you actually drive with a passenger, plus tips. A TAXI sign goes on your roof"},tow:{name:"Tow Truck",short:"Tow",ic:"🛻",col:"#e86b00",desc:"Hook up broken-down cars and haul them to the shop. Needs a truck or a big SUV"},freight:{name:"Halden Freight",short:"Freight",ic:"🚚",col:"#2e6bd6",desc:"Load heavy freight at the depot and deliver it to businesses. Needs a van, truck or big SUV"}};
+if(W2)for(const v of Object.values(GIG_SVC))v.name=v.name.replace("Halden","Westport");
 const GIG_FOOD=["Burger Barn","Pho Saigon","Luigi's Pizza","Taco Loco","Golden Dragon","Halden Deli","Sushi Go","Wing Stop Shop","Green Bowl","Café Marlo"];
 const GIG_NAMES=["Ava","Liam","Noah","Mia","Zoe","Ethan","Maya","Lucas","Ella","Omar","Priya","Jonah","Sofia","Kai"];
 function gigBig(){const T=TRIMS[st.trim];return trlCanTow()||/Transit|ProMaster|Express|Savana|Sprinter|Odyssey|Sienna|Pacifica|Carnival|ID\. Buzz/i.test((T.group||"")+T.name)}
@@ -9283,9 +9468,11 @@ function gigSpot(x,y,minD,maxD,tag){const ok=EDGES.filter(e=>!["xway","ramp","di
 function gigOffer(){const S=GIG.svc,px=st.walk?st.walk.x:car.px,py=st.walk?st.walk.y:car.py;let stops=[],pay=0,mi=0;
   if(S==="pkg"){const n=3+Math.floor(Math.random()*3);let x=px,y=py;const hub=gigSpot(px,py,150,700,"Delivery station");stops.push({...hub,kind:"pickup",label:"Load packages at the delivery station"});x=hub.x;y=hub.y;
     for(let i=0;i<n;i++){const p=gigSpot(x,y,180,650,`Package ${i+1}/${n}`);stops.push({...p,kind:"drop",label:`Drop package ${i+1} of ${n}`});mi+=Math.hypot(p.x-x,p.y-y)*1.35/1609;x=p.x;y=p.y}pay=6.5*n+mi*0.9}
-  else if(S==="food"){const r=GIG_FOOD[Math.floor(Math.random()*GIG_FOOD.length)],a=gigSpot(px,py,120,900,r),b=gigSpot(a.x,a.y,300,1500,`${GIG_NAMES[Math.floor(Math.random()*GIG_NAMES.length)]}'s door`);
+  else if(S==="food"){let r=GIG_FOOD[Math.floor(Math.random()*GIG_FOOD.length)],a=gigSpot(px,py,120,900,r);
+    if(W2){const F=W2P.filter(o=>o.k[0]==="f"&&Math.hypot(o.x-px,o.y-py)<3500);if(F.length){const o=F[Math.floor(Math.random()*F.length)],q=w2Xf(o,DT_PTS[o.k][1][0],0,DT_PTS[o.k][1][1]);r=DT_NAME[o.k];a={x:q[0],y:q[1],h:o.a,name:`${r} · pickup window`}}}
+    const b=gigSpot(a.x,a.y,300,1500,`${GIG_NAMES[Math.floor(Math.random()*GIG_NAMES.length)]}'s door`);
     mi=(Math.hypot(a.x-px,a.y-py)+Math.hypot(b.x-a.x,b.y-a.y))*1.35/1609;stops=[{...a,kind:"pickup",label:`Pick up the order at ${r}`},{...b,kind:"drop",label:"Hand the food to the customer"}];pay=3.5+mi*1.6}
-  else if(S==="tow"){const a=gigSpot(px,py,250,1200,"Broken-down car"),shop=gigSpot(a.x,a.y,500,2000,"Halden Auto Repair");mi=(Math.hypot(a.x-px,a.y-py)+Math.hypot(shop.x-a.x,shop.y-a.y))*1.35/1609;
+  else if(S==="tow"){const a=gigSpot(px,py,250,1200,"Broken-down car"),shop=(()=>{if(W2){const V=W2P.filter(o=>/service|tire_center/.test(o.k));if(V.length){const o=V.sort((p,q)=>Math.hypot(p.x-a.x,p.y-a.y)-Math.hypot(q.x-a.x,q.y-a.y))[0],f=W2_FP[o.k],q=w2Xf(o,0,0,f[3]+8);return {x:q[0],y:q[1],h:o.a,name:"Route 20 Auto Service"}}}return gigSpot(a.x,a.y,500,2000,"Halden Auto Repair")})();mi=(Math.hypot(a.x-px,a.y-py)+Math.hypot(shop.x-a.x,shop.y-a.y))*1.35/1609;
     stops=[{...a,kind:"hook",label:"Find the broken-down car and stop next to it to hook it up"},{...shop,kind:"unhook",label:"Tow it to the repair shop"}];pay=95+Math.hypot(shop.x-a.x,shop.y-a.y)*1.35/1609*3.2}
   else if(S==="freight"){const hub=gigSpot(px,py,150,800,"Halden Freight depot"),n=2+Math.floor(Math.random()*2);let x=hub.x,y=hub.y;stops.push({...hub,kind:"pickup",label:"Load the freight at the depot"});
     for(let i=0;i<n;i++){const q=gigSpot(x,y,350,1300,`${["Hardware store","Restaurant supply","Office park","Clinic","Brewery","School"][Math.floor(Math.random()*6)]}`);stops.push({...q,kind:"drop",label:`Deliver pallet ${i+1} of ${n}`});mi+=Math.hypot(q.x-x,q.y-y)*1.35/1609;x=q.x;y=q.y}pay=40+n*28+mi*2.4}
@@ -9934,7 +10121,7 @@ function headlights(cm,fwd,on){
 }
 // people (on foot, on bikes, in cars), deer, cones and falling rain / snow for this frame
 let dynFrame=-1;
-function dynBuild(eye,cm){if(dynFrame===GFX.frame)return;dynFrame=GFX.frame;CHARS=[];const ex=eye[0],ey=-eye[2],near=(x,y,r)=>(x-ex)*(x-ex)+(y-ey)*(y-ey)<r*r;
+function dynBuild(eye,cm){if(dynFrame===GFX.frame)return;dynFrame=GFX.frame;CHARS=[];const ex=eye[0],ey=-eye[2],near=(x,y,r)=>(x-ex)*(x-ex)+(y-ey)*(y-ey)<r*r;if(W2)try{w2Dyn(near)}catch(e){console.error(e)}
   for(const H of OPEN_HOUSES){const g=H.gdoor;if(!g||!near(g.x,g.y,160))continue;dBox("gdoor",g.x,g.y,g.open*2.15,5.3,2.28,0.08,g.h);if(H.i!==HOME.i&&near(H.door0[0],H.door0[1],90)){const q=H.P(H.ox-1.6,H.D2+3.2);dBox("post",q[0],q[1],0,0.06,1.1,0.06,H.a);dBox("forsale",q[0],q[1],0.75,0.7,0.45,0.04,H.a)}}
   for(const p of peds)if(near(p.wx,p.wy,170)){if(p.mode!=="down"&&near(p.wx,p.wy,90)){if(p.mk===undefined){const r=Math.random();p.mk=r<0.42?"Adult_Man":r<0.84?"Adult_Woman":"Child";p.dog=Math.random()<0.18?(Math.random()<0.5?"Dog_Golden":"Dog_Brown"):null;p.sd=Math.random()}
     if(charQueue(p.mk,p.wx,p.wy,p.wz||0,p.wh,Math.abs(p.v??1.2),p.sd)){if(p.dog){const c=Math.cos(p.wh),s_=Math.sin(p.wh);charQueue(p.dog,p.wx+c*0.9-s_*0.5,p.wy+s_*0.9+c*0.5,p.wz||0,p.wh,Math.abs(p.v??1.2),p.sd+0.3)}continue}}personInto(p.wx,p.wy,p.wz,p.wh,p.ph,p,p.mode==="down"?"down":"walk")}
@@ -10065,6 +10252,7 @@ function render(dt){
   gl.polygonOffset(7,7);mat([0.33,0.33,0.32],null,0.05,10,1,2);draw(SCN.plate);
   if(SCN.tc){const T_=SCN.tc;mat([0.42,0.42,0.4],null,0.05,10,1,2);draw(T_.conc);mat([0.55,0.5,0.43],null,0.08,12,1,2);draw(T_.sec);mat([0.09,0.09,0.095],null,0.2,30,1,2);draw(T_.asph);mat([0.33,0.29,0.25],null,0.1,10,1,2);draw(T_.cob);mat([0.36,0.3,0.22],null,0.05,8,1,1);draw(T_.grav);mat([0.40,0.38,0.35],null,0.1,10,1,2);draw(T_.rock);mat([0.20,0.14,0.09],null,0.25,30,1,1);draw(T_.mud);mat([0.92,0.94,0.97],null,0.2,20,1,2);draw(T_.snow);mat([0.76,0.66,0.47],null,0.03,6,1,1);draw(T_.sand);
     mat([0.85,0.7,0.1],null,0.2,20);draw(T_.paint);mat([0.95,0.38,0.05],null,0.2,20);draw(T_.dark);mat([0.55,0.55,0.55],null,0.3,20);draw(T_.post);mat([0.1,0.35,0.75],null,0.2,20);draw(T_.board);if(T_.rail){mat([0.62,0.64,0.66],null,0.6,40);draw(T_.rail)}try{orDraw()}catch(e){}tcSignsDraw()}
+  try{txbDraw()}catch(e){console.error(e)}
   gl.polygonOffset(6,6);mat([0.36,0.36,0.35],null,0.05,10,1,2);draw(SCN.walk);draw(SCN.drive);mat([0.1,0.102,0.11],null,0.2,30,1,2);draw(SCN.lot);mat([0.11,0.23,0.07],null,0.02,8,1,1);draw(SCN.green);mat([0.13,0.135,0.14],null,0.2,30,1,2);draw(SCN.pad);if(SCN.parkLane){mat([0.095,0.098,0.105],null,0.25,30,1,2);draw(SCN.parkLane)}
   gl.polygonOffset(4,4);
   {const wet=st.surface==="wet",snow=st.surface==="snow",sp_=wet?1.6:0.22,sh_=wet?90:26;
@@ -10100,7 +10288,7 @@ function render(dt){
   mat([0.85,0.87,0.88],null,0.6,40);draw(SCN.chg);
   if(SCN.via){const V=SCN.via;gl.uniformMatrix4fv(U.uM,false,M4.id());mat([0.56,0.56,0.54],null,0.1,10,1,2);draw(V.dk);draw(V.pl);draw(V.cap);mat([0.24,0.3,0.36],null,0.8,50);draw(V.gd);mat([0.62,0.63,0.62],null,0.2,10);draw(V.par);mat([0.3,0.27,0.24],null,0.05,8);draw(V.bl);mat([0.5,0.5,0.48],null,0.1,10);draw(V.xp);mat([0.02,0.02,0.02],null,0,1);draw(V.fw);mat([0.62,0.62,0.66],null,1.6,90);draw(V.rx);mat([0.2,0.13,0.08],null,0.05,6);draw(V.ti);mat([0.42,0.4,0.38],null,1.2,70);draw(V.rl)}
   try{cwDraw(eye,night)}catch(e){}
-  if(PROPS.loco&&!W2){const ex=eye[0],ey=-eye[2],hn=performance.now()<(TRAIN.hornOn||0);for(const c of TRAIN.cars){if(!PROPS[c.k])continue;const P=trainCarPose(c);if((P.x-ex)**2+(P.y-ey)**2>900*900)continue;propDraw(c.k,chain(carMatrix(P.x,P.y,P.yaw,P.z,P.pitch,0),M4.rY(Math.PI)),{head:c.k==="loco"?(hn&&performance.now()%600<300?1.6:1):0,brake:0})}}
+  if(PROPS.loco){const ex=eye[0],ey=-eye[2],hn=performance.now()<(TRAIN.hornOn||0);for(const c of TRAIN.cars){if(!PROPS[c.k])continue;const P=trainCarPose(c);if((P.x-ex)**2+(P.y-ey)**2>900*900)continue;propDraw(c.k,chain(carMatrix(P.x,P.y,P.yaw,P.z,P.pitch,0),M4.rY(Math.PI)),{head:c.k==="loco"?(hn&&performance.now()%600<300?1.6:1):0,brake:0})}}
   if(TRL.on&&!st.walk&&PROPS["trl_"+(TRL.kind==="tow"?"x":TRL.kind)]&&!(cam2==="rear"&&sfOn("trlClear")))trlDrawModel(lampsOn,braking);try{trlDrawParked()}catch(e){}
   // signal lamps: only the lit lenses nearby are drawn, all in one go: round balls, flashing-yellow left arrows, and WALK / hand / countdown
   {const ex=eye[0],ez=-eye[2],T=st.clock||0,BK=[0,1,2,3,4].map(()=>({P:[],N:[],I:[]})),blink=(T%1)<0.5;
@@ -11312,7 +11500,7 @@ function frame(now){if(XR.on&&!XR.inFrame){requestAnimationFrame(frame);return} 
     if(sys.hillDemo){sys.hillT+=dt;if(sys.hillT>6){sys.hillT=0;st.leveling=!st.leveling;toast(st.leveling?"Active levelling ON: beam hugs the ground":"Active levelling OFF: beam fixed to the body")}if(!car.offroad&&Math.abs(car.vx)>3)sys.hillDemo=false}
     if(sys.aim!=null){sys.levT=(sys.levT||0)+dt;if(sys.levT>5){sys.levT=0;st.leveling=!st.leveling;toast(st.leveling?"Levelling ON: beam back down on the road":"Levelling OFF: the loaded car aims the beam high")}
       if(Math.hypot(car.px-sys.aim.x,car.py-sys.aim.y)>40){sys.aim=null;car.cargo=0;st.leveling=true}}acc+=dt;const h=1/G().hz;while(acc>=h){physics(h);acc-=h}if(car.crashed>0)car.crashed-=dt;updateAudio()}
-  shopTick();homeTick(dt);if(st.walk){footTick(dt);openHouseTick()}else if(sys.flashT>0)sys.flashT-=dt;gtTick(dt);phTick();revChime(dt);beltTick(dt);econTick(dt);usedTick(dt);testTick(dt);ui2Tick();trainTick(dt);meterTick(dt);brTick(dt);gateTick(dt);mpTick(dt);netTick(dt);teslaTrip(dt);launchTick(dt);
+  shopTick();homeTick(dt);if(st.walk){footTick(dt);openHouseTick()}else if(sys.flashT>0)sys.flashT-=dt;gtTick(dt);phTick();revChime(dt);beltTick(dt);econTick(dt);usedTick(dt);testTick(dt);ui2Tick();trainTick(dt);meterTick(dt);brTick(dt);gateTick(dt);w2LifeTick(dt);mpTick(dt);netTick(dt);teslaTrip(dt);launchTick(dt);
   try{gigTick(dt)}catch(e){}try{copTick(dt)}catch(e){console.error(e)}if(DALE.p.length||DALE.pools.length||DALE.dead>0||DALE.shake>0||DALE.fire)try{daleTick(dt)}catch(e){}try{if(st.started)stkTick(dt)}catch(e){}if(st.started&&st.power===true&&!st.walk&&Math.abs(car.vx)>1)sys.tripT=(sys.tripT||0)+dt;if(sys.roaT>0)sys.roaT-=dt;
   try{rplRec(dt)}catch(e){}try{achTick(dt)}catch(e){}render(dt);if(PHOTO.want)photoGrab();hud(dt);
 }
@@ -11671,10 +11859,10 @@ const CONSIST=["loco","boxcar","hopper","hopper","boxcar","hopper","boxcar"],CLE
 TRAIN.cars=(()=>{let d=0;return CONSIST.map(k=>{const L=CLEN[k],c={k,off:d+L/2,L};d+=L+0.35;return c})})();TRAIN.len=TRAIN.cars.reduce((a,c)=>Math.max(a,c.off+c.L/2),0);
 function trainCarPose(c){const T=trainPath(),sc=TRAIN.s-c.off,f=trainAt(sc+3.65),r=trainAt(sc-3.65);const rt=q=>q.h+(q.g!==undefined&&q.h-q.g>1?0.26:0.46)-0.27;
   const x=(f.x+r.x)/2,y=(f.y+r.y)/2,z=(rt(f)+rt(r))/2,yaw=Math.atan2(f.y-r.y,f.x-r.x),pitch=Math.atan2(rt(f)-rt(r),7.3);return {x,y,z,yaw,pitch}}var TRAIN_LOW=[[1490,-400,1510,400],[0,-960,1350,-940],[-1510,-400,-1490,400],[0,940,1350,960]];   // stretches where the line comes down to the ground and crosses roads on the level
-function trainPath(){if(TRAIN.pts)return TRAIN.pts;const a=1500,b=950,r=150,P=[];
+function trainPath(){if(TRAIN.pts)return TRAIN.pts;const a=W2?2250:1500,b=W2?90:950,r=W2?80:150,P=[],X0=W2?950:0,Y0=W2?-1170:0;if(W2)TRAIN_LOW=[[-1400,-1300,-420,-1000],[330,-1300,3400,-1000]];
   const seg=(x0,y0,x1,y1)=>{const L=Math.hypot(x1-x0,y1-y0),n=Math.ceil(L/5);for(let i=0;i<n;i++)P.push([x0+(x1-x0)*i/n,y0+(y1-y0)*i/n])};
   const arc=(cx,cy,a0)=>{for(let i=0;i<24;i++){const t=a0+i/24*Math.PI/2;P.push([cx+Math.cos(t)*r,cy+Math.sin(t)*r])}};
-  seg(-a+r,-b,a-r,-b);arc(a-r,-b+r,-Math.PI/2);seg(a,-b+r,a,b-r);arc(a-r,b-r,0);seg(a-r,b,-a+r,b);arc(-a+r,b-r,Math.PI/2);seg(-a,b-r,-a,-b+r);arc(-a+r,-b+r,Math.PI);
+  seg(-a+r,-b,a-r,-b);arc(a-r,-b+r,-Math.PI/2);seg(a,-b+r,a,b-r);arc(a-r,b-r,0);seg(a-r,b,-a+r,b);arc(-a+r,b-r,Math.PI/2);seg(-a,b-r,-a,-b+r);arc(-a+r,-b+r,Math.PI);for(const p of P){p[0]+=X0;p[1]+=Y0}
   const g=P.map(p=>groundAt(p[0],p[1]).h),n=P.length,K=P.map(p=>groundAt(p[0],p[1]).kind);
   const low=P.map(p=>TRAIN_LOW.some(([x0,y0,x1,y1])=>p[0]>=x0&&p[0]<=x1&&p[1]>=y0&&p[1]<=y1));
   const road=K.map(k=>k==="road"||k==="kerb"||k==="pavement");
@@ -11707,7 +11895,7 @@ function buildViaduct(){if(SCN.via)return;const T=trainPath(),n=T.P.length,mk=()
     else for(const sd of [-1,1]){const rx=-Math.sin(yaw)*0.75*sd,ry=Math.cos(yaw)*0.75*sd;boxInto(rl,cx+rx,h+0.38,-(cy+ry),L,0.16,0.12,yaw)}
     if(false&&!collNear(cx,cy).some(o=>Math.hypot(o.x-cx,o.y-cy)<(o.t==="c"?o.r+2.5:Math.hypot(o.hl,o.hw)+2.5))){const g=groundAt(cx,cy).h;boxInto(pl,cx,(g+h-1)/2,-cy,1.8,h-1-g,1.8,yaw);collAdd({t:"c",x:cx,y:cy,r:1.0,what:"a rail viaduct pillar"})}}
   SCN.via={dk:meshFrom(dk.P,dk.N,dk.I),pl:meshFrom(pl.P,pl.N,pl.I),rl:meshFrom(rl.P,rl.N,rl.I),bl:meshFrom(bl.P,bl.N,bl.I),xp:meshFrom(xp.P,xp.N,xp.I),fw:meshFrom(fw.P,fw.N,fw.I),rx:meshFrom(rx_.P,rx_.N,rx_.I),ti:meshFrom(ti.P,ti.N,ti.I),gd:meshFrom(gd.P,gd.N,gd.I),par:meshFrom(par.P,par.N,par.I),cap:meshFrom(cap.P,cap.N,cap.I)}}
-function trainTick(dt){if(W2)return;TRAIN.s+=TRAIN.v*dt;const T=trainPath();if(TRAIN.s>T.L)TRAIN.s-=T.L;
+function trainTick(dt){TRAIN.s+=TRAIN.v*dt;const T=trainPath();if(TRAIN.s>T.L)TRAIN.s-=T.L;
   for(const x of TRAIN.xing||[]){let d=x.s-TRAIN.s;d=((d%T.L)+T.L)%T.L;if(d>T.L/2)d-=T.L;   // d > 0: train still coming; the train is 84 m long
     const down=(d<560&&d>-(TRAIN.len+12));if(down!==x.down){x.gT=0;x.down=down;for(const o of x.obs){const i=parked.indexOf(o);if(i>=0)parked.splice(i,1)}x.obs=[];
       if(down){xingMeasure(x);const ry=x.yaw+Math.PI/2,LTS=x.lanes.map(l=>-l);for(const sd of [-1,1])for(const lt of LTS){const o={kind:"xing",fixed:false,wx:x.x+Math.cos(ry)*sd*9-Math.sin(ry)*lt,wy:x.y+Math.sin(ry)*sd*9+Math.cos(ry)*lt,wh:ry,v:0,spin:0,sig:0,head:0,paint:"white"};x.obs.push(o);parked.push(o)}}}
@@ -12583,7 +12771,7 @@ maintCheck();setInterval(maintCheck,90000);
 async function boot(){
   document.body.classList.add("building");bootStep(0.35,"Loading the "+TRIMS[st.trim].short+"…");
   try{await loadModel(TRIMS[st.trim].model)}catch(e){bootStep(1,"Couldn't load the car files. Check your connection and reload.");return}
-  setTrim(st.trim,true);st.paint=TRIMS[st.trim].paint;if(!W2)buildViaduct();renderCfg();bootStep(1,"Ready");garModelLoad();if(W2)w2PropsBuild();
+  setTrim(st.trim,true);st.paint=TRIMS[st.trim].paint;buildViaduct();renderCfg();bootStep(1,"Ready");garModelLoad();if(W2)w2PropsBuild();
   setTimeout(()=>{$("boot").hidden=true},150);
   // the rest load one at a time while you choose, each uploaded to the GPU when the page is idle so nothing stutters
   // the newer cars load when you pick one, so phones and older laptops stay quick
