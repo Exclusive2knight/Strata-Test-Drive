@@ -8043,6 +8043,48 @@ const SM_INT=new Set(["prodR","prodG","prodB","prodY","prodW","prodO","shelf","r
 RETAIL.forEach((R,i)=>SM_MAT["sign"+i]=[R.col,R.col.map(c=>c*0.5),0.3,30]);
 // 7-segment digits for the speed-limit signs
 const DIG={0:"abcdef",1:"bc",2:"abged",3:"abgcd",4:"fgbc",5:"afgcd",6:"afgedc",7:"abc",8:"abcdefg",9:"abcdfg"};
+
+// ---- the new world's farmland: fields of corn, wheat, hay and fresh-ploughed earth along the country roads, each with a farmhouse, a red barn and a silo
+const FARMZ=[];   // {x,y,U,N,L,D}: trees and the old box houses keep out of these
+const inFarm=(x,y,m=0)=>FARMZ.some(F=>{const dx=x-F.x,dy=y-F.y;return Math.abs(dx*F.U[0]+dy*F.U[1])<F.L/2+m&&Math.abs(dx*F.N[0]+dy*F.N[1])<F.D/2+m});
+function w2Fill(r){const P=[],Nn=[],I=[],C=[];const gz=(x,y)=>groundAt(x,y).h;
+  const quad=(a,b,c,d,col)=>{const k=P.length/3;for(const q of [a,b,c,d]){P.push(q[0],q[2],-q[1]);Nn.push(0,1,0);C.push(...col)}I.push(k,k+1,k+2,k,k+2,k+3)};
+  const box=(x,y,z,w,l,h,a,col)=>{const c=Math.cos(a),s=Math.sin(a),V=[];for(const [i,j] of [[-1,-1],[1,-1],[1,1],[-1,1]])V.push([x+c*l/2*i-s*w/2*j,y+s*l/2*i+c*w/2*j]);
+    for(let f=0;f<4;f++){const A=V[f],B=V[(f+1)%4],k=P.length/3,nx=(B[1]-A[1]),ny=-(B[0]-A[0]),nl=Math.hypot(nx,ny)||1;for(const q of [[A,z],[B,z],[B,z+h],[A,z+h]]){P.push(q[0][0],q[1],-q[0][1]);Nn.push(nx/nl,0,-ny/nl);C.push(...col)}I.push(k,k+1,k+2,k,k+2,k+3,k,k+2,k+1,k,k+3,k+2)}
+    const k=P.length/3;for(const q of V){P.push(q[0],z+h,-q[1]);Nn.push(0,1,0);C.push(...col)}I.push(k,k+1,k+2,k,k+2,k+3,k,k+2,k+1,k,k+3,k+2);return V};
+  const CROPS=[[[0.27,0.44,0.14],[0.33,0.52,0.19]],[[0.80,0.68,0.36],[0.72,0.60,0.30]],[[0.38,0.28,0.18],[0.31,0.23,0.15]],[[0.52,0.58,0.27],[0.56,0.62,0.30]],[[0.42,0.52,0.18],[0.62,0.60,0.28]]];
+  const roads=EDGES.filter(e=>/^(road|lane|col|art)$/.test(e.type)&&e.L>260&&!e.T.dirt);let made=0;
+  for(const e of roads)for(let u=e.r0+90+r()*80;u<e.L-e.r1-90;u+=230+r()*160)for(const sd of [1,-1]){if(made>=46)break;
+    const W=hwOf(e)+(e.T.walk||0),L=150+r()*110,D=110+r()*90,c=ePt(e,u,sd*(W+16+D/2)),hh=c[2],U=[Math.cos(hh),Math.sin(hh)],N=[-Math.sin(hh)*sd,Math.cos(hh)*sd],F={x:c[0],y:c[1],U,N,L,D};
+    const at=(a,b)=>[F.x+U[0]*a+N[0]*b,F.y+U[1]*a+N[1]*b];
+    const test=[];for(let a=-L/2;a<=L/2+0.1;a+=L/4)for(let b=-D/2;b<=D/2+0.1;b+=D/4)test.push(at(a,b));
+    if(FARMZ.some(G=>Math.hypot(G.x-F.x,G.y-F.y)<(G.L+G.D)/2+(L+D)/2-20))continue;
+    if(!test.every(([x,y])=>cityW(x,y)<0.02&&riverD(x,y)>RIVER.w/2+14&&!inTC(x,y,30)&&!inOR(x,y,30)&&!inExtra(x,y,20)&&roadDist(x,y,14)>12&&Math.hypot(x-W2C.MT[0],y-W2C.MT[1])>1250&&!(y>-1330&&y<-970&&x>-1450&&x<3350)))continue;
+    if(!w2Free(F.x,F.y,Math.hypot(L,D)/2)||BLD_LIST.some(b=>Math.hypot(b[0]-F.x,b[1]-F.y)<Math.hypot(L,D)/2+10))continue;
+    const hs=test.map(([x,y])=>gz(x,y));if(Math.max(...hs)-Math.min(...hs)>14)continue;
+    FARMZ.push(F);made++;
+    // fields: two or three plots side by side, rows running away from the road
+    const nP=L>210?3:2,pw=L/nP;for(let q=0;q<nP;q++){const crop=CROPS[Math.floor(r()*CROPS.length)],a0=-L/2+q*pw+2,a1=a0+pw-4,b0=-D/2+(q===0?28:4),b1=D/2-4,row=crop===CROPS[3]?6:2.6;
+      for(let a=a0,k=0;a<a1-0.5;a+=row,k++){const aa=Math.min(a1,a+row),col=crop[k%2];for(let b=b0;b<b1-0.1;b+=10){const bb=Math.min(b1,b+10),p1=at(a,b),p2=at(aa,b),p3=at(aa,bb),p4=at(a,bb);
+          quad([...p1,gz(...p1)+0.07],[...p2,gz(...p2)+0.07],[...p3,gz(...p3)+0.07],[...p4,gz(...p4)+0.07],col)}}
+      if(crop===CROPS[3])for(let n=0;n<10;n++){const p=at(a0+4+r()*(pw-12),b0+6+r()*(b1-b0-12)),z=gz(...p);box(p[0],p[1],z,1.5,1.5,1.4,r()*3,[0.74,0.64,0.36]);collAdd({t:"c",x:p[0],y:p[1],r:0.8,what:"a hay bale"})}}
+    // the farmyard by the road at the near corner: house, red barn, silo, a gravel yard
+    const fy=at(-L/2+15,-D/2+12);w2Put("b_farmhouse",...at(-L/2+12,-D/2+10),Math.atan2(-N[1],-N[0]),gz(...at(-L/2+12,-D/2+10))-0.2);
+    {const p=at(-L/2+40,-D/2+16),z=gz(...p)-0.2,a=hh;box(p[0],p[1],z,12,18,6.5,a,[0.58,0.12,0.09]);
+      // gable roof: two sloped quads
+      const c_=Math.cos(a),s_=Math.sin(a),R=(i,j,h)=>[p[0]+c_*9.3*i-s_*j,p[1]+s_*9.3*i+c_*j,z+h];quad(R(-1,-6.6,6.3),R(1,-6.6,6.3),R(1,0,10),R(-1,0,10),[0.25,0.24,0.24]);quad(R(-1,6.6,6.3),R(-1,0,10),R(1,0,10),R(1,6.6,6.3),[0.25,0.24,0.24]);
+      for(const j of [-1,1]){const k=P.length/3;const g=[R(j,-6,6.5),R(j,6,6.5),R(j,0,9.8)];for(const v of g){P.push(v[0],v[2],-v[1]);Nn.push(c_*j,0,-s_*j);C.push(0.58,0.12,0.09)}I.push(k,k+1,k+2,k,k+2,k+1)}
+      box(...at(-L/2+40,-D/2+7.4),z,0.2,5,4,a,[0.92,0.9,0.86]);collAdd({t:"b",x:p[0],y:p[1],h:a,hl:9,hw:6,what:"a barn"})}
+    {const p=at(-L/2+54,-D/2+20),z=gz(...p)-0.2,n=10,R=2.6,H=13;for(let i=0;i<n;i++){const a0=i/n*Math.PI*2,a1=(i+1)/n*Math.PI*2,A=[p[0]+Math.cos(a0)*R,p[1]+Math.sin(a0)*R],B=[p[0]+Math.cos(a1)*R,p[1]+Math.sin(a1)*R],k=P.length/3,am=(a0+a1)/2;
+        for(const q of [[A,z],[B,z],[B,z+H],[A,z+H]]){P.push(q[0][0],q[1],-q[0][1]);Nn.push(Math.cos(am),0,-Math.sin(am));C.push(0.78,0.79,0.8)}I.push(k,k+1,k+2,k,k+2,k+3,k,k+2,k+1,k,k+3,k+2);
+        const t=P.length/3;P.push(A[0],z+H,-A[1],B[0],z+H,-B[1],p[0],z+H+2.2,-p[1]);Nn.push(Math.cos(am)*0.7,0.7,-Math.sin(am)*0.7,Math.cos(am)*0.7,0.7,-Math.sin(am)*0.7,0,1,0);C.push(0.55,0.56,0.58,0.55,0.56,0.58,0.6,0.6,0.62);I.push(t,t+1,t+2,t,t+2,t+1)}
+      collAdd({t:"c",x:p[0],y:p[1],r:R,what:"a silo"})}
+    {const a=-L/2+3,b=-D/2+3,p1=at(a,b),p2=at(a+62,b),p3=at(a+62,b+24),p4=at(a,b+24);quad([...p1,gz(...p1)+0.05],[...p2,gz(...p2)+0.05],[...p3,gz(...p3)+0.05],[...p4,gz(...p4)+0.05],[0.55,0.5,0.43])}
+    // a wire-and-post fence along the road side of the fields
+    for(let a=-L/2+64;a<L/2;a+=4){const p=at(a,-D/2+1),z=gz(...p);box(p[0],p[1],z,0.12,0.12,1.2,hh,[0.42,0.32,0.22])}
+    {const z0=gz(...at(-L/2+64,-D/2+1)),z1=gz(...at(L/2,-D/2+1));for(const h of [0.6,1.05]){const A=at(-L/2+64,-D/2+1),B=at(L/2,-D/2+1);box((A[0]+B[0])/2,(A[1]+B[1])/2,(z0+z1)/2+h,0.04,L-64,0.04,hh,[0.35,0.33,0.3])}}
+    void fy}
+  SCN.w2farm=P.length?(()=>{const m=meshFrom(P,Nn,I,C);m.dd=1600;return m})():null}
 // ======================================================================= the new world's buildings and trees (the owner's models in props/b_*.json and t_*.json)
 // Every placed copy is baked into a few big world meshes coloured per vertex (matte, semi-gloss, glass), split into map cells and culled by distance,
 // so hundreds of houses cost a handful of draw calls. Collision boxes come from props/colliders.json.
@@ -8082,7 +8124,7 @@ async function w2PropsBuild(){if(!W2||W2P_BUSY||!W2P.length)return;W2P_BUSY=true
     if(tree&&!cb)collAdd({t:"c",x:o.x,y:o.y,r:0.4,what:"a tree"})}
   const mk=(b,dd)=>{if(!b.I.length)return null;const m=meshFrom(b.P,b.N,b.I,b.C);m.dd=dd;return m};
   SCN.w2p={m:mk(BK.m,1000),s:mk(BK.s,1000),g:mk(BK.g,600),t:mk(BK.t,450),h:mk(BK.h,620)};W2P_BUSY=false}
-function w2pDraw(night){const W=SCN.w2p;if(!W)return;
+function w2pDraw(night){if(SCN.w2farm){mat([1,1,1],null,0.08,10);draw(SCN.w2farm);if(aC>=0){gl.disableVertexAttribArray(aC);gl.vertexAttrib3f(aC,1,1,1);bind.col=false}}const W=SCN.w2p;if(!W)return;
   if(W.m){mat([1,1,1],null,0.15,20);draw(W.m)}if(W.s){mat([1,1,1],null,0.45,50);draw(W.s)}
   if(W.h){mat([1,1,1],null,0.25,30);draw(W.h)}if(W.g){mat([1,1,1],night?[0.05,0.045,0.03]:null,1.2,90);draw(W.g)}if(W.t&&G().trees){mat([1,1,1],null,0.06,8);draw(W.t)}
   if(aC>=0){gl.disableVertexAttribArray(aC);gl.vertexAttrib3f(aC,1,1,1);bind.col=false}}
@@ -8253,13 +8295,14 @@ function worldScenery(){W2P.length=0;
     const zz=e.hz?ez(e,u):0;if(k<0.22){const len=2+r()*7,wid=1+r()*2.6,p=ePt(e,u,t);boxInto(r()<0.6?patchD:patchL,p[0],0.0015+zz,-p[1],len,0.003,wid,p[2])}
     else if(k<(e.T.col==="c"?0.75:0.5)){let uu=u,tt=t,ang=(r()-0.5)*1.2;for(let n=0;n<4+r()*6;n++){const L_=0.6+r()*1.4,p=ePt(e,uu+Math.cos(ang)*L_/2,tt+Math.sin(ang)*L_/2);
       boxInto(crack,p[0],0.0025+zz,-p[1],Math.abs(Math.cos(ang))*L_+0.05,0.002,Math.abs(Math.sin(ang))*L_+0.05,p[2]);uu+=Math.cos(ang)*L_;tt+=Math.sin(ang)*L_;ang+=(r()-0.5)*1.1}}}}
+  if(W2)try{w2Fill(r)}catch(e){console.error(e)}
   // ---- countryside: trees on the hills, farmhouses
-  let nt=0;const NT=W2?4200:1300;for(let n=0;n<(W2?32000:9000)&&nt<NT;n++){const x=WORLD.x0+r()*(WORLD.x1-WORLD.x0),y=WORLD.y0+r()*(WORLD.y1-WORLD.y0);if(cityW(x,y)>0.05||riverD(x,y)<RIVER.w/2+10||inTC(x,y,25)||orNoTree(x,y))continue;const d=dfAt(x,y);if(d<16)continue;
+  let nt=0;const NT=W2?4200:1300;for(let n=0;n<(W2?32000:9000)&&nt<NT;n++){const x=WORLD.x0+r()*(WORLD.x1-WORLD.x0),y=WORLD.y0+r()*(WORLD.y1-WORLD.y0);if(cityW(x,y)>0.05||riverD(x,y)<RIVER.w/2+10||inTC(x,y,25)||orNoTree(x,y)||W2&&inFarm(x,y,12))continue;const d=dfAt(x,y);if(d<16)continue;
     if(d<40&&!clear(x,y,12))continue;if(Math.hypot(x-PAD.cx,y-PAD.cy)<90)continue;if(tree.P.length/3>200000)break;
     if(W2&&Math.hypot(x-W2C.MT[0],y-W2C.MT[1])<1150){if(W2P.length<4000&&w2Free(x,y,4)){w2Put(r()<0.6?"t_pine_tall":"t_pine_small",x,y,r()*6.28,terrainH(x,y,d)-0.25);nt++}continue}
-    if(r()<0.55&&d>30){const cx=x,cy=y;for(let k=0;k<4;k++){const tx=cx+(r()-0.5)*30,ty=cy+(r()-0.5)*30;if(dfAt(tx,ty)<14||riverD(tx,ty)<RIVER.w/2+8||orNoTree(tx,ty))continue;treeAt(tx,ty,terrainH(tx,ty,dfAt(tx,ty))-0.3,true);nt++;if(dfAt(tx,ty)<40||inOR(tx,ty))collAdd({t:"c",x:tx,y:ty,r:0.35})}}
+    if(r()<0.55&&d>30){const cx=x,cy=y;for(let k=0;k<4;k++){const tx=cx+(r()-0.5)*30,ty=cy+(r()-0.5)*30;if(dfAt(tx,ty)<14||riverD(tx,ty)<RIVER.w/2+8||orNoTree(tx,ty)||W2&&inFarm(tx,ty,6))continue;treeAt(tx,ty,terrainH(tx,ty,dfAt(tx,ty))-0.3,true);nt++;if(dfAt(tx,ty)<40||inOR(tx,ty))collAdd({t:"c",x:tx,y:ty,r:0.35})}}
     else{treeAt(x,y,terrainH(x,y,d)-0.3,true);nt++;if(d<40||inOR(x,y))collAdd({t:"c",x,y,r:0.35})}}
-  for(let n=0;n<(W2?900:400);n++){const x=WORLD.x0+r()*(WORLD.x1-WORLD.x0),y=WORLD.y0+r()*(WORLD.y1-WORLD.y0);if(cityW(x,y)>0.05||riverD(x,y)<RIVER.w/2+20||inTC(x,y,40)||inOR(x,y,40))continue;const d=dfAt(x,y);if(d<45||d>160)continue;
+  for(let n=0;n<(W2?900:400);n++){const x=WORLD.x0+r()*(WORLD.x1-WORLD.x0),y=WORLD.y0+r()*(WORLD.y1-WORLD.y0);if(cityW(x,y)>0.05||riverD(x,y)<RIVER.w/2+20||inTC(x,y,40)||inOR(x,y,40)||W2&&inFarm(x,y,15))continue;const d=dfAt(x,y);if(d<45||d>160)continue;
     const hb=terrainH(x,y,d)-0.4,a=r()*Math.PI;B(house,x,y,hb,5.5,9+r()*4,7+r()*3,a);B(roofs,x,y,hb+5.5,1.6,7,5,a);collAdd({t:"b",x,y,h:a,hl:6,hw:4.5,what:"a house"})}
   // ---- the new world's old bridges: a red covered wooden bridge, a rusty steel truss, a stone bridge; gravel fords get marker posts
   const rust=M_(),wood=M_(),stone=M_(),fordW=M_();
