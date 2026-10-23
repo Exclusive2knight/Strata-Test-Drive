@@ -2311,9 +2311,12 @@ function terrainH(x,y,d){const D=Math.max(d,dfAt(x,y)),f=smooth01(45,80,D)*(1+2.
 // Bridge decks and the freeway cut are left to embZ and cutZ
 function w2Blend(x,y,base){let sw=0,sz=0,A=0,under=1e9;
   for(const e of edgesNear(x,y,32)){const p=eProj(e,x,y);if(p.u<-6||p.u>e.L+6)continue;const u=clamp(p.u,0,e.L);
-    if(e.ov&&overDeck(e,u)||e.br&&Math.abs(u-e.br.uc)<e.br.half||e.dip&&onDip(e,u))continue;
+    if(e.ov&&overDeck(e,u)||e.br&&Math.abs(u-e.br.uc)<e.br.half)continue;
     const mm=mAt(e,u),dd=Math.abs(p.t)-(mm/2+e.n*LANE+e.side+auxW(e,u,p.t)+(e.T.walk||0)),zr=e.hz?ez(e,u):0;
-    if(dd<0.6&&p.u>=0&&p.u<=e.L)under=Math.min(under,zr-0.12);const a=1-smooth01(0.6,30,dd);if(a<=0)continue;const w=a*a*a+1e-4;sw+=w;sz+=w*zr;if(a>A)A=a}
+    // never above the road (or its shoulder): a margin either side so the ground mesh can't slope up over the edge
+    if(dd<16&&p.u>=-2&&p.u<=e.L+2)under=Math.min(under,zr-0.15+Math.max(0,dd-1)*0.16);
+    if(e.dip&&onDip(e,u)){under=Math.min(under,zr-0.3+Math.max(0,dd-12)*0.42);continue}   // the freeway cut: flat beside the shoulder, then the grass bank
+    const a=1-smooth01(5,32,dd);if(a<=0)continue;const w=a*a*a+1e-4;sw+=w;sz+=w*zr;if(a>A)A=a}
   for(const n of gAt(GRID.n,x,y)){if(!n.pr)continue;const dd=Math.hypot(x-n.x,y-n.y)-n.pr;if(dd<0.6)under=Math.min(under,n.z-0.12);const a=1-smooth01(0.6,30,dd);if(a<=0)continue;const w=a*a*a+1e-4;sw+=w;sz+=w*n.z;if(a>A)A=a}
   const z=sw>0?base+(sz/sw-0.1-base)*A:base;return Math.min(z,under)}
 // embankments up to the bridge ramps
@@ -7452,7 +7455,7 @@ const TERR={};
 // the height of the drawn ground (the triangles as rendered) at a point
 function terrDrawn(x,y){const {N,NY,h}=TERR,fx=(x-WORLD.x0)/(WORLD.x1-WORLD.x0)*N,fy=(y-WORLD.y0)/(WORLD.y1-WORLD.y0)*NY,i=Math.floor(fx),j=Math.floor(fy),a=fx-i,b=fy-j,W=N+1;if(i<0||j<0||i>=N||j>=NY)return -9;
   const h00=h[j*W+i],h10=h[j*W+i+1],h01=h[(j+1)*W+i],h11=h[(j+1)*W+i+1];return a+b<=1?h00+(h10-h00)*a+(h01-h00)*b:h11+(h01-h11)*(1-a)+(h10-h11)*(1-b)}
-function terrainMesh(){const N=W2?640:360,X0=WORLD.x0,X1=WORLD.x1,Y0=WORLD.y0,Y1=WORLD.y1,P=[],Nn=[],I=[];const NY=Math.round(N*(Y1-Y0)/(X1-X0));
+function terrainMesh(){const N=W2?800:360,X0=WORLD.x0,X1=WORLD.x1,Y0=WORLD.y0,Y1=WORLD.y1,P=[],Nn=[],I=[];const NY=Math.round(N*(Y1-Y0)/(X1-X0));
   const onPad=(x,y)=>Math.abs(x-PAD.cx)<PAD.rad+8&&Math.abs(y-PAD.cy)<PAD.rad+8&&[[0,0],[7,0],[-7,0],[0,7],[0,-7]].some(([a,b])=>padHit(x+a,y+b));
   const H2=(x,y)=>{if(inCity(x,y)||inExtra(x,y,6)||onPad(x,y))return -0.14;const d=dfAt(x,y);let z=Math.max(d<45?hillZ(x,y)+riverCut(x,y):terrainH(x,y,d),embZ(x,y));z=Math.min(z,cutZ(x,y));if(d<40)z=w2Blend(x,y,z);return z-0.08};
   const H=W2?H2:(x,y)=>{if(inCity(x,y)||inTC(x,y,4)||inExtra(x,y,6)||onPad(x,y))return -0.14;const d=dfAt(x,y);let z=Math.max(d<45?hillZ(x,y)+riverCut(x,y):terrainH(x,y,d),embZ(x,y));
@@ -7958,7 +7961,7 @@ function worldScenery(){W2P.length=0;
       if(!inRoad){if(k){p=[x,y,p[2]]}return p}}return p};
   for(const n of NODES){if(n.kind!=="x")continue;const rX=Math.max(...n.legs.map(l=>l.r));
     for(const l of n.legs){if(l.e.n<1)continue;const e=l.e,dir=l.end===1?1:-1,lo=loOf(e.n),hi=lo+e.n-1,sideO=lo*LANE-LANE/2-e.side;
-      if(n.ctrl==="signal"){const sF=e.L+rX+1.5,p=offRoad(fpt(e,dir,sF,sideO-1.2),fpt(e,dir,sF,sideO-1.2)[2]),ph=p[2],fx=Math.cos(ph),fy=Math.sin(ph),gz=SZ(p[0],p[1]);
+      if(n.ctrl==="signal"){const sF=e.L+rX+1.5,p=offRoad(fpt(e,dir,sF,sideO-1.2),fpt(e,dir,sF,sideO-1.2)[2]),ph=p[2],fx=Math.cos(ph),fy=Math.sin(ph),gz=Math.max(SZ(p[0],p[1]),n.z||0);
         // galvanised steel pole on a base plate, a tapered mast arm reaching out over the lanes
         tubeInto(sigPole,[p[0],p[1],gz],[p[0],p[1],gz+7.4],0.17,0.12,12);B(sigPole,p[0],p[1],gz,0.06,0.55,0.55,ph);B(sigPole,p[0],p[1],gz+7.4,0.05,0.27,0.27,ph);collAdd({t:"c",x:p[0],y:p[1],r:0.2});
         const tip=fpt(e,dir,sF,hi*LANE+0.9);tubeInto(sigPole,[p[0],p[1],gz+6.45],[tip[0],tip[1],gz+6.75],0.12,0.065,10);
@@ -7978,9 +7981,9 @@ function worldScenery(){W2P.length=0;
           SIGH.push({t:"ped",x:px-fx*0.135,y:py-fy*0.135,h:ph,z:pz,n,g:l.grp})}}
       else if(n.rbt&&!l.major&&n.rbt.cul){}
       else if(n.rbt&&!l.major){const s=e.L-l.r-2.4,p=fpt(e,dir,s,sideO-0.9),gz=SZ(p[0],p[1]);B(post,p[0],p[1],gz,2.1,0.08,0.08);collAdd({t:"c",x:p[0],y:p[1],r:0.08});const hF=p[2]+Math.PI;octInto(stopR,p[0],p[1],gz+2.35,hF,0.52,0.04,3,-Math.PI/2);octInto(signW,p[0]+Math.cos(hF)*0.03,p[1]+Math.sin(hF)*0.03,gz+2.35,hF,0.3,0.02,3,-Math.PI/2)}
-      else if(n.ctrl==="allstop"||(n.ctrl==="minor"&&!l.major)){const s=e.L-l.r-1.4,p=fpt(e,dir,s,sideO-0.9);B(post,p[0],p[1],0,2.1,0.08,0.08);collAdd({t:"c",x:p[0],y:p[1],r:0.08});
-        const hF=p[2]+Math.PI;octInto(stopR,p[0],p[1],2.45,hF,0.42,0.04);const fx=Math.cos(hF)*0.025,fy=Math.sin(hF)*0.025;
-        boxInto(signW,p[0]+fx,2.45,-(p[1]+fy),0.02,0.1,0.5,p[2]);if(n.ctrl==="allstop")boxInto(signW,p[0]+fx,1.9,-(p[1]+fy),0.02,0.2,0.5,p[2])}}}
+      else if(n.ctrl==="allstop"||(n.ctrl==="minor"&&!l.major)){const s=e.L-l.r-1.4,p=fpt(e,dir,s,sideO-0.9),gz=W2?(e.hz?ez(e,dir>0?s:e.L-s):0):0;B(post,p[0],p[1],gz,2.1,0.08,0.08);collAdd({t:"c",x:p[0],y:p[1],r:0.08});
+        const hF=p[2]+Math.PI;octInto(stopR,p[0],p[1],gz+2.45,hF,0.42,0.04);const fx=Math.cos(hF)*0.025,fy=Math.sin(hF)*0.025;
+        boxInto(signW,p[0]+fx,gz+2.45,-(p[1]+fy),0.02,0.1,0.5,p[2]);if(n.ctrl==="allstop")boxInto(signW,p[0]+fx,gz+1.9,-(p[1]+fy),0.02,0.2,0.5,p[2])}}}
   for(const S of SIGNS){const e=S.e,lo=loOf(e.n);let o=lo*LANE-LANE/2-e.side-(e.T.z==="c"?1.6:2.2);for(let k=0;k<30;k++){const q=fpt(e,S.dir,S.s,o);if(!inRoadAt(q[0],q[1]))break;o-=0.5}const p=TE(signK,e,S.dir,S.s,o,0,2.15,0.08,0.08);collAdd({t:"c",x:p[0],y:p[1],r:0.1});
     const T=(m,s,oo,z0,h,ls,lo_)=>TE(m,e,S.dir,s,oo,z0,h,ls,lo_),s=S.s;
     T(signK,s,o,1.97,1.02,0.05,0.8);T(signW,s-0.035,o,2.01,0.94,0.02,0.72);T(signK,s-0.05,o,2.76,0.065,0.01,0.52);T(signK,s-0.05,o,2.63,0.065,0.01,0.44);
