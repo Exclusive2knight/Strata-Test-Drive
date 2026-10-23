@@ -18,4 +18,4 @@ async def main():
         return `draws ${(S.dc/5)|0}/frame · tris ${(S.tri/5/1000).toFixed(0)}k · bufferData ${(S.buf/5).toFixed(0)} (${(S.bufB/5/1024).toFixed(0)} KB) · tex uploads ${(S.tex/5).toFixed(1)} (${(S.texPx/5/1e6).toFixed(2)} Mpx) · quality ${G().label} res ${G().res} · cpu+gpu ${T.toFixed(0)} ms`+top})()""")
       print(scen,":",r);await pg.close()
     await b.close()
-asyncio.run(main())
+if __name__=="__main__":asyncio.run(main())

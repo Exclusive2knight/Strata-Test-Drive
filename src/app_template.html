@@ -7646,8 +7646,8 @@ function applyVehicle(T){const M=T&&T.model&&MODELS[T.model];
   if(typeof CLU!=="undefined"){if(VEH.clu&&!/^ex30/.test((TRIMS[st.trim]||{}).model||"")){const f=fitQuad(VEH.clu,CLU.W/CLU.H);CLU_BL=f.bl;CLU_BR=f.br;CLU_TL=f.tl;
     SCN.cluQuad=meshFrom([...CLU_BL,...CLU_BR,...CLU_BR.map((v,i)=>v+CLU_TL[i]-CLU_BL[i]),...CLU_TL],[0,0,1,0,0,1,0,0,1,0,0,1],[0,1,2,0,2,3])}else CLU_BL=null}}
 function bind(o){gl.bindBuffer(gl.ARRAY_BUFFER,o.p);gl.enableVertexAttribArray(aP);gl.vertexAttribPointer(aP,3,gl.FLOAT,false,0,0);
-  gl.bindBuffer(gl.ARRAY_BUFFER,o.n);gl.enableVertexAttribArray(aN);gl.vertexAttribPointer(aN,3,gl.FLOAT,false,0,0);
-  if(aC>=0){if(o.cb){gl.bindBuffer(gl.ARRAY_BUFFER,o.cb);gl.enableVertexAttribArray(aC);gl.vertexAttribPointer(aC,3,gl.FLOAT,false,0,0)}else if(bind.col!==false){gl.disableVertexAttribArray(aC);gl.vertexAttrib3f(aC,1,1,1)}bind.col=!!o.cb}
+  gl.bindBuffer(gl.ARRAY_BUFFER,o.n);gl.enableVertexAttribArray(aN);if(o.n8)gl.vertexAttribPointer(aN,3,gl.BYTE,true,4,0);else gl.vertexAttribPointer(aN,3,gl.FLOAT,false,0,0);
+  if(aC>=0){if(o.cb){gl.bindBuffer(gl.ARRAY_BUFFER,o.cb);gl.enableVertexAttribArray(aC);if(o.c8)gl.vertexAttribPointer(aC,3,gl.UNSIGNED_BYTE,true,4,0);else gl.vertexAttribPointer(aC,3,gl.FLOAT,false,0,0)}else if(bind.col!==false){gl.disableVertexAttribArray(aC);gl.vertexAttrib3f(aC,1,1,1)}bind.col=!!o.cb}
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,o.i)}
 function mat(c,e,sp,shin,a,pat){gl.uniform3fv(U.uC,c);gl.uniform3fv(U.uE,e||[0,0,0]);gl.uniform1f(U.uSp,sp||0);gl.uniform1f(U.uSh,shin||16);gl.uniform1f(U.uA,a==null?1:a);gl.uniform1f(U.uPat,pat||0)}
 // view culling: big static meshes are split into 320 m tiles at build time; each tile is drawn only if it is inside the view and within sight distance
@@ -8148,23 +8148,39 @@ function propRaw(k){if(!PROPR[k])PROPR[k]=fetch("props/"+k+".json").then(r=>{if(
   for(const ob of Object.values(d.objects)){const p16=b64(ob.p,Int16Array),n8=b64(ob.n,Int8Array),I=b64(ob.i,Uint16Array),P=new Float32Array(p16.length),N=new Float32Array(n8.length);
     for(let i=0;i<p16.length;i++)P[i]=p16[i]/kk;for(let i=0;i<n8.length;i++)N[i]=n8[i]/127;objs.push({P,N,I,g:ob.g})}return {objs,mats:d.mats}}).catch(()=>null);return PROPR[k]}
 let W2P_BUSY=false;
-async function w2PropsBuild(){if(!W2||W2P_BUSY||!W2P.length)return;W2P_BUSY=true;
+async function w2PropsBuild(onlyTrees){if(!W2||W2P_BUSY||!W2P.length)return;W2P_BUSY=true;const withTrees=!!G().trees;if(onlyTrees)W2L.treeMesh=true;else W2L.treeMesh=withTrees;
   const keys=[...new Set(W2P.map(o=>o.k))],R={};await Promise.all(keys.map(async k=>{R[k]=await propRaw(k)}));
   let COLB=null;try{COLB=await fetch("props/colliders.json").then(r=>r.json())}catch(e){}
-  const BK={m:{P:[],N:[],I:[],C:[]},s:{P:[],N:[],I:[],C:[]},g:{P:[],N:[],I:[],C:[]},t:{P:[],N:[],I:[],C:[]},h:{P:[],N:[],I:[],C:[]}},isHouse=k=>/house|bungalow|duplex|townhouse|farmhouse/.test(k);
-  for(const o of W2P){const M=R[o.k];if(!M)continue;const c=Math.cos(o.a),s=Math.sin(o.a),tree=o.k[0]==="t";
-    for(const ob of M.objs)for(const [mi,start,count] of ob.g){const m=M.mats[mi],B=tree?BK.t:isHouse(o.k)?BK.h:m[3]<0.9?BK.g:m[5]>0.2?BK.s:BK.m,base=B.P.length/3,map=new Map();
-      // shade each copy a little differently so a street of the same model doesn't look stamped
-      const tint=tree?0.85+((o.x*7.13+o.y*3.71)%1+1)%1*0.3:1;
-      for(let q=start;q<start+count;q++){const v=ob.I[q];let j=map.get(v);if(j===undefined){j=B.P.length/3;map.set(v,j);const lx=ob.P[v*3],ly=ob.P[v*3+1],lz=ob.P[v*3+2],nx=ob.N[v*3],ny=ob.N[v*3+1],nz=ob.N[v*3+2];
-          const wx=o.x-s*lx+c*lz,wy=o.y+c*lx+s*lz;B.P.push(wx,o.z+ly,-wy);B.N.push(-s*nx+c*nz,ny,-(c*nx+s*nz));B.C.push(m[0]*tint,m[1]*tint,m[2]*tint)}B.I.push(j)}}
-    // walls you bump into (floors and roofs are left out: you walk on the ground, and nobody drives on a roof)
-    const cb=COLB&&COLB[o.k];if(cb)for(const [cx,cy,cz,sx,sy,sz,nm] of cb){if(sy<0.5&&cy<0.4||/roof/i.test(nm||""))continue;const w=w2Xf(o,cx,cy,cz);
-      collAdd({t:"b",x:w[0],y:w[1],h:o.a+Math.PI/2,hl:sx/2,hw:sz/2,z0:w[2]-sy/2,z1:w[2]+sy/2,what:tree?"a tree":/door/i.test(nm||"")?"a door":"a wall"})}
-    if(tree&&!cb)collAdd({t:"c",x:o.x,y:o.y,r:0.4,what:"a tree"})}
-  const mk=(b,dd)=>{if(!b.I.length)return null;const m=meshFrom(b.P,b.N,b.I,b.C);m.dd=dd;return m};
-  SCN.w2p={m:mk(BK.m,1000),s:mk(BK.s,1000),g:mk(BK.g,600),t:mk(BK.t,450),h:mk(BK.h,620)};W2P_BUSY=false}
-function w2pDraw(night){if(SCN.w2farm){mat([1,1,1],null,0.08,10);draw(SCN.w2farm);if(aC>=0){gl.disableVertexAttribArray(aC);gl.vertexAttrib3f(aC,1,1,1);bind.col=false}}const W=SCN.w2p;if(!W)return;
+  // built map cell by map cell straight into typed arrays (the old way held every vertex of every copy in plain arrays at once: over a gigabyte for a moment,
+  // enough to crash phones), yielding between cells so the game keeps running while it builds
+  const isHouse=k=>/house|bungalow|duplex|townhouse|farmhouse/.test(k),DD={m:1000,s:1000,g:600,t:450,h:620},OUT={m:[],s:[],g:[],t:[],h:[]},CS=220;
+  const cells=new Map();for(const o of W2P){if(!R[o.k])continue;const k=Math.floor(o.x/CS)+","+Math.floor(o.y/CS);let L=cells.get(k);if(!L)cells.set(k,L=[]);L.push(o)}
+  const mkB=()=>({P:new Float32Array(65536*3),N:new Int8Array(65536*4),C:new Uint8Array(65536*4),I:new Uint16Array(98304),nv:0,ni:0,mn:[1e9,1e9,1e9],mx:[-1e9,-1e9,-1e9]});
+  const grow=(B,ni)=>{if(B.ni+ni>B.I.length){const n=new Uint16Array(Math.max(B.I.length*2,B.ni+ni));n.set(B.I.subarray(0,B.ni));B.I=n}};
+  const flush=(key,B)=>{if(!B.ni)return;const m=upload(B.P.slice(0,B.nv*3),B.N.slice(0,B.nv*4),B.I.slice(0,B.ni),B.C.slice(0,B.nv*4)),c=[0,1,2].map(a=>(B.mn[a]+B.mx[a])/2);m.c=c;m.r=Math.hypot(B.mx[0]-c[0],B.mx[1]-c[1],B.mx[2]-c[2]);m.n8=m.c8=true;OUT[key].push(m);
+    B.nv=0;B.ni=0;B.mn=[1e9,1e9,1e9];B.mx=[-1e9,-1e9,-1e9]};
+  const BK={m:mkB(),s:mkB(),g:mkB(),t:mkB(),h:mkB()};let mark=new Int32Array(1),stamp=0;const idx=new Int32Array(65536);let ix=new Int32Array(1);
+  const mk=k=>{const L=OUT[k];if(!L.length)return null;return {chunks:L,count:L.reduce((a,m)=>a+m.count,0),dd:DD[k]}},pub=()=>{if(onlyTrees){if(SCN.w2p)SCN.w2p.t=mk("t");return}SCN.w2p={m:mk("m"),s:mk("s"),g:mk("g"),t:mk("t"),h:mk("h")}};
+  // nearest cells first, and what's built so far shows up straight away
+  const order=[...cells.entries()].map(([k,L])=>{const [i,j]=k.split(",").map(Number);return [Math.hypot((i+0.5)*CS-car.px,(j+0.5)*CS-car.py),L]}).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);let tY=performance.now();
+  for(const L of order){
+    for(const o of L){const M=R[o.k];const c=Math.cos(o.a),s=Math.sin(o.a),tree=o.k[0]==="t",skip=onlyTrees?!tree:tree&&!withTrees,tint=tree?0.85+((o.x*7.13+o.y*3.71)%1+1)%1*0.3:1;
+      if(!skip)for(const ob of M.objs){const nV=ob.P.length/3;if(mark.length<nV){mark=new Int32Array(nV);ix=new Int32Array(nV)}
+        for(const [mi,start,count] of ob.g){const m=M.mats[mi],key=tree?"t":isHouse(o.k)?"h":m[3]<0.9?"g":m[5]>0.2?"s":"m";let B=BK[key];
+          if(B.nv+count>65000)flush(key,B);stamp++;grow(B,count);
+          for(let q=start;q<start+count;q++){const v=ob.I[q];if(mark[v]!==stamp){mark[v]=stamp;ix[v]=B.nv;const lx=ob.P[v*3],ly=ob.P[v*3+1],lz=ob.P[v*3+2],nx=ob.N[v*3],ny=ob.N[v*3+1],nz=ob.N[v*3+2],k3=B.nv*3,k4=B.nv*4;
+              const wx=o.x-s*lx+c*lz,wy=o.y+c*lx+s*lz,wz=o.z+ly;B.P[k3]=wx;B.P[k3+1]=wz;B.P[k3+2]=-wy;B.N[k4]=Math.round((-s*nx+c*nz)*127);B.N[k4+1]=Math.round(ny*127);B.N[k4+2]=Math.round(-(c*nx+s*nz)*127);
+              B.C[k4]=Math.min(255,m[0]*tint*255);B.C[k4+1]=Math.min(255,m[1]*tint*255);B.C[k4+2]=Math.min(255,m[2]*tint*255);B.nv++;
+              if(wx<B.mn[0])B.mn[0]=wx;if(wz<B.mn[1])B.mn[1]=wz;if(-wy<B.mn[2])B.mn[2]=-wy;if(wx>B.mx[0])B.mx[0]=wx;if(wz>B.mx[1])B.mx[1]=wz;if(-wy>B.mx[2])B.mx[2]=-wy}
+            B.I[B.ni++]=ix[v]}}}
+      // walls you bump into (floors and roofs are left out: you walk on the ground, and nobody drives on a roof)
+      if(onlyTrees)continue;const cb=COLB&&COLB[o.k];if(cb)for(const [cx,cy,cz,sx,sy,sz,nm] of cb){if(sy<0.5&&cy<0.4||/roof/i.test(nm||""))continue;const w=w2Xf(o,cx,cy,cz);
+        collAdd({t:"b",x:w[0],y:w[1],h:o.a+Math.PI/2,hl:sx/2,hw:sz/2,z0:w[2]-sy/2,z1:w[2]+sy/2,what:tree?"a tree":/door/i.test(nm||"")?"a door":"a wall"})}
+      if(tree&&!cb)collAdd({t:"c",x:o.x,y:o.y,r:0.4,what:"a tree"})}
+    for(const k in BK)flush(k,BK[k]);
+    if(performance.now()-tY>14){pub();await new Promise(r=>setTimeout(r,0));tY=performance.now()}}
+  pub();W2P_BUSY=false}
+function w2pDraw(night){if(SCN.w2farm){mat([1,1,1],null,0.08,10);draw(SCN.w2farm);if(aC>=0){gl.disableVertexAttribArray(aC);gl.vertexAttrib3f(aC,1,1,1);bind.col=false}}const W=SCN.w2p;if(!W)return;if(G().trees&&!W2L.treeMesh&&!W2P_BUSY)w2PropsBuild(true);
   if(W.m){mat([1,1,1],null,0.15,20);draw(W.m)}if(W.s){mat([1,1,1],null,0.45,50);draw(W.s)}
   if(W.h){mat([1,1,1],null,0.25,30);draw(W.h)}if(W.g){mat([1,1,1],night?[0.05,0.045,0.03]:null,1.2,90);draw(W.g)}if(W.t&&G().trees){mat([1,1,1],null,0.06,8);draw(W.t)}
   if(aC>=0){gl.disableVertexAttribArray(aC);gl.vertexAttrib3f(aC,1,1,1);bind.col=false}}
@@ -8339,7 +8355,7 @@ function worldScenery(){W2P.length=0;
   // ---- countryside: trees on the hills, farmhouses
   let nt=0;const NT=W2?4200:1300;for(let n=0;n<(W2?32000:9000)&&nt<NT;n++){const x=WORLD.x0+r()*(WORLD.x1-WORLD.x0),y=WORLD.y0+r()*(WORLD.y1-WORLD.y0);if(cityW(x,y)>0.05||riverD(x,y)<RIVER.w/2+10||inTC(x,y,25)||orNoTree(x,y)||W2&&inFarm(x,y,12))continue;const d=dfAt(x,y);if(d<16)continue;
     if(d<40&&!clear(x,y,12))continue;if(Math.hypot(x-PAD.cx,y-PAD.cy)<90)continue;if(tree.P.length/3>200000)break;
-    if(W2&&Math.hypot(x-W2C.MT[0],y-W2C.MT[1])<1150){if(W2P.length<4000&&w2Free(x,y,4)){w2Put(r()<0.6?"t_pine_tall":"t_pine_small",x,y,r()*6.28,terrainH(x,y,d)-0.25);nt++}continue}
+    if(W2&&Math.hypot(x-W2C.MT[0],y-W2C.MT[1])<1150){if(W2P.length<4000&&r()<0.55&&w2Free(x,y,4)){w2Put(r()<0.6?"t_pine_tall":"t_pine_small",x,y,r()*6.28,terrainH(x,y,d)-0.25);nt++}continue}
     if(r()<0.55&&d>30){const cx=x,cy=y;for(let k=0;k<4;k++){const tx=cx+(r()-0.5)*30,ty=cy+(r()-0.5)*30;if(dfAt(tx,ty)<14||riverD(tx,ty)<RIVER.w/2+8||orNoTree(tx,ty)||W2&&inFarm(tx,ty,6))continue;treeAt(tx,ty,terrainH(tx,ty,dfAt(tx,ty))-0.3,true);nt++;if(dfAt(tx,ty)<40||inOR(tx,ty))collAdd({t:"c",x:tx,y:ty,r:0.35})}}
     else{treeAt(x,y,terrainH(x,y,d)-0.3,true);nt++;if(d<40||inOR(x,y))collAdd({t:"c",x,y,r:0.35})}}
   for(let n=0;n<(W2?900:400);n++){const x=WORLD.x0+r()*(WORLD.x1-WORLD.x0),y=WORLD.y0+r()*(WORLD.y1-WORLD.y0);if(cityW(x,y)>0.05||riverD(x,y)<RIVER.w/2+20||inTC(x,y,40)||inOR(x,y,40)||W2&&inFarm(x,y,15))continue;const d=dfAt(x,y);if(d<45||d>160)continue;
