@@ -1,4 +1,4 @@
-import asyncio,sys,json
+import asyncio,sys,json,os
 from playwright.async_api import async_playwright
 # usage: multi.py out_prefix '[["name","x,y,h","yaw,pitch,dist",cam,"extraJS"],...]'
 async def main():
@@ -6,7 +6,7 @@ async def main():
   async with async_playwright() as p:
     b=await p.chromium.launch(args=["--use-gl=angle","--use-angle=swiftshader","--enable-unsafe-swiftshader"])
     pg=await b.new_page(viewport={"width":1000,"height":560});errs=[];pg.on("pageerror",lambda e:errs.append(str(e)))
-    await pg.goto("http://127.0.0.1:8765/dev.html",wait_until="domcontentloaded",timeout=120000);await pg.wait_for_function("document.getElementById('boot').hidden",timeout=120000)
+    await pg.goto("http://127.0.0.1:8765/dev.html"+os.environ.get("Q",""),wait_until="domcontentloaded",timeout=120000);await pg.wait_for_function("document.getElementById('boot').hidden",timeout=120000)
     await pg.evaluate("document.getElementById('maint').hidden=true");await pg.click("#newsGo");await pg.evaluate("st.cfgStep='color';st.cfgTab='fin'");await pg.click("#go");await pg.wait_for_timeout(800)
     await pg.add_style_tag(content="#u2msg,.toast,#toast,#hud,#spawnPop{display:none!important}")
     for n,pos,lk,cam,ex in SH:

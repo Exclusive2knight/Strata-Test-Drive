@@ -1702,7 +1702,11 @@ const RT={
   // unpaved: graded gravel with washboard ripples, wheel ruts and potholes
   dirt:{n:1,m:0,shR:0.5,lim:25,z:"r",rank:1,col:"d",dirt:true,label:"Gravel road"},
   // narrow paved country lane, no lines, cars pass close
-  lane:{n:1,m:-1.2,shR:0,lim:30,z:"r",rank:1,col:"h",label:"Country lane"}};
+  lane:{n:1,m:-1.2,shR:0,lim:30,z:"r",rank:1,col:"h",label:"Country lane"},
+  // one-way, one-lane ring of a roundabout (traffic goes round anticlockwise; it has priority, everyone entering yields)
+  rbt:{n:1,m:-LANE,shR:1.2,lim:20,z:"c",rank:7,col:"h",kerb:true,edgeL:true,label:"Roundabout",ow:true}};
+// the new world is being built behind this switch: add ?world=2 to the address to drive it (Halden stays the default until it is finished)
+const W2=(()=>{try{return /[?&]world=2\b/.test(location.search)}catch(e){return false}})();
 const NODES=[], EDGES=[];let BUILD_IC=[];
 function N(x,y,o){for(const n of NODES)if(Math.abs(n.x-x)<1&&Math.abs(n.y-y)<1){if(o)Object.assign(n,o);return n}
   const n=Object.assign({i:NODES.length,x,y,ctrl:null,kind:null,E:[]},o||{});NODES.push(n);return n}
@@ -1745,8 +1749,180 @@ const endNode=(e,dir)=>dir>0?e.b:e.a, startNode=(e,dir)=>dir>0?e.a:e.b;
 const rEnd=(e,dir)=>dir>0?e.r1:e.r0, rStart=(e,dir)=>dir>0?e.r0:e.r1;
 const laneOff=(e,i)=>(loOf(e.n)+i)*LANE;
 
+// ---- the new world's hills: Mount Kestrel (260 m), rolling country round Millbrook, gentle swells in the farmland
+const HILLS2=[[-3300,2500,260,650],[1150,2950,28,220],[2950,3350,34,250],[3750,2550,26,220],[700,2750,22,200],[1900,-750,16,250],[3750,800,18,300],[-3050,-600,20,300],
+  [1700,-2750,14,400],[-1550,-2900,16,400],[3400,-2850,14,350],[-1500,2700,30,260],[-4300,-700,18,280]];
+// water: the Clearwater River through Westport, Mill Creek out of Millbrook Lake down to the river
+const W2_WATER=[{k:"river",name:"Clearwater River",w:64,bh:5.2,rp:125,pts:[[-700,3700],[-450,2900],[-250,2100],[-300,1300],[-180,700],[-220,0],[-150,-700],[-60,-1300],[150,-2000],[450,-2800],[700,-3700]]},
+  {k:"river",name:"Mill Creek",w:12,bh:2.6,rp:60,pts:[[2150,2620],[2050,2520],[2000,2400],[1900,2280],[1700,2200],[1400,2160],[1000,2140],[600,1920],[200,1720],[-280,1640]]},
+  {k:"lake",name:"Millbrook Lake",x:2350,y:2750,rx:300,ry:180}];
+for(const B of W2_WATER){if(B.k==="lake"){B.bb=[B.x-B.rx,B.x+B.rx,B.y-B.ry,B.y+B.ry];continue}const xs=B.pts.map(p=>p[0]),ys=B.pts.map(p=>p[1]);B.bb=[Math.min(...xs)-B.w,Math.max(...xs)+B.w,Math.min(...ys)-B.w,Math.max(...ys)+B.w]}
+// distance from a water body's edge (negative inside it)
+function w2BodyD(B,x,y){if(B.k==="lake"){const q=Math.hypot((x-B.x)/B.rx,(y-B.y)/B.ry);return (q-1)*Math.min(B.rx,B.ry)}let d=1e9;const P=B.pts;
+  for(let i=0;i<P.length-1;i++){const a=P[i],b=P[i+1],dx=b[0]-a[0],dy=b[1]-a[1],t=clamp(((x-a[0])*dx+(y-a[1])*dy)/(dx*dx+dy*dy),0,1),dd=Math.hypot(x-a[0]-dx*t,y-a[1]-dy*t);if(dd<d)d=dd}return d-B.w/2}
+function w2WaterD(x,y,m=200){let d=1e9;for(const B of W2_WATER){const b=B.bb;if(x<b[0]-m||x>b[1]+m||y<b[2]-m||y>b[3]+m)continue;d=Math.min(d,w2BodyD(B,x,y))}return d}
+// ======================================================================= THE NEW WORLD (in progress; open with ?world=2 to try it)
+// Westport (downtown, the river, the parking garage), Fairhaven (the second city, shops, suburbs), Millbrook (an old small town by a lake),
+// Mount Kestrel (switchbacks and a pass road), farmland, and two interstates: I-38 east-west and I-61 north-south, crossing at a cloverleaf.
+// Cross streets ride over the freeways on raised bridges, so the ramps really climb up to them.
+const W2C={MT:[-3300,2500],FH:[2600,0],MB:[1750,2450],CL:[-2300,-1500],CLH:8};
+const W2_MTN=[];   // the mountain roads: their heights are smoothed along the road (see w2Profiles)
+const W2_RB=[];
+function buildNet2(){
+  // ---- roundabouts: where several roads meet out of town. Roads given through one of these centres stop at the ring instead
+  for(const [x,y,R] of [[-1000,1500,26],[-1000,-2400,24],[1000,-2400,24],[2600,-2400,24],[-3600,-2400,24],[4000,-2400,24],[-3600,1000,24],[-4252,3050,24],[2750,2700,22],[1900,2900,22],[4000,0,24],[-1000,-3300,22]])W2_RB.push({x,y,R,legs:[]});
+  const rbAt=p=>p.length===2&&W2_RB.find(b=>Math.abs(b.x-p[0])<1&&Math.abs(b.y-p[1])<1);
+  const ringPt=(b,q)=>{const a=Math.atan2(q[1]-b.y,q[0]-b.x),p=[Math.round((b.x+Math.cos(a)*b.R)*100)/100,Math.round((b.y+Math.sin(a)*b.R)*100)/100];b.legs.push({a,p});return p};
+  const mkRoad0=mkRoad,far=(b,q)=>Math.hypot(q[0]-b.x,q[1]-b.y)>b.R+18;
+  const mkR=(type,name,pts,o)=>{let cur=[];for(let i=0;i<pts.length;i++){const p=pts[i],b=rbAt(p);if(!b){cur.push(p);continue}
+      if(cur.length){while(cur.length>1&&!far(b,cur[cur.length-1]))cur.pop();const q=cur[cur.length-1];if(q.length>2)cur[cur.length-1]=q.slice(0,2);cur.push(ringPt(b,cur[cur.length-1]));mkRoad0(type,name,cur,o)}
+      cur=[];if(i<pts.length-1){let k=i+1;while(k<pts.length-1&&!far(b,pts[k]))k++;i=k-1;cur=[ringPt(b,pts[k])]}}
+    if(cur.length>1)mkRoad0(type,name,cur,o)};
+  const ZX=7.2;     // how high a cross street climbs to bridge a freeway at a diamond interchange
+  // ---- a diamond interchange on a straight freeway: c centre, F freeway direction. Signals where the ramps meet the raised cross street
+  const mkIC=(c,F,Ld,Dt,name)=>{const I={c,F,Ld,Dt:[Dt,Dt],name};const [cx,cy]=c,[fx,fy]=F,nx=-fy,ny=fx;
+    I.P=(u,t,r)=>{const p=[Math.round((cx+fx*u+nx*t)*100)/100,Math.round((cy+fy*u+ny*t)*100)/100];if(r)p.push(r);return p};
+    for(const u of [-Ld,Ld])N(...I.P(u,0),{ctrl:"merge"});I.T=sg=>sg<0?-I.Dt[0]:I.Dt[1];for(const sg of [-1,1])N(...I.P(0,I.T(sg)),{ctrl:"signal",zo:ZX});return I};
+  const icRamps=I=>{for(const d of [1,-1]){const sg=-d,L=I.Ld,Tt=I.T(sg),Ta=Math.abs(Tt),uS=Math.min(110,L-310),uP=Math.max(uS+90,L-205);
+    E("ramp",I.name+" exit",[I.P(-d*L,0),I.P(-d*(L-80),sg*20.6),I.P(-d*(L-150),sg*23.75),I.P(-d*uP,sg*24.1,90),I.P(-d*uS,sg*Ta*0.5,90),I.P(-d*30,Tt,40),I.P(0,Tt)]);
+    E("ramp",I.name+" entrance",[I.P(0,Tt),I.P(d*30,Tt,40),I.P(d*uS,sg*Ta*0.5,90),I.P(d*uP,sg*24.1,90),I.P(d*(L-150),sg*23.75),I.P(d*(L-80),sg*20.6),I.P(d*L,0)])}};
+  const icN=(I,u)=>I.P(u*I.Ld,0);
+  const I38=[mkIC([-3600,-1500],[1,0],420,150,"County Rd 3"),mkIC([-1000,-1500],[1,0],420,150,"Woodward Ave"),mkIC([1000,-1500],[1,0],420,150,"Maple Rd"),mkIC([2600,-1500],[1,0],420,150,"Fairhaven Blvd")];
+  const I61=[mkIC([-2300,0],[0,1],420,150,"Main St"),mkIC([-2300,1500],[0,1],420,150,"Kestrel Rd")];
+  // ---- the cloverleaf: I-61 rides over I-38 on a bridge. In each quarter a loop ramp (left turns) and an outer ramp (right turns).
+  // Loops leave 50 m past the bridge and join 85 m before it; the outer ramps leave 700 m out and join 730 m out
+  const [ccx,ccy]=W2C.CL,CLD={dX:50,dM:85,dOX:700,dOM:730,Rl:121,Dd:480};
+  const zB=d=>W2C.CLH*(1-smooth01(150,460,Math.abs(d)));     // I-61's height near the crossing
+  for(const d of [CLD.dX,CLD.dM,CLD.dOX,CLD.dOM])for(const sg of [1,-1]){N(ccx+sg*d,ccy,{ctrl:"merge"});N(ccx,ccy+sg*d,{ctrl:"merge",zo:zB(d)})}
+  const nA=d=>[ccx+d,ccy],nB=d=>[ccx,ccy+d];
+  // ---- I-38: west end at County Rd 1, east end at County Rd 11 (at-grade signals where the freeway ends)
+  N(-4400,-1500,{ctrl:"signal"});N(4500,-1500,{ctrl:"signal"});
+  mkR("xway","I-38",[[-4400,-1500],icN(I38[0],-1),icN(I38[0],1),nA(-CLD.dOM),nA(-CLD.dOX),nA(-CLD.dM),nA(-CLD.dX),nA(CLD.dX),nA(CLD.dM),nA(CLD.dOX),nA(CLD.dOM),
+    icN(I38[1],-1),icN(I38[1],1),icN(I38[2],-1),icN(I38[2],1),icN(I38[3],-1),icN(I38[3],1),[4500,-1500]]);
+  N(-2300,-3300,{ctrl:"signal"});N(-2300,3000,{ctrl:"signal"});
+  mkR("xway","I-61",[[-2300,-3300],nB(-CLD.dOM),nB(-CLD.dOX),nB(-CLD.dM),nB(-CLD.dX),nB(CLD.dX),nB(CLD.dM),nB(CLD.dOX),nB(CLD.dOM),
+    icN(I61[0],-1),icN(I61[0],1),icN(I61[1],-1),icN(I61[1],1),[-2300,3000]]);
+  for(const I of [...I38,...I61])icRamps(I);
+  // the ramps of the cloverleaf: quarter (sx, sy); P is the freeway coming in towards the crossing there, Q the one leaving
+  const NM={A:["I-38","I-38"],B:["I-61","I-61"]},dirName=v=>v[0]>0.5?"E":v[0]<-0.5?"W":v[1]>0.5?"N":"S";
+  for(const sx of [1,-1])for(const sy of [1,-1]){const AinP=sx===sy,ex=[1,0],ey=[0,1];
+    const Fi=AinP?[-sx,0]:[0,-sy],Fo=AinP?[0,sy]:[sx,0],c=[ccx,ccy];
+    const W=(a,b,r)=>{const p=[Math.round((c[0]+Fo[0]*a-Fi[0]*b)*100)/100,Math.round((c[1]+Fo[1]*a-Fi[1]*b)*100)/100];if(r)p.push(r);return p};   // a along Fo, b along -Fi
+    const Pn=AinP?"I-38":"I-61",Qn=AinP?"I-61":"I-38",{dX,dM,dOX,dOM,Rl,Dd}=CLD,o=24.1+2*Rl;
+    // loop: off Q just past the bridge, round 270 degrees to the right, onto P just before the bridge
+    E("ramp",`${Qn} ${dirName(Fo)} to ${Pn} ${dirName(Fi)}`,[W(dX,0),W(dX+35,20.6),W(dX+60,23.75),W(o,24.1,Rl),W(o,o,Rl),W(24.1,o,Rl),W(23.75,dM+60),W(20.6,dM+35),W(0,dM)]);
+    // outer ramp: off P well before the crossing, round the outside of the loop, onto Q well after it
+    E("ramp",`${Pn} ${dirName(Fi)} to ${Qn} ${dirName(Fo)}`,[W(0,dOX),W(20.6,dOX-80),W(23.75,dOX-150),W(24.1,Dd,150),W(Dd,24.1,150),W(dOM-150,23.75),W(dOM-80,20.6),W(dOM,0)])}
+  // ---- Westport downtown: 9 x 7 blocks of 150 m. The parking garage sits between Cass Ave and Park Ave, Jefferson Ave and Fort St
+  const DX=[-1600,-1450,-1300,-1150,-1000,-850,-700,-550,-400],DY=[-450,-300,-150,0,150,300,450];
+  const DXN=["1st St","2nd St","3rd St","Griswold St","Woodward Ave","Cass Ave","Park Ave","Brush St","River St"],DYN=["Grand Ave","Jefferson Ave","Fort St","Main St","Congress St","Lafayette Ave","Michigan Ave"];
+  for(const x of DX)for(const y of DY){const sig=y===0||x===-850||x===-1000||(Math.abs(y)<=150&&x>-1600&&x<-400)||(Math.abs(y)===300&&[-1600,-1300,-700,-400].includes(x));N(x,y,{ctrl:sig?"signal":"allstop"})}
+  DY.forEach((y,j)=>mkR(j%2===1||y===0?"ave":"st",DYN[j],DX.map(x=>[x,y])));
+  DX.forEach((x,i)=>mkR(x===-1000||x===-850?"ave":"st",DXN[i],DY.map(y=>[x,y])));
+  // Main St west to I-61 (it becomes Grand River Ave), east over the Clearwater River (it becomes Commerce Pkwy to Fairhaven)
+  mkR("ave","Main St",[[-1600,0],[-1890,0]],{lim:35});
+  mkR("art","Grand River Ave",[[-1890,0],[-2150,0],[-2450,0],[-2710,0]]);
+  mkR("road","Grand River Ave",[[-2710,0],[-3600,0],[-4400,0]],{lim:50});
+  mkR("art","Main St",[[-400,0],[100,0]],{lim:35});
+  mkR("art","Jefferson Ave",[[-400,-300],[100,-300]],{lim:35});
+  mkR("art","Lafayette Ave",[[-400,300],[100,300]],{lim:35});
+  for(const y of [-300,0,300])N(100,y,{ctrl:"signal"});
+  mkR("art","Commerce Pkwy",[[100,0],[500,0],[1000,0],[1700,0],[2300,0]],{lim:45});
+  for(const x of [500,1000,1700])N(x,0,{ctrl:"signal"});
+  // Woodward Ave: south to I-38 and on into the farmland as County Rd 15; north to Kestrel Rd
+  mkR("art","Woodward Ave",[[-1000,-450],[-1000,-1090],[-1000,-1350],[-1000,-1650],[-1000,-1910]],{lim:45});
+  mkR("road","County Rd 15",[[-1000,-1910],[-1000,-2400],[-1000,-3300]],{lim:55});
+  mkR("ave","Woodward Ave",[[-1000,450],[-1000,800]],{lim:35});
+  mkR("road","Woodward Ave",[[-1000,800],[-1000,1000],[-1000,1500]],{lim:45});
+  // ---- the east bank: Riverside Dr, Rosedale (north) and Birch Park (south) subdivisions
+  mkR("col","Riverside Dr",[[100,-850],[100,-650],[100,-450],[100,-300],[100,0],[100,300],[100,450],[100,650],[100,850],[100,1050]]);
+  const SX=[100,300,500,700,900],SXN=["Hazel Ln","Poplar Ln","Spruce Ln","Walnut Ln"];
+  {const SY=[450,650,850,1050],RN=["Rosedale Ave","Ardmore St","Kendall St","Linwood Ave"];SY.forEach((y,j)=>mkR("res",RN[j],SX.map(x=>[x,y])));SX.slice(1).forEach((x,i)=>mkR("res",SXN[i],SY.map(y=>[x,y])))}
+  {const SY=[-450,-650,-850],RN=["Birch St","Cedar St","Willow St"];SY.forEach((y,j)=>mkR("res",RN[j],SX.map(x=>[x,y])));SX.slice(1).forEach((x,i)=>mkR("res",SXN[i],SY.map(y=>[x,y])))}
+  mkR("col","Poplar Ln",[[500,-450],[500,0],[500,450]]);
+  mkR("res","Cedar St",[[900,-650],[1000,-650]]);
+  // ---- Maple Rd and the county roads: a mile-ish grid of 55 mph roads through the farmland
+  mkR("road","Maple Rd",[[1000,0],[1000,-650],[1000,-1090]],{lim:45});
+  mkR("art","Maple Rd",[[1000,-1090],[1000,-1350],[1000,-1650],[1000,-1910]],{lim:45});
+  mkR("road","Maple Rd",[[1000,-1910],[1000,-2400],[1000,-3300]],{lim:55});
+  mkR("road","County Rd 3",[[-3600,-3300],[-3600,-2400],[-3600,-1910]],{lim:55});
+  mkR("art","County Rd 3",[[-3600,-1910],[-3600,-1650],[-3600,-1350],[-3600,-1090]],{lim:45});
+  mkR("road","County Rd 3",[[-3600,-1090],[-3600,0],[-3600,1000],[-4100,1800,300],[-4252,3050]],{lim:50});
+  mkR("road","County Rd 1",[[-4400,-3300],[-4400,-2400],[-4400,-1500],[-4400,0]],{lim:55});
+  mkR("road","County Rd 11",[[4500,-3300],[4500,-2400],[4500,-1500],[4500,0]],{lim:55});
+  mkR("road","County Rd 9",[[4000,-3300],[4000,-2400],[4000,0],[4000,1500,300],[3300,2300,300],[2750,2700]],{lim:55});
+  mkR("road","County Rd 30",[[-4400,-2400],[-3600,-2400],[-1000,-2400],[1000,-2400],[2600,-2400],[3300,-2400],[4000,-2400],[4500,-2400]],{lim:55});
+  mkR("road","County Rd 40",[[-4400,-3300],[-3600,-3300],[-2300,-3300],[-1000,-3300],[-300,-3300],[1000,-3300],[2600,-3300],[3300,-3300],[4000,-3300],[4500,-3300]],{lim:55});
+  mkR("dirt","Quarry Rd",[[-1000,-3300],[-1000,-3480,60],[-300,-3480,60],[-300,-3300]]);
+  mkR("dirt","Gravel Pit Rd",[[3300,-2400],[3380,-2850,120],[3300,-3300]]);
+  // ---- Fairhaven: a small grid of 150 m blocks, Commerce Pkwy in from the west (the shops), Oakridge subdivision to the north
+  const FX=[2300,2450,2600,2750,2900],FY=[-300,-150,0,150,300],FXN=["Front St","Market St","Fairhaven Blvd","Elm St","Oak St"],FYN=["South St","Bank St","Main St","Court St","North St"];
+  for(const x of FX)for(const y of FY)N(x,y,{ctrl:y===0||x===2600?"signal":"allstop"});
+  FY.forEach((y,j)=>mkR(y===0?"ave":"st",FYN[j],FX.map(x=>[x,y]),{lim:25}));
+  FX.forEach((x,i)=>mkR(x===2600?"ave":"st",FXN[i],FY.map(y=>[x,y]),{lim:25}));
+  mkR("road","Route 20",[[2900,0],[4000,0],[4500,0]],{lim:50});
+  mkR("art","Fairhaven Blvd",[[2600,-300],[2600,-1090],[2600,-1350],[2600,-1650],[2600,-1910]],{lim:40});
+  mkR("road","County Rd 22",[[2600,-1910],[2600,-2400],[2600,-3300]],{lim:55});
+  {const OX=[2300,2600,2900,3200],OY=[600,800,1000,1200],ON=["Oakridge Dr","Laurel St","Chestnut St","Hickory Ln"],OXN=["Fox Run","Fairhaven Blvd","Deer Path","Quail Ct"];
+    OY.forEach((y,j)=>mkR("res",ON[j],OX.map(x=>[x,y])));OX.forEach((x,i)=>mkR("res",OXN[i],OY.map(y=>[x,y])));mkR("col","Fairhaven Blvd",[[2600,300],[2600,600]])}
+  // ---- Millbrook: Mill St, a few side streets, Lakeshore Dr round the lake, Old Mill Rd south over the creek, Route 9 west to Westport
+  mkR("st","Mill St",[[1450,2450],[1600,2450],[1750,2450],[1900,2450],[2100,2450]],{lim:25});
+  mkR("st","Church St",[[1600,2300],[1600,2450],[1600,2650]],{lim:25});
+  mkR("st","School St",[[1750,2300],[1750,2450],[1750,2650]],{lim:25});
+  mkR("res","Pine St",[[1900,2450],[1900,2650]]);
+  mkR("res","Water St",[[1600,2300],[1750,2300]]);
+  mkR("res","Hill St",[[1600,2650],[1750,2650],[1900,2650]]);
+  mkR("lane","Lakeshore Dr",[[2100,2450],[2500,2500,150],[2750,2700]],{lim:30});
+  mkR("lane","Lakeshore Dr",[[2750,2700],[2700,3000,150],[2300,3050,150],[1900,2900]],{lim:30});
+  mkR("lane","Lakeshore Dr",[[1900,2900],[1900,2650]],{lim:30});
+  mkR("lane","Old Mill Rd",[[1600,2300],[1580,1900,150],[1200,1500,200],[900,1250,150],[900,1050]],{lim:35});
+  mkR("road","Route 9",[[-1000,1500],[-760,1640,180],[-520,1960,200],[-80,2080,220],[300,2350,250],[760,2260,220],[1150,2480,200],[1450,2450]],{lim:45});
+  // ---- Kestrel Rd: from Woodward Ave west over I-61 to the foot of Mount Kestrel and on to County Rd 3
+  mkR("road","Kestrel Rd",[[-1000,1500],[-1890,1500]],{lim:45});
+  mkR("art","Kestrel Rd",[[-1890,1500],[-2150,1500],[-2450,1500],[-2710,1500]],{lim:40});
+  mkR("road","Kestrel Rd",[[-2710,1500],[-2850,1560]],{lim:40});
+  mkR("road","Kestrel Rd",[[-2850,1560],[-3250,1320,350],[-3600,1000]],{lim:45});
+  // ---- Ridge Rd: round the north side of the mountain, past the end of I-61, over the river to Millbrook
+  mkR("road","Ridge Rd",[[-4252,3050],[-3800,3400,300],[-2800,3400,300],[-2300,3000]],{lim:45});
+  mkR("road","Ridge Rd",[[-2300,3000],[-1200,3150,300],[-300,3200,300],[800,3100,300],[1500,3000,250],[1900,2900]],{lim:50});
+  // ---- Mount Kestrel: switchbacks up the south-east face, a flowing pass road down the north-west side, a loop round the summit
+  const top1=w2Climb(-2850,1560,{s0:-1,g:0.07,dTh:0.45,Rh:18,rEnd:235,step:22,nodeEvery:14});
+  const top2=w2Climb(-4252,3050,{s0:1,g:0.065,dTh:0.7,Rh:34,rEnd:235,step:24,nodeEvery:14});
+  mkR("road","Kestrel Switchbacks",top1,{lim:25,mtn:1});
+  mkR("road","Kestrel Pass",top2,{lim:35,mtn:1});
+  {const [mx,my]=W2C.MT,a=top1[top1.length-1],b=top2[top2.length-1],t1=Math.atan2(a[1]-my,a[0]-mx);let t2=Math.atan2(b[1]-my,b[0]-mx);
+    // the short way round, through the south-west (clear of both roads)
+    let d=wrapPi(t2-t1);const P=[[a[0],a[1]]],n=Math.max(4,Math.ceil(Math.abs(d)/0.2)),R=(Math.hypot(a[0]-mx,a[1]-my)+Math.hypot(b[0]-mx,b[1]-my))/2;
+    for(let k=1;k<n;k++){const t=t1+d*k/n;P.push([mx+Math.cos(t)*R,my+Math.sin(t)*R,R*0.9])}P.push([b[0],b[1]]);mkR("lane","Summit Loop",P,{lim:20,mtn:1})}
+  for(const b of W2_RB){b.legs.sort((p,q)=>p.a-q.a);const L=b.legs;for(const l of L)N(l.p[0],l.p[1],{ctrl:"minor",rbt:b});
+    for(let i=0;i<L.length;i++){const A=L[i],Bn=L[(i+1)%L.length];let a2=Bn.a;if(a2<=A.a)a2+=Math.PI*2;const d=a2-A.a,k=Math.max(1,Math.ceil(d/1.2)),pts=[A.p];
+      for(let j=0;j<k;j++){const m=A.a+d*(j+0.5)/k,r=b.R/Math.cos(d/k/2);pts.push([b.x+Math.cos(m)*r,b.y+Math.sin(m)*r,b.R])}pts.push(Bn.p);E("rbt","Roundabout",pts)}}
+  for(const e of EDGES)if(e.mtn)W2_MTN.push(e);
+  // ---- I-61's climb over I-38 (a smooth profile on each of its edges near the crossing)
+  for(const e of EDGES)if(e.name==="I-61"&&Math.min(Math.abs(e.a.y-ccy),Math.abs(e.b.y-ccy))<500)e.zo=u=>zB(eAt(e,u).y-ccy);
+  W2C.zB=zB;
+}
+// a road up a mountain: legs across the slope at grade g, a hairpin wherever a leg reaches the edge of its face (dTh either side of the start)
+function w2Climb(x0,y0,o){const [cx,cy]=W2C.MT,thc=Math.atan2(y0-cy,x0-cx),pts=[[x0,y0]];let x=x0,y=y0,s=o.s0||1,run=0,nAt=0,n=0;
+  const grad=(x,y)=>[(hillZ(x+2,y)-hillZ(x-2,y))/4,(hillZ(x,y+2)-hillZ(x,y-2))/4];
+  const hd=()=>{const [gx,gy]=grad(x,y),sl=Math.hypot(gx,gy)||1e-6,ux=gx/sl,uy=gy/sl,tx=-uy*s,ty=ux*s,al=Math.asin(Math.min(0.97,o.g/sl));return {hx:tx*Math.cos(al)+ux*Math.sin(al),hy:ty*Math.cos(al)+uy*Math.sin(al),al}};
+  while(Math.hypot(x-cx,y-cy)>o.rEnd&&n++<6000){const h=hd(),dth=wrapPi(Math.atan2(y-cy,x-cx)-thc);
+    if(-s*dth>o.dTh&&run>60){   // s = +1 runs clockwise round the mountain (the angle falls)   // hairpin: turn through the uphill side, from this leg's heading to the next one's
+      const a0=Math.atan2(h.hy,h.hx),turn=s>0?-1:1,sw=Math.PI-2*h.al,R=o.Rh,nx=turn>0?-Math.sin(a0):Math.sin(a0),ny=turn>0?Math.cos(a0):-Math.cos(a0),ccx=x+R*nx,ccy=y+R*ny;
+      const K=Math.max(4,Math.ceil(sw/0.26));
+      for(let k=1;k<=K;k++){const a=a0+turn*sw*k/K,mx=turn>0?-Math.sin(a):Math.sin(a),my=turn>0?Math.cos(a):-Math.cos(a);pts.push([ccx-R*mx,ccy-R*my,1])}
+      x=pts[pts.length-1][0];y=pts[pts.length-1][1];s=-s;run=0;nAt=0;continue}
+    x+=h.hx*o.step;y+=h.hy*o.step;run+=o.step;nAt++;
+    pts.push(nAt===o.nodeEvery?[x,y]:[x,y,1]);if(nAt===o.nodeEvery)nAt=0}
+  pts[pts.length-1]=[x,y];
+  {let d=0;for(let i=pts.length-2;i>0;i--){d+=Math.hypot(pts[i+1][0]-pts[i][0],pts[i+1][1]-pts[i][1]);if(d>140)break;if(pts[i].length<3)pts[i]=[pts[i][0],pts[i][1],1]}}
+  // corner radii that fit between the points
+  for(let i=1;i<pts.length-1;i++){if(pts[i].length<3)continue;const a=pts[i-1],b=pts[i],c=pts[i+1],l1=Math.hypot(b[0]-a[0],b[1]-a[1]),l2=Math.hypot(c[0]-b[0],c[1]-b[1]),
+    th=Math.abs(wrapPi(Math.atan2(c[1]-b[1],c[0]-b[0])-Math.atan2(b[1]-a[1],b[0]-a[0])));b[2]=th<0.003?0.001:Math.min(3000,0.45*Math.min(l1,l2)/Math.tan(th/2))}
+  return pts}
+
 // ---- the map
-(function buildNet(){
+(function buildNet(){if(W2){buildNet2();return}
   const R=400,X=1700,Y=1100;
   // Hwy 7: a 65 mph freeway loop. No junctions or crossovers on it: four diamond interchanges, with the cross street on a bridge
   // over the freeway, one-lane ramps that leave and join at a shallow angle, and signals where the ramps meet the cross street
@@ -1806,7 +1982,7 @@ const laneOff=(e,i)=>(loOf(e.n)+i)*LANE;
 })();
 const ePick=(ax,ay,bx,by)=>EDGES.find(e=>Math.hypot(e.a.x-ax,e.a.y-ay)<1&&Math.hypot(e.b.x-bx,e.b.y-by)<1);
 // Main St opens out into Maple Blvd: the median grows from nothing over the first block
-ePick(-550,0,-330,0).tp=[14,150];
+{const e=ePick(-550,0,-330,0);if(e)e.tp=[14,150]}
 // ---- junctions: what kind, who has priority, where the stop lines are, which turns are allowed
 function analyseNet(){
   for(const n of NODES){
@@ -1887,30 +2063,53 @@ function pathAt(P,d){const c=P.cum;if(P.L<1e-3)return [P.pts[0][0],P.pts[0][1],P
 // ---- height: steep hills (Lake Rd and Oak St climb over two of them), the Rouge River and its five bridges. Roads stay level across; junctions stay flat
 const HILLS=[[-930,-720,26,140],[-80,640,24,130],[-2050,700,28,200],[2000,-850,22,180],[-400,-1450,18,160],
   [1500,-1560,24,170],[-1550,-1600,26,160],[-700,1380,20,140],[2230,650,20,150],[1700,1430,16,140],[-2280,1150,22,170],[2300,-1250,18,150]];
-function hillZ(x,y){let z=0;for(const h of HILLS){const dx=x-h[0],dy=y-h[1],d2=dx*dx+dy*dy,s2=h[3]*h[3];if(d2<12*s2)z+=h[2]*Math.exp(-d2/s2)}return z}
-const RIVER={x:150,w:44,water:-1.5};const riverX=y=>RIVER.x+25*Math.sin(y/400),riverD=(x,y)=>Math.abs(x-riverX(y));
+function hillZ(x,y){let z=0;for(const h of (W2?HILLS2:HILLS)){const dx=x-h[0],dy=y-h[1],d2=dx*dx+dy*dy,s2=h[3]*h[3];if(d2<12*s2)z+=h[2]*Math.exp(-d2/s2)}return z}
+const RIVER={x:150,w:44,water:-1.5};const riverX=y=>RIVER.x+25*Math.sin(y/400),riverD=W2?((x,y)=>w2WaterD(x,y)+RIVER.w/2):((x,y)=>Math.abs(x-riverX(y)));   // in the new world: distance from the nearest water, offset so that < RIVER.w/2 is in the water
 function riverCut(x,y){const d=riverD(x,y);return d<RIVER.w/2+14?-3.4*(1-smooth01(RIVER.w/2-6,RIVER.w/2+14,d)):0}
 const BRIDGE_H=5.2,BRIDGE_RAMP=125,BRIDGE_HALF=RIVER.w/2+8;
 // where a street crosses the freeway, the freeway dips into a shallow cut (2.4 m) and the street climbs onto a bridge (3.4 m): 5.8 m clearance
 const OV_H=3.4,OV_HALF=29,DIP_H=2.4,DIP_HALF=24,DIP_RAMP=100;
+// the new world's mountain roads: heights follow the ground, smoothed along the road (about 70 m either way) so the hairpins are not walls
+function w2Profiles(){const ok=e=>e.mtn||/^(road|lane|dirt)$/.test(e.type),done=new Set();
+  for(const e0 of EDGES){if(!ok(e0)||done.has(e0))continue;const inC=new Set([e0]);
+    // the whole run of country road through plain bends and joins (not through junctions), in driving order
+    const step=(n,from)=>{if(n.legs.length!==2)return null;const l=n.legs.find(l=>l.e!==from);return l&&ok(l.e)&&!inC.has(l.e)?l:null};
+    const back=[],fwd=[];for(let n=e0.a,from=e0,l;(l=step(n,from));){inC.add(l.e);back.unshift({e:l.e,rev:l.end===0});n=l.end===0?l.e.b:l.e.a;from=l.e}
+    for(let n=e0.b,from=e0,l;(l=step(n,from));){inC.add(l.e);fwd.push({e:l.e,rev:l.end===1});n=l.end===0?l.e.b:l.e.a;from=l.e}
+    const chain=[...back,{e:e0,rev:false},...fwd],D=[],Z=[];let off=0;
+    for(const c of chain){const e=c.e,n=Math.ceil(e.L/4);c.off=off;for(let i=D.length?1:0;i<=n;i++){const d=Math.min(i*4,e.L),p=eAt(e,c.rev?e.L-d:d);D.push(off+d);Z.push(hillZ(p.x,p.y))}off+=e.L;done.add(e)}
+    // a moving average over about 100 m either way (less near the two ends of the run, so they meet their junctions exactly)
+    const m=Z.length,pre=new Float64Array(m+1);for(let i=0;i<m;i++)pre[i+1]=pre[i]+Z[i];const S=new Float32Array(m),W=25;
+    for(let i=0;i<m;i++){const w=Math.min(W,i,m-1-i);S[i]=(pre[i+w+1]-pre[i-w])/(2*w+1)}
+    const at=d=>{let lo=0,hi=m-1;while(hi-lo>1){const md=(lo+hi)>>1;if(D[md]<=d)lo=md;else hi=md}const t=D[hi]>D[lo]?clamp((d-D[lo])/(D[hi]-D[lo]),0,1):0;return S[lo]*(1-t)+S[hi]*t};
+    for(const c of chain){const e=c.e,n=Math.ceil(e.L/4)+1,zp=new Float32Array(n);for(let i=0;i<n;i++){const u=Math.min(i*4,e.L);zp[i]=at(c.off+(c.rev?e.L-u:u))}e.zp=zp}
+    for(let k=1;k<chain.length;k++){const c=chain[k],n=c.rev?c.e.b:c.e.a;n.zs=at(c.off)}}}
+if(W2)w2Profiles();
 for(const e of EDGES){if(e.type==="xway"||e.ow)continue;for(const x of EDGES){if(x.type!=="xway"||x.a===e.a||x.a===e.b||x.b===e.a||x.b===e.b)continue;let pt=null;
   for(let u=0;u<=e.L;u+=1){const p=eAt(e,u),q=eProj(x,p.x,p.y);if(q.u<1||q.u>x.L-1){pt=null;continue}if(pt!==null&&Math.sign(q.t)!==Math.sign(pt)){const uc=u-0.5;
+      if(W2){const dz=ez(e,uc)-ez(x,q.u);if(dz>4){e.ov={uc,half:OV_HALF+2,H:0,rA:22,rB:22};break}if(dz<-4)break}
       e.ov={uc,half:OV_HALF,H:OV_H,rA:clamp(uc-OV_HALF-Math.max(e.r0,e.a.pr||0)-3,30,105),rB:clamp(e.L-uc-OV_HALF-Math.max(e.r1,e.b.pr||0)-3,30,105)};
       (x.dip=x.dip||[]).push({uc:q.u,half:DIP_HALF,H:DIP_H,rA:Math.min(DIP_RAMP,q.u-DIP_HALF-5),rB:Math.min(DIP_RAMP,x.L-q.u-DIP_HALF-5)});break}pt=q.t}if(e.ov)break}}
-for(const e of EDGES){let prev=null;for(let u=0;u<=e.L;u+=2){const p=eAt(e,u),sg=Math.sign(p.x-riverX(p.y));if(prev!==null&&sg!==prev){e.br={uc:u-1,half:BRIDGE_HALF};break}prev=sg}}
-function ez(e,u){const p=eAt(e,clamp(u,0,e.L));let z=hillZ(p.x,p.y);
+if(W2){const e=EDGES.find(e=>e.name==="I-61"&&Math.abs(e.a.y-(W2C.CL[1]-50))<1&&Math.abs(e.b.y-(W2C.CL[1]+50))<1);if(e)e.ov={uc:50,half:31,H:0,rA:18,rB:18}}   // I-61 over I-38
+for(const e of EDGES){if(W2){let a=null;for(let u=0;u<=e.L+2;u+=2){const p=eAt(e,Math.min(u,e.L));let B=null;for(const b of W2_WATER)if(w2BodyD(b,p.x,p.y)<2){B=b;break}
+    if(B&&!a)a={u,B};if(a&&(!B||u>=e.L)){e.br={uc:(a.u+u)/2,half:(u-a.u)/2+8,H:a.B.bh,rp:a.B.rp};break}}continue}
+  let prev=null;for(let u=0;u<=e.L;u+=2){const p=eAt(e,u),sg=Math.sign(p.x-riverX(p.y));if(prev!==null&&sg!==prev){e.br={uc:u-1,half:BRIDGE_HALF,H:BRIDGE_H,rp:BRIDGE_RAMP};break}prev=sg}}
+function ez(e,u){let z;if(e.zp){const f=clamp(u,0,e.L)/4,i=Math.min(e.zp.length-2,Math.floor(f)),a=f-i;z=e.zp[i]*(1-a)+e.zp[i+1]*a}else{const p=eAt(e,clamp(u,0,e.L));z=hillZ(p.x,p.y)}
+  // raised roads (the new world): a profile of its own, or a smooth climb between raised junctions
+  if(e.zo)z+=e.zo(clamp(u,0,e.L));else if(e.a.zo||e.b.zo){const t=smooth01(e.r0||0,e.L-(e.r1||0),u);z+=(e.a.zo||0)*(1-t)+(e.b.zo||0)*t}
   // junctions are flat: the road eases into the junction's height over 25 m so there is no step at its edge
-  if(e.a.z!==undefined&&u<(e.r0||0)+25){const w=1-smooth01(e.r0||0,(e.r0||0)+25,u);z+=(e.a.z-hillZ(e.a.x,e.a.y))*0+(e.a.z-z)*w}
-  if(e.b.z!==undefined&&u>e.L-(e.r1||0)-25){const w=1-smooth01(e.r1||0,(e.r1||0)+25,e.L-u);z+=(e.b.z-z)*w}if(e.br)z+=BRIDGE_H*(1-smooth01(e.br.half,e.br.half+BRIDGE_RAMP,Math.abs(u-e.br.uc)));
+  const JE=W2?50:25;   // the new world is hillier: junctions ease in over a longer run
+  if(e.a.z!==undefined&&!(W2&&(e.a.ctrl==="merge"||e.a.kind==="cont"))&&u<(e.r0||0)+JE){const w=1-smooth01(e.r0||0,(e.r0||0)+JE,u);z+=(e.a.z-hillZ(e.a.x,e.a.y))*0+(e.a.z-z)*w}
+  if(e.b.z!==undefined&&!(W2&&(e.b.ctrl==="merge"||e.b.kind==="cont"))&&u>e.L-(e.r1||0)-JE){const w=1-smooth01(e.r1||0,(e.r1||0)+JE,e.L-u);z+=(e.b.z-z)*w}if(e.br)z+=e.br.H*(1-smooth01(e.br.half,e.br.half+e.br.rp,Math.abs(u-e.br.uc)));
   if(e.ov){const o=e.ov,d=u-o.uc;z+=o.H*(1-smooth01(o.half,o.half+(d<0?o.rA:o.rB),Math.abs(d)))}
   if(e.dip)for(const o of e.dip){const d=u-o.uc;z-=o.H*(1-smooth01(o.half,o.half+(d<0?o.rA:o.rB),Math.abs(d)))}return z}
 const onDip=(e,u)=>e.dip&&e.dip.some(o=>u>o.uc-o.half-o.rA&&u<o.uc+o.half+o.rB);
 // the sides of the freeway cut: grass slopes down to the shoulder
 function cutZ(x,y){let z=1e9;for(const e of gAt(GRID.e,x,y)){if(!e.dip)continue;const p=eProj(e,x,y);if(!onDip(e,p.u))continue;const outer=e.m/2+e.n*LANE+e.side+auxW(e,p.u,p.t),a=Math.abs(p.t),inner=e.m/2-e.shL;
   const dd=a>outer?a-outer:a<inner?inner-a:0;z=Math.min(z,ez(e,p.u)+Math.max(0,dd-0.4)*0.42)}return z}
-const onBridge=(e,u)=>e.br&&Math.abs(u-e.br.uc)<e.br.half+BRIDGE_RAMP;
+const onBridge=(e,u)=>e.br&&Math.abs(u-e.br.uc)<e.br.half+e.br.rp;
 const onOver=(e,u)=>e.ov&&Math.abs(u-e.ov.uc)<e.ov.half+(u<e.ov.uc?e.ov.rA:e.ov.rB), overDeck=(e,u)=>e.ov&&Math.abs(u-e.ov.uc)<e.ov.half;
-for(const n of NODES)n.z=hillZ(n.x,n.y);
+for(const n of NODES)n.z=n.zs!==undefined?n.zs:hillZ(n.x,n.y)+(n.zo||0);
 for(const e of EDGES){let mx=0;for(let u=0;u<=e.L;u+=10)mx=Math.max(mx,Math.abs(ez(e,u)));e.hz=mx>0.05}
 // ---- the parking garage on Fort St: the "Two-Bay Dual Helix" garage. Two long sloping bays side by side, north bay A and south bay B,
 // 48 m long and 16 m wide with an 8 m gap between them. The bays ARE the ramps: A rises 3.6 m going east, B rises 3.6 m going west (eased ends,
@@ -1944,7 +2143,7 @@ for(const e of EDGES){const r=e.W+(e.T.walk||0)+6;for(let u=-4;u<=e.L+4;u+=8){co
 for(const n of NODES)if(n.pr||n.xo)gAdd(GRID.n,n.x,n.y,(n.pr||n.xo.len)+2,n);
 function edgesNear(x,y,m){const C=GRID.C,out=new Set();for(let i=Math.floor((x-m)/C);i<=Math.floor((x+m)/C);i++)for(let j=Math.floor((y-m)/C);j<=Math.floor((y+m)/C);j++)for(const e of (GRID.e.get(i*100003+j)||[]))out.add(e);return out}
 // distance from a point to the nearest paved road (exact within ~40 m, from a coarse distance field further out)
-const WORLD={x0:-2400,x1:2400,y0:-1750,y1:1750};
+const WORLD=W2?{x0:-4800,x1:4800,y0:-3600,y1:3600}:{x0:-2400,x1:2400,y0:-1750,y1:1750};
 const DF={C:20};
 {const nx=Math.ceil((WORLD.x1-WORLD.x0)/DF.C)+1,ny=Math.ceil((WORLD.y1-WORLD.y0)/DF.C)+1,d=new Float32Array(nx*ny).fill(1e9);DF.nx=nx;DF.ny=ny;DF.d=d;
   for(const e of EDGES)for(let u=0;u<=e.L;u+=6){const p=eAt(e,u),i=Math.round((p.x-WORLD.x0)/DF.C),j=Math.round((p.y-WORLD.y0)/DF.C);
@@ -1961,13 +2160,14 @@ function roadDist(x,y,m){let best=m+1;for(const e of edgesNear(x,y,m+6)){const p
   return best}
 
 // ---- places: downtown (flat, concrete), the subdivisions (flat lawns), the rest rolling countryside
-const FLAT=[[-1420,-430,-420,420,"city"],[580,1620,180,1020,"sub"],[580,1620,-1020,-180,"sub"],[-200,1250,-120,120,"blvd"]];
+const FLAT=W2?[[-1720,-280,-570,570,"city"],[2230,2970,-370,370,"city"],[120,980,380,1120,"sub"],[120,1080,-920,-380,"sub"],[2230,3270,530,1270,"sub"],[1520,2160,2230,2720,"sub"]]
+  :[[-1420,-430,-420,420,"city"],[580,1620,180,1020,"sub"],[580,1620,-1020,-180,"sub"],[-200,1250,-120,120,"blvd"]];
 const CITY_BOX=FLAT[0];
-function inCity(x,y){const [x0,x1,y0,y1]=CITY_BOX;return x>x0&&x<x1&&y>y0&&y<y1}
+function inCity(x,y){for(const B of FLAT){if(B[4]!=="city")continue;const [x0,x1,y0,y1]=B;if(x>x0&&x<x1&&y>y0&&y<y1)return true}return false}
 function cityW(x,y){let w=0;for(const [x0,x1,y0,y1] of FLAT)w=Math.max(w,1-smooth01(0,150,Math.hypot(Math.max(x0-x,0,x-x1),Math.max(y0-y,0,y-y1))));return w}
 function zoneName(x,y){for(const [x0,x1,y0,y1,n] of FLAT)if(x>x0&&x<x1&&y>y0&&y<y1)return n;return "rural"}
 // the service plaza (fuel + fast chargers) sits beside Hwy 7 on the north side; the parallel-parking block is on Main St
-const PAD={e:ePick(-60,1100,-1700,420),dir:1,s0:380,s1:462,o0:-42,o1:-7};
+const PAD=W2?{e:ePick(1420,-1500,2180,-1500),dir:1,s0:380,s1:462,o0:-42,o1:-7}:{e:ePick(-60,1100,-1700,420),dir:1,s0:380,s1:462,o0:-42,o1:-7};
 const PARK={e:ePick(-1000,0,-850,0),dir:1,s0:24,s1:126,oP:-3.1,oA:-0.1,o0:-4.4};
 const padPt=(u,o)=>fpt(PAD.e,PAD.dir,PAD.s0+u,o);
 // signs for traffic sign recognition: a limit sign after every junction where the limit applies (both directions)
@@ -2041,11 +2241,11 @@ const TCS=[   // [lane, y0, y1, name, what it tests]
   [4,-1120,-1040,"Deep snow","Deep snow drags at the tyres: Snow mode and gentle throttle"],[4,-1020,-950,"Sand","Soft sand dunes: Sand mode, don't stop halfway"],
   [4,-930,-850,"Moguls","40 cm bumps left and right: wheels lift, traction control and lockers earn their keep"]];
 const TC_SKID={x:-1880,y:-1000,R:40};const TC_SIGNS=[];
-const inTC=(x,y,m=0)=>x>TC.x0-m&&x<TC.x1+m&&y>TC.y0-m&&y<TC.y1+m||x>TC.dw[0]-m&&x<TC.dw[1]+m&&y>TC.dw[2]-m&&y<TC.dw[3]+m;
+const inTC=(x,y,m=0)=>!W2&&x>TC.x0-m&&x<TC.x1+m&&y>TC.y0-m&&y<TC.y1+m||x>TC.dw[0]-m&&x<TC.dw[1]+m&&y>TC.dw[2]-m&&y<TC.dw[3]+m;
 const ORP={x0:-2392,x1:-2160,y0:-1450,y1:-905,
   trail:[[-2160,-921],[-2185,-921],[-2215,-928],[-2245,-945],[-2252,-985],[-2252,-1105],[-2262,-1140],[-2295,-1160],[-2300,-1185],[-2300,-1228],[-2290,-1262],[-2255,-1285],[-2222,-1300],[-2205,-1335],[-2230,-1380],[-2290,-1395],[-2335,-1385],[-2350,-1330],[-2350,-1275],[-2345,-1215],[-2342,-1160],[-2340,-1110],[-2340,-1050],[-2320,-985],[-2280,-955],[-2245,-945]],
   bog:{x:-2300,y:-1206,a:24,b:11,h:0},hill:{x:-2350,y:-1330,H:8,R:40},lot:{x0:-2205,x1:-2160,y0:-935,y1:-907},feats:[],grid:new Map(),zones:[],ready:false};
-const inOR=(x,y,m=0)=>x>ORP.x0-m&&x<ORP.x1+m&&y>ORP.y0-m&&y<ORP.y1+m;
+const inOR=(x,y,m=0)=>!W2&&x>ORP.x0-m&&x<ORP.x1+m&&y>ORP.y0-m&&y<ORP.y1+m;
 const orBogQ=(x,y)=>{const B=ORP.bog;return Math.hypot((x-B.x)/B.a,(y-B.y)/B.b)};
 const tcHash=(i,j)=>{let h=(i*374761393+j*668265263)|0;h=(h^(h>>>13))*1274126177|0;return ((h^(h>>>16))>>>0)/4294967296};
 // section boards: white text on blue, drawn as a texture on the front of each board when you're near
@@ -2091,6 +2291,15 @@ function tcWhere(x,y){const S=tcSec(x,y);if(S)return S;if(Math.hypot(x-TC_SKID.x
 function smooth01(a,b,x){const t=clamp((x-a)/(b-a),0,1);return t*t*(3-2*t)}
 function terrainH(x,y,d){const D=Math.max(d,dfAt(x,y)),f=smooth01(45,80,D)*(1+2.6*smooth01(80,230,D)),hills=MAP.hills?(1.4*Math.sin(x*0.021+1)*Math.cos(y*0.017)+0.7*Math.sin(x*0.047+y*0.039)):0;
   const k=1-cityW(x,y);return hillZ(x,y)+riverCut(x,y)+k*(f*hills+Math.min(1,d/1.5)*MAP.lumps*(Math.sin(x*2.3+Math.cos(y*1.7))+Math.sin(y*2.9+x*0.7)))}
+// the new world: ground near a road is cut or filled to meet it (embankments up to raised roads, benches cut into the mountain).
+// Bridge decks and the freeway cut are left to embZ and cutZ
+function w2Blend(x,y,base){let sw=0,sz=0,A=0,under=1e9;
+  for(const e of edgesNear(x,y,32)){const p=eProj(e,x,y);if(p.u<-6||p.u>e.L+6)continue;const u=clamp(p.u,0,e.L);
+    if(e.ov&&overDeck(e,u)||e.br&&Math.abs(u-e.br.uc)<e.br.half||e.dip&&onDip(e,u))continue;
+    const mm=mAt(e,u),dd=Math.abs(p.t)-(mm/2+e.n*LANE+e.side+auxW(e,u,p.t)+(e.T.walk||0)),zr=e.hz?ez(e,u):0;
+    if(dd<0.6&&p.u>=0&&p.u<=e.L)under=Math.min(under,zr-0.12);const a=1-smooth01(0.6,30,dd);if(a<=0)continue;const w=a*a*a+1e-4;sw+=w;sz+=w*zr;if(a>A)A=a}
+  for(const n of gAt(GRID.n,x,y)){if(!n.pr)continue;const dd=Math.hypot(x-n.x,y-n.y)-n.pr;if(dd<0.6)under=Math.min(under,n.z-0.12);const a=1-smooth01(0.6,30,dd);if(a<=0)continue;const w=a*a*a+1e-4;sw+=w;sz+=w*n.z;if(a>A)A=a}
+  const z=sw>0?base+(sz/sw-0.1-base)*A:base;return Math.min(z,under)}
 // embankments up to the bridge ramps
 function embZ(x,y){let z=-1e9;
   for(const e of gAt(GRID.e,x,y)){if(!e.ov)continue;const p=eProj(e,x,y);if(!onOver(e,p.u)||overDeck(e,p.u))continue;const outer=e.m/2+e.n*LANE+e.side+(e.T.walk||0);z=Math.max(z,ez(e,p.u)-Math.max(0,Math.abs(p.t)-outer-0.6)*0.6)}
@@ -2106,7 +2315,7 @@ function xLocal(S,a,b){return [S.x+S.U[0]*a+S.N[0]*b,S.y+S.U[1]*a+S.N[1]*b]}
 function placeExtras(){if(XSITES.some(S=>!S.custom))return;const want=[["stn",40,30],["lot",44,28],["stn",40,30],["lot",44,28],["stn",40,30],["lot",44,28],["lot",44,28],["stn",40,30]];let wi=0,sd=11;const r=()=>(sd=(sd*16807)%2147483647)/2147483647;
   const ok=(S)=>{for(let a=-S.L/2;a<=S.L/2;a+=4)for(let b=-S.D/2;b<=S.D/2+6;b+=4){const [x,y]=xLocal(S,a,b);if(inGarage(x,y))return false;const g=groundAt(x,y);if(b>-S.D/2+1&&g.kind!=="grass")return false;if(Math.abs(g.h)>0.6)return false;
       if(BLD_LIST.some(B=>Math.abs(x-B[0])<B[2]+3&&Math.abs(y-B[1])<B[3]+3))return false;if(XSITES.some(T=>Math.hypot(T.x-x,T.y-y)<T.L))return false}
-    if(Math.abs(S.y)<140&&Math.abs(S.x)>1840||inTC(S.x,S.y,40))return false;   // keep clear of the shopping strips and the proving ground
+    if((W2?Math.abs(S.y)<140&&S.x>950&&S.x<2250:Math.abs(S.y)<140&&Math.abs(S.x)>1840)||inTC(S.x,S.y,40))return false;   // keep clear of the shopping strips and the proving ground
     return Math.hypot(S.x-PAD.cx,S.y-PAD.cy)>160&&Math.hypot(S.x-car.px,S.y-car.py)>-1};
   const es=EDGES.filter(e=>e.type!=="hwy"&&e.L>120&&!e.br).sort((a,b)=>((a.a.x*7+a.b.y*3)%97)-((b.a.x*7+b.b.y*3)%97));
   for(const e of es){if(wi>=want.length)break;for(const side of [1,-1]){if(wi>=want.length)break;const [kind,L,D]=want[wi],u=e.L*(0.3+r()*0.4),c=ePt(e,u,0),off=side*(hwOf(e)+4.5+D/2),p=ePt(e,u,off),U=[Math.cos(c[2]),Math.sin(c[2])];
@@ -2121,6 +2330,7 @@ const RETAIL=[
   {a0:1895,a1:2062,s:-1,type:"hardware",name:"HomeWorks",lotD:43,bw:90,bd:46,h:7.6,ent:[1915,2042],chg:2,col:[0.85,0.42,0.08]},
   {a0:1978,a1:2122,s:1,type:"diner",name:"Burger Barn",lotD:25,bw:26,bd:16,h:4.4,ent:[1993,2107],chg:2,col:[0.78,0.1,0.08]}];
 const RETAIL_STN=[{x:-2096,s:1,name:"Fuel Stop"},{x:1934,s:1,name:"Fuel Stop"}];
+if(W2){const sh=x=>x+(x<0?3155:-160);for(const R of RETAIL){const a=R.a0;R.a0=sh(R.a0);R.a1=R.a1+(R.a0-a);R.ent=R.ent.map(v=>v+(R.a0-a))}for(const T of RETAIL_STN)T.x=sh(T.x)}
 const STORES=[];
 const RB0=13.2;   // lot front edge, measured from the road centre line (road 8.4 + walk 1.8 + a planted strip)
 function retailSites(){if(XSITES.some(S=>S.custom))return;
@@ -2157,8 +2367,8 @@ function groundAt0(x,y){
   if(kerb)return kz?{h:kz+0.04,mu:1.0,kind:"kerb"}:G_KERB;
   if(walk)return kz?{h:kz,mu:0.95,kind:"pavement"}:G_WALK;
   if(inCity(x,y))return G_WALK;
-  if(Math.abs(y)>24&&Math.abs(y)<64&&x>-45&&x<1355){const ax=Math.abs(y);for(const [xa,xb] of LOTS)if(x>xa+15&&x<xb-15)return G_LOT}
-  const tz=Math.min(terrainH(x,y,dmin)-0.03,cutZ(x,y)),em=embZ(x,y);if(em>tz)return {h:em,mu:MAP.offMu,kind:"grass"};
+  if(!W2&&Math.abs(y)>24&&Math.abs(y)<64&&x>-45&&x<1355){const ax=Math.abs(y);for(const [xa,xb] of LOTS)if(x>xa+15&&x<xb-15)return G_LOT}
+  let tz=Math.min(terrainH(x,y,dmin)-0.03,cutZ(x,y));const em=embZ(x,y);if(W2){tz=Math.max(tz,em);if(dmin<40)tz=w2Blend(x,y,tz)}else if(em>tz)return {h:em,mu:MAP.offMu,kind:"grass"};
   if(tz<RIVER.water&&riverD(x,y)<RIVER.w/2)return {h:RIVER.water-0.6,mu:0.3,kind:"water"};
   return {h:tz,mu:MAP.offMu,kind:"grass"}}
 {const c=padPt((PAD.s1-PAD.s0)/2,(PAD.o0+PAD.o1)/2);PAD.cx=c[0];PAD.cy=c[1];PAD.rad=70}
@@ -2202,6 +2412,21 @@ const STARTS={shops:{name:"Grand River shops",desc:"Outside the freeway: Fresh M
   offroad:{name:"Off-road park",desc:"West of County Rd 12: a trail loop with a rock garden, ledges, a mud bog, logs, an off-camber section and a 30% hill. Bring a 4x4",x:-2182,y:-921,h:Math.PI,free:true},garage:{name:"Parking garage",desc:"Cass Ave · the two-bay dual helix garage: every floor is a ramp. Entrance on your right, take a ticket at the gate; the exit is onto Park Ave",x:-846,y:-245,h:Math.PI/2},
   hills:{name:"Lake Rd hill",desc:"Steep two-lane road over a 26 m hill (up to 16% grades)",x:-1003,y:-420,h:-Math.PI/2},
   bridge:{name:"Rouge River",desc:"Maple Blvd over the river bridge",x:-60,y:-12,h:0}};
+if(W2){const sOn=(ax,ay,bx,by,u,dir=1)=>{const e=ePick(ax,ay,bx,by);if(!e)return {x:ax,y:ay,h:0};const p=fpt(e,dir,u,0);return {x:p[0],y:p[1],h:p[2]}};
+  for(const k in STARTS)delete STARTS[k];
+  const st_=(k,name,desc,p,o)=>STARTS[k]=Object.assign({name,desc},p,o||{});
+  st_("city","Downtown Westport","Main St · a signal every block, the parking garage on Cass Ave, the Clearwater River at the east end",sOn(-1600,0,-1450,0,35));
+  st_("hwy","I-38","Interstate, 65 mph, 3 lanes each way: cross streets bridge over it and the ramps climb up to them, a cloverleaf with I-61",sOn(-580,-1500,580,-1500,150));
+  st_("i61","I-61 cloverleaf","Northbound on I-61 towards the cloverleaf with I-38: loop ramps, outer ramps and a bridge over the other freeway",sOn(-2300,-3300,-2300,-2230,200));
+  st_("shops","Commerce Pkwy shops","Between Westport and Fairhaven: Fresh Market, Tread Center tires, Bean & Brew with fast chargers, Fuel Stop",sOn(1000,0,1700,0,425,-1));
+  st_("fairhaven","Fairhaven","The second city: a small grid of shops and offices, Oakridge subdivision to the north",sOn(2300,0,2450,0,25),{nav:"Town",ic:"🏙️"});
+  st_("millbrook","Millbrook","Old small town by a lake: Mill St, Lakeshore Dr, Old Mill Rd over the creek",sOn(1450,2450,1600,2450,30),{nav:"Small town",ic:"🏡"});
+  st_("mountain","Mount Kestrel","Switchbacks up the mountain, a pass road down the far side, a loop round the summit",sOn(-2710,1500,-2850,1560,60),{nav:"Mountain roads",ic:"⛰️"});
+  st_("garage","Parking garage","Cass Ave · the two-bay dual helix garage: every floor is a ramp. Entrance on your right, take a ticket at the gate; the exit is onto Park Ave",{x:-846,y:-245,h:Math.PI/2});
+  st_("suburb","Rosedale","Subdivision streets on the east bank: all-way stops, speed humps, 25 mph",sOn(100,650,300,650,40));
+  st_("county","County Rd 30","55 mph through the farmland, over the river and over I-61",sOn(-1000,-2400,1000,-2400,300));
+  st_("bridge","Clearwater River","Main St over the river bridge",sOn(-400,0,100,0,20));
+  {const p=PAD.e?fpt(PAD.e,PAD.dir,PAD.s0-90,0):[0,0,0];st_("station","Service plaza","Gas pumps and fast chargers beside I-38 between Maple Rd and Fairhaven",{x:p[0],y:p[1],h:p[2]})}}
 
 const COLL={g:new Map(),C:25}, BLD_LIST=[];
 const COLL_KEEP=[];function collReset(){COLL.g=new Map();BLD_LIST.length=0;for(const o of COLL_KEEP)collAdd(o)}
@@ -3961,7 +4186,9 @@ function carPose(c){if(c.fixed||c.dyn)return;if(c.jn){const P=c.jn.P,q=pathAt(P,
   else{const q=fpt(c.e,c.dir,c.s,c.off+(c.wob||0));c.wx=q[0];c.wy=q[1];c.wh=q[2]+(c.head||0);if(c.e.hz){const u=c.dir>0?c.s:c.e.L-c.s;c.wz=ez(c.e,u);c.wp=Math.atan((ez(c.e,u+c.dir)-ez(c.e,u-c.dir))/2)}else{c.wz=0;c.wp=0}}}
 function planMove(c,prefer){const n=endNode(c.e,c.dir),inL=arrLeg(c.e,c.dir);c.mv=null;c.stopDone=false;c.stopT=0;c.waitT=0;c.goYellow=false;c.needLane=null;if(!inL)return;
   let ms=movesFrom(n,inL);if(RW.closed.size){const ok=ms.filter(m=>!RW.closed.has(m.e));if(ok.length)ms=ok}if(c.kind==="bike")ms=ms.filter(m=>m.t!=="U"&&BIKE_T.has(m.e.type)||m.e.type==="blvd"&&m.t==="S");if(!ms.length)return;let pick=prefer?ms.find(m=>m.t===prefer):null;if(!pick&&c.route){const Q=c.route,nk=c.e===Q.dest.e&&c.dir===Q.dest.dir&&c.s>Q.dest.s+3?Q.loop:Q.next.get(skey(c.e,c.dir));if(nk!=null)pick=ms.find(m=>skey(m.e,m.dir)===nk)||null}
-  if(!pick){const W=c.kind==="bike"?{S:5,R:2.5,L:0.8,U:0}:{S:6,R:1.8,L:1.4,U:0.05};let tot=0;for(const m of ms)tot+=W[m.t];let x=rnd()*tot;for(const m of ms){x-=W[m.t];if(x<=0){pick=m;break}}pick=pick||ms[0]}
+  // a roundabout: go round at most a couple of exits, then take one (nobody does laps)
+  if(n.rbt){if(!inL.major)c.rbN=0;else{c.rbN=(c.rbN||0)+1;if(!pick&&!c.route&&c.rbN>=3)pick=ms.find(m=>m.t==="R")||null}}
+  if(!pick){const W=c.kind==="bike"?{S:5,R:2.5,L:0.8,U:0}:n.rbt&&inL.major?{S:1.3,R:1.8,L:0,U:0}:{S:6,R:1.8,L:1.4,U:0.05};let tot=0;for(const m of ms)tot+=W[m.t];let x=rnd()*tot;for(const m of ms){x-=W[m.t];if(x<=0){pick=m;break}}pick=pick||ms[0]}
   c.mv=pick;c.mvNode=n;c.mvLeg=inL;c.lanePinned=false;c.needLane=pick.t==="R"||pick.e.ow&&n.ctrl==="merge"?0:(pick.t==="L"||pick.t==="U")?c.e.n-1:null;
   if(c.needLane===null&&pick.e.n<c.e.n&&pick.t==="S"&&n.ctrl!=="merge"){const th=wrapPi(pick.o.h-(inL.h+Math.PI));if(Math.abs(th)>0.12)c.needLane=th>0?c.e.n-1:0}}
 function outLane(c,i){const m=c.mv,nO=m.e.n,nI=c.e.n;if(m.t==="R")return 0;if(m.t==="L"||m.t==="U")return nO-1;return nO>nI?i+(nO-nI):Math.max(0,i-(nI-nO))}
@@ -3970,8 +4197,12 @@ function newCar(e,dir,s,i,kind){const vf=0.92+rnd()*0.16,off=laneOff(e,i);
   const c={id:++CAR_ID,kind:kind||"ai",e,dir,s,off,offT:off,vf,v0:e.lim/2.23694*vf,v:e.lim/2.23694*vf*0.8,paint:TRAFFIC_PAINTS[Math.floor(rnd()*TRAFFIC_PAINTS.length)],sig:0,lcT:2+rnd()*6,spin:0,head:0,jn:null,idle:0};
   planMove(c);carPose(c);return c}
 function freeSpot(e,dir,s,i,gap){for(const o of cars){if(o.jn||o.e!==e||o.dir!==dir)continue;if(laneIdx(o)===i&&Math.abs(o.s-s)<gap)return false}return true}
-function randomSpot(minD,maxD){
-  for(let k=0;k<80;k++){const x=rnd()*EW[EW.length-1];let a=0,b=EW.length-1;while(a<b){const m=(a+b)>>1;if(EW[m]<x)a=m+1;else b=m}const e=EDGES[a];
+// the new world is big: pick from the roads near you (the list is redone when you have moved 150 m)
+const NEAR_E={x:1e9,y:1e9,d:0,E:[],W:[]};
+function nearEdges(maxD){if(Math.hypot(car.px-NEAR_E.x,car.py-NEAR_E.y)<150&&NEAR_E.d===maxD)return NEAR_E;Object.assign(NEAR_E,{x:car.px,y:car.py,d:maxD,E:[],W:[]});let a=0;
+  for(const e of EDGES){const c=eAt(e,e.L/2);if(Math.hypot(c.x-car.px,c.y-car.py)>maxD+e.L/2)continue;a+=e.L*e.n;NEAR_E.E.push(e);NEAR_E.W.push(a)}return NEAR_E}
+function randomSpot(minD,maxD){const NE=W2?nearEdges(maxD):{E:EDGES,W:EW};if(!NE.E.length)return null;
+  for(let k=0;k<80;k++){const x=rnd()*NE.W[NE.W.length-1];let a=0,b=NE.W.length-1;while(a<b){const m=(a+b)>>1;if(NE.W[m]<x)a=m+1;else b=m}const e=NE.E[a];
     const dir=e.ow||rnd()<0.5?1:-1,s0=rStart(e,dir)+4,s1=e.L-rEnd(e,dir)-12;if(s1<=s0)continue;const s=s0+rnd()*(s1-s0),i=Math.floor(rnd()*e.n);
     const p=fpt(e,dir,s,laneOff(e,i)),d=Math.hypot(p[0]-car.px,p[1]-car.py);if(d<minD||d>maxD)continue;if(!freeSpot(e,dir,s,i,30))continue;return {e,dir,s,i}}
   return null}
@@ -4003,6 +4234,13 @@ function approaching(n,leg,within,except){const dir=leg.end===1?1:-1,e=leg.e,meT
   return false}
 function boxBusy(n,c){for(const o of cars)if(o!==c&&o.jn&&o.jn.n===n)return true;
   return c&&c.kind!=="fsd"&&Math.hypot(car.px-n.x,car.py-n.y)<Math.max(n.pr,10)+2}
+// entering a roundabout: nobody coming round the ring within about 4.5 s (this ring piece and the one before it)
+function rbClear(c,n){const I=n.legs.find(l=>l.major&&l.end===1);if(!I)return true;const e1=I.e,n0=e1.a,P=n0.legs.find(l=>l.major&&l.end===1),e0=P&&P.e;
+  const far=(d,v)=>d>Math.max(12,v*4.5);
+  for(const o of cars){if(o===c)continue;let d=null;if(o.jn){if(o.jn.n===n0&&o.jn.mv.e===e1)d=e1.L+o.jn.P.L-o.jn.d;else continue}
+    else if(o.e===e1)d=e1.L-o.s;else if(o.e===e0)d=e1.L+e0.L-o.s;if(d!==null&&d>-3&&!far(d,o.v))return false}
+  const M=me();if(c.kind!=="fsd"&&!st.walk){let d=null;if(M.e===e1)d=M.L-M.s;else if(M.e===e0)d=e1.L+M.L-M.s;if(d!==null&&d>-3&&!far(d,car.vx))return false}
+  return true}
 const oppLeg=(n,L)=>n.legs.find(l=>l!==L&&Math.abs(wrapPi(l.h-L.h-Math.PI))<0.5);
 // a left turn needs a gap in oncoming traffic: anyone arriving within about 4.5 s blocks it, but an oncoming car that is
 // itself waiting to turn left does not (the two turn left in front of each other, as people really do)
@@ -4063,7 +4301,7 @@ function ctrlGap(c,dStop,dt){const n=c.mvNode,mv=c.mv,L=c.mvLeg;if(!mv)return dS
     case "allstop":{if(!c.stopDone){fullStop();return at}c.waitT+=dt;
       if(boxBusy(n,c)||(!firstInLine(c,n)&&c.waitT<8)||!exitClear(c))return at;return Infinity}
     case "minor":{if(L.major){if(mv.t==="L"&&!oppClear(c,n,L))return at;return Infinity}
-      if(!c.stopDone){fullStop();return at}c.waitT+=dt;if(boxBusy(n,c)||!gapClear(c,n,L,mv)||!exitClear(c))return at;return Infinity}
+      if(!c.stopDone&&!n.rbt){fullStop();return at}if(n.rbt&&dStop>14)return Math.max(at,dStop*0.6);c.waitT+=dt;if(boxBusy(n,c)||!gapClear(c,n,L,mv)||n.rbt&&!rbClear(c,n)||!exitClear(c))return at;return Infinity}
     case "merge":{if(L.major)return Infinity;if(mergeClear(c,n,mv)){c.waitT=0;return Infinity}if(stopped)c.waitT+=dt;return at}
     default:if(mv.t==="U"){const O=oppLeg(n,L);if(O&&approaching(n,O,withinFor(O.e),c)){if(stopped)c.waitT+=dt;return at}}return Infinity}}
 function advance(c,ds,P){
@@ -4621,9 +4859,10 @@ function navPlaces(){const L=[],add=(name,sub,x,y,h,ic)=>{if(x==null||!isFinite(
   if(VALET.stand)add("Halden Valet","Valet gig at the Cass Ave garage",VALET.stand.x,VALET.stand.y,VALET.stand.h,"🔑");
   if(STARTS.home)add(STARTS.home.name||"Home","Your house",STARTS.home.x,STARTS.home.y,STARTS.home.h,"🏠");
   try{if(TOLL.e){const q=fpt(TOLL.e,1,TOLL.s,0);add("Hwy 7 toll plaza","Cash lane and E-ZPass",q[0],q[1],0,"🛣️")}}catch(e){}
-  add("Halden Off-Road Park","Trails, rock garden, mud bog",STARTS.offroad.x,STARTS.offroad.y,STARTS.offroad.h,"⛰️");
-  add("Proving ground","Test track, hills and skidpad",STARTS.proving.x,STARTS.proving.y,STARTS.proving.h,"🏁");
+  if(STARTS.offroad)add("Halden Off-Road Park","Trails, rock garden, mud bog",STARTS.offroad.x,STARTS.offroad.y,STARTS.offroad.h,"⛰️");
+  if(STARTS.proving)add("Proving ground","Test track, hills and skidpad",STARTS.proving.x,STARTS.proving.y,STARTS.proving.h,"🏁");
   add("Rosedale","Neighborhood",STARTS.suburb.x,STARTS.suburb.y,STARTS.suburb.h,"🏘️");
+  if(W2){for(const k of ["mountain","millbrook","fairhaven","oakridge"])if(STARTS[k])add(STARTS[k].name,STARTS[k].nav||"",STARTS[k].x,STARTS[k].y,STARTS[k].h,STARTS[k].ic||"📍")}
   return L.sort((a,b)=>a.d-b.d)}
 // fastest route to frame f from every (road, direction): Dijkstra over the reversed graph. Used by the navigation and by the tow truck
 function navBuild(f){let loop;
@@ -4858,7 +5097,7 @@ function vizTesla(g,x,y,w,h,big){const M=me(),T=TRIMS[st.trim],dark=st.night,sp=
   {const n=M.node,L=n&&arrLeg(M.e,M.dir);if(n&&L&&M.s<M.L&&M.sStop-M.s<90){const p=fpt(M.e,M.dir,M.sStop,M.lo*LANE+LANE*(M.n-1)/2),q=P(p[0],p[1]);
     if(q&&n.ctrl==="signal"){const s_=sigState(n,L.grp,st.clock||0),col=s_==="green"?"#2ea84a":s_==="yellow"?"#e8a400":"#e0322a";g.strokeStyle=col;g.lineWidth=3;const a=fpt(M.e,M.dir,M.sStop,M.rEdge),b=fpt(M.e,M.dir,M.sStop,M.lEdge),qa=P(a[0],a[1]),qb=P(b[0],b[1]);if(qa&&qb){g.beginPath();g.moveTo(qa[0],qa[1]);g.lineTo(qb[0],qb[1]);g.stroke()}
       g.fillStyle="#22262b";rr2(g,q[0]+20,q[1]-46,12,30,3);g.fill();[["red",-42],["yellow",-32],["green",-22]].forEach(([c_,dy])=>{g.fillStyle=s_===c_?col:"#3a3f45";g.beginPath();g.arc(q[0]+26,q[1]+dy+1,3.5,0,7);g.fill()})}
-    else if(q&&(n.ctrl==="allstop"||(n.ctrl==="minor"&&!L.major))){g.fillStyle="#c8102e";g.beginPath();for(let k=0;k<8;k++){const a=Math.PI/8+k*Math.PI/4;g.lineTo(q[0]+26+Math.cos(a)*9,q[1]-26+Math.sin(a)*9)}g.closePath();g.fill();
+    else if(q&&(n.ctrl==="allstop"||(n.ctrl==="minor"&&!L.major&&!n.rbt))){g.fillStyle="#c8102e";g.beginPath();for(let k=0;k<8;k++){const a=Math.PI/8+k*Math.PI/4;g.lineTo(q[0]+26+Math.cos(a)*9,q[1]-26+Math.sin(a)*9)}g.closePath();g.fill();
       const a=fpt(M.e,M.dir,M.sStop,M.rEdge),b=fpt(M.e,M.dir,M.sStop,M.lEdge),qa=P(a[0],a[1]),qb=P(b[0],b[1]);if(qa&&qb){g.strokeStyle=dark?"#ddd":"#555";g.lineWidth=3;g.beginPath();g.moveTo(qa[0],qa[1]);g.lineTo(qb[0],qb[1]);g.stroke()}}}}
   // everyone around: cars as soft 3D boxes, people, bikes, cones, deer
   const objs=[];for(const o of cars.concat(parked))if(o.wx!==undefined&&Math.abs((o.wz||0)-(car.zb||0))<2.5)objs.push(o);for(const p of peds)objs.push(p);for(const d of EV.crit)objs.push(d);
@@ -7171,16 +7410,17 @@ const TERR={};
 // the height of the drawn ground (the triangles as rendered) at a point
 function terrDrawn(x,y){const {N,NY,h}=TERR,fx=(x-WORLD.x0)/(WORLD.x1-WORLD.x0)*N,fy=(y-WORLD.y0)/(WORLD.y1-WORLD.y0)*NY,i=Math.floor(fx),j=Math.floor(fy),a=fx-i,b=fy-j,W=N+1;if(i<0||j<0||i>=N||j>=NY)return -9;
   const h00=h[j*W+i],h10=h[j*W+i+1],h01=h[(j+1)*W+i],h11=h[(j+1)*W+i+1];return a+b<=1?h00+(h10-h00)*a+(h01-h00)*b:h11+(h01-h11)*(1-a)+(h10-h11)*(1-b)}
-function terrainMesh(){const N=360,X0=WORLD.x0,X1=WORLD.x1,Y0=WORLD.y0,Y1=WORLD.y1,P=[],Nn=[],I=[];const NY=Math.round(N*(Y1-Y0)/(X1-X0));
+function terrainMesh(){const N=W2?640:360,X0=WORLD.x0,X1=WORLD.x1,Y0=WORLD.y0,Y1=WORLD.y1,P=[],Nn=[],I=[];const NY=Math.round(N*(Y1-Y0)/(X1-X0));
   const onPad=(x,y)=>Math.abs(x-PAD.cx)<PAD.rad+8&&Math.abs(y-PAD.cy)<PAD.rad+8&&[[0,0],[7,0],[-7,0],[0,7],[0,-7]].some(([a,b])=>padHit(x+a,y+b));
-  const H=(x,y)=>{if(inCity(x,y)||inTC(x,y,4)||inExtra(x,y,6)||onPad(x,y))return -0.14;const d=dfAt(x,y);let z=Math.max(d<45?hillZ(x,y)+riverCut(x,y):terrainH(x,y,d),embZ(x,y));
+  const H2=(x,y)=>{if(inCity(x,y)||inExtra(x,y,6)||onPad(x,y))return -0.14;const d=dfAt(x,y);let z=Math.max(d<45?hillZ(x,y)+riverCut(x,y):terrainH(x,y,d),embZ(x,y));z=Math.min(z,cutZ(x,y));if(d<40)z=w2Blend(x,y,z);return z-0.08};
+  const H=W2?H2:(x,y)=>{if(inCity(x,y)||inTC(x,y,4)||inExtra(x,y,6)||onPad(x,y))return -0.14;const d=dfAt(x,y);let z=Math.max(d<45?hillZ(x,y)+riverCut(x,y):terrainH(x,y,d),embZ(x,y));
     for(const n of gAt(GRID.n,x,y)){if(n.pr){const dn=Math.hypot(x-n.x,y-n.y)-n.pr;if(dn<14)z=Math.min(z,n.z-0.25+Math.max(0,dn)*0.12)}}
     if(d<70){let best=1e9,rz=null,zc=1e9;for(const e of edgesNear(x,y,34)){const p=eProj(e,x,y);if(p.u<-6||p.u>e.L+6)continue;const dd=Math.abs(p.t)-e.W-auxW(e,p.u,p.t),zz=e.hz?ez(e,clamp(p.u,0,e.L)):0;
         if(e.dip&&onDip(e,p.u)||e.ov&&overDeck(e,p.u)){if(!(e.ov&&overDeck(e,p.u)))zc=Math.min(zc,zz-0.35+Math.max(0,dd-16)*0.42);continue}if(dd<best){best=dd;rz=zz}if(dd<40){const b=Math.max(0,dd-1.2);z=Math.min(z,zz-0.3+(b<12?b*0.1:1.2+(b-12)*0.3))}}   // every road nearby pulls the ground down under it, not just the nearest
       z=Math.min(z,zc)}
     return z-0.08};
   TERR.N=N;TERR.NY=NY;TERR.h=new Float32Array((N+1)*(NY+1));TERR.h0=new Float32Array((N+1)*(NY+1));
-  for(let j=0;j<=NY;j++)for(let i=0;i<=N;i++){const x=X0+(X1-X0)*i/N,y=Y0+(Y1-Y0)*j/NY,h0=H(x,y),h=h0-(orBogQ(x,y)<1.6?1.4:0),hx=H(x+3,y)-h0,hy=H(x,y+3)-h0;TERR.h[j*(N+1)+i]=h;TERR.h0[j*(N+1)+i]=h0;P.push(x,h,-y);Nn.push(...norm([-hx/3,1,hy/3]))}
+  for(let j=0;j<=NY;j++)for(let i=0;i<=N;i++){const x=X0+(X1-X0)*i/N,y=Y0+(Y1-Y0)*j/NY,h0=H(x,y),h=h0-(!W2&&orBogQ(x,y)<1.6?1.4:0),hx=H(x+3,y)-h0,hy=H(x,y+3)-h0;TERR.h[j*(N+1)+i]=h;TERR.h0[j*(N+1)+i]=h0;P.push(x,h,-y);Nn.push(...norm([-hx/3,1,hy/3]))}
   for(let j=0;j<NY;j++)for(let i=0;i<N;i++){const a=j*(N+1)+i;I.push(a,a+1,a+N+1,a+1,a+N+2,a+N+1)}return meshFrom(P,Nn,I)}
 function bumpMesh(){const B={P:[],N:[],I:[]},H={P:[],N:[],I:[]};
   for(const b of BUMPS.speed){const p=ePt(b.e,b.u,0);boxInto(B,p[0],0.035,-p[1],0.9,0.07,hwOf(b.e)*2-0.4,p[2])}
@@ -7259,7 +7499,7 @@ function buildWorld(){retailSites();placeExtras();
     const mu0=tp?e.tp[0]+8:0;   // where a tapering median is wide enough for kerbs and grass
     if(e.m>0){stripInto(R,e,F(u=>M2(u)-e.shL),F(u=>M2(u)+nL+sd),0,u0,u1);stripInto(R,e,F(u=>-M2(u)-nL-sd),F(u=>-(M2(u)-e.shL)),0,u0,u1);
       if(tp)stripInto(R,e,u=>-Math.max(0,M2(u)-e.shL),u=>Math.max(0,M2(u)-e.shL),0,u0,mu0);
-      if(e.br||e.ov){const b0=e.br?e.br.uc-e.br.half-BRIDGE_RAMP*0.75:e.ov.uc-e.ov.half-e.ov.rA*0.75,b1=e.br?e.br.uc+e.br.half+BRIDGE_RAMP*0.75:e.ov.uc+e.ov.half+e.ov.rB*0.75;stripInto(green,e,-(e.m/2-e.shL-0.3),e.m/2-e.shL-0.3,-0.02,mu0,b0);stripInto(green,e,-(e.m/2-e.shL-0.3),e.m/2-e.shL-0.3,-0.02,b1,e.L);stripInto(walk,e,-(e.m/2-e.shL),e.m/2-e.shL,0.004,b0,b1)}
+      if(e.br||e.ov){const b0=e.br?e.br.uc-e.br.half-e.br.rp*0.75:e.ov.uc-e.ov.half-e.ov.rA*0.75,b1=e.br?e.br.uc+e.br.half+e.br.rp*0.75:e.ov.uc+e.ov.half+e.ov.rB*0.75;stripInto(green,e,-(e.m/2-e.shL-0.3),e.m/2-e.shL-0.3,-0.02,mu0,b0);stripInto(green,e,-(e.m/2-e.shL-0.3),e.m/2-e.shL-0.3,-0.02,b1,e.L);stripInto(walk,e,-(e.m/2-e.shL),e.m/2-e.shL,0.004,b0,b1)}
       else stripInto(green,e,F(u=>-(M2(u)-e.shL-0.3)),F(u=>M2(u)-e.shL-0.3),-0.02,mu0,e.L)}
     else stripInto(R,e,-(e.m/2+nL+sd),e.m/2+nL+sd,0,u0,u1);
     for(const a of e.aux||[]){const o=e.m/2+nL+sd;stripInto(R,e,u=>a.sg*(o-0.05),u=>a.sg*(o+auxW(e,u,a.sg)),0,a.u0,a.u1)}
@@ -7300,7 +7540,7 @@ function buildWorld(){retailSites();placeExtras();
       if(n.ctrl!=="minor"&&e.T.z==="c"&&!e.T.rumble)for(let t=-W+0.5;t<W-0.3;t+=1.2){if(e.m>0&&Math.abs(t)<m2)continue;stripInto(zebra,e,t,t+0.6,0.011,Math.min(uAt(l.r-0.4),uAt(l.r-3.4)),Math.max(uAt(l.r-0.4),uAt(l.r-3.4)))}}}
   SCN.roadZ=[["c",mf(road.c)],["h",mf(road.h)],["d",mf(road.d)]];SCN.wear=[["c",mf(wear.c)],["h",mf(wear.h)],["d",mf(wear.d)]];SCN.lines=[mf(white)];SCN.ylines=mf(yellow);SCN.kerbs=[mf(kerb)];SCN.walk=mf(walk);
   SCN.rumble=[mf(rumble)];SCN.bikeL=mf(bikeL);SCN.zebraB=zebra;SCN.stopLB=stopL;SCN.greenB=green;
-  SCN.ground=terrainMesh();SCN.bumps=bumpMesh();SCN.tc=tcMesh();try{SCN.or=orMesh()}catch(e){console.error(e)}
+  SCN.ground=terrainMesh();SCN.bumps=bumpMesh();if(!W2){SCN.tc=tcMesh();try{SCN.or=orMesh()}catch(e){console.error(e)}}
   worldScenery();
 }
 // the proving ground: concrete pad, the test sections as real height-mapped surfaces, paint, cones and section boards
@@ -7535,21 +7775,22 @@ function worldScenery(){
       const b=tree.P.length/3;tree.P.push(x,hgt+hb,z,x+c0[0]*rad,hgt*0.28+hb,z+c0[1]*rad,x+c1[0]*rad,hgt*0.28+hb,z+c1[1]*rad);
       tree.N.push(...norm([(c0[0]+c1[0])/2,0.5,(c0[1]+c1[1])/2]),...norm([c0[0],0.5,c0[1]]),...norm([c1[0],0.5,c1[1]]));tree.I.push(b,b+2,b+1)}
     boxInto(trunk,x,hgt*0.15+hb,z,0.4,hgt*0.3,0.4,0)};
-  const nearBr=(x,y)=>{for(const e of gAt(GRID.e,x,y)){if(e.ov){const p=eProj(e,x,y);if(Math.abs(p.u-e.ov.uc)<e.ov.half+Math.max(e.ov.rA,e.ov.rB)+4&&Math.abs(p.t)<e.W+14)return true}if(e.br){const p=eProj(e,x,y);if(Math.abs(p.u-e.br.uc)<e.br.half+BRIDGE_RAMP*0.8&&Math.abs(p.t)<e.W+14)return true}}return riverD(x,y)<RIVER.w/2+6};
+  const nearBr=(x,y)=>{for(const e of gAt(GRID.e,x,y)){if(e.ov){const p=eProj(e,x,y);if(Math.abs(p.u-e.ov.uc)<e.ov.half+Math.max(e.ov.rA,e.ov.rB)+4&&Math.abs(p.t)<e.W+14)return true}if(e.br){const p=eProj(e,x,y);if(Math.abs(p.u-e.br.uc)<e.br.half+e.br.rp*0.8&&Math.abs(p.t)<e.W+14)return true}}return riverD(x,y)<RIVER.w/2+6};
   const SZ=(x,y)=>Math.max(hillZ(x,y),embZ(x,y));
   const clear=(x,y,m)=>roadDist(x,y,m)>m&&!nearBr(x,y)&&!inExtra(x,y,m+2)&&!(x>GAR.x0-8&&x<GAR.x1+8&&y>GAR.y0-8&&y<GAR.y1+4);
   const lamp=(x,y,h,arm)=>{const z=SZ(x,y);B(post,x,y,z,8,0.16,0.16);const hx=x+Math.cos(h)*arm,hy=y+Math.sin(h)*arm;B(head,hx,hy,z+7.95,0.12,1.4,0.5,h);collAdd({t:"c",x,y,r:0.15})};
   // ---- downtown: concrete everywhere between the streets, a park, buildings filling the blocks
-  const [X0,X1,Y0,Y1]=CITY_BOX;B(plate,(X0+X1)/2,(Y0+Y1)/2,-0.05,0.04,X1-X0,Y1-Y0);
+  for(const CB of FLAT){if(CB[4]!=="city")continue;const [X0,X1,Y0,Y1]=CB,main=CB===CITY_BOX;B(plate,(X0+X1)/2,(Y0+Y1)/2,-0.05,0.04,X1-X0,Y1-Y0);
   const PARKB=[-1140,-1010,160,290];  {const g=M_();B(g,(PARKB[0]+PARKB[1])/2,(PARKB[2]+PARKB[3])/2,-0.03,0.03,PARKB[1]-PARKB[0],PARKB[3]-PARKB[2]);green.P.push(...g.P);const k0=green.P.length/3-g.P.length/3;green.N.push(...g.N);green.I.push(...g.I.map(i=>i+k0))}
-  for(let n=0;n<30;n++){const x=PARKB[0]+6+r()*(PARKB[1]-PARKB[0]-12),y=PARKB[2]+6+r()*(PARKB[3]-PARKB[2]-12);treeAt(x,y,0,true);collAdd({t:"c",x,y,r:0.35})}
-  const core=[-925,0];
+  if(main)for(let n=0;n<30;n++){const x=PARKB[0]+6+r()*(PARKB[1]-PARKB[0]-12),y=PARKB[2]+6+r()*(PARKB[3]-PARKB[2]-12);treeAt(x,y,0,true);collAdd({t:"c",x,y,r:0.35})}
+  const core=main?[-925,0]:[(X0+X1)/2,(Y0+Y1)/2],big=main?1:0.25,coreR=main?330:220;
   for(let gx=X0+14;gx<X1-10;gx+=29)for(let gy=Y0+14;gy<Y1-10;gy+=29){
     const w=16+r()*9,d=16+r()*9,x=gx+(r()-0.5)*3,y=gy+(r()-0.5)*3,rad=Math.hypot(w,d)/2;
     if(x>PARKB[0]-6-rad&&x<PARKB[1]+6+rad&&y>PARKB[2]-6-rad&&y<PARKB[3]+6+rad)continue;if(x>GAR.x0-6-rad&&x<GAR.x1+6+rad&&y>GAR.y0-6-rad&&y<GAR.y1+6+rad)continue;if(!clear(x,y,5.5+rad))continue;
-    const cd=Math.hypot(x-core[0],y-core[1]),tall=cd<330,h=tall?(16+r()*26+Math.pow(1-cd/330,1.4)*r()*130):(8+r()*20),mi=Math.floor(r()*5);
+    if(W2&&riverD(x,y)<RIVER.w/2+rad+12)continue;
+    const cd=Math.hypot(x-core[0],y-core[1]),tall=cd<coreR,h=tall?(16*big+r()*26*Math.max(big,0.4)+Math.pow(1-cd/coreR,1.4)*r()*130*big):(8+r()*20*Math.max(big,0.5)),mi=Math.floor(r()*5);
     if(h>48){B(bld[mi],x,y,0,15,w,d);B(bld[(mi+2)%5],x,y,15,h-15,w*0.72,d*0.72);B(roofs,x,y,h,2.5,w*0.3,d*0.3)}else{B(bld[mi],x,y,0,h,w,d);B(roofs,x,y,h,0.6,w*0.92,d*0.92)}
-    collAdd({t:"b",x,y,h:0,hl:w/2,hw:d/2});BLD_LIST.push([x,y,w/2,d/2])}
+    collAdd({t:"b",x,y,h:0,hl:w/2,hw:d/2});BLD_LIST.push([x,y,w/2,d/2])}}
   // ---- along every road: lamps, street trees, houses in the subdivisions, trees in the boulevard medians
   for(const e of EDGES){const W=hwOf(e),k0=kerbTrim(e,0)+6,k1=e.L-kerbTrim(e,1)-6,T=e.T;if(k1<=k0)continue;
     if(e.type==="ave"||e.type==="st"){for(let u=k0+22;u<k1-6;u+=72)for(const sd of [1,-1]){   // benches, bins and bike racks along the downtown walks
@@ -7574,7 +7815,7 @@ function worldScenery(){
           XSITES.push({kind:"lot",custom:true,x:c[0],y:c[1],L:6,D:back-d/2-W+0.3,U:[Math.cos(c[2]),Math.sin(c[2])],N:[-Math.sin(c[2])*sd,Math.cos(c[2])*sd],stalls:[]})}else stripInto(drive,e,sd*dr0,sd*dr1,0.003,u+w/2-3.4,u+w/2-0.4);
         if(r()<0.7){const q=ePt(e,u-w/2-3,sd*(W+T.walk+5+r()*3));treeAt(q[0],q[1],SZ(q[0],q[1]),r()<0.5);collAdd({t:"c",x:q[0],y:q[1],r:0.3})}}}}
   // ---- strip malls along Maple Blvd: parking lots in front, low buildings behind
-  for(const [xa,xb] of [[-60,100],[230,470],[530,770],[830,1070],[1130,1370]])for(const sd of [1,-1]){
+  if(!W2)for(const [xa,xb] of [[-60,100],[230,470],[530,770],[830,1070],[1130,1370]])for(const sd of [1,-1]){
     const cx=(xa+xb)/2;B(lot,cx,sd*44,-0.04,0.045,xb-xa-30,36);for(let x=xa+22;x<xb-18;x+=4.8)B(stall,x,sd*44,0.008,0.012,0.12,8);
     const segs=Math.floor((xb-xa-30)/38);for(let k=0;k<segs;k++){const x=xa+15+19+k*38,h=5+r()*3,mi=Math.floor(r()*5);B(bld[mi],x,sd*80,0,h,34,24);B(roofs,x,sd*80,h,0.5,33,23);B(signGW,x,sd*(80-12.05),h-1.4,0.9,12,0.1);collAdd({t:"b",x,y:sd*80,h:0,hl:17,hw:12});BLD_LIST.push([x,sd*80,17,12])}}
   // ---- traffic control: signals on mast arms, stop signs, speed limits
@@ -7603,6 +7844,7 @@ function worldScenery(){
           boxInto(lens,px-fx*0.11,pz,-(py-fy*0.11),0.012,0.4,0.42,ph);visorInto(sigH,px-fx*0.1,py-fy*0.1,pz-0.03,ph,0.25,0.12,7);
           const bx=p[0]-fx*0.2+Math.sin(ph)*0.0,by=p[1]-fy*0.2;boxInto(sigH,bx,gz+1.05,-by,0.06,0.16,0.11,ph);octInto(sigY,bx-fx*0.035,by-fy*0.035,gz+1.05,ph,0.025,0.012,10,0);
           SIGH.push({t:"ped",x:px-fx*0.135,y:py-fy*0.135,h:ph,z:pz,n,g:l.grp})}}
+      else if(n.rbt&&!l.major){const s=e.L-l.r-2.4,p=fpt(e,dir,s,sideO-0.9),gz=SZ(p[0],p[1]);B(post,p[0],p[1],gz,2.1,0.08,0.08);collAdd({t:"c",x:p[0],y:p[1],r:0.08});const hF=p[2]+Math.PI;octInto(stopR,p[0],p[1],gz+2.35,hF,0.52,0.04,3,-Math.PI/2);octInto(signW,p[0]+Math.cos(hF)*0.03,p[1]+Math.sin(hF)*0.03,gz+2.35,hF,0.3,0.02,3,-Math.PI/2)}
       else if(n.ctrl==="allstop"||(n.ctrl==="minor"&&!l.major)){const s=e.L-l.r-1.4,p=fpt(e,dir,s,sideO-0.9);B(post,p[0],p[1],0,2.1,0.08,0.08);collAdd({t:"c",x:p[0],y:p[1],r:0.08});
         const hF=p[2]+Math.PI;octInto(stopR,p[0],p[1],2.45,hF,0.42,0.04);const fx=Math.cos(hF)*0.025,fy=Math.sin(hF)*0.025;
         boxInto(signW,p[0]+fx,2.45,-(p[1]+fy),0.02,0.1,0.5,p[2]);if(n.ctrl==="allstop")boxInto(signW,p[0]+fx,1.9,-(p[1]+fy),0.02,0.2,0.5,p[2])}}}
@@ -7617,17 +7859,21 @@ function worldScenery(){
     for(const l of n.legs){if(!l.major||l.e.type!=="xway")continue;if(Math.cos(wrapPi(l.h+Math.PI-hx))<0.7)continue;const e=l.e,dir=l.end===1?1:-1;for(const s of [e.L-330,e.L-40]){if(s<rStart(e,dir)+30)continue;
     const o=-LANE*1.5-e.side-2.2,p=TE(signK,e,dir,s,o,0,7.2,0.3,0.3);collAdd({t:"c",x:p[0],y:p[1],r:0.25});TE(signK,e,dir,s,o+1.8,6.6,0.25,0.25,3.6);
     TE(signG,e,dir,s,o+3.6,5.0,2.4,0.12,7.2);TE(signGW,e,dir,s-0.08,o+3.6+2.6,5.5,1.3,0.01,1.1);TE(signGW,e,dir,s-0.08,o+3.4,6.75,0.28,0.01,3.8);TE(signGW,e,dir,s-0.08,o+3.2,6.3,0.2,0.01,3.0);TE(signGW,e,dir,s-0.08,o+0.9,5.45,0.6,0.01,0.12)}}}
+  // ---- roundabout islands
+  const rbK=M_(),rbG=M_();for(const b of W2_RB){const z=hillZ(b.x,b.y),ri=b.R-3.0;discInto(rbK,b.x,b.y,ri,z+0.12,40);discInto(rbG,b.x,b.y,ri-0.4,z+0.16,40);treeAt(b.x,b.y,z+0.16,true);
+    for(let k=0;k<5;k++){const a=k/5*Math.PI*2+0.4,rr=ri*0.55;treeAt(b.x+Math.cos(a)*rr,b.y+Math.sin(a)*rr,z+0.16,false)}collAdd({t:"c",x:b.x,y:b.y,r:ri-0.2,z0:z-0.5,z1:z+3,what:"the roundabout island"})}
+  SCN.rbI=W2_RB.length?{k:meshFrom(rbK.P,rbK.N,rbK.I),g:meshFrom(rbG.P,rbG.N,rbG.I)}:null;
   // ---- asphalt repairs and sealed cracks
   for(const e of EDGES){if(e.T.dirt)continue;const u0=e.r0+4,u1=e.L-e.r1-4;for(let u=u0+r()*20;u<u1;u+=14+r()*36){const t=(r()-0.5)*2*(e.m/2+e.n*LANE),k=r();if(e.m>0&&Math.abs(t)<e.m/2+0.5)continue;
     const zz=e.hz?ez(e,u):0;if(k<0.22){const len=2+r()*7,wid=1+r()*2.6,p=ePt(e,u,t);boxInto(r()<0.6?patchD:patchL,p[0],0.0015+zz,-p[1],len,0.003,wid,p[2])}
     else if(k<(e.T.col==="c"?0.75:0.5)){let uu=u,tt=t,ang=(r()-0.5)*1.2;for(let n=0;n<4+r()*6;n++){const L_=0.6+r()*1.4,p=ePt(e,uu+Math.cos(ang)*L_/2,tt+Math.sin(ang)*L_/2);
       boxInto(crack,p[0],0.0025+zz,-p[1],Math.abs(Math.cos(ang))*L_+0.05,0.002,Math.abs(Math.sin(ang))*L_+0.05,p[2]);uu+=Math.cos(ang)*L_;tt+=Math.sin(ang)*L_;ang+=(r()-0.5)*1.1}}}}
   // ---- countryside: trees on the hills, farmhouses
-  let nt=0;for(let n=0;n<9000&&nt<1300;n++){const x=WORLD.x0+r()*(WORLD.x1-WORLD.x0),y=WORLD.y0+r()*(WORLD.y1-WORLD.y0);if(cityW(x,y)>0.05||riverD(x,y)<RIVER.w/2+10||inTC(x,y,25)||orNoTree(x,y))continue;const d=dfAt(x,y);if(d<16)continue;
+  let nt=0;const NT=W2?4200:1300;for(let n=0;n<(W2?32000:9000)&&nt<NT;n++){const x=WORLD.x0+r()*(WORLD.x1-WORLD.x0),y=WORLD.y0+r()*(WORLD.y1-WORLD.y0);if(cityW(x,y)>0.05||riverD(x,y)<RIVER.w/2+10||inTC(x,y,25)||orNoTree(x,y))continue;const d=dfAt(x,y);if(d<16)continue;
     if(d<40&&!clear(x,y,12))continue;if(Math.hypot(x-PAD.cx,y-PAD.cy)<90)continue;if(tree.P.length/3>200000)break;
     if(r()<0.55&&d>30){const cx=x,cy=y;for(let k=0;k<4;k++){const tx=cx+(r()-0.5)*30,ty=cy+(r()-0.5)*30;if(dfAt(tx,ty)<14||riverD(tx,ty)<RIVER.w/2+8||orNoTree(tx,ty))continue;treeAt(tx,ty,terrainH(tx,ty,dfAt(tx,ty))-0.3,true);nt++;if(dfAt(tx,ty)<40||inOR(tx,ty))collAdd({t:"c",x:tx,y:ty,r:0.35})}}
     else{treeAt(x,y,terrainH(x,y,d)-0.3,true);nt++;if(d<40||inOR(x,y))collAdd({t:"c",x,y,r:0.35})}}
-  for(let n=0;n<400;n++){const x=WORLD.x0+r()*(WORLD.x1-WORLD.x0),y=WORLD.y0+r()*(WORLD.y1-WORLD.y0);if(cityW(x,y)>0.05||riverD(x,y)<RIVER.w/2+20||inTC(x,y,40)||inOR(x,y,40))continue;const d=dfAt(x,y);if(d<45||d>160)continue;
+  for(let n=0;n<(W2?900:400);n++){const x=WORLD.x0+r()*(WORLD.x1-WORLD.x0),y=WORLD.y0+r()*(WORLD.y1-WORLD.y0);if(cityW(x,y)>0.05||riverD(x,y)<RIVER.w/2+20||inTC(x,y,40)||inOR(x,y,40))continue;const d=dfAt(x,y);if(d<45||d>160)continue;
     const hb=terrainH(x,y,d)-0.4,a=r()*Math.PI;B(house,x,y,hb,5.5,9+r()*4,7+r()*3,a);B(roofs,x,y,hb+5.5,1.6,7,5,a);collAdd({t:"b",x,y,h:a,hl:6,hw:4.5,what:"a house"})}
   // ---- bridges over the Rouge River: girders, piers, parapets you can hit
   const gird=M_(),para=M_(),water=M_(),gSlab=M_(),gWall=M_(),gLight=M_(),gBlue=M_();
@@ -7635,7 +7881,7 @@ function worldScenery(){
     const inJ=u=>u<(e.p0||0)+2||u>e.L-(e.p1||0)-2;   // the part of a ramp that has merged into the freeway is freeway, not bridge
     for(let u=uc-hf-34;u<=uc+hf+34;u+=6){if(inJ(u))continue;const z=ez(e,u),p=ePt(e,u,0);boxInto(gird,p[0],z-0.85,-p[1],6.1,1.2,2*Wt+0.6,p[2])}
     for(const du of [-hf+5,0,hf-5])for(const sd of [1,-1]){if(inJ(uc+du))continue;const p=ePt(e,uc+du,sd*Wt*0.55),z=ez(e,uc+du);boxInto(gird,p[0],(z-1.4-3.6)/2,-p[1],1.6,z-1.4+3.6,2.2,p[2])}
-    for(let u=uc-hf-BRIDGE_RAMP*0.7;u<=uc+hf+BRIDGE_RAMP*0.7;u+=4){const z=ez(e,u);if(z<0.9||inJ(u)||inJ(u+4))continue;
+    for(let u=uc-hf-e.br.rp*0.7;u<=uc+hf+e.br.rp*0.7;u+=4){const z=ez(e,u);if(z<0.9||inJ(u)||inJ(u+4))continue;
       for(const sd of [1,-1]){const p=ePt(e,u+2,sd*(Wt+0.25));
         // an acceleration / deceleration lane shares the freeway's deck: no railing between them (the ramp's outer railing is the edge)
         if(e.type==="xway"&&(auxW(e,u+2,sd)>0.3||gAt(GRID.e,p[0],p[1]).some(f=>f.type==="ramp"&&(()=>{const q=eProj(f,p[0],p[1]);return q.u>=(f.p0||0)&&q.u<=f.L-(f.p1||0)&&Math.abs(q.t)<f.m/2+f.n*LANE+f.side+0.6})())))continue;
@@ -7656,7 +7902,14 @@ function worldScenery(){
       const p=ePt(e,uc,0);boxInto(gird,p[0],z-1.75,-p[1],1.6,0.9,2*Wt+0.4,p[2])}
     for(const sd of [1,-1]){const u=uc+sd*(hf+1),z=ez(e,u),p=ePt(e,u,0);boxInto(gWall,p[0],(z-0.3)/2-0.5,-p[1],1.6,z+0.7,2*Wt+1.2,p[2]);
       collAdd({t:"b",x:p[0],y:p[1],h:p[2],hl:0.8,hw:Wt+0.6,z0:-0.4,z1:z-1.3,what:"the bridge abutment"})}}
-  for(let y=WORLD.y0;y<WORLD.y1;y+=16){const k=water.P.length/3,a=riverX(y),b=riverX(y+16),hw=RIVER.w/2-2;
+  if(W2)for(const Bw of W2_WATER){if(Bw.k==="lake"){const k0=water.P.length/3,n=64;water.P.push(Bw.x,RIVER.water,-Bw.y);water.N.push(0,1,0);
+      for(let i=0;i<n;i++){const a=i/n*Math.PI*2;water.P.push(Bw.x+Math.cos(a)*(Bw.rx-1.5),RIVER.water,-(Bw.y+Math.sin(a)*(Bw.ry-1.5)));water.N.push(0,1,0)}for(let i=0;i<n;i++)water.I.push(k0,k0+1+i,k0+1+(i+1)%n);continue}
+    // a river: a strip along its centre line, cut every 12 m, mitred at the bends
+    const P=Bw.pts,hw=Bw.w/2-1.5;let prev=null;for(let i=0;i<P.length-1;i++){const a=P[i],b=P[i+1],L=Math.hypot(b[0]-a[0],b[1]-a[1]),n=Math.max(1,Math.ceil(L/12));
+      for(let j=(i?1:0);j<=n;j++){const t=j/n,x=a[0]+(b[0]-a[0])*t,y=a[1]+(b[1]-a[1])*t;let hx=(b[0]-a[0])/L,hy=(b[1]-a[1])/L;
+        if(j===n&&i<P.length-2){const c=P[i+2],L2=Math.hypot(c[0]-b[0],c[1]-b[1]);hx+=(c[0]-b[0])/L2;hy+=(c[1]-b[1])/L2;const l=Math.hypot(hx,hy);hx/=l;hy/=l}
+        const k=water.P.length/3;water.P.push(x-hy*hw,RIVER.water,-(y+hx*hw),x+hy*hw,RIVER.water,-(y-hx*hw));water.N.push(0,1,0,0,1,0);if(prev!==null)water.I.push(prev,prev+1,k+1,prev,k+1,k);prev=k}}}
+  if(!W2)for(let y=WORLD.y0;y<WORLD.y1;y+=16){const k=water.P.length/3,a=riverX(y),b=riverX(y+16),hw=RIVER.w/2-2;
     water.P.push(a-hw,RIVER.water,-y,a+hw,RIVER.water,-y,b+hw,RIVER.water,-(y+16),b-hw,RIVER.water,-(y+16));water.N.push(0,1,0,0,1,0,0,1,0,0,1,0);water.I.push(k,k+1,k+2,k,k+2,k+3)}
   // ---- parking garage on Fort St: the two-bay dual helix (see GAR). Built from the same measurements as the model: decks, U-turns,
   // crossovers, guardrails with curbs, columns, crossbeams, stall lines, wheel stops, lights, driveways, signs and bollards
@@ -8337,10 +8590,12 @@ function dirtTick(dt){if(st.walk||!st.started)return;const v=Math.abs(car.vx);if
 const CW={o:null,tried:false,run:null,paid:false,paidT:0,gate:[0,0,0],gOpen:[0,0,0],said:"",price:12,snd:null,coll:[],gc:[],loaded:false,spin:0};
 const CW_LANE=[-10,-13,-16],CW_W=4.4;
 function cwSite(){if(CW.o||CW.tried)return CW.o;if(!EDGES.length||!SCN.sm)return null;CW.tried=true;let best=null;
-  for(const e of EDGES){if(/xway|ramp|dirt|lane/.test(e.type||"")||e.ov||e.br||e.hz||e.L<110)continue;const hw=hwOf(e);
+  // in the new world the car wash goes in Fairhaven: try the roads nearest it first
+  const EL=W2?EDGES.slice().sort((a,b)=>Math.hypot((a.a.x+a.b.x)/2-W2C.FH[0],(a.a.y+a.b.y)/2-W2C.FH[1])-Math.hypot((b.a.x+b.b.x)/2-W2C.FH[0],(b.a.y+b.b.y)/2-W2C.FH[1])):EDGES;
+  for(const e of EL){if(/xway|ramp|dirt|lane/.test(e.type||"")||e.ov||e.br||e.hz||e.L<110)continue;const hw=hwOf(e);
     for(let u=50;u<e.L-50;u+=25){const p=eAt(e,u),tx=Math.cos(p.h),ty=Math.sin(p.h);for(const sd of [1,-1]){const N=[-ty*sd,tx*sd],U=[-N[1],N[0]],O=[p.x+N[0]*(hw+2.5+26)-U[0]*10,p.y+N[1]*(hw+2.5+26)-U[1]*10];let ok=true;
       for(let x=-32;x<=52&&ok;x+=6)for(let z=-26;z<=26;z+=6.5){const wx=O[0]+U[0]*x+N[0]*z,wy=O[1]+U[1]*x+N[1]*z;if(!ptClear(wx,wy,1.5)){ok=false;break}GREF=0;const G=groundAt(wx,wy);if(G.kind!=="grass"||Math.abs(G.h||0)>0.4){ok=false;break}}
-      const d=Math.hypot(p.x+500,p.y-300);if(ok&&(!best||d<best.d))best={d,O,U,N,lim:e.lim||35}}}}
+      const d=W2?Math.hypot(p.x-W2C.FH[0],p.y-W2C.FH[1]):Math.hypot(p.x+500,p.y-300);if(ok&&(!best||d<best.d))best={d,O,U,N,lim:e.lim||35}}}}
   if(!best)return null;const o=CW.o=best;GREF=0;o.g=groundAt(o.O[0],o.O[1]).h||0;o.W=(x,z)=>[o.O[0]+o.U[0]*x+o.N[0]*z,o.O[1]+o.U[1]*x+o.N[1]*z];o.hX=Math.atan2(o.U[1],o.U[0]);
   {const c=o.W(10,-1.5);XSITES.push({kind:"lot",custom:true,cw:true,x:c[0],y:c[1],L:84,D:54,U:o.U,N:o.N,stalls:[]})}   // the whole site drives as pavement and shows on the map
   const box=(x,z,hl,hw,alongX)=>{const [wx,wy]=o.W(x,z),c={t:"b",x:wx,y:wy,h:alongX?o.hX:Math.atan2(o.N[1],o.N[0]),hl,hw,z0:-1,z1:4.5};COLL_KEEP.push(c);collAdd(c);return c};
@@ -9595,6 +9850,7 @@ function render(dt){
    if(!snow){mat([0.05,0.05,0.055],null,0.3,30,1,2);draw(SCN.patchD);mat([0.15,0.15,0.155],null,0.15,20,1,2);draw(SCN.patchL);mat([0.03,0.03,0.032],null,0.6,50);draw(SCN.crack);
      mat([0.16,0.16,0.165],null,0.2,20,1,2);for(const m of SCN.rumble)draw(m)}}
   gl.polygonOffset(2,2);for(const k of SCN.kerbs){mat([0.32,0.32,0.30],null,0.05,10,1,2);draw(k)}
+  if(SCN.rbI){mat([0.34,0.34,0.32],null,0.05,10,1,2);draw(SCN.rbI.k);gl.polygonOffset(1,1);mat(st.surface==="snow"?[0.8,0.82,0.86]:[0.11,0.23,0.07],null,0.02,8,1,1);draw(SCN.rbI.g);gl.polygonOffset(2,2)}
   gl.polygonOffset(0,0);mat([0.78,0.78,0.75],night?[0.012,0.012,0.012]:null,0.1,10);draw(SCN.xlines);draw(SCN.stall);draw(SCN.zebra);mat([0.9,0.9,0.85],night?[0.5,0.5,0.45]:null,0.8,60);draw(SCN.rpm);
   gl.disable(gl.CULL_FACE);mat([0.11,0.105,0.1],null,0.05,8);draw(SCN.bumps.rim);mat([0.018,0.017,0.016],null,0.3,30);draw(SCN.bumps.holes);mat([0.07,0.068,0.065],null,0.6,40);draw(SCN.bumps.man);mat([0.045,0.046,0.05],null,0.3,30);draw(SCN.bumps.cut);mat([0.75,0.6,0.08],night?[0.03,0.02,0]:null,0.3,20);draw(SCN.bumps.speed);
   if(SCN.bikeL&&st.surface!=="snow"){mat([0.13,0.4,0.2],null,0.15,15,1,2);draw(SCN.bikeL)}
@@ -9619,7 +9875,7 @@ function render(dt){
   mat([0.85,0.87,0.88],null,0.6,40);draw(SCN.chg);
   if(SCN.via){const V=SCN.via;gl.uniformMatrix4fv(U.uM,false,M4.id());mat([0.56,0.56,0.54],null,0.1,10,1,2);draw(V.dk);draw(V.pl);draw(V.cap);mat([0.24,0.3,0.36],null,0.8,50);draw(V.gd);mat([0.62,0.63,0.62],null,0.2,10);draw(V.par);mat([0.3,0.27,0.24],null,0.05,8);draw(V.bl);mat([0.5,0.5,0.48],null,0.1,10);draw(V.xp);mat([0.02,0.02,0.02],null,0,1);draw(V.fw);mat([0.62,0.62,0.66],null,1.6,90);draw(V.rx);mat([0.2,0.13,0.08],null,0.05,6);draw(V.ti);mat([0.42,0.4,0.38],null,1.2,70);draw(V.rl)}
   try{cwDraw(eye,night)}catch(e){}
-  if(PROPS.loco){const ex=eye[0],ey=-eye[2],hn=performance.now()<(TRAIN.hornOn||0);for(const c of TRAIN.cars){if(!PROPS[c.k])continue;const P=trainCarPose(c);if((P.x-ex)**2+(P.y-ey)**2>900*900)continue;propDraw(c.k,chain(carMatrix(P.x,P.y,P.yaw,P.z,P.pitch,0),M4.rY(Math.PI)),{head:c.k==="loco"?(hn&&performance.now()%600<300?1.6:1):0,brake:0})}}
+  if(PROPS.loco&&!W2){const ex=eye[0],ey=-eye[2],hn=performance.now()<(TRAIN.hornOn||0);for(const c of TRAIN.cars){if(!PROPS[c.k])continue;const P=trainCarPose(c);if((P.x-ex)**2+(P.y-ey)**2>900*900)continue;propDraw(c.k,chain(carMatrix(P.x,P.y,P.yaw,P.z,P.pitch,0),M4.rY(Math.PI)),{head:c.k==="loco"?(hn&&performance.now()%600<300?1.6:1):0,brake:0})}}
   if(TRL.on&&!st.walk&&PROPS["trl_"+(TRL.kind==="tow"?"x":TRL.kind)]&&!(cam2==="rear"&&sfOn("trlClear")))trlDrawModel(lampsOn,braking);try{trlDrawParked()}catch(e){}
   // signal lamps: only the lit lenses nearby are drawn, all in one go: round balls, flashing-yellow left arrows, and WALK / hand / countdown
   {const ex=eye[0],ez=-eye[2],T=st.clock||0,BK=[0,1,2,3,4].map(()=>({P:[],N:[],I:[]})),blink=(T%1)<0.5;
@@ -11224,7 +11480,7 @@ function buildViaduct(){if(SCN.via)return;const T=trainPath(),n=T.P.length,mk=()
     else for(const sd of [-1,1]){const rx=-Math.sin(yaw)*0.75*sd,ry=Math.cos(yaw)*0.75*sd;boxInto(rl,cx+rx,h+0.38,-(cy+ry),L,0.16,0.12,yaw)}
     if(false&&!collNear(cx,cy).some(o=>Math.hypot(o.x-cx,o.y-cy)<(o.t==="c"?o.r+2.5:Math.hypot(o.hl,o.hw)+2.5))){const g=groundAt(cx,cy).h;boxInto(pl,cx,(g+h-1)/2,-cy,1.8,h-1-g,1.8,yaw);collAdd({t:"c",x:cx,y:cy,r:1.0,what:"a rail viaduct pillar"})}}
   SCN.via={dk:meshFrom(dk.P,dk.N,dk.I),pl:meshFrom(pl.P,pl.N,pl.I),rl:meshFrom(rl.P,rl.N,rl.I),bl:meshFrom(bl.P,bl.N,bl.I),xp:meshFrom(xp.P,xp.N,xp.I),fw:meshFrom(fw.P,fw.N,fw.I),rx:meshFrom(rx_.P,rx_.N,rx_.I),ti:meshFrom(ti.P,ti.N,ti.I),gd:meshFrom(gd.P,gd.N,gd.I),par:meshFrom(par.P,par.N,par.I),cap:meshFrom(cap.P,cap.N,cap.I)}}
-function trainTick(dt){TRAIN.s+=TRAIN.v*dt;const T=trainPath();if(TRAIN.s>T.L)TRAIN.s-=T.L;
+function trainTick(dt){if(W2)return;TRAIN.s+=TRAIN.v*dt;const T=trainPath();if(TRAIN.s>T.L)TRAIN.s-=T.L;
   for(const x of TRAIN.xing||[]){let d=x.s-TRAIN.s;d=((d%T.L)+T.L)%T.L;if(d>T.L/2)d-=T.L;   // d > 0: train still coming; the train is 84 m long
     const down=(d<560&&d>-(TRAIN.len+12));if(down!==x.down){x.gT=0;x.down=down;for(const o of x.obs){const i=parked.indexOf(o);if(i>=0)parked.splice(i,1)}x.obs=[];
       if(down){xingMeasure(x);const ry=x.yaw+Math.PI/2,LTS=x.lanes.map(l=>-l);for(const sd of [-1,1])for(const lt of LTS){const o={kind:"xing",fixed:false,wx:x.x+Math.cos(ry)*sd*9-Math.sin(ry)*lt,wy:x.y+Math.sin(ry)*sd*9+Math.cos(ry)*lt,wh:ry,v:0,spin:0,sig:0,head:0,paint:"white"};x.obs.push(o);parked.push(o)}}}
@@ -12092,7 +12348,7 @@ maintCheck();setInterval(maintCheck,90000);
 async function boot(){
   document.body.classList.add("building");bootStep(0.35,"Loading the "+TRIMS[st.trim].short+"…");
   try{await loadModel(TRIMS[st.trim].model)}catch(e){bootStep(1,"Couldn't load the car files. Check your connection and reload.");return}
-  setTrim(st.trim,true);st.paint=TRIMS[st.trim].paint;buildViaduct();renderCfg();bootStep(1,"Ready");garModelLoad();
+  setTrim(st.trim,true);st.paint=TRIMS[st.trim].paint;if(!W2)buildViaduct();renderCfg();bootStep(1,"Ready");garModelLoad();
   setTimeout(()=>{$("boot").hidden=true},150);
   // the rest load one at a time while you choose, each uploaded to the GPU when the page is idle so nothing stutters
   // the newer cars load when you pick one, so phones and older laptops stay quick
