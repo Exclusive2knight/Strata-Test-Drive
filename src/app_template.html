@@ -11276,24 +11276,59 @@ function whlForce(dt){const c=WHL.cfg,T=TRIMS[st.trim]||{},v=Math.abs(car.vx);le
   const lk=0.576*180/Math.PI*c.ratio;if(Math.abs(WHL.deg)>lk)F-=Math.sign(WHL.deg)*Math.min(1,(Math.abs(WHL.deg)-lk)/12);   // the steering lock stops the wheel
   return clamp(F,-1,1)}
 const WHL_ALS=-1;
+
+// ---- standard USB force feedback (HID PID, the same thing DirectInput games use): Moza, Fanatec, Simagic, Cammus and other direct-drive bases.
+// The device describes its own reports; we find the ones we need by the usages they carry and pack the fields to match.
+const PID_V=[0x346e,0x0eb7,0x0483,0x3670,0x3416,0x11ff,0x044f],PU=u=>0x000f0000|u;
+function pidReports(dev){const out=[],walk=c=>{for(const [k,kind] of [["outputReports","out"],["featureReports","feat"],["inputReports","in"]])for(const r of c[k]||[])out.push({kind,id:r.reportId,items:r.items||[]});for(const ch of c.children||[])walk(ch)};
+  for(const c of dev.collections||[])walk(c);const has=(r,us)=>us.every(u=>r.items.some(it=>(it.usages||[]).includes(PU(u))||it.isRange&&it.usageMinimum<=PU(u)&&it.usageMaximum>=PU(u)));
+  const find=(kind,us,not)=>out.find(r=>r.kind===kind&&has(r,us)&&!(not&&has(r,not)));
+  return {setEff:find("out",[0x22,0x26,0x50]),cf:find("out",[0x22,0x70],[0x26]),op:find("out",[0x22,0x79]),dc:find("out",[0x97],[0x22]),gain:find("out",[0x7e],[0x22]),
+    create:find("feat",[0x26,0x8d])||find("feat",[0x26]),load:find("feat",[0x22,0x8c])}}
+// pack a report: vals maps PID usage id -> number (variable fields) or, for array fields, the usage id to select
+function pidPack(r,vals){let bits=0;for(const it of r.items)bits+=(it.reportSize||0)*(it.reportCount||0);const B=new Uint8Array(Math.ceil(bits/8));let pos=0;
+  const put=(v,n)=>{v=Math.round(v);if(v<0)v+=2**n;for(let i=0;i<n;i++){if(Math.floor(v/2**i)%2)B[(pos+i)>>3]|=1<<((pos+i)&7)}pos+=n};
+  for(const it of r.items){const n=it.reportSize||0,cnt=it.reportCount||0,us=it.usages||[],lo=it.logicalMinimum||0,hi=it.logicalMaximum||0;
+    for(let k=0;k<cnt;k++){let v=0;
+      if(it.isArray){const list=it.isRange?Array.from({length:it.usageMaximum-it.usageMinimum+1},(_,i)=>it.usageMinimum+i):us;const want=Object.keys(vals).map(Number).find(u=>vals[u]===true&&list.includes(PU(u)));v=want!=null&&k===0?list.indexOf(PU(want))+lo:0}
+      else{const u=it.isRange?it.usageMinimum+k:us[Math.min(k,us.length-1)],id=u&0xffff;if(u>>>16===0x0f&&vals[id]!==undefined&&vals[id]!==true){const x=vals[id];v=x==="max"?hi:x==="min"?lo:x}
+        else if(vals.dir&&u>>>16===0x0a)v=Math.round((hi+1)/4);          // the direction (an ordinal): 90 degrees, along the wheel's axis
+        else if(vals.dir&&u===0x00010030)v=1}
+      put(v,n)}}return B}
+function pidField(r,data,u){let pos=0;for(const it of r.items){const n=it.reportSize||0;for(let k=0;k<(it.reportCount||0);k++){const uu=it.isRange?it.usageMinimum+k:(it.usages||[])[Math.min(k,(it.usages||[]).length-1)];
+      if(uu===PU(u)){let v=0;for(let i=0;i<n;i++)if(data.getUint8((pos+i)>>3)>>((pos+i)&7)&1)v+=2**i;return v}pos+=n}}return null}
+async function pidInit(dev){const R=pidReports(dev);if(!R.setEff||!R.cf||!R.op)return false;const S=(r,v)=>dev.sendReport(r.id,pidPack(r,v));
+  if(R.dc){try{await S(R.dc,{0x9a:true})}catch(e){}await new Promise(r=>setTimeout(r,60));try{await S(R.dc,{0x97:true})}catch(e){}}
+  if(R.gain)try{await S(R.gain,{0x7e:"max"})}catch(e){}
+  let blk=1;if(R.create){try{await dev.sendFeatureReport(R.create.id,pidPack(R.create,{0x25:true,0x26:true,0x8d:0}))}catch(e){}
+    if(R.load)try{const d=await dev.receiveFeatureReport(R.load.id);const off=R.load.id?1:0,v=pidField(R.load,new DataView(d.buffer,d.byteOffset+off),0x22);if(v)blk=v}catch(e){}}
+  await S(R.setEff,{0x22:blk,0x25:true,0x26:true,0x50:0xffff,0x51:0,0x52:"max",0x53:0,0x54:0,0x56:1,0xa7:0,dir:true});
+  await S(R.cf,{0x22:blk,0x70:0});await S(R.op,{0x22:blk,0x78:true,0x79:true,0x7c:1});
+  // magnitude range from the descriptor
+  let mx=10000;for(const it of R.cf.items)if((it.usages||[]).includes(PU(0x70)))mx=it.logicalMaximum||mx;
+  WHL.pid={R,blk,mx,dev};return true}
+function pidForce(F){const P=WHL.pid;return P.dev.sendReport(P.R.cf.id,pidPack(P.R.cf,{0x22:P.blk,0x70:clamp(F,-1,1)*P.mx}))}
+
 async function whlSend(b){const d=WHL.hid;if(!d||!d.opened)return;await d.sendReport(0,new Uint8Array(b))}
 function whlOut(dt){if(!WHL.gp||!WHL.cfg)return;const c=WHL.cfg;let F=whlForce(dt)*(WHL.setup&&WHL.setup.F!=null?1:(c.ffb??0.7))*(c.sign||1);
-  if(WHL.ffbOK&&!WHL.busy){const lv=clamp(Math.round(0x80+F*127),0,255);let rp=0;const H=car.hyb,D=DRIVES[st.trim]||{};if(st.started&&!st.walk&&H&&H.eng&&D.red){const r=(H.rpm||0)/D.red;rp=r<0.6?0:Math.min(5,Math.floor((r-0.6)/0.07)+1)}
+  if(WHL.ffbOK&&WHL.pid){const q=Math.round(F*200);if(q!==WHL.sent&&!WHL.busy){WHL.busy=true;WHL.sent=q;pidForce(q/200).catch(()=>{WHL.ffbOK=false;WHL.pid=null;toast("Force feedback stopped: the wheel disconnected")}).finally(()=>{WHL.busy=false})}}
+  else if(WHL.ffbOK&&!WHL.busy){const lv=clamp(Math.round(0x80+F*127),0,255);let rp=0;const H=car.hyb,D=DRIVES[st.trim]||{};if(st.started&&!st.walk&&H&&H.eng&&D.red){const r=(H.rpm||0)/D.red;rp=r<0.6?0:Math.min(5,Math.floor((r-0.6)/0.07)+1)}
     const job=lv!==WHL.sent?[0x11,0x08,lv,0x80,0,0,0]:rp!==WHL.led?[0xf8,0x12,(1<<rp)-1,0,0,0,0]:null;
     if(job){WHL.busy=true;if(job[0]===0x11)WHL.sent=lv;else WHL.led=rp;whlSend(job).catch(()=>{WHL.ffbOK=false;toast("Force feedback stopped: the wheel disconnected")}).finally(()=>{WHL.busy=false})}}
   else if(!WHL.ffbOK&&WHL.gp.vibrationActuator&&st.started&&!st.walk){const now=performance.now(),k=Math.min(1,Math.abs(F-WHL.F)*3+(WHL.jolt>0?1:0));WHL.F=F;if(k>0.15&&now>WHL.rum){WHL.rum=now+70;WHL.gp.vibrationActuator.playEffect("dual-rumble",{duration:70,strongMagnitude:k,weakMagnitude:k*0.5}).catch(()=>{})}}}
 async function whlHid(dev){try{if(!dev.opened)await dev.open();const sw=WHL_LGSW[dev.productId];
     if(sw){for(const b of sw)await dev.sendReport(0,new Uint8Array(b));toast("Switching the wheel to its full mode. It reconnects in a moment: then press Connect force feedback again");return false}
-    if(!WHL_LG.has(dev.productId)){toast("Force feedback works on Logitech G29, G923 (PlayStation), G27, G25 and Driving Force GT. This wheel still steers, with rumble if it has it");return false}
+    if(!WHL_LG.has(dev.productId)){WHL.hid=dev;if(await pidInit(dev)){WHL.ffbOK=true;WHL.sent=-9999;if(WHL.cfg){WHL.cfg.ffbOn=true;whlSave()}return true}
+      WHL.hid=null;toast("This wheel doesn't offer standard force feedback to the browser. It still steers, with rumble if it has it");return false}
     WHL.hid=dev;await dev.sendReport(0,new Uint8Array([0xf5,0,0,0,0,0,0]));const r=WHL.cfg?WHL.cfg.range:900;await dev.sendReport(0,new Uint8Array([0xf8,0x81,r&255,r>>8,0,0,0]));
     WHL.ffbOK=true;WHL.sent=-1;WHL.led=-1;if(WHL.cfg){WHL.cfg.ffbOn=true;whlSave()}return true}catch(e){toast("Couldn't start force feedback: "+e.message);return false}}
 async function whlConnect(){if(!navigator.hid){toast("Force feedback needs Chrome or Edge on a computer");return false}
-  try{const L=await navigator.hid.requestDevice({filters:[{vendorId:0x046d}]});if(!L.length)return false;const ok=await whlHid(L[0]);if(ok){toast("Force feedback on");setTimeout(whlSignTest,300)}return ok}catch(e){toast("Couldn't connect: "+e.message);return false}}
+  try{const L=await navigator.hid.requestDevice({filters:[{vendorId:0x046d},...PID_V.map(v=>({vendorId:v}))]});if(!L.length)return false;const ok=await whlHid(L[0]);if(ok){toast("Force feedback on");setTimeout(whlSignTest,300)}return ok}catch(e){toast("Couldn't connect: "+e.message);return false}}
 // which way is "right" differs between wheels: push it briefly and watch where it goes
 async function whlSignTest(){if(!WHL.ffbOK||!WHL.gp)return;const S=WHL.setup||(WHL.setup={step:"sign",tmp:true});const p0=WHL.pos;S.F=0.45;await new Promise(r=>setTimeout(r,260));const d=WHL.pos-p0;S.F=0;await new Promise(r=>setTimeout(r,120));S.F=null;if(S.tmp)WHL.setup=null;
   if(Math.abs(d)>0.004){WHL.cfg.sign=d>0?1:-1;whlSave()}whlDraw()}
-if(navigator.hid&&navigator.hid.getDevices)setTimeout(()=>navigator.hid.getDevices().then(L=>{const c=WHL.cfg;if(!c||!c.ffbOn)return;const d=L.find(d=>d.vendorId===0x046d&&WHL_LG.has(d.productId));if(d)whlHid(d)}).catch(()=>{}),1500);
-addEventListener("pagehide",()=>{if(WHL.ffbOK)whlSend([0x13,0,0,0,0,0,0]).catch(()=>{})});
+if(navigator.hid&&navigator.hid.getDevices)setTimeout(()=>navigator.hid.getDevices().then(L=>{const c=WHL.cfg;if(!c||!c.ffbOn)return;const d=L.find(d=>d.vendorId===0x046d&&WHL_LG.has(d.productId))||L.find(d=>PID_V.includes(d.vendorId));if(d)whlHid(d)}).catch(()=>{}),1500);
+addEventListener("pagehide",()=>{if(WHL.ffbOK&&WHL.pid){const P=WHL.pid;try{P.dev.sendReport(P.R.op.id,pidPack(P.R.op,{0x22:P.blk,0x78:true,0x7b:true}))}catch(e){}}else if(WHL.ffbOK)whlSend([0x13,0,0,0,0,0,0]).catch(()=>{})});
 // ---- setup: find the steering axis and the pedals by moving them, the paddles by pulling them
 const WHL_STEPS=[["steer","Turn the wheel all the way left, then all the way right, then back to the middle"],["gas","Press the gas pedal all the way down, then let go"],["brake","Press the brake pedal all the way down, then let go"],["clutch","Press the clutch pedal all the way down, then let go (skip if you don't have one)"],["up","Pull the right paddle (shift up)"],["dn","Pull the left paddle (shift down)"],["horn","Press the button you want for the horn"]];
 function whlOpen(){let el=$("whl");if(!el){el=document.createElement("div");el.id="whl";document.body.appendChild(el);el.addEventListener("click",e=>{if(e.target===el){whlClose();return}const b=e.target.closest("button");if(b)whlAct(b.dataset.w)});
@@ -11320,7 +11355,7 @@ function whlDraw(soft){const el=$("whl");if(!el||el.hidden)return;if(soft){const
     if(S&&S.i!=null){h+=`<p class="whStep">Step ${S.i+1} of ${WHL_STEPS.length}</p><p><b>${WHL_STEPS[S.i][1]}</b></p><div class="whR">${S.i>=3?`<button data-w="skip">Skip</button>`:""}<button data-w="x">Cancel</button></div>`}
     else{const ok=c&&c.gas!=null;h+=`<p>${ok?"Set up: the wheel steers, the pedals drive"+(c.up!=null?", the paddles shift":"")+".":"Set up the pedals and paddles once: it takes about 20 seconds."}</p><div class="whR"><button class="whGo" data-w="go">${ok?"Set up again":"Set up the wheel"}</button>${ok?`<button data-w="reset">Reset</button>`:""}</div>
       <div class="whH2"><b>Force feedback</b>${WHL.ffbOK?`<span class="whOn">On</span>`:""}</div>
-      <p class="fine">Feel the road through the wheel: it gets heavier with speed, goes light when the front tyres slide, kicks over bumps and kerbs, stops at the car's steering lock, and turns by itself when Super Cruise, Lane Keep or Park Assist steer. Logitech G29, G923 (PlayStation), G27, G25 and Driving Force GT, in Chrome or Edge.</p>
+      <p class="fine">Feel the road through the wheel: it gets heavier with speed, goes light when the front tyres slide, kicks over bumps and kerbs, stops at the car's steering lock, and turns by itself when Super Cruise, Lane Keep or Park Assist steer. Moza, Fanatec, Simagic, Cammus and other direct-drive bases with standard force feedback, and Logitech G29, G923 (PlayStation), G27, G25 and Driving Force GT, in Chrome or Edge.</p>
       <div class="whR">${WHL.ffbOK?`<button data-w="test">Check direction</button><button data-w="rev">Reverse force</button>`:`<button class="whGo" data-w="ffb">Connect force feedback</button>`}</div>
       <div id="whVals">${whlVals()}</div>`}}
   el.innerHTML=h+`</div>`}
