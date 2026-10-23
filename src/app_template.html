@@ -1755,7 +1755,8 @@ const HILLS2=[[-3300,2500,260,650],[1150,2950,28,220],[2950,3350,34,250],[3750,2
 // water: the Clearwater River through Westport, Mill Creek out of Millbrook Lake down to the river
 const W2_WATER=[{k:"river",name:"Clearwater River",w:64,bh:5.2,rp:125,pts:[[-700,3700],[-450,2900],[-250,2100],[-300,1300],[-180,700],[-220,0],[-150,-700],[-60,-1300],[150,-2000],[450,-2800],[700,-3700]]},
   {k:"river",name:"Mill Creek",w:12,bh:2.6,rp:60,pts:[[2150,2620],[2050,2520],[2000,2400],[1900,2280],[1700,2200],[1400,2160],[1000,2140],[600,1920],[200,1720],[-280,1640]]},
-  {k:"lake",name:"Millbrook Lake",x:2350,y:2750,rx:300,ry:180}];
+  {k:"lake",name:"Millbrook Lake",x:2350,y:2750,rx:300,ry:180},
+  {k:"river",name:"Sandy Creek",w:10,bh:1.6,rp:30,pts:[[-2200,-3650],[-1500,-3420],[-1000,-3400],[-600,-3410],[-300,-3390],[100,-3350],[600,-3330]]}];
 for(const B of W2_WATER){if(B.k==="lake"){B.bb=[B.x-B.rx,B.x+B.rx,B.y-B.ry,B.y+B.ry];continue}const xs=B.pts.map(p=>p[0]),ys=B.pts.map(p=>p[1]);B.bb=[Math.min(...xs)-B.w,Math.max(...xs)+B.w,Math.min(...ys)-B.w,Math.max(...ys)+B.w]}
 // distance from a water body's edge (negative inside it)
 function w2BodyD(B,x,y){if(B.k==="lake"){const q=Math.hypot((x-B.x)/B.rx,(y-B.y)/B.ry);return (q-1)*Math.min(B.rx,B.ry)}let d=1e9;const P=B.pts;
@@ -1914,6 +1915,16 @@ function buildNet2(){
     for(let i=0;i<L.length;i++){const A=L[i],Bn=L[(i+1)%L.length];let a2=Bn.a;if(a2<=A.a)a2+=Math.PI*2;const d=a2-A.a,k=Math.max(1,Math.ceil(d/1.2)),pts=[A.p];
       for(let j=0;j<k;j++){const m=A.a+d*(j+0.5)/k,r=b.R/Math.cos(d/k/2);pts.push([b.x+Math.cos(m)*r,b.y+Math.sin(m)*r,b.R])}pts.push(Bn.p);E("rbt","Roundabout",pts)}}
   for(const e of EDGES)if(e.mtn)W2_MTN.push(e);
+  // ---- the off-road park goes on the mountain's lower slopes, clear of every road, with a gravel track up from the nearest mountain road
+  {const C0=[-2276,-1177.5],HW=146,HH=303,[mx,my]=W2C.MT,EL=EDGES.slice(),dmin=(x,y)=>{let d=1e9;for(const e of EL){if(Math.abs(e.a.x-x)>e.L+60&&Math.abs(e.b.x-x)>e.L+60)continue;const p=eProj(e,x,y);if(p.u>=-5&&p.u<=e.L+5)d=Math.min(d,p.d-e.W)}return d};
+    const nodes=NODES.filter(n=>n.E.some(l=>l.e.mtn)&&n.E.length===2&&n.E.every(l=>l.e.type==="road"));let best=null;
+    for(let th=-Math.PI;th<Math.PI;th+=Math.PI/36)for(const r of [650,750,850,950,1050,1150,1250]){const cx=mx+Math.cos(th)*r,cy=my+Math.sin(th)*r;let ok=true;
+      for(let a=-HW;a<=HW&&ok;a+=36)for(let b=-HH;b<=HH;b+=40){if(dmin(cx+a,cy+b)<18){ok=false;break}}if(!ok)continue;
+      const lx=cx+HW,ly=cy+(-921-C0[1]);let nb=null;for(const n of nodes){const d=Math.hypot(n.x-lx,n.y-ly);if(!nb||d<nb.d)nb={n,d}}W2C.orpTry=(W2C.orpTry||0)+1;if(!nb||nb.d>900)continue;
+      // the track must not cross another road on its way
+      let clear=true;for(let t=0.1;t<0.9;t+=0.05){const x=lx+(nb.n.x-lx)*t,y=ly+(nb.n.y-ly)*t;if(dmin(x,y)<6){clear=false;break}}if(!clear){W2C.orpX=(W2C.orpX||0)+1;continue}
+      if(!best||nb.d<best.d)best={cx,cy,d:nb.d,n:nb.n,lx,ly}}
+    if(best){W2C.orp=[best.cx-C0[0],best.cy-C0[1]];rd("dirt","Kestrel Trailhead Rd",[[best.n.x,best.n.y],[Math.round(best.lx+40),Math.round(best.ly)]],{lim:20});W2C.orpEnd=[best.lx+40,best.ly]}}
   // ---- I-61's climb over I-38 (a smooth profile on each of its edges near the crossing)
   for(const e of EDGES)if(e.name==="I-61"&&Math.min(Math.abs(e.a.y-ccy),Math.abs(e.b.y-ccy))<500)e.zo=u=>zB(eAt(e,u).y-ccy);
   W2C.zB=zB;
@@ -2108,7 +2119,9 @@ for(const e of EDGES){if(e.type==="xway"||e.ow)continue;for(const x of EDGES){if
       (x.dip=x.dip||[]).push({uc:q.u,half:DIP_HALF,H:DIP_H,rA:Math.min(DIP_RAMP,q.u-DIP_HALF-5),rB:Math.min(DIP_RAMP,x.L-q.u-DIP_HALF-5)});break}pt=q.t}if(e.ov)break}}
 if(W2){const e=EDGES.find(e=>e.name==="I-61"&&Math.abs(e.a.y-(W2C.CL[1]-50))<1&&Math.abs(e.b.y-(W2C.CL[1]+50))<1);if(e)e.ov={uc:50,half:31,H:0,rA:18,rB:18}}   // I-61 over I-38
 for(const e of EDGES){if(W2){let a=null;for(let u=0;u<=e.L+2;u+=2){const p=eAt(e,Math.min(u,e.L));let B=null;for(const b of W2_WATER)if(w2BodyD(b,p.x,p.y)<2){B=b;break}
-    if(B&&!a)a={u,B};if(a&&(!B||u>=e.L)){e.br={uc:(a.u+u)/2,half:(u-a.u)/2+8,H:a.B.bh,rp:a.B.rp};break}}continue}
+    if(B&&!a)a={u,B};if(a&&(!B||u>=e.L)){const uc=(a.u+u)/2,half=(u-a.u)/2+8;
+      if(e.T.dirt)e.ford={uc,half:(u-a.u)/2+2};    // a low-water crossing: the gravel dips through the creek
+      else{e.br={uc,half,H:a.B.bh,rp:a.B.rp};e.br.style=e.name==="Old Mill Rd"?"covered":e.name==="Ridge Rd"?"truss":e.name==="Mill St"?"stone":null}break}}continue}
   let prev=null;for(let u=0;u<=e.L;u+=2){const p=eAt(e,u),sg=Math.sign(p.x-riverX(p.y));if(prev!==null&&sg!==prev){e.br={uc:u-1,half:BRIDGE_HALF,H:BRIDGE_H,rp:BRIDGE_RAMP};break}prev=sg}}
 function ez(e,u){let z;if(e.zp){const f=clamp(u,0,e.L)/4,i=Math.min(e.zp.length-2,Math.floor(f)),a=f-i;z=e.zp[i]*(1-a)+e.zp[i+1]*a}else{const p=eAt(e,clamp(u,0,e.L));z=hillZ(p.x,p.y)}
   // raised roads (the new world): a profile of its own, or a smooth climb between raised junctions
@@ -2116,9 +2129,15 @@ function ez(e,u){let z;if(e.zp){const f=clamp(u,0,e.L)/4,i=Math.min(e.zp.length-
   // junctions are flat: the road eases into the junction's height over 25 m so there is no step at its edge
   const JE=W2?50:25;   // the new world is hillier: junctions ease in over a longer run
   if(e.a.z!==undefined&&!(W2&&(e.a.ctrl==="merge"||e.a.kind==="cont"))&&u<(e.r0||0)+JE){const w=1-smooth01(e.r0||0,(e.r0||0)+JE,u);z+=(e.a.z-hillZ(e.a.x,e.a.y))*0+(e.a.z-z)*w}
-  if(e.b.z!==undefined&&!(W2&&(e.b.ctrl==="merge"||e.b.kind==="cont"))&&u>e.L-(e.r1||0)-JE){const w=1-smooth01(e.r1||0,(e.r1||0)+JE,e.L-u);z+=(e.b.z-z)*w}if(e.br)z+=e.br.H*(1-smooth01(e.br.half,e.br.half+e.br.rp,Math.abs(u-e.br.uc)));
+  if(e.b.z!==undefined&&!(W2&&(e.b.ctrl==="merge"||e.b.kind==="cont"))&&u>e.L-(e.r1||0)-JE){const w=1-smooth01(e.r1||0,(e.r1||0)+JE,e.L-u);z+=(e.b.z-z)*w}if(e.br)z+=e.br.H*(1-smooth01(e.br.half,e.br.half+e.br.rp,Math.abs(u-e.br.uc)));if(e.ford)z+=(RIVER.water-0.3-z)*(1-smooth01(e.ford.half,e.ford.half+24,Math.abs(u-e.ford.uc)));
   if(e.ov){const o=e.ov,d=u-o.uc;z+=o.H*(1-smooth01(o.half,o.half+(d<0?o.rA:o.rB),Math.abs(d)))}
   if(e.dip)for(const o of e.dip){const d=u-o.uc;z-=o.H*(1-smooth01(o.half,o.half+(d<0?o.rA:o.rB),Math.abs(d)))}return z}
+// old bridges in the new world: a deck that gives a little under you (more under something heavy), and on the covered bridge
+// loose planks and one missing
+function brJank(e,u,t){const b=e.br,d=u-(b.uc-b.half);if(d<0||d>2*b.half)return 0;const heavy=(TRIMS[st.trim].mass||1800)>2400,f=Math.sin(Math.PI*d/(2*b.half));
+  if(b.style==="truss")return -f*(heavy?0.055:0.02);
+  if(b.style==="covered"){let h=-f*(heavy?0.04:0.022)+0.004*Math.max(0,Math.sin(u*2*Math.PI/0.32));if(Math.abs(u-b.uc-3.1)<0.14&&t>0&&t<1.6)h-=0.05;return h}
+  return 0}
 const onDip=(e,u)=>e.dip&&e.dip.some(o=>u>o.uc-o.half-o.rA&&u<o.uc+o.half+o.rB);
 // the sides of the freeway cut: grass slopes down to the shoulder
 function cutZ(x,y){let z=1e9;for(const e of gAt(GRID.e,x,y)){if(!e.dip)continue;const p=eProj(e,x,y);if(!onDip(e,p.u))continue;const outer=e.m/2+e.n*LANE+e.side+auxW(e,p.u,p.t),a=Math.abs(p.t),inner=e.m/2-e.shL;
@@ -2257,11 +2276,16 @@ const TCS=[   // [lane, y0, y1, name, what it tests]
   [4,-1120,-1040,"Deep snow","Deep snow drags at the tyres: Snow mode and gentle throttle"],[4,-1020,-950,"Sand","Soft sand dunes: Sand mode, don't stop halfway"],
   [4,-930,-850,"Moguls","40 cm bumps left and right: wheels lift, traction control and lockers earn their keep"]];
 const TC_SKID={x:-1880,y:-1000,R:40};const TC_SIGNS=[];
-const inTC=(x,y,m=0)=>!W2&&x>TC.x0-m&&x<TC.x1+m&&y>TC.y0-m&&y<TC.y1+m||x>TC.dw[0]-m&&x<TC.dw[1]+m&&y>TC.dw[2]-m&&y<TC.dw[3]+m;
+// the new world: the same course, moved to the flat farmland between County Rd 1 and County Rd 3, south of I-38 (in off County Rd 1)
+if(W2){const dx=-2190,dy=-995;Object.assign(TC,{x0:TC.x0+dx,x1:TC.x1+dx,y0:TC.y0+dy,y1:TC.y1+dy,dw:[-4396,TC.x0+dx,-950+dy-8,-950+dy+8]});for(let i=0;i<TCL.length;i++)TCL[i]+=dx;
+  for(const S of TCS){S[1]+=dy;S[2]+=dy}TC_SKID.x+=dx;TC_SKID.y+=dy}
+const inTC=(x,y,m=0)=>x>TC.x0-m&&x<TC.x1+m&&y>TC.y0-m&&y<TC.y1+m||x>TC.dw[0]-m&&x<TC.dw[1]+m&&y>TC.dw[2]-m&&y<TC.dw[3]+m;
 const ORP={x0:-2392,x1:-2160,y0:-1450,y1:-905,
   trail:[[-2160,-921],[-2185,-921],[-2215,-928],[-2245,-945],[-2252,-985],[-2252,-1105],[-2262,-1140],[-2295,-1160],[-2300,-1185],[-2300,-1228],[-2290,-1262],[-2255,-1285],[-2222,-1300],[-2205,-1335],[-2230,-1380],[-2290,-1395],[-2335,-1385],[-2350,-1330],[-2350,-1275],[-2345,-1215],[-2342,-1160],[-2340,-1110],[-2340,-1050],[-2320,-985],[-2280,-955],[-2245,-945]],
   bog:{x:-2300,y:-1206,a:24,b:11,h:0},hill:{x:-2350,y:-1330,H:8,R:40},lot:{x0:-2205,x1:-2160,y0:-935,y1:-907},feats:[],grid:new Map(),zones:[],ready:false};
-const inOR=(x,y,m=0)=>!W2&&x>ORP.x0-m&&x<ORP.x1+m&&y>ORP.y0-m&&y<ORP.y1+m;
+if(W2){const o=W2C.orp||[1e5,1e5],[dx,dy]=o;Object.assign(ORP,{x0:ORP.x0+dx,x1:ORP.x1+dx,y0:ORP.y0+dy,y1:ORP.y1+dy});ORP.trail=ORP.trail.map(([x,y])=>[x+dx,y+dy]);
+  ORP.bog.x+=dx;ORP.bog.y+=dy;ORP.hill.x+=dx;ORP.hill.y+=dy;Object.assign(ORP.lot,{x0:ORP.lot.x0+dx,x1:ORP.lot.x1+dx,y0:ORP.lot.y0+dy,y1:ORP.lot.y1+dy})}
+const inOR=(x,y,m=0)=>(!W2||W2C.orp)&&x>ORP.x0-m&&x<ORP.x1+m&&y>ORP.y0-m&&y<ORP.y1+m;
 const orBogQ=(x,y)=>{const B=ORP.bog;return Math.hypot((x-B.x)/B.a,(y-B.y)/B.b)};
 const tcHash=(i,j)=>{let h=(i*374761393+j*668265263)|0;h=(h^(h>>>13))*1274126177|0;return ((h^(h>>>16))>>>0)/4294967296};
 // section boards: white text on blue, drawn as a texture on the front of each board when you're near
@@ -2374,7 +2398,7 @@ function groundAt0(x,y){
   for(const e of gAt(GRID.e,x,y)){const p=eProj(e,x,y);if(p.u<e.p0-0.5||p.u>e.L-e.p1+0.5)continue;
     const mm=mAt(e,p.u),a=Math.abs(p.t),m2=mm/2,outer=m2+e.n*LANE+e.side+auxW(e,p.u,p.t),inner=mm>0.8?m2-e.shL:-1;
     if(a<=outer&&a>=inner){const rum=e.T.rumble&&(Math.abs(a-(m2+e.n*LANE+0.5))<0.2||Math.abs(a-(m2-0.6))<0.2)&&(p.u%0.6)<0.3;
-      {const hb=roadBumps(e,p.u,p.t);if(e.T.dirt){pick({h:(e.hz?ez(e,p.u):0)+hb+dirtH(e,p.u,p.t),mu:0.74,kind:"dirt",hole:RB_HOLE});continue}
+      {const hb=roadBumps(e,p.u,p.t)+(e.br&&e.br.style?brJank(e,p.u,p.t):0);if(e.T.dirt){const fd=e.ford&&Math.abs(p.u-e.ford.uc)<e.ford.half;pick({h:(e.hz||e.ford?ez(e,p.u):0)+hb+dirtH(e,p.u,p.t),mu:fd?0.5:0.74,kind:fd?"ford":"dirt",hole:RB_HOLE});continue}
         pick({h:(e.hz?ez(e,p.u):0)+hb+(rum?0.006:0),mu:1.15,kind:"road",rum,hole:RB_HOLE,deck:overDeck(e,p.u)});continue}}
     if(inner>0&&a<inner&&(e.br&&onBridge(e,p.u)||e.ov&&onOver(e,p.u))){pick({h:ez(e,p.u),mu:1.0,kind:"pavement",deck:overDeck(e,p.u)});continue}     // bridge deck between the carriageways
     if(e.T.kerb&&((a>outer&&a<outer+0.45)||(inner>0&&a<inner&&a>inner-0.45))){if(e.ov&&onOver(e,p.u))pick({h:ez(e,p.u)+0.04,mu:1.0,kind:"kerb",deck:overDeck(e,p.u)});else{kerb=true;kz=e.hz?ez(e,p.u):0}}
@@ -2445,6 +2469,8 @@ if(W2){const sOn=(ax,ay,bx,by,u,dir=1)=>{const e=ePick(ax,ay,bx,by);if(!e)return
   st_("suburb","Rosedale","Subdivision streets on the east bank: all-way stops, speed humps, 25 mph",sOn(100,650,240,740,40));
   st_("county","County Rd 30","55 mph through the farmland, over the river and over I-61",sOn(-1000,-2400,1000,-2400,300));
   st_("bridge","Clearwater River","Main St over the river bridge",sOn(-400,0,100,0,20));
+  if(W2C.orp)st_("offroad","Kestrel Off-Road Park","On Mount Kestrel's lower slopes: a trail loop with a rock garden, ledges, a mud bog, logs, an off-camber section and a steep climb. Bring a 4x4",{x:-2182+W2C.orp[0],y:-921+W2C.orp[1],h:Math.PI,free:true});
+  st_("proving","Proving ground","Suspension test course off County Rd 1: whoops, washboard, cobbles, potholes, humps, articulation, hills up to 40%, gravel, rock crawl, mud, snow, sand, skidpad",{x:TCL[0],y:TC.y0+30,h:Math.PI/2,free:true});
   {const p=PAD.e?fpt(PAD.e,PAD.dir,PAD.s0-90,0):[0,0,0];st_("station","Service plaza","Gas pumps and fast chargers beside I-38 between Maple Rd and Fairhaven",{x:p[0],y:p[1],h:p[2]})}}
 
 const COLL={g:new Map(),C:25}, BLD_LIST=[];
@@ -4769,6 +4795,10 @@ function meterTick(dt){if(!W2||!METER.spaces.length||!st.started)return;const M=
 function meterPay(){const M=METER;if(!M.cur)return;if(meterLeft()>=M.max-60){toast("🅿️ The meter is already at its 2 hour maximum");return}if(ECON.cash<M.price){toast("Not enough money for the meter");return}
   ECON.cash-=M.price;try{bankTx("Parking meter",-M.price);bankSave()}catch(e){}M.paid=Math.min(Math.max(M.paid,st.clock)+M.step,st.clock+M.max);M.warned=false;beep(1100,.05,"sine",.12);setTimeout(()=>beep(1500,.06,"sine",.12),80);
   toast(`🅿️ Paid · ${Math.ceil(meterLeft()/60)} min on the meter`)}
+function brTick(){if(!W2||st.walk)return;const M=me(),b=M.e.br;if(!b||!b.style){sys.brSaid=null;return}const u=M.dir>0?M.s:M.L-M.s;if(Math.abs(u-b.uc)>b.half){return}
+  if(sys.brSaid===M.e)return;sys.brSaid=M.e;const heavy=(TRIMS[st.trim].mass||1800)>2400;
+  if(b.style==="truss")toast(heavy?"🌉 The old truss bridge groans and sags under you · weight limit 10 tons":"🌉 Old steel truss bridge · it creaks as you cross");
+  else if(b.style==="covered")toast("🌉 Covered bridge · one lane, loose planks, take it slow")}
 // ---- start / stop button: the car can be switched off (in P, stopped) and on again
 st.power=true;
 
@@ -4902,7 +4932,7 @@ function navPlaces(){const L=[],add=(name,sub,x,y,h,ic)=>{if(x==null||!isFinite(
   if(VALET.stand)add("Halden Valet","Valet gig at the Cass Ave garage",VALET.stand.x,VALET.stand.y,VALET.stand.h,"🔑");
   if(STARTS.home)add(STARTS.home.name||"Home","Your house",STARTS.home.x,STARTS.home.y,STARTS.home.h,"🏠");
   try{if(TOLL.e){const q=fpt(TOLL.e,1,TOLL.s,0);add("Hwy 7 toll plaza","Cash lane and E-ZPass",q[0],q[1],0,"🛣️")}}catch(e){}
-  if(STARTS.offroad)add("Halden Off-Road Park","Trails, rock garden, mud bog",STARTS.offroad.x,STARTS.offroad.y,STARTS.offroad.h,"⛰️");
+  if(STARTS.offroad)add(W2?"Kestrel Off-Road Park":"Halden Off-Road Park","Trails, rock garden, mud bog",STARTS.offroad.x,STARTS.offroad.y,STARTS.offroad.h,"⛰️");
   if(STARTS.proving)add("Proving ground","Test track, hills and skidpad",STARTS.proving.x,STARTS.proving.y,STARTS.proving.h,"🏁");
   add("Rosedale","Neighborhood",STARTS.suburb.x,STARTS.suburb.y,STARTS.suburb.h,"🏘️");
   if(W2){for(const k of ["mountain","millbrook","fairhaven","oakridge"])if(STARTS[k])add(STARTS[k].name,STARTS[k].nav||"",STARTS[k].x,STARTS[k].y,STARTS[k].h,STARTS[k].ic||"📍")}
@@ -7457,7 +7487,7 @@ function terrDrawn(x,y){const {N,NY,h}=TERR,fx=(x-WORLD.x0)/(WORLD.x1-WORLD.x0)*
   const h00=h[j*W+i],h10=h[j*W+i+1],h01=h[(j+1)*W+i],h11=h[(j+1)*W+i+1];return a+b<=1?h00+(h10-h00)*a+(h01-h00)*b:h11+(h01-h11)*(1-a)+(h10-h11)*(1-b)}
 function terrainMesh(){const N=W2?800:360,X0=WORLD.x0,X1=WORLD.x1,Y0=WORLD.y0,Y1=WORLD.y1,P=[],Nn=[],I=[];const NY=Math.round(N*(Y1-Y0)/(X1-X0));
   const onPad=(x,y)=>Math.abs(x-PAD.cx)<PAD.rad+8&&Math.abs(y-PAD.cy)<PAD.rad+8&&[[0,0],[7,0],[-7,0],[0,7],[0,-7]].some(([a,b])=>padHit(x+a,y+b));
-  const H2=(x,y)=>{if(inCity(x,y)||inExtra(x,y,6)||onPad(x,y))return -0.14;const d=dfAt(x,y);let z=Math.max(d<45?hillZ(x,y)+riverCut(x,y):terrainH(x,y,d),embZ(x,y));z=Math.min(z,cutZ(x,y));if(d<40)z=w2Blend(x,y,z);return z-0.08};
+  const H2=(x,y)=>{if(inCity(x,y)||inTC(x,y,4)||inExtra(x,y,6)||onPad(x,y))return -0.14;const d=dfAt(x,y);let z=Math.max(d<45?hillZ(x,y)+riverCut(x,y):terrainH(x,y,d),embZ(x,y));z=Math.min(z,cutZ(x,y));if(d<40)z=w2Blend(x,y,z);return z-0.08};
   const H=W2?H2:(x,y)=>{if(inCity(x,y)||inTC(x,y,4)||inExtra(x,y,6)||onPad(x,y))return -0.14;const d=dfAt(x,y);let z=Math.max(d<45?hillZ(x,y)+riverCut(x,y):terrainH(x,y,d),embZ(x,y));
     for(const n of gAt(GRID.n,x,y)){if(n.pr){const dn=Math.hypot(x-n.x,y-n.y)-n.pr;if(dn<14)z=Math.min(z,n.z-0.25+Math.max(0,dn)*0.12)}}
     if(d<70){let best=1e9,rz=null,zc=1e9;for(const e of edgesNear(x,y,34)){const p=eProj(e,x,y);if(p.u<-6||p.u>e.L+6)continue;const dd=Math.abs(p.t)-e.W-auxW(e,p.u,p.t),zz=e.hz?ez(e,clamp(p.u,0,e.L)):0;
@@ -7465,7 +7495,7 @@ function terrainMesh(){const N=W2?800:360,X0=WORLD.x0,X1=WORLD.x1,Y0=WORLD.y0,Y1
       z=Math.min(z,zc)}
     return z-0.08};
   TERR.N=N;TERR.NY=NY;TERR.h=new Float32Array((N+1)*(NY+1));TERR.h0=new Float32Array((N+1)*(NY+1));
-  for(let j=0;j<=NY;j++)for(let i=0;i<=N;i++){const x=X0+(X1-X0)*i/N,y=Y0+(Y1-Y0)*j/NY,h0=H(x,y),h=h0-(!W2&&orBogQ(x,y)<1.6?1.4:0),hx=H(x+3,y)-h0,hy=H(x,y+3)-h0;TERR.h[j*(N+1)+i]=h;TERR.h0[j*(N+1)+i]=h0;P.push(x,h,-y);Nn.push(...norm([-hx/3,1,hy/3]))}
+  for(let j=0;j<=NY;j++)for(let i=0;i<=N;i++){const x=X0+(X1-X0)*i/N,y=Y0+(Y1-Y0)*j/NY,h0=H(x,y),h=h0-((!W2||W2C.orp)&&orBogQ(x,y)<1.6?1.4:0),hx=H(x+3,y)-h0,hy=H(x,y+3)-h0;TERR.h[j*(N+1)+i]=h;TERR.h0[j*(N+1)+i]=h0;P.push(x,h,-y);Nn.push(...norm([-hx/3,1,hy/3]))}
   for(let j=0;j<NY;j++)for(let i=0;i<N;i++){const a=j*(N+1)+i;I.push(a,a+1,a+N+1,a+1,a+N+2,a+N+1)}return meshFrom(P,Nn,I)}
 function bumpMesh(){const B={P:[],N:[],I:[]},H={P:[],N:[],I:[]};
   for(const b of BUMPS.speed){const p=ePt(b.e,b.u,0);boxInto(B,p[0],0.035,-p[1],0.9,0.07,hwOf(b.e)*2-0.4,p[2])}
@@ -7585,7 +7615,7 @@ function buildWorld(){retailSites();placeExtras();
       if(n.ctrl!=="minor"&&e.T.z==="c"&&!e.T.rumble)for(let t=-W+0.5;t<W-0.3;t+=1.2){if(e.m>0&&Math.abs(t)<m2)continue;stripInto(zebra,e,t,t+0.6,0.011,Math.min(uAt(l.r-0.4),uAt(l.r-3.4)),Math.max(uAt(l.r-0.4),uAt(l.r-3.4)))}}}
   SCN.roadZ=[["c",mf(road.c)],["h",mf(road.h)],["d",mf(road.d)]];SCN.wear=[["c",mf(wear.c)],["h",mf(wear.h)],["d",mf(wear.d)]];SCN.lines=[mf(white)];SCN.ylines=mf(yellow);SCN.kerbs=[mf(kerb)];SCN.walk=mf(walk);
   SCN.rumble=[mf(rumble)];SCN.bikeL=mf(bikeL);SCN.zebraB=zebra;SCN.stopLB=stopL;SCN.greenB=green;
-  SCN.ground=terrainMesh();SCN.bumps=bumpMesh();if(!W2){SCN.tc=tcMesh();try{SCN.or=orMesh()}catch(e){console.error(e)}}
+  SCN.ground=terrainMesh();SCN.bumps=bumpMesh();SCN.tc=tcMesh();if(!W2||W2C.orp){try{SCN.or=orMesh()}catch(e){console.error(e)}}
   worldScenery();
 }
 // the proving ground: concrete pad, the test sections as real height-mapped surfaces, paint, cones and section boards
@@ -8012,13 +8042,29 @@ function worldScenery(){W2P.length=0;
     else{treeAt(x,y,terrainH(x,y,d)-0.3,true);nt++;if(d<40||inOR(x,y))collAdd({t:"c",x,y,r:0.35})}}
   for(let n=0;n<(W2?900:400);n++){const x=WORLD.x0+r()*(WORLD.x1-WORLD.x0),y=WORLD.y0+r()*(WORLD.y1-WORLD.y0);if(cityW(x,y)>0.05||riverD(x,y)<RIVER.w/2+20||inTC(x,y,40)||inOR(x,y,40))continue;const d=dfAt(x,y);if(d<45||d>160)continue;
     const hb=terrainH(x,y,d)-0.4,a=r()*Math.PI;B(house,x,y,hb,5.5,9+r()*4,7+r()*3,a);B(roofs,x,y,hb+5.5,1.6,7,5,a);collAdd({t:"b",x,y,h:a,hl:6,hw:4.5,what:"a house"})}
+  // ---- the new world's old bridges: a red covered wooden bridge, a rusty steel truss, a stone bridge; gravel fords get marker posts
+  const rust=M_(),wood=M_(),stone=M_();
+  if(W2)for(const e of EDGES){const b=e.br;if(e.ford){for(const sd of [1,-1])for(const du of [-1,1]){const p=ePt(e,e.ford.uc+du*e.ford.half,sd*(hwOf(e)+0.6)),z=ez(e,e.ford.uc+du*e.ford.half);B(post,p[0],p[1],z,1.4,0.12,0.12);B(signGW,p[0],p[1],z+1.1,0.25,0.14,0.14)}
+      const q=ePt(e,e.ford.uc-e.ford.half-30,-(hwOf(e)+1.2));B(post,q[0],q[1],SZ(q[0],q[1]),2.2,0.08,0.08);B(signK,q[0],q[1],SZ(q[0],q[1])+1.8,0.7,0.7,0.05,q[2]);continue}
+    if(!b||!b.style)continue;const W=hwOf(e)+0.3,u0=b.uc-b.half,u1=b.uc+b.half,seg=(m,ua,ta,za,ub,tb,zb,w,h)=>{const p=ePt(e,ua,ta),q=ePt(e,ub,tb);tubeInto(m,[p[0],p[1],za],[q[0],q[1],zb],w,w,6)};
+    if(b.style==="covered"){for(let u=u0;u<u1;u+=2){const z=ez(e,u),p=ePt(e,u+1,0);boxInto(wood,p[0],z+4.3,-p[1],2.05,0.15,2*W+1.6,p[2]+Math.PI/2*0);
+        for(const sd of [1,-1]){const q=ePt(e,u+1,sd*(W+0.3)),r_=ePt(e,u+1,sd*(W*0.5+0.6));boxInto(wood,q[0],z+2.1,-q[1],2.02,3.0,0.12,p[2]);boxInto(wood,r_[0],z+4.75,-r_[1],2.05,0.12,W+1.4,p[2]);
+          collAdd({t:"b",x:q[0],y:q[1],h:p[2],hl:1.02,hw:0.1,z0:z-0.3,z1:z+3.4,what:"the bridge wall"})}}}
+    else if(b.style==="truss"){const H=5.6;for(const sd of [1,-1]){const t=sd*(W+0.5);for(let u=u0;u<u1-0.1;u+=6){const ua=u,ub=Math.min(u1,u+6),za=ez(e,ua),zb=ez(e,ub);
+        seg(rust,ua,t,za+H,ub,t,zb+H,0.16);seg(rust,ua,t,za+0.4,ub,t,zb+0.4,0.14);seg(rust,ua,t,za+0.3,ua,t,za+H,0.12);seg(rust,ua,t,za+0.4,ub,t,zb+H,0.09);
+        const p=ePt(e,ua,t);collAdd({t:"c",x:p[0],y:p[1],r:0.25,z0:za-0.3,z1:za+H,what:"the truss"})}}
+      for(let u=u0;u<u1;u+=6){const z=ez(e,u);seg(rust,u,-(W+0.5),z+H,u,W+0.5,z+H,0.1)}
+      for(const du of [-1,1]){const p=ePt(e,b.uc+du*(b.half+b.rp*0.6),-(W+1.2)*du),z=ez(e,b.uc+du*(b.half+b.rp*0.6));B(post,p[0],p[1],z,2.2,0.08,0.08);B(signW,p[0],p[1],z+1.75,0.75,0.6,0.05,p[2])}}
+    else if(b.style==="stone"){for(const sd of [1,-1])for(let u=u0-6;u<u1+6;u+=2){const z=ez(e,u),p=ePt(e,u+1,sd*(hwOf(e)+(e.T.walk||0)+0.2));boxInto(stone,p[0],z+0.45,-p[1],2.02,0.9,0.45,p[2])}
+      const p=ePt(e,b.uc,0);boxInto(stone,p[0],ez(e,b.uc)-1.6,-p[1],2*b.half,2.4,2*(hwOf(e)+(e.T.walk||0))+1,p[2])}}
+  SCN.oldBr={rust:meshFrom(rust.P,rust.N,rust.I),wood:meshFrom(wood.P,wood.N,wood.I),stone:meshFrom(stone.P,stone.N,stone.I)};
   // ---- bridges over the Rouge River: girders, piers, parapets you can hit
   const gird=M_(),para=M_(),water=M_(),gSlab=M_(),gWall=M_(),gLight=M_(),gBlue=M_();
   for(const e of EDGES){if(!e.br)continue;const uc=e.br.uc,hf=e.br.half,Wt=e.m/2+e.n*LANE+e.side;
     const inJ=u=>u<(e.p0||0)+2||u>e.L-(e.p1||0)-2;   // the part of a ramp that has merged into the freeway is freeway, not bridge
     for(let u=uc-hf-34;u<=uc+hf+34;u+=6){if(inJ(u))continue;const z=ez(e,u),p=ePt(e,u,0);boxInto(gird,p[0],z-0.85,-p[1],6.1,1.2,2*Wt+0.6,p[2])}
     for(const du of [-hf+5,0,hf-5])for(const sd of [1,-1]){if(inJ(uc+du))continue;const p=ePt(e,uc+du,sd*Wt*0.55),z=ez(e,uc+du);boxInto(gird,p[0],(z-1.4-3.6)/2,-p[1],1.6,z-1.4+3.6,2.2,p[2])}
-    for(let u=uc-hf-e.br.rp*0.7;u<=uc+hf+e.br.rp*0.7;u+=4){const z=ez(e,u);if(z<0.9||inJ(u)||inJ(u+4))continue;
+    for(let u=uc-hf-e.br.rp*0.7;u<=uc+hf+e.br.rp*0.7;u+=4){const z=ez(e,u);if(z<0.9||inJ(u)||inJ(u+4))continue;if(e.br.style&&Math.abs(u+2-uc)<hf+2)continue;   // old bridges have their own sides
       for(const sd of [1,-1]){const p=ePt(e,u+2,sd*(Wt+0.25));
         // an acceleration / deceleration lane shares the freeway's deck: no railing between them (the ramp's outer railing is the edge)
         if(e.type==="xway"&&(auxW(e,u+2,sd)>0.3||gAt(GRID.e,p[0],p[1]).some(f=>f.type==="ramp"&&(()=>{const q=eProj(f,p[0],p[1]);return q.u>=(f.p0||0)&&q.u<=f.L-(f.p1||0)&&Math.abs(q.t)<f.m/2+f.n*LANE+f.side+0.6})())))continue;
@@ -10003,6 +10049,7 @@ function render(dt){
     mat([0.62,0.55,0.45],null,0.1,10);draw(H_.ext);mat([0.12,0.16,0.2],night?[0.7,0.6,0.4]:null,1.3,90);draw(H_.glassH);mat([0.5,0.5,0.48],null,0.1,10);draw(H_.garf);mat([0.25,0.25,0.26],null,0.2,20);draw(H_.roofG);
     mat([1,0.97,0.9],night?[1.6,1.5,1.3]:null,0,1);draw(H_.lampG);mat([0.4,0.42,0.44],null,0.3,20);draw(H_.shelfG)}
   if(SCN.home){for(const [k,m] of Object.entries(SCN.home)){const q=HOME_MAT[k];mat(q[0],q[1],q[2],q[3]);draw(m)}}
+  if(SCN.oldBr){mat([0.42,0.2,0.1],null,0.2,20);draw(SCN.oldBr.rust);mat([0.5,0.1,0.07],null,0.05,8);draw(SCN.oldBr.wood);mat([0.45,0.42,0.38],null,0.05,8,1,2);draw(SCN.oldBr.stone)}
   mat([0.56,0.56,0.54],null,0.15,20,1,2);draw(SCN.barrier);draw(SCN.gird);draw(SCN.para);mat([0.34,0.34,0.335],null,0.1,10,1,2);draw(SCN.gSlab);mat([0.6,0.6,0.58],null,0.1,10,1,2);draw(SCN.gWall);garModelDraw(night);
   mat([0.9,0.92,0.9],[1.6,1.6,1.5],0.3,20);draw(SCN.gLight);mat([0.05,0.25,0.75],[0.04,0.15,0.5],0.3,20);draw(SCN.gBlue);
   gl.enable(gl.POLYGON_OFFSET_FILL);gl.polygonOffset(1,1);mat(st.surface==="snow"?[0.55,0.6,0.65]:[0.05,0.11,0.13],null,1.4,90);draw(SCN.water);gl.disable(gl.POLYGON_OFFSET_FILL);mat([0.62,0.64,0.66],null,0.9,60);draw(SCN.rail);
@@ -11223,7 +11270,7 @@ function frame(now){if(XR.on&&!XR.inFrame){requestAnimationFrame(frame);return} 
     if(sys.hillDemo){sys.hillT+=dt;if(sys.hillT>6){sys.hillT=0;st.leveling=!st.leveling;toast(st.leveling?"Active levelling ON: beam hugs the ground":"Active levelling OFF: beam fixed to the body")}if(!car.offroad&&Math.abs(car.vx)>3)sys.hillDemo=false}
     if(sys.aim!=null){sys.levT=(sys.levT||0)+dt;if(sys.levT>5){sys.levT=0;st.leveling=!st.leveling;toast(st.leveling?"Levelling ON: beam back down on the road":"Levelling OFF: the loaded car aims the beam high")}
       if(Math.hypot(car.px-sys.aim.x,car.py-sys.aim.y)>40){sys.aim=null;car.cargo=0;st.leveling=true}}acc+=dt;const h=1/G().hz;while(acc>=h){physics(h);acc-=h}if(car.crashed>0)car.crashed-=dt;updateAudio()}
-  shopTick();homeTick(dt);if(st.walk){footTick(dt);openHouseTick()}else if(sys.flashT>0)sys.flashT-=dt;gtTick(dt);phTick();revChime(dt);beltTick(dt);econTick(dt);usedTick(dt);testTick(dt);ui2Tick();trainTick(dt);meterTick(dt);gateTick(dt);mpTick(dt);netTick(dt);teslaTrip(dt);launchTick(dt);
+  shopTick();homeTick(dt);if(st.walk){footTick(dt);openHouseTick()}else if(sys.flashT>0)sys.flashT-=dt;gtTick(dt);phTick();revChime(dt);beltTick(dt);econTick(dt);usedTick(dt);testTick(dt);ui2Tick();trainTick(dt);meterTick(dt);brTick();gateTick(dt);mpTick(dt);netTick(dt);teslaTrip(dt);launchTick(dt);
   try{gigTick(dt)}catch(e){}try{copTick(dt)}catch(e){console.error(e)}if(DALE.p.length||DALE.pools.length||DALE.dead>0||DALE.shake>0||DALE.fire)try{daleTick(dt)}catch(e){}try{if(st.started)stkTick(dt)}catch(e){}if(st.started&&st.power===true&&!st.walk&&Math.abs(car.vx)>1)sys.tripT=(sys.tripT||0)+dt;if(sys.roaT>0)sys.roaT-=dt;
   try{rplRec(dt)}catch(e){}try{achTick(dt)}catch(e){}render(dt);if(PHOTO.want)photoGrab();hud(dt);
 }
