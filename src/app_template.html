@@ -7045,12 +7045,17 @@ const CULL={pl:null,eye:[0,0,0],maxD:1e9,n:0,skip:0};
 function cullSet(VP,eye,maxD){const m=VP,pl=[];const r=i=>[m[i],m[4+i],m[8+i],m[12+i]];const r0=r(0),r1=r(1),r2=r(2),r3=r(3);
   for(const [a,sg] of [[r0,1],[r0,-1],[r1,1],[r1,-1],[r2,1]]){const q=[r3[0]+sg*a[0],r3[1]+sg*a[1],r3[2]+sg*a[2],r3[3]+sg*a[3]],l=Math.hypot(q[0],q[1],q[2])||1;pl.push([q[0]/l,q[1]/l,q[2]/l,q[3]/l])}
   CULL.pl=pl;CULL.eye=eye;if(maxD!==undefined)CULL.maxD=maxD}
-function chunkVis(c){const e=CULL.eye,d=Math.hypot(c.c[0]-e[0],c.c[1]-e[1],c.c[2]-e[2])-c.r;if(d>CULL.maxD)return false;if(!CULL.pl)return true;
+function sphVis(x,y,z,r,maxD){const e=CULL.eye;if(Math.hypot(x-e[0],y-e[1],z-e[2])-r>maxD)return false;if(CULL.pl)for(const p of CULL.pl)if(p[0]*x+p[1]*y+p[2]*z+p[3]<-r)return false;return true}
+function chunkVis(c,dd){const e=CULL.eye,d=Math.hypot(c.c[0]-e[0],c.c[1]-e[1],c.c[2]-e[2])-c.r,lim=CULL.sec?Math.min(CULL.maxD,420,dd?dd*0.6:1e9):dd?Math.min(dd,CULL.maxD):CULL.maxD;if(d>lim)return false;if(!CULL.pl)return true;
   for(const p of CULL.pl)if(p[0]*c.c[0]+p[1]*c.c[1]+p[2]*c.c[2]+p[3]<-c.r)return false;return true}
-function draw(o){if(o.chunks){for(const c of o.chunks){if(chunkVis(c)){c.ko=o.ko;draw(c)}else CULL.skip+=c.count}return}if(!o.count)return;if(KO.on!==!!o.ko){KO.on=!!o.ko;gl.uniform1f(U.uKOn,KO.on?1:0)}bind(o);gl.drawElements(gl.TRIANGLES,o.count,o.type||gl.UNSIGNED_SHORT,0)}
+function draw(o){if(o.chunks){const dd=o.dd;for(const c of o.chunks){if(chunkVis(c,dd)){c.ko=o.ko;draw(c)}else CULL.skip+=c.count}return}if(!o.count)return;if(KO.on!==!!o.ko){KO.on=!!o.ko;gl.uniform1f(U.uKOn,KO.on?1:0)}bind(o);gl.drawElements(gl.TRIANGLES,o.count,o.type||gl.UNSIGNED_SHORT,0)}
 
+// detail meshes (cracks, wear, lines, signals, kerb furniture, trees...) stop drawing well before the horizon, where they'd be a pixel or less
+const DD_RULES=[[/^(crack|bumps|wear|rumble)/,260],[/^(furn|stall|post|sm)\b/,320],[/^roadZ/,420],[/^(signK|sigY|sigH|sigPole|head)/,520],[/^lens/,650],[/^(lines|ylines|tc\.paint)/,700],[/^(hedge)/,600],[/^(trunks|crowns|para)/,950],[/^(tc|or)\./,1400]];
+let DD_N=-1;function ddAssign(){let n=0;const walk=(o,name,d)=>{if(!o||d>3||typeof o!=="object")return;if(o.chunks){n++;if(o.dd===undefined){o.dd=0;for(const [re,v] of DD_RULES)if(re.test(name)){o.dd=v;break}}return}if(o.count!==undefined)return;for(const k in o){walk(o[k],d?name+"."+k:k,d+1)}};for(const k in SCN)walk(SCN[k],k,0);DD_N=n}
 // ---- static scene
-function meshChunked(P,N,I){const CS=360,cells=new Map(),nT=I.length/3;
+function meshChunked(P,N,I){const nT=I.length/3;let es=0,ns=0;for(let t=0;t<nT;t+=Math.max(1,(nT/1500)|0)){const a=I[t*3]*3,b=I[t*3+1]*3,c=I[t*3+2]*3;es+=Math.max(Math.hypot(P[a]-P[b],P[a+2]-P[b+2]),Math.hypot(P[a]-P[c],P[a+2]-P[c+2]));ns++}
+  const CS=es/Math.max(1,ns)<3?160:360,cells=new Map();
   for(let t=0;t<nT;t++){const a=I[t*3];const k=Math.floor(P[a*3]/CS)+","+Math.floor(P[a*3+2]/CS);let L=cells.get(k);if(!L)cells.set(k,L=[]);L.push(t)}
   const nV=P.length/3,mark=new Int32Array(nV).fill(-1),idx=new Int32Array(nV),out=[];let id=0,total=0;
   for(const L of cells.values()){id++;const p=[],n=[],ii=[];let vc=0,mn=[1e9,1e9,1e9],mx=[-1e9,-1e9,-1e9];
@@ -7782,7 +7787,7 @@ function volvoBezel(P,q,sz){if(q.h>q.w*1.15)return;const u=sub(q.br,q.bl),v=sub(
   for(let i=0;i<P.length;i+=3){const d=[P[i]-bc[0],P[i+1]-bc[1],P[i+2]-bc[2]],a=d[0]*U[0]+d[1]*U[1]+d[2]*U[2],b=d[0]*V[0]+d[1]*V[1]+d[2]*V[2],n=d[0]*N[0]+d[1]*N[1]+d[2]*N[2];
     if(Math.abs(a)>lu/2+0.035||b<-0.035||b>lv+0.035||Math.abs(n)>0.07)continue;const a2=a*sx,b2=b<0?b:b*sy;for(let j=0;j<3;j++)P[i+j]=bc[j]+U[j]*a2+V[j]*b2+N[j]*n}}
 // screen and cluster sharpness: full on Medium/High, a bit softer on Low/Lowest (or when zoomed in, always full) so they can redraw every frame without lag
-function scrRes(){const lo=(GFX.eff==="lowest"||GFX.eff==="low")&&!SCR.focus&&!SCR.focusClu,s=lo?1.25:2;
+function scrRes(){const q=GFX.q==="auto"?GFX.eff:GFX.q,z=SCR.focus||SCR.focusClu,s=z?2:q==="high"?2:q==="medium"?1.5:1.25;
   if(s!==SS){SS=s;SCR.cv.width=SCR.W*SS;SCR.cv.height=SCR.H*SS}if(s!==CLU.k){CLU.k=s;CLU.cv.width=CLU.W*s;CLU.cv.height=CLU.H*s}}
 function setScreenFrame(){const s=VEH.screen;let q=VEH.scr;if(isVolvo()&&q&&!q.vp){q=VEH.scr=Object.assign(volvoPortrait(q,TRIMS[st.trim].model),{vp:1})}{const portrait=q&&q.h>q.w*1.15,W_=portrait?420:680,H_=portrait?620:400;if(SCR.W!==W_){SCR.W=W_;SCR.H=H_;SCR.cv.width=W_*SS;SCR.cv.height=H_*SS}}SCR_N=[0,0.2419,0.9703];if(q){const f=fitQuad(q,SCR.W/SCR.H);SCR_BL=f.bl;SCR_BR=f.br;SCR_TL=f.tl;SCR_C=q.c;SCR_N=q.n}else if(!s){SCR_BL=[-0.17,0.9405,-0.5111];SCR_BR=[0.17,0.9405,-0.5111];SCR_TL=[-0.17,1.1346,-0.5595];SCR_C=[0,1.0375,-0.5353]}
   else{const [x,y,z]=s;SCR_BL=[x-0.17,y-0.097,z+0.024];SCR_BR=[x+0.17,y-0.097,z+0.024];SCR_TL=[x-0.17,y+0.097,z-0.024];SCR_C=[x,y,z]}
@@ -8929,9 +8934,9 @@ function charSitPose(A){if(A.sit)return A.sit;const n=A.nodes,F0=A.fr.subarray(0
     if(th!=null){const H=rotAt(pos(th),M4.rX(-Math.PI/2-0.2));out.set(M4.mul(H,get(th)),th*16);if(sh!=null){const kn=M4.p(H,pos(sh)),K=M4.mul(rotAt(kn,M4.rX(0.8)),H);out.set(M4.mul(K,get(sh)),sh*16)}}
     if(ua!=null){const S=rotAt(pos(ua),M4.rX(-0.9));out.set(M4.mul(S,get(ua)),ua*16);if(fa!=null){const el=M4.p(S,pos(fa)),E=M4.mul(rotAt(el,M4.rX(-0.75)),S);out.set(M4.mul(E,get(fa)),fa*16)}}}
   return A.sit=out}
-function charsDraw(){const t=performance.now()/1000;for(const it of CHARS){if(!Array.isArray(it)){const A=ACCM[it.k];if(!A)continue;if(A.kind==="acc"){accDrawMs(A.ms,it.M,false);continue}let fr;if(it.pose==="sit"){const an=A.anims&&A.anims.seat;if(an){const f=an[0]+Math.floor(((t+(it.sd||0))/an[2]%1)*an[1]);fr=A.fr.subarray(f*A.nodes*16,(f+1)*A.nodes*16)}else fr=charSitPose(A)}else fr=A.fr.subarray(0,A.nodes*16);
+function charsDraw(){const t=performance.now()/1000,cr=CULL.sec?70:220;for(const it of CHARS){if(!Array.isArray(it)){const A=ACCM[it.k];if(!A)continue;if(it.M&&!sphVis(it.M[12],it.M[13],it.M[14],2.5,cr))continue;if(A.kind==="acc"){accDrawMs(A.ms,it.M,false);continue}let fr;if(it.pose==="sit"){const an=A.anims&&A.anims.seat;if(an){const f=an[0]+Math.floor(((t+(it.sd||0))/an[2]%1)*an[1]);fr=A.fr.subarray(f*A.nodes*16,(f+1)*A.nodes*16)}else fr=charSitPose(A)}else fr=A.fr.subarray(0,A.nodes*16);
       for(const P of A.parts){if(it.skip&&it.skip.includes(P.name))continue;const o=P.node*16;accDrawMs(P.ms,M4.mul(it.M,fr.subarray(o,o+16)),false)}continue}
-    const [k,x,y,z,h,v,sd]=it;const A=ACCM[k];if(!A)continue;const sp=v>0.05?Math.min(1.8,v/1.3):0,ai=A.anims&&A.anims.idle,f=sp?Math.floor(((t*sp+sd)/A.dur%1)*A.F):ai?ai[0]+Math.floor(((t+sd*7)/ai[2]%1)*ai[1]):0,M=chain(M4.T(x,z,-y),M4.rY(h+Math.PI/2));
+    const [k,x,y,z,h,v,sd]=it;const A=ACCM[k];if(!A)continue;if(!sphVis(x,(z||0)+0.9,-y,1.3,cr))continue;const sp=v>0.05?Math.min(1.8,v/1.3):0,ai=A.anims&&A.anims.idle,f=sp?Math.floor(((t*sp+sd)/A.dur%1)*A.F):ai?ai[0]+Math.floor(((t+sd*7)/ai[2]%1)*ai[1]):0,M=chain(M4.T(x,z,-y),M4.rY(h+Math.PI/2));
   for(const P of A.parts){const o=(f*A.nodes+P.node)*16;accDrawMs(P.ms,M4.mul(M,A.fr.subarray(o,o+16)),false)}}}
 
 // ======================================================================= Vehicle Settings: a list of categories on the left, the chosen list (or the driver-assistance car) on the right
@@ -9348,8 +9353,8 @@ function drawCar(model,paint,lit,spin,dF,dR,glassPass,ride,simple,wofs){
     for(const part of ["rim_"+n,"tire_"+n]){const o=K.objs[part];bind(o);gl.uniform2f(U.uTy,part[0]==="t"?(simple?1:TYRES[st.tyre||"allseason"].pat):0,K.R||0.36);for(const [g,start,count] of o.groups){const m=mats[g.replace("strata_","")]||colMat(g);mat(m.c,m.e,m.sp,m.sh);gl.drawElements(gl.TRIANGLES,count,gl.UNSIGNED_SHORT,start*2)}}});;
   gl.uniform2f(U.uTy,0,0);if(dOn)gl.uniform1f(U.uDentOn,1);if(two)gl.enable(gl.CULL_FACE)
 }
-function drawProxy(model,paint,brk){ // distant traffic: a simple box with lamps
-  bind(SCN.box);gl.uniformMatrix4fv(U.uM,false,chain(model,M4.T(0,0.95,0),M4.S(1.9,1.2,4.6)));mat(paint,null,0.6,40);gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_SHORT,0);
+function drawProxy(model,paint,brk,dist){ // distant traffic: a simple box with lamps (the lamp strip only while it is more than a pixel)
+  bind(SCN.box);gl.uniformMatrix4fv(U.uM,false,chain(model,M4.T(0,0.95,0),M4.S(1.9,1.2,4.6)));mat(paint,null,0.6,40);gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_SHORT,0);if(dist>160&&!brk)return;
   gl.uniformMatrix4fv(U.uM,false,chain(model,M4.T(0,0.8,2.32),M4.S(1.6,0.12,0.05)));mat([0.5,0.02,0.02],brk?[1.4,0.04,0.02]:[0.25,0,0]);gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_SHORT,0);
 }
 
@@ -9515,7 +9520,8 @@ function render(dt){
   const lampsOn=(st.lights||night)&&st.power!==false;
   headlights(cm,fwd,lampsOn);
   const braking=car.brake>0.05; gl.uniform3fv(U.uTP,M4.p(cm,VEH.tail)); gl.uniform1f(U.uTail,braking?1:(lampsOn?0.25:0));
-  const pass=(VP,eye,tgt,cam2)=>{gl.uniformMatrix4fv(U.uVP,false,VP);gl.uniform3fv(U.uEye,eye);cullSet(VP,eye);
+  if(GFX.frame%90===0||DD_N<0)try{ddAssign()}catch(e){}
+  const pass=(VP,eye,tgt,cam2)=>{gl.uniformMatrix4fv(U.uVP,false,VP);gl.uniform3fv(U.uEye,eye);cullSet(VP,eye);CULL.sec=!!cam2;
   gl.disable(gl.CULL_FACE);gl.uniformMatrix4fv(U.uM,false,M4.id());
   // layered flat surfaces: push lower layers back in depth so the road and paint never flicker at distance
   gl.enable(gl.POLYGON_OFFSET_FILL);
@@ -9586,13 +9592,13 @@ function render(dt){
   const view=norm(sub(tgt,eye)); const drawn=[];
   dynBuild(eye,cm);
   const vis=[];for(const c of cars.concat(parked)){if(c.wx===undefined||c.kind==="bike"||c.kind==="cone"||c.kind==="xing")continue;const pos=[c.wx,0.6,-c.wy];const d=sub(pos,eye);const dist=Math.hypot(d[0],d[1],d[2]);
-    if(dist>1400||(dot(d,view)<-8&&dist>12))continue;vis.push([dist,c])}
+    if(dist>1400||(dot(d,view)<-8&&dist>12))continue;if(dist>12&&!sphVis(pos[0],pos[1],pos[2],3.5,CULL.sec?300:Math.min(900,CULL.maxD)))continue;vis.push([dist,c])}
   // only the nearest few get the full model (fewer still in the camera and mirror views); the rest are simple boxes
   vis.sort((a,b)=>a[0]-b[0]);const capFull=cam2?4:(G().fullCars||10),lodD=cam2?G().lod*0.5:G().lod;let nFull=0;
   for(const [dist,c] of vis){
     const om=aiMat(c);const sOn=(c.sig||c.haz)&&st.blink;
     const fl=c.flashT>0&&(c.flashT%0.55)>0.25,rmt=c.kind==="remote",lc={head:rmt?(c.li===2?[4.2,4.2,3.9]:c.li?[1.2,1.2,1.1]:[0.3,0.3,0.32]):fl?[4.2,4.2,3.9]:lampsOn?[1.2,1.2,1.1]:[0.3,0.3,0.32],tail:c.kind==="parked"?OFF:c.brk||c.v<0.1?[1.3,0.04,0.02]:(lampsOn?[0.4,0.01,0.01]:OFF),sigL:sOn&&(c.haz||c.sig<0)?AMB:OFF,sigR:sOn&&(c.haz||c.sig>0)?AMB:OFF};
-    if(dist<lodD&&nFull<capFull&&(c.mdl===undefined||KITS[c.mdl]||nFull<2)){nFull++;kitNext=kitOf(trafficModel(c));drawCar(om,paintRGB(c.paint),lc,[c.spin,c.spin,c.spin,c.spin],c.kind==="remote"?(c.steer||0):0,0,false,0,true);drawn.push([om,c])}else drawProxy(om,paintRGB(c.paint),c.brk)}
+    if(dist<lodD&&nFull<capFull&&(c.mdl===undefined||KITS[c.mdl]||nFull<2)){nFull++;kitNext=kitOf(trafficModel(c));drawCar(om,paintRGB(c.paint),lc,[c.spin,c.spin,c.spin,c.spin],c.kind==="remote"?(c.steer||0):0,0,false,0,true);drawn.push([om,c])}else drawProxy(om,paintRGB(c.paint),c.brk,dist)}
   if(cam2!=="rear"&&cam2!=="dash"){dentOn(true);WHL_ME=true;drawCar(cm,myPaint(),lit,car.spin,car.dF,car.dR,false,car.height-tuneLow(),false,car.defl.map(d=>d));WHL_ME=false;dentOn(false);}
   if(!cam2&&mirOn()&&MIR.fresh){gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,MIR.tex);bind(SCN.box);
     for(const [c,hw,hh,[u0,u1,v0,v1]] of mirrorGlass()){const Og=M4.p(cm,[c[0]+hw,c[1]-hh,c[2]]),Ug=M4.d(cm,[-2*hw,0,0]),Vg=M4.d(cm,[0,2*hh,0]),du=u1-u0,dv=v1-v0;
@@ -10199,14 +10205,15 @@ $("dPilot").onclick=()=>act("pilot");$("dSigL").onclick=()=>act("sigL"); $("dSig
 
 // ---- graphics quality. Auto picks from the device, then lowers the render resolution by itself if the frame rate drops
 const GQ={lowest:{cullD:1300,res:0.5,fullCars:3,traffic:6,onc:5,lod:38,hz:300,trees:false,shadow:false,aiSnd:false,scrEvery:2,camEvery:4,label:"Lowest",cap:30},low:{cullD:1900,res:0.62,fullCars:6,traffic:9,onc:8,lod:60,hz:400,trees:false,shadow:false,aiSnd:false,scrEvery:2,camEvery:3,label:"Low"},
-  medium:{cullD:2800,res:1.0,fullCars:10,traffic:16,onc:16,lod:120,hz:600,trees:true,shadow:true,aiSnd:true,scrEvery:1,camEvery:2,label:"Medium"},
-  high:{res:2,fullCars:18,traffic:40,onc:32,lod:260,hz:1000,trees:true,shadow:true,aiSnd:true,scrEvery:1,camEvery:2,label:"High"}};
+  medium:{cullD:2800,res:1.0,fullCars:10,traffic:16,onc:16,lod:120,hz:600,trees:true,shadow:true,aiSnd:true,scrEvery:2,camEvery:2,label:"Medium"},
+  high:{res:1.5,fullCars:18,traffic:40,onc:32,lod:260,hz:600,trees:true,shadow:true,aiSnd:true,scrEvery:1,camEvery:2,label:"High"}};
 const GFX={q:"auto",eff:"medium",dyn:1,fps:60,t:0,slow:0,frame:0};
 function gpuName(){try{const c=document.createElement("canvas").getContext("webgl"),e=c&&c.getExtension("WEBGL_debug_renderer_info");return e?String(c.getParameter(e.UNMASKED_RENDERER_WEBGL)):""}catch(_){return ""}}
 function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwareConcurrency||4,touch=matchMedia("(pointer:coarse)").matches,gpu=gpuName();
   if(mem<=3||cores<=3)return "low";
   if(/Intel/i.test(gpu)&&/(UHD|HD) Graphics/i.test(gpu)&&!/Iris/i.test(gpu))return cores>=8?"medium":"low";   // older Intel integrated graphics: Surface Go, budget laptops
   if(/SwiftShader|llvmpipe|Microsoft Basic/i.test(gpu))return "low";
+  if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
 const APP_VER="167";let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
@@ -10216,8 +10223,8 @@ function G(){return GQ[GFX.q==="auto"?GFX.eff:GFX.q]}
 function setGfx(q){GFX.q=q;GFX.dyn=1;try{localStorage.setItem("strata.gfx",q)}catch(e){}}
 function gfxTick(dt){GFX.fps=lerp(GFX.fps,1/Math.max(dt,1e-3),0.05);GFX.t+=dt;GFX.frame++;
   if(GFX.q!=="auto"||!st.started||GFX.t<1)return;GFX.t=0;
-  if(GFX.fps<45){GFX.dyn=Math.max(0.5,GFX.dyn-0.07);if(GFX.fps<30||GFX.dyn<=0.5)GFX.slow++;if(GFX.slow>5&&GFX.eff!=="lowest"){GFX.eff=GFX.eff==="high"?"medium":GFX.eff==="medium"?"low":"lowest";GFX.slow=0;GFX.dyn=1;toast(`Graphics lowered to ${G().label} to keep it smooth`)}}
-  else{GFX.slow=0;if(GFX.fps>56)GFX.dyn=Math.min(1,GFX.dyn+0.04)}}
+  if(GFX.fps<52){GFX.dyn=Math.max(0.5,GFX.dyn-(GFX.fps<40?0.1:0.05));if(GFX.fps<30||GFX.dyn<=0.5)GFX.slow++;if(GFX.slow>5&&GFX.eff!=="lowest"){GFX.eff=GFX.eff==="high"?"medium":GFX.eff==="medium"?"low":"lowest";GFX.slow=0;GFX.dyn=1;toast(`Graphics lowered to ${G().label} to keep it smooth`)}}
+  else{GFX.slow=0;if(GFX.fps>58)GFX.dyn=Math.min(1,GFX.dyn+0.03)}}
 // ---- PC detection
 const PC={on:false,gp:null,prev:[]};
 function setPC(on){if(PC.on===on)return;PC.on=on;document.body.classList.toggle("pc",on)}
@@ -11963,7 +11970,7 @@ function garModelLoad(){if(GARM.loading||GARM.g)return;GARM.loading=true;
         meshFrom.noChunk=n<65000;const m=meshFrom(P,N,I);meshFrom.noChunk=false;const c=[(mn[0]+mx[0])/2,(mn[1]+mx[1])/2,(mn[2]+mx[2])/2];m.c=c;m.r=Math.hypot(mx[0]-c[0],mx[1]-c[1],mx[2]-c[2]);meshes.push(m)}
       out.push({ms:meshes,c:g.c,e:g.e,n:g.n,mt:g.mt,detail,solid:!/marking|yellow|Blue|green|LED/i.test(g.n)})}
     GARM.g=out;delete MODELS.garage_helix}).catch(()=>{GARM.loading=false;setTimeout(garModelLoad,5000)})}
-function garModelDraw(night){if(!GARM.g)return;const e=CULL.eye;if(!e||Math.hypot(e[0]-GAR.cx,e[2]+GAR.cy)>(CULL.maxD||2000)+80)return;const cull=gl.isEnabled(gl.CULL_FACE),lod=GFX.q==="high"||(GFX.q==="auto"&&GFX.eff==="high")?70:45,inside=Math.abs(e[0]-GAR.cx)<46&&Math.abs(e[2]+GAR.cy)<22;
+function garModelDraw(night){if(!GARM.g)return;const e=CULL.eye;if(!e||Math.hypot(e[0]-GAR.cx,e[2]+GAR.cy)>(CULL.maxD||2000)+80)return;if(!sphVis(GAR.cx,12,-GAR.cy,62,CULL.sec?450:(CULL.maxD||2000)))return;const cull=gl.isEnabled(gl.CULL_FACE),lod=GFX.q==="high"||(GFX.q==="auto"&&GFX.eff==="high")?70:45,inside=Math.abs(e[0]-GAR.cx)<46&&Math.abs(e[2]+GAR.cy)<22;
   for(const g of GARM.g){const paint=!g.solid;if(paint){gl.enable(gl.POLYGON_OFFSET_FILL);gl.polygonOffset(-1,-3);gl.disable(gl.CULL_FACE)}else gl.enable(gl.CULL_FACE);
     const em=g.e&&g.e[0]>0?(night?[1.8,1.8,1.7]:[0.5,0.5,0.5]):null,conc=/concrete|driving/i.test(g.n);mat(g.c.map(v=>Math.min(1,v*1.15)),em,g.mt>0.5?0.7:0.12,g.mt>0.5?50:10,1,conc?2:0);
     for(const m of g.ms){if(g.detail&&(Math.hypot(m.c[0]-e[0],m.c[1]-e[1],m.c[2]-e[2])-m.r>lod||(inside&&Math.abs(m.c[1]-e[1])>5.5)))continue;   // inside: fine detail on other levels is hidden by the decks anyway
