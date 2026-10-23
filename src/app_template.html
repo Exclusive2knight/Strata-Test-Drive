@@ -10944,7 +10944,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="171";let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="171",BUILD_VER=172;   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){return GQ[GFX.q==="auto"?GFX.eff:GFX.q]}
@@ -11739,7 +11739,7 @@ const MP={room:null,objs:new Map(),sendT:0,last:"",lastT:0,gp:null};
 function mpTick(dt){const R_=MP.room;if(!R_)return;MP.sendT+=dt;
   if(MP.sendT>0.1&&st.started){MP.sendT=0;const pc=paintRGB(st.paint).map(v=>+v.toFixed(3));
     const p={x:+car.px.toFixed(2),y:+car.py.toFixed(2),z:+(car.zb||0).toFixed(2),h:+car.psi.toFixed(3),v:+car.vx.toFixed(2),m:TRIMS[st.trim].model||"",pc,b:(inp.brk>0.1||st.gear==="P")?1:0,sg:st.hazard?2:(st.signal||0),w:st.walk?1:0,st:Math.round((car.dF||0)*25)/25,li:st.power===false?0:st.high?2:(st.lights||st.night)?1:0,rv:st.gear==="R"?1:0,pt:Math.round((car.pitch||0)*100)/100,rl:Math.round((car.roll||0)*100)/100,hn:st.hornAt&&(st.clock||0)-st.hornAt<0.6?1:0};
-    const key=JSON.stringify(p),now=performance.now();if(key!==MP.last||now-MP.lastT>1000){MP.last=key;MP.lastT=now;R_.presence({car:p}).catch(()=>{})}}
+    const key=JSON.stringify(p),now=performance.now();if(key!==MP.last||now-MP.lastT>1000){MP.last=key;MP.lastT=now;R_.presence({car:p,playing:true,ver:BUILD_VER}).catch(()=>{})}}
   const now=performance.now(),seen=new Set();let peers=[];try{peers=R_.peers()}catch(e){}
   for(const pr of peers){if(pr.sameTab||pr.kind!=="viewer")continue;const c=pr.presence&&pr.presence.car;if(!c||typeof c.x!=="number"||!isFinite(c.x)||!isFinite(c.y))continue;seen.add(pr.peer);
     let o=MP.objs.get(pr.peer);if(!o){o={kind:"remote",peer:pr.peer,wx:c.x,wy:c.y,wz:c.z||0,wh:c.h||0,v:0,spin:0,sig:0,head:0,paint:"white",occ:{pax:false,a:{skin:Math.floor(Math.random()*3),shirt:Math.floor(Math.random()*6)},b:{skin:0,shirt:0}}};MP.objs.set(pr.peer,o);if(MP.ready)toast(`${netClean(pr.presence.n,20)||"Another player"} joined the drive`)}o.name=netClean(pr.presence.n,20)||o.name;
@@ -11756,8 +11756,8 @@ function mpTick(dt){const R_=MP.room;if(!R_)return;MP.sendT+=dt;
   MP.ready=true}
 
 (async()=>{try{if(!window.claude||!window.claude.use)return;const user=await window.claude.use("user");const owner=user?await user.isOwner():false;const room=await window.claude.use("room");if(!room)return;
-  MP.room=room;room.presence({playing:true,ver:+APP_VER}).catch(()=>{});const el=$("players");el.hidden=false;
-  const upd=()=>{try{const nv=Math.max(0,...room.peers().map(p=>+(p.presence&&p.presence.ver)||0));if(nv>+APP_VER){let done="";try{done=sessionStorage.getItem("strata.reloadFor")||""}catch(e){}if(done!==String(nv)){try{sessionStorage.setItem("strata.reloadFor",String(nv))}catch(e){}toast(`Version ${nv} is out: restarting the game`);setTimeout(()=>location.reload(),2500)}}}catch(e){}const n=new Set(room.peers().filter(p=>p.kind==="viewer").map(p=>p.peer)).size;el.textContent=`👥 ${n} online`;el.title="Players online right now, worldwide"};room.onPeers(upd,()=>{});upd()}catch(e){}})();
+  MP.room=room;room.presence({playing:true,ver:BUILD_VER}).catch(()=>{});const el=$("players");el.hidden=false;
+  const upd=()=>{try{const nv=Math.max(0,...room.peers().map(p=>+(p.presence&&p.presence.ver)||0));if(nv>BUILD_VER){let done="";try{done=sessionStorage.getItem("strata.reloadFor")||""}catch(e){}if(done!==String(nv)){try{sessionStorage.setItem("strata.reloadFor",String(nv))}catch(e){}toast(`Version ${nv} is out: restarting the game`);setTimeout(()=>location.reload(),2500)}}}catch(e){}const n=new Set(room.peers().filter(p=>p.kind==="viewer").map(p=>p.peer)).size;el.textContent=`👥 ${n} online`;el.title="Players online right now, worldwide"};room.onPeers(upd,()=>{});upd()}catch(e){}})();
 
 // ======================================================================= online servers (GitHub site): two free public MQTT brokers carry the server list and
 // everyone's car positions (pub/sub over a WebSocket). No game server and nothing peer-to-peer, so home, school and phone networks can't block it. A server is a
@@ -12785,7 +12785,7 @@ function garModelDraw(night){if(!GARM.g)return;const e=CULL.eye;if(!e||Math.hypo
 function bootStep(p,msg){$("bootBar").style.width=(p*100)+"%";$("bootMsg").textContent=msg}
 const idle=f=>("requestIdleCallback" in window)?requestIdleCallback(f,{timeout:400}):setTimeout(f,60);
 // ---- maintenance flag: maint.json on the site says when an update is being worked on; it can also say a newer version is out
-const MAINT={on:false,t:0};
+const MAINT={on:false,t:0},PAGE_T0=Date.now();
 // ---- countdown to the new map (shown until it arrives; then a tap reloads into it)
 (function w2Countdown(){if(W2)return;const el=document.createElement("div");el.id="w2cd";
   el.style.cssText="position:fixed;top:max(8px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:60;background:rgba(10,16,24,.82);color:#fff;font:600 13px/1.2 system-ui,sans-serif;padding:7px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.18);box-shadow:0 4px 14px rgba(0,0,0,.35);pointer-events:auto;cursor:default;white-space:nowrap;letter-spacing:.2px";
@@ -12797,8 +12797,10 @@ const MAINT={on:false,t:0};
 function maintUrl(){const h=location.hostname;return(/github\.io$|^127\.|^localhost$/.test(h)?"maint.json":"https://exclusive2knight.github.io/Strata-Test-Drive/maint.json")+"?t="+Date.now()}
 async function maintCheck(){let d;try{const r=await fetch(maintUrl(),{cache:"no-store"});if(!r.ok)return;d=await r.json()}catch(e){return}
   const on=!!d.on&&!(d.until&&Date.now()>d.until),first=!MAINT.t;MAINT.t=Date.now();
+  // "reload": copies opened before that moment restart (once), so everyone lands on the maintenance screen or the new version
+  if(d.reload&&PAGE_T0<d.reload){let done="";try{done=sessionStorage.getItem("strata.mReload")||""}catch(e){}if(done!==String(d.reload)){try{sessionStorage.setItem("strata.mReload",String(d.reload))}catch(e){}location.reload();return}}
   if(on){$("maintMsg").textContent=d.msg||"Mission Strata is being updated. Check back in a few minutes.";
-    if(first||!$("maint").hidden)$("maint").hidden=false;else{$("maintBar").hidden=false;$("maintBarT").textContent="Under maintenance: an update is on the way. You can keep driving.";$("maintBarB").hidden=true}}
+    if(first||!$("maint").hidden||d.hard)$("maint").hidden=false;else{$("maintBar").hidden=false;$("maintBarT").textContent="Under maintenance: an update is on the way. You can keep driving.";$("maintBarB").hidden=true}}
   else{$("maint").hidden=true;if(d.ver&&+d.ver>+APP_VER){$("maintBar").hidden=false;$("maintBarT").textContent="A new version is out.";$("maintBarB").hidden=false}else $("maintBar").hidden=true}
   MAINT.on=on;MAINT.until=on&&d.cd?d.until:0;maintCd()}
 // a countdown on the maintenance screen (maint.json "cd": true counts down to "until"); at zero the page reloads into the update
