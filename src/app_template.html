@@ -1778,6 +1778,15 @@ function buildNet2(){
       if(cur.length){while(cur.length>1&&!far(b,cur[cur.length-1]))cur.pop();const q=cur[cur.length-1];if(q.length>2)cur[cur.length-1]=q.slice(0,2);cur.push(ringPt(b,cur[cur.length-1]));mkRoad0(type,name,cur,o)}
       cur=[];if(i<pts.length-1){let k=i+1;while(k<pts.length-1&&!far(b,pts[k]))k++;i=k-1;cur=[ringPt(b,pts[k])]}}
     if(cur.length>1)mkRoad0(type,name,cur,o)};
+  // ---- curving streets: [x,y] is a junction, [x,y,0] a bend whose radius is worked out to fit between its neighbours
+  const fitR=pts=>pts.map((p,i)=>{if(p.length<3||p[2]>0||i===0||i===pts.length-1)return p;const a=pts[i-1],c=pts[i+1],l1=Math.hypot(p[0]-a[0],p[1]-a[1]),l2=Math.hypot(c[0]-p[0],c[1]-p[1]),
+    th=Math.abs(wrapPi(Math.atan2(c[1]-p[1],c[0]-p[0])-Math.atan2(p[1]-a[1],p[0]-a[0])));return [p[0],p[1],th<0.003?0.001:Math.min(2000,0.45*Math.min(l1,l2)/Math.tan(th/2))]});
+  const rd=(type,name,pts,o)=>mkR(type,name,fitR(pts),o);
+  // a loop street round an oval with junctions at its four ends (S, E, N, W): returns them
+  const ovalLoop=(name,cx,cy,rx,ry,o)=>{const at=t=>[Math.round(cx+Math.cos(t)*rx),Math.round(cy+Math.sin(t)*ry)],J=[-Math.PI/2,0,Math.PI/2,Math.PI].map(at),P=[];
+    for(let q=0;q<4;q++){P.push(J[q]);for(const f of [1/3,2/3])P.push([...at(-Math.PI/2+(q+f)*Math.PI/2),0])}P.push(J[0]);rd("res",name,P,o);return {S:J[0],E:J[1],N:J[2],W:J[3]}};
+  // a cul-de-sac: a short street off a junction ending in a turning circle (a little ring round a planted island)
+  const cul=(name,from,dx,dy,len=80)=>{const L_=Math.hypot(dx,dy),c=[Math.round(from[0]+dx/L_*len),Math.round(from[1]+dy/L_*len)];W2_RB.push({x:c[0],y:c[1],R:13,legs:[],cul:true});rd("res",name,[from,c])};
   const ZX=7.2;     // how high a cross street climbs to bridge a freeway at a diamond interchange
   // ---- a diamond interchange on a straight freeway: c centre, F freeway direction. Signals where the ramps meet the raised cross street
   const mkIC=(c,F,Ld,Dt,name)=>{const I={c,F,Ld,Dt:[Dt,Dt],name};const [cx,cy]=c,[fx,fy]=F,nx=-fy,ny=fx;
@@ -1835,12 +1844,14 @@ function buildNet2(){
   mkR("ave","Woodward Ave",[[-1000,450],[-1000,800]],{lim:35});
   mkR("road","Woodward Ave",[[-1000,800],[-1000,1000],[-1000,1500]],{lim:45});
   // ---- the east bank: Riverside Dr, Rosedale (north) and Birch Park (south) subdivisions
-  mkR("col","Riverside Dr",[[100,-850],[100,-650],[100,-450],[100,-300],[100,0],[100,300],[100,450],[100,650],[100,850],[100,1050]]);
-  const SX=[100,300,500,700,900],SXN=["Hazel Ln","Poplar Ln","Spruce Ln","Walnut Ln"];
-  {const SY=[450,650,850,1050],RN=["Rosedale Ave","Ardmore St","Kendall St","Linwood Ave"];SY.forEach((y,j)=>mkR("res",RN[j],SX.map(x=>[x,y])));SX.slice(1).forEach((x,i)=>mkR("res",SXN[i],SY.map(y=>[x,y])))}
-  {const SY=[-450,-650,-850],RN=["Birch St","Cedar St","Willow St"];SY.forEach((y,j)=>mkR("res",RN[j],SX.map(x=>[x,y])));SX.slice(1).forEach((x,i)=>mkR("res",SXN[i],SY.map(y=>[x,y])))}
-  mkR("col","Poplar Ln",[[500,-450],[500,0],[500,450]]);
-  mkR("res","Cedar St",[[900,-650],[1000,-650]]);
+  mkR("col","Riverside Dr",[[100,-650],[100,-300],[100,0],[100,300],[100,650]]);
+  // Rosedale: a loop street round an oval, a winding spine through the middle, cul-de-sacs off it
+  {const R=ovalLoop("Rosedale Dr",560,740,320,280);rd("res","Kendall St",[R.S,[520,620,0],[560,740],[600,880,0],R.N]);
+    cul("Linwood Ct",[560,740],-1,0,150);cul("Spruce Ct",[560,740],1,0,150);cul("Walnut Ct",R.E,1,0,90);
+    rd("res","Ardmore St",[[100,650],[170,700,0],R.W]);rd("col","Poplar Ln",[[500,0],[530,240,0],R.S])}
+  // Birch Park: an oval loop with a cross street, a cul-de-sac off the south end
+  {const B=ovalLoop("Birch Park Dr",560,-670,330,200);rd("res","Willow St",[B.W,[400,-610,0],[720,-730,0],B.E]);cul("Aspen Ct",B.S,0,-1,85);
+    rd("res","Birch St",[[100,-650],B.W]);rd("res","Cedar St",[B.E,[1000,-650]]);rd("col","Poplar Ln",[[500,0],[530,-240,0],B.N])}
   // ---- Maple Rd and the county roads: a mile-ish grid of 55 mph roads through the farmland
   mkR("road","Maple Rd",[[1000,0],[1000,-650],[1000,-1090]],{lim:45});
   mkR("art","Maple Rd",[[1000,-1090],[1000,-1350],[1000,-1650],[1000,-1910]],{lim:45});
@@ -1863,8 +1874,10 @@ function buildNet2(){
   mkR("road","Route 20",[[2900,0],[4000,0],[4500,0]],{lim:50});
   mkR("art","Fairhaven Blvd",[[2600,-300],[2600,-1090],[2600,-1350],[2600,-1650],[2600,-1910]],{lim:40});
   mkR("road","County Rd 22",[[2600,-1910],[2600,-2400],[2600,-3300]],{lim:55});
-  {const OX=[2300,2600,2900,3200],OY=[600,800,1000,1200],ON=["Oakridge Dr","Laurel St","Chestnut St","Hickory Ln"],OXN=["Fox Run","Fairhaven Blvd","Deer Path","Quail Ct"];
-    OY.forEach((y,j)=>mkR("res",ON[j],OX.map(x=>[x,y])));OX.forEach((x,i)=>mkR("res",OXN[i],OY.map(y=>[x,y])));mkR("col","Fairhaven Blvd",[[2600,300],[2600,600]])}
+  // Oakridge: an oval loop, a winding spine, cul-de-sacs off three sides
+  {const O=ovalLoop("Oakridge Dr",2800,900,430,270);rd("res","Laurel St",[O.S,[2740,780,0],[2800,900],[2860,1040,0],O.N]);
+    cul("Fox Run",O.W,-1,0,95);cul("Deer Path",O.E,1,0,95);cul("Quail Ct",O.N,0,1,85);cul("Hickory Ct",[2800,900],-1,0.15,170);cul("Chestnut Ct",[2800,900],1,-0.15,170);
+    rd("col","Fairhaven Blvd",[[2600,300],[2680,480,0],O.S])}
   // ---- Millbrook: Mill St, a few side streets, Lakeshore Dr round the lake, Old Mill Rd south over the creek, Route 9 west to Westport
   mkR("st","Mill St",[[1450,2450],[1600,2450],[1750,2450],[1900,2450],[2100,2450]],{lim:25});
   mkR("st","Church St",[[1600,2300],[1600,2450],[1600,2650]],{lim:25});
@@ -1875,12 +1888,11 @@ function buildNet2(){
   mkR("lane","Lakeshore Dr",[[2100,2450],[2500,2500,150],[2750,2700]],{lim:30});
   mkR("lane","Lakeshore Dr",[[2750,2700],[2700,3000,150],[2300,3050,150],[1900,2900]],{lim:30});
   mkR("lane","Lakeshore Dr",[[1900,2900],[1900,2650]],{lim:30});
-  mkR("lane","Old Mill Rd",[[1600,2300],[1580,1900,150],[1200,1500,200],[900,1250,150],[900,1050]],{lim:35});
+  mkR("lane","Old Mill Rd",[[1600,2300],[1580,1900,150],[1200,1500,200],[800,1180,150],[560,1020]],{lim:35});
   mkR("road","Route 9",[[-1000,1500],[-760,1640,180],[-520,1960,200],[-80,2080,220],[300,2350,250],[760,2260,220],[1150,2480,200],[1450,2450]],{lim:45});
   // ---- Kestrel Estates: a gated community off Woodward Ave (the gatehouse is on Estates Dr)
-  mkR("res","Estates Dr",[[-1000,1000],[-1300,1000]],{lim:20});
-  mkR("res","Estates Dr",[[-1300,1000],[-1450,1000],[-1600,1000],[-1600,1270,40],[-1450,1270],[-1300,1270,40],[-1300,1000]],{lim:20});
-  mkR("res","Ridgeview Ct",[[-1450,1000],[-1450,1270]],{lim:20});
+  {const G=ovalLoop("Estates Loop",-1450,1140,210,125,{lim:20});rd("res","Estates Dr",[[-1000,1000],[-1120,1060,0],G.E],{lim:20});
+    cul("Summit Ct",G.N,0,1,75);cul("Ridgeview Ct",G.W,-1,0,85);cul("Aspen Ridge",G.S,0,-1,75)}
   // ---- Kestrel Rd: from Woodward Ave west over I-61 to the foot of Mount Kestrel and on to County Rd 3
   mkR("road","Kestrel Rd",[[-1000,1500],[-1890,1500]],{lim:45});
   mkR("art","Kestrel Rd",[[-1890,1500],[-2150,1500],[-2450,1500],[-2710,1500]],{lim:40});
@@ -1898,7 +1910,7 @@ function buildNet2(){
     // the short way round, through the south-west (clear of both roads)
     let d=wrapPi(t2-t1);const P=[[a[0],a[1]]],n=Math.max(4,Math.ceil(Math.abs(d)/0.2)),R=(Math.hypot(a[0]-mx,a[1]-my)+Math.hypot(b[0]-mx,b[1]-my))/2;
     for(let k=1;k<n;k++){const t=t1+d*k/n;P.push([mx+Math.cos(t)*R,my+Math.sin(t)*R,R*0.9])}P.push([b[0],b[1]]);mkR("lane","Summit Loop",P,{lim:20,mtn:1})}
-  for(const b of W2_RB){b.legs.sort((p,q)=>p.a-q.a);const L=b.legs;for(const l of L)N(l.p[0],l.p[1],{ctrl:"minor",rbt:b});
+  for(const b of W2_RB){if(b.legs.length===1){const a=Math.atan2(-Math.sin(b.legs[0].a),-Math.cos(b.legs[0].a));b.legs.push({a,p:[Math.round((b.x+Math.cos(a)*b.R)*100)/100,Math.round((b.y+Math.sin(a)*b.R)*100)/100]})}b.legs.sort((p,q)=>p.a-q.a);const L=b.legs;for(const l of L)N(l.p[0],l.p[1],{ctrl:"minor",rbt:b});
     for(let i=0;i<L.length;i++){const A=L[i],Bn=L[(i+1)%L.length];let a2=Bn.a;if(a2<=A.a)a2+=Math.PI*2;const d=a2-A.a,k=Math.max(1,Math.ceil(d/1.2)),pts=[A.p];
       for(let j=0;j<k;j++){const m=A.a+d*(j+0.5)/k,r=b.R/Math.cos(d/k/2);pts.push([b.x+Math.cos(m)*r,b.y+Math.sin(m)*r,b.R])}pts.push(Bn.p);E("rbt","Roundabout",pts)}}
   for(const e of EDGES)if(e.mtn)W2_MTN.push(e);
@@ -2164,7 +2176,7 @@ function roadDist(x,y,m){let best=m+1;for(const e of edgesNear(x,y,m+6)){const p
   return best}
 
 // ---- places: downtown (flat, concrete), the subdivisions (flat lawns), the rest rolling countryside
-const FLAT=W2?[[-1720,-280,-570,570,"city"],[2230,2970,-370,370,"city"],[120,980,380,1120,"sub"],[120,1080,-920,-380,"sub"],[2230,3270,530,1270,"sub"],[1520,2160,2230,2720,"sub"],[-1680,-1220,930,1340,"gated"]]
+const FLAT=W2?[[-1720,-280,-570,570,"city"],[2230,2970,-370,370,"city"],[120,1010,380,1120,"sub"],[120,1080,-990,-380,"sub"],[2160,3440,520,1370,"sub"],[1520,2160,2230,2720,"sub"],[-1790,-1150,860,1360,"gated"]]
   :[[-1420,-430,-420,420,"city"],[580,1620,180,1020,"sub"],[580,1620,-1020,-180,"sub"],[-200,1250,-120,120,"blvd"]];
 const CITY_BOX=FLAT[0];
 function inCity(x,y){for(const B of FLAT){if(B[4]!=="city")continue;const [x0,x1,y0,y1]=B;if(x>x0&&x<x1&&y>y0&&y<y1)return true}return false}
@@ -2427,7 +2439,7 @@ if(W2){const sOn=(ax,ay,bx,by,u,dir=1)=>{const e=ePick(ax,ay,bx,by);if(!e)return
   st_("millbrook","Millbrook","Old small town by a lake: Mill St, Lakeshore Dr, Old Mill Rd over the creek",sOn(1450,2450,1600,2450,30),{nav:"Small town",ic:"🏡"});
   st_("mountain","Mount Kestrel","Switchbacks up the mountain, a pass road down the far side, a loop round the summit",sOn(-2710,1500,-2850,1560,60),{nav:"Mountain roads",ic:"⛰️"});
   st_("garage","Parking garage","Cass Ave · the two-bay dual helix garage: every floor is a ramp. Entrance on your right, take a ticket at the gate; the exit is onto Park Ave",{x:-846,y:-245,h:Math.PI/2});
-  st_("suburb","Rosedale","Subdivision streets on the east bank: all-way stops, speed humps, 25 mph",sOn(100,650,300,650,40));
+  st_("suburb","Rosedale","Subdivision streets on the east bank: all-way stops, speed humps, 25 mph",sOn(100,650,240,740,40));
   st_("county","County Rd 30","55 mph through the farmland, over the river and over I-61",sOn(-1000,-2400,1000,-2400,300));
   st_("bridge","Clearwater River","Main St over the river bridge",sOn(-400,0,100,0,20));
   {const p=PAD.e?fpt(PAD.e,PAD.dir,PAD.s0-90,0):[0,0,0];st_("station","Service plaza","Gas pumps and fast chargers beside I-38 between Maple Rd and Fairhaven",{x:p[0],y:p[1],h:p[2]})}}
@@ -4726,11 +4738,34 @@ function walkCtx(){const W=st.walk,T=TRIMS[st.trim];if(!W)return null;
     return {a:null,label:H_.kind==="pump"?"Nozzle in · walk back to the pump to hang it up":"Plugged in · walk back to the charger to unplug"}}
   const near=(l,r)=>stnWorld(l).some(p=>Math.hypot(p[0]-W.x,p[1]-W.y)<r&&Math.hypot(p[0]-car.px,p[1]-car.py)<8);
   {const vc=valetCtx(W);if(vc)return vc}
+  if(METER.cur&&Math.hypot(W.x-METER.cur.mx,W.y-METER.cur.my)<1.6){const l=meterLeft();return {a:"meter",label:`🅿️ Pay the meter · +15 min for $1 · ${l>0?Math.ceil(l/60)+" min left":METER.paid>METER.arrive?"expired":"not paid yet"}`}}
   {const an=airNear();if(an)return tiresLow()?{a:"air",label:"🛞 Air for your tires · $2.00"}:{a:null,label:"🛞 Air machine · your tires are fine"}}
   if(fuelOK&&near("pumps",2.2))return {a:"pump",label:"⛽ Fill up"};
   if(plugOK&&near("chargers",2.2))return {a:"plug",label:"⚡ Plug in"};
   if(dd<2.4)return {a:"in",label:"Get in"};
   return {a:null,label:fuelOK||plugOK?"Walk to the pump or charger":""}}
+// ---- metered street parking (the new world): spaces on the shopping streets, a meter at each. $1 buys 15 minutes, 2 hours at most.
+// Park in a space and walk to its meter to pay; stay unpaid (or past your time) and an enforcement officer leaves a ticket
+const METER={spaces:[],cur:null,paid:0,arrive:0,ticketed:false,warned:false,price:1,step:15*60,max:2*3600};
+function meterSetup(){METER.spaces.length=0;if(!W2)return;
+  for(const e of EDGES){if(!e.T.park)continue;const m=eAt(e,e.L/2);if(!(e.name==="Mill St"||inCity(m.x,m.y)))continue;e.mtr=[];
+    const W=e.m/2+e.n*LANE,off=W+e.T.park/2,u0=kerbTrim(e,0)+9,u1=e.L-kerbTrim(e,1)-9;
+    for(const sd of [1,-1])for(let u=u0;u+6.4<=u1;u+=6.4){const c=ePt(e,u+3.2,sd*off),mt=ePt(e,u+(sd>0?0.6:5.8),sd*(W+e.T.park+0.55)),en=ePt(e,u+6.4,sd*off);
+      const S={e,sd,u0:u,u1:u+6.4,off:sd*off,x:c[0],y:c[1],h:c[2],mx:mt[0],my:mt[1],ex:en[0],ey:en[1]};METER.spaces.push(S);e.mtr.push(S)}}}
+function meterAt(x,y){for(const e of gAt(GRID.e,x,y)){if(!e.mtr)continue;const p=eProj(e,x,y);for(const S of e.mtr)if(p.u>=S.u0-0.6&&p.u<=S.u1+0.6&&Math.abs(p.t-S.off)<1.7)return S}return null}
+const meterLeft=()=>Math.max(0,METER.paid-st.clock);
+function meterTick(dt){if(!W2||!METER.spaces.length||!st.started)return;const M=METER,now=st.clock,parkedNow=Math.abs(car.vx)<0.3&&(st.walk||st.gear==="P"||!st.power);
+  if(M.cur){const S=M.cur,still=Math.hypot(car.px-S.x,car.py-S.y)<5;
+    if(!still){if(Math.abs(car.vx)>1)M.cur=null;return}
+    const left=meterLeft();if(left>0&&left<120&&!M.warned){M.warned=true;toast(`🅿️ Your meter runs out in ${Math.ceil(left/60)} min`)}
+    // enforcement comes round: 90 s grace when you arrive, 45 s after the time runs out
+    if(!M.ticketed&&parkedNow&&(M.paid<=M.arrive&&now-M.arrive>90||M.paid>M.arrive&&now-M.paid>45)){M.ticketed=true;const fine=35;ECON.cash-=fine;try{bankTx("Parking ticket · "+(M.paid>M.arrive?"expired meter":"unpaid meter"),-fine);bankSave()}catch(e){}
+      toast(`📝 Parking ticket on your windshield: ${money(fine)} (${M.paid>M.arrive?"the meter ran out":"you didn't pay the meter"})`);beep(520,.15,"square",.12)}
+    return}
+  if(parkedNow){const S=meterAt(car.px,car.py);if(S){M.cur=S;M.arrive=now;M.paid=now;M.ticketed=false;M.warned=false;toast("🅿️ Metered parking · $1 per 15 min, 2 h max · walk to the meter by the curb to pay")}}}
+function meterPay(){const M=METER;if(!M.cur)return;if(meterLeft()>=M.max-60){toast("🅿️ The meter is already at its 2 hour maximum");return}if(ECON.cash<M.price){toast("Not enough money for the meter");return}
+  ECON.cash-=M.price;try{bankTx("Parking meter",-M.price);bankSave()}catch(e){}M.paid=Math.min(Math.max(M.paid,st.clock)+M.step,st.clock+M.max);M.warned=false;beep(1100,.05,"sine",.12);setTimeout(()=>beep(1500,.06,"sine",.12),80);
+  toast(`🅿️ Paid · ${Math.ceil(meterLeft()/60)} min on the meter`)}
 // ---- start / stop button: the car can be switched off (in P, stopped) and on again
 st.power=true;
 
@@ -4830,6 +4865,7 @@ function walkAction(){if(TOWH.ride){toast("Stay in the car until the tow truck d
     st.acc=false;st.pilot=false;st.signal=0;tick(1);toast(PC.on?"On foot: WASD to walk, drag to look, Space to jump, L to lock, P for your phone":"On foot: stick to walk, drag to look, your phone and key are on the right");return}
   const c=walkCtx();if(!c||!c.a)return;const T=TRIMS[st.trim],H=car.hyb;
   if(c.a==="air"){airFill();return}
+  if(c.a==="meter"){meterPay();return}
   if(c.a==="valetTake"){valetTake(c.rec);return}
   if(c.a==="pump"){if(H.fuel>=H.tank-0.2){toast("The tank is already full");return}gradePick(()=>{sys.fuel="pump";hoseStart("pump");if(!sys.hose){sys.fuel=null;return}beep(660,.08,"sine",.2);toast(`Pumping ${PUMP.grade||"fuel"}…`)})}
   else if(c.a==="plug"){if(T.plug?(H.pb||0)>=0.99:H.soc>=0.895){toast(T.plug?"The battery is already full":"Already charged to 90 %");return}sys.fuel="plug";hoseStart("plug");if(!sys.hose){sys.fuel=null;return}beep(880,.08,"sine",.2);setTimeout(()=>beep(1320,.1,"sine",.2),120);toast(`Plugged in · ${T.phev?"Level 2, 7 kW (sped up)":"DC fast charging (sped up)"}`)}
@@ -7863,7 +7899,14 @@ function worldScenery(){W2P.length=0;
         const q=ePt(g,u+2.5,sd*(W+0.4));B(post,q[0],q[1],z,1.1,0.25,0.25);const t=ePt(g,u+2.5,sd*(W+0.2));B(signGW,t[0],t[1],z+1.1+2.2,4.4,0.12,0.12)}
       const w=ePt(g,u-12,-(W+6));B(signGW,w[0],w[1],z+0.3,1.2,6,0.4,w[2]);B(bld[0],w[0],w[1],z,0.35,6.4,0.6,w[2])}}
     // roundabout islands get a real tree; Mount Kestrel gets a pine forest (instead of the plain cone trees)
-    for(const b of W2_RB)w2Put("t_oak_large",b.x,b.y,0,hillZ(b.x,b.y)+0.16);
+    for(const b of W2_RB)w2Put(b.cul?"t_ornamental_tree":"t_oak_large",b.x,b.y,0,hillZ(b.x,b.y)+0.16);
+    // houses round each turning circle, facing it (leaving the street in clear)
+    for(const b of W2_RB){if(!b.cul)continue;const st0=b.legs.find(l=>gAt(GRID.e,l.p[0],l.p[1]).some(e=>e.type==="res"&&(Math.hypot(e.a.x-l.p[0],e.a.y-l.p[1])<1||Math.hypot(e.b.x-l.p[0],e.b.y-l.p[1])<1)));
+      const a0=st0?st0.a:0,zn=zoneName(b.x,b.y),HK=zn==="gated"?["b_luxury_house","b_modern_house"]:["b_ranch_house","b_bungalow","b_suburban_two_story","b_modern_house","b_duplex"];
+      for(let k=0;k<5;k++){const t=a0+0.95+k*(2*Math.PI-1.9)/4,kk=HK[Math.floor(r()*HK.length)],f=W2_FP[kk],d=b.R+4.5+f[3],x=b.x+Math.cos(t)*d,y=b.y+Math.sin(t)*d;
+        if(w2Free(x,y,Math.max(f[1],f[3])-1)&&fits(kk,x,y,t+Math.PI,0.6))w2Put(kk,x,y,t+Math.PI)}}
+    // metered parking in front of the shops: a meter at every space, painted space ends
+    meterSetup();for(const S of METER.spaces){const z=hillZ(S.mx,S.my);B(post,S.mx,S.my,z,1.15,0.09,0.09);B(signK,S.mx,S.my,z+1.15,0.42,0.22,0.16,S.h);B(stall,S.ex,S.ey,z+0.012,0.012,0.12,2.3,S.h);collAdd({t:"c",x:S.mx,y:S.my,r:0.12,what:"a parking meter"})}
     {const [mx,my]=W2C.MT;let n=0;for(let k=0;k<9000&&n<1600;k++){const rr=Math.sqrt(r())*1150,t=r()*6.28,x=mx+Math.cos(t)*rr,y=my+Math.sin(t)*rr,d=dfAt(x,y);if(d<9||d<30&&roadDist(x,y,8)<7||riverD(x,y)<RIVER.w/2+6||!w2Free(x,y,3))continue;
       w2Put(r()<0.65?"t_pine_tall":"t_pine_small",x,y,r()*6.28,terrainH(x,y,d)-0.25);n++}}
   }
@@ -7933,6 +7976,7 @@ function worldScenery(){W2P.length=0;
           boxInto(lens,px-fx*0.11,pz,-(py-fy*0.11),0.012,0.4,0.42,ph);visorInto(sigH,px-fx*0.1,py-fy*0.1,pz-0.03,ph,0.25,0.12,7);
           const bx=p[0]-fx*0.2+Math.sin(ph)*0.0,by=p[1]-fy*0.2;boxInto(sigH,bx,gz+1.05,-by,0.06,0.16,0.11,ph);octInto(sigY,bx-fx*0.035,by-fy*0.035,gz+1.05,ph,0.025,0.012,10,0);
           SIGH.push({t:"ped",x:px-fx*0.135,y:py-fy*0.135,h:ph,z:pz,n,g:l.grp})}}
+      else if(n.rbt&&!l.major&&n.rbt.cul){}
       else if(n.rbt&&!l.major){const s=e.L-l.r-2.4,p=fpt(e,dir,s,sideO-0.9),gz=SZ(p[0],p[1]);B(post,p[0],p[1],gz,2.1,0.08,0.08);collAdd({t:"c",x:p[0],y:p[1],r:0.08});const hF=p[2]+Math.PI;octInto(stopR,p[0],p[1],gz+2.35,hF,0.52,0.04,3,-Math.PI/2);octInto(signW,p[0]+Math.cos(hF)*0.03,p[1]+Math.sin(hF)*0.03,gz+2.35,hF,0.3,0.02,3,-Math.PI/2)}
       else if(n.ctrl==="allstop"||(n.ctrl==="minor"&&!l.major)){const s=e.L-l.r-1.4,p=fpt(e,dir,s,sideO-0.9);B(post,p[0],p[1],0,2.1,0.08,0.08);collAdd({t:"c",x:p[0],y:p[1],r:0.08});
         const hF=p[2]+Math.PI;octInto(stopR,p[0],p[1],2.45,hF,0.42,0.04);const fx=Math.cos(hF)*0.025,fy=Math.sin(hF)*0.025;
@@ -11176,7 +11220,7 @@ function frame(now){if(XR.on&&!XR.inFrame){requestAnimationFrame(frame);return} 
     if(sys.hillDemo){sys.hillT+=dt;if(sys.hillT>6){sys.hillT=0;st.leveling=!st.leveling;toast(st.leveling?"Active levelling ON: beam hugs the ground":"Active levelling OFF: beam fixed to the body")}if(!car.offroad&&Math.abs(car.vx)>3)sys.hillDemo=false}
     if(sys.aim!=null){sys.levT=(sys.levT||0)+dt;if(sys.levT>5){sys.levT=0;st.leveling=!st.leveling;toast(st.leveling?"Levelling ON: beam back down on the road":"Levelling OFF: the loaded car aims the beam high")}
       if(Math.hypot(car.px-sys.aim.x,car.py-sys.aim.y)>40){sys.aim=null;car.cargo=0;st.leveling=true}}acc+=dt;const h=1/G().hz;while(acc>=h){physics(h);acc-=h}if(car.crashed>0)car.crashed-=dt;updateAudio()}
-  shopTick();homeTick(dt);if(st.walk){footTick(dt);openHouseTick()}else if(sys.flashT>0)sys.flashT-=dt;gtTick(dt);phTick();revChime(dt);beltTick(dt);econTick(dt);usedTick(dt);testTick(dt);ui2Tick();trainTick(dt);gateTick(dt);mpTick(dt);netTick(dt);teslaTrip(dt);launchTick(dt);
+  shopTick();homeTick(dt);if(st.walk){footTick(dt);openHouseTick()}else if(sys.flashT>0)sys.flashT-=dt;gtTick(dt);phTick();revChime(dt);beltTick(dt);econTick(dt);usedTick(dt);testTick(dt);ui2Tick();trainTick(dt);meterTick(dt);gateTick(dt);mpTick(dt);netTick(dt);teslaTrip(dt);launchTick(dt);
   try{gigTick(dt)}catch(e){}try{copTick(dt)}catch(e){console.error(e)}if(DALE.p.length||DALE.pools.length||DALE.dead>0||DALE.shake>0||DALE.fire)try{daleTick(dt)}catch(e){}try{if(st.started)stkTick(dt)}catch(e){}if(st.started&&st.power===true&&!st.walk&&Math.abs(car.vx)>1)sys.tripT=(sys.tripT||0)+dt;if(sys.roaT>0)sys.roaT-=dt;
   try{rplRec(dt)}catch(e){}try{achTick(dt)}catch(e){}render(dt);if(PHOTO.want)photoGrab();hud(dt);
 }
