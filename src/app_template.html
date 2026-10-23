@@ -1017,7 +1017,7 @@ body.pmOn>*:not(#gl):not(#pm):not(#pmFx):not(#toast):not(#flashFx):not(script){v
   </div>
 </div>
 
-<div id="maint" hidden><div class="mc"><svg viewBox="0 0 100 88" width="96" height="85" aria-hidden="true"><path d="M50 4 L96 84 H4 Z" fill="#f5c518" stroke="#f5c518" stroke-width="6" stroke-linejoin="round"/><rect x="45" y="28" width="10" height="32" rx="4" fill="#1a1400"/><circle cx="50" cy="71" r="6" fill="#1a1400"/></svg><h2>Under maintenance</h2><p id="maintMsg">Mission Strata is being updated. Check back in a few minutes.</p><button id="maintRe">Check again</button></div></div>
+<div id="maint" hidden><div class="mc"><svg viewBox="0 0 100 88" width="96" height="85" aria-hidden="true"><path d="M50 4 L96 84 H4 Z" fill="#f5c518" stroke="#f5c518" stroke-width="6" stroke-linejoin="round"/><rect x="45" y="28" width="10" height="32" rx="4" fill="#1a1400"/><circle cx="50" cy="71" r="6" fill="#1a1400"/></svg><h2>Under maintenance</h2><p id="maintMsg">Mission Strata is being updated. Check back in a few minutes.</p><div id="maintCd" hidden style="font:800 34px/1.1 system-ui,sans-serif;color:#f5c518;margin:6px 0 14px;letter-spacing:1px"></div><button id="maintRe">Check again</button></div></div>
 <div id="testChip" hidden></div>
 <div id="spawnPop" hidden><div class="sp"><h2>Where do you want to go?</h2><p>Pick a start point. You can change it any time in Settings › Car › Go to.</p><div class="g" id="spawnList"></div></div></div>
 <div id="maintBar" hidden><svg viewBox="0 0 100 88" width="18" height="16" aria-hidden="true"><path d="M50 4 L96 84 H4 Z" fill="#f5c518" stroke="#f5c518" stroke-width="6" stroke-linejoin="round"/><rect x="45" y="28" width="10" height="32" rx="4" fill="#1a1400"/><circle cx="50" cy="71" r="6" fill="#1a1400"/></svg><span id="maintBarT"></span><button id="maintBarB" hidden>Reload</button></div>
@@ -12765,7 +12765,12 @@ async function maintCheck(){let d;try{const r=await fetch(maintUrl(),{cache:"no-
   if(on){$("maintMsg").textContent=d.msg||"Mission Strata is being updated. Check back in a few minutes.";
     if(first||!$("maint").hidden)$("maint").hidden=false;else{$("maintBar").hidden=false;$("maintBarT").textContent="Under maintenance: an update is on the way. You can keep driving.";$("maintBarB").hidden=true}}
   else{$("maint").hidden=true;if(d.ver&&+d.ver>+APP_VER){$("maintBar").hidden=false;$("maintBarT").textContent="A new version is out.";$("maintBarB").hidden=false}else $("maintBar").hidden=true}
-  MAINT.on=on}
+  MAINT.on=on;MAINT.until=on&&d.cd?d.until:0;maintCd()}
+// a countdown on the maintenance screen (maint.json "cd": true counts down to "until"); at zero the page reloads into the update
+function maintCd(){const el=$("maintCd");if(!el)return;if(!MAINT.until){el.hidden=true;return}const ms=MAINT.until-Date.now();
+  if(ms<=0){el.textContent="Loading…";if(!$("maint").hidden&&!MAINT.rl){MAINT.rl=1;setTimeout(()=>location.reload(),500+Math.random()*4000)}return}
+  const s=Math.floor(ms/1000),two=n=>String(n).padStart(2,"0");el.hidden=false;el.textContent=`${Math.floor(s/3600)?Math.floor(s/3600)+":":""}${two(Math.floor(s%3600/60))}:${two(s%60)}`}
+setInterval(maintCd,1000);
 $("maintRe").onclick=()=>{location.reload()};$("maintBarB").onclick=()=>{location.reload()};
 maintCheck();setInterval(maintCheck,90000);
 async function boot(){
