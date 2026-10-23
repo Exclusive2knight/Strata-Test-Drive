@@ -1705,8 +1705,10 @@ const RT={
   lane:{n:1,m:-1.2,shR:0,lim:30,z:"r",rank:1,col:"h",label:"Country lane"},
   // one-way, one-lane ring of a roundabout (traffic goes round anticlockwise; it has priority, everyone entering yields)
   rbt:{n:1,m:-LANE,shR:1.2,lim:20,z:"c",rank:7,col:"h",kerb:true,edgeL:true,label:"Roundabout",ow:true}};
-// the new world is being built behind this switch: add ?world=2 to the address to drive it (Halden stays the default until it is finished)
-const W2=(()=>{try{return /[?&]world=2\b/.test(location.search)}catch(e){return false}})();
+// the new world (Westport, Fairhaven, Millbrook, Mount Kestrel) takes over from Halden at 3 pm Eastern on Oct 23 2026 (19:00 UTC).
+// Before then it can be tried with ?world=2; after it, ?world=1 still opens Halden
+const W2_AT=Date.UTC(2026,9,23,19,0,0);
+const W2=(()=>{try{const q=location.search;if(/[?&]world=1\b/.test(q))return false;if(/[?&]world=2\b/.test(q))return true;return Date.now()>=W2_AT}catch(e){return false}})();
 const NODES=[], EDGES=[];let BUILD_IC=[];
 function N(x,y,o){for(const n of NODES)if(Math.abs(n.x-x)<1&&Math.abs(n.y-y)<1){if(o)Object.assign(n,o);return n}
   const n=Object.assign({i:NODES.length,x,y,ctrl:null,kind:null,E:[]},o||{});NODES.push(n);return n}
@@ -2285,6 +2287,12 @@ const ORP={x0:-2392,x1:-2160,y0:-1450,y1:-905,
   bog:{x:-2300,y:-1206,a:24,b:11,h:0},hill:{x:-2350,y:-1330,H:8,R:40},lot:{x0:-2205,x1:-2160,y0:-935,y1:-907},feats:[],grid:new Map(),zones:[],ready:false};
 if(W2){const o=W2C.orp||[1e5,1e5],[dx,dy]=o;Object.assign(ORP,{x0:ORP.x0+dx,x1:ORP.x1+dx,y0:ORP.y0+dy,y1:ORP.y1+dy});ORP.trail=ORP.trail.map(([x,y])=>[x+dx,y+dy]);
   ORP.bog.x+=dx;ORP.bog.y+=dy;ORP.hill.x+=dx;ORP.hill.y+=dy;Object.assign(ORP.lot,{x0:ORP.lot.x0+dx,x1:ORP.lot.x1+dx,y0:ORP.lot.y0+dy,y1:ORP.lot.y1+dy})}
+// the new world's off-road park adds a log bridge: a ravine cut across the longest free straight of the trail, two logs over it
+if(W2&&W2C.orp){const used=new Set([4,20,15,8,16,13]),T=ORP.trail;let bi=-1,bl=0;for(let i=0;i<T.length-1;i++){if(used.has(i)||used.has(i-1)||used.has(i+1))continue;const l=Math.hypot(T[i+1][0]-T[i][0],T[i+1][1]-T[i][1]);if(l>bl){bl=l;bi=i}}
+  if(bi>=0&&bl>30){const a=T[bi],b=T[bi+1],dx=(b[0]-a[0])/bl,dy=(b[1]-a[1])/bl;ORP.rav={x:(a[0]+b[0])/2,y:(a[1]+b[1])/2,dx,dy,w:6,d:2.4,span:18,seg:bi}}}
+// how deep the ravine is here, and where the point is relative to it (a along the trail, b across)
+function orRav(x,y){const R=ORP.rav;if(!R)return null;const ex=x-R.x,ey=y-R.y,a=ex*R.dx+ey*R.dy,b=-ex*R.dy+ey*R.dx;if(Math.abs(a)>R.w/2+3||Math.abs(b)>R.span/2+1)return null;
+  return {a,b,c:R.d*(1-smooth01(R.w/2-1.5,R.w/2+2.5,Math.abs(a)))*(1-smooth01(R.span/2-4,R.span/2,Math.abs(b)))}}
 const inOR=(x,y,m=0)=>(!W2||W2C.orp)&&x>ORP.x0-m&&x<ORP.x1+m&&y>ORP.y0-m&&y<ORP.y1+m;
 const orBogQ=(x,y)=>{const B=ORP.bog;return Math.hypot((x-B.x)/B.a,(y-B.y)/B.b)};
 const tcHash=(i,j)=>{let h=(i*374761393+j*668265263)|0;h=(h^(h>>>13))*1274126177|0;return ((h^(h>>>16))>>>0)/4294967296};
@@ -4795,7 +4803,14 @@ function meterTick(dt){if(!W2||!METER.spaces.length||!st.started)return;const M=
 function meterPay(){const M=METER;if(!M.cur)return;if(meterLeft()>=M.max-60){toast("🅿️ The meter is already at its 2 hour maximum");return}if(ECON.cash<M.price){toast("Not enough money for the meter");return}
   ECON.cash-=M.price;try{bankTx("Parking meter",-M.price);bankSave()}catch(e){}M.paid=Math.min(Math.max(M.paid,st.clock)+M.step,st.clock+M.max);M.warned=false;beep(1100,.05,"sine",.12);setTimeout(()=>beep(1500,.06,"sine",.12),80);
   toast(`🅿️ Paid · ${Math.ceil(meterLeft()/60)} min on the meter`)}
-function brTick(){if(!W2||st.walk)return;const M=me(),b=M.e.br;if(!b||!b.style){sys.brSaid=null;return}const u=M.dir>0?M.s:M.L-M.s;if(Math.abs(u-b.uc)>b.half){return}
+const FLOOD={h:0,said:0};
+function floodTick(dt){if(!W2)return;const tgt=WX.cur==="rain"&&WX.w>0.6?0.8:0;FLOOD.h=tgt>FLOOD.h?Math.min(tgt,FLOOD.h+dt/90):Math.max(tgt,FLOOD.h-dt/150);
+  if(st.walk)return;const M=me(),f=M.e.ford;if(!f)return;const u=M.dir>0?M.s:M.L-M.s,dep=0.3+FLOOD.h;
+  if(Math.abs(u-f.uc)<f.half+60&&Math.abs(u-f.uc)>f.half&&FLOOD.h>0.2&&performance.now()-FLOOD.said>20000){FLOOD.said=performance.now();toast(`⚠️ Flooded crossing ahead: about ${Math.round(dep*100)} cm of water. Turn around, don't drown`)}
+  if(Math.abs(u-f.uc)<f.half&&dep>0.45){const T=TRIMS[st.trim],deep=dep-0.45;car.vx*=Math.max(0,1-dt*deep*1.6);
+    if(dep>0.7&&st.power===true&&(T.ice||T.hybrid)&&Math.abs(car.vx)>1.5&&!FLOOD.stalled){FLOOD.stalled=true;st.power=false;car.hyb.eng=false;st.acc=false;st.pilot=false;toast("💦 Water got into the intake: the engine stalled in the flood");beep(220,.4,"square",.2)}}
+  else FLOOD.stalled=false}
+function brTick(dt){floodTick(dt||0.016);if(!W2||st.walk)return;const M=me(),b=M.e.br;if(!b||!b.style){sys.brSaid=null;return}const u=M.dir>0?M.s:M.L-M.s;if(Math.abs(u-b.uc)>b.half){return}
   if(sys.brSaid===M.e)return;sys.brSaid=M.e;const heavy=(TRIMS[st.trim].mass||1800)>2400;
   if(b.style==="truss")toast(heavy?"🌉 The old truss bridge groans and sags under you · weight limit 10 tons":"🌉 Old steel truss bridge · it creaks as you cross");
   else if(b.style==="covered")toast("🌉 Covered bridge · one lane, loose planks, take it slow")}
@@ -7495,7 +7510,7 @@ function terrainMesh(){const N=W2?800:360,X0=WORLD.x0,X1=WORLD.x1,Y0=WORLD.y0,Y1
       z=Math.min(z,zc)}
     return z-0.08};
   TERR.N=N;TERR.NY=NY;TERR.h=new Float32Array((N+1)*(NY+1));TERR.h0=new Float32Array((N+1)*(NY+1));
-  for(let j=0;j<=NY;j++)for(let i=0;i<=N;i++){const x=X0+(X1-X0)*i/N,y=Y0+(Y1-Y0)*j/NY,h0=H(x,y),h=h0-((!W2||W2C.orp)&&orBogQ(x,y)<1.6?1.4:0),hx=H(x+3,y)-h0,hy=H(x,y+3)-h0;TERR.h[j*(N+1)+i]=h;TERR.h0[j*(N+1)+i]=h0;P.push(x,h,-y);Nn.push(...norm([-hx/3,1,hy/3]))}
+  for(let j=0;j<=NY;j++)for(let i=0;i<=N;i++){const x=X0+(X1-X0)*i/N,y=Y0+(Y1-Y0)*j/NY,h0=H(x,y),h=h0-((!W2||W2C.orp)&&orBogQ(x,y)<1.6?1.4:0)-(W2&&ORP.rav&&orRav(x,y)?3:0),hx=H(x+3,y)-h0,hy=H(x,y+3)-h0;TERR.h[j*(N+1)+i]=h;TERR.h0[j*(N+1)+i]=h0;P.push(x,h,-y);Nn.push(...norm([-hx/3,1,hy/3]))}
   for(let j=0;j<NY;j++)for(let i=0;i<N;i++){const a=j*(N+1)+i;I.push(a,a+1,a+N+1,a+1,a+N+2,a+N+1)}return meshFrom(P,Nn,I)}
 function bumpMesh(){const B={P:[],N:[],I:[]},H={P:[],N:[],I:[]};
   for(const b of BUMPS.speed){const p=ePt(b.e,b.u,0);boxInto(B,p[0],0.035,-p[1],0.9,0.07,hwOf(b.e)*2-0.4,p[2])}
@@ -7655,6 +7670,7 @@ function orBuild(){if(ORP.ready)return;ORP.ready=true;const R=orRng(4242);
     if(i>1&&i!==8&&R()<0.6){const p=orTrailPt(i,0.3+R()*0.4,(R()-0.5)*3);if(orBogQ(p[0],p[1])>1.4)orRock(R,p[0],p[1],0.12+R()*0.18,0.35+R()*0.3)}}
   ORP.zones.push({name:"The Bog",d:"◆ Blue square: deep, sticky mud. Mud mode, steady momentum, don't stop",seg:8,t0:0.1,t1:0.9});
   ORP.zones.push({name:"Widowmaker",d:"◆◆ Black diamond: 30% climb. Low range, steady throttle, never turn sideways on the slope",seg:16,t0:0,t1:1});
+  if(ORP.rav)ORP.zones.push({name:"Log Bridge",d:"◆◆ Black diamond: two logs over a 2.4 m ravine. Line your wheels up on them and creep across",seg:ORP.rav.seg,t0:0.35,t1:0.65});
   ORP.zones.push({name:"Off-Camber",d:"◆ Blue square: the trail tilts about 15°. Slow, and keep the heavy side uphill",seg:13,t0:0.15,t1:0.85});
   for(const f of ORP.feats)if(f.k==="rock"&&f.H>0.95)orColl({t:"c",x:f.x,y:f.y,r:Math.min(f.rx,f.ry)*0.8});}
 function orBase0(x,y){return TERR.h0?terrDrawn0(x,y):terrainH(x,y,dfAt(x,y))-0.11}
@@ -7667,11 +7683,14 @@ function orSurf(x,y){let h=orBase0(x,y);const Hh=ORP.hill,dh=Math.hypot(x-Hh.x,y
   if(T[0]<4.2){const lat=T[1],tw=smooth01(4.2,3.2,T[0]);const rut=Math.abs(Math.abs(lat)-0.85);h+=tw*(0.06-0.05*Math.max(0,1-rut/0.3)+0.012*Math.sin(T[3]*1.7+lat));
     if(T[2]===13){const z=ORP.zones.find(q=>q.seg===13),Ls=Math.hypot(ORP.trail[14][0]-ORP.trail[13][0],ORP.trail[14][1]-ORP.trail[13][1]),f=smooth01(0,10,T[3]-Ls*z.t0)*smooth01(0,10,Ls*z.t1-T[3]);h+=lat*0.27*f*tw}
     if(T[0]<3.4){kind="dirt";mu=0.72}}
+  {const rv=orRav(x,y);if(rv&&rv.c>0.01){h-=rv.c;if(rv.c>0.3){kind="dirt";mu=0.62}}}
   const q=orBogQ(x,y);if(q<1){const B=ORP.bog;const dx=x-B.x,lat=y-B.y;h-=0.62*(1-q*q)+0.1*Math.max(0,1-Math.abs(Math.abs(dx*0+lat)-0.85)/0.35)*(1-q)-0.04*Math.sin(dx*0.9+lat*1.3);kind="mud";mu=0.34}
   if(x>L.x0&&y>L.y0&&y<L.y1){kind="dirt";mu=0.74}return {h,kind,mu}}
 function orH(x,y,g0){if(!ORP.ready)return g0;const S=orSurf(x,y),di=Math.min(x-ORP.x0,ORP.x1-x,y-ORP.y0,ORP.y1-y);let h=S.h;if(di<10&&!(x>ORP.lot.x0-12&&y>ORP.lot.y0-12&&y<ORP.lot.y1+12))h=lerp(g0.h,h,smooth01(0,10,di));
   let fh=0,ff=null;const a=ORP.grid.get(Math.floor(x/6)*100003+Math.floor(y/6));if(a)for(const f of a){const v=featH(f,x,y);if(v>fh){fh=v;ff=f}}
-  if(ff)return {h:h+fh,mu:ff.k==="log"?0.7:1.0,kind:ff.k==="log"?"dirt":"rock",feat:1};return {h,mu:S.mu,kind:S.kind}}
+  if(ff)return {h:h+fh,mu:ff.k==="log"?0.7:1.0,kind:ff.k==="log"?"dirt":"rock",feat:1};
+  {const rv=orRav(x,y),R=ORP.rav;if(rv&&Math.abs(rv.a)<R.w/2+3)for(const lb of [-0.85,0.85]){const q=Math.abs(rv.b-lb);if(q<0.36){const top=h+rv.c+0.06+0.3*(1-smooth01(R.w/2+1.2,R.w/2+3,Math.abs(rv.a)))*Math.sqrt(1-q*q/0.13);if(top>h)return {h:top,mu:0.62,kind:"dirt",feat:1}}}}
+  return {h,mu:S.mu,kind:S.kind}}
 // ---- meshes
 function orMesh(){orBuild();const M_=()=>({P:[],N:[],I:[]}),O={trail:M_(),mud:M_(),grass:M_(),dirt:M_(),rock0:M_(),rock1:M_(),rock2:M_(),log:M_(),post:M_(),board:M_(),lot:M_()};
   const vtx=(B,x,y,h,n)=>{B.P.push(x,h,-y);B.N.push(n[0],n[1],n[2])};
@@ -7698,6 +7717,7 @@ function orMesh(){orBuild();const M_=()=>({P:[],N:[],I:[]}),O={trail:M_(),mud:M_
     const ring=QS.map(q=>{const row=[];for(let a=0;a<NA;a++){const th=a/NA*Math.PI*2+(q>0?(Rj()-0.5)*0.12:0),Rt=1+f.n1*Math.sin(3*th+f.p1)+f.n2*Math.sin(5*th+f.p2)+f.n3*Math.sin(8*th+f.p3),qq=Math.min(0.999,q*(q<1?1+(Rj()-0.5)*0.05:1)),u=Math.cos(th)*qq*Rt*f.rx,v=Math.sin(th)*qq*Rt*f.ry,
         x=f.x+u*f.c-v*f.s,y=f.y+u*f.s+v*f.c,hh=q>=1?-0.04:featH(f,x,y)*(1+(Rj()-0.5)*0.08);row.push([x,orSurf(x,y).h+hh+0.03,-y])}return row});
     for(let r=0;r<QS.length-1;r++)for(let a=0;a<NA;a++){const a2=(a+1)%NA,p00=ring[r][a],p01=ring[r][a2],p10=ring[r+1][a],p11=ring[r+1][a2];if(r===0)tri(B,p00,p11,p10);else{tri(B,p00,p01,p11);tri(B,p00,p11,p10)}}}
+  if(ORP.rav){const R=ORP.rav,L_=R.w/2+2.6;for(const lb of [-0.85,0.85]){const P_=k=>{const a=k*L_,x=R.x+R.dx*a-R.dy*lb,y=R.y+R.dy*a+R.dx*lb;return [x,y,orSurf(x,y).h+(orRav(x,y)?.c||0)+0.0]};tubeInto(O.log,P_(-1),P_(1),0.36,0.33,10)}}
   for(const f of ORP.feats){if(f.k==="rock")continue;const r=f.rad,Bk=f.k==="log"?O.log:O["rock"+f.col];
     grid(()=>Bk,f.x-r,f.x+r,f.y-r,f.y+r,0.08,(x,y)=>{const v=featH(f,x,y);return {h:orSurf(x,y).h+v,v}},0.03,c=>c.some(q=>q.v>0.004))}
   // boards: the trailhead and one at each obstacle
@@ -8043,7 +8063,9 @@ function worldScenery(){W2P.length=0;
   for(let n=0;n<(W2?900:400);n++){const x=WORLD.x0+r()*(WORLD.x1-WORLD.x0),y=WORLD.y0+r()*(WORLD.y1-WORLD.y0);if(cityW(x,y)>0.05||riverD(x,y)<RIVER.w/2+20||inTC(x,y,40)||inOR(x,y,40))continue;const d=dfAt(x,y);if(d<45||d>160)continue;
     const hb=terrainH(x,y,d)-0.4,a=r()*Math.PI;B(house,x,y,hb,5.5,9+r()*4,7+r()*3,a);B(roofs,x,y,hb+5.5,1.6,7,5,a);collAdd({t:"b",x,y,h:a,hl:6,hw:4.5,what:"a house"})}
   // ---- the new world's old bridges: a red covered wooden bridge, a rusty steel truss, a stone bridge; gravel fords get marker posts
-  const rust=M_(),wood=M_(),stone=M_();
+  const rust=M_(),wood=M_(),stone=M_(),fordW=M_();
+  if(W2)for(const e of EDGES)if(e.ford){const f=e.ford;for(let u=f.uc-f.half-26;u<f.uc+f.half+26;u+=4){const a=ePt(e,u,-14),b=ePt(e,u,14),c=ePt(e,u+4,14),d=ePt(e,u+4,-14),k=fordW.P.length/3;for(const p of [a,b,c,d]){fordW.P.push(p[0],RIVER.water,-p[1]);fordW.N.push(0,1,0)}fordW.I.push(k,k+2,k+1,k,k+3,k+2,k,k+1,k+2,k,k+2,k+3)}}
+  SCN.fordW=fordW.I.length?meshFrom(fordW.P,fordW.N,fordW.I):null;
   if(W2)for(const e of EDGES){const b=e.br;if(e.ford){for(const sd of [1,-1])for(const du of [-1,1]){const p=ePt(e,e.ford.uc+du*e.ford.half,sd*(hwOf(e)+0.6)),z=ez(e,e.ford.uc+du*e.ford.half);B(post,p[0],p[1],z,1.4,0.12,0.12);B(signGW,p[0],p[1],z+1.1,0.25,0.14,0.14)}
       const q=ePt(e,e.ford.uc-e.ford.half-30,-(hwOf(e)+1.2));B(post,q[0],q[1],SZ(q[0],q[1]),2.2,0.08,0.08);B(signK,q[0],q[1],SZ(q[0],q[1])+1.8,0.7,0.7,0.05,q[2]);continue}
     if(!b||!b.style)continue;const W=hwOf(e)+0.3,u0=b.uc-b.half,u1=b.uc+b.half,seg=(m,ua,ta,za,ub,tb,zb,w,h)=>{const p=ePt(e,ua,ta),q=ePt(e,ub,tb);tubeInto(m,[p[0],p[1],za],[q[0],q[1],zb],w,w,6)};
@@ -10052,7 +10074,7 @@ function render(dt){
   if(SCN.oldBr){mat([0.42,0.2,0.1],null,0.2,20);draw(SCN.oldBr.rust);mat([0.5,0.1,0.07],null,0.05,8);draw(SCN.oldBr.wood);mat([0.45,0.42,0.38],null,0.05,8,1,2);draw(SCN.oldBr.stone)}
   mat([0.56,0.56,0.54],null,0.15,20,1,2);draw(SCN.barrier);draw(SCN.gird);draw(SCN.para);mat([0.34,0.34,0.335],null,0.1,10,1,2);draw(SCN.gSlab);mat([0.6,0.6,0.58],null,0.1,10,1,2);draw(SCN.gWall);garModelDraw(night);
   mat([0.9,0.92,0.9],[1.6,1.6,1.5],0.3,20);draw(SCN.gLight);mat([0.05,0.25,0.75],[0.04,0.15,0.5],0.3,20);draw(SCN.gBlue);
-  gl.enable(gl.POLYGON_OFFSET_FILL);gl.polygonOffset(1,1);mat(st.surface==="snow"?[0.55,0.6,0.65]:[0.05,0.11,0.13],null,1.4,90);draw(SCN.water);gl.disable(gl.POLYGON_OFFSET_FILL);mat([0.62,0.64,0.66],null,0.9,60);draw(SCN.rail);
+  gl.enable(gl.POLYGON_OFFSET_FILL);gl.polygonOffset(1,1);mat(st.surface==="snow"?[0.55,0.6,0.65]:[0.05,0.11,0.13],null,1.4,90);draw(SCN.water);if(SCN.fordW&&FLOOD.h>0.02){gl.uniformMatrix4fv(U.uM,false,M4.T(0,FLOOD.h,0));draw(SCN.fordW);gl.uniformMatrix4fv(U.uM,false,M4.id())}gl.disable(gl.POLYGON_OFFSET_FILL);mat([0.62,0.64,0.66],null,0.9,60);draw(SCN.rail);
   mat([0.9,0.9,0.88],night?[0.05,0.05,0.05]:null,0.3,30);draw(SCN.signW);mat([0.03,0.03,0.03],null,0.2,20);draw(SCN.signK);
   mat([0.02,0.24,0.12],null,0.3,30);draw(SCN.signG);mat([0.92,0.94,0.92],night?[0.25,0.25,0.25]:null,0.3,30);draw(SCN.signGW);
   mat([0.2,0.2,0.21],null,0.3,30);draw(SCN.post);if(SCN.furn){mat([0.12,0.22,0.16],null,0.4,30);draw(SCN.furn)}mat([0.08,0.08,0.085],null,0.3,30);draw(SCN.pole);mat([0.05,0.05,0.048],null,0.35,30);draw(SCN.sigH);gl.enable(gl.POLYGON_OFFSET_FILL);gl.polygonOffset(-1,-4);mat([0.03,0.03,0.032],null,0.9,80);draw(SCN.lens);gl.polygonOffset(0,0);gl.disable(gl.POLYGON_OFFSET_FILL);if(SCN.sigPole){mat([0.5,0.51,0.5],null,0.5,40);draw(SCN.sigPole);mat([0.035,0.035,0.035],null,0.15,20);draw(SCN.sigBP);mat([0.95,0.78,0.06],[0.12,0.09,0],0.4,30);draw(SCN.sigY)}
@@ -11270,7 +11292,7 @@ function frame(now){if(XR.on&&!XR.inFrame){requestAnimationFrame(frame);return} 
     if(sys.hillDemo){sys.hillT+=dt;if(sys.hillT>6){sys.hillT=0;st.leveling=!st.leveling;toast(st.leveling?"Active levelling ON: beam hugs the ground":"Active levelling OFF: beam fixed to the body")}if(!car.offroad&&Math.abs(car.vx)>3)sys.hillDemo=false}
     if(sys.aim!=null){sys.levT=(sys.levT||0)+dt;if(sys.levT>5){sys.levT=0;st.leveling=!st.leveling;toast(st.leveling?"Levelling ON: beam back down on the road":"Levelling OFF: the loaded car aims the beam high")}
       if(Math.hypot(car.px-sys.aim.x,car.py-sys.aim.y)>40){sys.aim=null;car.cargo=0;st.leveling=true}}acc+=dt;const h=1/G().hz;while(acc>=h){physics(h);acc-=h}if(car.crashed>0)car.crashed-=dt;updateAudio()}
-  shopTick();homeTick(dt);if(st.walk){footTick(dt);openHouseTick()}else if(sys.flashT>0)sys.flashT-=dt;gtTick(dt);phTick();revChime(dt);beltTick(dt);econTick(dt);usedTick(dt);testTick(dt);ui2Tick();trainTick(dt);meterTick(dt);brTick();gateTick(dt);mpTick(dt);netTick(dt);teslaTrip(dt);launchTick(dt);
+  shopTick();homeTick(dt);if(st.walk){footTick(dt);openHouseTick()}else if(sys.flashT>0)sys.flashT-=dt;gtTick(dt);phTick();revChime(dt);beltTick(dt);econTick(dt);usedTick(dt);testTick(dt);ui2Tick();trainTick(dt);meterTick(dt);brTick(dt);gateTick(dt);mpTick(dt);netTick(dt);teslaTrip(dt);launchTick(dt);
   try{gigTick(dt)}catch(e){}try{copTick(dt)}catch(e){console.error(e)}if(DALE.p.length||DALE.pools.length||DALE.dead>0||DALE.shake>0||DALE.fire)try{daleTick(dt)}catch(e){}try{if(st.started)stkTick(dt)}catch(e){}if(st.started&&st.power===true&&!st.walk&&Math.abs(car.vx)>1)sys.tripT=(sys.tripT||0)+dt;if(sys.roaT>0)sys.roaT-=dt;
   try{rplRec(dt)}catch(e){}try{achTick(dt)}catch(e){}render(dt);if(PHOTO.want)photoGrab();hud(dt);
 }
@@ -12521,6 +12543,14 @@ function bootStep(p,msg){$("bootBar").style.width=(p*100)+"%";$("bootMsg").textC
 const idle=f=>("requestIdleCallback" in window)?requestIdleCallback(f,{timeout:400}):setTimeout(f,60);
 // ---- maintenance flag: maint.json on the site says when an update is being worked on; it can also say a newer version is out
 const MAINT={on:false,t:0};
+// ---- countdown to the new map (shown until it arrives; then a tap reloads into it)
+(function w2Countdown(){if(W2)return;const el=document.createElement("div");el.id="w2cd";
+  el.style.cssText="position:fixed;top:max(8px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:60;background:rgba(10,16,24,.82);color:#fff;font:600 13px/1.2 system-ui,sans-serif;padding:7px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.18);box-shadow:0 4px 14px rgba(0,0,0,.35);pointer-events:auto;cursor:default;white-space:nowrap;letter-spacing:.2px";
+  document.body.appendChild(el);let done=false;
+  const two=n=>String(n).padStart(2,"0"),tick=()=>{const ms=W2_AT-Date.now();
+    if(ms<=0){if(!done){done=true;el.textContent="🗺️ The new map is here! Tap to load it";el.style.background="rgba(20,120,70,.92)";el.style.cursor="pointer";el.onclick=()=>location.reload()}return}
+    const t=Math.floor(ms/1000),h=Math.floor(t/3600),m=Math.floor(t%3600/60),sec=t%60;el.textContent=`🗺️ New map at 3 PM ET · ${h?h+":":""}${two(m)}:${two(sec)}`};
+  tick();setInterval(tick,1000)})();
 function maintUrl(){const h=location.hostname;return(/github\.io$|^127\.|^localhost$/.test(h)?"maint.json":"https://exclusive2knight.github.io/Strata-Test-Drive/maint.json")+"?t="+Date.now()}
 async function maintCheck(){let d;try{const r=await fetch(maintUrl(),{cache:"no-store"});if(!r.ok)return;d=await r.json()}catch(e){return}
   const on=!!d.on&&!(d.until&&Date.now()>d.until),first=!MAINT.t;MAINT.t=Date.now();
