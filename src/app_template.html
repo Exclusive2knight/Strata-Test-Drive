@@ -1034,7 +1034,7 @@ body.pmOn>*:not(#gl):not(#pm):not(#pmFx):not(#toast):not(#flashFx):not(#susUI):n
   <div class="nc">
     <div class="nh"><small>What's new</small><h2>Version 172 · The new map, 11 new cars, smarter navigation</h2></div>
     <div class="nb">
-      <h4>🔄 Updates since launch</h4><ul><li>Fixed the new map freezing and crashing a few seconds after it loads (especially on phones and tablets).</li><li>Roundabouts (not the little turning circles) now have <b>two lanes</b>: the outer lane for the first exit, the inner lane to go further round. Traffic and Full Self-Driving pick the right lane from where they're going.</li><li><b>Suspension setup</b> (Settings › Controls, or ☰ › Settings): fit adjustable coilovers ($1,800) and tune ride height, front and rear springs, dampers, anti-roll bars and camber on a live diagram of your car, or pick a preset (Comfort, Sport, Track, Drift, Stance, Lifted). It shows the ride frequency, body roll, ground clearance and whether the car will understeer or oversteer, and the car really drives that way: stiffer bars roll less, more camber grips harder in corners, and slamming it scrapes over bumps. Tap <b>See it on the car</b> to look at the coilovers in the wheel wells (shown through the body) while you adjust them: the car rises and drops, the springs change colour and size, and the wheels lean in with camber.</li><li>Full Self-Driving follows the navigation off the freeway again: it used to drift back onto the freeway at the start of an exit ramp. Navigation no longer says "Rerouting" when you take the exit it asked for.</li></ul>
+      <h4>🔄 Updates since launch</h4><ul><li>Fixed the new map freezing and crashing a few seconds after it loads (especially on phones and tablets).</li><li>Roundabouts (not the little turning circles) now have <b>two lanes</b>: the outer lane for the first exit, the inner lane to go further round. Traffic and Full Self-Driving pick the right lane from where they're going.</li><li>The old Halden map is gone for good: the new map is the only world now (the <code>?world=1</code> link no longer opens it).</li><li>If the game ever hits an error, a small red bar now says what went wrong. Screenshot it and send it in so it can be fixed.</li><li><b>Suspension setup</b> (Settings › Controls, or ☰ › Settings): fit adjustable coilovers ($1,800) and tune ride height, front and rear springs, dampers, anti-roll bars and camber on a live diagram of your car, or pick a preset (Comfort, Sport, Track, Drift, Stance, Lifted). It shows the ride frequency, body roll, ground clearance and whether the car will understeer or oversteer, and the car really drives that way: stiffer bars roll less, more camber grips harder in corners, and slamming it scrapes over bumps. Tap <b>See it on the car</b> to look at the coilovers in the wheel wells (shown through the body) while you adjust them: the car rises and drops, the springs change colour and size, and the wheels lean in with camber.</li><li>Full Self-Driving follows the navigation off the freeway again: it used to drift back onto the freeway at the start of an exit ramp. Navigation no longer says "Rerouting" when you take the exit it asked for.</li></ul>
       <h4>🗺️ A whole new world</h4><ul><li>Halden is replaced by a much bigger map: <b>Westport</b> downtown, the town of <b>Fairhaven</b>, little <b>Millbrook</b> on the lake, the <b>Rosedale</b> and <b>Kestrel Estates</b> neighborhoods, country roads and farms, and <b>Mount Kestrel</b> with a switchback road to the summit.</li><li>Two interstates: <b>I-38</b> (east–west) and <b>I-61</b> (north–south), joined by a full cloverleaf, with diamond interchanges, exit numbers, mile markers, green guide signs and orange median lights at night.</li><li>Roundabouts where several roads meet, cul-de-sacs in the neighborhoods, and bridges over the Clearwater River, including an old covered bridge, a rusty truss bridge and a stone bridge. Gravel fords and low crossings flood when it rains hard: deep water slows you down and can stall a gas engine.</li><li>The off-road park sits up on the mountain now, with a log bridge on the trail, and the proving ground is off County Rd 1.</li></ul>
       <h4>🍔 Places to go</h4><ul><li>Working drive-thrus at McDonald's, Burger King, Wendy's, Taco Bell, Chick-fil-A and KFC: order and pay at the speaker, then pick up at the window.</li><li>Dealerships on Route 20 (Ford, Toyota, Chevrolet, BMW, Mercedes-Benz, Tesla): pull into the lot to shop, test drive or trade in. The service centers do recalls, software updates and alignments.</li><li>Paid street parking in the towns: $1 per 15 minutes, 2 hours max, and a $35 ticket if the meter runs out.</li><li>Kestrel Estates is gated: the arms lift for residents (buy a house there) or with a $20 guest pass.</li><li>Farms all over the countryside: corn, wheat and hay fields, red barns, silos and hay bales.</li></ul>
       <h4>🚦 Life on the roads</h4><ul><li>School buses in the morning and mid-afternoon. When one stops, its red lights flash and the stop arm swings out: passing it is a $250 ticket.</li><li>A lane closure on I-38 eastbound with cones and a flagger: 45 mph, fines doubled, and a speed camera ($300).</li><li>The Jefferson Ave drawbridge opens every 4 minutes: bells, gates, the bridge lifts and a boat goes through.</li><li>A freight train runs between Westport and Fairhaven, with crossing gates on every road and a viaduct over the river.</li><li>Car meet every night after 8 PM in the Fairhaven Blvd lot.</li></ul>
@@ -1701,7 +1701,7 @@ const chain=(...ms)=>ms.reduce((a,b)=>M4.mul(a,b));
 // Every road is an edge between two nodes with its own lanes, median, limit and zone. You (and the driver aids) use the road you are on;
 // AI cars drive the whole network, turning at junctions that have signals, all-way stops, side-street stops or median U-turn crossovers.
 const LANE=3.6, CARLEN=4.8, D2R=Math.PI/180;
-const MAP={name:"Halden",ground:[0.13,0.24,0.07],gpat:1,hills:true,offMu:0.62,lumps:0.035};
+const MAP={name:"Westport",ground:[0.13,0.24,0.07],gpat:1,hills:true,offMu:0.62,lumps:0.035};
 const LEN=1e9;                                   // nothing wraps any more (kept for old "% LEN" maths)
 const relS=(a,b)=>b-a;
 // road types: lanes per direction, median width, shoulder / parking lane, kerbs, sidewalk, speed limit (mph), zone, rank (who has priority)
@@ -1723,10 +1723,14 @@ const RT={
   lane:{n:1,m:-1.2,shR:0,lim:30,z:"r",rank:1,col:"h",label:"Country lane"},
   // one-way, one-lane ring of a roundabout (traffic goes round anticlockwise; it has priority, everyone entering yields)
   rbt:{n:1,m:-LANE,shR:1.2,lim:20,z:"c",rank:7,col:"h",kerb:true,edgeL:true,label:"Roundabout",ow:true}};
-// the new world (Westport, Fairhaven, Millbrook, Mount Kestrel) takes over from Halden at 3 pm Eastern on Oct 23 2026 (19:00 UTC).
-// Before then it can be tried with ?world=2; after it, ?world=1 still opens Halden
+// the new world (Westport, Fairhaven, Millbrook, Mount Kestrel) takes over from Westport at 3 pm Eastern on Oct 23 2026 (19:00 UTC).
+// Before then it can be tried with ?world=2; after it, ?world=1 still opens Westport
 const W2_AT=Date.UTC(2026,9,23,19,0,0);
-const W2=(()=>{try{const q=location.search;if(/[?&]world=1\b/.test(q))return false;if(/[?&]world=2\b/.test(q))return true;return Date.now()>=W2_AT}catch(e){return false}})();
+// any error the game hits shows once on screen (so a player can screenshot it for a bug report)
+(()=>{const seen=new Set();const show=(m)=>{m=String(m||"").slice(0,160);if(!m||seen.has(m)||seen.size>5)return;seen.add(m);let el=document.getElementById("errBar");if(!el){el=document.createElement("div");el.id="errBar";el.style.cssText="position:fixed;left:8px;bottom:8px;z-index:2147483600;max-width:min(560px,92vw);background:rgba(120,20,20,.92);color:#fff;font:600 12px/1.35 system-ui,sans-serif;padding:8px 10px;border-radius:10px;box-shadow:0 4px 14px rgba(0,0,0,.4)";el.onclick=()=>el.remove();document.body.appendChild(el)}
+  el.textContent="⚠️ Game error (screenshot this for a bug report, tap to hide): "+m+(st&&st.trim?" · car "+st.trim:"")};
+  addEventListener("error",e=>{try{show(e.message+(e.lineno?" @"+e.lineno+":"+e.colno:""))}catch(_){}});addEventListener("unhandledrejection",e=>{try{show("promise: "+(e.reason&&e.reason.message||e.reason))}catch(_){}})})();
+const W2=true;   // the new world is the only world now (the old Westport map was retired on Oct 24 2026)
 const NODES=[], EDGES=[];let BUILD_IC=[];
 function N(x,y,o){for(const n of NODES)if(Math.abs(n.x-x)<1&&Math.abs(n.y-y)<1){if(o)Object.assign(n,o);return n}
   const n=Object.assign({i:NODES.length,x,y,ctrl:null,kind:null,E:[]},o||{});NODES.push(n);return n}
@@ -1969,63 +1973,7 @@ function w2Climb(x0,y0,o){const [cx,cy]=W2C.MT,thc=Math.atan2(y0-cy,x0-cx),pts=[
   return pts}
 
 // ---- the map
-(function buildNet(){if(W2){buildNet2();return}
-  const R=400,X=1700,Y=1100;
-  // Hwy 7: a 65 mph freeway loop. No junctions or crossovers on it: four diamond interchanges, with the cross street on a bridge
-  // over the freeway, one-lane ramps that leave and join at a shallow angle, and signals where the ramps meet the cross street
-  const IC=[{c:[500,-Y],F:[1,0],Ld:560,Dt:[165,135],name:"Woodward Ave"},{c:[X,0],F:[0,1],Ld:420,Dt:[160,160],name:"Maple Blvd"},{c:[500,Y],F:[-1,0],Ld:560,Dt:[165,135],name:"Woodward Ave"},{c:[-X,0],F:[0,-1],Ld:420,Dt:[160,160],name:"Grand River Ave"}];
-  for(const I of IC){const [cx,cy]=I.c,[fx,fy]=I.F,nx=-fy,ny=fx;I.P=(u,t,r)=>{const p=[Math.round((cx+fx*u+nx*t)*100)/100,Math.round((cy+fy*u+ny*t)*100)/100];if(r)p.push(r);return p};
-    for(const u of [-I.Ld,I.Ld])N(...I.P(u,0),{ctrl:"merge"});I.T=sg=>sg<0?-I.Dt[0]:I.Dt[1];for(const sg of [-1,1])N(...I.P(0,I.T(sg)),{ctrl:"signal"})}
-  const icN=(k,u)=>IC[k].P(u*IC[k].Ld,0);
-  mkRoad("xway","Hwy 7",[icN(3,1),[-X,-Y,R],icN(0,-1),icN(0,1),[X,-Y,R],icN(1,-1),icN(1,1),[X,Y,R],icN(2,-1),icN(2,1),[-X,Y,R],icN(3,-1),icN(3,1)]);
-  for(const I of IC)for(const d of [1,-1]){const sg=-d,L=I.Ld;
-    // ramps leave at a shallow angle, sweep out and meet the cross street square on, at the signal
-    const Tt=I.T(sg),Ta=Math.abs(Tt);
-    // a long parallel lane beside the freeway (deceleration lane on exits, acceleration lane on entrances) and a gentle taper, instead of cutting in at 23°
-    // sweep out from the cross street, then a parallel lane right beside the freeway (deceleration lane on exits, acceleration lane on entrances) and a gentle taper.
-    // The points must keep moving away from the bridge (u always increasing), or the ramp doubles back across the freeway
-    const uS=Math.min(110,L-310),uP=Math.max(uS+90,L-205);
-    E("ramp",I.name+" exit",[I.P(-d*L,0),I.P(-d*(L-80),sg*20.6),I.P(-d*(L-150),sg*23.75),I.P(-d*uP,sg*24.1,90),I.P(-d*uS,sg*Ta*0.5,90),I.P(-d*30,Tt,40),I.P(0,Tt)]);
-    E("ramp",I.name+" entrance",[I.P(0,Tt),I.P(d*30,Tt,40),I.P(d*uS,sg*Ta*0.5,90),I.P(d*uP,sg*24.1,90),I.P(d*(L-150),sg*23.75),I.P(d*(L-80),sg*20.6),I.P(d*L,0)])}
-  BUILD_IC=IC;
-  // downtown: 6 x 5 grid of 150 m blocks, signals on the busy streets, all-way stops on the quiet corners
-  const DX=[-1300,-1150,-1000,-850,-700,-550],DY=[-300,-150,0,150,300];
-  const DXN=["1st St","2nd St","3rd St","Cass Ave","Park Ave","Brush St"],DYN=["Jefferson Ave","Fort St","Main St","Congress St","Lafayette Ave"];
-  for(const x of DX)for(const y of DY){const sig=y===0||x===-850||(Math.abs(y)<=150&&x>-1300&&x<-550)||(x===-550&&Math.abs(y)===300)||(x===-1000&&y===-300);N(x,y,{ctrl:sig?"signal":"allstop"})}
-  DY.forEach((y,j)=>mkRoad(j%2===0?"ave":"st",DYN[j],DX.map(x=>[x,y])));
-  DX.forEach((x,i)=>mkRoad(i===3?"ave":"st",DXN[i],DY.map(y=>[x,y])));
-  mkRoad("ave","Grand River Ave",[[-1300,0],IC[3].P(0,IC[3].T(1))],{lim:35});
-  mkRoad("art","Grand River Ave",[IC[3].P(0,IC[3].T(1)),IC[3].P(0,IC[3].T(-1)),[-2150,0]]);
-  mkRoad("road","Lake Rd",[[-1000,-300],[-1000,-550,250],[-900,-750,250],[-1000,-1250,300],[-1000,-1500]]);
-  // Maple Blvd and Woodward Ave: wide medians, no left turns at the main crossings, U-turn crossovers between them
-  for(const x of [-330,330,800,1400])N(x,0,{kind:"xo",ctrl:"free"});
-  for(const x of [-100,500,1100])N(x,0,{ctrl:"signal",noLeft:true});
-  mkRoad("blvd","Maple Blvd",[[-550,0],[-330,0],[-100,0],[330,0],[500,0],[800,0],[1100,0],[1400,0],IC[1].P(0,IC[1].T(1))]);
-  mkRoad("art","Maple Blvd",[IC[1].P(0,IC[1].T(1)),IC[1].P(0,IC[1].T(-1)),[2150,0]]);
-  for(const y of [-700,-200,200,700])N(500,y,{kind:"xo",ctrl:"free"});
-  for(const y of [-900,900])N(500,y,{ctrl:"signal",noLeft:true});
-  mkRoad("blvd","Woodward Ave",[[500,-1500],IC[0].P(0,IC[0].T(-1)),IC[0].P(0,IC[0].T(1)),[500,-900],[500,-700],[500,-500],[500,-200],[500,0],[500,200],[500,500],[500,700],[500,900],IC[2].P(0,IC[2].T(1)),IC[2].P(0,IC[2].T(-1)),[500,1500]]);
-  // Oak St: from downtown's east side up and round to Woodward
-  for(const y of [-300,300])N(-100,y,{ctrl:"allstop"});
-  mkRoad("ave","Jefferson Ave",[[-550,-300],[-100,-300]],{lim:35});
-  mkRoad("ave","Lafayette Ave",[[-550,300],[-100,300]],{lim:35});
-  mkRoad("col","Oak St",[[500,-900],[-100,-900,200],[-100,-300],[-100,0],[-100,300],[-100,900,200],[500,900]]);
-  // two subdivisions: Rosedale (north) and Birch Park (south), stop signs everywhere, Elm Rd through the middle
-  const SX=[700,900,1100,1300,1500],CN={700:"Hazel Ln",900:"Poplar Ln",1300:"Spruce Ln",1500:"Walnut Ln"};
-  for(const sg of [1,-1]){const SY=[300,500,700,900].map(v=>v*sg),RN=sg>0?["Rosedale Ave","Ardmore St","Kendall St","Linwood Ave"]:["Birch St","Cedar St","Willow St","Aspen Ave"];
-    SY.forEach((y,j)=>mkRoad("res",RN[j],SX.map(x=>[x,y])));
-    for(const x of SX)if(x!==1100)mkRoad("res",CN[x],SY.map(y=>[x,y]));
-    mkRoad("res",RN[1],[[500,SY[1]],[700,SY[1]]]);mkRoad("res",RN[3],[[500,SY[3]],[700,SY[3]]])}
-  // ---- outside the freeway: a ring of 50 mph county roads over the hills, gravel roads, narrow lanes, the proving ground
-  const CR=2150,CY=1500,RC=150;
-  mkRoad("road","County Rd 12",[[-CR,0],[-CR,-400],[-CR,-950],[-CR,-CY,RC],[-1000,-CY],[-300,-CY],[500,-CY],[1300,-CY],[CR,-CY,RC],[CR,-700],[CR,-300],[CR,0]],{lim:50});
-  mkRoad("road","Ridge Rd",[[CR,0],[CR,1180],[CR,CY,RC],[1300,CY],[500,CY],[-500,CY],[-1200,CY],[-CR,CY,RC],[-CR,700],[-CR,400],[-CR,0]],{lim:50});
-  mkRoad("dirt","Quarry Rd",[[-1000,-CY],[-1000,-1690,70],[-300,-1690,70],[-300,-CY]]);
-  mkRoad("dirt","Gravel Pit Rd",[[CR,-700],[1960,-700,60],[1960,-300,60],[CR,-300]]);
-  mkRoad("dirt","Cemetery Rd",[[1300,CY],[1300,1330,80],[1800,1280,120],[CR,1180]]);
-  mkRoad("lane","Birch Hollow Ln",[[-500,CY],[-500,1300,40],[-860,1260,60],[-1200,1300,40],[-1200,CY]]);
-  mkRoad("lane","Mill Pond Ln",[[-CR,700],[-1930,690,40],[-1900,520,50],[-1960,410,40],[-CR,400]]);
-  mkRoad("col","Elm Rd",[[1100,-900],[1100,-700],[1100,-500],[1100,-300],[1100,0],[1100,300],[1100,500],[1100,700],[1100,900]]);
+(function buildNet(){buildNet2()
 })();
 const ePick=(ax,ay,bx,by)=>EDGES.find(e=>Math.hypot(e.a.x-ax,e.a.y-ay)<1&&Math.hypot(e.b.x-bx,e.b.y-by)<1);
 // Main St opens out into Maple Blvd: the median grows from nothing over the first block
@@ -2568,7 +2516,7 @@ const inp={steer:0,steerT:0,thr:0,brk:0,thrT:0,brkT:0,keys:{},padActive:false};
 const sys={aebBrake:0,aebState:"ready",fcw:false,ttc:Infinity,lead:null,lkaState:"standby",lkaDelta:0,ldw:false,drift:0,driftT:0,
   bsmL:false,bsmR:false,lcw:0,elk:0,elkDelta:0,esa:null,esaDelta:0,rAebBrake:0,accThr:0,accBrk:0,accState:"off",cruiseThr:0,cruiseV:0,e:0,lkaLog:{maxE:0}};
 let cars=[], parked=[];   // AI traffic and test cars: {s, off, offT, v, v0, paint, kind, sig, lcT, script}
-const PKGS={assist:{name:"Driver Assist Pro",price:2400,items:"Halden Pilot hands-free, automatic passing, evasive steering, emergency lane keeping"},
+const PKGS={assist:{name:"Driver Assist Pro",price:2400,items:"Westport Pilot hands-free, automatic passing, evasive steering, emergency lane keeping"},
   light:{name:"Lighting Pack",price:1600,items:"Matrix LED high beam, auto high beam, cornering + bending lights, active levelling"},
   park:{name:"Parking Pack",price:1100,items:"Park assist: parallel parks and pulls into charging bays by itself"},
   tech:{name:"Tech Pack",price:1800,items:"360° top-down camera, wheel camera, live chassis display"},
@@ -5161,10 +5109,10 @@ function navPlaces(){const L=[],add=(name,sub,x,y,h,ic)=>{if(x==null||!isFinite(
   try{const P=fpt(PARK.e,PARK.dir,(PARK.s0+PARK.s1)/2,PARK.oP);add("Park & charge lot","Parking with chargers",P[0],P[1],0,"🅿️")}catch(e){}
   add("Fort St parking garage","Two-level parking garage",GAR.cx,GAR.cy+14,0,"🅿️");
   try{const o=cwSite();if(o){const [x,y]=o.W(4,-28);add("Strata Car Wash","Conveyor wash · $12 · free vacuums",x,y,Math.atan2(o.N[1],o.N[0]),"🫧")}}catch(e){}
-  if(VALET.stand)add("Halden Valet","Valet gig at the Cass Ave garage",VALET.stand.x,VALET.stand.y,VALET.stand.h,"🔑");
+  if(VALET.stand)add("Westport Valet","Valet gig at the Cass Ave garage",VALET.stand.x,VALET.stand.y,VALET.stand.h,"🔑");
   if(STARTS.home)add(STARTS.home.name||"Home","Your house",STARTS.home.x,STARTS.home.y,STARTS.home.h,"🏠");
   try{if(TOLL.e){const q=fpt(TOLL.e,1,TOLL.s,0);add("Hwy 7 toll plaza","Cash lane and E-ZPass",q[0],q[1],0,"🛣️")}}catch(e){}
-  if(STARTS.offroad)add(W2?"Kestrel Off-Road Park":"Halden Off-Road Park","Trails, rock garden, mud bog",STARTS.offroad.x,STARTS.offroad.y,STARTS.offroad.h,"⛰️");
+  if(STARTS.offroad)add(W2?"Kestrel Off-Road Park":"Westport Off-Road Park","Trails, rock garden, mud bog",STARTS.offroad.x,STARTS.offroad.y,STARTS.offroad.h,"⛰️");
   if(STARTS.proving)add("Proving ground","Test track, hills and skidpad",STARTS.proving.x,STARTS.proving.y,STARTS.proving.h,"🏁");
   add("Rosedale","Neighborhood",STARTS.suburb.x,STARTS.suburb.y,STARTS.suburb.h,"🏘️");
   if(W2){for(const k of ["mountain","millbrook","fairhaven","oakridge"])if(STARTS[k])add(STARTS[k].name,STARTS[k].nav||"",STARTS[k].x,STARTS[k].y,STARTS[k].h,STARTS[k].ic||"📍")}
@@ -6194,7 +6142,7 @@ function mbHome(g,top,bot,W){const h=bot-top,bg=g.createRadialGradient(W/2,bot,2
   g.fillStyle="#cfe0ff";g.font=FONT(13);g.textAlign="left";g.textBaseline="middle";g.fillText("⌂  Profile",12,top+16);g.textAlign="center";g.fillText("⌕  Search",W/2,top+16);
   const A=[["♫","Media",()=>SCR.page="media"],["✿","Comfort",()=>SCR.page="climate"],["ⓘ","Info",()=>SCR.page="controls"]];const cw=W/3;A.forEach(([i,l,fn],k)=>luxIcon(g,k*cw,top+30,cw,h-70,i,l,fn,k===1?"#7fd0ff":"#fff",44));
   g.fillStyle="rgba(255,255,255,.6)";g.font=FONT(11);g.fillText("THEME WORLDS",W/2,bot-14)}
-function bmwHome(g,top,bot,W){const h=bot-top;g.fillStyle="#07090d";g.fillRect(0,top,W,h);const cw=(W-20)/4,cards=[["ASSISTANT","Hi, how can I help?","#2a3f6a"],["VALUES SINCE INDIVIDUAL",`${(st.tripA/1000||0).toFixed(1)} km`,"#c7643f"],["WEATHER",ambF()+"°F  Halden","#4a74b8"],["ROUTE PREVIEW",NAV.dest?NAV.dest.name:"No route","#1d4f70"]];
+function bmwHome(g,top,bot,W){const h=bot-top;g.fillStyle="#07090d";g.fillRect(0,top,W,h);const cw=(W-20)/4,cards=[["ASSISTANT","Hi, how can I help?","#2a3f6a"],["VALUES SINCE INDIVIDUAL",`${(st.tripA/1000||0).toFixed(1)} km`,"#c7643f"],["WEATHER",ambF()+"°F  Westport","#4a74b8"],["ROUTE PREVIEW",NAV.dest?NAV.dest.name:"No route","#1d4f70"]];
   cards.forEach(([t,s,c],i)=>{const x=10+i*cw;g.fillStyle="#11151c";g.fillRect(x+3,top+8,cw-6,h-60);g.fillStyle=c;g.beginPath();g.moveTo(x+cw*0.45,top+8);g.lineTo(x+cw-3,top+8);g.lineTo(x+cw-3,top+8+(h-60)*0.6);g.closePath();g.fill();
     g.fillStyle="#9fc4ff";g.font=FONT(11);g.textAlign="left";g.textBaseline="middle";g.fillText(t,x+12,top+24);g.strokeStyle="#1c69d4";g.lineWidth=2;g.beginPath();g.moveTo(x+12,top+34);g.lineTo(x+cw-14,top+34);g.stroke();g.fillStyle="#fff";g.font=FONT(18);g.fillText(s,x+12,top+(h-60)*0.6);
     hit(x,top+8,cw,h-60,[null,()=>SCR.page="controls",()=>SCR.page="apps",()=>SCR.page="map"][i]||(()=>{}))});
@@ -7214,7 +7162,7 @@ function assist(dt){
     if(!st.matrix){const c0=Math.cos(car.psi),s0=Math.sin(car.psi);blocked=cars.some(c=>{const dx=c.wx-car.px,dy=c.wy-car.py,d=Math.hypot(dx,dy);if(d>450||d<1)return false;const f=(dx*c0+dy*s0)/d,toward=Math.cos(c.wh-car.psi)<-0.5;return f>0.85&&(toward||d<350)||d<60&&f>0.2})}
     const fast=sp>(st.high?8:11);
     if(fast&&!blocked){sys.ahbT=(sys.ahbT||0)+dt;if(sys.ahbT>1.0)st.high=true}else{sys.ahbT=0;st.high=false}}
-  // ---- hands-free Halden Pilot: lane centring + adaptive cruise + lane changes on the signal (or by itself to pass)
+  // ---- hands-free Westport Pilot: lane centring + adaptive cruise + lane changes on the signal (or by itself to pass)
   const override=Math.abs(inp.steer)>0.22;
   sys.pilotDelta=0;
   sys.fsdActive=false;if(!st.pilot&&FSD.a)fsdReset();
@@ -7969,7 +7917,7 @@ function orMesh(){orBuild();const M_=()=>({P:[],N:[],I:[]}),O={trail:M_(),mud:M_
     grid(()=>Bk,f.x-r,f.x+r,f.y-r,f.y+r,0.08,(x,y)=>{const v=featH(f,x,y);return {h:orSurf(x,y).h+v,v}},0.03,c=>c.some(q=>q.v>0.004))}
   // boards: the trailhead and one at each obstacle
   const sign=(x,y,S)=>{for(const sx of [-1.05,1.05]){boxInto(O.post,x+sx,orSurf(x+sx,y).h+1.2,-y,0.1,2.4,0.1,0);orColl({t:"c",x:x+sx,y,r:0.08})}boxInto(O.board,x,orSurf(x,y).h+2.2,-y,2.6,1.3,0.06,0);TC_SIGNS.push({x,y:y-0.035,z:orSurf(x,y).h+2.2,w:2.5,h:1.2,S})};
-  sign(-2195,-938,[0,0,0,"Halden Off-Road Park","Trail loop: Boulder Alley, The Bog, Log Crossing, Off-Camber, Widowmaker, The Steps. 4x4 only past this sign"]);
+  sign(-2195,-938,[0,0,0,"Westport Off-Road Park","Trail loop: Boulder Alley, The Bog, Log Crossing, Off-Camber, Widowmaker, The Steps. 4x4 only past this sign"]);
   for(const z of ORP.zones){const p=orTrailPt(z.seg,Math.max(0,z.t0-0.06),5.6);sign(p[0],p[1],[0,0,0,z.name,z.d])}
   const r={};for(const k in O)r[k]=meshFrom(O[k].P,O[k].N,O[k].I);
   // muddy water in the bottom of the bog
@@ -8997,14 +8945,14 @@ function scrControls(g,top,bot,W){
 var BANK=(()=>{let b=null;try{b=JSON.parse(localStorage.getItem("strata.bank")||"null")}catch(e){}return b||{score:700,loans:[],tx:[],card:{limit:5000,bal:0,apr:24.99,stmt:0,minDue:0,due:0,paidCycle:0},pay:"debit",autopay:true,garage:[],ontime:0,late:0,msgs:[],nid:1}})();
 function bankSave(){try{localStorage.setItem("strata.bank",JSON.stringify(BANK))}catch(e){}econSave()}
 const money2=v=>(v<0?"-":"")+"$"+Math.abs(v).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
-// texts from people in your life: Marcus (your friend), Mom, Dana at Halden Freight, plus the shop and the radio station; some react to what you do
+// texts from people in your life: Marcus (your friend), Mom, Dana at Westport Freight, plus the shop and the radio station; some react to what you do
 const TXT={t:150,seen:{}};
 function txt(from,text,key){if(key){if(TXT.seen[key])return;TXT.seen[key]=1}bankMsg(from,text);toast(`💬 ${from}: ${text.length>70?text.slice(0,68)+"…":text}`);try{beep(1046,.07,"sine",.1);setTimeout(()=>beep(1318,.08,"sine",.1),90)}catch(e){}}
-const TXT_POOL=[["Marcus","yo you still driving around in that thing? 😂"],["Mom","Did you eat today? Drive safe sweetie ❤️"],["Marcus","heard Tread Center does wraps now. matte black would go hard"],["Dana · Halden Freight","Got pallets waiting at the depot if you've got a van or a truck. Pays well."],
-  ["Mom","Your aunt says hi! Call her sometime"],["Marcus","bro the late night drivers are wild on Hwy 7. careful out there"],["Halden FM","Request line is open! We're playing the night drive all night 🌙"],["Tread Center","Winter's coming: winter tires are $860 a set, fitted while you wait ❄️"],
-  ["Marcus","you should try driving stick. it's in settings. you'll stall it lol"],["Mom","Remember to get your oil changed!"],["Dana · Halden Freight","Tow companies are short-handed too if you've got a truck"],["Northline Bank","Tip: paying your card off each week keeps your credit score high"]];
+const TXT_POOL=[["Marcus","yo you still driving around in that thing? 😂"],["Mom","Did you eat today? Drive safe sweetie ❤️"],["Marcus","heard Tread Center does wraps now. matte black would go hard"],["Dana · Westport Freight","Got pallets waiting at the depot if you've got a van or a truck. Pays well."],
+  ["Mom","Your aunt says hi! Call her sometime"],["Marcus","bro the late night drivers are wild on Hwy 7. careful out there"],["Westport FM","Request line is open! We're playing the night drive all night 🌙"],["Tread Center","Winter's coming: winter tires are $860 a set, fitted while you wait ❄️"],
+  ["Marcus","you should try driving stick. it's in settings. you'll stall it lol"],["Mom","Remember to get your oil changed!"],["Dana · Westport Freight","Tow companies are short-handed too if you've got a truck"],["Northline Bank","Tip: paying your card off each week keeps your credit score high"]];
 function txtTick(dt){if(!st.started)return;TXT.t-=dt;if(TXT.t>0)return;TXT.t=240+Math.random()*180;const [f,m]=TXT_POOL[Math.floor(Math.random()*TXT_POOL.length)];
-  const h=hourNow();if(f==="Mom"&&(h<7||h>22))return;if(WX.cur==="snow"&&WX.w>0.5&&!TXT.seen.snow){txt("Halden Weather","❄️ Snow and black ice tonight. Bridges freeze first: take it slow","snow");return}txt(f,m)}
+  const h=hourNow();if(f==="Mom"&&(h<7||h>22))return;if(WX.cur==="snow"&&WX.w>0.5&&!TXT.seen.snow){txt("Westport Weather","❄️ Snow and black ice tonight. Bridges freeze first: take it slow","snow");return}txt(f,m)}
 // ---- photo mode: the world pauses; orbit the car or fly a free camera; background blur around a focus point, filters, exposure, vignette,
 // letterbox, time of day; the picture goes to the phone's Photos app (and can be downloaded on PC)
 const PM={on:false,mode:"orbit",yaw:0,pitch:0.25,dist:7,fov:50,roll:0,eye:null,fy:0,fp:0,blur:0,fx:0.5,fy2:0.55,fr:0.28,filter:"none",exp:0,sat:100,vig:0.35,box:false,hidePanel:false,keys:{},cv:null,g:null,drag:null,pinch:null,tod:null,hideCar:false};
@@ -9177,7 +9125,7 @@ function tcamTick(dt){if(!st.started||st.walk)return;if(TCAM.cool>0)TCAM.cool-=d
     TCAM.prev={e:M.e,dir:M.dir,s:M.s}}
   // tickets arrive the next morning
   const day=GT.day||1;for(let i=TCAM.pend.length-1;i>=0;i--){const T=TCAM.pend[i];if(day>T.due||day===T.due&&GT.min>=8*60){TCAM.pend.splice(i,1);ECON.cash-=T.fine;try{bankTx(`Traffic camera ticket · ${T.why}`,-T.fine);bankSave()}catch(e){}
-      T.read=false;TCAM.mail.unshift(T);txt("Halden Traffic Court",`📬 Mail: a camera ticket for $${T.fine}. ${T.why}`);try{achHit("ticket")}catch(e){}tcamSave()}}}
+      T.read=false;TCAM.mail.unshift(T);txt("Westport Traffic Court",`📬 Mail: a camera ticket for $${T.fine}. ${T.why}`);try{achHit("ticket")}catch(e){}tcamSave()}}}
 function tcamRed(n,sp){const c=(tcamList()).find(c=>c.t==="red"&&c.n===n);if(c)tcamTrigger(c,`Ran a red light at ${Math.round(sp*2.237)} mph`,150,Math.round(sp*2.237),0)}
 // the picture: drawn from the camera pole into the off-screen buffer, then stamped like a real enforcement photo
 function tcamDev(S){const W=480,H=288,c=document.createElement("canvas");c.width=W;c.height=H;const g=c.getContext("2d"),img=g.createImageData(W,H);for(let y=0;y<H;y++)img.data.set(SCR.px.subarray((H-1-y)*W*4,(H-y)*W*4),y*W*4);g.putImageData(img,0,0);
@@ -9191,9 +9139,9 @@ function tcamInto(){const L=TCAM.list;if(!L)return;if(!DMAT.tcP){DMAT.tcP=[[0.35
     dBox("tcP",c.x,c.y,g,0.16,4.2,0.16,h);dBox("tcB",c.x,c.y,g+4.0,0.7,0.45,0.4,h);dBox("tcL",c.x+Math.cos(h+Math.PI)*0.36,c.y+Math.sin(h+Math.PI)*0.36,g+4.15,0.05,0.18,0.25,h);
     if(c.t==="speed"){const sg=groundAt(c.sx,c.sy).h||0;dBox("tcP",c.sx,c.sy,sg,0.08,2.4,0.08,c.sh);dBox("tcS",c.sx,c.sy,sg+2.1,0.04,0.9,0.75,c.sh+Math.PI/2);dBox("tcSb",c.sx+Math.cos(c.sh+Math.PI)*0.03,c.sy+Math.sin(c.sh+Math.PI)*0.03,sg+2.3,0.02,0.25,0.6,c.sh+Math.PI/2)}}}
 function mailApp(){const s=PHONE.sub;const M=TCAM.mail;if(s!==null&&s!==undefined&&s!==""&&M[+s]){const T=M[+s];T.read=true;tcamSave();
-    return phHdr("Mail")+`<div class="card"><small>Halden Traffic Court · day ${T.day} · ${T.t}</small><b>${acctEsc(T.why)}</b></div>${T.img?`<img src="${T.img}" style="width:100%;border-radius:10px;display:block">`:""}<div class="card"><small>${acctEsc(T.car||"")}</small><b>Fine: $${T.fine} · paid from your account</b></div><div class="chips"><button data-a="sub" data-v="">‹ All mail</button></div>`}
-  return phHdr("Mail",`<span class="sc">${M.filter(m=>!m.read).length||""}</span>`)+(M.length?M.map((T,i)=>`<button class="card" data-a="sub" data-v="${i}" style="text-align:left;width:100%"><small>${T.read?"":"● "}Day ${T.day} · Halden Traffic Court</small><b>$${T.fine} · ${acctEsc(T.why)}</b></button>`).join(""):`<p class="fine">No mail. Tickets from speed and red-light cameras arrive here.</p>`)}
-// ---- v155 Halden Auto Auction: every 7th game day (8 AM to 8 PM) six lots go under the hammer: used cars, wrecks with salvage titles, and one rare car.
+    return phHdr("Mail")+`<div class="card"><small>Westport Traffic Court · day ${T.day} · ${T.t}</small><b>${acctEsc(T.why)}</b></div>${T.img?`<img src="${T.img}" style="width:100%;border-radius:10px;display:block">`:""}<div class="card"><small>${acctEsc(T.car||"")}</small><b>Fine: $${T.fine} · paid from your account</b></div><div class="chips"><button data-a="sub" data-v="">‹ All mail</button></div>`}
+  return phHdr("Mail",`<span class="sc">${M.filter(m=>!m.read).length||""}</span>`)+(M.length?M.map((T,i)=>`<button class="card" data-a="sub" data-v="${i}" style="text-align:left;width:100%"><small>${T.read?"":"● "}Day ${T.day} · Westport Traffic Court</small><b>$${T.fine} · ${acctEsc(T.why)}</b></button>`).join(""):`<p class="fine">No mail. Tickets from speed and red-light cameras arrive here.</p>`)}
+// ---- v155 Westport Auto Auction: every 7th game day (8 AM to 8 PM) six lots go under the hammer: used cars, wrecks with salvage titles, and one rare car.
 // AI bidders each have their own limit; a late bid adds 10 minutes. Win it and it's in your garage (pay cash); fix it up and flip it
 const AUC={w:-1,lots:null,said:{},wins:0};try{const o=JSON.parse(localStorage.getItem("mstrata.auc")||"{}");Object.assign(AUC,o)}catch(e){}
 const aucSave=()=>{try{localStorage.setItem("mstrata.auc",JSON.stringify({w:AUC.w,lots:AUC.lots,said:AUC.said,wins:AUC.wins}))}catch(e){}};
@@ -9216,7 +9164,7 @@ function aucGen(w){let seed=w*104729+77;const r=()=>{seed=(seed*16807)%214748364
   return L}
 function aucLots(){const w=aucNext();if(AUC.w!==w||!AUC.lots){AUC.w=w;AUC.lots=aucGen(w);aucSave()}return AUC.lots}
 function aucTick(dt){if(!st.started)return;const L=aucLots(),live=aucLive(),d=GT.day||1;
-  if(live&&!AUC.said[AUC.w]){AUC.said[AUC.w]=1;aucSave();txt("Halden Auto Auction",`🔨 The auction is live today until 8 PM: ${L.length} lots, including a rare ${TRIMS[L[5].trim].short||TRIMS[L[5].trim].name}. Open the Auction app to bid`)}
+  if(live&&!AUC.said[AUC.w]){AUC.said[AUC.w]=1;aucSave();txt("Westport Auto Auction",`🔨 The auction is live today until 8 PM: ${L.length} lots, including a rare ${TRIMS[L[5].trim].short||TRIMS[L[5].trim].name}. Open the Auction app to bid`)}
   if(!live||aucDayOf(AUC.w)!==d)return;AUC.acc=(AUC.acc||0)+dt;if(AUC.acc<0.5)return;const step=AUC.acc;AUC.acc=0;let ch=false;
   for(const l of L){if(l.done)continue;const left=l.end-GT.min;
     if(left<=0){l.done=true;ch=true;if(l.who==="you")aucWin(l);else if(l.mine)toast0(`🔨 Outbid: the ${usedName(TRIMS[l.trim],l.yr)} sold for ${money(l.bid)}`);continue}
@@ -9228,9 +9176,9 @@ function aucBid(id,mult){const l=(AUC.lots||[]).find(x=>x.id===id);if(!l||l.done
   const nb=l.bid+aucInc(l.bid)*(mult||1);if(nb>ECON.cash){toast0(`You need ${money(nb)} in checking to bid that (the auction takes cash only)`);return}
   l.bid=nb;l.who="you";l.mine=1;if(l.end-GT.min<10)l.end=GT.min+10;aucSave();try{beep(990,0.06,"sine",0.12)}catch(e){}phRender(true)}
 function aucWin(l){const T=TRIMS[l.trim],nm=usedName(T,l.yr);if(ECON.cash<l.bid){toast0(`You won the ${nm} but couldn't pay: the auction resells it`);return}
-  ECON.cash-=l.bid;try{bankTx(`Halden Auto Auction · ${nm}`,-l.bid);bankSave()}catch(e){}AUC.wins=(AUC.wins||0)+1;aucSave();
+  ECON.cash-=l.bid;try{bankTx(`Westport Auto Auction · ${nm}`,-l.bid);bankSave()}catch(e){}AUC.wins=(AUC.wins||0)+1;aucSave();
   const G={trim:l.trim,name:nm,how:"cash",price:l.bid,odoM:l.miles*1609.34,used:{yr:l.yr,cond:l.cond,cpo:false,miles:l.miles,risk:usedRisk(l.miles,l.cond,false),acc:!!l.wreck,owners:2},build:{paint:usedPaint(l.pc)},auction:{paid:l.bid,kind:l.kind}};if(l.wreck)G.wreck=JSON.parse(JSON.stringify(l.wreck));
-  garageAdd(G);try{achHit("auctionWin")}catch(e){}bankMsg("Halden Auto Auction",`Sold to you! The ${nm} is in your garage.${l.wreck?` It has a salvage title and needs about ${money(l.fix)} of body work: Tread Center can fix it.`:""}`);toast0(`🔨 SOLD to you: ${nm} for ${money(l.bid)}. It's in your garage`)}
+  garageAdd(G);try{achHit("auctionWin")}catch(e){}bankMsg("Westport Auto Auction",`Sold to you! The ${nm} is in your garage.${l.wreck?` It has a salvage title and needs about ${money(l.fix)} of body work: Tread Center can fix it.`:""}`);toast0(`🔨 SOLD to you: ${nm} for ${money(l.bid)}. It's in your garage`)}
 const wreckCost=d=>Math.round((((d.f||0)+(d.r||0)+(d.l||0)+(d.rt||0))*1800+(d.rad?650:0)));
 function aucApp(){const L=aucLots(),live=aucLive()&&aucDayOf(AUC.w)===(GT.day||1),nd=aucDayOf(AUC.w),d=GT.day||1;
   const head=live?`<div class="card" style="background:#fde8e6;color:#8c1d14"><b>🔴 LIVE until 8 PM</b><small>Cash only · a late bid adds 10 minutes</small></div>`:`<div class="card"><b>Next auction: day ${nd}${nd===d?" at 8 AM":` (in ${nd-d} day${nd-d===1?"":"s"})`}</b><small>Preview the lots below. Bidding opens at 8 AM on auction day</small></div>`;
@@ -9294,10 +9242,10 @@ function otdFees(base,T){const dest=DEST_FEE(T),tax=Math.round((base+dest)*0.06)
 function insWeekly(price){const s=BANK.score,f=s<600?1.6:s<680?1.25:s<740?1.0:0.88;let m=1;try{m=insMul()}catch(e){}return Math.round((1150+price*0.021)*f*m/52*100)/100}
 function insCharge(){const own=GARAGE.filter(g=>g&&TRIMS[g.trim]);if(!own.length)return;let tot=0;for(const g of own)tot+=insWeekly(g.price||PRICE[g.trim]||30000);tot=Math.round(tot*100)/100;
   if(ECON.cash>=tot){ECON.cash-=tot;bankTx(`Car insurance (${own.length} car${own.length>1?"s":""})`,-tot)}else{BANK.card.bal+=tot;bankTx(`Car insurance (${own.length} car${own.length>1?"s":""})`,-tot,"Credit card")}
-  bankMsg("Halden Mutual Insurance",`Weekly premium ${money2(tot)} for ${own.length} car${own.length>1?"s":""}${BANK.score<680?" · a better credit score lowers your rate":""}`)}
+  bankMsg("Westport Mutual Insurance",`Weekly premium ${money2(tot)} for ${own.length} car${own.length>1?"s":""}${BANK.score<680?" · a better credit score lowers your rate":""}`)}
 // ======================================================================= stocks (v109): a simulated market you can invest in from the phone
 // Prices move every few seconds of play (random walk with each company's trend and volatility); some pay a weekly dividend.
-const STK_LIST=[["STRM","Strata Motors","Autos",42,0.10,0.34,0],["VOLT","Voltline Energy","EV charging",18,0.16,0.55,0],["NRTH","Northline Financial","Banking",61,0.06,0.18,0.031],["HALD","Halden Grocers","Retail",33,0.04,0.14,0.024],
+const STK_LIST=[["STRM","Strata Motors","Autos",42,0.10,0.34,0],["VOLT","Voltline Energy","EV charging",18,0.16,0.55,0],["NRTH","Northline Financial","Banking",61,0.06,0.18,0.031],["HALD","Westport Grocers","Retail",33,0.04,0.14,0.024],
   ["GIGR","GigRoute","Delivery apps",27,0.12,0.48,0],["CHIP","Lakeshore Semiconductor","Chips",115,0.14,0.42,0.006],["OILX","Great Lakes Oil","Energy",74,0.03,0.26,0.045],["TIRE","Ridgeway Tire","Auto parts",22,0.05,0.22,0.018],
   ["SKY","Skyway Airlines","Travel",14,0.02,0.45,0],["AIQ","Quorum AI","Software",205,0.18,0.5,0],["UTIL","Midstate Power","Utilities",48,0.03,0.12,0.038],["SPDX","Market Index Fund","Index",480,0.08,0.16,0.013]];
 var STK=(()=>{let s=null;try{s=JSON.parse(localStorage.getItem("strata.stocks")||"null")}catch(e){}if(!s||!s.p){s={p:{},h:{},open:{},hist:{},own:{},tick:0}}for(const [k,,,p0] of STK_LIST){if(!s.p[k]){s.p[k]=p0;s.open[k]=p0;s.hist[k]=[p0]}}return s})();
@@ -9569,16 +9517,16 @@ function phHome(d){const ios=PHONE.os==="ios",T=TRIMS[st.trim],A=appOf(),ic=k=>{
   const carW=`<div class="wCar" data-a="open" data-v="car"><b>${T.name.replace(/^20\d\d /,"")}</b><span>${A?A[0]:"Car"}</span><div class="wBtns"><button data-a="fob" data-v="start">✣</button><button data-a="fob" data-v="lock">🔒</button><button data-a="fob" data-v="unlock">🔓</button></div></div>`;
   const nd=BANK.loans.reduce((m,l)=>Math.min(m,l.nextDue),1e9);
   if(ios)return `<div class="pHomeS">${carW}<div class="grid"><div class="wCal" data-a="open" data-v="cal"><small>${d.toLocaleDateString([],{weekday:"long"}).toUpperCase()}</small><b>${d.getDate()}</b><span>${nd<1e9?`Payment due day ${nd}`:"No Events Today"}</span></div>${["bank","wallet","maps","music"].map(ic).join("")}${["weather","clock","settings","garage"].map(ic).join("")}${["msgs","cal","car","gig","stocks","photos","mail","auction"].map(ic).join("")}</div><div class="dots">• ○ ○</div><div class="dock">${["phone","bank","msgs","music"].map(ic).join("")}</div></div>`;
-  return `<div class="pHomeS and"><div class="wRow"><div class="wWx" data-a="open" data-v="weather"><b>68°</b><span>${WX.cur==="clear"||!WX.cur?"Fair":WX.cur}</span><small>📍 Halden</small></div><div class="wClock">${d.toLocaleDateString([],{weekday:"short",day:"numeric",month:"short"})}<b>${gtClock()}</b></div></div>${carW}<div class="grid">${["bank","wallet","maps","music","weather","clock","settings","garage","cal","car","gig","stocks","photos","mail","auction"].map(ic).join("")}</div><div class="dots">= ⌂</div><div class="dock">${["phone","msgs","bank","music"].map(ic).join("")}</div></div>`}
+  return `<div class="pHomeS and"><div class="wRow"><div class="wWx" data-a="open" data-v="weather"><b>68°</b><span>${WX.cur==="clear"||!WX.cur?"Fair":WX.cur}</span><small>📍 Westport</small></div><div class="wClock">${d.toLocaleDateString([],{weekday:"short",day:"numeric",month:"short"})}<b>${gtClock()}</b></div></div>${carW}<div class="grid">${["bank","wallet","maps","music","weather","clock","settings","garage","cal","car","gig","stocks","photos","mail","auction"].map(ic).join("")}</div><div class="dots">= ⌂</div><div class="dock">${["phone","msgs","bank","music"].map(ic).join("")}</div></div>`}
 function phHdr(t,sub){return `<div class="aHdr"><button data-a="home">‹</button><b>${t}</b>${sub||"<span></span>"}</div>`}
 function phLoanQuote(){const amt=PHONE.amt||10000,wk=PHONE.term||260,apr=bankAprFor("personal"),p=wkPay(amt,apr,wk),dc=bankDecide(amt,"personal");return `<div class="q"><span>APR <b>${apr.toFixed(2)}%</b></span><span>Weekly <b>${money2(p)}</b></span><span>Total <b>${money(p*wk)}</b></span></div>${dc.ok?`<div class="ok">✓ Pre-approved</div>`:`<div class="no">${dc.why}</div>`}`}
 // ======================================================================= gig jobs (v107): package delivery, food delivery and rideshare
 // Go online in the Gig Jobs app, take an offer, drive to the pickup, stop there, then drive to the drop-off (packages: a route of stops).
 // Pay = base + per mile + tip; food has a delivery deadline, riders rate your driving (hard braking and crashes cost stars and tips).
 var GIG=(()=>{let g=null;try{g=JSON.parse(localStorage.getItem("strata.gig")||"null")}catch(e){}return Object.assign({svc:"food",online:false,offer:null,job:null,earned:0,trips:0,rating:5,ratings:0,week:0},g||{},{online:false,offer:null,job:null})})();
-const GIG_SVC={valet:{name:"Halden Valet",short:"Valet",ic:"🔑",col:"#b8860b",desc:"Park guests' cars in the Cass Ave garage and bring them back"},pkg:{name:"Package Delivery",short:"Packages",ic:"📦",col:"#ff9900",desc:"Blocks of 3 to 5 packages, paid per block"},food:{name:"Food Delivery",short:"Food",ic:"🍔",col:"#ff3008",desc:"Pick up at a restaurant, deliver before the food gets cold"},ride:{name:"Rideshare",short:"Rides",ic:"🚘",col:"#111",desc:"Pick up riders and drive them; they rate the ride"},taxi:{name:"Halden Taxi",short:"Taxi",ic:"🚕",col:"#f5c400",desc:"Metered fares: you're paid for every mile you actually drive with a passenger, plus tips. A TAXI sign goes on your roof"},tow:{name:"Tow Truck",short:"Tow",ic:"🛻",col:"#e86b00",desc:"Hook up broken-down cars and haul them to the shop. Needs a truck or a big SUV"},freight:{name:"Halden Freight",short:"Freight",ic:"🚚",col:"#2e6bd6",desc:"Load heavy freight at the depot and deliver it to businesses. Needs a van, truck or big SUV"}};
-if(W2)for(const v of Object.values(GIG_SVC))v.name=v.name.replace("Halden","Westport");
-const GIG_FOOD=["Burger Barn","Pho Saigon","Luigi's Pizza","Taco Loco","Golden Dragon","Halden Deli","Sushi Go","Wing Stop Shop","Green Bowl","Café Marlo"];
+const GIG_SVC={valet:{name:"Westport Valet",short:"Valet",ic:"🔑",col:"#b8860b",desc:"Park guests' cars in the Cass Ave garage and bring them back"},pkg:{name:"Package Delivery",short:"Packages",ic:"📦",col:"#ff9900",desc:"Blocks of 3 to 5 packages, paid per block"},food:{name:"Food Delivery",short:"Food",ic:"🍔",col:"#ff3008",desc:"Pick up at a restaurant, deliver before the food gets cold"},ride:{name:"Rideshare",short:"Rides",ic:"🚘",col:"#111",desc:"Pick up riders and drive them; they rate the ride"},taxi:{name:"Westport Taxi",short:"Taxi",ic:"🚕",col:"#f5c400",desc:"Metered fares: you're paid for every mile you actually drive with a passenger, plus tips. A TAXI sign goes on your roof"},tow:{name:"Tow Truck",short:"Tow",ic:"🛻",col:"#e86b00",desc:"Hook up broken-down cars and haul them to the shop. Needs a truck or a big SUV"},freight:{name:"Westport Freight",short:"Freight",ic:"🚚",col:"#2e6bd6",desc:"Load heavy freight at the depot and deliver it to businesses. Needs a van, truck or big SUV"}};
+if(W2)for(const v of Object.values(GIG_SVC))v.name=v.name.replace("Westport","Westport");
+const GIG_FOOD=["Burger Barn","Pho Saigon","Luigi's Pizza","Taco Loco","Golden Dragon","Westport Deli","Sushi Go","Wing Stop Shop","Green Bowl","Café Marlo"];
 const GIG_NAMES=["Ava","Liam","Noah","Mia","Zoe","Ethan","Maya","Lucas","Ella","Omar","Priya","Jonah","Sofia","Kai"];
 function gigBig(){const T=TRIMS[st.trim];return trlCanTow()||/Transit|ProMaster|Express|Savana|Sprinter|Odyssey|Sienna|Pacifica|Carnival|ID\. Buzz/i.test((T.group||"")+T.name)}
 function gigSave(){try{const {offer,job,online,...keep}=GIG;localStorage.setItem("strata.gig",JSON.stringify(keep))}catch(e){}}
@@ -9592,9 +9540,9 @@ function gigOffer(){const S=GIG.svc,px=st.walk?st.walk.x:car.px,py=st.walk?st.wa
     if(W2){const F=W2P.filter(o=>o.k[0]==="f"&&Math.hypot(o.x-px,o.y-py)<3500);if(F.length){const o=F[Math.floor(Math.random()*F.length)],q=w2Xf(o,DT_PTS[o.k][1][0],0,DT_PTS[o.k][1][1]);r=DT_NAME[o.k];a={x:q[0],y:q[1],h:o.a,name:`${r} · pickup window`}}}
     const b=gigSpot(a.x,a.y,300,1500,`${GIG_NAMES[Math.floor(Math.random()*GIG_NAMES.length)]}'s door`);
     mi=(Math.hypot(a.x-px,a.y-py)+Math.hypot(b.x-a.x,b.y-a.y))*1.35/1609;stops=[{...a,kind:"pickup",label:`Pick up the order at ${r}`},{...b,kind:"drop",label:"Hand the food to the customer"}];pay=3.5+mi*1.6}
-  else if(S==="tow"){const a=gigSpot(px,py,250,1200,"Broken-down car"),shop=(()=>{if(W2){const V=W2P.filter(o=>/service|tire_center/.test(o.k));if(V.length){const o=V.sort((p,q)=>Math.hypot(p.x-a.x,p.y-a.y)-Math.hypot(q.x-a.x,q.y-a.y))[0],f=W2_FP[o.k],q=w2Xf(o,0,0,f[3]+8);return {x:q[0],y:q[1],h:o.a,name:"Route 20 Auto Service"}}}return gigSpot(a.x,a.y,500,2000,"Halden Auto Repair")})();mi=(Math.hypot(a.x-px,a.y-py)+Math.hypot(shop.x-a.x,shop.y-a.y))*1.35/1609;
+  else if(S==="tow"){const a=gigSpot(px,py,250,1200,"Broken-down car"),shop=(()=>{if(W2){const V=W2P.filter(o=>/service|tire_center/.test(o.k));if(V.length){const o=V.sort((p,q)=>Math.hypot(p.x-a.x,p.y-a.y)-Math.hypot(q.x-a.x,q.y-a.y))[0],f=W2_FP[o.k],q=w2Xf(o,0,0,f[3]+8);return {x:q[0],y:q[1],h:o.a,name:"Route 20 Auto Service"}}}return gigSpot(a.x,a.y,500,2000,"Westport Auto Repair")})();mi=(Math.hypot(a.x-px,a.y-py)+Math.hypot(shop.x-a.x,shop.y-a.y))*1.35/1609;
     stops=[{...a,kind:"hook",label:"Find the broken-down car and stop next to it to hook it up"},{...shop,kind:"unhook",label:"Tow it to the repair shop"}];pay=95+Math.hypot(shop.x-a.x,shop.y-a.y)*1.35/1609*3.2}
-  else if(S==="freight"){const hub=gigSpot(px,py,150,800,"Halden Freight depot"),n=2+Math.floor(Math.random()*2);let x=hub.x,y=hub.y;stops.push({...hub,kind:"pickup",label:"Load the freight at the depot"});
+  else if(S==="freight"){const hub=gigSpot(px,py,150,800,"Westport Freight depot"),n=2+Math.floor(Math.random()*2);let x=hub.x,y=hub.y;stops.push({...hub,kind:"pickup",label:"Load the freight at the depot"});
     for(let i=0;i<n;i++){const q=gigSpot(x,y,350,1300,`${["Hardware store","Restaurant supply","Office park","Clinic","Brewery","School"][Math.floor(Math.random()*6)]}`);stops.push({...q,kind:"drop",label:`Deliver pallet ${i+1} of ${n}`});mi+=Math.hypot(q.x-x,q.y-y)*1.35/1609;x=q.x;y=q.y}pay=40+n*28+mi*2.4}
   else{const nm=GIG_NAMES[Math.floor(Math.random()*GIG_NAMES.length)],a=gigSpot(px,py,100,800,`Pick up ${nm}`),b=gigSpot(a.x,a.y,500,2600,`${nm}'s destination`);
     const tripMi=Math.hypot(b.x-a.x,b.y-a.y)*1.35/1609;mi=tripMi+Math.hypot(a.x-px,a.y-py)*1.35/1609;stops=[{...a,kind:"pickup",label:`Pick up ${nm}`,who:nm},{...b,kind:"drop",label:`Drop off ${nm}`,who:nm}];pay=2.8+tripMi*1.25+tripMi/0.4*0.3}
@@ -9610,7 +9558,7 @@ function gigDone(){try{if(achCount("gigs")>=10)achHit("gigs10")}catch(e){}const 
   else if(J.svc==="tow"&&J.hits){pay*=0.8;note=" (you damaged the customer's car: -20%)"}
   else if(J.svc==="ride"){const stars=Math.max(1,5-J.hits*2-Math.min(2,Math.floor(J.hard/2)));GIG.rating=(GIG.rating*GIG.ratings+stars)/(GIG.ratings+1);GIG.ratings++;tip=stars===5?Math.round((1+Math.random()*5)*100)/100:0;note=` · ${J.stops[0].who} rated you ${"★".repeat(stars)}${"☆".repeat(5-stars)}`}
   else if(J.hits){tip=0;note+=" (damaged order: no tip)"}
-  const tot=Math.round((pay+tip)*liveCash()*100)/100;ECON.cash+=tot;bankTx(`${GIG_SVC[J.svc].name} payout${liveCash()>1?" ("+liveCash()+"× cash event)":""}`,tot);GIG.earned+=tot;GIG.trips++;if(GIG.trips===5)setTimeout(()=>txt("Dana · Halden Freight","Saw your ratings on the app. If you've got a van or truck, try Freight: it pays more"),5000);if(GIG.earned>1000)setTimeout(()=>txt("Marcus","you made a grand doing gigs?? lunch is on you","gig1k"),4000);bankSave();beep(1568,.15,"sine",.14);gigEnd(`${GIG_SVC[J.svc].ic} Job done: +${money2(tot)}${note}`)}
+  const tot=Math.round((pay+tip)*liveCash()*100)/100;ECON.cash+=tot;bankTx(`${GIG_SVC[J.svc].name} payout${liveCash()>1?" ("+liveCash()+"× cash event)":""}`,tot);GIG.earned+=tot;GIG.trips++;if(GIG.trips===5)setTimeout(()=>txt("Dana · Westport Freight","Saw your ratings on the app. If you've got a van or truck, try Freight: it pays more"),5000);if(GIG.earned>1000)setTimeout(()=>txt("Marcus","you made a grand doing gigs?? lunch is on you","gig1k"),4000);bankSave();beep(1568,.15,"sine",.14);gigEnd(`${GIG_SVC[J.svc].ic} Job done: +${money2(tot)}${note}`)}
 function gigTick(dt){if(!st.started)return;const now=performance.now();
   if(GIG.online&&!GIG.job&&GIG.svc!=="valet"){if(GIG.offer&&now>GIG.offer.exp){GIG.offer=null;if(PHONE.open&&PHONE.app==="gig")phRender(true)}if(!GIG.offer){GIG.nextT=(GIG.nextT??6)-dt;if(GIG.nextT<=0){GIG.nextT=10+Math.random()*15;gigOffer()}}}
   const J=GIG.job;if(!J)return;const S=J.stops[J.i],px=st.walk?st.walk.x:car.px,py=st.walk?st.walk.y:car.py;
@@ -9660,7 +9608,7 @@ function phApp(k){const T=TRIMS[st.trim],H=car.hyb;if(k==="gig")return gigApp();
   if(k==="music"){const on=SCR.radioOn,i=au.station||0,R=RADIO[i];return phHdr(PHONE.os==="ios"?"Music":"Music")+`<div class="np"><div class="art" style="background:linear-gradient(135deg,hsl(${i*67},70%,55%),hsl(${i*67+60},70%,35%))">♫</div><b>${SCR.adBreak?"📻 Ad: "+SCR.adBreak:R.tracks?R.tracks[(Math.floor(GT.min/4))%R.tracks.length]:R.name}</b><span>${R.name} · ${R.genre||""}</span><div class="ctl"><button data-a="mprev">⏮</button><button data-a="mplay">${on?"⏸":"▶"}</button><button data-a="mnext">⏭</button></div><small>${st.phoneConn?"Playing through the car":"Playing on the phone speaker"}</small></div><div class="list">${RADIO.map((r,j)=>`<button class="li" data-a="mst" data-v="${j}"><span>${r.name}<small>${r.genre||""}</small></span>${j===i&&on?"<b>♫</b>":""}</button>`).join("")}</div>`}
   if(k==="phone"){const C=[["Mom","👩"],["Northline Bank","🏦"],[`${(T.group||"").split(" ")[0]} Dealer`,"🚗"],["Roadside Assistance","🛻"],["Pizza Place","🍕"]];return phHdr("Phone")+`<div class="list">${C.map(([n,e])=>`<button class="li" data-a="call" data-v="${n}"><span>${e} ${n}<small>mobile</small></span><b>✆</b></button>`).join("")}</div>`}
   if(k==="msgs"){BANK.msgs.forEach(m=>m.unread=false);return phHdr("Messages")+`<div class="list">${BANK.msgs.slice(0,30).map(m=>`<div class="li msg"><span><b>${m.from}</b>${m.text}<small>Day ${m.day} · ${m.t}</small></span></div>`).join("")||"<div class='li'>No messages</div>"}</div>`}
-  if(k==="weather")return phHdr("Weather")+`<div class="wx"><small>Halden</small><b>68°</b><span>${WX.cur==="rain"?"Rain":WX.cur==="snow"?"Snow":WX.cur==="fog"?"Fog":st.night?"Clear night":"Sunny"}</span><div class="hrs">${[0,1,2,3,4,5].map(i=>{const h=(Math.floor(GT.min/60)+i)%24;return `<span>${h%12||12}${h<12?"a":"p"}<br>${h>=7&&h<19?"☀":"☾"}<br>${66+Math.round(Math.sin((h-8)/24*6.28)*6)}°</span>`}).join("")}</div></div>`;
+  if(k==="weather")return phHdr("Weather")+`<div class="wx"><small>Westport</small><b>68°</b><span>${WX.cur==="rain"?"Rain":WX.cur==="snow"?"Snow":WX.cur==="fog"?"Fog":st.night?"Clear night":"Sunny"}</span><div class="hrs">${[0,1,2,3,4,5].map(i=>{const h=(Math.floor(GT.min/60)+i)%24;return `<span>${h%12||12}${h<12?"a":"p"}<br>${h>=7&&h<19?"☀":"☾"}<br>${66+Math.round(Math.sin((h-8)/24*6.28)*6)}°</span>`}).join("")}</div></div>`;
   if(k==="clock")return phHdr("Clock")+`<div class="wx"><b>${gtClock()}</b><span>Day ${GT.day||1}</span><small>1 hour in the game = 1 minute in real life</small><div class="chips"><button data-a="tskip" data-v="6">Skip to 6 am</button><button data-a="tskip" data-v="12">Noon</button><button data-a="tskip" data-v="19.5">Sunset</button><button data-a="tskip" data-v="23">Night</button></div></div>`;
   if(k==="cal"){const skipB=`<div style="padding:0 12px"><b style="font-size:15px">${calFmt(null,true)}</b>${calHtml()}<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">${[["day","+1 day"],["week","+1 week"],["month","+1 month"],["year","+1 year"]].map(([k2,l])=>`<button data-a="skip" data-v="${k2}" style="padding:9px;border-radius:10px;border:0;background:#2b2d33;color:#fff;font:600 13px system-ui">⏩ ${l}</button>`).join("")}</div></div>`;const ev=[...BANK.loans.map(l=>[l.nextDue,`${l.name} payment ${money2(l.pay)}`]),...(BANK.card.minDue?[[BANK.card.due,`Credit card minimum ${money2(BANK.card.minDue)}`]]:[])].sort((a,b)=>a[0]-b[0]);return phHdr("Calendar")+skipB+`<div class="list">${ev.map(([d,t])=>`<div class="li"><span>Day ${d}<small>${t}</small></span><b>${d-(GT.day||1)<=1?"⚠":""}</b></div>`).join("")||"<div class='li'>No Events Today</div>"}</div>`}
   if(k==="garage")return phHdr("Garage")+`<div class="list">${[{trim:st.trim,how:"driving"},...st.fleet.map(f=>({trim:f.trim,how:"parked"}))].map(f=>`<div class="li"><span>${TRIMS[f.trim].name}<small>${f.how==="driving"?"You're in it":"Parked · T to switch"}${BANK.garage.some(g=>g.trim===f.trim)?" · owned":" · test drive"}</small></span></div>`).join("")}${BANK.garage.map(g=>`<div class="li"><span>${TRIMS[g.trim].name}<small>${g.how==="cash"?"Bought":g.how==="lease"?"Leased":"Financed"} day ${g.day} · ${money(g.price)}</small></span></div>`).join("")}</div>`;
@@ -9842,7 +9790,7 @@ function vsCar(g,top,bot,W){const F=FONT,h=bot-top,cx=W*0.5,cy=top+h*0.56,t=SCR.
   box(10,bot-44,bw,"Parking Safety","park",cx-70*s,cy+50*s);box(W-bw-10,bot-44,bw,"Blind-Spot Safety","bsm",cx+95*s,cy+45*s);
   if(sys.limit){const x=W/2-24,y=bot-66;g.fillStyle="#f4f4f0";rr2(g,x,y,48,58,5);g.fill();g.fillStyle="#111";g.font=F(9);g.textAlign="center";g.fillText("SPEED",x+24,y+12);g.fillText("LIMIT",x+24,y+21);g.font=F(22);g.fillText(sys.limit,x+24,y+42)}}
 // ---- radio: generated music (chords, bass, drums) so it works offline
-const RADIO=[{name:"Halden FM",genre:"Night drive · synthwave",bpm:96,kind:"synth",tracks:["Neon Causeway","Harbor Lights","Slow Merge","Afterglow"],
+const RADIO=[{name:"Westport FM",genre:"Night drive · synthwave",bpm:96,kind:"synth",tracks:["Neon Causeway","Harbor Lights","Slow Merge","Afterglow"],
     prog:[[57,60,64],[53,57,60],[48,52,55],[55,59,62]]},
   {name:"Lo-Fi Lane",genre:"Chill beats",bpm:78,kind:"keys",tracks:["Rainy Exit 2","Parallel Parking","Coffee at 7","Green Wave"],prog:[[50,53,57,60],[55,59,62,65],[48,52,55,59],[57,61,64,67]]},
   {name:"Coastline 101",genre:"Deep house",bpm:120,kind:"house",tracks:["Hwy 7 Sunrise","Service Plaza","Torque Vector","Open Road"],prog:[[45,52,57,60],[41,48,53,57],[43,50,55,59],[40,47,52,55]]}];
@@ -9853,9 +9801,9 @@ function radioPlay(i){setTimeout(audioSave,0);if(!au.ctx){toast("Tap Start first
   if(!au.radioTimer)au.radioTimer=setInterval(radioTick,60);toast(`${RADIO[i].name} · ${RADIO[i].genre}`)}
 // ad breaks: every few minutes the music dips and the station runs a local ad (spoken by the browser's voice) and its station ID
 const RADS={t:140,on:false};
-const RAD_ADS=["Tread Center, out on Grand River. Four all-season tires, fitted and balanced, from seven twenty. Body shop and tuning while you wait.","Thirsty? Bean and Brew, Grand River shops. Lattes, fast chargers out front, and the best croissant in Halden.",
+const RAD_ADS=["Tread Center, out on Grand River. Four all-season tires, fitted and balanced, from seven twenty. Body shop and tuning while you wait.","Thirsty? Bean and Brew, Grand River shops. Lattes, fast chargers out front, and the best croissant in Westport.",
   "Strata Motors. New, used, and certified pre-owned. Trade in your old car today: we'll take anything with four wheels. Well, most things.","Northline Bank. Auto loans from your phone in seconds. Northline, member F D I C.","Fresh Market. Fresh produce every morning, open late. Fill your trunk, not your schedule.",
-  "Now hiring: Halden Freight. Got a van or a truck? Run deliveries on your own schedule. Download Gig Jobs today.","Fuel Stop. Cheap gas, cold drinks, clean restrooms. Fuel Stop: we're always on your way.","Halden Taxi. Drive for us, keep eighty percent of every fare. Open the Gig Jobs app and pick Taxi."];
+  "Now hiring: Westport Freight. Got a van or a truck? Run deliveries on your own schedule. Download Gig Jobs today.","Fuel Stop. Cheap gas, cold drinks, clean restrooms. Fuel Stop: we're always on your way.","Westport Taxi. Drive for us, keep eighty percent of every fare. Open the Gig Jobs app and pick Taxi."];
 function radAdTick(){if(!SCR.radioOn||!au.radioG||!("speechSynthesis" in window)){return}RADS.t-=1;if(RADS.t>0||RADS.on)return;RADS.t=150+Math.random()*120;RADS.on=true;const c=au.ctx,R_=RADIO[au.station||0];
   au.radioG.gain.setTargetAtTime(0.03*(au.vol??0.5),c.currentTime,0.3);const ad=RAD_ADS[Math.floor(Math.random()*RAD_ADS.length)];SCR.adBreak=ad.split(".")[0];
   const say=(t,end)=>{try{const u=new SpeechSynthesisUtterance(t);u.rate=1.08;u.pitch=0.95;u.volume=Math.min(1,0.9*(au.vol??0.5)*2);u.onend=end;u.onerror=end;speechSynthesis.speak(u)}catch(e){end()}};
@@ -10851,11 +10799,11 @@ function act(a){ {const T0=TRIMS[st.trim];if(T0.real&&!has(a)){toast(`The real $
     case "accUp":st.accSet=Math.min(st.accSet+(st.units==="mph"?2.2352:1.3889),55);break;
     case "accDown":st.accSet=Math.max(st.accSet-(st.units==="mph"?2.2352:1.3889),8);break;
     case "gap":st.accGap=st.accGap%3+1;break;
-    case "pilot":if(st.pilot){st.pilot=false;sys.pilotLC=null;fsdReset();toast(`${T.pilotName||"Halden Pilot"} off: you are steering`);beep(500,.15,"sine",.2)}
+    case "pilot":if(st.pilot){st.pilot=false;sys.pilotLC=null;fsdReset();toast(`${T.pilotName||"Westport Pilot"} off: you are steering`);beep(500,.15,"sine",.2)}
       else if(T.tesla&&sys.apStrike)toast("Autosteer unavailable for the rest of this drive (shift to P to reset)");
       else if(T.tesla&&fsdOwned()&&(st.gear==="D"||(st.gear==="P"&&Math.abs(car.vx)<0.2))){if(st.gear==="P"){st.gear="D";sys.epb=false;sys.hold=false;tick(1)}st.pilot=true;st.acc=true;st.accSet=Math.max(st.accSet,13.4);fsdReset();beep(880,.08,"sine",.2);setTimeout(()=>beep(1320,.1,"sine",.2),100);toast(NAV.dest?`FSD (Supervised) on: driving to ${NAV.dest.name}`:"FSD (Supervised) on: pick a destination on the map, or it keeps following the road")}
-      else if(st.gear!=="D"||car.vx<(T.tesla?0.5:8))toast(T.tesla?"Shift to D first":"Halden Pilot works above 18 mph in D");
-      else{st.pilot=true;if(!st.acc){st.acc=true;st.accSet=Math.max(car.vx,13.4)}toast(T.pilotName?(T.pilotHwy?`${T.pilotName} on: hands-free on Hwy 7 (it waits on town streets). Signal to change lanes`:T.handsOn?`${T.pilotName} on: centres you in the lane, keep your hands on the wheel`:`${T.pilotName} on: hands-free below 25 mph, hands on above`):"Halden Pilot on: hands-free. Tap a signal to change lanes; steer or brake to take over");beep(880,.1,"sine",.2);setTimeout(()=>beep(1320,.12,"sine",.2),120)}break;
+      else if(st.gear!=="D"||car.vx<(T.tesla?0.5:8))toast(T.tesla?"Shift to D first":"Westport Pilot works above 18 mph in D");
+      else{st.pilot=true;if(!st.acc){st.acc=true;st.accSet=Math.max(car.vx,13.4)}toast(T.pilotName?(T.pilotHwy?`${T.pilotName} on: hands-free on Hwy 7 (it waits on town streets). Signal to change lanes`:T.handsOn?`${T.pilotName} on: centres you in the lane, keep your hands on the wheel`:`${T.pilotName} on: hands-free below 25 mph, hands on above`):"Westport Pilot on: hands-free. Tap a signal to change lanes; steer or brake to take over");beep(880,.1,"sine",.2);setTimeout(()=>beep(1320,.12,"sine",.2),120)}break;
     case "autoLC":st.autoLC=!st.autoLC;toast(st.autoLC?"Pilot may change lanes by itself to pass":"Pilot changes lanes only when you signal");break;
   }
   hudT=0; if(!$("drawer").hidden)renderTab();
@@ -10963,7 +10911,7 @@ const TABS={
   safety(){return `<h3>Collision avoidance</h3><div class="grid2">${tog("aeb","Emergency braking",`Warns at ${aebT(0)} s, brakes at ${aebT(2)} s to impact`,st.aeb)}${tog("aebAuto","Front auto braking",st.aebAuto!==false?"Brakes for you if you don't react to the warning":"Off: warning only, you brake",st.aeb&&st.aebAuto!==false)}${tog("esa","Evasive steering","Adds steering when you swerve round an obstacle",st.esa)}${smartRegenOn()||(/^(Hyundai|Kia|Genesis) /.test(TRIMS[st.trim].group||"")&&!TRIMS[st.trim].ice&&!TRIMS[st.trim].hybrid)?tog("smartRegen","Smart Regen",st.smartRegen===false?"Off: regen stays at the level you picked":"Lifting off, regen slows you for the car ahead",st.smartRegen!==false):""}${tog("sigAuto","Self-cancelling turn signals",st.sigAutoOff?"Off: the signal stays on until you switch it off":"Cancels when the wheel comes back after a turn",!st.sigAutoOff)}${(()=>{const P=tcsProf(),v=st.tcsLv|0;return tog("tcs",P.b,v?P.s[v-1].n:"On"+(P.s.length>1?` · tap again for the next stage (${P.s.length} stages, like a long press in the real car)`:""),!v)})()}${tog("rAeb","Rear auto brake (U)","Stops you backing into a car",st.rAeb)}${tog("parkAssist","Parking sensors","Bird's-eye distance display and beeps below 10 mph or in reverse",st.parkAssist)}</div>
     <h3>Forward collision warning & braking</h3><div class="grid2">${[["early","Early","Warns 3.4 s out, brakes at 2.0 s. Most cautious"],["normal","Normal","2.8 s / 1.6 s, the factory setting"],["late","Late","2.2 s / 1.2 s. Fewer false alarms in traffic"]].map(([k,n,d])=>opt(`data-aebs="${k}"`,st.aebSens===k,n,d)).join("")}</div>
     <h3>Lanes</h3><div class="grid2">${tog("lka","Lane keep assist","Nudges you back if you drift onto a line above 40 mph. You still steer",st.lka)}${tog("bsm","Blind spot monitoring","Mirror lights, warning when you signal",st.bsm)}${tog("elk","Blind spot assist","Steers you back into your lane if you signal or drift toward a car in your blind spot",st.elk)}</div>
-    <h3>Hands-free driving</h3><div class="grid2">${tog("pilot","Halden Pilot","Steers, keeps distance and changes lanes when you signal. Above 18 mph",st.pilot)}${tog("autoLC","Automatic passing","Pilot overtakes slower cars and moves back right",st.autoLC)}</div>
+    <h3>Hands-free driving</h3><div class="grid2">${tog("pilot","Westport Pilot","Steers, keeps distance and changes lanes when you signal. Above 18 mph",st.pilot)}${tog("autoLC","Automatic passing","Pilot overtakes slower cars and moves back right",st.autoLC)}</div>
     <h3>Adaptive cruise</h3><div class="grid2">${tog("acc","Adaptive cruise",st.acc?"Holding speed, follows traffic":"Sets to your current speed",st.acc)}${tog("isa","Speed assist","Cruise follows speed-limit signs it reads",st.isa)}</div>
     <div class="stepper" style="margin-top:8px"><button data-a="accDown" aria-label="Lower set speed">−</button><span>${Math.round(spdUnit(st.accSet))} ${st.units==="mph"?"mph":"km/h"}</span><button data-a="accUp" aria-label="Raise set speed">+</button>
     <button data-a="gap" style="width:auto;padding:0 12px;font-size:13px">Gap ${"▮".repeat(st.accGap)}${"▯".repeat(3-st.accGap)}</button></div>`},
@@ -11250,7 +11198,7 @@ function paOpenMenu(){if(!st.started||st.walk)return;if(!has("autopark")){toast(
   if(PA.mode){PA.mode=null;PA.found=false;SCR.paMenu=false;return}SCR.paMenu=true;PA.prevCam=st.cam;st.cam=1;SCR.focus=true;tick(1)}
 function paChoose(k){$("paMenu").hidden=true;SCR.paMenu=false;SCR.focus=false;if(!k){PA.mode=null;return}st.acc=false;st.pilot=false;
   if(k==="exit"){paStartExit();return}PA.mode=k;PA.found=false;PA.side=st.signal||1;tick(1)}
-// a parallel-parking stretch: Halden's Main St block, or (new world) whichever parking street you're driving along
+// a parallel-parking stretch: Westport's Main St block, or (new world) whichever parking street you're driving along
 function paK(M){if(W2&&M.e.T.park&&M.e.mtr){const lo=loOf(M.e.n)*LANE;return {e:M.e,dir:M.dir,s0:rStart(M.e,M.dir)+9,s1:M.L-rEnd(M.e,M.dir)-9,oP:lo-LANE/2-M.e.T.park/2,oA:lo-0.1}}return PARK}
 function paScan(){sys.paSpot=null;if(!PA.mode||sys.pa)return;if(st.signal)PA.side=st.signal;const sp=Math.abs(car.vx),M=me();PA.fast=sp>8.5;if(PA.fast||st.gear==="R")return;
   if(PA.mode==="par"){const K=paK(M);if(PA.side>0&&M.e===K.e&&M.dir===K.dir&&M.off<1.2+(K.oA+0.1)){const xs=parked.filter(p=>p.e===K.e&&(p.dir===K.dir||p.dir===undefined)).map(p=>p.s).sort((a,b)=>a-b),edges=[K.s0-2.4,...xs,K.s1+2.4];
@@ -12580,7 +12528,7 @@ function nearMissTick(dt){if(!hasReplay()||st.walk)return;if(OWN.nearT>0){OWN.ne
 // ---- insurance: claims and tickets raise the premium for three years; a claim pays the body shop minus a $500 deductible
 const INS_YR=365;function insMul(){const d=GT.day||1,C=OWN.ins.claims.filter(x=>d-x<3*INS_YR).length,K=OWN.ins.tickets.filter(x=>d-x<3*INS_YR).length;return 1+0.32*C+0.14*Math.min(K,5)}
 function insTicket(){OWN.ins.tickets.push(GT.day||1);ownSave()}
-function insClaim(cost){if(st.noIns){toast("You don't have insurance right now");return false}const pay=Math.max(0,cost-500);OWN.ins.claims.push(GT.day||1);ownSave();bankMsg("Halden Mutual Insurance",`Claim approved: we paid ${money(pay)} toward your repairs (you pay the $500 deductible). Your premium goes up about 32% for 3 years`);return true}
+function insClaim(cost){if(st.noIns){toast("You don't have insurance right now");return false}const pay=Math.max(0,cost-500);OWN.ins.claims.push(GT.day||1);ownSave();bankMsg("Westport Mutual Insurance",`Claim approved: we paid ${money(pay)} toward your repairs (you pay the $500 deductible). Your premium goes up about 32% for 3 years`);return true}
 // ---- software updates over the air: the brands that really push them, with what the updates really add
 function otaBrand(k=st.trim){const b=brandOfK(k),y=yrOf(k),g=grpOf(k);if(b==="Tesla")return "Software update";if(b==="Rivian")return "Rivian software update";if(b==="Lucid")return "Lucid UX update";if((b==="Ford"||b==="Lincoln")&&y>=2021)return b==="Ford"?"Ford Power-Up":"Lincoln Power-Up";
   if(/^(Chevrolet|GMC|Cadillac|Buick)$/.test(b)&&y>=2021)return "Vehicle software update";if(/^(Hyundai|Kia|Genesis)$/.test(b)&&y>=2023)return "Over-the-air update";if(b==="BMW"&&y>=2019)return "Remote Software Upgrade";if(/^Mercedes/.test(b)&&y>=2021)return "Mercedes me software update";
@@ -12714,7 +12662,7 @@ function valetStart(){if(VALET.on)return;VALET.ding=false;const S=valetStandPt()
   VALET.on=true;VALET.task=null;VALET.nextT=6;VALET.earned=0;VALET.cars=0;navTo({x:S.x,y:S.y,h:S.h,name:"Valet stand · Cass Ave garage"});toast("🔑 Valet shift started. Park your own car nearby and walk to the stand on Cass Ave, outside the garage")}
 function valetEnd(){if(VALET.cur){toast("Finish with the guest's car first");return}for(const r of VALET.lot)valetDrop(r);if(VALET.task&&VALET.task.rec)valetDrop(VALET.task.rec);if(VALET.guestPed){const i=peds.indexOf(VALET.guestPed);if(i>=0)peds.splice(i,1);VALET.guestPed=null}
   if(VALET.cars>=5&&!VALET.ding)try{achHit("valetPerfect")}catch(e){}VALET.lot=[];VALET.task=null;VALET.on=false;toast(`🔑 Shift over: ${VALET.cars} car${VALET.cars===1?"":"s"}, ${money2(VALET.earned)} earned. The night crew takes the rest`)}
-const valetPay=(amt,what)=>{amt=Math.round(amt*(amt>0?liveCash():1)*100)/100;if(amt>0){bankPay(amt,"Halden Valet · "+what);GIG.earned+=amt;VALET.earned+=amt}else if(amt<0){ECON.cash+=amt;bankTx("Halden Valet · damage",amt);bankSave();VALET.earned+=amt}};
+const valetPay=(amt,what)=>{amt=Math.round(amt*(amt>0?liveCash():1)*100)/100;if(amt>0){bankPay(amt,"Westport Valet · "+what);GIG.earned+=amt;VALET.earned+=amt}else if(amt<0){ECON.cash+=amt;bankTx("Westport Valet · damage",amt);bankSave();VALET.earned+=amt}};
 // swap the car you're in: your own car stays parked where it is, the guest car becomes "your" car until you hand it back
 function carSnap(){return {trim:st.trim,paint:st.paint,x:car.px,y:car.py,h:car.psi,z:car.zb||0,hyb:{fuel:car.hyb.fuel,soc:car.hyb.soc,pb:car.hyb.pb,tank:car.hyb.tank},dmg:JSON.parse(JSON.stringify(car.dmg||{})),dents:JSON.parse(JSON.stringify(DENTS.list||[])),gid:st.garageId,tyre:st.tyre}}
 function carLoad(S,asGuest){setTrim(S.trim,true);st.paint=S.paint;try{fitPaint()}catch(e){}try{applyBuild(S.trim);applyVehicle(TRIMS[S.trim])}catch(e){}GREF=S.z||0;resetCar({free:true,x:S.x,y:S.y,h:S.h});
@@ -12759,7 +12707,7 @@ function valetInto(){if(!VALET.on)return;if(!DMAT.vMark){DMAT.vMark=[[1,0.8,0.1]
   dBox("vStand",S.x,S.y,g,0.7,1.1,0.5,S.h);dBox("vSign",S.x,S.y,g+1.1,0.05,0.45,0.75,S.h);const bob=Math.sin(performance.now()/300)*0.15,T=VALET.task;let m=null;
   if(T&&!VALET.cur)m={x:T.rec.x,y:T.rec.y,z:T.rec.z||g};else if(VALET.cur&&T&&T.type==="fetch")m={x:S.cx,y:S.cy,z:g};if(m)dBox("vMark",m.x,m.y,m.z+2.6+bob,0.35,0.7,0.35,performance.now()/500)}
 function valetCard(){const S=valetStandPt(),T=VALET.task;let h="";
-  if(!VALET.on)return h+`<div class="card"><small>🔑 Halden Valet · Cass Ave garage</small><b>Valet parking</b><span>Guests pull up at the stand outside the garage. Park their cars in free stalls and bring them back when they leave. $7 a car plus tips for speed; dents come out of your pay. 15 mph max in the garage.</span></div><button class="big" data-a="v_start">Start a shift</button>`;
+  if(!VALET.on)return h+`<div class="card"><small>🔑 Westport Valet · Cass Ave garage</small><b>Valet parking</b><span>Guests pull up at the stand outside the garage. Park their cars in free stalls and bring them back when they leave. $7 a car plus tips for speed; dents come out of your pay. 15 mph max in the garage.</span></div><button class="big" data-a="v_start">Start a shift</button>`;
   const P=st.walk?{x:st.walk.x,y:st.walk.y}:{x:car.px,y:car.py},d=S?Math.round(Math.hypot(S.x-P.x,S.y-P.y)):0;
   h+=`<div class="card"><small>🔑 On shift · ${VALET.cars} cars · ${money2(VALET.earned)}</small><b>${VALET.cur?(T&&T.type==="fetch"?`Bring ticket #${T.rec.ticket} to the stand`:`Park ${T&&T.rec?T.rec.who+"'s car":"the car"} in a free stall`):T?(T.type==="park"?`${T.rec.who} is waiting with a ${TRIMS[T.rec.trim].short||TRIMS[T.rec.trim].name}`:`Ticket #${T.rec.ticket}: level ${T.rec.level}`):d>45?"Walk to the valet stand":"Waiting for the next guest…"}</b><span>${d} m from the stand${VALET.lot.length?` · in the garage: ${VALET.lot.map(r=>`#${r.ticket} (L${r.level})`).join(", ")}`:""}</span>
     <div class="chips"><button data-a="v_nav">Navigate to the stand</button><button data-a="v_run">Run there</button><button data-a="v_end">End shift</button></div></div>`;return h}
@@ -13001,13 +12949,7 @@ const idle=f=>("requestIdleCallback" in window)?requestIdleCallback(f,{timeout:4
 // ---- maintenance flag: maint.json on the site says when an update is being worked on; it can also say a newer version is out
 const MAINT={on:false,t:0},PAGE_T0=Date.now();
 // ---- countdown to the new map (shown until it arrives; then a tap reloads into it)
-(function w2Countdown(){if(W2)return;const el=document.createElement("div");el.id="w2cd";
-  el.style.cssText="position:fixed;top:max(8px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:60;background:rgba(10,16,24,.82);color:#fff;font:600 13px/1.2 system-ui,sans-serif;padding:7px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.18);box-shadow:0 4px 14px rgba(0,0,0,.35);pointer-events:auto;cursor:default;white-space:nowrap;letter-spacing:.2px";
-  document.body.appendChild(el);let done=false;
-  const two=n=>String(n).padStart(2,"0"),tick=()=>{const ms=W2_AT-Date.now();
-    if(ms<=0){if(!done){done=true;el.textContent="🗺️ The new map is here! Tap to load it";el.style.background="rgba(20,120,70,.92)";el.style.cursor="pointer";el.onclick=()=>location.reload()}return}
-    const t=Math.floor(ms/1000),h=Math.floor(t/3600),m=Math.floor(t%3600/60),sec=t%60;el.textContent=`🗺️ New map at 3 PM ET · ${h?h+":":""}${two(m)}:${two(sec)}`};
-  tick();setInterval(tick,1000)})();
+
 function maintUrl(){const h=location.hostname;return(/github\.io$|^127\.|^localhost$/.test(h)?"maint.json":"https://exclusive2knight.github.io/Strata-Test-Drive/maint.json")+"?t="+Date.now()}
 async function maintCheck(){let d;try{const r=await fetch(maintUrl(),{cache:"no-store"});if(!r.ok)return;d=await r.json()}catch(e){return}
   const on=!!d.on&&!(d.until&&Date.now()>d.until),first=!MAINT.t;MAINT.t=Date.now();
