@@ -511,6 +511,13 @@ body.incab #ui2 .u2tr{opacity:.28;transform:scale(.8);transform-origin:top right
 #acct .acGo{background:var(--teal,#2bb3a3);color:#04110f}#acct .acT{display:flex;gap:6px}#acct .acT button{flex:1;background:#121c20}#acct .acT button.on{background:#24414a}#acct .acR{display:flex;gap:8px}#acct .acR button{flex:1}
 #acct .acLink{background:none;padding:0;color:var(--teal,#2bb3a3);text-decoration:underline;font:600 12.5px var(--f-ui,system-ui)}#acct .acM{color:#ffcf6b;font-size:13px;min-height:1em}#acct .acA{background:#24414a;color:#8ee6da;border-radius:6px;padding:1px 6px;font-size:11px}#acct .acX{background:#5a1f22;color:#ffb3b3;border-radius:6px;padding:1px 6px;font-size:11px}
 #acct .acL{display:flex;flex-direction:column;gap:6px}#acct .acI{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#0f1a1e;border-radius:10px;padding:8px 10px}#acct .acBt{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}#acct .acBt button{padding:6px 8px;font-size:12px}#acct .acI small{display:block;color:#9fb0b4;font-size:12px;margin-top:2px}#acct .acI.ban{opacity:.75}
+#susUI{position:fixed;inset:0;z-index:99980;background:rgba(4,8,10,.72);display:flex;align-items:center;justify-content:center;padding:12px;box-sizing:border-box}#susUI[hidden]{display:none}
+#susUI .suBox{width:min(900px,100%);max-height:100%;overflow:auto;background:#0b1316;color:#e8eef0;border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;font:500 14px var(--f-ui,system-ui);box-sizing:border-box}
+#susUI .suH{display:flex;align-items:center;justify-content:space-between}#susUI .suH b{font-size:20px}#susUI .suH button{background:none;border:0;color:#fff;font-size:18px;cursor:pointer}#susUI p{margin:0}#susUI .fine{color:#9fb0b4;font-size:12.5px}
+#susUI canvas{width:100%;height:auto;border-radius:12px;background:#0d181c}#susUI .suStats{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:#cfd8db}#susUI .suStats b{color:#8ee6da}#susUI .suStats small{color:#8a9a9e}
+#susUI .suPre{display:flex;flex-wrap:wrap;gap:6px}#susUI button{background:#1f2c31;color:#fff;border:0;border-radius:10px;padding:9px 13px;font:600 13.5px var(--f-ui,system-ui);cursor:pointer}#susUI .suGo{background:var(--teal,#2bb3a3);color:#04110f}
+#susUI .suGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px}#susUI label{display:flex;flex-direction:column;gap:3px;font-size:13px;color:#cfd8db}#susUI label small{color:#8ee6da}#susUI input[type=range]{width:100%;accent-color:var(--teal,#2bb3a3)}#susUI .suR{display:flex;gap:8px;flex-wrap:wrap}#susUI .suR button{flex:1}
+@media (max-width:560px){#susUI .suGrid{grid-template-columns:1fr}#susUI .suGrid>span{display:none}}
 #whl{position:fixed;inset:0;z-index:99980;background:rgba(4,8,10,.72);display:flex;align-items:center;justify-content:center;padding:14px;box-sizing:border-box}#whl[hidden]{display:none}
 #whl .whBox{width:min(460px,100%);max-height:100%;overflow:auto;background:#0b1316;color:#e8eef0;border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:16px 18px;display:flex;flex-direction:column;gap:10px;font:500 14px var(--f-ui,system-ui);box-sizing:border-box}
 #whl .whH,#whl .whH2{display:flex;align-items:center;justify-content:space-between;gap:8px}#whl .whH b{font-size:20px}#whl .whH2{margin-top:6px;border-top:1px solid rgba(255,255,255,.1);padding-top:10px}#whl p{margin:0}#whl .fine{color:#9fb0b4;font-size:12.5px;line-height:1.4}
@@ -1026,7 +1033,7 @@ body.pmOn>*:not(#gl):not(#pm):not(#pmFx):not(#toast):not(#flashFx):not(script){v
   <div class="nc">
     <div class="nh"><small>What's new</small><h2>Version 172 · The new map, 11 new cars, smarter navigation</h2></div>
     <div class="nb">
-      <h4>🔄 Updates since launch</h4><ul><li>Fixed the new map freezing and crashing a few seconds after it loads (especially on phones and tablets).</li><li>Roundabouts (not the little turning circles) now have <b>two lanes</b>: the outer lane for the first exit, the inner lane to go further round. Traffic and Full Self-Driving pick the right lane from where they're going.</li><li>Full Self-Driving follows the navigation off the freeway again: it used to drift back onto the freeway at the start of an exit ramp. Navigation no longer says "Rerouting" when you take the exit it asked for.</li></ul>
+      <h4>🔄 Updates since launch</h4><ul><li>Fixed the new map freezing and crashing a few seconds after it loads (especially on phones and tablets).</li><li>Roundabouts (not the little turning circles) now have <b>two lanes</b>: the outer lane for the first exit, the inner lane to go further round. Traffic and Full Self-Driving pick the right lane from where they're going.</li><li><b>Suspension setup</b> (Settings › Controls, or ☰ › Settings): fit adjustable coilovers ($1,800) and tune ride height, front and rear springs, dampers, anti-roll bars and camber on a live diagram of your car, or pick a preset (Comfort, Sport, Track, Drift, Stance, Lifted). It shows the ride frequency, body roll, ground clearance and whether the car will understeer or oversteer, and the car really drives that way: stiffer bars roll less, more camber grips harder in corners, and slamming it scrapes over bumps.</li><li>Full Self-Driving follows the navigation off the freeway again: it used to drift back onto the freeway at the start of an exit ramp. Navigation no longer says "Rerouting" when you take the exit it asked for.</li></ul>
       <h4>🗺️ A whole new world</h4><ul><li>Halden is replaced by a much bigger map: <b>Westport</b> downtown, the town of <b>Fairhaven</b>, little <b>Millbrook</b> on the lake, the <b>Rosedale</b> and <b>Kestrel Estates</b> neighborhoods, country roads and farms, and <b>Mount Kestrel</b> with a switchback road to the summit.</li><li>Two interstates: <b>I-38</b> (east–west) and <b>I-61</b> (north–south), joined by a full cloverleaf, with diamond interchanges, exit numbers, mile markers, green guide signs and orange median lights at night.</li><li>Roundabouts where several roads meet, cul-de-sacs in the neighborhoods, and bridges over the Clearwater River, including an old covered bridge, a rusty truss bridge and a stone bridge. Gravel fords and low crossings flood when it rains hard: deep water slows you down and can stall a gas engine.</li><li>The off-road park sits up on the mountain now, with a log bridge on the trail, and the proving ground is off County Rd 1.</li></ul>
       <h4>🍔 Places to go</h4><ul><li>Working drive-thrus at McDonald's, Burger King, Wendy's, Taco Bell, Chick-fil-A and KFC: order and pay at the speaker, then pick up at the window.</li><li>Dealerships on Route 20 (Ford, Toyota, Chevrolet, BMW, Mercedes-Benz, Tesla): pull into the lot to shop, test drive or trade in. The service centers do recalls, software updates and alignments.</li><li>Paid street parking in the towns: $1 per 15 minutes, 2 hours max, and a $35 ticket if the meter runs out.</li><li>Kestrel Estates is gated: the arms lift for residents (buy a house there) or with a $20 guest pass.</li><li>Farms all over the countryside: corn, wheat and hay fields, red barns, silos and hay bales.</li></ul>
       <h4>🚦 Life on the roads</h4><ul><li>School buses in the morning and mid-afternoon. When one stops, its red lights flash and the stop arm swings out: passing it is a $250 ticket.</li><li>A lane closure on I-38 eastbound with cones and a flagger: 45 mph, fines doubled, and a speed camera ($300).</li><li>The Jefferson Ave drawbridge opens every 4 minutes: bells, gates, the bridge lifts and a boat goes through.</li><li>A freight train runs between Westport and Fairhaven, with crossing gates on every road and a viaduct over the river.</li><li>Car meet every night after 8 PM in the Fairhaven Blvd lot.</li></ul>
@@ -3688,11 +3695,12 @@ function physics(dt){if(TOWH.ride){towRide(dt);return}
   const Fs0=[ms*g*B/L/2,ms*g*B/L/2,ms*g*A/L/2,ms*g*A/L/2];
   // springs from the car's real ride frequency (soft luxury ~1.1 Hz … sports car ~1.7 Hz; leaf-sprung truck rears stiffer); air springs keep the same frequency loaded
   const kS=SP?Fs0.map((f,i)=>{const hz=SP.f[i<2?0:1],w=2*Math.PI*hz;return w*w*(f/g)*(SP.airLevel?1+(car.cargo||0)/Math.max(800,ms):1)}):[52000,52000,47000,47000].map(k=>k*SU.k);
-  const cS=kS.map((k,i)=>2*zeta*Math.sqrt(k*Fs0[i]/g)), KT=260000, CT=350;
+  const SUT=susT(),kS0=kS.slice();if(SUT)for(let i=0;i<4;i++)kS[i]*=i<2?SUT.kf:SUT.kr;
+  const cS=kS.map((k,i)=>2*zeta*Math.sqrt(k*Fs0[i]/g)*(SUT?(i<2?SUT.df:SUT.dr):1)), KT=260000, CT=350;
   const offTer=!!st.terr||/offroad|rock|mud|sand|trail/.test(MD().type||"");let KARB=[38000,24000];
-  if(SP){const y2=(TRACK/2)*(TRACK/2),Ks=2*y2*(kS[0]+kS[2]),Kt=ms*g*SP.hR/(SP.grad*Math.PI/180*(1+MD().esc*0.06)),Ka=Math.max(0,Kt-Ks)*(SP.arbOn?1:0);   // sport modes stiffen a little
-    KARB=[Ka*SP.split/(4*y2),Ka*(1-SP.split)/(4*y2)];if(SP.disc&&offTer&&Math.abs(car.vx)<9)KARB[0]=0}car.swayOff=!!(SP&&SP.disc&&!KARB[0]);
-  const TB=SP?[SP.tb[0],SP.tb[0],SP.tb[1],SP.tb[1]]:[0.085,0.085,0.085,0.085],TD=SP?[SP.td[0],SP.td[0],SP.td[1],SP.td[1]]:[0.11,0.11,0.11,0.11];
+  if(SP){const y2=(TRACK/2)*(TRACK/2),Ks=2*y2*(kS0[0]+kS0[2]),Kt=ms*g*SP.hR/(SP.grad*Math.PI/180*(1+MD().esc*0.06)),Ka=Math.max(0,Kt-Ks)*(SP.arbOn?1:0);   // sport modes stiffen a little
+    KARB=[Ka*SP.split/(4*y2),Ka*(1-SP.split)/(4*y2)];if(SP.disc&&offTer&&Math.abs(car.vx)<9)KARB[0]=0}if(SUT){KARB[0]*=SUT.af;KARB[1]*=SUT.ar}car.swayOff=!!(SP&&SP.disc&&!KARB[0]);
+  const TB=(SP?[SP.tb[0],SP.tb[0],SP.tb[1],SP.tb[1]]:[0.085,0.085,0.085,0.085]).map(b=>SUT&&SUT.drop>0?Math.max(0.03,b-SUT.drop/1000*0.8):b),TD=SP?[SP.td[0],SP.td[0],SP.td[1],SP.td[1]]:[0.11,0.11,0.11,0.11];
   if(!car.zw){const h0=car.zInit||0;car.zw=Fs0.map((f,i)=>h0-(f+MWv[i]*g)/KT);car.vzw=[0,0,0,0];car.zb=h0;car.vzb=0;car.th=car.thd=car.phi=car.phid=0}
   const fz=[0,0,0,0], Fsp=[0,0,0,0], cps=Math.cos(car.psi), sps=Math.sin(car.psi);
   car.gnd=car.gnd||[{},{},{},{}];
@@ -3825,7 +3833,7 @@ function physics(dt){if(TOWH.ride){towRide(dt);return}
     const vxw=car.vx-car.r*y, vyw=car.vy+car.r*x, vl=vxw*cd+vyw*sd, vs=-vxw*sd+vyw*cd;
     const aT=Math.atan2(vs,Math.abs(vl)+0.3); car.alpha[i]+=(aT-car.alpha[i])*Math.min(1,(Math.abs(vl)+0.8)*dt/0.35);
     const vref=Math.max(Math.abs(vl),4), kap=clamp((car.w[i]*WR-vl)/vref,-1.5,1.5); car.kap[i]=kap;
-    const TY=TYRES[st.tyre||"allseason"].k,tmu=tireMu(i),kd_=car.gnd[i].kind,loose_=kd_==="grass"||kd_==="dirt"||kd_==="mud"||kd_==="sand",TMn=terrNow(),modeK=kd_==="rock"?(/Rock/i.test(TMn)?1.15:/Off.?Road|Trail|Baja|Mogul/i.test(TMn)?1.08:1):kd_==="mud"?(/Mud/i.test(TMn)?1.22:/Off.?Road|Trail|Baja/i.test(TMn)?1.08:1):kd_==="sand"?(/Sand/i.test(TMn)?1.18:/Off.?Road|Baja/i.test(TMn)?1.08:1):kd_==="snow"?(/Snow|Slippery/i.test(TMn)?1.2:1):1,muW=tmu*(car.wxMu?car.wxMu[i]:1)*(tuneCur().low?1.04:1)*offSurf(i,kd_,kap,dt)*modeK*(WEAR.grip||1)*(TY[kd_==="snow"?"snow":loose_?"grass":(st.surface||"dry")]||1)*(car.gnd[i].mu||1.15)*(car.gnd[i].kind==="dirt"&&st.surface!=="dry"?0.85:SF)*(loose_?(T.offGrip||1)*(T.terrain&&!T.terrSync&&/Mud|Rock/.test(st.terrainM||"")?1.15:1)*(st.lockers&&T.lockers?1.15:1):1)*(st.surface==="snow"&&T.terrain&&!T.terrSync&&st.terrainM==="Snow"?1.12:1), f=tyre(kap,car.alpha[i],fz[i],muW), f2=tyre(kap+0.002,car.alpha[i],fz[i],muW);
+    const TY=TYRES[st.tyre||"allseason"].k,tmu=tireMu(i),kd_=car.gnd[i].kind,loose_=kd_==="grass"||kd_==="dirt"||kd_==="mud"||kd_==="sand",TMn=terrNow(),modeK=kd_==="rock"?(/Rock/i.test(TMn)?1.15:/Off.?Road|Trail|Baja|Mogul/i.test(TMn)?1.08:1):kd_==="mud"?(/Mud/i.test(TMn)?1.22:/Off.?Road|Trail|Baja/i.test(TMn)?1.08:1):kd_==="sand"?(/Sand/i.test(TMn)?1.18:/Off.?Road|Baja/i.test(TMn)?1.08:1):kd_==="snow"?(/Snow|Slippery/i.test(TMn)?1.2:1):1,muW=tmu*(car.wxMu?car.wxMu[i]:1)*camberGrip(i,car.alpha[i],kap)*offSurf(i,kd_,kap,dt)*modeK*(WEAR.grip||1)*(TY[kd_==="snow"?"snow":loose_?"grass":(st.surface||"dry")]||1)*(car.gnd[i].mu||1.15)*(car.gnd[i].kind==="dirt"&&st.surface!=="dry"?0.85:SF)*(loose_?(T.offGrip||1)*(T.terrain&&!T.terrSync&&/Mud|Rock/.test(st.terrainM||"")?1.15:1)*(st.lockers&&T.lockers?1.15:1):1)*(st.surface==="snow"&&T.terrain&&!T.terrSync&&st.terrainM==="Snow"?1.12:1), f=tyre(kap,car.alpha[i],fz[i],muW), f2=tyre(kap+0.002,car.alpha[i],fz[i],muW);
     // motor torque with a 30 ms response, then the wheel spin equation (semi-implicit so it stays stable)
     const tgt=ice?want[i]*(want[i]>0?car.tcsF[i]:1)*escCut*(dirG<0&&want[i]*dirG>0?0.3*clamp((7-sp)/2.5,0,1):1):thr*want[i]*car.tcsF[i]*tvMul[i]*escCut*dirG*revK - (driven[i]?(regen/nDriven+blendT)*Math.sign(car.w[i]):0);
     car.tq[i]+=(tgt-car.tq[i])*Math.min(1,dt/0.03);
@@ -10783,6 +10791,7 @@ function act(a){ {const T0=TRIMS[st.trim];if(T0.real&&!has(a)){toast(`The real $
     case "uilook:glass":case "uilook:solid":uiLook(a.slice(7));toast(a.endsWith("solid")?"Solid HUD":"Glass HUD");break;
     case "uiz:0.7":case "uiz:0.82":case "uiz:0.92":case "uiz:1":uiScale(+a.slice(4));toast("HUD size set");break;
     case "whlSetup":whlOpen();break;
+    case "susSetup":susOpen();break;
     case "mouseSteer":st.mouseSteer=!st.mouseSteer;toast(st.mouseSteer?"Mouse steering on: move left / right to steer, left button gas, right button brake":"Mouse steering off");break;
     case "police":policeSet(st.police===false);break;
     case "roa":st.roa=st.roa===false;toast(st.roa!==false?"Rear Seat Reminder on":"Rear Seat Reminder off");break;
@@ -10922,7 +10931,7 @@ const TABS={
     <h3>HUD size</h3><div class="grid2">${[[0.7,"Small"],[0.82,"Medium"],[0.92,"Large"],[1,"Extra large"]].map(([v,n])=>opt(`data-a="uiz:${v}"`,Math.abs((st.uiz||(PC.on?0.82:0.85))-v)<0.04,n,v===0.82?"Default":"")).join("")}${opt(`data-a="uihide"`,document.body.classList.contains("uihide"),"Hide the HUD","Eye button top left, or F2")}</div>
     <h3>HUD look</h3><div class="grid2">${opt(`data-a="uilook:glass"`,st.uilook!=="solid","Glass","See-through frosted panels")}${opt(`data-a="uilook:solid"`,st.uilook==="solid","Solid","Opaque dark panels, no blur. Easier to read, lighter on older devices")}</div>
     <h3>Your character</h3><div class="grid2">${[["Adult_Man","Man","On foot and at the wheel"],["Adult_Woman","Woman","On foot and at the wheel"]].map(([k,n,d])=>opt(`data-a="char:${k}"`,PLAYER_MK===k,n,d)).join("")}</div>
-    <h3>Controls</h3><div class="grid2">${opt(`data-a="tutorial"`,false,"Show the tutorial","The short first-drive guide")}${manOK()?opt(`data-a="manual"`,!!st.manual,"Manual gearbox with clutch","Shift = clutch, Q = up a gear, E = down. On phones: the buttons on the right. Let the clutch out at too few revs and it stalls"):""}${opt(`data-a="whlSetup"`,!!(WHL.cfg&&WHL.cfg.gas!=null),"Steering wheel","Set up a USB wheel and pedals, paddles and force feedback")}${opt(`data-a="mouseSteer"`,!!st.mouseSteer,"Mouse steering","Move the mouse left / right to steer · left button gas · right button brake")}${opt(`data-a="roa"`,st.roa!==false,"Rear Seat Reminder","Chimes and a cluster warning when you switch off")}${opt(`data-a="police"`,st.police!==false,"Police","Speeding past a cruiser gets you pulled over; run and you get wanted stars")}${XR.ok?opt(`data-a="vr"`,XR.on,XR.on?"Exit VR":"Enter VR (Quest)","Right trigger gas, left trigger brake, left stick steers. A Drive/Reverse, B Park, right stick signals/high beams/wipers, right grip view, X horn, Y lights, left grip parking brake or clutch, left stick click engine"):""}</div>
+    <h3>Controls</h3><div class="grid2">${opt(`data-a="tutorial"`,false,"Show the tutorial","The short first-drive guide")}${manOK()?opt(`data-a="manual"`,!!st.manual,"Manual gearbox with clutch","Shift = clutch, Q = up a gear, E = down. On phones: the buttons on the right. Let the clutch out at too few revs and it stalls"):""}${opt(`data-a="whlSetup"`,!!(WHL.cfg&&WHL.cfg.gas!=null),"Steering wheel","Set up a USB wheel and pedals, paddles and force feedback")}${opt(`data-a="susSetup"`,!!tuneCur().co,"Suspension setup","Coilovers: ride height, springs, dampers, anti-roll bars and camber, on a live diagram")}${opt(`data-a="mouseSteer"`,!!st.mouseSteer,"Mouse steering","Move the mouse left / right to steer · left button gas · right button brake")}${opt(`data-a="roa"`,st.roa!==false,"Rear Seat Reminder","Chimes and a cluster warning when you switch off")}${opt(`data-a="police"`,st.police!==false,"Police","Speeding past a cruiser gets you pulled over; run and you get wanted stars")}${XR.ok?opt(`data-a="vr"`,XR.on,XR.on?"Exit VR":"Enter VR (Quest)","Right trigger gas, left trigger brake, left stick steers. A Drive/Reverse, B Park, right stick signals/high beams/wipers, right grip view, X horn, Y lights, left grip parking brake or clutch, left stick click engine"):""}</div>
     ${BCLU_OF[brandS()]||brandS()==="INFINITI"?`<h3>Gauge cluster</h3><div class="grid2">${[["auto","Auto","As this trim comes"],["digital","Digital","Full screen cluster"],["analog","Analog","Real dials with a small screen"]].map(([k,n,d])=>opt(`data-a="clu:${k}"`,(st.cluStyle||"auto")===k,n,d)).join("")}</div>`:""}<h3>Driving</h3><div class="grid2">${tog("autoHold","Auto hold","Holds you still after you stop",st.autoHold)}${T.ice?tog("autoSS","Auto stop/start","Engine stops while you wait",st.autoSS):""}</div>
     ${T.evBtn?`<div class="grid2" style="margin-top:7px">${tog("evMode","EV mode","Electric only below 25 mph",st.evMode)}</div>`:""}
     ${T.bMode?`<h3>Shift position</h3><div class="grid2">${[[1,"D","Normal"],[2,"B","More regen when you lift, for long downhills"]].map(([v,n,d])=>opt(`data-regen="${v}"`,st.regen===v,n,d)).join("")}</div>`:""}
@@ -12752,7 +12761,79 @@ function trlInto(){const K=TRL.on;if(!K||st.walk)return;if(!DMAT.trlGray){DMAT.t
 // ---- tuning: kept with each car you own (or with the car you're test-driving)
 function tuneCur(){const G=garageCur();if(G)return G.tune||(G.tune={});st.tuneM=st.tuneM||{};return st.tuneM[st.trim]||(st.tuneM[st.trim]={})}
 function tuneP(){const t=tuneCur(),T=TRIMS[st.trim];if(!t.stage)return 1;return T.ice||T.hybrid?(t.stage>=2?(DRIVES[st.trim]&&DRIVES[st.trim].turbo?1.22:1.13):1.08):1.12}
-const tuneLow=()=>tuneCur().low?0.035:0;
+const tuneLow=()=>{const S=susT();return S?S.drop/1000:tuneCur().low?0.035:0};
+const susEsc=s=>String(s).replace(/[<>&"']/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;",'"':"&quot;","'":"&#39;"}[c]));
+// ======================================================================= suspension setup: adjustable coilovers you tune on a live diagram
+// ride height, spring rates, dampers and anti-roll bars front and rear, and camber; the physics reads them (susT) and the diagram shows what they do
+const SUS_DEF={drop:0,kf:1,kr:1,df:1,dr:1,af:1,ar:1,cf:0,cr:0};
+const SUS_PRESETS={Stock:{...SUS_DEF},Comfort:{drop:0,kf:0.85,kr:0.85,df:0.8,dr:0.8,af:0.8,ar:0.8,cf:0.3,cr:0.2},Sport:{drop:25,kf:1.25,kr:1.2,df:1.25,dr:1.2,af:1.3,ar:1.25,cf:1.2,cr:0.8},
+  Track:{drop:40,kf:1.6,kr:1.5,df:1.5,dr:1.45,af:1.6,ar:1.4,cf:2.6,cr:1.6},Drift:{drop:30,kf:1.4,kr:1.1,df:1.3,dr:1.0,af:1.8,ar:0.6,cf:3.5,cr:0.5},Stance:{drop:60,kf:1.5,kr:1.5,df:1.2,dr:1.2,af:1,ar:1,cf:4,cr:4},"Lifted":{drop:-25,kf:0.9,kr:0.95,df:0.9,dr:0.9,af:0.7,ar:0.7,cf:0,cr:0}};
+const SUS_RANGE={drop:[-30,60,1,"mm lower"],kf:[0.6,1.8,0.05,"×"],kr:[0.6,1.8,0.05,"×"],df:[0.5,1.8,0.05,"×"],dr:[0.5,1.8,0.05,"×"],af:[0,2.5,0.05,"×"],ar:[0,2.5,0.05,"×"],cf:[0,4.5,0.1,"°"],cr:[0,4.5,0.1,"°"]};
+const SUS_LAB={drop:"Ride height",kf:"Front springs",kr:"Rear springs",df:"Front dampers",dr:"Rear dampers",af:"Front anti-roll bar",ar:"Rear anti-roll bar",cf:"Front camber",cr:"Rear camber"};
+// the setup the physics uses: null on stock suspension
+function susT(){const t=tuneCur();return t&&t.co?{...SUS_DEF,...(t.sus||{})}:null}
+// tyre grip from camber: more negative camber grips harder in corners, a little less in a straight line (and wears the inner edge)
+function camberGrip(i,alpha,kap){const S=susT();if(!S)return tuneCur().low?1.04:1;const cam=i<2?S.cf:S.cr,a=Math.abs(alpha||0),k=Math.abs(kap||0),w=a/(a+2.5*k+0.02),opt=i<2?2.6:1.8;
+  const lat=1+0.028*Math.min(cam,opt)-0.02*Math.max(0,cam-opt),lon=1-0.011*cam;return (1+(S.drop>0?Math.min(S.drop,40)*0.0008:0))*(lat*w+lon*(1-w))}
+// what the setup does, for the read-outs: ride frequency, roll in a 0.8 g corner, handling balance
+function susStats(S){const T=TRIMS[st.trim]||{},SP=T.sus||{f:[1.2,1.35],grad:4.4,split:0.6,hR:0.5};const s=SP.split||0.6;
+  const Kf=0.4*0.5*S.kf+0.6*s*S.af,Kr=0.4*0.5*S.kr+0.6*(1-s)*S.ar,Kf0=0.2+0.6*s,Kr0=0.2+0.6*(1-s);
+  const roll=SP.grad*(Kf0+Kr0)/Math.max(0.05,Kf+Kr)*Math.max(0.5,1-S.drop/1000/(SP.hR||0.5))*0.8;
+  const bal=Kf/(Kf+Kr)-Kf0/(Kf0+Kr0)-0.012*(S.cf-S.cr);   // + = more understeer than stock
+  return {ff:SP.f[0]*Math.sqrt(S.kf),fr:SP.f[1]*Math.sqrt(S.kr),roll,bal,clear:Math.round(((SP.ground||150)-S.drop)),stockRoll:SP.grad*0.8}}
+function susOpen(){let el=$("susUI");if(!el){el=document.createElement("div");el.id="susUI";document.body.appendChild(el);
+    el.addEventListener("click",e=>{if(e.target===el){susClose();return}const b=e.target.closest("button");if(b)susAct(b.dataset.s)});
+    el.addEventListener("input",e=>{const t=e.target;if(!t.dataset.k)return;const T=tuneCur();if(!T.co)return;T.sus={...SUS_DEF,...(T.sus||{}),[t.dataset.k]:+t.value};SUS_UI.dirty=true;susDraw(false)})}
+  el.hidden=false;susDraw(true)}
+function susClose(){const el=$("susUI");if(el)el.hidden=true;if(SUS_UI.dirty){SUS_UI.dirty=false;try{garageSave()}catch(e){}toast("Suspension setup saved")}}
+const SUS_UI={dirty:false};
+function susAct(a){const T=tuneCur();
+  if(a==="close"){susClose();return}
+  if(a==="buy"){const p=1800;if(ECON.cash<p){toast("Not enough money for coilovers");return}ECON.cash-=p;try{bankTx("Adjustable coilovers fitted",-p);bankSave()}catch(e){}T.co=1;T.low=0;T.sus={...SUS_DEF};SUS_UI.dirty=true;beep(990,.08,"sine",.12);toast("🔧 Adjustable coilovers fitted: tune away");susDraw(true);return}
+  if(a==="remove"){T.co=0;T.sus=null;SUS_UI.dirty=true;toast("Back on the stock suspension");susDraw(true);return}
+  if(a&&a.startsWith("pre:")&&T.co){T.sus={...SUS_PRESETS[a.slice(4)]};SUS_UI.dirty=true;susDraw(true)}}
+function susDraw(full){const el=$("susUI"),T=tuneCur(),on=!!T.co,S=on?{...SUS_DEF,...(T.sus||{})}:{...SUS_DEF,drop:T.low?35:0},TR=TRIMS[st.trim]||{};
+  if(full){const sl=k=>{const [a,b,stp,u]=SUS_RANGE[k];return `<label>${SUS_LAB[k]} <small id="susV_${k}"></small><input type="range" data-k="${k}" min="${a}" max="${b}" step="${stp}" value="${S[k]}" ${on?"":"disabled"}></label>`};
+    el.innerHTML=`<div class="suBox"><div class="suH"><b>Suspension setup</b><button data-s="close">✕</button></div>
+      <p class="fine">${susEsc(TR.short||TR.name||"")} · ${susEsc((SUSP_NAME&&SUSP_NAME[st.trim])||"stock suspension")}</p>
+      <canvas id="susCv" width="880" height="380"></canvas>
+      <div class="suStats" id="susSt"></div>
+      ${on?`<div class="suPre">${Object.keys(SUS_PRESETS).map(k=>`<button data-s="pre:${k}">${k}</button>`).join("")}</div>
+      <div class="suGrid">${sl("drop")}<span></span>${sl("kf")}${sl("kr")}${sl("df")}${sl("dr")}${sl("af")}${sl("ar")}${sl("cf")}${sl("cr")}</div>
+      <div class="suR"><button data-s="remove">Refit stock suspension</button><button class="suGo" data-s="close">Done</button></div>`
+      :`<p class="fine">Your car is on its stock suspension${T.low?" with lowering springs":""}. Adjustable coilovers let you set ride height, springs, dampers, anti-roll bars and camber, front and rear.</p><div class="suR"><button class="suGo" data-s="buy">Fit adjustable coilovers · ${money(1800)}</button></div>`}</div>`}
+  for(const k of Object.keys(SUS_RANGE)){const v=$("susV_"+k);if(!v)continue;const x=S[k];v.textContent=k==="drop"?(x>=0?`${x} mm lower`:`${-x} mm higher`):k[0]==="c"?`−${x.toFixed(1)}°`:`${Math.round(x*100)}%`}
+  const st_=susStats(S),sEl=$("susSt");if(sEl){const balTxt=st_.bal>0.03?"more understeer (pushes wide)":st_.bal<-0.03?"more oversteer (rear steps out)":"neutral, like stock";
+    sEl.innerHTML=`<span>Ride <b>${st_.ff.toFixed(2)} / ${st_.fr.toFixed(2)} Hz</b></span><span>Body roll at 0.8 g <b>${st_.roll.toFixed(1)}°</b> <small>(stock ${st_.stockRoll.toFixed(1)}°)</small></span><span>Ground clearance <b>${st_.clear} mm</b></span><span>Balance <b>${balTxt}</b></span>`}
+  const cv=$("susCv");if(!cv)return;const narrow=el.clientWidth<620;if(full){cv.width=narrow?450:880;cv.height=narrow?740:380}const g=cv.getContext("2d"),W=cv.width,H=380;g.clearRect(0,0,cv.width,cv.height);g.fillStyle="#0d181c";g.fillRect(0,0,cv.width,cv.height);
+  // ---- side view (left half): body, wheels, springs; nose to the right
+  const gy=H-46,dropPx=S.drop*0.55,rollDeg=st_.roll;
+  const side=(x0,w)=>{const wr=34,body=gy-wr*2-8+dropPx,fx=x0+w*0.78,rx=x0+w*0.22;g.strokeStyle="#33464d";g.lineWidth=2;g.beginPath();g.moveTo(x0,gy);g.lineTo(x0+w,gy);g.stroke();
+    // body
+    g.fillStyle="#2bb3a3";g.globalAlpha=0.9;g.beginPath();g.moveTo(rx-58,body+6);g.lineTo(fx+62,body+10);g.lineTo(fx+66,body-26);g.lineTo(fx+10,body-36);g.lineTo(x0+w*0.6,body-78);g.lineTo(x0+w*0.3,body-80);g.lineTo(rx-30,body-40);g.lineTo(rx-60,body-34);g.closePath();g.fill();g.globalAlpha=1;
+    g.fillStyle="#0d181c";g.fillRect(x0+w*0.34,body-70,w*0.22,26);g.fillRect(x0+w*0.58,body-66,w*0.12,22);
+    for(const [x,k,d] of [[fx,S.kf,S.df],[rx,S.kr,S.dr]]){g.fillStyle="#0d181c";g.beginPath();g.arc(x,body+2,wr+9,Math.PI,0);g.fill();
+      // coil spring: more turns and a thicker wire for a stiffer spring; the damper body under it
+      const top=body-46,bot=gy-wr,turns=Math.round(3+k*2.5),lw=1.5+k*1.8;g.fillStyle=`hsl(${200-d*60},60%,${40+d*8}%)`;g.fillRect(x-4,top+2,8,(bot-top)*0.75);
+      g.strokeStyle="#f2c94c";g.lineWidth=lw;g.beginPath();for(let q=0;q<=turns*10;q++){const t=q/(turns*10),y=top+(bot-top)*t,xx=x+Math.sin(t*turns*2*Math.PI)*9;q?g.lineTo(xx,y):g.moveTo(xx,y)}g.stroke();
+      g.fillStyle="#111";g.beginPath();g.arc(x,gy-wr,wr,0,7);g.fill();g.fillStyle="#9aa6aa";g.beginPath();g.arc(x,gy-wr,wr*0.55,0,7);g.fill()}
+    g.fillStyle="#9fb0b4";g.font="600 15px system-ui";g.textAlign="center";g.fillText("SIDE",x0+w/2,24);
+    g.fillStyle="#8ee6da";g.font="600 13px system-ui";g.fillText(S.drop>=0?`${S.drop} mm lower`:`${-S.drop} mm higher`,x0+w/2,44)};
+  side(narrow?10:16,430);g.save();if(narrow)g.translate(-475,360);
+  // ---- front view (right half), leaning as it would in a hard right-hand corner, wheels showing camber
+  const fx0=500,fw=360,cx=fx0+fw/2,wr=36,tw=150,cam=S.cf*Math.PI/180*3.2,roll=rollDeg*Math.PI/180*3,body=gy-2*wr-6+dropPx;
+  g.strokeStyle="#33464d";g.lineWidth=2;g.beginPath();g.moveTo(fx0,gy);g.lineTo(fx0+fw,gy);g.stroke();
+  g.save();g.translate(cx,body);g.rotate(roll);g.fillStyle="#2bb3a3";g.globalAlpha=0.9;g.beginPath();g.moveTo(-tw-6,6);g.lineTo(tw+6,6);g.lineTo(tw-4,-34);g.lineTo(tw-40,-92);g.lineTo(-tw+40,-92);g.lineTo(-tw+4,-34);g.closePath();g.fill();g.globalAlpha=1;
+  g.fillStyle="#0d181c";g.fillRect(-tw+48,-84,2*tw-96,34);
+  // anti-roll bar: a U across the car, thicker when stiffer
+  g.strokeStyle="#e85d75";g.lineWidth=2+S.af*4;g.beginPath();g.moveTo(-tw+24,22);g.lineTo(-tw+40,30);g.lineTo(tw-40,30);g.lineTo(tw-24,22);g.stroke();g.restore();
+  for(const sd of [-1,1]){const x=cx+sd*tw,y=gy-wr;g.save();g.translate(x,y);g.rotate(-sd*cam);g.fillStyle="#111";g.fillRect(-14,-wr,28,2*wr);g.fillStyle="#9aa6aa";g.fillRect(-6,-wr*0.55,12,wr*1.1);g.restore();
+    g.strokeStyle="#f2c94c";g.lineWidth=1.5+S.kf*1.6;const top=body-20+sd*Math.sin(roll)*tw,bot=y-8;g.beginPath();for(let q=0;q<=40;q++){const t=q/40,yy=top+(bot-top)*t,xx=x-sd*36+Math.sin(t*5*2*Math.PI)*8;q?g.lineTo(xx,yy):g.moveTo(xx,yy)}g.stroke()}
+  g.fillStyle="#9fb0b4";g.font="600 15px system-ui";g.textAlign="center";g.fillText("FRONT · hard right turn",cx,24);g.fillStyle="#8ee6da";g.font="600 13px system-ui";g.fillText(`camber −${S.cf.toFixed(1)}° · roll ${rollDeg.toFixed(1)}°`,cx,44);
+  // balance bar
+  const bx=fx0+20,bw=fw-40,by=H-20;g.fillStyle="#1f2c31";g.fillRect(bx,by,bw,8);const m=clamp(st_.bal/0.15,-1,1);g.fillStyle=Math.abs(m)<0.2?"#8ee6da":m>0?"#f2c94c":"#e85d75";g.fillRect(bx+bw/2+Math.min(0,m*bw/2),by,Math.abs(m)*bw/2+2,8);
+  g.fillStyle="#9fb0b4";g.font="500 11px system-ui";g.textAlign="left";g.fillText("oversteer",bx,by-4);g.textAlign="right";g.fillText("understeer",bx+bw,by-4);g.restore()}
+
 const WRAPS={matteBlack:["Matte black","#141517",0.12],satinGray:["Satin battleship gray","#5d6266",0.3],nardo:["Nardo gray","#8b8f90",0.6],matteGreen:["Matte army green","#3c4a32",0.12],glossRed:["Gloss race red","#b3121b",1.1],satinBlue:["Satin midnight blue","#1d2b4a",0.3],chrome:["Silver chrome","#d9dde2",2.2],purple:["Gloss candy purple","#4b1a6e",1.1]};
 const RIMS={black:["Gloss black",[0.05,0.05,0.06],0.6],bronze:["Bronze",[0.42,0.3,0.14],0.9],chrome:["Chrome",[0.9,0.9,0.93],1.7],gunmetal:["Gunmetal",[0.2,0.21,0.23],0.8]};
 const MANUI={clutch:false};
