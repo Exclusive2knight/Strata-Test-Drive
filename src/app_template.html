@@ -1026,6 +1026,7 @@ body.pmOn>*:not(#gl):not(#pm):not(#pmFx):not(#toast):not(#flashFx):not(script){v
   <div class="nc">
     <div class="nh"><small>What's new</small><h2>Version 172 · The new map, 11 new cars, smarter navigation</h2></div>
     <div class="nb">
+      <h4>🔄 Updates since launch</h4><ul><li>Fixed the new map freezing and crashing a few seconds after it loads (especially on phones and tablets).</li><li>Roundabouts (not the little turning circles) now have <b>two lanes</b>: the outer lane for the first exit, the inner lane to go further round. Traffic and Full Self-Driving pick the right lane from where they're going.</li><li>Full Self-Driving follows the navigation off the freeway again: it used to drift back onto the freeway at the start of an exit ramp. Navigation no longer says "Rerouting" when you take the exit it asked for.</li></ul>
       <h4>🗺️ A whole new world</h4><ul><li>Halden is replaced by a much bigger map: <b>Westport</b> downtown, the town of <b>Fairhaven</b>, little <b>Millbrook</b> on the lake, the <b>Rosedale</b> and <b>Kestrel Estates</b> neighborhoods, country roads and farms, and <b>Mount Kestrel</b> with a switchback road to the summit.</li><li>Two interstates: <b>I-38</b> (east–west) and <b>I-61</b> (north–south), joined by a full cloverleaf, with diamond interchanges, exit numbers, mile markers, green guide signs and orange median lights at night.</li><li>Roundabouts where several roads meet, cul-de-sacs in the neighborhoods, and bridges over the Clearwater River, including an old covered bridge, a rusty truss bridge and a stone bridge. Gravel fords and low crossings flood when it rains hard: deep water slows you down and can stall a gas engine.</li><li>The off-road park sits up on the mountain now, with a log bridge on the trail, and the proving ground is off County Rd 1.</li></ul>
       <h4>🍔 Places to go</h4><ul><li>Working drive-thrus at McDonald's, Burger King, Wendy's, Taco Bell, Chick-fil-A and KFC: order and pay at the speaker, then pick up at the window.</li><li>Dealerships on Route 20 (Ford, Toyota, Chevrolet, BMW, Mercedes-Benz, Tesla): pull into the lot to shop, test drive or trade in. The service centers do recalls, software updates and alignments.</li><li>Paid street parking in the towns: $1 per 15 minutes, 2 hours max, and a $35 ticket if the meter runs out.</li><li>Kestrel Estates is gated: the arms lift for residents (buy a house there) or with a $20 guest pass.</li><li>Farms all over the countryside: corn, wheat and hay fields, red barns, silos and hay bales.</li></ul>
       <h4>🚦 Life on the roads</h4><ul><li>School buses in the morning and mid-afternoon. When one stops, its red lights flash and the stop arm swings out: passing it is a $250 ticket.</li><li>A lane closure on I-38 eastbound with cones and a flagger: 45 mph, fines doubled, and a speed camera ($300).</li><li>The Jefferson Ave drawbridge opens every 4 minutes: bells, gates, the bridge lifts and a boat goes through.</li><li>A freight train runs between Westport and Fairhaven, with crossing gates on every road and a viaduct over the river.</li><li>Car meet every night after 8 PM in the Fairhaven Blvd lot.</li></ul>
@@ -1924,7 +1925,7 @@ function buildNet2(){
     for(let k=1;k<n;k++){const t=t1+d*k/n;P.push([mx+Math.cos(t)*R,my+Math.sin(t)*R,R*0.9])}P.push([b[0],b[1]]);mkR("lane","Summit Loop",P,{lim:20,mtn:1})}
   for(const b of W2_RB){if(b.legs.length===1){const a=Math.atan2(-Math.sin(b.legs[0].a),-Math.cos(b.legs[0].a));b.legs.push({a,p:[Math.round((b.x+Math.cos(a)*b.R)*100)/100,Math.round((b.y+Math.sin(a)*b.R)*100)/100]})}b.legs.sort((p,q)=>p.a-q.a);const L=b.legs;for(const l of L)N(l.p[0],l.p[1],{ctrl:"minor",rbt:b});
     for(let i=0;i<L.length;i++){const A=L[i],Bn=L[(i+1)%L.length];let a2=Bn.a;if(a2<=A.a)a2+=Math.PI*2;const d=a2-A.a,k=Math.max(1,Math.ceil(d/1.2)),pts=[A.p];
-      for(let j=0;j<k;j++){const m=A.a+d*(j+0.5)/k,r=b.R/Math.cos(d/k/2);pts.push([b.x+Math.cos(m)*r,b.y+Math.sin(m)*r,b.R])}pts.push(Bn.p);E("rbt","Roundabout",pts)}}
+      for(let j=0;j<k;j++){const m=A.a+d*(j+0.5)/k,r=b.R/Math.cos(d/k/2);pts.push([b.x+Math.cos(m)*r,b.y+Math.sin(m)*r,b.R])}pts.push(Bn.p);E("rbt","Roundabout",pts,b.cul?undefined:{n:2,m:-2*LANE})}}   // two lanes round (turning circles in cul-de-sacs keep one)
   for(const e of EDGES)if(e.mtn)W2_MTN.push(e);
   // ---- the off-road park goes on the mountain's lower slopes, clear of every road, with a gravel track up from the nearest mountain road
   {const C0=[-2276,-1177.5],HW=146,HH=303,[mx,my]=W2C.MT,EL=EDGES.slice(),dmin=(x,y)=>{let d=1e9;for(const e of EL){if(Math.abs(e.a.x-x)>e.L+60&&Math.abs(e.b.x-x)>e.L+60)continue;const p=eProj(e,x,y);if(p.u>=-5&&p.u<=e.L+5)d=Math.min(d,p.d-e.W)}return d};
@@ -4283,10 +4284,12 @@ function planMove(c,prefer){const n=endNode(c.e,c.dir),inL=arrLeg(c.e,c.dir);c.m
   // a roundabout: go round at most a couple of exits, then take one (nobody does laps)
   if(n.rbt){if(!inL.major)c.rbN=0;else{c.rbN=(c.rbN||0)+1;if(!pick&&!c.route&&c.rbN>=3)pick=ms.find(m=>m.t==="R")||null}}
   if(!pick){const W=c.kind==="bike"?{S:5,R:2.5,L:0.8,U:0}:n.rbt&&inL.major?{S:1.3,R:1.8,L:0,U:0}:{S:6,R:1.8,L:1.4,U:0.05};let tot=0;for(const m of ms)tot+=W[m.t];let x=rnd()*tot;for(const m of ms){x-=W[m.t];if(x<=0){pick=m;break}}pick=pick||ms[0]}
-  c.mv=pick;c.mvNode=n;c.mvLeg=inL;c.lanePinned=false;c.needLane=pick.t==="R"||pick.e.ow&&n.ctrl==="merge"?0:(pick.t==="L"||pick.t==="U")?c.e.n-1:null;
+  if(pick.e.type==="rbt"&&c.e.type!=="rbt"&&pick.e.n>1){let k=0;if(c.route){let ee=pick.e,dd=pick.dir;for(let g=0;g<12;g++){const nk=c.route.next.get(skey(ee,dd));if(nk==null)break;const e2=EDGES[nk>>1];if(e2.type!=="rbt")break;k++;ee=e2;dd=nk&1?1:-1}}c.rbLane=c.route?(k>=1?1:0):(rnd()<0.4?1:0)}
+  c.mv=pick;c.mvNode=n;c.mvLeg=inL;c.lanePinned=false;c.needLane=c.e.type==="rbt"&&pick.e.type!=="rbt"?null:pick.t==="R"||pick.e.ow&&n.ctrl==="merge"?0:(pick.t==="L"||pick.t==="U")?c.e.n-1:null;
   if(c.needLane===null&&pick.e.n<c.e.n&&pick.t==="S"&&n.drop)c.needLane=c.e.n-1;   // right lane ends: merge left before the join
   if(c.needLane===null&&pick.e.n<c.e.n&&pick.t==="S"&&n.ctrl!=="merge"){const th=wrapPi(pick.o.h-(inL.h+Math.PI));if(Math.abs(th)>0.12)c.needLane=th>0?c.e.n-1:0}}
-function outLane(c,i){const m=c.mv,nO=m.e.n,nI=c.e.n;if(m.t==="R")return 0;if(c.mvNode&&c.mvNode.ctrl==="merge"&&c.mvLeg&&!c.mvLeg.major)return 0;/* a ramp joins the right-hand lane, not the fast lane */if(m.t==="L"||m.t==="U")return nO-1;return nO>nI?i+(nO-nI):Math.max(0,i-(nI-nO))}
+function outLane(c,i){const m=c.mv,nO=m.e.n,nI=c.e.n;if(m.e.type==="rbt"&&c.e.type!=="rbt"&&nO>1)return Math.min(nO-1,c.rbLane||0);   // into a two-lane roundabout: outer lane for the first exit, inner lane to go further round
+  if(m.t==="R")return 0;if(c.mvNode&&c.mvNode.ctrl==="merge"&&c.mvLeg&&!c.mvLeg.major)return 0;/* a ramp joins the right-hand lane, not the fast lane */if(m.t==="L"||m.t==="U")return nO-1;return nO>nI?i+(nO-nI):Math.max(0,i-(nI-nO))}
 function mvP(c){const i=laneIdx(c);return mvPath(c.mvNode,c.e,c.dir,c.mv,i,outLane(c,i))}
 function newCar(e,dir,s,i,kind){const vf=0.92+rnd()*0.16,off=laneOff(e,i);
   const c={id:++CAR_ID,kind:kind||"ai",e,dir,s,off,offT:off,vf,v0:e.lim/2.23694*vf,v:e.lim/2.23694*vf*0.8,paint:TRAFFIC_PAINTS[Math.floor(rnd()*TRAFFIC_PAINTS.length)],sig:0,lcT:2+rnd()*6,spin:0,head:0,jn:null,idle:0};
@@ -5218,7 +5221,10 @@ function navText(G,now){const onto=G.name?` onto ${G.name}`:"";return G.t==="A"?
 function navSay(t){if(st.navVoice===false||!("speechSynthesis" in window))return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.rate=1.05;u.volume=0.9;speechSynthesis.speak(u)}catch(e){}}
 // every frame while navigating: prompts at a distance that suits your speed, rerouting when you leave the route, arrival
 function navTick(dt){if(!NAV.dest||st.walk||!st.started){const b=$("u2nav");if(b&&!b.hidden&&!NAV.dest)b.hidden=true;if(document.body.classList.contains("navon")&&(!NAV.dest||st.walk))document.body.classList.remove("navon");return}
-  const M=me();if(!M)return;const k=skey(M.e,M.dir);
+  let M=me();if(!M)return;
+  if(NAV.expect!==undefined&&NAV.expect!==null){const ee=EDGES[NAV.expect>>1],dd=NAV.expect&1?1:-1;if(M.e!==ee||M.dir!==dd){const on=onEdgeAt(ee,dd,car.px,car.py,true);if(on&&(Math.abs(wrapPi(car.psi-(eAt(ee,dd>0?on.s:ee.L-on.s).h+(dd<0?Math.PI:0))))<0.6))M={...M,e:ee,dir:dd,s:on.s,off:on.off}}}
+  else if(NAV.cur!==undefined){const ce=EDGES[NAV.cur>>1],cd=NAV.cur&1?1:-1;if((M.e!==ce||M.dir!==cd)&&ce.type==="ramp"){const on=onEdgeAt(ce,cd,car.px,car.py);if(on)M={...M,e:ce,dir:cd,s:on.s,off:on.off}}}
+  const k=skey(M.e,M.dir);
   if(NAV.cur!==k&&NAV.cand!==k){NAV.cand=k;NAV.candT=0}if(NAV.cand===k&&NAV.cur!==k){NAV.candT+=dt}   // a new road only counts after a second on it (not while crossing a junction)
   if(NAV.cur!==k&&NAV.candT>0.9){if(NAV.expect!==undefined&&k!==NAV.expect&&NAV.cur!==undefined){const ok=navNextKey(M.e,M.dir,M.s)!==undefined||(M.e===NAV.dest.e&&M.dir===NAV.dest.dir);toast(ok?"Rerouting…":"No route from here: turn around when you can");navSay(ok?"Rerouting":"Make a U-turn when possible");NAV.said={}}NAV.cur=k;NAV.expect=navNextKey(M.e,M.dir,M.s)}
   else if(M.e===NAV.dest.e&&M.dir===NAV.dest.dir)NAV.expect=navNextKey(M.e,M.dir,M.s);
@@ -5240,7 +5246,10 @@ function fsdObstacles(){const OB=[];for(const o of cars)if(o.wx!==undefined)OB.p
 function fsdPlan(A){const n=endNode(A.e,A.dir),L=arrLeg(A.e,A.dir);A.mv=null;A.stopDone=false;A.stopT=0;A.waitT=0;A.goYellow=false;A.needLane=null;if(!L)return;
   const ms=movesFrom(n,L);if(!ms.length)return;let pick=null;const nk=NAV.dest&&navNextKey(A.e,A.dir,A.s);
   if(nk!==undefined&&nk!==null)pick=ms.find(m=>skey(m.e,m.dir)===nk);if(!pick)pick=ms.find(m=>m.t==="S")||ms.find(m=>m.t!=="U")||ms[0];
-  A.mv=pick;A.mvNode=n;A.mvLeg=L;A.needLane=pick.t==="R"?0:(pick.t==="L"||pick.t==="U")?A.e.n-1:null}
+  if(pick.e.type==="rbt"&&A.e.type!=="rbt"&&pick.e.n>1){let k=0,ee=pick.e,dd=pick.dir;if(NAV.dest)for(let g=0;g<12;g++){const nk2=navNextKey(ee,dd,0);if(nk2==null)break;const e2=EDGES[nk2>>1];if(e2.type!=="rbt")break;k++;ee=e2;dd=nk2&1?1:-1}A.rbLane=k>=1?1:0}
+  A.mv=pick;A.mvNode=n;A.mvLeg=L;A.needLane=A.e.type==="rbt"?null:pick.t==="R"?0:(pick.t==="L"||pick.t==="U")?A.e.n-1:null}
+// is (x,y) on edge e (direction dir)? -> where along it and how far across, in that direction's lane terms
+function onEdgeAt(e,dir,x,y,strict){const q=eProj(e,x,y);if(q.u<-1||q.u>e.L+1||Math.abs(q.t)>hwOf(e)+1.5)return null;if(strict&&(q.u<(e.p0||0)+2||q.u>e.L-(e.p1||0)-2))return null;const u=clamp(q.u,0,e.L);return {s:dir>0?u:e.L-u,off:dir*q.t-shiftOf(e,u)}}
 function fsdReset(){FSD.over=null;FSD.slowT=0;FSD.a=null;FSD.lcT=0;FSD.arrived=false;FSD.around=null;FSD.waitAround=0;FSD.lcDoing=false;sys.fsdThr=0;sys.fsdBrk=0;sys.fsdPts=null}
 function fsdDrive(dt,M,S){const prof={sloth:[0.96,1.7,1.9],chill:[1.0,2.0,1.6],standard:[1.04,2.4,1.3],hurry:[1.09,2.8,1.05],madmax:[1.22,3.7,1.05]}[TSL.profile]||[1.04,2.4,1.3];
   const MAD=TSL.profile==="madmax",HUR=TSL.profile==="hurry";let A=FSD.a;if(!A){A=FSD.a={kind:"fsd",e:M.e,dir:M.dir,s:M.s,off:M.off,offT:laneOf(M.off)*LANE,v:0,vf:1,jn:null,sig:0,arrT:0};fsdPlan(A)}
@@ -5248,7 +5257,10 @@ function fsdDrive(dt,M,S){const prof={sloth:[0.96,1.7,1.9],chill:[1.0,2.0,1.6],s
   let P=null;
   if(A.jn){const Pj=A.jn.P;let bi=0,bd=1e9;for(let q=0;q<Pj.pts.length;q++){const d=(Pj.pts[q][0]-car.px)**2+(Pj.pts[q][1]-car.py)**2;if(d<bd){bd=d;bi=q}}A.jn.d=Pj.cum[bi];
     if(A.jn.d>=Pj.L-0.6||(M.e===A.jn.mv.e&&M.dir===A.jn.mv.dir&&!M.inJ)){const m=A.jn.mv,j=A.jn.j;A.e=m.e;A.dir=m.dir;A.jn=null;A.s=M.e===A.e?M.s:Pj.s1;A.off=M.e===A.e?M.off:laneOff(A.e,j);A.offT=laneOff(A.e,j);A.sig=0;st.signal=0;fsdPlan(A)}}
-  if(!A.jn){if(M.e!==A.e||M.dir!==A.dir){Object.assign(A,{e:M.e,dir:M.dir,s:M.s,off:M.off,offT:clamp(Math.round(M.off/LANE),M.lo,M.hi)*LANE});fsdPlan(A)}else{A.s=M.s;A.off=M.off}
+  if(!A.jn){// stay on the road we planned while the car is still on it (an exit ramp's first stretch runs alongside the freeway, where the map frame still says freeway)
+    const on=onEdgeAt(A.e,A.dir,car.px,car.py);
+    if((M.e!==A.e||M.dir!==A.dir)&&on){A.s=on.s;A.off=on.off}
+    else if(M.e!==A.e||M.dir!==A.dir){Object.assign(A,{e:M.e,dir:M.dir,s:M.s,off:M.off,offT:clamp(Math.round(M.off/LANE),M.lo,M.hi)*LANE});fsdPlan(A)}else{A.s=M.s;A.off=M.off}
     if(A.mv){P=mvP(A);if(A.s>=P.s0-0.4)A.jn={P,d:0,mv:A.mv,j:P.j,n:A.mvNode,inLeg:A.mvLeg}}}
   // lane choice: the lane the next turn needs, passing slower cars, back to the right
   if(!A.jn&&A.e.n>1&&!FSD.lcT){const li=laneIdx(A),dStop=P?P.s0-A.s:999;let want=0;
@@ -8343,7 +8355,7 @@ function worldScenery(){W2P.length=0;
       txbAdd(p[0],p[1],z+1.75,0.55,0.9,p[2],(x,W,H)=>{x.fillStyle="#0b6b3a";x.fillRect(0,0,W,H);x.strokeStyle="#fff";x.lineWidth=W*0.05;x.strokeRect(W*0.06,W*0.06,W-W*0.12,H-W*0.12);x.fillStyle="#fff";x.textAlign="center";x.textBaseline="middle";x.font=`800 ${W*0.22}px Inter,system-ui,sans-serif`;x.fillText("MILE",W/2,H*0.3);x.font=`800 ${W*0.42}px Inter,system-ui,sans-serif`;x.fillText(String(m),W/2,H*0.65)},220,128)}}}
   SCN.fwHead=fwH.I.length?meshFrom(fwH.P,fwH.N,fwH.I):null;SCN.fwPool=fwP.I.length?meshFrom(fwP.P,fwP.N,fwP.I):null;
   // ---- roundabout islands
-  const rbK=M_(),rbG=M_();for(const b of W2_RB){const z=hillZ(b.x,b.y),ri=b.R-3.0;discInto(rbK,b.x,b.y,ri,z+0.12,40);discInto(rbG,b.x,b.y,ri-0.4,z+0.16,40);
+  const rbK=M_(),rbG=M_();for(const b of W2_RB){const z=hillZ(b.x,b.y),ri=b.R-(b.cul?3.0:LANE+1.2);discInto(rbK,b.x,b.y,ri,z+0.12,40);discInto(rbG,b.x,b.y,ri-0.4,z+0.16,40);
     for(let k=0;k<5;k++){const a=k/5*Math.PI*2+0.4,rr=ri*0.55;treeAt(b.x+Math.cos(a)*rr,b.y+Math.sin(a)*rr,z+0.16,false)}collAdd({t:"c",x:b.x,y:b.y,r:ri-0.2,z0:z-0.5,z1:z+3,what:"the roundabout island"})}
   SCN.rbI=W2_RB.length?{k:meshFrom(rbK.P,rbK.N,rbK.I),g:meshFrom(rbG.P,rbG.N,rbG.I)}:null;
   // ---- asphalt repairs and sealed cracks
