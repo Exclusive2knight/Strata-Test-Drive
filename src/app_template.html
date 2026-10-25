@@ -13464,7 +13464,9 @@ function openBuilder(){if(st.everStarted&&!st.walk)st.buildFrom={x:car.px,y:car.
 // ---- loading in stages: the world, then the car you're looking at, then the rest of the cars in the background
 const LOADING={};
 function loadModel(k){if(MODELS[k])return Promise.resolve(MODELS[k]);
-  if(!LOADING[k])LOADING[k]=fetch("models/"+k+".json").then(r=>{if(!r.ok)throw new Error(r.status);return r.json()}).then(d=>{MODELS[k]=d;return d}).catch(e=>{delete LOADING[k];throw e});return LOADING[k]}
+  // a copy that doesn't carry every model file (the Claude artifact) falls back to the public repo through jsDelivr
+  const get=u=>fetch(u).then(r=>{if(!r.ok)throw new Error(r.status);return r.json()});
+  if(!LOADING[k])LOADING[k]=get("models/"+k+".json").catch(e=>{if(/github\.io$/.test(location.hostname))throw e;return get("https://cdn.jsdelivr.net/gh/Exclusive2knight/Strata-Test-Drive@main/models/"+k+".json")}).then(d=>{MODELS[k]=d;return d}).catch(e=>{delete LOADING[k];throw e});return LOADING[k]}
 // ---- the parking garage model: the uploaded Two_Bay_Dual_Helix_Garage at full detail (277k triangles), loaded in the background.
 // Stored per material as centimetre positions in garage coordinates (x along, y up, z across = GAR local X, height, Z)
 const GARM={g:null,loading:false};
