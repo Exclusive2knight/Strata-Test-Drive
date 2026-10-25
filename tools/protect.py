@@ -31,7 +31,8 @@ LOCK = r"""
  if(!ok){document.title="Mission Strata";document.body.innerHTML='<div style="font:16px system-ui;max-width:520px;margin:15vh auto;padding:24px;color:#ddd;background:#111;border-radius:12px;text-align:center"><h2 style="margin-top:0">Unauthorized copy</h2><p>Mission Strata is © """ + OWNER + r""". All rights reserved. This copy is not allowed to run here.</p><p>Play the real game at <a style="color:#7cf" href="https://exclusive2knight.github.io/Strata-Test-Drive/">exclusive2knight.github.io/Strata-Test-Drive</a></p></div>';throw new Error("unauthorized host")}}
 """
 body = (LOCK if lock else "") + js
-wrapped = "(()=>{\n" + body + "\n})();"
+# start the game one frame after the page first paints, so the loading screen shows straight away instead of a blank page
+wrapped = "(()=>{const go=()=>{\n" + body + "\n};requestAnimationFrame(()=>setTimeout(go,0));})();"
 
 tmp_in = os.path.join(HERE, "dist", "_in.js")
 os.makedirs(os.path.dirname(tmp_in), exist_ok=True)
