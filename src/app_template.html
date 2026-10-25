@@ -1077,6 +1077,12 @@ html body.ui2 #ui2 #u2prs button{background:transparent!important;border:0!impor
 @media (pointer:coarse) and (max-height:600px),(max-height:440px){#ui2 #u2prs button{width:30px;height:24px;font-size:11px}
   html body.ui2 #ui2 #u2arrows button{width:68px!important;height:68px!important;border-radius:18px!important}html body.ui2 #ui2 #u2arrows svg{width:30px;height:30px}
   html body.ui2 #brake{width:74px!important;height:104px!important}html body.ui2 #accel{width:84px!important;height:140px!important}}
+
+/* drive-mode row: folded into one pill until tapped, then the modes slide out */
+#ui2 #u2modes button.cur{display:flex;align-items:center;gap:8px}#ui2 #u2modes button.cur b{font-weight:700;color:var(--tx)}#ui2 #u2modes button.cur i{font-style:normal;color:var(--acc)}#ui2 #u2modes button.cur .chev{color:var(--sub);font-size:14px;line-height:1}
+#ui2 #u2modes button.cls{color:var(--sub);font-size:14px;padding:6px 10px}
+#ui2 #u2modes.open .sl{animation:modeIn .32s cubic-bezier(.2,.8,.2,1) both;animation-delay:var(--d,0ms)}
+@keyframes modeIn{from{opacity:0;transform:translateX(-18px)}to{opacity:1;transform:none}}
 </style>
 
 <canvas id="gl"></canvas>
@@ -1239,7 +1245,7 @@ html body.ui2 #ui2 #u2prs button{background:transparent!important;border:0!impor
 <li>The cluster screen now has <b>‹ › arrows</b> to flip between Energy, Assist, Trip and Car, with a slide animation and page dots.</li>
 <li><b>Cruise control button</b> next to the cluster: tap it to turn cruise on. A bar pops up on top of the cluster to set the <b>following distance</b> and the speed with <b>− / +</b> (5 mph a tap). Tap again to turn it off.</li>
 <li>The <b>EV mode</b> button is now a circle above the cruise button (hybrids and plug-ins).</li>
-<li><b>Drive modes</b> are a row of pills under the cluster; cars with terrain select get a <b>Terrain ▾</b> pill that opens the list.</li>
+<li><b>Drive modes</b> fold into one pill under the cluster showing your current mode; tap it and all the modes (and the <b>Terrain ▾</b> list on cars that have one) slide out. It folds back up a few seconds after you pick.</li><li>The <b>Energy</b> screen now works on the F-150 <b>PowerBoost</b>: engine, battery and motor flow, battery % and "Electric" when you're driving on the battery.</li>
 <li>Top right: your money with a <b>level ring</b>, and labelled tiles for Garage, Spawn, Tests, Dealer, Full screen and More.</li>
 <li>Settings, the spawn picker, What's new and the loading screen match the new look.</li>
 <li>Fixed an error that could pop up while the other cars load in the background.</li></ul>
@@ -5317,15 +5323,22 @@ function ccInit(){const cc=$("u2cc"),bt=$("u2ccb");if(!cc||!bt)return;for(const 
   cc.addEventListener("click",e=>{e.stopPropagation();const b=e.target.closest("[data-cc]");if(!b)return;act(b.dataset.cc);cc._h="";ccTick()})}
 // drive modes as pills under the cluster; "Terrain" opens the car's terrain list
 function modesRender(){const el=$("u2modes");if(!el)return;const I=modesInfo(),has=I.drive.length>1||!!I.terr,show=has&&!st.walk&&st.started;if(el.hidden===show)el.hidden=!show;if(!show)return;
-  const sig=[st.trim,I.dcur,I.tcur,VIEW.tOpen?1:0,I.drive.length,I.terr?I.terr.length:0].join("|");if(el.dataset.s===sig)return;el.dataset.s=sig;
-  const tName=I.terr?(I.tcur>0||(I.tcur===0&&I.terr[0]!=="Off")?I.terr[I.tcur]:(I.sys.replace(/ Select$| System$/,"")||"Terrain")):"";
-  el.innerHTML=(I.drive.length>1?I.drive.map((n,i)=>`<button data-k="d" data-i="${i}" class="${i===I.dcur?"on":""}">${String(n).replace(/</g,"&lt;")}</button>`).join(""):"")
-    +(I.terr?`<button class="tr ${I.terr[I.tcur]&&I.terr[I.tcur]!=="Off"?"on":""}" data-t="1">${String(tName).replace(/</g,"&lt;")} ▾</button>`:"")
-    +(I.terr&&VIEW.tOpen?`<div class="tp">${I.terr.map((n,i)=>`<button data-k="t" data-i="${i}" class="${i===I.tcur?"on":""}">${String(n).replace(/</g,"&lt;")}</button>`).join("")}</div>`:"")}
+  const sig=[st.trim,I.dcur,I.tcur,VIEW.tOpen?1:0,VIEW.mOpen?1:0,I.drive.length,I.terr?I.terr.length:0].join("|");if(el.dataset.s===sig)return;const wasOpen=el.classList.contains("open");el.dataset.s=sig;
+  const E=x=>String(x).replace(/</g,"&lt;"),tOn=I.terr&&I.terr[I.tcur]&&I.terr[I.tcur]!=="Off",tName=I.terr?(tOn?I.terr[I.tcur]:(I.sys.replace(/ Select$| System$/,"")||"Terrain")):"";
+  el.classList.toggle("open",!!VIEW.mOpen);
+  // closed: one pill with the current mode (and terrain if one is on); tap it and the rest slide out
+  if(!VIEW.mOpen){el.innerHTML=`<button class="cur" data-x="open" aria-label="Drive modes">${I.drive.length>1?`<b>${E(I.drive[I.dcur]||"")}</b>`:""}${tOn?`<i>${E(tName)}</i>`:""}<span class="chev">›</span></button>`;return}
+  el.innerHTML=`<button class="cls" data-x="close" aria-label="Close drive modes">‹</button>`+(I.drive.length>1?I.drive.map((n,i)=>`<button data-k="d" data-i="${i}" class="sl ${i===I.dcur?"on":""}" style="--d:${i*35}ms">${E(n)}</button>`).join(""):"")
+    +(I.terr?`<button class="sl tr ${tOn?"on":""}" data-t="1" style="--d:${I.drive.length*35}ms">${E(tName)} ▾</button>`:"")
+    +(I.terr&&VIEW.tOpen?`<div class="tp">${I.terr.map((n,i)=>`<button data-k="t" data-i="${i}" class="${i===I.tcur?"on":""}">${E(n)}</button>`).join("")}</div>`:"");
+  if(wasOpen)el.querySelectorAll(".sl").forEach(b=>b.style.animation="none")}
 function modesInit(){const el=$("u2modes");if(!el)return;el.addEventListener("pointerdown",e=>e.stopPropagation());
-  el.addEventListener("click",e=>{e.stopPropagation();if(e.target.closest("[data-t]")){VIEW.tOpen=!VIEW.tOpen;el.dataset.s="";modesRender();return}
-    const b=e.target.closest("button[data-k]");if(b){modesPick(b.dataset.k,+b.dataset.i);if(b.dataset.k==="t")VIEW.tOpen=false;el.dataset.s="";modesRender()}})}
-function modesToggle(tab){VIEW.tOpen=tab==="terr"?!VIEW.tOpen:false;const el=$("u2modes");if(el){el.dataset.s="";modesRender()}}
+  el.addEventListener("click",e=>{e.stopPropagation();const x=e.target.closest("[data-x]");if(x){VIEW.mOpen=x.dataset.x==="open";VIEW.tOpen=false;el.dataset.s="";modesRender();modesAuto();return}
+    if(e.target.closest("[data-t]")){VIEW.tOpen=!VIEW.tOpen;el.dataset.s="";modesRender();modesAuto();return}
+    const b=e.target.closest("button[data-k]");if(b){modesPick(b.dataset.k,+b.dataset.i);if(b.dataset.k==="t")VIEW.tOpen=false;el.dataset.s="";modesRender();modesAuto(1500)}})}
+// the row folds itself back up a few seconds after the last tap
+function modesAuto(ms){clearTimeout(VIEW.mT);VIEW.mT=setTimeout(()=>{if(VIEW.tOpen)return modesAuto();VIEW.mOpen=false;const el=$("u2modes");if(el){el.dataset.s="";modesRender()}},ms||5000)}
+function modesToggle(tab){VIEW.mOpen=true;VIEW.tOpen=tab==="terr"?!VIEW.tOpen:false;const el=$("u2modes");if(el){el.dataset.s="";modesRender();modesAuto()}}
 // trip history: one bar per 15 s of driving (mpg, or mi/kWh in an EV)
 function viewSample(){const now=performance.now(),T=TRIMS[st.trim],H=car.hyb,d=st.tripA||0,f=H.used||0,wh=(typeof TE==="object"&&TE.totWh)||0;
   if(VIEW.lastD===null||d<VIEW.lastD){VIEW.lastD=d;VIEW.lastF=f;VIEW.lastWh=wh;VIEW.ht=now;VIEW.hist=[];VIEW.drv=0}
@@ -5343,7 +5356,7 @@ function viewDraw(){const c=$("u2vc");if(!c||c.offsetParent===null)return;const 
   const carTop=(x,y,w,h,col)=>{g.strokeStyle=col||"#5a5d62";g.lineWidth=1.5;rr2(g,x,y,w,h,w*0.3);g.stroke()};
   const wheel=(x,y,on,col)=>{g.fillStyle=on?(col||amb):TH.track;rr2(g,x,y,7,17,2);g.fill()};
   const D=DRIVES[st.trim]||{},fr=D.bias?D.bias[0]>0.05:D.T?D.T[0]>0:true,rr=D.bias?D.bias[1]>0.05:D.T?D.T[1]>0:false,drv=fr&&rr?(/4x4|4WD|TRD|Wrangler|Bronco|Tacoma|4Runner/i.test((T.name||"")+(T.group||""))?"4WD":"AWD"):rr?"RWD":"FWD";
-  if(v==="energy"){const hyb=!!T.hybrid,ice=!!T.ice&&!hyb,ev=!T.ice&&!hyb;let pe=0,pm=0,P=car.tq.reduce((a,q,i)=>a+q*car.w[i],0)/1000,regen=false,engChg=false,soc=null;
+  if(v==="energy"){const hyb=!!T.hybrid||!!(DRIVES[st.trim]||{}).par,ice=!!T.ice&&!hyb,ev=!T.ice&&!hyb;let pe=0,pm=0,P=car.tq.reduce((a,q,i)=>a+q*car.w[i],0)/1000,regen=false,engChg=false,soc=null;
     if(hyb){try{const S=hybState();pe=S.pe;pm=S.pm;P=S.P;regen=S.regen;engChg=S.engChg;soc=S.soc}catch(e){}}else if(ice)pe=Math.max(0,P);else{pm=P;regen=P<-1;soc=socShow(H)}
     const fuelF=ice||hyb?clamp(H.fuel/(H.tank||1),0,1):null,go=P>0.5,eOn=pe>0.5&&!engChg,mOn=Math.abs(pm)>0.5,cE=TH.pow,cB=regen?TH.good:TH.ev,cw=c.clientWidth||196,big=cw<150?1.45:cw<200?1.28:1.15;
     // the car from above, nose to the right: body, glass, mirrors, tyres
