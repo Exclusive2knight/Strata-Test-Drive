@@ -1275,7 +1275,7 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
 <b>Acura</b> (map with tiles down the right side), <b>Subaru STARLINK</b> (starry background with colorful tiles),
 <b>INFINITI InTouch</b> (map on top, audio, climate, phone, apps, info and settings below), <b>Chrysler Uconnect 5</b> (map, media and app cards),
 and <b>Rivian</b> (no home screen, like the real one: the map with a media column and the lock button top left).</li>
-<li><b>2019 RAV4</b>: Entune 3.0's three-way split home screen. The map (with navigation) or audio on the left, audio or hands-free top right, and the hybrid's <b>Energy Monitor</b> (engine, battery and wheels around a circle with the power flow moving between them, plus the battery level) bottom right; the gas RAV4 shows the clock there.</li></ul>
+<li><b>2019 RAV4</b>: the Entune 3.0 home screen like the real 2019 RAV4 Hybrid: Audio top left with the four "Select & Hold to Add a Contact" buttons under it, and the <b>Energy Monitor</b> on the right (wheel, engine and battery joined by paths that light up red-orange from the engine, green from the battery and when braking charges it, with the battery cells showing the charge). The status icons sit next to the clock. The gas RAV4 shows the map (with navigation) or the clock there.</li></ul>
 <h4>🚙 2019 RAV4 trims fixed</h4><ul>
 <li>Added the gas <b>LE</b>, <b>XLE Premium</b> and <b>Limited</b>. Every trim now has only what the real one had: the LE (gas and hybrid) has no Blind Spot Monitor, Multi-Terrain Select is only on the Adventure and Limited, Intelligent Clearance Sonar with Rear Cross-Traffic Braking only comes with the Advanced Technology Packages, and the Limited's Bird's Eye View camera is in its package instead of standard. The XSE and Limited get the digital rearview mirror and blue ambient lighting, the Limited gets navigation, and the XLE Premium has its own Weather Package.</li></ul>
 <h4>🔊 Real 2019 RAV4 and Toyota sounds</h4><ul>
@@ -6604,7 +6604,11 @@ function rav19Screen(g,W,H,M){const F=CF2;g.fillStyle="#1a1b1e";g.fillRect(0,0,W
   g.fillStyle="#9a9da2";g.font=F(9,800);g.fillText("JBL",W/2,H-10);g.textAlign="right";g.font=F(8);g.fillText("((SiriusXM))   HD Radio",x1-8,H-10);
   // the display
   g.save();g.beginPath();g.rect(x0,0,x1-x0,bot);g.clip();const bg=g.createLinearGradient(0,0,0,bot);bg.addColorStop(0,"#0c1430");bg.addColorStop(1,"#1d2c58");g.fillStyle=bg;g.fillRect(x0,0,x1-x0,bot);
-  const d=gDate();g.fillStyle="#fff";g.font=F(15,600);g.textAlign="left";g.fillText(({home:"Home",media:"Radio",map:"Map",phone:"Phone",apps:"Menu",camera:"Camera",controls:"Setup",energy:"Energy",climate:"Climate",park:"Park"})[SCR.page]||"",x0+12,18);g.textAlign="right";g.fillText(`${d.getHours()%12||12}:${String(d.getMinutes()).padStart(2,"0")}`,x1-14,18);
+  const d=gDate();g.fillStyle="#fff";g.font=F(15,600);g.textAlign="left";g.fillText(({home:"Home",media:"Radio",map:"Map",phone:"Phone",apps:"Menu",camera:"Camera",controls:"Setup",energy:"Energy",climate:"Climate",park:"Park"})[SCR.page]||"",x0+12,18);g.textAlign="right";g.font=F(18,500);g.fillText(`${d.getHours()%12||12}:${String(d.getMinutes()).padStart(2,"0")}`,x1-84,18);
+  // status icons after the clock: DCM, signal, phone battery, Bluetooth
+  {const sx=x1-78;g.strokeStyle="#dfe4ee";g.lineWidth=1;rr2(g,sx,11,22,12,4);g.stroke();g.fillStyle="#dfe4ee";g.font=F(6,800);g.textAlign="center";g.fillText("DCM",sx+11,17.5);
+   for(let i=0;i<4;i++){g.fillStyle=st.phoneConn||i<3?"#dfe4ee":"#5a6070";g.fillRect(sx+28+i*4,21-i*3,3,3+i*3)}g.strokeStyle="#dfe4ee";g.strokeRect(sx+47.5,10.5,7,12);g.fillStyle="#dfe4ee";g.fillRect(sx+49,15,4,6);
+   g.fillStyle=st.phoneConn?"#4fa3ff":"#5a6070";g.font=F(12,700);g.fillText("ᛒ",sx+64,18)}
   g.fillStyle="rgba(255,255,255,.25)";g.fillRect(x0,top-2,x1-x0,1);const pw=x1-x0;
   g.translate(x0,0);SCR.ox=x0;
   if(SCR.page==="media"){const Lm=["Source","Presets","Radio Replay","Station List","Options","Sound"];Lm.forEach((t,i)=>{const y=top+10+i*32,on=i===1;if(on){g.fillStyle="rgba(120,150,230,.35)";g.fillRect(6,y,150,28)}g.fillStyle="#fff";g.font=F(13,600);g.textAlign="left";g.fillText(t,16,y+15)});
@@ -9299,23 +9303,44 @@ function chrHome(g,top,bot,W,M){if(hkOld(g,top,bot,W,M))return;const h=bot-top,p
 function rivHome(g,top,bot,W,M){if(hkOld(g,top,bot,W,M))return;const h=bot-top,mw=Math.min(200,W*0.3),C={r:14,card:"rgba(24,26,29,.94)",stroke:"rgba(255,255,255,.08)",fg:"#f4f4f2",sub:"#a3a6aa",acc:"#2a2c2f",acc2:"#f7b500"};
   HK.map(g,0,top,W-mw,h,0,M,true);g.fillStyle="rgba(16,18,20,.9)";rr2(g,10,top+10,96,30,15);g.fill();HK.t(g,st.locked?"🔒":"🔓",28,top+25,"#fff",13,500,"center");HK.t(g,"RIVIAN",46,top+25,"#f7b500",10,800);hit(10,top+10,96,30,()=>act("lock"));
   g.fillStyle="#101214";g.fillRect(W-mw,top,mw,h);HK.media(g,W-mw+8,top+8,mw-16,h*0.62,C,"Media");HK.phone(g,W-mw+8,top+16+h*0.62,mw-16,h*0.38-24,C)}
-// 2019 RAV4 (Entune 3.0): the three-way split home screen. Map (with navigation) or audio on the left, audio or hands-free top right,
-// the hybrid's energy monitor (or the clock on the gas RAV4) bottom right
-function ravHome(g,top,bot,pw,M){const p=6,h=bot-top,lw=pw*0.52,rx=lw+2*p,rw=pw-rx-p,rh=(h-3*p)/2,nav=ownF("navigation"),T=TRIMS[st.trim],hyb=!!T.hybrid,panel=(x,y,w,hh,lab)=>{g.fillStyle="rgba(40,46,96,.55)";g.fillRect(x,y,w,hh);g.strokeStyle="rgba(150,170,230,.35)";g.lineWidth=1;g.strokeRect(x+.5,y+.5,w-1,hh-1);if(lab)HK.t(g,lab,x+10,y+14,"#c8d2f0",11,600)};
-  const audio=(x,y,w,hh)=>{panel(x,y,w,hh,"Audio");const n=HK.np();HK.t(g,n.t,x+12,y+hh*0.45,"#fff",Math.min(20,hh*0.13),600,"left",w-24);HK.t(g,n.s,x+12,y+hh*0.45+22,"#b8c3e3",11,500,"left",w-24);hit(x,y,w,hh,HK.go("media"))};
-  const phone=(x,y,w,hh)=>{panel(x,y,w,hh,"Hands-free");HK.t(g,st.phoneConn?PHONE.name():"No phone connected",x+12,y+hh*0.55,"#fff",13,600,"left",w-24);HK.t(g,st.phoneConn?"Bluetooth ✓":"Tap to connect",x+12,y+hh*0.55+18,"#b8c3e3",10,500);hit(x,y,w,hh,HK.go("phone"))};
-  if(nav){g.save();g.beginPath();g.rect(p,top+p,lw,h-2*p);g.clip();SCR.ox+=p;g.translate(p,0);SCR.mapLight=true;SCR.mapCompact=true;try{scrMap(g,top+p,bot-p,lw,M)}finally{SCR.mapLight=false;SCR.mapCompact=false}g.restore();SCR.ox-=p;hit(p,top+p,lw,h-2*p,HK.go("map"))}
-  else audio(p,top+p,lw,h-2*p);
-  if(nav)audio(rx,top+p,rw,rh);else phone(rx,top+p,rw,rh);
-  const by=top+2*p+rh;if(hyb)ravEnergy(g,rx,by,rw,rh,panel);else{panel(rx,by,rw,rh,"Clock");HK.t(g,HK.time(),rx+rw/2,by+rh*0.55,"#fff",Math.min(30,rh*0.32),300,"center");HK.t(g,HK.date(),rx+rw/2,by+rh*0.55+24,"#b8c3e3",10,500,"center")}}
-// Toyota hybrid energy monitor, small: the engine, the battery and the wheels around a circle, with the flow lit up and moving
-function ravEnergy(g,x,y,w,h,panel){panel(x,y,w,h,"Energy Monitor");let S={pe:0,pm:0,regen:false,engChg:false,soc:0.6};try{S=hybState()}catch(e){}const cx=x+w/2,cy=y+h*0.58,R=Math.min(w*0.3,h*0.32),t=performance.now()/1000;
-  g.strokeStyle="rgba(150,170,230,.3)";g.lineWidth=2;g.beginPath();g.arc(cx,cy,R,0,7);g.stroke();
-  const E=[cx-R*0.87,cy-R*0.5],B=[cx,cy+R],Wh=[cx+R*0.87,cy-R*0.5],flow=(a,b,on,col)=>{if(!on)return;g.strokeStyle=col;g.lineWidth=2.5;g.beginPath();const a0=Math.atan2(a[1]-cy,a[0]-cx);let a1=Math.atan2(b[1]-cy,b[0]-cx);g.stroke();
-    for(let k=0;k<3;k++){const u=((t*0.8+k/3)%1);const ang=a0+(((a1-a0+3*Math.PI)%(2*Math.PI))-Math.PI)*u;g.fillStyle=col;g.beginPath();g.arc(cx+Math.cos(ang)*R,cy+Math.sin(ang)*R,2.6,0,7);g.fill()}};
-  const eOn=S.pe>0.5,mOn=Math.abs(S.pm)>0.5;flow(E,Wh,eOn&&!S.regen,"#ffb020");flow(B,Wh,mOn&&!S.regen&&S.pm>0,"#4fb3ff");flow(Wh,B,S.regen,"#55d68c");flow(E,B,S.engChg,"#ffb020");
-  const node=(p_,ic,on,col)=>{g.fillStyle=on?col:"#2a2f55";g.beginPath();g.arc(p_[0],p_[1],R*0.32,0,7);g.fill();HK.t(g,ic,p_[0],p_[1],"#fff",R*0.3,600,"center")};node(E,"⚙",eOn||S.engChg,"#b5770c");node(Wh,"◎",eOn||mOn||S.regen,"#3a5bb8");node(B,"▮",mOn||S.regen||S.engChg,S.regen||S.engChg?"#2f9e5e":"#2f6fb8");
-  for(let i=0;i<8;i++){g.fillStyle=i<Math.round((S.soc??0.6)*8)?"#4fb3ff":"#2a2f55";g.fillRect(x+w-14-(8-i)*6,y+8,4,9)}hit(x,y,w,h,HK.go("energy"))}
+// 2019 RAV4 (Entune 3.0) home, as it looks in a real 2019 RAV4 Hybrid: Audio top left, four favourite-contact buttons under it,
+// the Energy Monitor filling the right half (the gas RAV4 shows the map with navigation, or the clock)
+function ravPanel(g,x,y,w,h){const gr=g.createLinearGradient(0,y,0,y+h);gr.addColorStop(0,"#0b1430");gr.addColorStop(1,"#233a78");g.fillStyle=gr;g.fillRect(x,y,w,h);
+  g.save();g.beginPath();g.rect(x,y,w,h);g.clip();g.fillStyle="rgba(255,255,255,.035)";for(let yy=y;yy<y+h;yy+=4)for(let xx=x+((yy-y)/4%2)*4;xx<x+w;xx+=8)g.fillRect(xx,yy,4,4);g.restore();
+  g.strokeStyle="#8f99b3";g.lineWidth=1.5;g.strokeRect(x+.75,y+.75,w-1.5,h-1.5)}
+function ravHome(g,top,bot,pw,M){const p=6,h=bot-top,lw=pw*0.46,rx=lw+2*p,rw=pw-rx-p,ah=(h-3*p)*0.54,T=TRIMS[st.trim],hyb=!!T.hybrid,nav=ownF("navigation");
+  // Audio
+  ravPanel(g,p,top+p,lw,ah);const n=HK.np();HK.t(g,"♪",p+lw-14,top+p+14,"#fff",13,500,"center");HK.t(g,n.on?n.t:"Audio Off",p+lw/2,top+p+ah/2,"#fff",Math.min(17,ah*0.15),500,"center",lw-20);if(n.on)HK.t(g,n.s,p+lw/2,top+p+ah/2+20,"#b8c3e3",10,500,"center",lw-20);hit(p,top+p,lw,ah,HK.go("media"));
+  // favourite contacts
+  const cy=top+2*p+ah,ch=h-3*p-ah;g.fillStyle="#0a0f22";g.fillRect(p,cy,lw,ch);g.strokeStyle="#8f99b3";g.lineWidth=1.5;g.strokeRect(p+.75,cy+.75,lw-1.5,ch-1.5);
+  const tw=(lw-12)/2,th=(ch-12)/2;for(let i=0;i<4;i++){const x=p+4+(i%2)*(tw+4),y=cy+4+Math.floor(i/2)*(th+4);ravPanel(g,x,y,tw,th);HK.t(g,"Select & Hold to",x+tw/2,y+th/2-7,"#fff",Math.min(11,tw*0.085),500,"center",tw-6);HK.t(g,"Add a Contact.",x+tw/2,y+th/2+8,"#fff",Math.min(11,tw*0.085),500,"center",tw-6);hit(x,y,tw,th,HK.go("phone"))}
+  // right half
+  if(hyb)ravEnergy(g,rx,top+p,rw,h-2*p);
+  else if(nav){g.save();g.beginPath();g.rect(rx,top+p,rw,h-2*p);g.clip();SCR.ox+=rx;g.translate(rx,0);SCR.mapLight=true;SCR.mapCompact=true;try{scrMap(g,top+p,bot-p,rw,M)}finally{SCR.mapLight=false;SCR.mapCompact=false}g.restore();SCR.ox-=rx;hit(rx,top+p,rw,h-2*p,HK.go("map"))}
+  else{ravPanel(g,rx,top+p,rw,h-2*p);HK.t(g,HK.time(),rx+rw/2,top+h*0.45,"#fff",Math.min(46,rw*0.2),300,"center");HK.t(g,gDate().toLocaleDateString([],{weekday:"long",month:"long",day:"numeric"}),rx+rw/2,top+h*0.45+34,"#b8c3e3",12,500,"center",rw-20)}}
+// Toyota hybrid Energy Monitor: the wheel (left), the engine (right) and the battery (bottom) joined by grey paths; the paths that carry power
+// light up with an arrow: red-orange from the engine, green from the battery, green into the battery when braking charges it
+function ravEnergy(g,x,y,w,h){ravPanel(g,x,y,w,h);let S={pe:0,pm:0,regen:false,engChg:false,soc:0.6};try{S=hybState()}catch(e){}const t=performance.now()/1000,s=Math.min(w/250,h/210);
+  const Wp=[x+w*0.22,y+h*0.38],Ep=[x+w*0.8,y+h*0.36],Bp=[x+w*0.52,y+h*0.74];
+  const path=(k)=>{g.beginPath();if(k==="WE"){g.moveTo(Wp[0]+14*s,Wp[1]-14*s);g.quadraticCurveTo(x+w*0.5,y+h*0.1,Ep[0]-20*s,Ep[1]-14*s)}else if(k==="WB"){g.moveTo(Wp[0]-4*s,Wp[1]+20*s);g.quadraticCurveTo(x+w*0.18,y+h*0.78,Bp[0]-24*s,Bp[1]+6*s)}else{g.moveTo(Ep[0]+4*s,Ep[1]+22*s);g.quadraticCurveTo(x+w*0.84,y+h*0.72,Bp[0]+24*s,Bp[1]+2*s)}};
+  g.strokeStyle="#6e7690";g.lineWidth=7*s;g.lineCap="round";for(const k of ["WE","WB","EB"]){path(k);g.stroke()}
+  const eOn=S.pe>0.5&&!S.engChg,mOn=S.pm>0.5&&!S.regen;
+  const lit=(k,c0,c1,rev)=>{const gr=g.createLinearGradient(Ep[0],Ep[1],Bp[0],Bp[1]);gr.addColorStop(0,c0);gr.addColorStop(1,c1);g.strokeStyle=gr;g.lineWidth=7*s;path(k);g.stroke();
+    g.save();g.setLineDash([10*s,22*s]);g.lineDashOffset=(rev?1:-1)*t*40*s;g.strokeStyle="rgba(255,255,255,.55)";g.lineWidth=3*s;path(k);g.stroke();g.restore()};
+  if(eOn)lit("WE","#ff3b2f","#ff9a3c",true);if(S.engChg||(eOn&&S.pe>Math.max(0,S.pm)+2))lit("EB","#ff3b2f","#ff2a2a",false);if(mOn)lit("WB","#3ad46a","#8ff0a8",true);if(S.regen)lit("WB","#3ad46a","#8ff0a8",false);
+  // arrowheads where power arrives
+  const head=(px,py,ang,col)=>{g.fillStyle=col;g.save();g.translate(px,py);g.rotate(ang);g.beginPath();g.moveTo(9*s,0);g.lineTo(-7*s,-8*s);g.lineTo(-7*s,8*s);g.closePath();g.fill();g.restore()};
+  if(S.engChg||(eOn&&S.pe>Math.max(0,S.pm)+2))head(Bp[0]+26*s,Bp[1]+2*s,Math.PI*1.05,"#ff2a2a");if(eOn)head(Wp[0]+16*s,Wp[1]-15*s,Math.PI*1.12,"#ff3b2f");if(mOn)head(Wp[0]-3*s,Wp[1]+22*s,-Math.PI*0.45,"#3ad46a");if(S.regen)head(Bp[0]-26*s,Bp[1]+6*s,0,"#3ad46a");
+  // wheel
+  {const [cx,cy]=Wp,R=20*s;g.fillStyle="#111";g.beginPath();g.arc(cx,cy,R,0,7);g.fill();g.strokeStyle="#4a4d55";g.lineWidth=2*s;g.stroke();g.fillStyle="#c9ccd2";g.beginPath();g.arc(cx,cy,R*0.62,0,7);g.fill();g.strokeStyle="#6b6f78";g.lineWidth=1.6*s;for(let i=0;i<5;i++){const a=i*Math.PI*0.4+t*(mOn||eOn?Math.abs(car.vx)*0.4:0);g.beginPath();g.moveTo(cx,cy);g.lineTo(cx+Math.cos(a)*R*0.6,cy+Math.sin(a)*R*0.6);g.stroke()}g.fillStyle="#555";g.beginPath();g.arc(cx,cy,R*0.15,0,7);g.fill()}
+  // engine
+  {const [cx,cy]=Ep;g.fillStyle="#d9dce2";rr2(g,cx-22*s,cy-12*s,40*s,20*s,4*s);g.fill();g.fillStyle="#a7abb4";rr2(g,cx-18*s,cy-20*s,30*s,9*s,3*s);g.fill();g.fillStyle="#8b8f98";for(let i=0;i<4;i++)g.fillRect(cx-16*s+i*7*s,cy-4*s,4*s,8*s);if(eOn||S.engChg){g.fillStyle="#ff3b2f";g.fillRect(cx+2*s,cy+8*s,8*s,10*s)}
+   HK.t(g,"Engine",cx+4*s,cy-34*s,"#fff",Math.max(10,15*s),600,"center")}
+  // battery: green cells by state of charge
+  {const [cx,cy]=Bp,bw=30*s,bh=40*s,bx=cx-bw/2,by=cy-bh/2;g.fillStyle="rgba(170,255,200,.18)";g.beginPath();g.ellipse(cx,cy+bh*0.55,bw*0.9,6*s,0,0,7);g.fill();g.fillStyle="#d4f7df";rr2(g,bx,by,bw,bh,3*s);g.fill();const segs=8,on=Math.round(clamp(S.soc??0.6,0,1)*segs);
+   for(let i=0;i<segs;i++){g.fillStyle=i<on?"#33d17a":"#9aa6a0";g.fillRect(bx+3*s,by+bh-3*s-(i+1)*(bh-6*s)/segs+1,bw-6*s,(bh-6*s)/segs-1.5)}
+   HK.t(g,"Battery",cx,by-14*s,"#fff",Math.max(10,15*s),600,"center")}
+  hit(x,y,w,h,HK.go("energy"))}
 const SCR_THEME={GM:{bg:"#0b0d10",dock:"#121417",line:"#262a2f",acc:"#4c8bf5",on:"#8ab4f8",dim:"#9aa0a6",rail:true,ui:"Google built-in",home:(...a)=>gmHome(...a)},
   Kia:{bg:"#0a1220",dock:"#0f1a2c",line:"#22324a",acc:"#00a0e1",on:"#6fd0ff",dim:"#8ea0b8",ui:"Kia Connect",home:(...a)=>kiaHome(...a)},
   Stell:{bg:"#0c0d10",dock:"#15171b",line:"#2a2d33",acc:"#3a8dde",on:"#8cc4ff",dim:"#9aa1a8",ui:"Uconnect 5",home:(...a)=>chrHome(...a)},
@@ -11726,7 +11751,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=181;   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="173",BUILD_VER=182;   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){return GQ[GFX.q==="auto"?GFX.eff:GFX.q]}
