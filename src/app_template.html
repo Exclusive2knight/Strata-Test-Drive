@@ -1266,7 +1266,8 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
 <li>The all-new <b>2025 Audi Q5</b> (new model) in every US trim: <b>Q5 Premium, Premium Plus and Prestige</b> (2.0 TFSI, 268 hp, 295 lb-ft, 7-speed S tronic, quattro, 0-60 in about 5.8 s) and <b>SQ5 Premium, Premium Plus and Prestige</b> (3.0 TFSI V6 mild hybrid, 362 hp, 406 lb-ft, 0-60 in about 4.4 s).</li>
 <li>Audi drive select with all six modes (comfort, balanced, dynamic, efficiency, offroad, individual). The SQ5 gets S sport suspension with damper control as standard; adaptive air suspension is an option on the Q5 Prestige and the SQ5.</li>
 <li>Real features and packages: adaptive cruise assist with lane guidance, top view camera, head-up display, Bang & Olufsen 3D sound, Digital Matrix LED headlights, digital OLED taillights, park assist plus and the 10.9-in. passenger screen, by trim or as options. The 2019 Q5 is still there too.</li></ul>
-      <h4>🏠 Real infotainment home screens</h4><ul>
+      <h4>🔇 Electric motor sound</h4><ul><li>On EVs and hybrids the electric motor hum now fades out together with the pedestrian warning sound (gone by about 19 mph), instead of whining the whole drive. It still plays in reverse.</li></ul>
+<h4>🏠 Real infotainment home screens</h4><ul>
 <li>The home screen on the center touchscreen now looks like each brand's real one, laid out from the owner's manuals and reviews:
 <b>Kia, Hyundai and Genesis</b> (map and media widgets with the weather, a row of menu icons underneath, Genesis in black and copper),
 <b>Ford SYNC 4</b> (map on the left, swipeable Audio / Phone / weather / clock cards on the right with arrows),
@@ -7907,12 +7908,13 @@ function updateAudio(){
   au.mw.frequency.setTargetAtTime(60+kmh*11,t,0.05); au.bp.frequency.setTargetAtTime(900+kmh*14,t,0.05);
   // motor whine: a soft, quiet tone that rises with speed and swells a little under load (gas cars have no traction motor)
   {const E=au.ev,T=TRIMS[st.trim],ev=!T.ice,cab=st.cam===1?0.55:1,P=car.tq.reduce((a,q,i)=>a+q*car.w[i],0)/1000,ld=clamp(Math.abs(P)/(T.kW*0.6),0,1),fade=Math.min(1,kmh/8);
-   const rv=st.gear==="R",mf=(rv?60:35)+kmh*(rv?16:8.2);E.m.frequency.setTargetAtTime(mf,t,0.05);E.m2.frequency.setTargetAtTime(mf*2.01,t,0.05);E.mLP.frequency.setTargetAtTime(600+kmh*8+ld*400,t,0.08);E.res.frequency.setTargetAtTime(mf*6,t,0.06);
-   const MDs=MD(),SK=MDs.sndK??1,SPm=MDs.sndP??1;if(SPm!==1){E.m.frequency.setTargetAtTime(mf*SPm,t,0.05);E.m2.frequency.setTargetAtTime(mf*2.01*SPm,t,0.05)}E.mG.gain.setTargetAtTime(ev?(0.0018+0.0055*ld)*Math.min(1,kmh/5)*cab*SK:0,t,0.1);
+   // the motor sounds go quiet together with the pedestrian warning sound: full below 20 km/h, fading out by 30 km/h (always on in reverse)
+   const rv=st.gear==="R",avF=rv?1:kmh<20?1:kmh<30?(30-kmh)/10:0,mf=(rv?60:35)+kmh*(rv?16:8.2);E.m.frequency.setTargetAtTime(mf,t,0.05);E.m2.frequency.setTargetAtTime(mf*2.01,t,0.05);E.mLP.frequency.setTargetAtTime(600+kmh*8+ld*400,t,0.08);E.res.frequency.setTargetAtTime(mf*6,t,0.06);
+   const MDs=MD(),SK=MDs.sndK??1,SPm=MDs.sndP??1;if(SPm!==1){E.m.frequency.setTargetAtTime(mf*SPm,t,0.05);E.m2.frequency.setTargetAtTime(mf*2.01*SPm,t,0.05)}E.mG.gain.setTargetAtTime(ev?(0.0018+0.0055*ld)*Math.min(1,kmh/5)*cab*SK*avF:0,t,0.1);
    E.r.frequency.setTargetAtTime(640+kmh*32,t,0.12);E.rLP.frequency.setTargetAtTime(640+kmh*32,t,0.12);E.rG.gain.setTargetAtTime(ev&&rv&&kmh>0.3?0.0035*cab*Math.min(1,kmh/3):0,t,0.08);
-   E.g.frequency.setTargetAtTime(90+kmh*27,t,0.05);E.gG.gain.setTargetAtTime(ev?0.0022*Math.min(1,kmh/40)*(0.35+0.65*ld)*cab*SK:0,t,0.12);
+   E.g.frequency.setTargetAtTime(90+kmh*27,t,0.05);E.gG.gain.setTargetAtTime(ev?0.0022*Math.min(1,kmh/40)*(0.35+0.65*ld)*cab*SK*avF:0,t,0.12);
    const step=Math.min(8,Math.floor(kmh/7)),fi=480*Math.pow(1.1225,step);E.i.frequency.setTargetAtTime(fi,t,0.015);E.iBP.frequency.setTargetAtTime(fi*2,t,0.015);
-   E.iG.gain.setTargetAtTime(ev&&P>3&&kmh<50?0.0015*ld*(1-kmh/50)*cab:0,t,0.06)}
+   E.iG.gain.setTargetAtTime(ev&&P>3&&kmh<50?0.0015*ld*(1-kmh/50)*cab*avF:0,t,0.06)}
   au.mwG.gain.setTargetAtTime(0*(TRIMS[st.trim].ice||kmh<1?0:1)*Math.min(0.016,0.004+load/30000*0.012)*(st.cam===1?0.6:1)*Math.min(1,kmh/15),t,0.1);
   // wind: softer outside than before, and inside the cabin much quieter and muffled (laminated glass, door seals)
   const inCab=st.cam===1, wind=Math.min(0.15,kmh*kmh/135000);
@@ -11724,7 +11726,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=180;   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="173",BUILD_VER=181;   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){return GQ[GFX.q==="auto"?GFX.eff:GFX.q]}
