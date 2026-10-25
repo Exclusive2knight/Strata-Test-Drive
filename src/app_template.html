@@ -9323,17 +9323,23 @@ function ravHome(g,top,bot,pw,M){const p=6,h=bot-top,lw=pw*0.46,rx=lw+2*p,rw=pw-
 // Toyota hybrid Energy Monitor (as on the real 2019 RAV4 Hybrid screen): an alloy wheel on the left, the engine top right, the glowing battery
 // low in the middle, joined by thick grey pipes; a pipe carrying power turns red (engine) or green (battery, braking) with a big arrowhead
 function ravEnergy(g,x,y,w,h){ravPanel(g,x,y,w,h);let S={pe:0,pm:0,regen:false,engChg:false,soc:0.6};try{S=hybState()}catch(e){}const t=performance.now()/1000,s=Math.min(w/270,h/250),P=(u,v)=>[x+w*u,y+h*v];
-  const Wc=P(0.2,0.38),Ec=P(0.82,0.4),Bc=P(0.54,0.76);
-  const pipe={WE:[P(0.27,0.3),P(0.52,0.06),P(0.74,0.33)],WB:[P(0.19,0.48),P(0.18,0.86),P(0.46,0.82)],EB:[P(0.86,0.5),P(0.86,0.78),P(0.62,0.79)]};
-  const stroke=(k,col,wd)=>{const [a,c,b]=pipe[k];g.strokeStyle=col;g.lineWidth=wd;g.lineCap="round";g.beginPath();g.moveTo(a[0],a[1]);g.quadraticCurveTo(c[0],c[1],b[0],b[1]);g.stroke()};
-  for(const k of ["WE","WB"]){stroke(k,"#3c4352",11*s);stroke(k,"#8a909d",8*s);stroke(k,"rgba(255,255,255,.25)",2*s)}
+  // the three parts sit on one big oval, like the real screen: wheel on the left, engine on the right, battery at the bottom
+  const cx0=x+w*0.5,cy0=y+h*0.47,rx=w*0.33,ry=h*0.3,D=Math.PI/180,aW=199*D,aE=341*D,aB=450*D,at=a=>[cx0+rx*Math.cos(a),cy0+ry*Math.sin(a)];
+  const Wc=at(aW),Ec=at(aE),Bc=at(aB);
+  const arc=(a0,a1,col,wd)=>{g.strokeStyle=col;g.lineWidth=wd;g.lineCap="round";g.beginPath();g.ellipse(cx0,cy0,rx,ry,0,a0,a1);g.stroke()};
+  const tube=(a0,a1)=>{arc(a0,a1,"#363c48",12*s);arc(a0,a1,"#8c929e",9*s);arc(a0,a1,"rgba(255,255,255,.22)",2.5*s)};
+  const gapW=0.2,gapE=0.17,gapB=0.2;   // stop each tube short of the part it meets
+  tube(aW+gapW,aE-gapE);tube(aB+gapB,aW+2*Math.PI-gapW);
   const eOn=S.pe>0.5&&!S.engChg,mOn=S.pm>0.5&&!S.regen,chg=S.engChg||(eOn&&S.pe>Math.max(0,S.pm)+2);
-  // a lit pipe ending in an arrowhead at "to" (0 = start, 1 = end)
-  const flow=(k,c0,c1,to)=>{const [a,c,b]=pipe[k],gr=g.createLinearGradient(a[0],a[1],b[0],b[1]);gr.addColorStop(0,c0);gr.addColorStop(1,c1);stroke(k,gr,9*s);
-    const e=to?b:a,q=to?[2*b[0]-c[0],2*b[1]-c[1]]:c,ang=Math.atan2(e[1]-(to?c[1]:c[1]),e[0]-(to?c[0]:c[0]));const A=to?Math.atan2(b[1]-c[1],b[0]-c[0]):Math.atan2(a[1]-c[1],a[0]-c[0]);
-    g.fillStyle=to?c1:c0;g.save();g.translate(e[0],e[1]);g.rotate(A);g.beginPath();g.moveTo(10*s,0);g.lineTo(-8*s,-11*s);g.lineTo(-4*s,0);g.lineTo(-8*s,11*s);g.closePath();g.fill();g.restore();
-    const u=(t*0.9)%1,uu=to?u:1-u,px=(1-uu)*(1-uu)*a[0]+2*(1-uu)*uu*c[0]+uu*uu*b[0],py=(1-uu)*(1-uu)*a[1]+2*(1-uu)*uu*c[1]+uu*uu*b[1];g.fillStyle="rgba(255,255,255,.6)";g.beginPath();g.arc(px,py,2.6*s,0,7);g.fill()};
-  if(chg)flow("EB","#e8382c","#ff2a2a",1);if(eOn)flow("WE","#ff6b2a","#e8382c",0);if(mOn)flow("WB","#22b85a","#5fe08a",0);if(S.regen)flow("WB","#22b85a","#5fe08a",1);
+  if(!chg)tube(aE+gapE,aB-gapB);
+  // a lit stretch of the oval from angle a0 to a1 with a big arrowhead at a1 and a light running along it
+  const flow=(a0,a1,c0,c1)=>{const p0=at(a0),p1=at(a1),gr=g.createLinearGradient(p0[0],p0[1],p1[0],p1[1]);gr.addColorStop(0,c0);gr.addColorStop(1,c1);const lo=Math.min(a0,a1),hi=Math.max(a0,a1);arc(lo,hi,gr,10*s);
+    const dir=a1>a0?1:-1,tx=-rx*Math.sin(a1)*dir,ty=ry*Math.cos(a1)*dir,A=Math.atan2(ty,tx);g.fillStyle=c1;g.save();g.translate(p1[0],p1[1]);g.rotate(A);g.beginPath();g.moveTo(12*s,0);g.lineTo(-9*s,-13*s);g.lineTo(-4*s,0);g.lineTo(-9*s,13*s);g.closePath();g.fill();g.restore();
+    const u=(t*0.8)%1,am=a0+(a1-a0)*u,q=at(am);g.fillStyle="rgba(255,255,255,.65)";g.beginPath();g.arc(q[0],q[1],2.8*s,0,7);g.fill()};
+  if(chg)flow(aE+gapE,aB-gapB-0.04,"#ff3b2f","#ff2020");
+  if(eOn)flow(aE-gapE,aW+gapW+0.04,"#ff6b2a","#ff3b2f");
+  if(mOn)flow(aB+gapB,aW+2*Math.PI-gapW-0.04,"#22b85a","#5fe08a");
+  if(S.regen)flow(aW+2*Math.PI-gapW,aB+gapB+0.04,"#5fe08a","#22b85a");
   // alloy wheel
   {const [cx,cy]=Wc,R=27*s,tg=g.createRadialGradient(cx-R*0.3,cy-R*0.3,R*0.2,cx,cy,R);tg.addColorStop(0,"#3a3d44");tg.addColorStop(1,"#0b0c0e");g.fillStyle=tg;g.beginPath();g.arc(cx,cy,R,0,7);g.fill();
    const rg=g.createLinearGradient(cx-R,cy-R,cx+R,cy+R);rg.addColorStop(0,"#f1f3f6");rg.addColorStop(1,"#8d939c");g.fillStyle=rg;g.beginPath();g.arc(cx,cy,R*0.66,0,7);g.fill();g.fillStyle="#2a2d33";g.beginPath();g.arc(cx,cy,R*0.6,0,7);g.fill();
@@ -11760,7 +11766,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=183;   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="173",BUILD_VER=184;   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){return GQ[GFX.q==="auto"?GFX.eff:GFX.q]}
