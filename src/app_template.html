@@ -1068,6 +1068,15 @@ html body.ui2 #accel .fill{background:linear-gradient(to top,var(--acc),transpar
 
   html body.ui2 #ui2 #u2ccb,html body.ui2 #ui2 #u2ev{left:calc(50% - var(--midw)*.4 - 44px)!important}html body.ui2 #ui2 #u2start{left:calc(50% + var(--midw)*.4 + 6px)!important}
   html body.ui2 #ui2 #u2ccb,html body.ui2 #ui2 #u2start{bottom:calc(env(safe-area-inset-bottom,0px) + 26px)!important}html body.ui2 #ui2 #u2ev{bottom:calc(env(safe-area-inset-bottom,0px) + 68px)!important}}
+
+/* P R N D buttons above the cluster replace the shift buttons (+ / − only show with the manual gearbox) */
+html body.ui2 #ui2 #u2gearsel{display:none!important}html body.ui2 #ui2 #u2up[hidden],html body.ui2 #ui2 #u2dn[hidden]{display:none!important}
+#ui2 #u2prs{display:flex;gap:2px;padding:3px;border-radius:999px;background:var(--card);border:1px solid var(--brd);box-shadow:var(--sh);pointer-events:auto}
+#ui2 #u2prs button{all:unset;cursor:pointer;width:34px;height:28px;border-radius:999px;display:flex;align-items:center;justify-content:center;font:700 13px var(--hf);color:var(--sub)}
+html body.ui2 #ui2 #u2prs button{background:transparent!important;border:0!important;box-shadow:none!important;color:var(--sub)!important}html body.ui2 #ui2 #u2prs button.on{background:var(--sel)!important;color:var(--selTx)!important}
+@media (pointer:coarse) and (max-height:600px),(max-height:440px){#ui2 #u2prs button{width:30px;height:24px;font-size:11px}
+  html body.ui2 #ui2 #u2arrows button{width:68px!important;height:68px!important;border-radius:18px!important}html body.ui2 #ui2 #u2arrows svg{width:30px;height:30px}
+  html body.ui2 #brake{width:74px!important;height:104px!important}html body.ui2 #accel{width:84px!important;height:140px!important}}
 </style>
 
 <canvas id="gl"></canvas>
@@ -1188,7 +1197,7 @@ html body.ui2 #accel .fill{background:linear-gradient(to top,var(--acc),transpar
   </div>
   <div id="u2msg"></div><div id="u2nav" hidden></div>
   <div class="u2mid"><div id="u2cc" hidden></div>
-    <div class="u2row"><button id="u2vol" aria-label="Volume"><svg viewBox="0 0 24 24"><path d="M4 10v4h4l6 4V6L8 10z" class="f"/><path d="M17 9a4 4 0 0 1 0 6"/></svg></button><button id="u2gearsel" aria-label="Gear selector"><svg viewBox="0 0 24 24"><path d="M6 4v16M12 4v16M18 4v8M6 12h12"/></svg></button><button id="u2up" aria-label="Shift up (E)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button><button id="u2dn" aria-label="Shift down (Q)"><svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button><span class="sp"></span><button id="u2exit" class="red" aria-label="Get out (O)"><svg viewBox="0 0 24 24"><path d="M14 4h5v16h-5"/><path d="M10 8l-4 4 4 4M6 12h9"/></svg></button></div>
+    <div class="u2row"><button id="u2vol" aria-label="Volume"><svg viewBox="0 0 24 24"><path d="M4 10v4h4l6 4V6L8 10z" class="f"/><path d="M17 9a4 4 0 0 1 0 6"/></svg></button><button id="u2gearsel" aria-label="Gear selector"><svg viewBox="0 0 24 24"><path d="M6 4v16M12 4v16M18 4v8M6 12h12"/></svg></button><button id="u2up" aria-label="Shift up (E)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button><button id="u2dn" aria-label="Shift down (Q)"><svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button><div id="u2prs" role="group" aria-label="Gear"><button data-g="P" aria-label="Park">P</button><button data-g="R" aria-label="Reverse">R</button><button data-g="N" aria-label="Neutral">N</button><button data-g="D" aria-label="Drive">D</button></div><span class="sp"></span><button id="u2exit" class="red" aria-label="Get out (O)"><svg viewBox="0 0 24 24"><path d="M14 4h5v16h-5"/><path d="M10 8l-4 4 4 4M6 12h9"/></svg></button></div>
     <div class="u2line"><i id="u2thr"></i><i id="u2brk"></i></div>
     <div class="u2cells"><div id="u2spdc"><div class="sp"><b id="u2spd">0</b><div id="u2lim" hidden><small>SPEED<br>LIMIT</small><b>30</b></div></div><small id="u2unit">mph</small><div class="u2sb"><i id="u2sbf"></i></div></div><div class="u2view" id="u2carbtn"><div class="u2vh"><button class="u2va" data-d="-1" aria-label="Previous screen">‹</button><div class="u2vtt"><div class="u2vtn"><span id="u2vtA">Energy</span><span id="u2vtB"></span></div><div class="u2dots"><i class="on"></i><i></i><i></i><i></i></div></div><button class="u2va" data-d="1" aria-label="Next screen">›</button></div><div class="u2vs"><canvas id="u2vc" width="392" height="216" aria-label="Cluster screen"></canvas><canvas id="u2vg" width="392" height="216" aria-hidden="true"></canvas></div></div><div id="u2gearc"><div class="u2prnd" id="u2prnd"><span>P</span><span>R</span><span>N</span><span>D</span></div><b id="u2gear" hidden>P</b><small id="u2hpv">Power 0 hp</small><div class="u2pb"><i id="u2pr"></i><i id="u2pp"></i></div><small id="u2stR"></small><div class="u2pw" hidden><i id="u2pwn"></i><i id="u2pwp"></i></div></div></div>
     <div class="u2bars"><i class="ic" id="u2fic">⛽</i><div class="u2fuel"><i id="u2fuel"></i></div><div class="u2hp"><i id="u2hp"></i></div><i class="ic">🔧</i></div>
@@ -5363,6 +5372,7 @@ function ui2Init(){document.body.classList.add("ui2");const on=(id,fn)=>{const e
   const horn=$("u2horn");horn.addEventListener("pointerdown",e=>{e.preventDefault();hornOn(true)});for(const ev of ["pointerup","pointerleave","pointercancel"])horn.addEventListener(ev,()=>hornOff());
   on("u2vol",()=>{const L=[0.5,0.8,1,0,0.25];au.vol=L[(L.indexOf(au.vol??0.5)+1)%L.length];if(au.master)au.master.gain.value=0.7*(au.vol===0?0:Math.max(0.3,au.vol*1.4));toast(au.vol?`Volume ${Math.round(au.vol*100)}%`:"Muted")});
   on("u2gearsel",()=>{$("u2gearpop").hidden=!$("u2gearpop").hidden});on("u2up",()=>act("shiftDn"));on("u2dn",()=>act("shiftUp"));on("u2exit",()=>walkAction());
+  {const g=$("u2prs");g.addEventListener("pointerdown",e=>{e.stopPropagation();const b=e.target.closest("button[data-g]");if(!b)return;e.preventDefault();act("g"+b.dataset.g)});g.addEventListener("click",e=>e.stopPropagation())}
   $("u2gearpop").addEventListener("click",e=>{const b=e.target.closest("button[data-g]");if(b){act("g"+b.dataset.g);$("u2gearpop").hidden=true}});
   {const tb=$("u2terr");tb.addEventListener("pointerdown",e=>e.stopPropagation());tb.addEventListener("click",e=>{e.stopPropagation();if(!document.body.classList.contains("pc")){modesToggle("terr");return}act("terrain");tick(1)})}
   {const mb=$("u2mode");let lt=null,long=false;mb.addEventListener("pointerdown",e=>{e.stopPropagation();long=false;lt=setTimeout(()=>{long=true;if(hasCrawl())act("crawl")},550)});
@@ -5396,7 +5406,7 @@ function ui2Tick(){if(!document.body.classList.contains("ui2")||GFX.frame%4)retu
     if(on){let t,sub;if(T_.eModes){const m=T_.eModes.find(m=>m[0]===(st.eMode||"hyb"))||T_.eModes[0];t=m[1].toUpperCase();sub="EV MODE";eb.classList.toggle("on",m[0]==="ev");eb.classList.toggle("save",m[0]==="save"||m[0]==="charge")}
       else{t=(T_.evName||"EV").toUpperCase().replace(/ MODE$/,"");sub=st.evMode?"ON":"MODE";eb.classList.toggle("on",!!st.evMode);eb.classList.remove("save")}
       const b=eb.firstChild;if(b.textContent!==t){b.textContent=t;b.style.fontSize=t.length>11?"7px":t.length>8?"8px":""}if(eb.lastChild.textContent!==sub)eb.lastChild.textContent=sub}}
-  document.querySelectorAll("#u2gearpop button").forEach(b=>b.classList.toggle("on",b.dataset.g===st.gear));
+  document.querySelectorAll("#u2gearpop button,#u2prs button").forEach(b=>b.classList.toggle("on",b.dataset.g===st.gear));{const m=!!manOn();$("u2up").hidden=$("u2dn").hidden=!m}
   const msg=st.walk?"":st.power===false?(PC.on?"Hold S and press F to start your vehicle":"Press the start button to start your vehicle"):st.power==="acc"?(PC.on?"Accessory mode · hold S and press F to start":"Accessory mode · hold the brake and press start"):!st.belt&&v>2.5?"Fasten your seatbelt":"";set("u2msg",msg);try{viewSample();viewDraw();modesRender();ccTick();gaugeTick();{const P=car.tq.reduce((a,q,i)=>a+q*car.w[i],0)/1000,mx=T.kW||200;$("u2pwp").style.setProperty("--p",(clamp(P/mx,0,1)*100).toFixed(0)+"%");$("u2pwn").style.setProperty("--p",(clamp(-P/(mx*0.4),0,1)*100).toFixed(0)+"%")}}catch(e){}}
 // ignition, as in the car: off -> accessory (screens and radio, no engine) -> running. Brake + start button starts it; in an EV
 // (Tesla and co.) the car is simply on when you get in.
