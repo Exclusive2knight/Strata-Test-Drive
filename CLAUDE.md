@@ -26,6 +26,7 @@ https://exclusive2knight.github.io/Strata-Test-Drive/
    - Add a changelog entry: in the "What's new" panel, the newest version gets an `<h2>Version N · title</h2>` header, and the previous header becomes `<h4 class="old">…</h4>` inside the same `.nb` block.
    - Bump `const APP_VER="N"` (this resets players' saved games; that's expected).
    - `sh tools/maint.sh off N` (N = the new APP_VER; turns maintenance off and tells older open copies to reload), then commit and push to `main`. GitHub Pages updates the site in a minute or two.
+   - Hotfix without a save reset: keep `APP_VER`, bump `BUILD_VER` and set `"build"` in `maint.json` to it, so open copies get the "A new version is out" bar.
 5. Write changelog text in plain, specific words for a player (what changed and what they'll notice).
 
 ## Testing
