@@ -885,7 +885,7 @@ body.pmOn>*:not(#gl):not(#pm):not(#pmFx):not(#toast):not(#flashFx):not(#susUI):n
 #wanted{position:fixed;top:calc(env(safe-area-inset-top,0px) + 46px);left:50%;transform:translateX(-50%);z-index:9;text-align:center;pointer-events:none;color:#fff;text-shadow:0 2px 6px #000}#wanted[hidden]{display:none}#wanted b{display:block;font:900 30px system-ui;letter-spacing:4px;color:#fff}#wanted b i{font-style:normal;color:rgba(255,255,255,.25)}#wanted small{font:700 12px system-ui;letter-spacing:.12em;text-transform:uppercase}#wanted.mem b{color:rgba(255,255,255,.45)}#wanted.mem small{opacity:.75}#wanted.flash b{animation:wflash .5s steps(2) infinite}@keyframes wflash{50%{color:#ff3b30}}
 /* ===================== HUD 4 (v173): flat dark panels, hairline dividers, one amber accent =====================
    no blur, no glow; square-ish corners; plain sans with tabular numbers. Same layout and buttons as before. */
-:root{--g-bg:#121314;--g-bg2:#1b1c1f;--g-brd:#26282b;--g-hi:none;--g-sh:0 6px 18px rgba(0,0,0,.32);--acc:#f2a33a;--acc-d:rgba(242,163,58,.14);--acc-g:none;--amb:#f2a33a;--bad:#ff5b52;--tx:#ececec;--dim:#8b8e93;--r:6px;--midw:min(620px,54vw)}
+:root{--g-bg:#121314;--g-bg2:#1b1c1f;--g-brd:#26282b;--g-hi:none;--g-sh:0 6px 18px rgba(0,0,0,.32);--acc:#f2a33a;--acc-d:rgba(242,163,58,.14);--acc-g:none;--amb:#f2a33a;--bad:#ff5b52;--tx:#ececec;--dim:#8b8e93;--r:6px;--midw:min(470px,40vw)}
 body.ui2 #ui2{--f-hud:"Helvetica Neue",Helvetica,Arial,sans-serif;--f-ui:"Helvetica Neue",Helvetica,Arial,sans-serif;font-variant-numeric:tabular-nums}
 body.ui2 #ui2 *{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
 html body.ui2 #ui2 .u2c,html body.ui2 #ui2 .u2bar,html body.ui2 #ui2 .u2pill,html body.ui2 #ui2 .u2left button,html body.ui2 #ui2 .u2right button,html body.ui2 #ui2 .u2row button,html body.ui2 #ui2 .u2cells,html body.ui2 #ui2 .u2bars,
@@ -928,14 +928,14 @@ html body.ui2 #ui2 .u2mid{width:var(--midw);gap:5px}
 html body.ui2 #ui2 .u2row button{border-radius:6px}
 html body.ui2 #ui2 .u2line{height:2px;background:#2a2c2f;border-radius:0}html body.ui2 #ui2 .u2line i{background:#ececec;box-shadow:none;border-radius:0}html body.ui2 #ui2 .u2line #u2brk{background:var(--bad);box-shadow:none}
 html body.ui2 #ui2 .u2cells{grid-template-columns:0.78fr 1.75fr 0.78fr;border-radius:6px;padding:0;gap:0;pointer-events:auto}
-html body.ui2 #ui2 .u2cells>div{border-radius:0;background:transparent;box-shadow:none!important;padding:10px 0}
+html body.ui2 #ui2 .u2cells>div{border-radius:0;background:transparent;box-shadow:none!important;padding:6px 0}
 html body.ui2 #ui2 .u2cells>div+div{border-left:1px solid #222427}
-html body.ui2 #ui2 .u2cells b{font:300 30px var(--f-hud);letter-spacing:-.5px}html body.ui2 #ui2 #u2spd{font-size:44px;font-weight:300}
+html body.ui2 #ui2 .u2cells b{font:300 24px var(--f-hud);letter-spacing:-.5px}html body.ui2 #ui2 #u2spd{font-size:34px;font-weight:300}
 html body.ui2 #ui2 .u2cells small{font:400 10px var(--f-ui);letter-spacing:.04em;text-transform:none;color:var(--dim)}
 html body.ui2 #ui2 #u2gear{font-weight:500}
-html body.ui2 #ui2 .u2view{padding:6px 8px 4px!important;display:flex;flex-direction:column;align-items:stretch!important;justify-content:flex-start!important;gap:4px}
+html body.ui2 #ui2 .u2view{padding:4px 6px 2px!important;display:flex;flex-direction:column;align-items:stretch!important;justify-content:flex-start!important;gap:4px}
 html body.ui2 #ui2 #u2vt{display:flex;gap:12px;border-bottom:1px solid #222427;padding:0 2px 4px}
-html body.ui2 #ui2 #u2vt button{all:unset;cursor:pointer;font:400 11px var(--f-ui);color:#6d7075;padding-bottom:2px;border-bottom:2px solid transparent}
+html body.ui2 #ui2 #u2vt button{all:unset;cursor:pointer;font:400 10px var(--f-ui);color:#6d7075;padding-bottom:2px;border-bottom:2px solid transparent}
 html body.ui2 #ui2 #u2vt button.on{color:#ececec;border-bottom-color:var(--acc)}
 html body.ui2 #ui2 #u2vc{width:100%;height:auto;aspect-ratio:196/108;display:block;cursor:pointer}
 html body.ui2 #ui2 .u2pw{display:flex;gap:2px;width:72%;margin-top:7px}html body.ui2 #ui2 .u2pw i{display:block;height:5px;background:#2a2c2f;position:relative;overflow:hidden}
@@ -967,22 +967,22 @@ html body.ui2 #accel.on,html body.ui2 #accel:active{box-shadow:inset 0 -3px 0 #e
 body.ui2:not(.rcOpen) #ui2 .u2right>*:not(#u2rc):not(#u2haz):not(.u2pair:has(#u2sl)){display:none!important}
 html body.ui2.rcOpen #ui2 #u2rc{box-shadow:inset 0 -2px 0 #f2a33a!important}
 /* drive / terrain mode panel: docked beside the cluster on PC, a pop-up over the cluster on touch */
-#ui2 #u2modes{position:fixed;z-index:7;width:104px;background:#121314;border:1px solid #26282b;border-radius:6px;box-shadow:0 6px 18px rgba(0,0,0,.32);font:400 12px "Helvetica Neue",Helvetica,Arial,sans-serif;color:#a9acb1;padding:4px;pointer-events:auto}
+#ui2 #u2modes{position:fixed;z-index:7;width:92px;background:#121314;border:1px solid #26282b;border-radius:6px;box-shadow:0 6px 18px rgba(0,0,0,.32);font:400 12px "Helvetica Neue",Helvetica,Arial,sans-serif;color:#a9acb1;padding:4px;pointer-events:auto}
 #ui2 #u2modes[hidden]{display:none}
 #ui2 #u2modes .mt{display:flex;gap:2px;padding:2px 2px 5px;border-bottom:1px solid #222427;margin-bottom:3px}
 #ui2 #u2modes .mt span{font-size:10px;color:#8b8e93;padding:2px 4px}
 #ui2 #u2modes .mt button{all:unset;cursor:pointer;flex:1;text-align:center;font-size:10px;color:#6d7075;padding:2px 0;border-bottom:2px solid transparent}#ui2 #u2modes .mt button.on{color:#ececec;border-bottom-color:#f2a33a}
 #ui2 #u2modes .ml{display:flex;flex-direction:column;gap:1px;max-height:150px;overflow-y:auto;scrollbar-width:none}
-#ui2 #u2modes .ml button{all:unset;cursor:pointer;padding:5px 8px;border-radius:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#ui2 #u2modes .ml button{all:unset;cursor:pointer;font-size:11px;padding:4px 7px;border-radius:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #ui2 #u2modes .ml button:hover{background:#1c1d1f;color:#ececec}#ui2 #u2modes .ml button.on{background:#f2a33a;color:#121314;font-weight:700}
 body.pc #ui2 #u2modes{left:calc(50% + var(--midw)/2 + 66px);bottom:calc(env(safe-area-inset-bottom,0px) + 30px)}
 body.pc #ui2 #u2mode,body.pc #ui2 #u2terr{display:none!important}
 body.pc #ui2 #u2ev{right:auto!important;left:calc(50% + var(--midw)/2 + 178px)!important;bottom:calc(env(safe-area-inset-bottom,0px) + 30px)!important}
-body:not(.pc) #ui2 #u2modes{left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 200px);width:150px}
-body:not(.pc) #ui2 #u2modes .ml button{padding:8px 10px;font-size:13px}
+body:not(.pc) #ui2 #u2modes{left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 170px);width:130px}
+body:not(.pc) #ui2 #u2modes .ml button{padding:6px 9px;font-size:12px}
 body.onfoot #ui2 #u2modes{display:none!important}
-@media (max-width:820px){:root{--midw:min(470px,56vw)}}
-@media (max-height:440px){:root{--midw:min(400px,50vw)}html body.ui2 #ui2 .u2left .dk button{height:31px!important;width:104px!important}html body.ui2 #ui2 .u2left .dk small{font-size:11px}html body.ui2 #ui2 #u2spd{font-size:30px}html body.ui2 #ui2 .u2cells b{font-size:22px}html body.ui2 #ui2 .u2cells>div{padding:5px 0}body:not(.pc) #ui2 #u2modes{bottom:calc(env(safe-area-inset-bottom,0px) + 150px)}}
+@media (max-width:820px){:root{--midw:min(400px,46vw)}}
+@media (max-height:440px){:root{--midw:min(330px,40vw)}html body.ui2 #ui2 #u2vt{gap:7px}html body.ui2 #ui2 #u2vt button{font-size:9px}html body.ui2 #ui2 .u2left .dk button{height:31px!important;width:104px!important}html body.ui2 #ui2 .u2left .dk small{font-size:11px}html body.ui2 #ui2 #u2spd{font-size:24px}html body.ui2 #ui2 .u2cells b{font-size:18px}html body.ui2 #ui2 .u2cells>div{padding:3px 0}body:not(.pc) #ui2 #u2modes{bottom:calc(env(safe-area-inset-bottom,0px) + 130px)}}
 </style>
 
 <canvas id="gl"></canvas>
@@ -5152,13 +5152,13 @@ function viewDraw(){const c=$("u2vc");if(!c||c.offsetParent===null)return;const 
   document.querySelectorAll("#u2vt button").forEach(b=>b.classList.toggle("on",b.dataset.v===v));
   if(v==="assist"&&isTesla()){vizTesla(g,0,0,W,Hh,false);return}
   g.setTransform(k,0,0,k,0,0);g.lineJoin="round";g.lineCap="round";
-  const bigG=(c.clientWidth||196)<175?1.35:1.12,txt=(s,x,y,col,sz,al,w)=>{g.fillStyle=col;g.font=F((sz||9)*bigG,w);g.textAlign=al||"left";g.fillText(s,x,y)};
+  const bigG=(c.clientWidth||196)<150?1.35:(c.clientWidth||196)<200?1.2:1.1,txt=(s,x,y,col,sz,al,w)=>{g.fillStyle=col;g.font=F((sz||9)*bigG,w);g.textAlign=al||"left";g.fillText(s,x,y)};
   const carTop=(x,y,w,h,col)=>{g.strokeStyle=col||"#5a5d62";g.lineWidth=1.5;rr2(g,x,y,w,h,w*0.3);g.stroke()};
   const wheel=(x,y,on,col)=>{g.fillStyle=on?(col||amb):"#2c2e31";rr2(g,x,y,7,17,2);g.fill()};
   const D=DRIVES[st.trim]||{},fr=D.bias?D.bias[0]>0.05:D.T?D.T[0]>0:true,rr=D.bias?D.bias[1]>0.05:D.T?D.T[1]>0:false,drv=fr&&rr?(/4x4|4WD|TRD|Wrangler|Bronco|Tacoma|4Runner/i.test((T.name||"")+(T.group||""))?"4WD":"AWD"):rr?"RWD":"FWD";
   if(v==="energy"){const hyb=!!T.hybrid,ice=!!T.ice&&!hyb,ev=!T.ice&&!hyb;let pe=0,pm=0,P=car.tq.reduce((a,q,i)=>a+q*car.w[i],0)/1000,regen=false,engChg=false,soc=null;
     if(hyb){try{const S=hybState();pe=S.pe;pm=S.pm;P=S.P;regen=S.regen;engChg=S.engChg;soc=S.soc}catch(e){}}else if(ice)pe=Math.max(0,P);else{pm=P;regen=P<-1;soc=socShow(H)}
-    const fuelF=ice||hyb?clamp(H.fuel/(H.tank||1),0,1):null,go=P>0.5,eOn=pe>0.5&&!engChg,mOn=Math.abs(pm)>0.5,cE="#f2a33a",cB=regen?"#7fd17f":"#4fb3ff",cw=c.clientWidth||196,big=cw<175?1.4:1.18;
+    const fuelF=ice||hyb?clamp(H.fuel/(H.tank||1),0,1):null,go=P>0.5,eOn=pe>0.5&&!engChg,mOn=Math.abs(pm)>0.5,cE="#f2a33a",cB=regen?"#7fd17f":"#4fb3ff",cw=c.clientWidth||196,big=cw<150?1.45:cw<200?1.28:1.15;
     // the car from above, nose to the right: body, glass, mirrors, tyres
     const X0=54,X1=144,YC=56,HW=21,fa=127,ra=72;
     g.fillStyle="#1d1f22";g.strokeStyle="#55585d";g.lineWidth=1.3;g.beginPath();g.moveTo(X0+8,YC-HW);g.lineTo(fa-6,YC-HW);g.bezierCurveTo(X1-4,YC-HW,X1,YC-HW+6,X1,YC-8);g.lineTo(X1,YC+8);g.bezierCurveTo(X1,YC+HW-6,X1-4,YC+HW,fa-6,YC+HW);g.lineTo(X0+8,YC+HW);g.bezierCurveTo(X0+1,YC+HW,X0,YC+HW-5,X0,YC+10);g.lineTo(X0,YC-10);g.bezierCurveTo(X0,YC-HW+5,X0+1,YC-HW,X0+8,YC-HW);g.closePath();g.fill();g.stroke();
