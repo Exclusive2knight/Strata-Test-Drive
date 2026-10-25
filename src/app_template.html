@@ -1269,7 +1269,7 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
 <li>The cluster screen now has <b>‹ › arrows</b> to flip between Energy, Assist, Trip and Car, with a slide animation and page dots.</li>
 <li><b>Cruise control button</b> next to the cluster: tap it to turn cruise on. A bar pops up on top of the cluster to set the <b>following distance</b> and the speed with <b>− / +</b> (5 mph a tap). Tap again to turn it off.</li>
 <li>The <b>EV mode</b> button is now a circle above the cruise button (hybrids and plug-ins).</li>
-<li><b>Drive mode</b> and <b>Terrain</b> are two small pills side by side under the cluster; tap one and its choices slide out of it, and it folds back up after you pick.</li><li>Every HUD button now has a little press-and-pop animation when you tap it.</li><li><b>New loading screen:</b> a gold gauge whose needle sweeps up as the game loads, light trails racing past behind it and a new tip every few seconds. Works on PC, phones and landscape.</li><li>The <b>Energy</b> screen now works on the F-150 <b>PowerBoost</b>: engine, battery and motor flow, battery % and "Electric" when you're driving on the battery.</li>
+<li><b>Drive mode</b> and <b>Terrain</b> are two small pills side by side under the cluster; tap one and its choices slide out of it, and it folds back up after you pick.</li><li>Every HUD button now has a little press-and-pop animation when you tap it.</li><li><b>The 3D driving visualization is on every car now</b>, not just Teslas: the cluster's Assist screen and the big sensor panel show your car, the cars around you, lane lines, stop lines and traffic lights. Your lane's lines glow light green when <b>Lane Keeping Assist</b> is ready and bright green when it's steering you back, blue when lane centring or hands-free driving (BlueCruise, Super Cruise and the rest) is on, the car you're following lights up with cruise on, and cars in your blind spot turn red when you signal.</li><li><b>New loading screen:</b> a gold gauge whose needle sweeps up as the game loads, light trails racing past behind it and a new tip every few seconds. Works on PC, phones and landscape.</li><li>The <b>Energy</b> screen now works on the F-150 <b>PowerBoost</b>: engine, battery and motor flow, battery % and "Electric" when you're driving on the battery.</li>
 <li>Top right: your money with a <b>level ring</b>, and labelled tiles for Garage, Spawn, Tests, Dealer, Full screen and More.</li>
 <li>Settings, the spawn picker, What's new and the loading screen match the new look.</li>
 <li>Fixed an error that could pop up while the other cars load in the background.</li></ul>
@@ -5371,7 +5371,7 @@ function viewDraw(){const c=$("u2vc");if(!c||c.offsetParent===null)return;const 
   const CS=getComputedStyle(document.body),cv=(n,d)=>(CS.getPropertyValue(n)||"").trim()||d,TH={tx:cv("--tx","#ececec"),sub:cv("--sub","#8b8e93"),acc:cv("--acc","#f2a33a"),pow:cv("--pow","#f2a33a"),good:cv("--good","#7fd17f"),ev:cv("--ev","#4fb3ff"),track:cv("--track","#3a3c40"),cbody:cv("--cbody","#1d1f22"),cline:cv("--cline","#55585d"),cfill:cv("--cfill","#121314"),glass:cv("--glass","#2a2d31"),cardS:cv("--cardS","#121314")};const ink=TH.tx,dim=TH.sub,amb=TH.pow,grn=TH.good,line=TH.track,F=(s,w)=>`${w||400} ${s}px "Helvetica Neue",Helvetica,Arial,sans-serif`;
   g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,W,Hh);
   document.querySelectorAll("#u2vt button").forEach(b=>b.classList.toggle("on",b.dataset.v===v));
-  if(v==="assist"&&isTesla()){vizTesla(g,0,0,W,Hh,false);return}
+  if(v==="assist"){vizTesla(g,0,0,W,Hh,false);return}
   g.setTransform(k,0,0,k,0,0);g.lineJoin="round";g.lineCap="round";
   const bigG=(c.clientWidth||196)<150?1.35:(c.clientWidth||196)<200?1.2:1.1,txt=(s,x,y,col,sz,al,w)=>{g.fillStyle=col;g.font=F((sz||9)*bigG,w);g.textAlign=al||"left";g.fillText(s,x,y)};
   const carTop=(x,y,w,h,col)=>{g.strokeStyle=col||"#5a5d62";g.lineWidth=1.5;rr2(g,x,y,w,h,w*0.3);g.stroke()};
@@ -5855,8 +5855,9 @@ function vizDraw(g,x,y,w,h,big){const M=me(),T=TRIMS[st.trim],dark=st.night,sp=M
     const s=e.L-rEnd(e,dir)-1.5;const q=[];for(const [o0,ds] of [[laneOff(e,0)-LANE/2,0],[laneOff(e,e.n-1)+LANE/2,0],[laneOff(e,e.n-1)+LANE/2,0.45],[laneOff(e,0)-LANE/2,0.45]]){const p=fpt(e,dir,s+ds,o0),[f,l]=Fr(p[0],p[1]);q.push(f>-10&&f<120?Pj(f,l,(e.hz?ez(e,dir>0?s:e.L-s):zc)-zc):null)}
     if(q.every(Boolean)){g.moveTo(q[0][0],q[0][1]);for(let i=1;i<4;i++)g.lineTo(q[i][0],q[i][1]);g.closePath();if(n.ctrl==="signal")stops.push([e,dir,s,n,L_])}}g.fill();
   const ap=sys.pilotState==="active"||sys.pilotState==="changing"||sys.pilotState==="waiting",fsdA=ap&&fsdOwned()&&isTesla();
-  // Autosteer: your lane's lines in blue
-  if(ap&&!fsdA&&!M.inJ){g.fillStyle=TSL.rainbow?`hsl(${performance.now()*0.15%360},95%,60%)`:"#3e6ae1";g.beginPath();for(const o of [M.lo-0.5,M.hi+0.5].map(k=>k*LANE))for(let d=-8;d<Math.min(110,M.L-M.s+20);d+=3){const a=fpt(M.e,M.dir,M.s+d,o-0.12),b=fpt(M.e,M.dir,M.s+d+3,o-0.12),c=fpt(M.e,M.dir,M.s+d+3,o+0.12),e2=fpt(M.e,M.dir,M.s+d,o+0.12);const P=[a,b,c,e2].map(p=>{const [f,l]=Fr(p[0],p[1]);return Pj(f,l,0)});if(P.every(Boolean)){g.moveTo(P[0][0],P[0][1]);for(let i=1;i<4;i++)g.lineTo(P[i][0],P[i][1]);g.closePath()}}g.fill()}
+  // Autosteer / lane centring: your lane's lines in blue; lane keeping assist steering you back: green
+  const tes=isTesla(),lkaOn=!tes&&sys.lkaState==="nudge",lkaRdy=!tes&&sys.lkaState==="ready";
+  if(((ap&&!fsdA)||lkaOn||lkaRdy)&&!M.inJ){g.fillStyle=TSL.rainbow&&tes?`hsl(${performance.now()*0.15%360},95%,60%)`:ap?"#3e6ae1":lkaOn?"#34c759":"rgba(52,199,89,.5)";g.beginPath();const myK=clamp(Math.round(M.off/LANE),M.lo,M.hi);for(const o of [myK-0.5,myK+0.5].map(k=>k*LANE))for(let d=-8;d<Math.min(110,M.L-M.s+20);d+=3){const a=fpt(M.e,M.dir,M.s+d,o-0.12),b=fpt(M.e,M.dir,M.s+d+3,o-0.12),c=fpt(M.e,M.dir,M.s+d+3,o+0.12),e2=fpt(M.e,M.dir,M.s+d,o+0.12);const P=[a,b,c,e2].map(p=>{const [f,l]=Fr(p[0],p[1]);return Pj(f,l,0)});if(P.every(Boolean)){g.moveTo(P[0][0],P[0][1]);for(let i=1;i<4;i++)g.lineTo(P[i][0],P[i][1]);g.closePath()}}g.fill()}
   // FSD's planned path: a blue ribbon on the road
   if(fsdA&&sys.fsdPts){g.fillStyle=TSL.rainbow?`hsl(${performance.now()*0.12%360},95%,60%)`:"rgba(62,106,225,.9)";g.beginPath();const pp=sys.fsdPts.filter(p=>p[2]<=80);
     for(let i=0;i+1<pp.length;i++){const a=pp[i],b=pp[i+1],hx=b[0]-a[0],hy=b[1]-a[1],hl=Math.hypot(hx,hy)||1,nx=-hy/hl*0.38,ny=hx/hl*0.38;const P=[[a[0]+nx,a[1]+ny],[b[0]+nx,b[1]+ny],[b[0]-nx,b[1]-ny],[a[0]-nx,a[1]-ny]].map(p=>{const [f,l]=Fr(p[0],p[1]);return Pj(f,l,0.02)});if(P.every(Boolean)){g.moveTo(P[0][0],P[0][1]);for(let k=1;k<4;k++)g.lineTo(P[k][0],P[k][1]);g.closePath()}}g.fill()}
@@ -5892,11 +5893,12 @@ function vizDraw(g,x,y,w,h,big){const M=me(),T=TRIMS[st.trim],dark=st.night,sp=M
     if(it.k==="sig"){const b=Pj(it.f,it.l,4.4),t=Pj(it.f,it.l,5.6),gp=Pj(it.f,it.l,7);if(!b||!t||!gp)continue;const hh=b[1]-t[1],ww=hh*0.42;g.strokeStyle=rgb(mix(dark?[90,94,99]:[120,124,129],pal.bg,fog));g.lineWidth=Math.max(1,ww*0.14);g.beginPath();g.moveTo(t[0],t[1]);g.lineTo(gp[0],gp[1]);g.stroke();
       g.fillStyle=rgb(mix(dark?[70,73,78]:[96,100,105],pal.bg,fog));rr2(g,t[0]-ww/2,t[1],ww,hh,ww*0.2);g.fill();const on={red:0,yellow:1,green:2}[it.s]??0,col=["#ff3b30","#ffb000","#30d158"][on];
       for(let i=0;i<3;i++){const ly=t[1]+hh*(0.2+0.3*i),r=ww*0.3;if(i===on){const gl=g.createRadialGradient(t[0],ly,0,t[0],ly,r*3.2);gl.addColorStop(0,col);gl.addColorStop(0.35,col+"aa");gl.addColorStop(1,col+"00");g.fillStyle=gl;g.beginPath();g.arc(t[0],ly,r*3.2,0,7);g.fill()}g.fillStyle=i===on?col:"rgba(0,0,0,.35)";g.beginPath();g.arc(t[0],ly,r,0,7);g.fill()}continue}
-    if(it.k==="me"){const k=/modely|modelx/.test(T.model||"")?"suv":/cyber/.test(T.model||"")?"truck":"sedan",m=vzModel(4.72,1.9,k==="suv"?1.62:1.44,k);const brk=inp.brk>0.05||sys.hold;
+    if(it.k==="me"){const grp=(T.group||"")+" "+(T.model||""),k=/cyber|F-150|Silverado|Sierra|Ram |Tacoma|Tundra|Ranger|Maverick|Colorado|Gladiator|Frontier|Ridgeline|Santa Cruz|R1T|Lightning|Super Duty|Hummer EV(?! SUV)/i.test(grp)?"truck":/modely|modelx/.test(T.model||"")||(T.mass||1700)>2000||/SUV|RAV4|CR-V|Explorer|Expedition|Tahoe|Suburban|Escalade|Wagoneer|Bronco|4Runner|GV|Palisade|Telluride|Highlander|Pilot|Q5|Q7|X5|Grand Cherokee|Aviator|Navigator|Escape|Equinox|Tucson|Santa Fe|Sportage|Sorento/i.test(grp)?"suv":"sedan",m=vzModel(T.length||(k==="truck"?5.9:4.75),k==="truck"?2.0:1.9,k==="truck"?1.9:k==="suv"?1.7:1.44,k);const brk=inp.brk>0.05||sys.hold;
       if(brk){const p=Pj(-3.2,0,0);if(p){const r=Fc/p[2]*2.6,gl=g.createRadialGradient(p[0],p[1],0,p[0],p[1],r);gl.addColorStop(0,"rgba(255,30,30,.45)");gl.addColorStop(1,"rgba(255,30,30,0)");g.fillStyle=gl;g.beginPath();g.ellipse(p[0],p[1],r,r*0.45,0,0,7);g.fill()}}
       drawModel(m,0,0,0,0,dark?[244,245,247]:[252,252,252],{roof:[22,24,27],glass:[30,33,37],tail:brk?"rgba(255,45,45,1)":"rgba(150,20,25,.95)"})}}
   // top: gear, speed, set speed, limit, hold, lights, Autopilot / FSD status
   const ink=dark?"#e8ecef":"#1c1f23",soft=dark?"#5b636b":"#9aa1a8",u=big?1:0.78;
+  if(tes||big){
   g.textAlign="left";g.textBaseline="alphabetic";g.font=`600 ${15*u}px ${hudF}`;["P","R","N","D"].forEach((k,i)=>{g.fillStyle=st.gear===k?ink:soft;g.fillText(k,x+14+i*17*u,y+24*u)});
   g.font=`500 ${44*u}px ${hudF}`;g.fillStyle=ink;g.fillText(Math.round(spdUnit(sp)),x+14,y+70*u);g.font=F_(11*u);g.fillStyle=soft;g.fillText(st.units==="mph"?"MPH":"KM/H",x+16,y+86*u);
   let iy=y+112*u;const icon=(on,col,txt,draw)=>{g.save();g.translate(x+30*u,iy);g.strokeStyle=on?col:soft;g.fillStyle=on?col:soft;g.lineWidth=2*u;draw(u);g.restore();if(txt){g.font=`600 ${11*u}px ${hudF}`;g.textAlign="center";g.fillStyle=on?col:soft;g.fillText(txt,x+30*u,iy+28*u);g.textAlign="left"}iy+=txt?50*u:36*u};
@@ -5907,12 +5909,13 @@ function vizDraw(g,x,y,w,h,big){const M=me(),T=TRIMS[st.trim],dark=st.night,sp=M
   {const ix=x+w/2,iyy=y+30*u;if(ap||st.acc){g.strokeStyle=ap?"#3e6ae1":ink;g.lineWidth=2.4*u;g.beginPath();g.arc(ix,iyy,9*u,0,7);g.stroke();g.beginPath();g.moveTo(ix-9*u,iyy);g.lineTo(ix+9*u,iyy);g.moveTo(ix,iyy);g.lineTo(ix,iyy+9*u);g.stroke()}
    const arrow=(sg)=>{g.fillStyle="#30d158";g.beginPath();g.moveTo(ix+sg*48*u,iyy);g.lineTo(ix+sg*36*u,iyy-9*u);g.lineTo(ix+sg*36*u,iyy-4*u);g.lineTo(ix+sg*26*u,iyy-4*u);g.lineTo(ix+sg*26*u,iyy+4*u);g.lineTo(ix+sg*36*u,iyy+4*u);g.lineTo(ix+sg*36*u,iyy+9*u);g.closePath();g.fill()};
    if((st.signal===-1||st.hazard)&&st.blink)arrow(-1);if((st.signal===1||st.hazard)&&st.blink)arrow(1)}
-  // banner: nags, status
-  let msg="",col=ink,blue=false;
+  }
+  // banner: nags, status (each brand's own names)
+  let msg="",col=ink,blue=false;const pn=T.pilotName||"Lane Centering";
   if(sys.aebState==="braking"||sys.fcw){msg="Emergency braking";col="#ff453a"}
   else if(sys.nag===2){msg="Take control immediately";col="#ff453a"}else if(sys.nag===1){msg=fsdA?"Pay attention to the road":"Apply slight turning force to steering wheel";blue=true}
-  else if(sys.apStrike){msg="Autosteer unavailable for the rest of this drive";col="#ff453a"}
-  else if(fsdA){msg=`Self-Driving · ${sys.fsdState||""}`;col="#6f93ff"}else if(ap){msg="Autosteer";col="#6f93ff"}else if(st.acc){msg="Traffic-Aware Cruise Control";col="#6f93ff"}
+  else if(sys.apStrike){msg=(tes?"Autosteer":pn)+" unavailable for the rest of this drive";col="#ff453a"}
+  else if(fsdA){msg=`Self-Driving · ${sys.fsdState||""}`;col="#6f93ff"}else if(ap){msg=tes?"Autosteer":pn;col="#6f93ff"}else if(lkaOn){msg="Lane Keeping Assist";col="#34c759"}else if(st.acc){msg=tes?"Traffic-Aware Cruise Control":"Adaptive Cruise Control";col="#6f93ff"}else if(!tes&&sys.bsmL&&st.signal<0||!tes&&sys.bsmR&&st.signal>0){msg="Vehicle in blind spot";col="#ff9f0a"}
   if(msg){const bh=big?26:19;g.fillStyle=blue?(performance.now()%700<350?"#3e6ae1":"#2b4fb8"):dark?"rgba(24,27,31,.88)":"rgba(255,255,255,.9)";rr2(g,x+10,y+h-bh-8,w-20,bh,bh/2);g.fill();g.fillStyle=blue?"#fff":col;g.font=F_(big?12:10);g.textAlign="center";g.fillText(msg,cx,y+h-8-bh/2+4)}
   g.restore()}
 
@@ -11193,7 +11196,7 @@ function drawChassis(){
   sg.fillText(`brakes ${far?"°F":"°C"} · travel cm`,cx,h-10);
   $("sensorCap").textContent="Chassis";
 }
-function drawSensor(){if(isTesla()){vizTesla(sg,0,0,sensor.width,sensor.height,false);$("sensorCap").textContent=sys.fsdActive?"FSD":"Autopilot";return}
+function drawSensor(){{vizTesla(sg,0,0,sensor.width,sensor.height,false);const T=TRIMS[st.trim];$("sensorCap").textContent=isTesla()?(sys.fsdActive?"FSD":"Autopilot"):sys.pilotState==="active"?(T.pilotShort||"LC"):st.lka?"Lane keeping":"Sensors";return}
   const w=sensor.width,h=sensor.height,M=me(),px=w/14.4,meY=h*0.68,scl=h/90;   // 90 m shown, 61 ahead
   sg.clearRect(0,0,w,h);
   const lane=laneOf(M.off), lx=o=>w/2+(-(o-M.off))*px;
