@@ -6603,10 +6603,11 @@ function rav19Screen(g,W,H,M){const F=CF2;g.fillStyle="#1a1b1e";g.fillRect(0,0,W
   knob(bz/2,H-46,"POWER VOLUME",()=>{const Lv=[0.5,0.8,1,0,0.25];au.vol=Lv[(Lv.indexOf(au.vol??0.5)+1)%Lv.length];toast(au.vol?`Volume ${Math.round(au.vol*100)}%`:"Muted")});knob(W-bz/2,H-46,"TUNE SCROLL",()=>{au.station=((au.station||0)+1)%RADIO.length;radioPlay(au.station)});
   g.fillStyle="#9a9da2";g.font=F(9,800);g.fillText("JBL",W/2,H-10);g.textAlign="right";g.font=F(8);g.fillText("((SiriusXM))   HD Radio",x1-8,H-10);
   // the display
-  g.save();g.beginPath();g.rect(x0,0,x1-x0,bot);g.clip();const bg=g.createLinearGradient(0,0,0,bot);bg.addColorStop(0,"#0c1430");bg.addColorStop(1,"#1d2c58");g.fillStyle=bg;g.fillRect(x0,0,x1-x0,bot);
+  g.save();g.beginPath();g.rect(x0,0,x1-x0,bot);g.clip();const bg=g.createLinearGradient(0,0,0,bot);bg.addColorStop(0,SCR.page==="home"?"#050608":"#0c1430");bg.addColorStop(1,SCR.page==="home"?"#07090f":"#1d2c58");g.fillStyle=bg;g.fillRect(x0,0,x1-x0,bot);
+  if(SCR.page==="home"){const hb=g.createLinearGradient(0,0,0,top-2);hb.addColorStop(0,"#2b2d33");hb.addColorStop(1,"#141519");g.fillStyle=hb;g.fillRect(x0,0,x1-x0,top-2)}
   const d=gDate();g.fillStyle="#fff";g.font=F(15,600);g.textAlign="left";g.fillText(({home:"Home",media:"Radio",map:"Map",phone:"Phone",apps:"Menu",camera:"Camera",controls:"Setup",energy:"Energy",climate:"Climate",park:"Park"})[SCR.page]||"",x0+12,18);g.textAlign="right";g.font=F(18,500);g.fillText(`${d.getHours()%12||12}:${String(d.getMinutes()).padStart(2,"0")}`,x1-84,18);
   // status icons after the clock: DCM, signal, phone battery, Bluetooth
-  {const sx=x1-78;g.strokeStyle="#dfe4ee";g.lineWidth=1;rr2(g,sx,11,22,12,4);g.stroke();g.fillStyle="#dfe4ee";g.font=F(6,800);g.textAlign="center";g.fillText("DCM",sx+11,17.5);
+  {const sx=x1-78;g.fillStyle="rgba(0,0,0,.45)";rr2(g,sx-4,7,76,21,10);g.fill();g.strokeStyle="#dfe4ee";g.lineWidth=1;rr2(g,sx,11,22,12,4);g.stroke();g.fillStyle="#dfe4ee";g.font=F(6,800);g.textAlign="center";g.fillText("DCM",sx+11,17.5);
    for(let i=0;i<4;i++){g.fillStyle=st.phoneConn||i<3?"#dfe4ee":"#5a6070";g.fillRect(sx+28+i*4,21-i*3,3,3+i*3)}g.strokeStyle="#dfe4ee";g.strokeRect(sx+47.5,10.5,7,12);g.fillStyle="#dfe4ee";g.fillRect(sx+49,15,4,6);
    g.fillStyle=st.phoneConn?"#4fa3ff":"#5a6070";g.font=F(12,700);g.fillText("ᛒ",sx+64,18)}
   g.fillStyle="rgba(255,255,255,.25)";g.fillRect(x0,top-2,x1-x0,1);const pw=x1-x0;
@@ -9305,41 +9306,49 @@ function rivHome(g,top,bot,W,M){if(hkOld(g,top,bot,W,M))return;const h=bot-top,m
   g.fillStyle="#101214";g.fillRect(W-mw,top,mw,h);HK.media(g,W-mw+8,top+8,mw-16,h*0.62,C,"Media");HK.phone(g,W-mw+8,top+16+h*0.62,mw-16,h*0.38-24,C)}
 // 2019 RAV4 (Entune 3.0) home, as it looks in a real 2019 RAV4 Hybrid: Audio top left, four favourite-contact buttons under it,
 // the Energy Monitor filling the right half (the gas RAV4 shows the map with navigation, or the clock)
-function ravPanel(g,x,y,w,h){const gr=g.createLinearGradient(0,y,0,y+h);gr.addColorStop(0,"#0b1430");gr.addColorStop(1,"#233a78");g.fillStyle=gr;g.fillRect(x,y,w,h);
-  g.save();g.beginPath();g.rect(x,y,w,h);g.clip();g.fillStyle="rgba(255,255,255,.035)";for(let yy=y;yy<y+h;yy+=4)for(let xx=x+((yy-y)/4%2)*4;xx<x+w;xx+=8)g.fillRect(xx,yy,4,4);g.restore();
-  g.strokeStyle="#8f99b3";g.lineWidth=1.5;g.strokeRect(x+.75,y+.75,w-1.5,h-1.5)}
+function ravPanel(g,x,y,w,h){const gr=g.createLinearGradient(0,y,0,y+h);gr.addColorStop(0,"#050a1c");gr.addColorStop(0.55,"#0d1f4a");gr.addColorStop(1,"#2547a0");g.fillStyle=gr;g.fillRect(x,y,w,h);
+  // the fine diagonal weave Toyota uses behind its panels
+  g.save();g.beginPath();g.rect(x,y,w,h);g.clip();g.strokeStyle="rgba(140,170,255,.07)";g.lineWidth=1;g.beginPath();for(let d=-h;d<w;d+=5){g.moveTo(x+d,y+h);g.lineTo(x+d+h,y)}g.stroke();g.strokeStyle="rgba(0,0,0,.18)";g.beginPath();for(let d=0;d<w+h;d+=5){g.moveTo(x+d,y+h);g.lineTo(x+d-h,y)}g.stroke();g.restore();
+  g.strokeStyle="#7d869a";g.lineWidth=2;g.strokeRect(x+1,y+1,w-2,h-2)}
 function ravHome(g,top,bot,pw,M){const p=6,h=bot-top,lw=pw*0.46,rx=lw+2*p,rw=pw-rx-p,ah=(h-3*p)*0.54,T=TRIMS[st.trim],hyb=!!T.hybrid,nav=ownF("navigation");
   // Audio
   ravPanel(g,p,top+p,lw,ah);const n=HK.np();HK.t(g,"♪",p+lw-14,top+p+14,"#fff",13,500,"center");HK.t(g,n.on?n.t:"Audio Off",p+lw/2,top+p+ah/2,"#fff",Math.min(17,ah*0.15),500,"center",lw-20);if(n.on)HK.t(g,n.s,p+lw/2,top+p+ah/2+20,"#b8c3e3",10,500,"center",lw-20);hit(p,top+p,lw,ah,HK.go("media"));
   // favourite contacts
-  const cy=top+2*p+ah,ch=h-3*p-ah;g.fillStyle="#0a0f22";g.fillRect(p,cy,lw,ch);g.strokeStyle="#8f99b3";g.lineWidth=1.5;g.strokeRect(p+.75,cy+.75,lw-1.5,ch-1.5);
+  const cy=top+2*p+ah,ch=h-3*p-ah;g.fillStyle="#0a0c12";g.fillRect(p,cy,lw,ch);g.strokeStyle="#9aa2b2";g.lineWidth=2;g.strokeRect(p+1,cy+1,lw-2,ch-2);
   const tw=(lw-12)/2,th=(ch-12)/2;for(let i=0;i<4;i++){const x=p+4+(i%2)*(tw+4),y=cy+4+Math.floor(i/2)*(th+4);ravPanel(g,x,y,tw,th);HK.t(g,"Select & Hold to",x+tw/2,y+th/2-7,"#fff",Math.min(11,tw*0.085),500,"center",tw-6);HK.t(g,"Add a Contact.",x+tw/2,y+th/2+8,"#fff",Math.min(11,tw*0.085),500,"center",tw-6);hit(x,y,tw,th,HK.go("phone"))}
   // right half
   if(hyb)ravEnergy(g,rx,top+p,rw,h-2*p);
   else if(nav){g.save();g.beginPath();g.rect(rx,top+p,rw,h-2*p);g.clip();SCR.ox+=rx;g.translate(rx,0);SCR.mapLight=true;SCR.mapCompact=true;try{scrMap(g,top+p,bot-p,rw,M)}finally{SCR.mapLight=false;SCR.mapCompact=false}g.restore();SCR.ox-=rx;hit(rx,top+p,rw,h-2*p,HK.go("map"))}
   else{ravPanel(g,rx,top+p,rw,h-2*p);HK.t(g,HK.time(),rx+rw/2,top+h*0.45,"#fff",Math.min(46,rw*0.2),300,"center");HK.t(g,gDate().toLocaleDateString([],{weekday:"long",month:"long",day:"numeric"}),rx+rw/2,top+h*0.45+34,"#b8c3e3",12,500,"center",rw-20)}}
-// Toyota hybrid Energy Monitor: the wheel (left), the engine (right) and the battery (bottom) joined by grey paths; the paths that carry power
-// light up with an arrow: red-orange from the engine, green from the battery, green into the battery when braking charges it
-function ravEnergy(g,x,y,w,h){ravPanel(g,x,y,w,h);let S={pe:0,pm:0,regen:false,engChg:false,soc:0.6};try{S=hybState()}catch(e){}const t=performance.now()/1000,s=Math.min(w/250,h/210);
-  const Wp=[x+w*0.22,y+h*0.38],Ep=[x+w*0.8,y+h*0.36],Bp=[x+w*0.52,y+h*0.74];
-  const path=(k)=>{g.beginPath();if(k==="WE"){g.moveTo(Wp[0]+14*s,Wp[1]-14*s);g.quadraticCurveTo(x+w*0.5,y+h*0.1,Ep[0]-20*s,Ep[1]-14*s)}else if(k==="WB"){g.moveTo(Wp[0]-4*s,Wp[1]+20*s);g.quadraticCurveTo(x+w*0.18,y+h*0.78,Bp[0]-24*s,Bp[1]+6*s)}else{g.moveTo(Ep[0]+4*s,Ep[1]+22*s);g.quadraticCurveTo(x+w*0.84,y+h*0.72,Bp[0]+24*s,Bp[1]+2*s)}};
-  g.strokeStyle="#6e7690";g.lineWidth=7*s;g.lineCap="round";for(const k of ["WE","WB","EB"]){path(k);g.stroke()}
-  const eOn=S.pe>0.5&&!S.engChg,mOn=S.pm>0.5&&!S.regen;
-  const lit=(k,c0,c1,rev)=>{const gr=g.createLinearGradient(Ep[0],Ep[1],Bp[0],Bp[1]);gr.addColorStop(0,c0);gr.addColorStop(1,c1);g.strokeStyle=gr;g.lineWidth=7*s;path(k);g.stroke();
-    g.save();g.setLineDash([10*s,22*s]);g.lineDashOffset=(rev?1:-1)*t*40*s;g.strokeStyle="rgba(255,255,255,.55)";g.lineWidth=3*s;path(k);g.stroke();g.restore()};
-  if(eOn)lit("WE","#ff3b2f","#ff9a3c",true);if(S.engChg||(eOn&&S.pe>Math.max(0,S.pm)+2))lit("EB","#ff3b2f","#ff2a2a",false);if(mOn)lit("WB","#3ad46a","#8ff0a8",true);if(S.regen)lit("WB","#3ad46a","#8ff0a8",false);
-  // arrowheads where power arrives
-  const head=(px,py,ang,col)=>{g.fillStyle=col;g.save();g.translate(px,py);g.rotate(ang);g.beginPath();g.moveTo(9*s,0);g.lineTo(-7*s,-8*s);g.lineTo(-7*s,8*s);g.closePath();g.fill();g.restore()};
-  if(S.engChg||(eOn&&S.pe>Math.max(0,S.pm)+2))head(Bp[0]+26*s,Bp[1]+2*s,Math.PI*1.05,"#ff2a2a");if(eOn)head(Wp[0]+16*s,Wp[1]-15*s,Math.PI*1.12,"#ff3b2f");if(mOn)head(Wp[0]-3*s,Wp[1]+22*s,-Math.PI*0.45,"#3ad46a");if(S.regen)head(Bp[0]-26*s,Bp[1]+6*s,0,"#3ad46a");
-  // wheel
-  {const [cx,cy]=Wp,R=20*s;g.fillStyle="#111";g.beginPath();g.arc(cx,cy,R,0,7);g.fill();g.strokeStyle="#4a4d55";g.lineWidth=2*s;g.stroke();g.fillStyle="#c9ccd2";g.beginPath();g.arc(cx,cy,R*0.62,0,7);g.fill();g.strokeStyle="#6b6f78";g.lineWidth=1.6*s;for(let i=0;i<5;i++){const a=i*Math.PI*0.4+t*(mOn||eOn?Math.abs(car.vx)*0.4:0);g.beginPath();g.moveTo(cx,cy);g.lineTo(cx+Math.cos(a)*R*0.6,cy+Math.sin(a)*R*0.6);g.stroke()}g.fillStyle="#555";g.beginPath();g.arc(cx,cy,R*0.15,0,7);g.fill()}
-  // engine
-  {const [cx,cy]=Ep;g.fillStyle="#d9dce2";rr2(g,cx-22*s,cy-12*s,40*s,20*s,4*s);g.fill();g.fillStyle="#a7abb4";rr2(g,cx-18*s,cy-20*s,30*s,9*s,3*s);g.fill();g.fillStyle="#8b8f98";for(let i=0;i<4;i++)g.fillRect(cx-16*s+i*7*s,cy-4*s,4*s,8*s);if(eOn||S.engChg){g.fillStyle="#ff3b2f";g.fillRect(cx+2*s,cy+8*s,8*s,10*s)}
-   HK.t(g,"Engine",cx+4*s,cy-34*s,"#fff",Math.max(10,15*s),600,"center")}
-  // battery: green cells by state of charge
-  {const [cx,cy]=Bp,bw=30*s,bh=40*s,bx=cx-bw/2,by=cy-bh/2;g.fillStyle="rgba(170,255,200,.18)";g.beginPath();g.ellipse(cx,cy+bh*0.55,bw*0.9,6*s,0,0,7);g.fill();g.fillStyle="#d4f7df";rr2(g,bx,by,bw,bh,3*s);g.fill();const segs=8,on=Math.round(clamp(S.soc??0.6,0,1)*segs);
-   for(let i=0;i<segs;i++){g.fillStyle=i<on?"#33d17a":"#9aa6a0";g.fillRect(bx+3*s,by+bh-3*s-(i+1)*(bh-6*s)/segs+1,bw-6*s,(bh-6*s)/segs-1.5)}
-   HK.t(g,"Battery",cx,by-14*s,"#fff",Math.max(10,15*s),600,"center")}
+// Toyota hybrid Energy Monitor (as on the real 2019 RAV4 Hybrid screen): an alloy wheel on the left, the engine top right, the glowing battery
+// low in the middle, joined by thick grey pipes; a pipe carrying power turns red (engine) or green (battery, braking) with a big arrowhead
+function ravEnergy(g,x,y,w,h){ravPanel(g,x,y,w,h);let S={pe:0,pm:0,regen:false,engChg:false,soc:0.6};try{S=hybState()}catch(e){}const t=performance.now()/1000,s=Math.min(w/270,h/250),P=(u,v)=>[x+w*u,y+h*v];
+  const Wc=P(0.2,0.38),Ec=P(0.82,0.4),Bc=P(0.54,0.76);
+  const pipe={WE:[P(0.27,0.3),P(0.52,0.06),P(0.74,0.33)],WB:[P(0.19,0.48),P(0.18,0.86),P(0.46,0.82)],EB:[P(0.86,0.5),P(0.86,0.78),P(0.62,0.79)]};
+  const stroke=(k,col,wd)=>{const [a,c,b]=pipe[k];g.strokeStyle=col;g.lineWidth=wd;g.lineCap="round";g.beginPath();g.moveTo(a[0],a[1]);g.quadraticCurveTo(c[0],c[1],b[0],b[1]);g.stroke()};
+  for(const k of ["WE","WB"]){stroke(k,"#3c4352",11*s);stroke(k,"#8a909d",8*s);stroke(k,"rgba(255,255,255,.25)",2*s)}
+  const eOn=S.pe>0.5&&!S.engChg,mOn=S.pm>0.5&&!S.regen,chg=S.engChg||(eOn&&S.pe>Math.max(0,S.pm)+2);
+  // a lit pipe ending in an arrowhead at "to" (0 = start, 1 = end)
+  const flow=(k,c0,c1,to)=>{const [a,c,b]=pipe[k],gr=g.createLinearGradient(a[0],a[1],b[0],b[1]);gr.addColorStop(0,c0);gr.addColorStop(1,c1);stroke(k,gr,9*s);
+    const e=to?b:a,q=to?[2*b[0]-c[0],2*b[1]-c[1]]:c,ang=Math.atan2(e[1]-(to?c[1]:c[1]),e[0]-(to?c[0]:c[0]));const A=to?Math.atan2(b[1]-c[1],b[0]-c[0]):Math.atan2(a[1]-c[1],a[0]-c[0]);
+    g.fillStyle=to?c1:c0;g.save();g.translate(e[0],e[1]);g.rotate(A);g.beginPath();g.moveTo(10*s,0);g.lineTo(-8*s,-11*s);g.lineTo(-4*s,0);g.lineTo(-8*s,11*s);g.closePath();g.fill();g.restore();
+    const u=(t*0.9)%1,uu=to?u:1-u,px=(1-uu)*(1-uu)*a[0]+2*(1-uu)*uu*c[0]+uu*uu*b[0],py=(1-uu)*(1-uu)*a[1]+2*(1-uu)*uu*c[1]+uu*uu*b[1];g.fillStyle="rgba(255,255,255,.6)";g.beginPath();g.arc(px,py,2.6*s,0,7);g.fill()};
+  if(chg)flow("EB","#e8382c","#ff2a2a",1);if(eOn)flow("WE","#ff6b2a","#e8382c",0);if(mOn)flow("WB","#22b85a","#5fe08a",0);if(S.regen)flow("WB","#22b85a","#5fe08a",1);
+  // alloy wheel
+  {const [cx,cy]=Wc,R=27*s,tg=g.createRadialGradient(cx-R*0.3,cy-R*0.3,R*0.2,cx,cy,R);tg.addColorStop(0,"#3a3d44");tg.addColorStop(1,"#0b0c0e");g.fillStyle=tg;g.beginPath();g.arc(cx,cy,R,0,7);g.fill();
+   const rg=g.createLinearGradient(cx-R,cy-R,cx+R,cy+R);rg.addColorStop(0,"#f1f3f6");rg.addColorStop(1,"#8d939c");g.fillStyle=rg;g.beginPath();g.arc(cx,cy,R*0.66,0,7);g.fill();g.fillStyle="#2a2d33";g.beginPath();g.arc(cx,cy,R*0.6,0,7);g.fill();
+   const sp=t*(mOn||eOn||S.regen?Math.min(6,Math.abs(car.vx)*0.5):0);g.fillStyle=rg;for(let i=0;i<5;i++){const a=sp+i*Math.PI*0.4;g.save();g.translate(cx,cy);g.rotate(a);g.beginPath();g.moveTo(-R*0.06,0);g.lineTo(-R*0.12,R*0.6);g.lineTo(R*0.12,R*0.6);g.lineTo(R*0.06,0);g.closePath();g.fill();g.restore()}
+   g.fillStyle="#c9ced6";g.beginPath();g.arc(cx,cy,R*0.16,0,7);g.fill()}
+  // engine: a silver block in perspective with the cam cover and intake, red when it's running
+  {const [cx,cy]=Ec,k=s;const blk=(px,py,ww,hh,dd,top,front,side)=>{g.fillStyle=top;g.beginPath();g.moveTo(px,py);g.lineTo(px+ww,py);g.lineTo(px+ww+dd,py-dd*0.6);g.lineTo(px+dd,py-dd*0.6);g.closePath();g.fill();
+     g.fillStyle=front;g.fillRect(px,py,ww,hh);g.fillStyle=side;g.beginPath();g.moveTo(px+ww,py);g.lineTo(px+ww+dd,py-dd*0.6);g.lineTo(px+ww+dd,py+hh-dd*0.6);g.lineTo(px+ww,py+hh);g.closePath();g.fill()};
+   blk(cx-30*k,cy-8*k,44*k,20*k,14*k,"#f4f5f7","#c3c7ce","#8f949d");blk(cx-24*k,cy-20*k,34*k,10*k,10*k,"#ffffff","#d9dce1","#a3a8b0");g.fillStyle="#7d828b";for(let i=0;i<4;i++)g.fillRect(cx-26*k+i*10*k,cy-4*k,6*k,10*k);
+   g.fillStyle=eOn||S.engChg?"#e8382c":"#9a9fa8";g.fillRect(cx+6*k,cy+12*k,7*k,14*k);HK.t(g,"Engine",cx+6*k,cy-48*k,"#fff",Math.max(11,18*k),600,"center")}
+  // battery: glowing green cells
+  {const [cx,cy]=Bc,bw=36*s,bh=50*s,bx=cx-bw/2,by=cy-bh/2,lvl=clamp(S.soc??0.6,0,1);const gl=g.createRadialGradient(cx,cy,bw*0.2,cx,cy,bw*1.4);gl.addColorStop(0,"rgba(120,255,170,.35)");gl.addColorStop(1,"rgba(120,255,170,0)");g.fillStyle=gl;g.beginPath();g.arc(cx,cy,bw*1.4,0,7);g.fill();
+   g.fillStyle="#e9fff1";g.beginPath();g.moveTo(bx,by+6*s);g.lineTo(bx+bw,by);g.lineTo(bx+bw+4*s,by+bh);g.lineTo(bx+4*s,by+bh+5*s);g.closePath();g.fill();
+   const n=10,on=Math.round(lvl*n);for(let i=0;i<n;i++){const f=(i+0.5)/n,yy=by+bh-f*bh+2*s;g.strokeStyle=i<on?"#2fd36b":"#9fb5a8";g.lineWidth=(bh/n)*0.55;g.beginPath();g.moveTo(bx+4*s,yy+4*s*(1-f));g.lineTo(bx+bw,yy-1*s*(1-f));g.stroke()}
+   HK.t(g,"Battery",cx-2*s,by-18*s,"#fff",Math.max(11,18*s),600,"center")}
   hit(x,y,w,h,HK.go("energy"))}
 const SCR_THEME={GM:{bg:"#0b0d10",dock:"#121417",line:"#262a2f",acc:"#4c8bf5",on:"#8ab4f8",dim:"#9aa0a6",rail:true,ui:"Google built-in",home:(...a)=>gmHome(...a)},
   Kia:{bg:"#0a1220",dock:"#0f1a2c",line:"#22324a",acc:"#00a0e1",on:"#6fd0ff",dim:"#8ea0b8",ui:"Kia Connect",home:(...a)=>kiaHome(...a)},
@@ -11751,7 +11760,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=182;   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="173",BUILD_VER=183;   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){return GQ[GFX.q==="auto"?GFX.eff:GFX.q]}
