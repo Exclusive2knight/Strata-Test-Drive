@@ -5,9 +5,10 @@ G10 = [4.70, 2.99, 2.15, 1.80, 1.52, 1.28, 1.00, 0.85, 0.69, 0.64]
 FCP = "Ford Co-Pilot360 2.0: Pre-Collision Assist with Automatic Emergency Braking, BLIS with trailer coverage and Cross-Traffic Alert, Lane-Keeping System, Auto High Beams, Post-Collision Braking, rear view camera."
 FCPA = FCP + " Co-Pilot360 Assist 2.0: Intelligent Adaptive Cruise with Stop-and-Go and Lane Centering, Speed Sign Recognition, Evasive Steering Assist."
 BLUE = FCPA + " BlueCruise hands-free driving on mapped highways, Active Park Assist 2.0, 360° camera."
+PB = " PowerBoost full hybrid: 35 kW (47 hp) motor between the engine and the 10-speed, 1.5 kWh lithium-ion battery; 430 hp and 570 lb-ft combined; drives on electricity alone at low speed and light throttle, engine auto stop-start, regenerative braking; Pro Power Onboard {kw} kW generator."
 S = ["cornering", "leveling", "crab", "matrix", "ws4"]
 ENG = {"33": ("v6", False, 359, 290, 6500, "3.3 L Ti-VCT V6"), "27": ("v6", True, 542, 325, 6000, "2.7 L EcoBoost V6"), "50": ("v8", False, 556, 400, 7000, "5.0 L Coyote V8"),
-       "35": ("v6", True, 678, 400, 6000, "3.5 L EcoBoost V6"), "pb": ("v6", True, 773, 430, 6000, "3.5 L PowerBoost hybrid V6"), "hor": ("v6", True, 691, 450, 6000, "3.5 L High-Output EcoBoost V6")}
+       "35": ("v6", True, 678, 400, 6000, "3.5 L EcoBoost V6"), "pb": ("v6", True, 610, 430, 6000, "3.5 L PowerBoost full hybrid V6"), "hor": ("v6", True, 691, 450, 6000, "3.5 L High-Output EcoBoost V6")}
 TR = [  # key, trim, engine, kg, price, paint, mpg, tank L, extras
     ("f150_22_xl", "XL", "33", 2050, 41500, "c:#eeeeec", 20, 87, dict(std=FCP, feats=["bsm", "rcta", "autoHigh", "towPkg", "awd"])),
     ("f150_22_stx", "STX", "27", 2120, 45000, "c:#1c1d20", 20, 87, dict(std=FCP, feats=["bsm", "rcta", "autoHigh", "towPkg", "awd"])),
@@ -15,9 +16,13 @@ TR = [  # key, trim, engine, kg, price, paint, mpg, tank L, extras
     ("f150_22_lariat", "Lariat", "50", 2300, 58500, "c:#7a1f24", 19, 98, dict(std=FCPA, feats=["acc", "pilot", "bsm", "rcta", "autoHigh", "heatedSeats", "ventSeats", "heatedWheel", "remoteStart", "wirelessCharge", "towPkg", "awd"])),
     ("f150_22_kr", "King Ranch", "35", 2380, 64500, "c:#5a3a22", 18, 98, dict(std=FCPA + " 360° camera.", feats=["acc", "pilot", "bsm", "rcta", "autoHigh", "cam360", "heatedSeats", "ventSeats", "heatedWheel", "heatedRear", "remoteStart", "wirelessCharge", "premiumAudio", "towPkg", "awd"])),
     ("f150_22_plat", "Platinum", "35", 2400, 67000, "c:#3a3d42", 18, 98, dict(std=FCPA + " 360° camera, Active Park Assist 2.0.", feats=["acc", "pilot", "bsm", "rcta", "rAeb", "autoHigh", "cam360", "autopark", "heatedSeats", "ventSeats", "heatedWheel", "heatedRear", "massageSeats", "remoteStart", "wirelessCharge", "premiumAudio", "panoRoof", "ambient", "towPkg", "trailerAssist", "awd"])),
-    ("f150_22_ltd", "Limited", "pb", 2560, 79000, "c:#d8d6d0", 23, 114, dict(std=BLUE + " PowerBoost full hybrid: 35 kW motor in the 10-speed, 1.5 kWh battery, Pro Power Onboard 7.2 kW.", hybrid=True, feats=["acc", "pilot", "handsfree", "autoLC", "bsm", "rcta", "rAeb", "autoHigh", "cam360", "autopark", "heatedSeats", "ventSeats", "heatedWheel", "heatedRear", "massageSeats", "remoteStart", "wirelessCharge", "premiumAudio", "panoRoof", "ambient", "towPkg", "trailerAssist", "proPower", "awd"])),
+    ("f150_22_ltd", "Limited", "pb", 2600, 79000, "c:#d8d6d0", 23, 116, dict(std=BLUE + PB.format(kw="7.2"), hybrid=True, feats=["acc", "pilot", "handsfree", "autoLC", "bsm", "rcta", "rAeb", "autoHigh", "cam360", "autopark", "heatedSeats", "ventSeats", "heatedWheel", "heatedRear", "massageSeats", "remoteStart", "wirelessCharge", "premiumAudio", "panoRoof", "ambient", "towPkg", "trailerAssist", "proPower", "awd"])),
     ("f150_22_tremor", "Tremor", "35", 2450, 58500, "c:#c45a1a", 17, 98, dict(std=FCPA + " Electronic locking rear differential, Trail Control, Trail Turn Assist, 33-in. all-terrain tyres.", offGrip=1.3, feats=["acc", "pilot", "bsm", "rcta", "autoHigh", "offroad", "towPkg", "heatedSeats", "remoteStart", "proPower", "awd", "perfUpgrade"])),
     ("f150_22_raptor", "Raptor", "hor", 2600, 66000, "c:#2f6fb0", 15, 136, dict(std=FCP + " Trail Control, Trail Turn Assist, front and rear e-lockers, 360° camera with off-road spotter view.", offGrip=1.45, feats=["bsm", "rcta", "autoHigh", "cam360", "offroad", "heatedSeats", "heatedWheel", "remoteStart", "premiumAudio", "awd", "perfUpgrade", "sportExhaust"])),
+    ("f150_22_xlt_pb", "XLT PowerBoost", "pb", 2490, 52800, "c:#2c5a7a", 24, 116, dict(std=FCPA + PB.format(kw="2.4"), hybrid=True, feats=["acc", "pilot", "bsm", "rcta", "autoHigh", "heatedSeats", "heatedWheel", "remoteStart", "towPkg", "proPower", "awd"])),
+    ("f150_22_lariat_pb", "Lariat PowerBoost", "pb", 2540, 61800, "c:#7a1f24", 24, 116, dict(std=FCPA + PB.format(kw="2.4"), hybrid=True, feats=["acc", "pilot", "bsm", "rcta", "autoHigh", "heatedSeats", "ventSeats", "heatedWheel", "remoteStart", "wirelessCharge", "towPkg", "proPower", "awd"])),
+    ("f150_22_kr_pb", "King Ranch PowerBoost", "pb", 2560, 67000, "c:#5a3a22", 24, 116, dict(std=FCPA + " 360° camera." + PB.format(kw="2.4"), hybrid=True, feats=["acc", "pilot", "bsm", "rcta", "autoHigh", "cam360", "heatedSeats", "ventSeats", "heatedWheel", "heatedRear", "remoteStart", "wirelessCharge", "premiumAudio", "towPkg", "proPower", "awd"])),
+    ("f150_22_plat_pb", "Platinum PowerBoost", "pb", 2580, 69500, "c:#3a3d42", 24, 116, dict(std=FCPA + " 360° camera, Active Park Assist 2.0." + PB.format(kw="2.4"), hybrid=True, feats=["acc", "pilot", "bsm", "rcta", "rAeb", "autoHigh", "cam360", "autopark", "heatedSeats", "ventSeats", "heatedWheel", "heatedRear", "massageSeats", "remoteStart", "wirelessCharge", "premiumAudio", "panoRoof", "ambient", "towPkg", "trailerAssist", "proPower", "awd"])),
 ]
 MODES = [["Normal", "normal", "Default on-road calibration for throttle, shifting, steering and 4x4."], ["Eco", "eco", "Softer throttle and early upshifts to save fuel."],
          ["Sport", "sport", "Quicker throttle response, holds gears longer and firmer steering."], ["Tow/Haul", "tow", "Adjusts shift points and grade braking for trailers and heavy loads."],
@@ -35,17 +40,17 @@ def build():
         feats = x["feats"]; std = x["std"]
         pilot = ("BlueCruise", "BLUE", False) if "handsfree" in feats else ("Lane Centering", "LC", True)
         T = {"cda": 1.6 if trim == "Raptor" else 1.55, "ws4": False, "crab": False, "tv": False, "height": False, "modes": 7, "real": True, "model": "f150_22", "group": "Ford F-150 · 2022",
-             "name": f"2022 Ford F-150 {trim} SuperCrew 4x4", "short": f"F-150 {trim}", "desc": f"{en} · 10-speed · 4x4 · {hp} hp", "mass": kg, "kW": kW, "paint": paint, "fwd": 0.56, "Ff": 6800, "Fr": 6400,
+             "name": f"2022 Ford F-150 {trim} SuperCrew 4x4", "short": f"F-150 {trim}", "desc": f"{en} · 10-speed · 4x4 · {hp} hp" + (" · 570 lb-ft · 1.5 kWh" if hyb else ""), "mass": kg, "kW": kW, "paint": paint, "fwd": 0.56, "Ff": 6800, "Fr": 6400,
              "modeNames": [m[0] for m in MODES], "noSigLC": True, "pilotName": pilot[0], "pilotShort": pilot[1], "handsOn": pilot[2], "odo0": 31000, "std": std, "ice": True, "tank": tank, "mpg": mpg,
-             "feat": f"{en}, {hp} hp"}
+             "feat": "PowerBoost hybrid: electric at low speed, 430 hp, 570 lb-ft" if hyb else f"{en}, {hp} hp"}
         if not pilot[2]: T["pilotHwy"] = True
         if "offGrip" in x: T["offGrip"] = x["offGrip"]
         if hyb: T["par"] = True
         no = S + ["avas", "regen", "tech"] + ([] if "autopark" in feats else ["autopark"]) + ([] if "autoLC" in feats else ["autoLC"]) + ([] if "acc" in feats else ["acc", "pilot"])
-        D = {"layout": "ice", "eng": eng, "turbo": turbo, "Tna": round(tq * (0.6 if turbo else 0.9)), "Tpk": tq, "Ppk": kW * 1000, "red": red, "idle": 650 if eng == "v6" else 600, "gears": G10,
+        D = {"layout": "ice", "eng": eng, "turbo": turbo, "Tna": 365 if hyb else round(tq * (0.6 if turbo else 0.9)), "Tpk": tq, "Ppk": 288000 if hyb else kW * 1000, "red": red, "idle": 650 if eng == "v6" else 600, "gears": G10,
              "fd": 3.73 if trim in ("Tremor", "Raptor") else 3.55 if e != "50" else 3.31, "rev": 4.87, "bias": [0.3, 0.7]}
         if e == "50": D["pkRpm"] = 4250
-        if hyb: D["par"] = {"T": 240, "P": 35000, "kWh": 1.5}
+        if hyb: D["par"] = {"T": 240, "P": 35000, "kWh": 1.5, "soc0": 0.6, "min": 0.25, "evThr": 0.25, "evV": 9}
         adds.append(f' add({json.dumps(key)},{{...{json.dumps(T, separators=(",", ":"))},no:{json.dumps(no)}}},{json.dumps(D, separators=(", ", ": "))},{price});')
         m = [list(a) for a in MODES]
         if trim == "Raptor": m = [m[0], m[2], m[4], m[3], OFFRD, BAJA, list(ROCK), m[6]]
@@ -75,8 +80,7 @@ def build():
           "op": [["exterior", "Twin-Panel Moonroof", 1495, ["f150_22_xlt", "f150_22_lariat", "f150_22_tremor"], "power twin-panel moonroof", ["panoRoof"], None],
                  ["exterior", "Factory Spray-In Bedliner", 595, None, "black spray-in bedliner", ["bedLinerFeat"], "bedLiner"],
                  ["mechanical", "Pro Power Onboard 2.0 kW", 995, ["f150_22_xlt", "f150_22_lariat", "f150_22_kr", "f150_22_plat"], "2.0 kW 120V outlets in the bed", ["proPower"], None],
-                 ["mechanical", "Pro Power Onboard 7.2 kW", 750, ["f150_22_ltd"], "7.2 kW generator with 240V outlet", ["proPower"], None],
-                 ["mechanical", "3.5 L PowerBoost Full Hybrid V6", 3300, ["f150_22_xlt", "f150_22_lariat", "f150_22_kr", "f150_22_plat"], "430 hp hybrid V6 (engine upgrade)", ["perfUpgrade"], None],
+                                  ["mechanical", "Pro Power Onboard 7.2 kW", 750, ["f150_22_xlt_pb", "f150_22_lariat_pb", "f150_22_kr_pb", "f150_22_plat_pb"], "7.2 kW generator with 240V 30A outlet (replaces the 2.4 kW)", ["proPower"], None],
                  ["exterior", "Power Deployable Running Boards", 1095, ["f150_22_lariat", "f150_22_kr", "f150_22_plat"], "automatic power-deploying running boards", [], "runningBoards"],
                  ["exterior", "Tailgate Work Surface", 225, ["f150_22_xl", "f150_22_stx", "f150_22_xlt", "f150_22_lariat"], "tailgate work surface with clamp pockets", [], None]],
           "wh": [["17-in. Silver Steel", 0, ["f150_22_xl"]], ["18-in. Dark Painted Aluminum", 0, ["f150_22_stx"]], ["18-in. Chrome-Like PVD Aluminum", 0, ["f150_22_xlt"]], ["20-in. Machined Aluminum", 995, ["f150_22_xlt", "f150_22_lariat"]],

@@ -5,7 +5,7 @@ import f150_22
 tmp = "/tmp/b11.json"; subprocess.run([sys.executable, os.path.join(HERE, "new_batch11.py"), tmp], check=True)
 B = json.load(open(tmp)); fa, fdm, fsu, fbd, fkeys = f150_22.build()
 p = os.path.join(ROOT, "src", "app_template.html"); s = open(p).read()
-lines = s.split("\n"); pat = re.compile(r'^ add\("(gen_|chv_bolt|chv_malibu|nissan_altima27)'); idx = [i for i, l in enumerate(lines) if pat.match(l)]
+lines = s.split("\n"); pat = re.compile(r'^ add\("(gen_|chv_bolt|chv_malibu|nissan_altima27|f150_22)'); idx = [i for i, l in enumerate(lines) if pat.match(l)]
 assert idx, "batch 10 lines not found"
 first = idx[0]; lines = [l for i, l in enumerate(lines) if i not in set(idx)]
 lines[first:first] = B["adds"] + fa
@@ -16,5 +16,5 @@ def merge(prefix, upd):
     D = json.loads(body); D.update(upd); s = s[:i] + prefix + json.dumps(D, separators=(",", ":")) + ";" + s[j:]
 merge("const DMODES=", {**B["dmodes"], **fdm}); merge("const SUSR=", {**B["susr"], **fsu}); merge("var BDATA=", {**B["bdata"], **fbd})
 a = 'const LAZY=new Set(["gen_g70",'
-if '"f150_22"' not in s[s.index(a):s.index(a) + 3000]: s = s.replace(a, 'const LAZY=new Set(["f150_22","gen_g70",', 1)
+if a in s: s = s.replace(a, 'const LAZY=new Set(["f150_22","gen_g70",', 1)
 open(p, "w").write(s); print("applied", len(B["adds"]) + len(fa), "trims")
