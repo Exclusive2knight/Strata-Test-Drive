@@ -1055,7 +1055,11 @@ html body.ui2 #accel .fill{background:linear-gradient(to top,var(--acc),transpar
   html body.ui2 #ui2 .u2row button{width:30px!important;height:26px!important}html body.ui2 #ui2 .u2row svg{width:15px;height:15px}
   html body.ui2 #ui2 #u2arrows button{width:52px!important;height:52px!important}html body.ui2 #brake{width:56px!important;height:80px!important}html body.ui2 #accel{width:64px!important;height:108px!important}
   html body.ui2 #testChip{font-size:12px!important;padding:6px 14px!important}
-  body.ui2:not(.rcOpen) #ui2 .u2right{width:fit-content!important;max-width:fit-content!important;display:flex!important;flex-direction:row!important;grid-template-columns:none!important;gap:2px!important}}
+  body.ui2:not(.rcOpen) #ui2 .u2right{width:fit-content!important;max-width:fit-content!important;display:flex!important;flex-direction:row!important;grid-template-columns:none!important;gap:2px!important}
+  /* the cluster block (speed, screen, PRND, cruise bar, mode pills) 20% smaller; the circles beside it follow */
+  html body.ui2 #ui2 .u2mid{zoom:.8}
+  html body.ui2 #ui2 #u2ccb,html body.ui2 #ui2 #u2ev{left:calc(50% - var(--midw)*.4 - 44px)!important}html body.ui2 #ui2 #u2start{left:calc(50% + var(--midw)*.4 + 6px)!important}
+  html body.ui2 #ui2 #u2ccb,html body.ui2 #ui2 #u2start{bottom:calc(env(safe-area-inset-bottom,0px) + 26px)!important}html body.ui2 #ui2 #u2ev{bottom:calc(env(safe-area-inset-bottom,0px) + 68px)!important}}
 </style>
 
 <canvas id="gl"></canvas>
