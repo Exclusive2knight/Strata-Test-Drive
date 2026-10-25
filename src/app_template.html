@@ -1266,7 +1266,10 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
 <li>The all-new <b>2025 Audi Q5</b> (new model) in every US trim: <b>Q5 Premium, Premium Plus and Prestige</b> (2.0 TFSI, 268 hp, 295 lb-ft, 7-speed S tronic, quattro, 0-60 in about 5.8 s) and <b>SQ5 Premium, Premium Plus and Prestige</b> (3.0 TFSI V6 mild hybrid, 362 hp, 406 lb-ft, 0-60 in about 4.4 s).</li>
 <li>Audi drive select with all six modes (comfort, balanced, dynamic, efficiency, offroad, individual). The SQ5 gets S sport suspension with damper control as standard; adaptive air suspension is an option on the Q5 Prestige and the SQ5.</li>
 <li>Real features and packages: adaptive cruise assist with lane guidance, top view camera, head-up display, Bang & Olufsen 3D sound, Digital Matrix LED headlights, digital OLED taillights, park assist plus and the 10.9-in. passenger screen, by trim or as options. The 2019 Q5 is still there too.</li></ul>
-      <h4>🚦 Leading vehicle departure on the cluster</h4><ul>
+      <h4>🔊 Real 2019 RAV4 and Toyota sounds</h4><ul>
+<li><b>2019 RAV4</b>: recorded from a real one. The startup chime when it turns on, the turn-signal click, the seatbelt reminder (slow at first, faster after 20 seconds), a cleaner pedestrian warning sound, and the real engine sound laid over the engine note (it rises with the revs).</li>
+<li><b>Every Toyota and Lexus</b>: the real forward collision / emergency braking warning beep, and the real cabin chime that repeats while you're in reverse (hybrids and EVs).</li></ul>
+<h4>🚦 Leading vehicle departure on the cluster</h4><ul>
 <li>When you're stopped behind a car and it pulls away while you don't, the cluster now pops up a <b>"Leading vehicle is driving away"</b> card (like Hyundai, Kia and Genesis show it): your car in the lane with the car ahead moving off up the road, together with the chime. It shows on the car's own cluster screen and pops up above the cluster in the new HUD, and goes away after a few seconds or as soon as you drive off. Works on every car with forward collision warning; you can still turn it off in Settings (next to Driver Attention Warning).</li></ul>
 <h4>🚲 Smarter cyclists, heavier traffic, safer FSD</h4><ul>
 <li><b>Genesis screens fixed:</b> on the G80, GV60, GV70, Electrified GV70, GV80 and GV80 Coupe the gauges and the touchscreen were drawn on top of each other in the middle of the dash. The gauges now sit behind the steering wheel and the touchscreen to the right of them, like the real cars.</li>
@@ -5313,7 +5316,7 @@ st.power=true;
 
 // ---- seatbelt reminder: a chime that gets more insistent while you drive unbuckled
 function beltTick(dt){if(st.walk||!st.started||st.belt||st.power!==true){sys.beltT=0;return}const v=Math.abs(car.vx);if(v<2.5){return}sys.beltT=(sys.beltT||0)+dt;sys.beltC=(sys.beltC||0)-dt;
-  if(sys.beltC<=0){sys.beltC=sys.beltT>20?0.5:1.1;const b=(TRIMS[st.trim].group||"").split(" ")[0];if(b==="Ford"){sys.beltC=1.6;if(!playS("ch_ford",0.4))beep(880,.14,"sine",.16)}else if(b==="BMW"){sys.beltC=1.3;if(!playS("ch_bmw",0.4))beep(880,.14,"sine",.16)}else if(!(GMB.has(b)&&playS("gm_chime",0.35)))beep(sys.beltT>20?1180:880,.14,"sine",.16)}
+  if(sys.beltC<=0){sys.beltC=sys.beltT>20?0.5:1.1;const b=(TRIMS[st.trim].group||"").split(" ")[0];if(isRav19()){const fast=sys.beltT>20;sys.beltC=fast?5.95:3.38;if(!playS(fast?"rav19_belt_fast":"rav19_belt_slow",0.45))beep(800,.14,"sine",.16)}else if(b==="Ford"){sys.beltC=1.6;if(!playS("ch_ford",0.4))beep(880,.14,"sine",.16)}else if(b==="BMW"){sys.beltC=1.3;if(!playS("ch_bmw",0.4))beep(880,.14,"sine",.16)}else if(!(GMB.has(b)&&playS("gm_chime",0.35)))beep(sys.beltT>20?1180:880,.14,"sine",.16)}
   if(!sys.beltToast||performance.now()-sys.beltToast>9000){sys.beltToast=performance.now();toast(PC.on?"Fasten your seatbelt: press B":"Fasten your seatbelt")}}
 // ---- G: radial menu of the driver assists
 const RADIAL={open:false};
@@ -5527,7 +5530,7 @@ function powerToggle(){const T=TRIMS[st.trim],H=car.hyb;if(!st.started)return;if
   if(st.power){if(Math.abs(car.vx)>0.5){toast("Stop the car first");return}if(st.gear!=="P"){st.gear="P";tick(1)}
     st.power=false;H.eng=false;H.ssOff=false;H.everRan=false;H.crank=0;st.acc=false;st.pilot=false;sys.fsdActive&&(sys.fsdActive=false);beep(660,.08,"sine",.12);setTimeout(()=>beep(440,.12,"sine",.12),110);toast(`${T.short||T.name} off`);
     if(st.roa!==false&&(sys.tripT||0)>20){sys.roaT=8;for(let i=0;i<4;i++)setTimeout(()=>beep(1180,.22,"sine",.2),500+i*650);setTimeout(()=>toast("Rear Seat Reminder: look in the rear seat"),450)}sys.tripT=0}
-  else{st.power=true;welcomeChime();if(!T.ice){beep(523,.09,"sine",.14);setTimeout(()=>beep(784,.14,"sine",.14),120);toast(T.tesla?"Ready to drive":"READY")}else toast("Starting the engine")}
+  else{st.power=true;welcomeChime();if(!T.ice&&!isRav19()){beep(523,.09,"sine",.14);setTimeout(()=>beep(784,.14,"sine",.14),120);toast(T.tesla?"Ready to drive":"READY")}else toast("Starting the engine")}
   document.body.classList.toggle("carOff",!st.power)}
 function canGetOut(){return st.started&&!st.walk&&Math.abs(car.vx)<0.3&&(st.gear==="P"||sys.epb)&&!sys.pa}
 function hudHide(on){const v=on??!document.body.classList.contains("uihide");document.body.classList.toggle("uihide",v);try{localStorage.setItem("mstrata.uihide",v?"1":"")}catch(e){}if(!v)toast("HUD back")}
@@ -7671,7 +7674,7 @@ function assist(dt){
   if(sys.aebState==="held"){sys.aebHold-=dt;sys.aebBrake=1;if(sys.aebHold<=0){sys.aebBrake=0;sys.aebState="ready"}}
   if(sys.aebState==="ready"&&sys.aebBrake>0&&!(ttc<aebT(1)))sys.aebBrake=Math.max(0,sys.aebBrake-dt*2);
   if(!st.aeb||!has("aeb")){sys.aebBrake=0;sys.aebState="off"}else if(st.aebAuto===false){sys.aebBrake=0;sys.aebState="ready"}else if(sys.aebState==="off")sys.aebState="ready";
-  {const b=brandS(),lin=b==="Lincoln",gm=GMB.has(b),kia=b==="Kia",bmw=b==="BMW",ford=b==="Ford",kSolid=kia&&(sys.aebState==="braking"||sys.aebBrake>0.3);if(sys.fcw&&(lin||gm||kia||bmw||ford)){const now=performance.now();if(!sys.fcwSndT||now-sys.fcwSndT>(lin?2300:kia?(kSolid?1850:1300):bmw?600:ford?1000:950)){sys.fcwSndT=now;if(!playS(lin?"lin_hard":kia?(kSolid?"kia_aeb_solid":"kia_aeb"):bmw?"bmw_aeb":ford?"ford_aeb":"gm_aeb",0.7))beep(2300,.08,"square",.18)}}else{if(!sys.fcw)sys.fcwSndT=0;if(sys.fcw&&(performance.now()%220)<dt*1000*1.2)beep(2400,.07,"square",.2)}}
+  {const b=brandS(),lin=b==="Lincoln",gm=GMB.has(b),kia=b==="Kia",bmw=b==="BMW",ford=b==="Ford",toy=b==="Toyota"||b==="Lexus",kSolid=kia&&(sys.aebState==="braking"||sys.aebBrake>0.3);if(sys.fcw&&(lin||gm||kia||bmw||ford||toy)){const now=performance.now();if(!sys.fcwSndT||now-sys.fcwSndT>(lin?2300:kia?(kSolid?1850:1300):bmw?600:ford?1000:toy?1690:950)){sys.fcwSndT=now;if(!playS(lin?"lin_hard":kia?(kSolid?"kia_aeb_solid":"kia_aeb"):bmw?"bmw_aeb":ford?"ford_aeb":toy?"toy_aeb":"gm_aeb",0.7))beep(2300,.08,"square",.18)}}else{if(!sys.fcw)sys.fcwSndT=0;if(sys.fcw&&(performance.now()%220)<dt*1000*1.2)beep(2400,.07,"square",.2)}}
   // ---- traffic lights ahead: ACC / Pilot stop for them quietly; running a red is logged
   sys.red=null;sys.redWarn=false;
   {const n=M.node;if(n&&n.ctrl==="signal"&&M.s<M.L){const leg=arrLeg(M.e,M.dir),d=M.sStop-M.s,ls=sigState(n,leg.grp,st.clock||0);
@@ -7964,23 +7967,28 @@ function revChime(dt){const T=TRIMS[st.trim],hy=!T.ice||!!(T.hybrid||T.plug||T.p
   const s_=au.ctx.createBufferSource(),g=au.ctx.createGain();s_.buffer=b;s_.loop=true;g.gain.value=st.cam===1?0.6:0.25;s_.connect(g);g.connect(au.master);s_.start();au.rcSrc=s_;au.rcG=g}
 // Toyota and Lexus: the cabin beep that repeats while you're in reverse
 function toyRevBeep(dt){const on=st.started&&st.power!==false&&st.gear==="R";if(!on){au.tbT=0;au.tbOn=false;return}if(!au.ctx)return;if(!au.tbOn){au.tbOn=true;au.tbT=0}au.tbT-=dt;
-  if(au.tbT<=0){au.tbT=0.95;const v=st.cam===1?0.13:0.05;beep(2050,0.28,"sine",v);beep(4100,0.2,"sine",v*0.15)}}
+  if(au.tbT<=0){au.tbT=1.2;if(playS("toy_rev",0.32))return;au.tbT=0.95;const v=st.cam===1?0.13:0.05;beep(2050,0.28,"sine",v);beep(4100,0.2,"sine",v*0.15)}}
 
 // ---- real brand sounds: welcome chimes, Lincoln's warning chimes and GM's chimes, beeps and indicator click
 const CHIME={Ford:"ch_ford",Toyota:"ch_toyota",Lexus:"ch_lexus",Jeep:"ch_stell",Chrysler:"ch_stell",Ram:"ch_stell",Dodge:"ch_dodge",Lincoln:"ch_lincoln",Kia:"ch_kia",Hyundai:"ch_kia","Mercedes-Benz":"ch_mb",BMW:"ch_bmw",Nissan:"ch_nissan",Infiniti:"ch_nissan"};
 const GMB=new Set(["Chevrolet","Buick","GMC","Cadillac"]);
 const brandS=()=>(TRIMS[st.trim]&&TRIMS[st.trim].group||"").split(" ")[0];
-function brandPreload(){if(!au.ctx)return;const b=brandS();if(CHIME[b])sfxLoad(CHIME[b]);if(b==="Lincoln")["lin_hard","lin_soft","lin_nc"].forEach(sfxLoad);if(b==="BMW")sfxLoad("bmw_aeb");if(b==="Ford")sfxLoad("ford_aeb");if(b==="Kia")["kia_bsm","kia_aeb","kia_aeb_solid","kia_ldw","kia_notify","kia_rev"].forEach(sfxLoad);if(GMB.has(b))["gm_aeb","gm_pdc1","gm_rct","gm_scstop","gm_chime","gm_notify","gm_tick"].forEach(sfxLoad)}
+function brandPreload(){if(!au.ctx)return;const b=brandS();if(CHIME[b])sfxLoad(CHIME[b]);if(b==="Lincoln")["lin_hard","lin_soft","lin_nc"].forEach(sfxLoad);if(b==="BMW")sfxLoad("bmw_aeb");if(b==="Ford")sfxLoad("ford_aeb");if(b==="Kia")["kia_bsm","kia_aeb","kia_aeb_solid","kia_ldw","kia_notify","kia_rev"].forEach(sfxLoad);if(b==="Toyota"||b==="Lexus")["toy_aeb","toy_rev"].forEach(sfxLoad);if(isRav19())["rav19_start","rav19_tick_on","rav19_tick_off","rav19_belt_slow","rav19_belt_fast","rav19_eng"].forEach(sfxLoad);if(GMB.has(b))["gm_aeb","gm_pdc1","gm_rct","gm_scstop","gm_chime","gm_notify","gm_tick"].forEach(sfxLoad)}
 function playS(k,vol,rate){const c=au.ctx;if(!c||!k)return false;const b=sfxLoad(k);if(!b)return false;const s_=c.createBufferSource(),g=c.createGain();s_.buffer=b;if(rate)s_.playbackRate.value=rate;g.gain.value=vol*(st.cam===1&&!st.walk?1:0.5);s_.connect(g);g.connect(au.master);s_.start();return true}
-function welcomeChime(){const k=CHIME[brandS()];if(!k)return;brandPreload();let n=0;const tr=()=>{if(playS(k,0.55))return;if(++n<15)setTimeout(tr,200)};setTimeout(tr,300)}
+function welcomeChime(){const k=isRav19()?"rav19_start":CHIME[brandS()];if(!k||isRav19()&&st.power!==true)return;brandPreload();let n=0;const tr=()=>{if(playS(k,0.55))return;if(++n<15)setTimeout(tr,200)};setTimeout(tr,300)}
 function startSound(vol){const c=au.ctx;if(!c)return false;const b=sfxLoad("start");if(!b)return false;const s_=c.createBufferSource(),g=c.createGain();s_.buffer=b;g.gain.value=vol;s_.connect(g);g.connect(au.master);s_.start();au.duckT=c.currentTime+2.2;return true}
+// the 2019 RAV4's own engine: a recording of the real 2.5 L looped and pitched with the revs (laid over a quieter synthesised note that carries the load)
+function rav19Eng(t,k,rpm,L,inside){if(!k&&!au.r19)return;const b=sfxLoad("rav19_eng");if(!b)return;
+  if(!au.r19){const c=au.ctx,s_=c.createBufferSource();s_.buffer=b;s_.loop=true;const lp=c.createBiquadFilter();lp.type="lowpass";lp.frequency.value=3000;const g=c.createGain();g.gain.value=0;s_.connect(lp);lp.connect(g);g.connect(au.master);s_.start();au.r19={s:s_,g,lp}}
+  const R_=au.r19;R_.s.playbackRate.setTargetAtTime(clamp(rpm/1150,0.75,3.6),t,0.06);R_.g.gain.setTargetAtTime(k*(inside?0.13:0.22)*(0.55+0.45*L),t,0.06);R_.lp.frequency.setTargetAtTime(inside?1500+L*2500+rpm*0.3:4500,t,0.1)}
 function engineAudioUpdate(t){
   const T=TRIMS[st.trim],H=car.hyb,kind=T.ice?DRIVES[st.trim].eng:(T.sound||"i4h"),S=engSnd(kind),rpm=Math.max(H.rpm,0),L=H.load||0,inside=st.cam===1,uv=[0.45,1,1.6][st.engVol??1]*(TRIMS[st.trim].loud||1);
   if(au.engKind!==kind){au.engKind=kind;au.eO.setPeriodicWave(engWave(au.ctx,kind));au.eBoom.frequency.value=S.boom}if(au.lastTrim!==st.trim){au.lastTrim=st.trim;brandPreload();if(au.lastTrimSeen)audioSwitch();au.lastTrimSeen=1;au.engKind=kind}
   const has=T.ice||T.hybrid, lvl=has?clamp(rpm/600,0,1):0;
   au.eO.frequency.setTargetAtTime(Math.max(rpm,60)/120,t,0.03);
   const duck=au.duckT&&t<au.duckT?clamp(1-(au.duckT-t)/1.2,0,1):1;
-  au.eG.gain.setTargetAtTime((H.deact?0.72:1)*(MD().sndK??1)*(tuneCur().exh?(inside?1.6:2.1):1)*duck*lvl*S.vol*uv*(inside?0.03:0.05)*(0.45+0.55*L)*(0.75+rpm/8000),t,0.05);
+  {const r19=isRav19()&&!!T.ice||isRav19()&&!!T.hybrid;rav19Eng(t,r19?duck*lvl*uv:0,rpm,L,inside)}
+  au.eG.gain.setTargetAtTime((isRav19()?0.45:1)*(H.deact?0.72:1)*(MD().sndK??1)*(tuneCur().exh?(inside?1.6:2.1):1)*duck*lvl*S.vol*uv*(inside?0.03:0.05)*(0.45+0.55*L)*(0.75+rpm/8000),t,0.05);
   au.eLP.frequency.setTargetAtTime(((inside?260:380)+rpm*(inside?0.11:0.2)*S.bright+L*(inside?250:600))*(H.deact?0.7:1),t,0.06);
   const fire=rpm/60*S.fire/2;au.cF.frequency.setTargetAtTime(Math.max(fire,5),t,0.03);au.cBP.frequency.setTargetAtTime(380+rpm*0.12,t,0.08);
   const cl=duck*lvl*S.vol*uv*(inside?0.006:0.012)*(0.3+L);au.cAM.gain.setTargetAtTime(cl,t,0.06);au.cFG.gain.setTargetAtTime(cl,t,0.06);
@@ -8019,7 +8027,7 @@ function aiAudioUpdate(t){if(!au.ai)return;if(!G().aiSnd){au.ai.forEach(V=>{V.eg
     V.ng.gain.setTargetAtTime(0.05*a*Math.pow(Math.min(1,v/30),1.4),t,0.12);V.nb.frequency.setTargetAtTime(300+v*12,t,0.2)})}
 function beep(freq,dur,type,vol){const c=au.ctx;if(!c)return;if(!beep.raw){const b=brandS();if(b==="Kia"&&freq===880&&dur<0.2&&type!=="square"){if(performance.now()-(beep.kT||0)<500)return;beep.kT=performance.now();if(playS("kia_notify",0.5))return}if(b==="Ford"&&(freq===500||freq===980||(freq===880&&dur<0.2))){if(performance.now()-(beep.fT||0)<700)return;beep.fT=performance.now();if(playS("ch_ford",0.45))return}if(freq===500&&(b==="Lincoln"?playS("lin_nc",0.5):GMB.has(b)&&playS("gm_chime",0.5)))return;if(GMB.has(b)&&freq===1050&&type==="sine"&&playS("gm_pdc1",0.6))return;if(GMB.has(b)&&freq===1050&&type==="square"){if(!beep.rctT||c.currentTime-beep.rctT>0.4){beep.rctT=c.currentTime;if(playS("gm_rct",0.6))return}else return}if(freq===400&&dur===.5&&(b==="Lincoln"?playS("lin_hard",0.6):GMB.has(b)&&playS("gm_scstop",0.6)))return;if(freq===880&&GMB.has(b)&&playS("gm_notify",0.4)){beep.skip=performance.now();return}if(freq===1320&&GMB.has(b)&&performance.now()-(beep.skip||0)<400)return;if(freq===980&&b==="Lincoln"&&playS("lin_soft",0.5))return}if(TSL.joe&&isTesla())vol*=0.3;const o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.value=freq;
   g.gain.setValueAtTime(vol,c.currentTime);g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+dur);o.connect(g);g.connect(au.master);o.start();o.stop(c.currentTime+dur+0.02)}
-function tick(hi){const c=au.ctx;if(!c)return;if(GMB.has(brandS())&&playS("gm_tick",0.7,hi?1:0.86))return;const t=c.currentTime,v=st.cam===1&&!st.walk?1:0.45;// a relay "tick" on, a softer "tock" off
+function tick(hi){const c=au.ctx;if(!c)return;if(GMB.has(brandS())&&playS("gm_tick",0.7,hi?1:0.86))return;if(isRav19()&&!isTesla()&&playS(hi?"rav19_tick_on":"rav19_tick_off",0.75))return;const t=c.currentTime,v=st.cam===1&&!st.walk?1:0.45;// a relay "tick" on, a softer "tock" off
   noiseBurst(t,0.018,0.32*v,"bandpass",hi?3400:2300);noiseBurst(t,0.04,0.22*v,"lowpass",hi?260:200);beep(hi?1250:900,0.012,"triangle",0.05*v)}
 // hybrid engine pull-start: the motor spins it up, so a soft thump and a short rumble instead of a starter
 function hybStartSnd(){const c=au.ctx;if(!c||st.power===false)return;const t=c.currentTime,v=st.cam===1?0.6:1;noiseBurst(t,0.35,0.07*v,"lowpass",140);beep(52,0.3,"sine",0.12*v);beep(104,0.18,"triangle",0.03*v)}
@@ -11606,7 +11614,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=177;   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="173",BUILD_VER=178;   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){return GQ[GFX.q==="auto"?GFX.eff:GFX.q]}
