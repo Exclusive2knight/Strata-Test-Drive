@@ -883,6 +883,106 @@ body.pmOn>*:not(#gl):not(#pm):not(#pmFx):not(#toast):not(#flashFx):not(#susUI):n
 #busted b{font:900 clamp(56px,13vw,140px)/1 system-ui;letter-spacing:.06em;color:#e8f0ff;text-shadow:0 0 30px #2a6bff,0 4px 0 #000}#busted small{margin-top:14px;font:600 18px system-ui;opacity:.9}
 #busted.go b{animation:bustIn .5s ease-out}@keyframes bustIn{from{transform:scale(1.6);opacity:0}to{transform:scale(1);opacity:1}}
 #wanted{position:fixed;top:calc(env(safe-area-inset-top,0px) + 46px);left:50%;transform:translateX(-50%);z-index:9;text-align:center;pointer-events:none;color:#fff;text-shadow:0 2px 6px #000}#wanted[hidden]{display:none}#wanted b{display:block;font:900 30px system-ui;letter-spacing:4px;color:#fff}#wanted b i{font-style:normal;color:rgba(255,255,255,.25)}#wanted small{font:700 12px system-ui;letter-spacing:.12em;text-transform:uppercase}#wanted.mem b{color:rgba(255,255,255,.45)}#wanted.mem small{opacity:.75}#wanted.flash b{animation:wflash .5s steps(2) infinite}@keyframes wflash{50%{color:#ff3b30}}
+/* ===================== HUD 4 (v173): flat dark panels, hairline dividers, one amber accent =====================
+   no blur, no glow; square-ish corners; plain sans with tabular numbers. Same layout and buttons as before. */
+:root{--g-bg:#121314;--g-bg2:#1b1c1f;--g-brd:#26282b;--g-hi:none;--g-sh:0 6px 18px rgba(0,0,0,.32);--acc:#f2a33a;--acc-d:rgba(242,163,58,.14);--acc-g:none;--amb:#f2a33a;--bad:#ff5b52;--tx:#ececec;--dim:#8b8e93;--r:6px;--midw:min(620px,54vw)}
+body.ui2 #ui2{--f-hud:"Helvetica Neue",Helvetica,Arial,sans-serif;--f-ui:"Helvetica Neue",Helvetica,Arial,sans-serif;font-variant-numeric:tabular-nums}
+body.ui2 #ui2 *{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+html body.ui2 #ui2 .u2c,html body.ui2 #ui2 .u2bar,html body.ui2 #ui2 .u2pill,html body.ui2 #ui2 .u2left button,html body.ui2 #ui2 .u2right button,html body.ui2 #ui2 .u2row button,html body.ui2 #ui2 .u2cells,html body.ui2 #ui2 .u2bars,
+html body.ui2 #ui2 #u2start,html body.ui2 #ui2 #u2mode,html body.ui2 #ui2 #u2terr,html body.ui2 #ui2 #u2ev,html body.ui2 #ui2 #u2arrows button,html body.ui2 #ui2 #u2gearpop,html body.ui2 #toast,html body.ui2 #testChip{background:var(--g-bg)!important;border:1px solid var(--g-brd)!important;box-shadow:var(--g-sh)!important}
+body.ui2 #ui2 svg{stroke:#cfcfcf;stroke-width:1.6}
+@media (hover:hover){html body.ui2 #ui2 button:hover{background:var(--g-bg2)!important}}
+html body.ui2 #ui2 .u2right button.on,html body.ui2 #ui2 .u2left button.on{background:#1c1d1f!important;border-color:var(--g-brd)!important;box-shadow:inset 0 -2px 0 var(--acc)!important}
+html body.ui2 #ui2 .u2right button.grn.on svg,html body.ui2 #ui2 .u2right button.grn.on{stroke:#7fd17f;color:#7fd17f}
+html body.ui2 #ui2 #u2haz.on,html body.ui2 #ui2 #u2epb.on{background:#2a1513!important;border-color:#5a2a26!important;box-shadow:inset 0 -2px 0 var(--bad)!important}
+/* top left: one bar of buttons with dividers */
+html body.ui2 #ui2 .u2tl{gap:0}
+html body.ui2 #ui2 .u2tl .u2c{width:40px;height:40px;border-radius:0;border-left-width:0!important;box-shadow:none!important}
+html body.ui2 #ui2 .u2tl .u2c:first-child{border-radius:6px 0 0 6px;border-left-width:1px!important}html body.ui2 #ui2 .u2tl .u2c:last-child{border-radius:0 6px 6px 0}
+html body.ui2 #ui2 .u2tl .u2c svg{width:18px;height:18px}
+/* top right: shortcut bar, then money / clock / level as one card */
+html body.ui2 #ui2 .u2tr{gap:6px;width:min(250px,34vw)}
+html body.ui2 #ui2 .u2bar{border-radius:6px;padding:0}html body.ui2 #ui2 .u2bar button{border-radius:0;height:38px;border-right:1px solid #222427!important}html body.ui2 #ui2 .u2bar button:last-child{border-right:0!important}
+html body.ui2 #ui2 .u2bar button.g{background:#1c1d1f!important}html body.ui2 #ui2 .u2bar button.g svg{stroke:var(--acc)}
+html body.ui2 #ui2 .u2pills{gap:0;background:var(--g-bg);border:1px solid var(--g-brd);border-bottom:0;border-radius:6px 6px 0 0;padding:8px 12px 2px;justify-content:space-between}
+html body.ui2 #ui2 .u2pill{background:transparent!important;border:0!important;box-shadow:none!important;padding:0;border-radius:0;font:600 17px var(--f-hud)}
+html body.ui2 #ui2 .u2pill i{display:none}html body.ui2 #ui2 #u2cashP b::before{content:"$"}html body.ui2 #ui2 .u2pill+.u2pill{font-size:13px;font-weight:400;color:#bdbdbd;align-self:center}
+html body.ui2 #ui2 .u2lvl{background:var(--g-bg);border:1px solid var(--g-brd);border-top:0;border-radius:0 0 6px 6px;padding:4px 12px 9px;margin-top:-6px;text-shadow:none;font:400 10px var(--f-hud);color:var(--dim);letter-spacing:.04em;gap:8px}
+html body.ui2 #ui2 .u2lvl b{font:400 10px var(--f-hud);color:var(--dim)}html body.ui2 #ui2 .u2lvl b::before{content:"Lv ";font-size:10px;opacity:1}
+html body.ui2 #ui2 .u2xp{height:3px;background:#2a2c2f;border-radius:0}html body.ui2 #ui2 .u2xp i{background:var(--acc);box-shadow:none;border-radius:0}
+html body.ui2 #ui2 .u2lvl small{font:400 10px var(--f-hud);letter-spacing:0;opacity:1}
+/* left: lock / phone / pair as a labelled list */
+html body.ui2 #ui2 .u2left .dk{border-radius:6px;padding:0;background:var(--g-bg);border:1px solid var(--g-brd);box-shadow:var(--g-sh)}
+html body.ui2 #ui2 .u2left .dk button{width:118px!important;height:38px!important;flex-direction:row;justify-content:flex-start;gap:9px;padding:0 11px;border-radius:0;border-bottom:1px solid #222427!important;background:transparent!important;box-shadow:none!important}
+html body.ui2 #ui2 .u2left .dk button:last-of-type{border-bottom:0!important}
+html body.ui2 #ui2 .u2left .dk button .ic{width:18px;height:18px;background:transparent!important;border:0!important;box-shadow:none!important}html body.ui2 #ui2 .u2left .dk svg{width:17px;height:17px}
+html body.ui2 #ui2 .u2left .dk small{font:400 12px var(--f-ui);letter-spacing:0;text-transform:none;color:#cfcfcf;opacity:1}
+html body.ui2 #ui2 .u2left .dk button.warn small,html body.ui2 #ui2 .u2left .dk button.warn svg{color:#7fd17f;stroke:#7fd17f}html body.ui2 #ui2 .u2left .dk button.ok small{color:#cfcfcf}
+html body.ui2 #ui2 .u2left .dk button.blu small{color:#7cb7ff}html body.ui2 #ui2 .u2left .dk button.blu svg{stroke:#7cb7ff}
+html body.ui2 #ui2 #u2dock{border-radius:4px!important}
+body.dkMin #ui2 .u2left .dk button{width:40px!important}body.dkMin #ui2 .u2left .dk small{display:none}
+/* right column */
+html body.ui2 #ui2 .u2right button{border-radius:6px}
+/* the cluster: speed | middle screen | gear + power */
+html body.ui2 #ui2 .u2mid{width:var(--midw);gap:5px}
+html body.ui2 #ui2 .u2row button{border-radius:6px}
+html body.ui2 #ui2 .u2line{height:2px;background:#2a2c2f;border-radius:0}html body.ui2 #ui2 .u2line i{background:#ececec;box-shadow:none;border-radius:0}html body.ui2 #ui2 .u2line #u2brk{background:var(--bad);box-shadow:none}
+html body.ui2 #ui2 .u2cells{grid-template-columns:0.78fr 1.75fr 0.78fr;border-radius:6px;padding:0;gap:0;pointer-events:auto}
+html body.ui2 #ui2 .u2cells>div{border-radius:0;background:transparent;box-shadow:none!important;padding:10px 0}
+html body.ui2 #ui2 .u2cells>div+div{border-left:1px solid #222427}
+html body.ui2 #ui2 .u2cells b{font:300 30px var(--f-hud);letter-spacing:-.5px}html body.ui2 #ui2 #u2spd{font-size:44px;font-weight:300}
+html body.ui2 #ui2 .u2cells small{font:400 10px var(--f-ui);letter-spacing:.04em;text-transform:none;color:var(--dim)}
+html body.ui2 #ui2 #u2gear{font-weight:500}
+html body.ui2 #ui2 .u2view{padding:6px 8px 4px!important;display:flex;flex-direction:column;align-items:stretch!important;justify-content:flex-start!important;gap:4px}
+html body.ui2 #ui2 #u2vt{display:flex;gap:12px;border-bottom:1px solid #222427;padding:0 2px 4px}
+html body.ui2 #ui2 #u2vt button{all:unset;cursor:pointer;font:400 11px var(--f-ui);color:#6d7075;padding-bottom:2px;border-bottom:2px solid transparent}
+html body.ui2 #ui2 #u2vt button.on{color:#ececec;border-bottom-color:var(--acc)}
+html body.ui2 #ui2 #u2vc{width:100%;height:auto;aspect-ratio:196/108;display:block;cursor:pointer}
+html body.ui2 #ui2 .u2pw{display:flex;gap:2px;width:72%;margin-top:7px}html body.ui2 #ui2 .u2pw i{display:block;height:5px;background:#2a2c2f;position:relative;overflow:hidden}
+html body.ui2 #ui2 .u2pw i:first-child{flex:1}html body.ui2 #ui2 .u2pw i:last-child{flex:3}
+html body.ui2 #ui2 .u2pw i::after{content:"";position:absolute;top:0;bottom:0;width:var(--p,0%);background:#ececec}html body.ui2 #ui2 .u2pw i:first-child::after{right:0;background:#7fd17f}html body.ui2 #ui2 .u2pw i:last-child::after{left:0}
+html body.ui2 #ui2 .u2bars{border-radius:6px;padding:6px 12px}html body.ui2 #ui2 .u2fuel,html body.ui2 #ui2 .u2hp{height:3px;background:#2a2c2f;border-radius:0}
+html body.ui2 #ui2 .u2fuel i,html body.ui2 #ui2 .u2hp i{box-shadow:none;border-radius:0}html body.ui2 #ui2 .u2fuel i{background:#ececec}html body.ui2 #ui2 .u2hp i{background:var(--bad)}
+html body.ui2 #ui2 .u2bars .ic{filter:grayscale(1);opacity:.7}
+html body.ui2 #ui2 .u2odo{font:400 10px var(--f-hud);letter-spacing:.12em;color:#9a9da2}
+html body.ui2 #ui2 #u2lim{border-radius:4px}
+html body.ui2 #ui2 #u2msg{font:500 17px var(--f-ui)}
+/* start, mode, terrain, EV buttons */
+html body.ui2 #ui2 #u2start{border-radius:6px}html body.ui2 #ui2 #u2start.on{box-shadow:inset 0 -2px 0 #7fd17f!important}html body.ui2 #ui2 #u2start.on svg{stroke:#7fd17f}
+html body.ui2 #ui2 #u2mode,html body.ui2 #ui2 #u2terr,html body.ui2 #ui2 #u2ev{border-radius:6px;letter-spacing:.04em}
+html body.ui2 #ui2 #u2mode.sp{box-shadow:inset 0 -2px 0 var(--acc)!important}html body.ui2 #ui2 #u2ev.on{box-shadow:inset 0 -2px 0 #7fd17f!important;color:#7fd17f}html body.ui2 #ui2 #u2terr.on{box-shadow:inset 0 -2px 0 #c9a26b!important}
+html body.ui2 #ui2 #u2arrows button{border-radius:10px}html body.ui2 #ui2 #u2arrows button.on{background:#1c1d1f!important;box-shadow:inset 0 -3px 0 var(--acc)!important}
+html body.ui2 #ui2 #u2gearpop{border-radius:6px}html body.ui2 #ui2 #u2gearpop button{border-radius:4px}html body.ui2 #ui2 #u2gearpop button.on{background:var(--acc);color:#121314;box-shadow:none}
+html body.ui2 #ui2 #u2nav{background:var(--g-bg)!important;border:1px solid var(--g-brd)!important;border-left:3px solid var(--acc)!important;border-radius:6px!important;box-shadow:var(--g-sh)!important}
+html body.ui2 #ui2 #u2nav i{background:#1c1d1f!important;color:var(--acc)!important;border-radius:4px}
+html body.ui2 #testChip{border-radius:4px;border-left:3px solid var(--acc)!important;color:#ececec;font:600 14px "Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:0}
+html body.ui2 #toast{border-radius:6px!important}
+html body.ui2 #brake,html body.ui2 #accel{border-radius:10px!important;background:#121314!important;border:1px solid #26282b!important;box-shadow:var(--g-sh)!important}
+html body.ui2 #accel::after{color:#ececec!important;font:600 12px "Helvetica Neue",Helvetica,Arial,sans-serif!important;letter-spacing:.16em}
+html body.ui2 #brake span{color:#ff8f88!important;font:600 12px "Helvetica Neue",Helvetica,Arial,sans-serif!important;letter-spacing:.16em!important}
+html body.ui2 #accel.on,html body.ui2 #accel:active{box-shadow:inset 0 -3px 0 #ececec!important}html body.ui2 #brake.on,html body.ui2 #brake:active{box-shadow:inset 0 -3px 0 var(--bad)!important}
+/* pop-outs: cruise / lane-keep status only while it's on; the right-hand buttons fold behind one button */
+#ui2 #u2cc{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);display:flex;gap:9px;align-items:baseline;background:#121314;border:1px solid #26282b;border-radius:6px;padding:5px 11px;font:400 12px "Helvetica Neue",Helvetica,Arial,sans-serif;color:#ececec;white-space:nowrap;box-shadow:0 6px 18px rgba(0,0,0,.32)}
+#ui2 #u2cc[hidden]{display:none}#ui2 #u2cc b{font-weight:600;color:#f2a33a}#ui2 #u2cc b.a{color:#7cb7ff}#ui2 #u2cc i{font-style:normal;letter-spacing:1px;color:#f2a33a;font-size:10px}#ui2 #u2cc em{font-style:normal;color:#8b8e93;font-size:11px}
+body.ui2:not(.rcOpen) #ui2 .u2right>*:not(#u2rc):not(#u2haz):not(.u2pair:has(#u2sl)){display:none!important}
+html body.ui2.rcOpen #ui2 #u2rc{box-shadow:inset 0 -2px 0 #f2a33a!important}
+/* drive / terrain mode panel: docked beside the cluster on PC, a pop-up over the cluster on touch */
+#ui2 #u2modes{position:fixed;z-index:7;width:104px;background:#121314;border:1px solid #26282b;border-radius:6px;box-shadow:0 6px 18px rgba(0,0,0,.32);font:400 12px "Helvetica Neue",Helvetica,Arial,sans-serif;color:#a9acb1;padding:4px;pointer-events:auto}
+#ui2 #u2modes[hidden]{display:none}
+#ui2 #u2modes .mt{display:flex;gap:2px;padding:2px 2px 5px;border-bottom:1px solid #222427;margin-bottom:3px}
+#ui2 #u2modes .mt span{font-size:10px;color:#8b8e93;padding:2px 4px}
+#ui2 #u2modes .mt button{all:unset;cursor:pointer;flex:1;text-align:center;font-size:10px;color:#6d7075;padding:2px 0;border-bottom:2px solid transparent}#ui2 #u2modes .mt button.on{color:#ececec;border-bottom-color:#f2a33a}
+#ui2 #u2modes .ml{display:flex;flex-direction:column;gap:1px;max-height:150px;overflow-y:auto;scrollbar-width:none}
+#ui2 #u2modes .ml button{all:unset;cursor:pointer;padding:5px 8px;border-radius:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#ui2 #u2modes .ml button:hover{background:#1c1d1f;color:#ececec}#ui2 #u2modes .ml button.on{background:#f2a33a;color:#121314;font-weight:700}
+body.pc #ui2 #u2modes{left:calc(50% + var(--midw)/2 + 66px);bottom:calc(env(safe-area-inset-bottom,0px) + 30px)}
+body.pc #ui2 #u2mode,body.pc #ui2 #u2terr{display:none!important}
+body.pc #ui2 #u2ev{right:auto!important;left:calc(50% + var(--midw)/2 + 178px)!important;bottom:calc(env(safe-area-inset-bottom,0px) + 30px)!important}
+body:not(.pc) #ui2 #u2modes{left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 200px);width:150px}
+body:not(.pc) #ui2 #u2modes .ml button{padding:8px 10px;font-size:13px}
+body.onfoot #ui2 #u2modes{display:none!important}
+@media (max-width:820px){:root{--midw:min(470px,56vw)}}
+@media (max-height:440px){:root{--midw:min(400px,50vw)}html body.ui2 #ui2 .u2left .dk button{height:31px!important;width:104px!important}html body.ui2 #ui2 .u2left .dk small{font-size:11px}html body.ui2 #ui2 #u2spd{font-size:30px}html body.ui2 #ui2 .u2cells b{font-size:22px}html body.ui2 #ui2 .u2cells>div{padding:5px 0}body:not(.pc) #ui2 #u2modes{bottom:calc(env(safe-area-inset-bottom,0px) + 150px)}}
 </style>
 
 <canvas id="gl"></canvas>
@@ -991,6 +1091,7 @@ body.pmOn>*:not(#gl):not(#pm):not(#pmFx):not(#toast):not(#flashFx):not(#susUI):n
     <button id="u2scr" aria-label="Screen" hidden><span class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M9 20h6M12 17v3"/></svg></span><small id="u2scrL">Screen</small></button>
   </div><button id="u2dock" aria-label="Collapse"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button></div>
   <div class="u2right">
+    <button id="u2rc" aria-label="More controls"><svg viewBox="0 0 24 24"><path d="M6 12h.01M12 12h.01M18 12h.01" stroke-width="3.2"/></svg></button>
     <button id="u2clu" aria-label="Zoom cluster (N)"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M16 16l5 5M11 8v3l2 2"/></svg></button>
     <button id="u2cam" aria-label="Camera (V)"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="13" height="10" rx="2"/><path d="M16 11l5-3v8l-5-3z"/></svg></button>
     <button id="u2belt" aria-label="Seatbelt (B)"><svg viewBox="0 0 24 24"><circle cx="12" cy="4.5" r="2"/><path d="M8 9h8l-1 6h-6zM9 9l7 9M10 21l1-6M14 21l-1-6"/></svg></button>
@@ -1002,14 +1103,14 @@ body.pmOn>*:not(#gl):not(#pm):not(#pmFx):not(#toast):not(#flashFx):not(#susUI):n
     <button id="u2assist" aria-label="Assists (G)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v6M12 15v6M3 12h6M15 12h6"/></svg></button>
   </div>
   <div id="u2msg"></div><div id="u2nav" hidden></div>
-  <div class="u2mid">
+  <div class="u2mid"><div id="u2cc" hidden></div>
     <div class="u2row"><button id="u2vol" aria-label="Volume"><svg viewBox="0 0 24 24"><path d="M4 10v4h4l6 4V6L8 10z" class="f"/><path d="M17 9a4 4 0 0 1 0 6"/></svg></button><button id="u2gearsel" aria-label="Gear selector"><svg viewBox="0 0 24 24"><path d="M6 4v16M12 4v16M18 4v8M6 12h12"/></svg></button><button id="u2up" aria-label="Shift up (E)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button><button id="u2dn" aria-label="Shift down (Q)"><svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button><span class="sp"></span><button id="u2exit" class="red" aria-label="Get out (O)"><svg viewBox="0 0 24 24"><path d="M14 4h5v16h-5"/><path d="M10 8l-4 4 4 4M6 12h9"/></svg></button></div>
     <div class="u2line"><i id="u2thr"></i><i id="u2brk"></i></div>
-    <div class="u2cells"><div id="u2spdc"><div id="u2lim" hidden><small>SPEED<br>LIMIT</small><b>30</b></div><b id="u2spd">0</b><small id="u2unit">mph</small></div><div class="car" id="u2carbtn" title="Energy, hybrid flow, lane and suspension views"><svg viewBox="0 0 24 44" id="u2carico"><rect x="4" y="2" width="16" height="40" rx="7"/><rect x="6.5" y="11" width="11" height="8" rx="2" class="g"/><rect x="6.5" y="27" width="11" height="6" rx="2" class="g"/></svg></div><div><b id="u2gear">P</b><small>gear</small></div></div>
+    <div class="u2cells"><div id="u2spdc"><div id="u2lim" hidden><small>SPEED<br>LIMIT</small><b>30</b></div><b id="u2spd">0</b><small id="u2unit">mph</small></div><div class="u2view" id="u2carbtn"><div id="u2vt"><button data-v="energy">Energy</button><button data-v="assist">Assist</button><button data-v="trip">Trip</button><button data-v="car">Car</button></div><canvas id="u2vc" width="392" height="216" aria-label="Cluster screen"></canvas></div><div><b id="u2gear">P</b><small>gear</small><div class="u2pw" title="Power / regen"><i id="u2pwn"></i><i id="u2pwp"></i></div></div></div>
     <div class="u2bars"><i class="ic" id="u2fic">⛽</i><div class="u2fuel"><i id="u2fuel"></i></div><div class="u2hp"><i id="u2hp"></i></div><i class="ic">🔧</i></div>
     <div class="u2odo" id="u2odo">0 mi</div>
   </div>
-  <button id="shopBtn" hidden></button><div id="shopSheet" hidden><div class="sc"></div></div><button id="u2terr" aria-label="Terrain mode" hidden><svg viewBox="0 0 24 16"><path d="M1 15 8 5l4 5 3-3 8 8z"/></svg><span>TERRAIN</span></button><button id="u2ev" aria-label="EV mode" hidden><b>EV</b><small>MODE</small></button><button id="u2mode" aria-label="Drive mode"><b>NORMAL</b><small>MODE</small></button><button id="u2start" aria-label="Start / stop"><svg viewBox="0 0 24 24"><path d="M12 3v8"/><path d="M6.3 6.3a8 8 0 1 0 11.4 0"/></svg></button>
+  <button id="shopBtn" hidden></button><div id="shopSheet" hidden><div class="sc"></div></div><button id="u2terr" aria-label="Terrain mode" hidden><svg viewBox="0 0 24 16"><path d="M1 15 8 5l4 5 3-3 8 8z"/></svg><span>TERRAIN</span></button><button id="u2ev" aria-label="EV mode" hidden><b>EV</b><small>MODE</small></button><button id="u2mode" aria-label="Drive mode"><b>NORMAL</b><small>MODE</small></button><div id="u2modes" hidden></div><button id="u2start" aria-label="Start / stop"><svg viewBox="0 0 24 24"><path d="M12 3v8"/><path d="M6.3 6.3a8 8 0 1 0 11.4 0"/></svg></button>
   <div id="u2arrows"><button id="u2al" aria-label="Steer left"><svg viewBox="0 0 24 24"><path d="M14 5l-7 7 7 7"/></svg></button><button id="u2ar" aria-label="Steer right"><svg viewBox="0 0 24 24"><path d="M10 5l7 7-7 7"/></svg></button></div>
   <div id="u2gearpop" hidden><button data-g="P">P</button><button data-g="R">R</button><button data-g="N">N</button><button data-g="D">D</button></div>
 </div>
@@ -1034,7 +1135,7 @@ body.pmOn>*:not(#gl):not(#pm):not(#pmFx):not(#toast):not(#flashFx):not(#susUI):n
   <div class="nc">
     <div class="nh"><small>What's new</small><h2>Version 172 · The new map, 11 new cars, smarter navigation</h2></div>
     <div class="nb">
-      <h4>🔄 Updates since launch</h4><ul><li><b>Ford sounds:</b> Fords have a new startup chime when you turn the car on, and a new forward collision warning: the real Ford alert beeps now play when the car warns you or brakes for something ahead, instead of the generic beep.</li><li>Fixed the new map freezing and crashing a few seconds after it loads (especially on phones and tablets).</li><li>Roundabouts (not the little turning circles) now have <b>two lanes</b>: the outer lane for the first exit, the inner lane to go further round. Traffic and Full Self-Driving pick the right lane from where they're going.</li><li>Full Self-Driving without a destination now picks an exit at roundabouts (usually straight on) instead of circling, using the right lane for it. At all-way stops it no longer sits waiting behind a car that is itself waiting for it: after a couple of seconds it takes its turn.</li><li>The old Halden map is gone for good: the new map is the only world now (the <code>?world=1</code> link no longer opens it).</li><li>Fixed the Grand Wagoneer L (and Kia K5) freezing as soon as you spawned: the camera stuck and the car wouldn't drive. Their engine type had no engine sound, which stopped the game every frame. The Grand Wagoneer L now has its own twin-turbo straight-six sound.</li><li>If the game ever hits an error, a small red bar now says what went wrong. Screenshot it and send it in so it can be fixed.</li><li><b>Suspension setup</b> (Settings › Controls, or ☰ › Settings): fit adjustable coilovers ($1,800) and tune ride height, front and rear springs, dampers, anti-roll bars and camber on a live diagram of your car, or pick a preset (Comfort, Sport, Track, Drift, Stance, Lifted). It shows the ride frequency, body roll, ground clearance and whether the car will understeer or oversteer, and the car really drives that way: stiffer bars roll less, more camber grips harder in corners, and slamming it scrapes over bumps. Tap <b>See it on the car</b> to look at the coilovers in the wheel wells (shown through the body) while you adjust them: the car rises and drops, the springs change colour and size, and the wheels lean in with camber.</li><li>Full Self-Driving follows the navigation off the freeway again: it used to drift back onto the freeway at the start of an exit ramp. Navigation no longer says "Rerouting" when you take the exit it asked for.</li></ul>
+      <h4>🔄 Updates since launch</h4><ul><li><b>New HUD look:</b> flat dark panels with thin dividers and one orange highlight. The top-left buttons sit in one bar, money / time / level are one card, and Lock / Phone / Pair on the left now have labels.</li><li><b>New cluster screen</b> in the middle of the speedometer, with four tabs: <b>Energy</b> (a top view of your car showing the engine, battery and motor and moving arrows for where the power is going, plus horsepower and battery or fuel %), <b>Assist</b> (cruise, lane keep, the car ahead and blind spots; on a Tesla it's a mini FSD view), <b>Trip</b> (mpg or mi/kWh, miles, drive time and a bar per 15 seconds) and <b>Car</b> (tyre pressures and body damage). Tap the screen for the big panel.</li><li><b>Drive and terrain modes</b> are now a list next to the cluster on PC (tap one to switch). On phones, tap the mode or terrain button to open the list.</li><li><b>Saves screen space:</b> cruise control / lane keep / Autosteer status only pops up above the cluster while it's on, and the right-hand buttons fold behind one ••• button (signals and hazards stay out).</li><li><b>Tesla FSD visualization rebuilt</b> to look like the real screen: a camera above and behind the car, shaded 3D cars with your car in white, road surfaces with kerbs, white lane lines and double yellow centre lines, stop lines, glowing traffic lights, HOLD and auto-headlight icons, and your set speed as "MAX" next to the speed limit.</li><li><b>Imperial units everywhere:</b> mph, miles, feet, inches, pounds, °F and psi, and engine / motor power in horsepower. The km/h option is gone.</li><li><b>Ford sounds:</b> Fords have a new startup chime when you turn the car on, and a new forward collision warning: the real Ford alert beeps now play when the car warns you or brakes for something ahead, instead of the generic beep.</li><li>Fixed the new map freezing and crashing a few seconds after it loads (especially on phones and tablets).</li><li>Roundabouts (not the little turning circles) now have <b>two lanes</b>: the outer lane for the first exit, the inner lane to go further round. Traffic and Full Self-Driving pick the right lane from where they're going.</li><li>Full Self-Driving without a destination now picks an exit at roundabouts (usually straight on) instead of circling, using the right lane for it. At all-way stops it no longer sits waiting behind a car that is itself waiting for it: after a couple of seconds it takes its turn.</li><li>The old Halden map is gone for good: the new map is the only world now (the <code>?world=1</code> link no longer opens it).</li><li>Fixed the Grand Wagoneer L (and Kia K5) freezing as soon as you spawned: the camera stuck and the car wouldn't drive. Their engine type had no engine sound, which stopped the game every frame. The Grand Wagoneer L now has its own twin-turbo straight-six sound.</li><li>If the game ever hits an error, a small red bar now says what went wrong. Screenshot it and send it in so it can be fixed.</li><li><b>Suspension setup</b> (Settings › Controls, or ☰ › Settings): fit adjustable coilovers ($1,800) and tune ride height, front and rear springs, dampers, anti-roll bars and camber on a live diagram of your car, or pick a preset (Comfort, Sport, Track, Drift, Stance, Lifted). It shows the ride frequency, body roll, ground clearance and whether the car will understeer or oversteer, and the car really drives that way: stiffer bars roll less, more camber grips harder in corners, and slamming it scrapes over bumps. Tap <b>See it on the car</b> to look at the coilovers in the wheel wells (shown through the body) while you adjust them: the car rises and drops, the springs change colour and size, and the wheels lean in with camber.</li><li>Full Self-Driving follows the navigation off the freeway again: it used to drift back onto the freeway at the start of an exit ramp. Navigation no longer says "Rerouting" when you take the exit it asked for.</li></ul>
       <h4>🗺️ A whole new world</h4><ul><li>Halden is replaced by a much bigger map: <b>Westport</b> downtown, the town of <b>Fairhaven</b>, little <b>Millbrook</b> on the lake, the <b>Rosedale</b> and <b>Kestrel Estates</b> neighborhoods, country roads and farms, and <b>Mount Kestrel</b> with a switchback road to the summit.</li><li>Two interstates: <b>I-38</b> (east–west) and <b>I-61</b> (north–south), joined by a full cloverleaf, with diamond interchanges, exit numbers, mile markers, green guide signs and orange median lights at night.</li><li>Roundabouts where several roads meet, cul-de-sacs in the neighborhoods, and bridges over the Clearwater River, including an old covered bridge, a rusty truss bridge and a stone bridge. Gravel fords and low crossings flood when it rains hard: deep water slows you down and can stall a gas engine.</li><li>The off-road park sits up on the mountain now, with a log bridge on the trail, and the proving ground is off County Rd 1.</li></ul>
       <h4>🍔 Places to go</h4><ul><li>Working drive-thrus at McDonald's, Burger King, Wendy's, Taco Bell, Chick-fil-A and KFC: order and pay at the speaker, then pick up at the window.</li><li>Dealerships on Route 20 (Ford, Toyota, Chevrolet, BMW, Mercedes-Benz, Tesla): pull into the lot to shop, test drive or trade in. The service centers do recalls, software updates and alignments.</li><li>Paid street parking in the towns: $1 per 15 minutes, 2 hours max, and a $35 ticket if the meter runs out.</li><li>Kestrel Estates is gated: the arms lift for residents (buy a house there) or with a $20 guest pass.</li><li>Farms all over the countryside: corn, wheat and hay fields, red barns, silos and hay bales.</li></ul>
       <h4>🚦 Life on the roads</h4><ul><li>School buses in the morning and mid-afternoon. When one stops, its red lights flash and the stop arm swings out: passing it is a $250 ticket.</li><li>A lane closure on I-38 eastbound with cones and a flagger: 45 mph, fines doubled, and a speed camera ($300).</li><li>The Jefferson Ave drawbridge opens every 4 minutes: bells, gates, the bridge lifts and a boat goes through.</li><li>A freight train runs between Westport and Fairhaven, with crossing gates on every road and a viaduct over the river.</li><li>Car meet every night after 8 PM in the Fairhaven Blvd lot.</li></ul>
@@ -1168,7 +1269,7 @@ body.pmOn>*:not(#gl):not(#pm):not(#pmFx):not(#toast):not(#flashFx):not(#susUI):n
       <h4>Toll plaza on Hwy 7</h4><ul><li>A toll plaza with booths in every lane, a canopy and lane lights, in both directions. The toll is $2.50 ($5.00 with a trailer).</li><li><b>Right lane, CASH:</b> stop at the booth, pay, and the gate arm lifts. Drive through it and you break the gate and get a $50 violation by mail.</li><li><b>Other lanes, E-ZPass:</b> with a tag ($10 in Settings › Assists › Your car) the toll comes off as you pass. Without one, a toll-by-plate bill with a $5 fee arrives in the mail.</li><li>Traffic slows down for the plaza, stays in its lane, and cars in the cash lane stop at the booth.</li></ul>
       <h4 class="old">Version 131 · Engine heat, hot brakes, fuel grades, dashcam replays, off-road tools and more</h4>
       <h4>Where to find them</h4><ul><li>Settings › Assists, under the safety systems: <b>Off-road</b>, your car's <b>air suspension</b>, <b>More car features</b> and a <b>Your car</b> summary (outside temperature, engine temperature, fuel, alignment, alarm, dashcam, insurance, updates and recalls).</li></ul>
-      <h4>Driving</h4><ul><li><b>Outside temperature</b> now follows the season and time of day (cold January mornings, hot July afternoons, the odd heat wave), and the screens show it.</li><li><b>Engine heat:</b> slow traffic on a hot day, towing something heavy or a cracked radiator push the temperature up. Around 112 °C the A/C switches itself off; above 117 °C you lose power until it cools. The gauge on the cluster moves.</li><li><b>Hot brakes:</b> ride the brakes down a long hill and you get a hot-brake smell warning, then brake fade (a soft pedal) and smoke from the wheels.</li><li><b>Alignment:</b> a hard pothole hit can knock it out. The car pulls to one side and wears its tires faster until Tread Center fixes it ($129).</li><li><b>Rev-matching</b> on manual downshifts for the cars that have it (Civic Type R, Integra Type S). In other cars, blip the throttle with the clutch in or the car lurches.</li></ul>
+      <h4>Driving</h4><ul><li><b>Outside temperature</b> now follows the season and time of day (cold January mornings, hot July afternoons, the odd heat wave), and the screens show it.</li><li><b>Engine heat:</b> slow traffic on a hot day, towing something heavy or a cracked radiator push the temperature up. Around 234°F the A/C switches itself off; above 243°F you lose power until it cools. The gauge on the cluster moves.</li><li><b>Hot brakes:</b> ride the brakes down a long hill and you get a hot-brake smell warning, then brake fade (a soft pedal) and smoke from the wheels.</li><li><b>Alignment:</b> a hard pothole hit can knock it out. The car pulls to one side and wears its tires faster until Tread Center fixes it ($129).</li><li><b>Rev-matching</b> on manual downshifts for the cars that have it (Civic Type R, Integra Type S). In other cars, blip the throttle with the clutch in or the car lurches.</li></ul>
       <h4>Fuel</h4><ul><li><b>Pick a grade</b> at the pump: Regular 87, Midgrade 89 or Premium 93. Cars that need premium lose about 6% power on regular; turbo engines that only recommend it lose a little.</li><li><b>Fuel door and charge port</b> on the correct side for the cars we know. The arrow next to the fuel (or battery) icon shows which side; park with the pump on that side or the hose won't reach.</li></ul>
       <h4>Security and cameras</h4><ul><li>While you're away from your parked car, someone may try the door. Locked cars set off the alarm and your brand's app sends an alert (myChevrolet, FordPass, Toyota app, and so on). Unlocked cars get robbed.</li><li><b>Tesla Sentry Mode</b> and <b>Rivian Gear Guard</b> flash the lights and save a clip. <b>Dog Mode</b> (Tesla) and <b>Pet Comfort</b> (Rivian) show the "My owner will be back soon" screen.</li><li>Locked doors now stop the person who walks up to your car at a red light.</li><li><b>Dashcam replays:</b> on cars with a dashcam (Tesla, Rivian, newer Hyundai/Kia/Genesis Built-in Cam, BMW Drive Recorder, Mercedes, or the dealer add-on), crashes and near misses save the last 30 seconds. Watch them back with slow-mo; <kbd>F8</kbd> replays the last 30 seconds any time.</li></ul>
       <h4>Owning the car</h4><ul><li><b>Insurance:</b> tickets raise your premium for 3 years. At the body shop you can file a claim: insurance pays, you pay the $500 deductible, and the premium goes up for 3 years.</li><li><b>Software updates</b> over the air on the brands that really send them (Tesla, Rivian, Lucid, Ford Power-Up, GM, BMW, Mercedes, Hyundai/Kia/Genesis, Volvo, VW, Audi, Toyota and Lexus). BlueCruise and Super Cruise cars without lane changes get them in an update. You install from Settings while parked.</li><li><b>Recalls:</b> now and then a recall notice arrives for your model, and you may notice the problem (a rear camera that blacks out, an engine that runs hot or stalls, charging capped at 80%). <b>Dealer service</b> at Tread Center fixes it for free, along with an inspection, any update, alignment and oil. It's free in the first 2 years on Toyota and Lexus and 3 years on BMW.</li></ul>
@@ -2510,6 +2611,10 @@ let REAR_MAX=9.8*Math.PI/180, CRAB_MAX=10*Math.PI/180, WB=2.8, A=1.4, B=1.4, HCG
 const GAS_N={0.3:"Soft",0.5:"Medium",0.75:"Strong",1:"Full"};
 const st={seatH:0.12,trim:"camry25",weather:"auto",events:"normal",people:true,odo:{},tripA:0,mode:0,units:"mph",aeb:true,aebAuto:true,lka:true,bsm:true,esa:true,rAeb:true,ws4:true,crab:false,avas:true,lights:false,night:false,
   hazard:false,signal:0,signalT:0,blink:false,cam:0,gear:"D",started:false,tab:"car",acc:false,accSet:29.06,accGap:2,trafficN:0,pilot:false,autoLC:true,panel:"sensors",map:"city",high:false,matrix:true,cornering:true,leveling:true,parkAssist:true,isa:true,tcsOff:false,autoHold:false,autoSS:true,regen:2,engVol:1,aiSnd:true,surface:"dry",autoHigh:true,elk:true,paint:"teal",wheel:"19",pkgs:{assist:true,light:true,park:true,tech:true,perf:false},built:false};
+// v173: imperial units everywhere (mph, mi, ft, in, lb, °F, psi, hp)
+Object.defineProperty(st,"units",{get:()=>"mph",set:()=>{},enumerable:true});
+function impText(s){if(typeof s!=="string")return s;return s.replace(/([+\-−]?)(\d+(?:\.\d+)?)\s?mm\b/g,(a,sg,n)=>{const v=n/25.4;return `${sg}${v<10?v.toFixed(1):Math.round(v)} in`}).replace(/(\d+(?:\.\d+)?)\s?km\/h\b/g,(a,n)=>`${Math.round(n/1.609)} mph`).replace(/(\d+(?:\.\d+)?)\s?km\b/g,(a,n)=>`${(n/1.609).toFixed(n<10?1:0)} mi`).replace(/(\d+(?:\.\d+)?)\s?kg\b/g,(a,n)=>`${Math.round(n*2.205).toLocaleString()} lb`).replace(/(-?\d+(?:\.\d+)?)\s?°C\b/g,(a,n)=>`${Math.round(n*9/5+32)}°F`).replace(/(\d+(?:\.\d+)?)\s?kPa\b/g,(a,n)=>`${Math.round(n*0.145)} psi`).replace(/(\d+(?:\.\d+)?) m\b(?![\/²³·])/g,(a,n)=>{const f=n*3.281;return `${f<10?f.toFixed(1):Math.round(f)} ft`})}
+const ftS=m=>{const f=m*3.281;return `${Math.abs(f)<10?f.toFixed(1):Math.round(f)} ft`},inS=mm=>{const v=mm/25.4;return `${Math.abs(v)<10?v.toFixed(1):Math.round(v)} in`},degF=c=>Math.round(c*9/5+32),hpN=kw=>Math.round(kw*1.341);
 const car={px:0,py:0,psi:0,vx:0,vy:0,r:0,ax:0,ay:0,dF:0,dR:0,spin:[0,0,0,0],height:0,pitch:0,roll:0,
   zb:0,th:0,phi:0,drive:[0,0,0,0],brake:0,tcs:false,esc:false,abs:false,tvSplit:0,crashed:0,offroad:false,regen:0,crabOn:false};
 const inp={steer:0,steerT:0,thr:0,brk:0,thrT:0,brkT:0,keys:{},padActive:false};
@@ -3888,7 +3993,7 @@ function energy(dt,Pw){
   if(sys.fuel==="plug"&&nearStn("chargers",8)&&sp<0.3&&(T.phev||!T.hybrid)){if(H.soc<0.9){H.charging=true;H.Pb-=(T.phev?50e3:250e3)*10}else{sys.fuel=null;setTimeout(()=>toast("Charged to 90 %"),0)}}
   H.soc=clamp(H.soc-H.Pb*dt/(cap*3.6e6),T.hybrid?0.12:0,T.hybrid?0.95:1);   // EVs run right down to empty; hybrids keep a hidden reserve
   if(!T.ice||T.hybrid){let amb=20;try{amb=(ambF()-32)/1.8}catch(e){}if(H.bt==null)H.bt=amb;const kwh=Math.max(1,cap);H.bt+=Math.abs(H.Pb)/1e3*0.045/kwh*dt*(T.hybrid&&!T.phev?0.12:1)-(H.bt-amb)*dt/900-(H.bt>34?(H.bt-32)*dt/120:0)+(H.charging&&H.bt<25?0.05*dt:0);
-    H.btK=clamp((H.bt+15)/25,0.3,1)*(H.bt>48?0.6:1);if(H.btK<0.7&&!SAFE.btSaid&&!T.ice&&st.started){SAFE.btSaid=1;carMsg(H.bt<10?`❄️ The battery is cold (${Math.round(H.bt)}°C): regenerative braking and power are limited until it warms up`:`🌡️ The battery is hot: power is limited to protect it`)}}
+    H.btK=clamp((H.bt+15)/25,0.3,1)*(H.bt>48?0.6:1);if(H.btK<0.7&&!SAFE.btSaid&&!T.ice&&st.started){SAFE.btSaid=1;carMsg(H.bt<10?`❄️ The battery is cold (${degF(H.bt)}°F): regenerative braking and power are limited until it warms up`:`🌡️ The battery is hot: power is limited to protect it`)}}
   H.pAvail=(H.eng?eMax:20e3)+(H.soc>(T.phev?0.16:0.2)?bMax*clamp((H.btK??1)*1.4,0.5,1):0);
   const k=Math.min(1,dt*6), F=H.f;
   F.engW=lerp(F.engW,Math.min(H.Pe,drive),k); F.engB=lerp(F.engB,Math.max(H.Pe-drive,0),k);
@@ -5006,6 +5111,106 @@ function econTick(dt){if(!st.started||st.walk)return;const H=car.hyb,T=TRIMS[st.
   // pay for what goes in the tank or battery: gas $3.89/gal, fast charging $0.48/kWh
   econFuel(H,T)}
 const PB_KWH=T=>{const D=DRIVES[st.trim]||{};return (D.par&&D.par.kWh)||T.kWh||60};
+// ---- v173 HUD: the cluster's middle screen (Energy · Assist · Trip · Car) and the drive / terrain mode panel
+const VIEW={v:"energy",hist:[],ht:0,lastD:null,lastF:0,lastWh:0,drv:0,lt:0,mtab:"drive"};
+try{const v=localStorage.getItem("mstrata.view");if(v)VIEW.v=v}catch(e){}
+function ccTick(){const cc=$("u2cc");if(!cc)return;const ap=sys.pilotState==="active"||sys.pilotState==="changing"||sys.pilotState==="waiting",lk=sys.lkaState==="active",fsd=ap&&isTesla()&&fsdOwned(),show=!st.walk&&st.started&&(st.acc||ap||lk);
+  if(cc.hidden===show)cc.hidden=!show;if(!show)return;const gp=st.accGap||2;
+  const h=(st.acc&&!fsd?`<b>Cruise</b><span>${Math.round(spdUnit(st.accSet))} mph</span><i>${"▮".repeat(gp)}${"▯".repeat(Math.max(0,3-gp))}</i>${sys.accState==="following"?"<em>following</em>":""}`:"")+(fsd?`<b class="a">Self-Driving</b><em>${sys.fsdState||""}</em>`:ap?`<b class="a">${isTesla()?"Autosteer":"Hands-free"}</b>`:lk?`<b class="a">Lane keep</b>`:"");
+  if(cc._h!==h){cc._h=h;cc.innerHTML=h}}
+function modesInfo(){const T=TRIMS[st.trim],n=T.modes||1,drive=[];if(n>1)for(let i=0;i<n;i++)drive.push(String(modeName(i)).replace(/\s*\(.*\)/,""));
+  let terr=null,tcur=-1,sys_="";const L=terrList();
+  if(L){terr=["Off"].concat(L.o);tcur=st.terr||0;sys_=L.sys}else if(T.terrain){terr=T.terrain.slice();tcur=terr.indexOf(terrM(T));sys_=terrSys(T)}
+  return {drive,dcur:st.mode,terr,tcur,sys:sys_}}
+function modesPick(kind,i){const T=TRIMS[st.trim];
+  if(kind==="d"){const n=T.modes||1;if(n<2||i===st.mode)return;st.mode=(i-1+n)%n;act("mode")}
+  else{const L=terrList();if(L){if((st.terr||0)===i)return;st.terr=(i-1+L.o.length+1)%(L.o.length+1);act("terrain")}
+    else if(T.terrain){for(let k=0;k<T.terrain.length&&T.terrain.indexOf(terrM(T))!==i;k++)act("terrain")}}
+  const el=$("u2modes");if(el)el.dataset.s="";try{tick(1)}catch(e){}}
+function modesRender(){const el=$("u2modes");if(!el)return;const I=modesInfo(),pc=document.body.classList.contains("pc"),has=I.drive.length>1||!!I.terr;
+  const show=has&&!st.walk&&st.started&&(pc||el.classList.contains("open"));if(el.hidden===show)el.hidden=!show;if(!show)return;
+  if(VIEW.mtab==="terr"&&!I.terr)VIEW.mtab="drive";if(VIEW.mtab==="drive"&&I.drive.length<2)VIEW.mtab="terr";
+  const sig=[st.trim,I.dcur,I.tcur,VIEW.mtab,I.drive.length,I.terr?I.terr.length:0].join("|");if(el.dataset.s===sig)return;el.dataset.s=sig;
+  const both=I.drive.length>1&&I.terr,sysN=I.sys.replace(/ Select$| System$/,"")||"Terrain";
+  const head=both?`<div class="mt"><button data-t="drive" class="${VIEW.mtab==="drive"?"on":""}">Drive</button><button data-t="terr" class="${VIEW.mtab==="terr"?"on":""}">Terrain</button></div>`:`<div class="mt"><span>${VIEW.mtab==="terr"?sysN:"Drive mode"}</span></div>`;
+  const list=(VIEW.mtab==="drive"?I.drive:I.terr).map((n,i)=>`<button data-k="${VIEW.mtab==="drive"?"d":"t"}" data-i="${i}" class="${i===(VIEW.mtab==="drive"?I.dcur:I.tcur)?"on":""}">${String(n).replace(/</g,"&lt;")}</button>`).join("");
+  el.innerHTML=head+`<div class="ml">${list}</div>`}
+function modesInit(){const el=$("u2modes");if(!el)return;el.addEventListener("pointerdown",e=>e.stopPropagation());
+  el.addEventListener("click",e=>{e.stopPropagation();const t=e.target.closest("button[data-t]");if(t){VIEW.mtab=t.dataset.t;el.dataset.s="";modesRender();return}
+    const b=e.target.closest("button[data-k]");if(b){modesPick(b.dataset.k,+b.dataset.i);if(!document.body.classList.contains("pc"))el.classList.remove("open");modesRender()}})}
+function modesToggle(tab){const el=$("u2modes");if(!el)return;if(tab)VIEW.mtab=tab;el.classList.toggle("open");el.dataset.s="";modesRender()}
+// trip history: one bar per 15 s of driving (mpg, or mi/kWh in an EV)
+function viewSample(){const now=performance.now(),T=TRIMS[st.trim],H=car.hyb,d=st.tripA||0,f=H.used||0,wh=(typeof TE==="object"&&TE.totWh)||0;
+  if(VIEW.lastD===null||d<VIEW.lastD){VIEW.lastD=d;VIEW.lastF=f;VIEW.lastWh=wh;VIEW.ht=now;VIEW.hist=[];VIEW.drv=0}
+  if(VIEW.lt){const dt=Math.min(0.5,(now-VIEW.lt)/1000);if(Math.abs(car.vx)>0.5)VIEW.drv+=dt}VIEW.lt=now;
+  if(now-VIEW.ht<15000)return;const dd=d-VIEW.lastD,ev=!T.ice&&!T.hybrid;let v=0;
+  if(dd>15){if(ev){const dw=wh-VIEW.lastWh;v=dw>1?(dd/1609)/(dw/1000):9}else{const df=f-VIEW.lastF;v=df>0.0005?Math.min(99,(dd/1609)/(df/3.785)):99}}
+  VIEW.hist.push(v);if(VIEW.hist.length>14)VIEW.hist.shift();VIEW.lastD=d;VIEW.lastF=f;VIEW.lastWh=wh;VIEW.ht=now}
+function viewDraw(){const c=$("u2vc");if(!c||c.offsetParent===null)return;const g=c.getContext("2d"),W=c.width,Hh=c.height,k=W/196,T=TRIMS[st.trim],H=car.hyb,v=VIEW.v,t=performance.now();
+  const ink="#ececec",dim="#8b8e93",amb="#f2a33a",grn="#7fd17f",line="#3a3c40",F=(s,w)=>`${w||400} ${s}px "Helvetica Neue",Helvetica,Arial,sans-serif`;
+  g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,W,Hh);
+  document.querySelectorAll("#u2vt button").forEach(b=>b.classList.toggle("on",b.dataset.v===v));
+  if(v==="assist"&&isTesla()){vizTesla(g,0,0,W,Hh,false);return}
+  g.setTransform(k,0,0,k,0,0);g.lineJoin="round";g.lineCap="round";
+  const bigG=(c.clientWidth||196)<175?1.35:1.12,txt=(s,x,y,col,sz,al,w)=>{g.fillStyle=col;g.font=F((sz||9)*bigG,w);g.textAlign=al||"left";g.fillText(s,x,y)};
+  const carTop=(x,y,w,h,col)=>{g.strokeStyle=col||"#5a5d62";g.lineWidth=1.5;rr2(g,x,y,w,h,w*0.3);g.stroke()};
+  const wheel=(x,y,on,col)=>{g.fillStyle=on?(col||amb):"#2c2e31";rr2(g,x,y,7,17,2);g.fill()};
+  const D=DRIVES[st.trim]||{},fr=D.bias?D.bias[0]>0.05:D.T?D.T[0]>0:true,rr=D.bias?D.bias[1]>0.05:D.T?D.T[1]>0:false,drv=fr&&rr?(/4x4|4WD|TRD|Wrangler|Bronco|Tacoma|4Runner/i.test((T.name||"")+(T.group||""))?"4WD":"AWD"):rr?"RWD":"FWD";
+  if(v==="energy"){const hyb=!!T.hybrid,ice=!!T.ice&&!hyb,ev=!T.ice&&!hyb;let pe=0,pm=0,P=car.tq.reduce((a,q,i)=>a+q*car.w[i],0)/1000,regen=false,engChg=false,soc=null;
+    if(hyb){try{const S=hybState();pe=S.pe;pm=S.pm;P=S.P;regen=S.regen;engChg=S.engChg;soc=S.soc}catch(e){}}else if(ice)pe=Math.max(0,P);else{pm=P;regen=P<-1;soc=socShow(H)}
+    const fuelF=ice||hyb?clamp(H.fuel/(H.tank||1),0,1):null,go=P>0.5,eOn=pe>0.5&&!engChg,mOn=Math.abs(pm)>0.5,cE="#f2a33a",cB=regen?"#7fd17f":"#4fb3ff",cw=c.clientWidth||196,big=cw<175?1.4:1.18;
+    // the car from above, nose to the right: body, glass, mirrors, tyres
+    const X0=54,X1=144,YC=56,HW=21,fa=127,ra=72;
+    g.fillStyle="#1d1f22";g.strokeStyle="#55585d";g.lineWidth=1.3;g.beginPath();g.moveTo(X0+8,YC-HW);g.lineTo(fa-6,YC-HW);g.bezierCurveTo(X1-4,YC-HW,X1,YC-HW+6,X1,YC-8);g.lineTo(X1,YC+8);g.bezierCurveTo(X1,YC+HW-6,X1-4,YC+HW,fa-6,YC+HW);g.lineTo(X0+8,YC+HW);g.bezierCurveTo(X0+1,YC+HW,X0,YC+HW-5,X0,YC+10);g.lineTo(X0,YC-10);g.bezierCurveTo(X0,YC-HW+5,X0+1,YC-HW,X0+8,YC-HW);g.closePath();g.fill();g.stroke();
+    g.fillStyle="#2a2d31";g.beginPath();g.moveTo(108,YC-HW+4);g.lineTo(117,YC-HW+7);g.lineTo(117,YC+HW-7);g.lineTo(108,YC+HW-4);g.closePath();g.fill();
+    g.beginPath();g.moveTo(68,YC-HW+6);g.lineTo(75,YC-HW+4);g.lineTo(75,YC+HW-4);g.lineTo(68,YC+HW-6);g.closePath();g.fill();
+    g.strokeStyle="#34373b";g.beginPath();g.moveTo(75,YC-HW+4);g.lineTo(108,YC-HW+4);g.moveTo(75,YC+HW-4);g.lineTo(108,YC+HW-4);g.stroke();
+    g.fillStyle="#3a3d42";g.beginPath();g.ellipse(111,YC-HW-2,3.5,2,0,0,7);g.ellipse(111,YC+HW+2,3.5,2,0,0,7);g.fill();
+    const tyre=(x,y,on,col)=>{g.fillStyle=on?col:"#0c0d0e";g.strokeStyle=on?col:"#4a4d52";g.lineWidth=1;rr2(g,x-7,y-3,14,6,2);g.fill();g.stroke()};
+    const fwd=fr,rwd=rr;tyre(fa,YC-HW-1,go&&fwd||regen&&fwd,regen?cB:cE);tyre(fa,YC+HW+1,go&&fwd||regen&&fwd,regen?cB:cE);tyre(ra,YC-HW-1,go&&rwd||regen&&rwd,regen?cB:cE);tyre(ra,YC+HW+1,go&&rwd||regen&&rwd,regen?cB:cE);
+    // drivetrain lines (dim) and moving chevrons where energy flows
+    const path=(pts,col,on,rev)=>{g.strokeStyle="#34373b";g.lineWidth=2;g.beginPath();g.moveTo(pts[0][0],pts[0][1]);for(const p of pts.slice(1))g.lineTo(p[0],p[1]);g.stroke();if(!on)return;
+      let L=0;const seg=[];for(let i=0;i+1<pts.length;i++){const a=pts[i],b=pts[i+1],l=Math.hypot(b[0]-a[0],b[1]-a[1]);seg.push([a,b,l,L]);L+=l}
+      g.strokeStyle=col;g.lineWidth=1.6;const off=(t/40)%7;for(let d=(rev?7-off:off);d<L;d+=7){const sg=seg.find(s=>d>=s[3]&&d<=s[3]+s[2]);if(!sg)continue;const [a,b,l,s0]=sg,u=(d-s0)/l,x=a[0]+(b[0]-a[0])*u,y=a[1]+(b[1]-a[1])*u,ang=Math.atan2(b[1]-a[1],b[0]-a[0])+(rev?Math.PI:0);
+        g.save();g.translate(x,y);g.rotate(ang);g.beginPath();g.moveTo(-2,-2.6);g.lineTo(1.2,0);g.lineTo(-2,2.6);g.stroke();g.restore()}};
+    const axle=(x,col,on,rev)=>{path([[x,YC],[x,YC-HW+2]],col,on,rev);path([[x,YC],[x,YC+HW-2]],col,on,rev)};
+    if(ice){if(rwd)path([[124,YC],[ra,YC]],cE,eOn);if(fwd)axle(fa,cE,eOn);if(rwd)axle(ra,cE,eOn)}
+    if(hyb){path([[124,YC],[118,YC]],cE,eOn||engChg);path([[86,YC],[110,YC]],cB,mOn||engChg||regen,regen||engChg);axle(fa,regen?cB:pe>0.5&&mOn?cE:mOn?cB:cE,go||regen,regen);if(rwd)axle(ra,regen?cB:cB,(go||regen)&&mOn,regen)}
+    if(ev){if(fwd){path([[108,YC],[fa-12,YC]],cB,mOn,regen);axle(fa,cB,mOn,regen)}if(rwd){path([[86,YC],[ra+12,YC]],cB,mOn,regen);axle(ra,cB,mOn,regen)}}
+    // components
+    if(ice||hyb){g.fillStyle="#121314";g.strokeStyle=eOn||engChg?cE:"#6d7075";g.lineWidth=1.3;rr2(g,124,YC-7,14,14,2);g.fill();g.stroke();g.beginPath();for(let i=0;i<3;i++){g.moveTo(127+i*4,YC-4);g.lineTo(127+i*4,YC+4)}g.stroke()}
+    if(hyb||ev){const bx=ev?86:62,bw=ev?22:22;g.fillStyle="#121314";g.strokeStyle=mOn||regen||engChg?cB:"#6d7075";g.lineWidth=1.3;rr2(g,bx,YC-8,bw,16,2);g.fill();g.stroke();
+      const lvl=clamp(soc??0,0,1);g.fillStyle=mOn||regen||engChg?cB:"#6d7075";g.globalAlpha=0.35;g.fillRect(bx+2,YC-6,(bw-4)*lvl,12);g.globalAlpha=1;g.strokeStyle="#2a2c2f";g.beginPath();for(let i=1;i<4;i++){g.moveTo(bx+bw*i/4,YC-8);g.lineTo(bx+bw*i/4,YC+8)}g.stroke()}
+    if(hyb){g.fillStyle="#121314";g.strokeStyle=mOn||regen||engChg?cB:"#6d7075";g.beginPath();g.arc(115,YC,5,0,7);g.fill();g.stroke()}
+    if(ev){g.strokeStyle=mOn||regen?cB:"#6d7075";g.fillStyle="#121314";for(const [x,on] of [[fa-8,fwd],[ra+8,rwd]])if(on){g.beginPath();g.arc(x,YC,4.5,0,7);g.fill();g.stroke()}}
+    if(ice){g.fillStyle="#121314";g.strokeStyle="#6d7075";g.lineWidth=1.2;rr2(g,60,YC-6,14,12,2);g.fill();g.stroke();g.fillStyle="#6d7075";g.fillRect(62,YC+4-8*fuelF,10,8*fuelF)}
+    // readouts at the sides, sized to fit
+    const L1=ev?"motor":"engine",V1=`${hpN(Math.max(0,ev?pm:pe))} hp`,L2=soc!==null?"battery":"fuel",V2=soc!==null?`${Math.round(soc*100)}%`:`${Math.round((fuelF||0)*100)}%`,R1=regen?"regen":"wheels",V3=`${hpN(Math.abs(P))} hp`;
+    const fit=(s,x,y,col,sz,al,w,max)=>{let z=sz*big;g.font=F(z,w);while(z>6&&g.measureText(s).width>max){z-=0.5;g.font=F(z,w)}g.fillStyle=col;g.textAlign=al;g.fillText(s,x,y)};
+    fit(L1,3,24,dim,8,"left",400,46);fit(V1,3,36,ink,11,"left",500,47);fit(L2,3,72,dim,8,"left",400,46);fit(V2,3,84,soc!==null?(regen?"#7fd17f":"#4fb3ff"):ink,11,"left",500,47);
+    fit(R1,193,24,dim,8,"right",400,44);fit(V3,193,36,regen?"#7fd17f":ink,11,"right",500,46);fit("drive",193,72,dim,8,"right",400,44);fit(drv,193,84,ink,11,"right",500,46);
+    fit(regen?"Charging the battery":hyb?(eOn&&mOn?"Engine + battery":eOn?"Engine":mOn?"Electric":engChg?"Engine charging battery":"Ready"):ev?(go?"Electric drive":"Ready"):go?"Engine":"Ready",98,105,dim,8,"center",400,120);return}
+  if(v==="assist"){g.strokeStyle=ink;g.lineWidth=1.6;g.beginPath();g.moveTo(64,108);g.lineTo(90,8);g.moveTo(132,108);g.lineTo(106,8);g.stroke();
+    g.strokeStyle=line;g.setLineDash([6,6]);g.lineDashOffset=-(odoMiles()*1609%12);g.beginPath();g.moveTo(14,108);g.lineTo(76,8);g.moveTo(182,108);g.lineTo(120,8);g.stroke();g.setLineDash([]);
+    const lk=sys.lkaState==="active"||sys.pilotState==="active";if(lk){g.strokeStyle=amb;g.lineWidth=2.4;g.beginPath();g.moveTo(64,108);g.lineTo(90,8);g.moveTo(132,108);g.lineTo(106,8);g.stroke()}
+    if(sys.lead&&sys.lead.ds<90){const y=96-Math.min(85,sys.lead.ds)*0.95,s=1-(96-y)/150;g.strokeStyle=ink;g.lineWidth=1.4;rr2(g,98-12*s,y-14*s,24*s,15*s,3);g.stroke();
+      if(st.acc){g.strokeStyle=amb;g.lineWidth=2;for(let i=0;i<3;i++){const yy=y+6+i*7;if(yy<92){g.beginPath();g.moveTo(98-(8+i*2),yy);g.lineTo(98+(8+i*2),yy);g.stroke()}}}
+      txt(`gap ${(sys.lead.ds/Math.max(1,Math.abs(car.vx))).toFixed(1)} s`,188,14,dim,9,"right")}
+    if(sys.bsmL){g.fillStyle=amb;rr2(g,30,66,22,15,3);g.fill()}if(sys.bsmR){g.fillStyle=amb;rr2(g,144,66,22,15,3);g.fill()}
+    g.fillStyle=ink;g.beginPath();g.moveTo(86,106);g.bezierCurveTo(86,86,91,80,98,80);g.bezierCurveTo(105,80,110,86,110,106);g.fill();
+    txt(st.acc?`ACC ${Math.round(spdUnit(st.accSet))}`:"ACC off",8,14,st.acc?amb:dim,10,"left",700);txt(st.lka?(lk?"LKA active":"LKA on"):"LKA off",8,27,st.lka?ink:dim,9);return}
+  if(v==="trip"){viewSample();const ev=!T.ice&&!T.hybrid,mi=(st.tripA||0)/1609;let avg="–",unit=ev?"mi/kWh":"mpg";
+    if(ev){const wh=(typeof TE==="object"&&TE.totWh)||0,dm=(typeof TE==="object"&&TE.totD||0)/1609;if(wh>50&&dm>0.05)avg=(dm/(wh/1000)).toFixed(1)}else if(H.used>0.01)avg=((H.trip/1609)/(H.used/3.785)).toFixed(1);
+    const tm=Math.floor(VIEW.drv/60);txt(avg,2,18,ink,19,"left",600);txt(unit,2,30,dim,9);txt(mi.toFixed(1),62,18,ink,19,"left",600);txt("mi",62,30,dim,9);txt(`${Math.floor(tm/60)}:${String(tm%60).padStart(2,"0")}`,120,18,ink,19,"left",600);txt("drive time",120,30,dim,9);
+    const hs=VIEW.hist,mx=Math.max(ev?6:50,...hs),bw=(192-13*3)/14;for(let i=0;i<14;i++){const val=hs[i-(14-hs.length)],x=2+i*(bw+3);if(val===undefined){g.fillStyle="#1d1e20";g.fillRect(x,96-2,bw,2);continue}const hh=Math.max(2,val/mx*52);g.fillStyle=i===13?amb:line;g.fillRect(x,96-hh,bw,hh)}
+    txt(hs.length?"last 15 s per bar":"bars fill as you drive",2,108,dim,8);txt(`odo ${Math.floor(odoMiles()).toLocaleString()} mi`,194,108,dim,8,"right");return}
+  if(v==="car"){const P=SAFE.tp||[35,35,35,35],low=P.map(p=>p<30);carTop(76,8,44,92);g.strokeStyle=line;g.beginPath();g.moveTo(82,30);g.lineTo(114,30);g.moveTo(82,76);g.lineTo(114,76);g.stroke();
+    wheel(70,20,true,low[0]?amb:"#7a7d82");wheel(119,20,true,low[1]?amb:"#7a7d82");wheel(70,70,true,low[2]?amb:"#7a7d82");wheel(119,70,true,low[3]?amb:"#7a7d82");
+    const ps=(i,x,y,al)=>{txt(String(Math.round(P[i])),x,y,low[i]?amb:ink,13,al);txt("psi",al==="right"?x+3:x+(String(Math.round(P[i])).length*7.5+3),y,dim,8,"left")};
+    ps(0,40,33,"left");ps(1,148,33,"left");ps(2,40,83,"left");ps(3,148,83,"left");
+    const Dm=car.dmg||{f:0,r:0,l:0,rt:0},dm=Math.round((Dm.f+Dm.r+Dm.l+Dm.rt)/4*100),n=low.filter(Boolean).length;
+    txt(n?(n>1?"Low tyre pressure":`${["Front left","Front right","Rear left","Rear right"][low.indexOf(true)]} tyre low`):"Tyres OK",98,106,n?amb:dim,9,"center");txt(dm?`body ${dm}%`:"",194,106,dm>30?amb:dim,8,"right");return}}
+
 function ui2Init(){document.body.classList.add("ui2");const on=(id,fn)=>{const el=$(id);if(!el)return;el.addEventListener("pointerdown",e=>{if(e.pointerType==="mouse")return;e.stopPropagation();e.preventDefault();el._pd=performance.now();fn(e)});el.addEventListener("click",e=>{e.stopPropagation();if(performance.now()-(el._pd||0)<800)return;fn(e)})};
   on("u2menu",()=>openDrawer());on("u2acct",()=>acctOpen());on("u2help",()=>document.body.classList.toggle("help"));on("u2photo",()=>pmOpen());on("u2more",()=>openDrawer());
   on("u2car",()=>{closeDrawer();st.site="garage";openBuilder()});on("u2home",()=>{st.tab="spawn";openDrawer()});on("u2tests",()=>{st.tab="tests";openDrawer()});on("u2shop",()=>act("redoCar"));
@@ -5013,14 +5218,15 @@ function ui2Init(){document.body.classList.add("ui2");const on=(id,fn)=>{const e
   on("u2bt",()=>phoneConnect(!st.phoneConn));on("u2scr",()=>{SCR.focus=!SCR.focus;tick(1)});on("u2dock",()=>{const m=!document.body.classList.contains("dkMin");document.body.classList.toggle("dkMin",m);try{localStorage.setItem("mstrata.dkmin",m?"1":"")}catch(e){}});
   try{if(localStorage.getItem("mstrata.dkmin"))document.body.classList.add("dkMin")}catch(e){}
   on("u2cam",()=>{st.cam=st.cam===1?0:1;$("screen").hidden=true;SCR.focus=false});on("u2belt",()=>{st.belt=!st.belt;beep(st.belt?1400:700,.05,"square",.1);toast(st.belt?"Seatbelt fastened":"Seatbelt unfastened")});
-  on("u2haz",()=>act("hazard"));on("u2sl",()=>act("sigL"));on("u2sr",()=>act("sigR"));on("u2lights",()=>act("lights"));on("u2high",()=>act("high"));on("u2epb",()=>act("epb"));on("u2fs",()=>fsToggle());{const cb=$("u2carbtn");cb.style.pointerEvents="auto";cb.style.cursor="pointer";cb.addEventListener("pointerdown",e=>{e.stopPropagation();e.preventDefault();const o=document.body.classList.toggle("sbOpen");if(o){if(!st.panel||st.panel==="sensors")st.panel=isHybT(st.trim)?"flow":"sensors"}toast(o?"Tap the panel to switch: sensors & lanes · energy / mpg · hybrid flow · suspension":"Panel closed")})}on("u2clu",()=>{if(st.cam!==1){st.cam=1}SCR.focusClu=!SCR.focusClu;SCR.focus=false});on("u2assist",()=>{RADIAL.mode="assist";radialToggle()});on("u2comfort",()=>{if(RADIAL.open&&RADIAL.mode==="comfort"){radialToggle(false);return}RADIAL.mode="comfort";radialToggle(true)});
+  on("u2haz",()=>act("hazard"));on("u2rc",()=>{const o=document.body.classList.toggle("rcOpen");try{localStorage.setItem("mstrata.rc",o?"1":"")}catch(e){}});try{if(localStorage.getItem("mstrata.rc"))document.body.classList.add("rcOpen")}catch(e){}on("u2sl",()=>act("sigL"));on("u2sr",()=>act("sigR"));on("u2lights",()=>act("lights"));on("u2high",()=>act("high"));on("u2epb",()=>act("epb"));on("u2fs",()=>fsToggle());{const vc=$("u2vc");vc.addEventListener("pointerdown",e=>{e.stopPropagation();e.preventDefault();const o=document.body.classList.toggle("sbOpen");if(o){if(!st.panel||st.panel==="sensors")st.panel=isHybT(st.trim)?"flow":"sensors"}toast(o?"Big panel open: tap it to switch views":"Panel closed")});
+   const vt=$("u2vt");vt.addEventListener("pointerdown",e=>{e.stopPropagation();const b=e.target.closest("button[data-v]");if(!b)return;e.preventDefault();VIEW.v=b.dataset.v;try{localStorage.setItem("mstrata.view",VIEW.v)}catch(_){}try{viewDraw()}catch(_){}});vt.addEventListener("click",e=>e.stopPropagation())}modesInit();on("u2clu",()=>{if(st.cam!==1){st.cam=1}SCR.focusClu=!SCR.focusClu;SCR.focus=false});on("u2assist",()=>{RADIAL.mode="assist";radialToggle()});on("u2comfort",()=>{if(RADIAL.open&&RADIAL.mode==="comfort"){radialToggle(false);return}RADIAL.mode="comfort";radialToggle(true)});
   const horn=$("u2horn");horn.addEventListener("pointerdown",e=>{e.preventDefault();hornOn(true)});for(const ev of ["pointerup","pointerleave","pointercancel"])horn.addEventListener(ev,()=>hornOff());
   on("u2vol",()=>{const L=[0.5,0.8,1,0,0.25];au.vol=L[(L.indexOf(au.vol??0.5)+1)%L.length];if(au.master)au.master.gain.value=0.7*(au.vol===0?0:Math.max(0.3,au.vol*1.4));toast(au.vol?`Volume ${Math.round(au.vol*100)}%`:"Muted")});
   on("u2gearsel",()=>{$("u2gearpop").hidden=!$("u2gearpop").hidden});on("u2up",()=>act("shiftDn"));on("u2dn",()=>act("shiftUp"));on("u2exit",()=>walkAction());
   $("u2gearpop").addEventListener("click",e=>{const b=e.target.closest("button[data-g]");if(b){act("g"+b.dataset.g);$("u2gearpop").hidden=true}});
-  {const tb=$("u2terr");tb.addEventListener("pointerdown",e=>e.stopPropagation());tb.addEventListener("click",e=>{e.stopPropagation();act("terrain");tick(1)})}
+  {const tb=$("u2terr");tb.addEventListener("pointerdown",e=>e.stopPropagation());tb.addEventListener("click",e=>{e.stopPropagation();if(!document.body.classList.contains("pc")){modesToggle("terr");return}act("terrain");tick(1)})}
   {const mb=$("u2mode");let lt=null,long=false;mb.addEventListener("pointerdown",e=>{e.stopPropagation();long=false;lt=setTimeout(()=>{long=true;if(hasCrawl())act("crawl")},550)});
-   const end=()=>{clearTimeout(lt)};mb.addEventListener("pointerup",end);mb.addEventListener("pointerleave",end);mb.addEventListener("click",e=>{e.stopPropagation();if(long){long=false;return}act("mode");tick(1)})}
+   const end=()=>{clearTimeout(lt)};mb.addEventListener("pointerup",end);mb.addEventListener("pointerleave",end);mb.addEventListener("click",e=>{e.stopPropagation();if(long){long=false;return}if(!document.body.classList.contains("pc")&&(modesInfo().terr||(TRIMS[st.trim].modes||1)>2)){modesToggle("drive");return}act("mode");tick(1)})}
   on("u2ev",()=>act("evMode"));on("u2start",()=>ignition(!PC.on||inp.brkT>0.2||inp.brk>0.2||inp.keys.s||st.power===true?"start":"acc"));
   for(const [id,dir] of [["u2al",-1],["u2ar",1]]){const b=$(id);const dn=e=>{e.preventDefault();b.setPointerCapture&&b.setPointerCapture(e.pointerId);inp.steerT=dir;inp.arrowSteer=dir;b.classList.add("on")},up=()=>{if(inp.arrowSteer===dir){inp.steerT=0;inp.arrowSteer=0}b.classList.remove("on")};
     b.addEventListener("pointerdown",dn);b.addEventListener("pointerup",up);b.addEventListener("pointercancel",up)}}
@@ -5051,7 +5257,7 @@ function ui2Tick(){if(!document.body.classList.contains("ui2")||GFX.frame%4)retu
       else{t=(T_.evName||"EV").toUpperCase().replace(/ MODE$/,"");sub=st.evMode?"ON":"MODE";eb.classList.toggle("on",!!st.evMode);eb.classList.remove("save")}
       const b=eb.firstChild;if(b.textContent!==t){b.textContent=t;b.style.fontSize=t.length>11?"7px":t.length>8?"8px":""}if(eb.lastChild.textContent!==sub)eb.lastChild.textContent=sub}}
   document.querySelectorAll("#u2gearpop button").forEach(b=>b.classList.toggle("on",b.dataset.g===st.gear));
-  const msg=st.walk?"":st.power===false?(PC.on?"Hold S and press F to start your vehicle":"Press the start button to start your vehicle"):st.power==="acc"?(PC.on?"Accessory mode · hold S and press F to start":"Accessory mode · hold the brake and press start"):!st.belt&&v>2.5?"Fasten your seatbelt":"";set("u2msg",msg)}
+  const msg=st.walk?"":st.power===false?(PC.on?"Hold S and press F to start your vehicle":"Press the start button to start your vehicle"):st.power==="acc"?(PC.on?"Accessory mode · hold S and press F to start":"Accessory mode · hold the brake and press start"):!st.belt&&v>2.5?"Fasten your seatbelt":"";set("u2msg",msg);try{viewSample();viewDraw();modesRender();ccTick();{const P=car.tq.reduce((a,q,i)=>a+q*car.w[i],0)/1000,mx=T.kW||200;$("u2pwp").style.setProperty("--p",(clamp(P/mx,0,1)*100).toFixed(0)+"%");$("u2pwn").style.setProperty("--p",(clamp(-P/(mx*0.4),0,1)*100).toFixed(0)+"%")}}catch(e){}}
 // ignition, as in the car: off -> accessory (screens and radio, no engine) -> running. Brake + start button starts it; in an EV
 // (Tesla and co.) the car is simply on when you get in.
 const isEVT=()=>{const T=TRIMS[st.trim];return !T.ice&&!T.hybrid};
@@ -5365,53 +5571,125 @@ function summonStep(dt){const W=st.walk,S_=sys.summon;S_.t+=dt;S_.planT=(S_.plan
   S_.msg=front<0.9?"Waiting: something in front":pedNear?"Waiting for a pedestrian":carNear?"Waiting for a car":"Coming to you · "+Math.round(d)+" m"}
 
 // ---- the driving visualization: what the car sees, drawn the way Tesla does it (also replaces the sensor panel on a Tesla)
-function vizTesla(g,x,y,w,h,big){const M=me(),T=TRIMS[st.trim],dark=st.night,sp=Math.abs(car.vx),F=FONT;
-  const bg=dark?"#0b0d10":"#e7e9ec",ink=dark?"#e6eef0":"#1c1f23",soft=dark?"#3a424a":"#b9bec4",road=dark?"#1a1f24":"#d5d8dc";
-  g.save();g.beginPath();g.rect(x,y,w,h);g.clip();g.fillStyle=bg;g.fillRect(x,y,w,h);
-  const cx=x+w/2,hz=y+h*0.30,by=y+h*0.86,cc=Math.cos(car.psi),ss=Math.sin(car.psi);
-  const P=(wx,wy)=>{const dx=wx-car.px,dy=wy-car.py,f=dx*cc+dy*ss+7,l=-dx*ss+dy*cc;if(f<0.5)return null;const z=12/f;return [cx-l*z*w*0.085,hz+(by-hz)*z*0.62*(7/12)*1.6]};
-  // roads nearby as soft bands, your road's lane lines on top
-  g.lineCap="round";g.lineJoin="round";
-  for(const r of ROADS2D){const e=r.e;if(Math.min(Math.hypot(e.a.x-car.px,e.a.y-car.py),Math.hypot(e.b.x-car.px,e.b.y-car.py))>e.L+120)continue;g.strokeStyle=road;g.beginPath();let on=false;
-    for(const p of r.pts){const q=P(p[0],p[1]);if(!q){on=false;continue}const f=((p[0]-car.px)*cc+(p[1]-car.py)*ss+7);g.lineWidth=Math.max(2,r.w*12/f*w*0.085);on?g.lineTo(q[0],q[1]):g.moveTo(q[0],q[1]);on=true}g.stroke()}
+// v173: a real perspective camera above and behind the car, shaded low-poly cars, road surfaces with kerbs, white and yellow lines, stop lines, 3D traffic lights
+const VZ={mdl:{},fog:null};
+function vzModel(L,W,H,k){const key=k+"|"+L.toFixed(1)+"|"+W.toFixed(1)+"|"+H.toFixed(2);let m=VZ.mdl[key];if(m)return m;
+  const F=[],hw=W/2,z0=0.26,q=(c,o,...p)=>F.push({c,o,p});
+  if(k==="ped"){const b=[[L/2,hw,0.4],[L/2,-hw,0.4],[-L/2,-hw,0.4],[-L/2,hw,0.4],[L/2,hw,H],[L/2,-hw,H],[-L/2,-hw,H],[-L/2,hw,H]],o=[0,0,H/2];q("body",o,b[0],b[1],b[5],b[4]);q("body",o,b[2],b[3],b[7],b[6]);q("body",o,b[1],b[2],b[6],b[5]);q("body",o,b[3],b[0],b[4],b[7]);q("top",o,b[4],b[5],b[6],b[7]);m={F,cz:H/2,L,W,H};VZ.mdl[key]=m;return m}
+  // lower body: a loft of rounded cross-sections, nose to tail (x along, belt height and width per station)
+  const P={sedan:{x:[.5,.46,.3,-.36,-.46,-.5],z:[.43,.5,.53,.56,.55,.5],w:[.78,.94,1,1,.95,.84],c:[.22,.03,-.25,-.37]},
+    suv:{x:[.5,.46,.3,-.4,-.48,-.5],z:[.47,.53,.55,.56,.56,.54],w:[.82,.95,1,1,.97,.9],c:[.22,.04,-.44,-.47]},
+    truck:{x:[.5,.47,.32,-.47,-.5,-.5],z:[.52,.56,.57,.58,.58,.58],w:[.86,.97,1,1,1,1],c:[.19,.06,-.12,-.14]},
+    van:{x:[.5,.48,.38,-.48,-.5,-.5],z:[.36,.42,.44,.45,.45,.45],w:[.88,.97,1,1,1,1],c:[.43,.3,-.47,-.49]}}[k]||null;
+  const st_=P.x.map((x,i)=>{const zt=P.z[i]*H,ww=P.w[i]*hw;return {x:x*L,pts:[[ww,z0],[ww,zt*0.78],[ww*0.86,zt],[-ww*0.86,zt],[-ww,zt*0.78],[-ww,z0]]}}),ob=[0,0,(z0+P.z[2]*H)/2];
+  for(let i=0;i+1<st_.length;i++){const A=st_[i],B=st_[i+1];for(let j=0;j<5;j++){const c=j===2?"top":"body";q(c,ob,[A.x,...A.pts[j]],[B.x,...B.pts[j]],[B.x,...B.pts[j+1]],[A.x,...A.pts[j+1]])}}
+  {const A=st_[0],B=st_[st_.length-1];F.push({c:"body",o:ob,p:A.pts.map(p=>[A.x,...p])});F.push({c:"rear",o:ob,p:B.pts.map(p=>[B.x,...p])})}
+  // wheels on the sides
+  for(const sx of [L/2-Math.min(0.95,L*0.19),-L/2+Math.min(1.0,L*0.2)])for(const sy of [1,-1]){const y=sy*(hw+0.01),r=0.34;q("tyre",[0,0,0.4],[sx+r,y,0.03],[sx-r,y,0.03],[sx-r*1.1,y,0.36],[sx-r,y,0.66],[sx+r,y,0.66],[sx+r*1.1,y,0.36])}
+    // cabin: windscreen, roof, rear window, side glass
+  const zb=P.z[2]*H,c=P.c,cs=[[c[0]*L,hw*0.84,zb],[c[1]*L,hw*0.66,H],[c[2]*L,hw*0.66,H],[c[3]*L,hw*0.84,zb]],oc=[(c[0]+c[3])*L/2,0,(zb+H)/2];
+  const sec=([x,w,z])=>[[x,w,z],[x,-w,z]];
+  for(let i=0;i<3;i++){const A=cs[i],B=cs[i+1],cl=i===1?"roof":"glass";q(cl,oc,[A[0],A[1],A[2]],[A[0],-A[1],A[2]],[B[0],-B[1],B[2]],[B[0],B[1],B[2]]);
+    q("side",oc,[A[0],A[1],A[2]],[B[0],B[1],B[2]],[B[0],B[1]*1.0,zb],[A[0],A[1],zb]);q("side",oc,[A[0],-A[1],A[2]],[B[0],-B[1],B[2]],[B[0],-B[1],zb],[A[0],-A[1],zb])}
+  if(k==="truck"){const r=-L/2+0.12,yy=hw*0.86,zz=P.z[3]*H+0.01;q("bed",[0,0,0],[c[3]*L-0.06,yy,zz],[c[3]*L-0.06,-yy,zz],[r,-yy,zz],[r,yy,zz])}
+  m={F,cz:H/2,L,W,H};VZ.mdl[key]=m;return m}
+function vizTesla(g,x,y,w,h,big){w=Math.round(w);h=Math.round(h);if(w<8||h<8)return;const key=w+"x"+h+(big?"b":"");VZ.c=VZ.c||{};let C=VZ.c[key];const now=performance.now();
+  if(!C){const cv=document.createElement("canvas");cv.width=w;cv.height=h;C=VZ.c[key]={cv,g:cv.getContext("2d"),t:-1e9}}
+  if(now-C.t>45){C.t=now;vizDraw(C.g,0,0,w,h,big)}g.drawImage(C.cv,x,y,w,h)}
+function vizDraw(g,x,y,w,h,big){const M=me(),T=TRIMS[st.trim],dark=st.night,sp=Math.abs(car.vx),F_=FONT,hudF=getComputedStyle(document.body).getPropertyValue("--f-hud");
+  const pal=dark?{bg:[18,20,23],gnd:[37,40,44],side:[52,55,59],road:[13,14,16],line:[226,228,230],yel:[214,178,40],car:[196,199,203],glass:[92,98,105],tyre:[30,32,35]}
+                :{bg:[214,217,221],gnd:[196,199,203],side:[178,181,186],road:[132,136,141],line:[250,250,250],yel:[236,190,40],car:[236,238,240],glass:[120,126,133],tyre:[60,63,67]};
+  const rgb=(c,a)=>a===undefined?`rgb(${c[0]|0},${c[1]|0},${c[2]|0})`:`rgba(${c[0]|0},${c[1]|0},${c[2]|0},${a})`,mix=(a,b,t)=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t];
+  g.save();g.beginPath();g.rect(x,y,w,h);g.clip();
+  // camera: above and behind, looking down the road
+  const S=Math.min(h,w*1.35),B=20,U=8,pa=0.32,ca=Math.cos(pa),sa=Math.sin(pa),Fc=S*1.15,cx=x+w/2,cy=y+h*0.58,zc=car.zb||0;
+  const cc=Math.cos(car.psi),ss=Math.sin(car.psi),Fr=(wx,wy)=>{const dx=wx-car.px,dy=wy-car.py;return [dx*cc+dy*ss,-dx*ss+dy*cc]};
+  const Pj=(f,l,z)=>{const dx=f+B,dz=z-U,d=dx*ca-dz*sa;if(d<1)return null;const up=dx*sa+dz*ca;return [cx-l*Fc/d,cy-up*Fc/d,d]};
+  const fogT=d=>clamp((d-50)/110,0,0.9);
+  // sky / ground with distance fog
+  {const hy=cy-Fc*sa/ca,gr=g.createLinearGradient(0,Math.max(y,hy-h*0.05),0,y+h);gr.addColorStop(0,rgb(pal.bg));gr.addColorStop(0.18,rgb(mix(pal.bg,pal.gnd,0.55)));gr.addColorStop(1,rgb(pal.gnd));g.fillStyle=gr;g.fillRect(x,y,w,h)}
+  // roads: kerb/sidewalk band, asphalt, then lines — each as one filled path per colour
+  const edges=[];for(const e of EDGES){if(Math.min(Math.hypot(e.a.x-car.px,e.a.y-car.py),Math.hypot(e.b.x-car.px,e.b.y-car.py))>e.L+140)continue;
+    if(!e._vz){const a=[];for(let u=0;u<=e.L+0.01;u+=Math.min(3,e.L/2)){const p=eAt(e,u);a.push({x:p.x,y:p.y,nx:-Math.sin(p.h),ny:Math.cos(p.h),u,z:e.hz?ez(e,u):null})}e._vz=a}
+    const pts=[];let any=false;for(const s of e._vz){const [f,l]=Fr(s.x,s.y),z=(s.z===null?zc:s.z)-zc,ok=f>-16&&f<135&&Math.abs(l)<90&&Math.abs(z)<4;pts.push({s,f,l,z,ok,nf:s.nx*cc+s.ny*ss,nl:-s.nx*ss+s.ny*cc});any=any||ok}if(any)edges.push([e,pts])}
+  const band=(t0,t1,fill,dash)=>{for(const [e,pts] of edges){const tt0=typeof t0==="function"?t0(e):t0,tt1=typeof t1==="function"?t1(e):t1;if(tt0===null)continue;
+    for(let i=0;i+1<pts.length;i++){const A=pts[i],Bp=pts[i+1];if(!A.ok&&!Bp.ok)continue;if(dash&&Math.floor(A.s.u/dash)%2)continue;
+      const c=(P,t)=>Pj(P.f+P.nf*t,P.l+P.nl*t,P.z);const p1=c(A,tt0),p2=c(Bp,tt0),p3=c(Bp,tt1),p4=c(A,tt1);if(!p1||!p2||!p3||!p4)continue;
+      g.moveTo(p1[0],p1[1]);g.lineTo(p2[0],p2[1]);g.lineTo(p3[0],p3[1]);g.lineTo(p4[0],p4[1]);g.closePath()}}};
+  const hwA=e=>e.ow?-e.m/2+0.4:hwOf(e),hwB=e=>e.ow?-(e.m/2+e.n*LANE)-0.4:-hwOf(e);
+  g.fillStyle=rgb(pal.side);g.beginPath();band(e=>hwA(e)+2.2,e=>hwB(e)-2.2);g.fill();
+  g.fillStyle=rgb(pal.road);g.beginPath();band(hwA,hwB);g.fill();
+  // lane lines: white edges, white dashes between lanes, double yellow down the middle of two-way roads
+  const W2=0.065;g.fillStyle=rgb(pal.line);g.beginPath();
+  for(const sg of [1,-1]){band(e=>{if(e.ow&&sg<0)return null;return e.ow?-(e.m/2+e.n*LANE)+W2:sg*(e.m/2+e.n*LANE)-W2},e=>e.ow?-(e.m/2+e.n*LANE)-W2:sg*(e.m/2+e.n*LANE)+W2);
+    for(let i=1;i<6;i++)band(e=>i>=e.n||(e.ow&&sg<0)?null:(e.ow?-(e.m/2+i*LANE):sg*(e.m/2+i*LANE))-W2,e=>(e.ow?-(e.m/2+i*LANE):sg*(e.m/2+i*LANE))+W2,3)}
+  band(e=>e.ow?-e.m/2-W2:null,e=>-e.m/2+W2);g.fill();
+  g.fillStyle=rgb(pal.yel);g.beginPath();for(const sg of [1,-1])band(e=>e.ow||e.type==="rbt"?null:sg*Math.max(e.m/2,0.13)-W2,e=>sg*Math.max(e.m/2,0.13)+W2);g.fill();
+  // stop lines at signals and stop signs nearby
+  const stops=[];g.fillStyle=rgb(pal.line);g.beginPath();
+  for(const [e] of edges)for(const dir of [1,-1]){if(e.ow&&dir<0)continue;const n=endNode(e,dir);if(!n||!(n.ctrl==="signal"||n.ctrl==="allstop"||n.ctrl==="minor"))continue;const L_=arrLeg(e,dir);if(n.ctrl==="minor"&&(!L_||L_.major||n.rbt))continue;
+    const s=e.L-rEnd(e,dir)-1.5;const q=[];for(const [o0,ds] of [[laneOff(e,0)-LANE/2,0],[laneOff(e,e.n-1)+LANE/2,0],[laneOff(e,e.n-1)+LANE/2,0.45],[laneOff(e,0)-LANE/2,0.45]]){const p=fpt(e,dir,s+ds,o0),[f,l]=Fr(p[0],p[1]);q.push(f>-10&&f<120?Pj(f,l,(e.hz?ez(e,dir>0?s:e.L-s):zc)-zc):null)}
+    if(q.every(Boolean)){g.moveTo(q[0][0],q[0][1]);for(let i=1;i<4;i++)g.lineTo(q[i][0],q[i][1]);g.closePath();if(n.ctrl==="signal")stops.push([e,dir,s,n,L_])}}g.fill();
   const ap=sys.pilotState==="active"||sys.pilotState==="changing"||sys.pilotState==="waiting",fsdA=ap&&fsdOwned()&&isTesla();
-  if(!M.inJ)for(let k=M.lo;k<=M.hi+1;k++){const o=(k-0.5)*LANE,edge=k===M.lo||k===M.hi+1;g.strokeStyle=ap&&TSL.rainbow?`hsl(${((k-M.lo)*70+performance.now()*0.15)%360},95%,60%)`:ap&&!fsdA?"#3e6ae1":edge?(dark?"#9aa3ab":"#6c737a"):soft;g.lineWidth=ap&&!fsdA?3:2;g.setLineDash(edge?[]:[8,10]);g.beginPath();let on=false;
-    for(let d=-6;d<=Math.min(110,M.L-M.s+20);d+=5){const p=fpt(M.e,M.dir,M.s+d,o),q=P(p[0],p[1]);if(!q){on=false;continue}on?g.lineTo(q[0],q[1]):g.moveTo(q[0],q[1]);on=true}g.stroke()}
-  g.setLineDash([]);
-  // FSD's planned path: a blue ribbon
-  if(fsdA&&sys.fsdPts){g.strokeStyle=TSL.rainbow?`hsl(${performance.now()*0.12%360},95%,60%)`:"rgba(62,106,225,.85)";g.lineWidth=big?14:9;g.beginPath();let on=false;for(const p of sys.fsdPts){if(p[2]>70)break;const q=P(p[0],p[1]);if(!q)continue;on?g.lineTo(q[0],q[1]):g.moveTo(q[0],q[1]);on=true}g.stroke()}
-  // traffic lights and stop signs ahead
-  {const n=M.node,L=n&&arrLeg(M.e,M.dir);if(n&&L&&M.s<M.L&&M.sStop-M.s<90){const p=fpt(M.e,M.dir,M.sStop,M.lo*LANE+LANE*(M.n-1)/2),q=P(p[0],p[1]);
-    if(q&&n.ctrl==="signal"){const s_=sigState(n,L.grp,st.clock||0),col=s_==="green"?"#2ea84a":s_==="yellow"?"#e8a400":"#e0322a";g.strokeStyle=col;g.lineWidth=3;const a=fpt(M.e,M.dir,M.sStop,M.rEdge),b=fpt(M.e,M.dir,M.sStop,M.lEdge),qa=P(a[0],a[1]),qb=P(b[0],b[1]);if(qa&&qb){g.beginPath();g.moveTo(qa[0],qa[1]);g.lineTo(qb[0],qb[1]);g.stroke()}
-      g.fillStyle="#22262b";rr2(g,q[0]+20,q[1]-46,12,30,3);g.fill();[["red",-42],["yellow",-32],["green",-22]].forEach(([c_,dy])=>{g.fillStyle=s_===c_?col:"#3a3f45";g.beginPath();g.arc(q[0]+26,q[1]+dy+1,3.5,0,7);g.fill()})}
-    else if(q&&(n.ctrl==="allstop"||(n.ctrl==="minor"&&!L.major&&!n.rbt))){g.fillStyle="#c8102e";g.beginPath();for(let k=0;k<8;k++){const a=Math.PI/8+k*Math.PI/4;g.lineTo(q[0]+26+Math.cos(a)*9,q[1]-26+Math.sin(a)*9)}g.closePath();g.fill();
-      const a=fpt(M.e,M.dir,M.sStop,M.rEdge),b=fpt(M.e,M.dir,M.sStop,M.lEdge),qa=P(a[0],a[1]),qb=P(b[0],b[1]);if(qa&&qb){g.strokeStyle=dark?"#ddd":"#555";g.lineWidth=3;g.beginPath();g.moveTo(qa[0],qa[1]);g.lineTo(qb[0],qb[1]);g.stroke()}}}}
-  // everyone around: cars as soft 3D boxes, people, bikes, cones, deer
-  const objs=[];for(const o of cars.concat(parked))if(o.wx!==undefined&&Math.abs((o.wz||0)-(car.zb||0))<2.5)objs.push(o);for(const p of peds)objs.push(p);for(const d of EV.crit)objs.push(d);
-  const list=[];for(const o of objs){const dx=o.wx-car.px,dy=o.wy-car.py,f=dx*cc+dy*ss;if(f<-9||f>100||Math.abs(-dx*ss+dy*cc)>30)continue;list.push([f,o])}list.sort((a,b)=>b[0]-a[0]);
-  for(const [f,o] of list){const q=P(o.wx,o.wy);if(!q)continue;const z=12/(f+7);
-    if(o.kind==="ped"){g.fillStyle=dark?"#d9dee2":"#4b5258";g.beginPath();g.arc(q[0],q[1]-z*w*0.17,z*w*0.035+1,0,7);g.fill();g.fillRect(q[0]-z*w*0.03,q[1]-z*w*0.14,z*w*0.06,z*w*0.14);continue}
-    if(o.kind==="deer"){g.fillStyle="#8a5a2b";g.fillRect(q[0]-z*w*0.09,q[1]-z*w*0.12,z*w*0.18,z*w*0.07);continue}
-    if(o.kind==="cone"){g.fillStyle="#ff7a1a";g.beginPath();g.moveTo(q[0],q[1]-z*w*0.09);g.lineTo(q[0]+z*w*0.03,q[1]);g.lineTo(q[0]-z*w*0.03,q[1]);g.fill();continue}
-    const rel=wrapPi((o.wh||0)-car.psi),wd=(Math.abs(Math.cos(rel))*0.17+Math.abs(Math.sin(rel))*0.4)*z*w*(o.kind==="bike"?0.45:1),ht=0.13*z*w*(o.kind==="bike"?0.8:1);
-    const lead=sys.lead&&sys.lead.o===o,blind=(sys.bsmL||sys.bsmR)&&f<3&&f>-8;
-    g.fillStyle=blind&&st.signal?"#e0322a":lead&&ap?"#3e6ae1":dark?"#c9cfd4":"#8d949b";rr2(g,q[0]-wd/2,q[1]-ht,wd,ht,Math.min(6,ht*0.3));g.fill();g.fillStyle=dark?"#89929a":"#6c737a";rr2(g,q[0]-wd*0.38,q[1]-ht*1.25,wd*0.76,ht*0.45,3);g.fill()}
-  // your car
-  {const q=[cx,by+4],wd=w*0.2,ht=h*0.11;g.fillStyle=dark?"#f0f2f4":"#ffffff";g.strokeStyle=dark?"#8a929a":"#9aa1a8";g.lineWidth=1.5;rr2(g,q[0]-wd/2,q[1]-ht,wd,ht,ht*0.35);g.fill();g.stroke();g.fillStyle=dark?"#30363c":"#2a2f35";rr2(g,q[0]-wd*0.35,q[1]-ht*1.12,wd*0.7,ht*0.5,5);g.fill()}
-  // top bar: gear, speed, limit, Autopilot / FSD status
-  g.textAlign="left";g.font=F(big?15:12);["P","R","N","D"].forEach((k,i)=>{g.fillStyle=st.gear===k?ink:soft;g.fillText(k,x+12+i*(big?16:12),y+(big?22:17))});
-  g.textAlign="center";g.fillStyle=ink;g.font=`600 ${big?46:32}px ${getComputedStyle(document.body).getPropertyValue("--f-hud")}`;g.fillText(Math.round(spdUnit(sp)),cx,y+(big?52:38));g.font=F(big?12:10);g.fillStyle=soft;g.fillText(st.units==="mph"?"MPH":"KM/H",cx,y+(big?66:50));
-  if(sys.limit){const sx=x+w-(big?44:36),sy=y+8,sw=big?32:26,sh=big?40:32;g.fillStyle="#fff";g.fillRect(sx,sy,sw,sh);g.strokeStyle="#111";g.lineWidth=1.5;g.strokeRect(sx+2,sy+2,sw-4,sh-4);g.fillStyle="#111";g.font=F(big?7:6);g.fillText("SPEED",sx+sw/2,sy+10);g.fillText("LIMIT",sx+sw/2,sy+17);g.font=F(big?15:12);g.fillText(sys.limit,sx+sw/2,sy+sh-6)}
-  {const ix=x+(big?22:18),iy=y+(big?46:36),col=ap?"#3e6ae1":st.acc?"#3e6ae1":soft;g.strokeStyle=col;g.lineWidth=2.5;g.beginPath();g.arc(ix,iy,big?9:7,0,7);g.stroke();g.beginPath();g.moveTo(ix-(big?9:7),iy);g.lineTo(ix+(big?9:7),iy);g.moveTo(ix,iy);g.lineTo(ix,iy+(big?9:7));g.stroke();
-   if(st.acc){g.fillStyle=col;g.font=F(big?12:10);g.textAlign="left";g.fillText(fsdA?"":Math.round(spdUnit(st.accSet)),ix+(big?13:10),iy+4)}}
-  if((st.signal===-1||st.hazard)&&st.blink){g.fillStyle="#2ea84a";g.font=F(big?20:15);g.textAlign="center";g.fillText("◀",cx-(big?52:40),y+(big?40:30))}if((st.signal===1||st.hazard)&&st.blink){g.fillStyle="#2ea84a";g.font=F(big?20:15);g.textAlign="center";g.fillText("▶",cx+(big?52:40),y+(big?40:30))}
+  // Autosteer: your lane's lines in blue
+  if(ap&&!fsdA&&!M.inJ){g.fillStyle=TSL.rainbow?`hsl(${performance.now()*0.15%360},95%,60%)`:"#3e6ae1";g.beginPath();for(const o of [M.lo-0.5,M.hi+0.5].map(k=>k*LANE))for(let d=-8;d<Math.min(110,M.L-M.s+20);d+=3){const a=fpt(M.e,M.dir,M.s+d,o-0.12),b=fpt(M.e,M.dir,M.s+d+3,o-0.12),c=fpt(M.e,M.dir,M.s+d+3,o+0.12),e2=fpt(M.e,M.dir,M.s+d,o+0.12);const P=[a,b,c,e2].map(p=>{const [f,l]=Fr(p[0],p[1]);return Pj(f,l,0)});if(P.every(Boolean)){g.moveTo(P[0][0],P[0][1]);for(let i=1;i<4;i++)g.lineTo(P[i][0],P[i][1]);g.closePath()}}g.fill()}
+  // FSD's planned path: a blue ribbon on the road
+  if(fsdA&&sys.fsdPts){g.fillStyle=TSL.rainbow?`hsl(${performance.now()*0.12%360},95%,60%)`:"rgba(62,106,225,.9)";g.beginPath();const pp=sys.fsdPts.filter(p=>p[2]<=80);
+    for(let i=0;i+1<pp.length;i++){const a=pp[i],b=pp[i+1],hx=b[0]-a[0],hy=b[1]-a[1],hl=Math.hypot(hx,hy)||1,nx=-hy/hl*0.38,ny=hx/hl*0.38;const P=[[a[0]+nx,a[1]+ny],[b[0]+nx,b[1]+ny],[b[0]-nx,b[1]-ny],[a[0]-nx,a[1]-ny]].map(p=>{const [f,l]=Fr(p[0],p[1]);return Pj(f,l,0.02)});if(P.every(Boolean)){g.moveTo(P[0][0],P[0][1]);for(let k=1;k<4;k++)g.lineTo(P[k][0],P[k][1]);g.closePath()}}g.fill()}
+  // everything with a height, drawn far to near: cars, people, bikes, cones, deer, traffic lights, your car
+  const items=[];const Ld=[-0.45,0.35,0.82];
+  for(const o of cars.concat(parked)){if(o.wx===undefined)continue;const [f,l]=Fr(o.wx,o.wy),z=(o.wz??zc)-zc;if(f<-14||f>120||Math.abs(l)>45||Math.abs(z)>3)continue;items.push({k:"car",o,f,l,z})}
+  for(const p of peds){const [f,l]=Fr(p.wx,p.wy);if(f<-10||f>90||Math.abs(l)>40)continue;items.push({k:"ped",o:p,f,l,z:((p.wz??zc)-zc)})}
+  for(const d of EV.crit){const [f,l]=Fr(d.wx,d.wy);if(f<-10||f>90||Math.abs(l)>40)continue;items.push({k:d.kind,o:d,f,l,z:0})}
+  for(const [e,dir,s,n,L_] of stops){const s_=sigState(n,L_?L_.grp:0,st.clock||0);for(let i=0;i<e.n;i++){const p=fpt(e,dir,s+14,laneOff(e,i)),[f,l]=Fr(p[0],p[1]);if(f>-4&&f<120)items.push({k:"sig",f,l,z:0,s:s_})}}
+  items.push({k:"me",f:0,l:0,z:0});
+  for(const it of items){const p=Pj(it.f,it.l,it.z+0.8);it.d=p?p[2]:-1}items.sort((a,b)=>b.d-a.d);
+  const drawModel=(m,f0,l0,z0,rel,base,opt)=>{const cr=Math.cos(rel),sr=Math.sin(rel),fog=opt.fog||0,bgc=pal.bg;
+    // soft ground shadow
+    {const P=[[m.L/2+0.25,m.W/2+0.25],[m.L/2+0.25,-m.W/2-0.25],[-m.L/2-0.25,-m.W/2-0.25],[-m.L/2-0.25,m.W/2+0.25]].map(([a,b])=>Pj(f0+a*cr-b*sr,l0+a*sr+b*cr,z0+0.01));if(P.every(Boolean)){g.fillStyle=`rgba(0,0,0,${(dark?0.45:0.22)*(1-fog)})`;g.beginPath();g.moveTo(P[0][0],P[0][1]);for(let i=1;i<4;i++)g.lineTo(P[i][0],P[i][1]);g.closePath();g.fill()}}
+    const cam=[-B,0,U];
+    for(const fc of m.F){const W3=fc.p.map(([a,b,c])=>[f0+a*cr-b*sr,l0+a*sr+b*cr,z0+c]);
+      const i2=W3.length>4?Math.floor(W3.length/2):2,u=[W3[1][0]-W3[0][0],W3[1][1]-W3[0][1],W3[1][2]-W3[0][2]],v=[W3[i2][0]-W3[0][0],W3[i2][1]-W3[0][1],W3[i2][2]-W3[0][2]];let n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];
+      const ce=[0,0,0],nn=W3.length;for(const p of W3){ce[0]+=p[0]/nn;ce[1]+=p[1]/nn;ce[2]+=p[2]/nn}const ro=fc.o||[0,0,m.cz],rw=[f0+ro[0]*cr-ro[1]*sr,l0+ro[0]*sr+ro[1]*cr,z0+ro[2]],oc=[ce[0]-rw[0],ce[1]-rw[1],ce[2]-rw[2]];if(n[0]*oc[0]+n[1]*oc[1]+n[2]*oc[2]<0)n=n.map(a=>-a);
+      if(n[0]*(cam[0]-ce[0])+n[1]*(cam[1]-ce[1])+n[2]*(cam[2]-ce[2])<=0)continue;const nl=Math.hypot(...n)||1,lam=Math.max(0,(n[0]*Ld[0]+n[1]*Ld[1]+n[2]*Ld[2])/nl/Math.hypot(...Ld));
+      let col=fc.c==="glass"||fc.c==="side"?(opt.glass||pal.glass):fc.c==="tyre"||fc.c==="bed"?pal.tyre:fc.c==="roof"&&opt.roof?opt.roof:base;col=col.map(c=>c*(0.62+0.42*lam));
+      col=mix(col,bgc,fog);
+      const P=W3.map(p=>Pj(p[0],p[1],p[2]));if(!P.every(Boolean))continue;g.fillStyle=rgb(col);g.beginPath();g.moveTo(P[0][0],P[0][1]);for(let i=1;i<P.length;i++)g.lineTo(P[i][0],P[i][1]);g.closePath();g.fill();
+      if(fc.c==="rear"&&opt.tail){const t=(a,b,c)=>Pj(f0+a*cr-b*sr,l0+a*sr+b*cr,z0+c);for(const sy of [1,-1]){const q=[t(-m.L/2-0.01,sy*m.W*0.46,0.62),t(-m.L/2-0.01,sy*m.W*0.18,0.62),t(-m.L/2-0.01,sy*m.W*0.18,0.72),t(-m.L/2-0.01,sy*m.W*0.46,0.72)];if(q.every(Boolean)){g.fillStyle=opt.tail;g.beginPath();g.moveTo(q[0][0],q[0][1]);for(let i=1;i<4;i++)g.lineTo(q[i][0],q[i][1]);g.closePath();g.fill()}}}}};
+  const kindOf=o=>{const L=o.len||4.7;return L>9?"van":L>5.5?"truck":(o.wid||1.85)>1.95||L>5?"suv":"sedan"};
+  for(const it of items){const fog=it.d>0?fogT(it.d):0;
+    if(it.k==="car"){const o=it.o;if(o.kind==="bike"){const m=vzModel(1.8,0.5,1.5,"ped");drawModel(m,it.f,it.l,it.z,wrapPi((o.wh||0)-car.psi),pal.car,{fog});continue}
+      const L=o.len||4.7,W=o.wid||1.85,k=kindOf(o),H=k==="van"?2.9:k==="truck"?1.9:k==="suv"?1.75:1.45,m=vzModel(L,W,H,k);
+      const lead=sys.lead&&sys.lead.o===o,blind=st.signal&&it.f<3&&it.f>-8&&((sys.bsmL&&it.l>0)||(sys.bsmR&&it.l<0));
+      drawModel(m,it.f,it.l,it.z,wrapPi((o.wh||0)-car.psi),blind?[224,60,52]:lead&&(ap||st.acc)?[120,148,236]:pal.car,{fog,tail:o.brk||o.brake?"rgba(255,40,40,.95)":null});continue}
+    if(it.k==="ped"){const p=Pj(it.f,it.l,it.z),t=Pj(it.f,it.l,it.z+1.75);if(!p||!t)continue;const r=Math.max(1.5,(p[1]-t[1])*0.13),c=rgb(mix(dark?[222,226,230]:[90,96,102],pal.bg,fog));g.fillStyle=c;g.beginPath();g.arc(t[0],t[1]+r,r,0,7);g.fill();rr2(g,t[0]-r*1.1,t[1]+r*2.3,r*2.2,p[1]-t[1]-r*2.3,r);g.fill();continue}
+    if(it.k==="cone"){const p=Pj(it.f,it.l,it.z),t=Pj(it.f,it.l,it.z+0.75);if(!p||!t)continue;const r=(p[1]-t[1])*0.35;g.fillStyle="#ff7a1a";g.beginPath();g.moveTo(t[0],t[1]);g.lineTo(p[0]+r,p[1]);g.lineTo(p[0]-r,p[1]);g.closePath();g.fill();continue}
+    if(it.k==="deer"){const m=vzModel(1.7,0.45,1.3,"ped");drawModel(m,it.f,it.l,it.z,0,[140,95,55],{fog});continue}
+    if(it.k==="sig"){const b=Pj(it.f,it.l,4.4),t=Pj(it.f,it.l,5.6),gp=Pj(it.f,it.l,7);if(!b||!t||!gp)continue;const hh=b[1]-t[1],ww=hh*0.42;g.strokeStyle=rgb(mix(dark?[90,94,99]:[120,124,129],pal.bg,fog));g.lineWidth=Math.max(1,ww*0.14);g.beginPath();g.moveTo(t[0],t[1]);g.lineTo(gp[0],gp[1]);g.stroke();
+      g.fillStyle=rgb(mix(dark?[70,73,78]:[96,100,105],pal.bg,fog));rr2(g,t[0]-ww/2,t[1],ww,hh,ww*0.2);g.fill();const on={red:0,yellow:1,green:2}[it.s]??0,col=["#ff3b30","#ffb000","#30d158"][on];
+      for(let i=0;i<3;i++){const ly=t[1]+hh*(0.2+0.3*i),r=ww*0.3;if(i===on){const gl=g.createRadialGradient(t[0],ly,0,t[0],ly,r*3.2);gl.addColorStop(0,col);gl.addColorStop(0.35,col+"aa");gl.addColorStop(1,col+"00");g.fillStyle=gl;g.beginPath();g.arc(t[0],ly,r*3.2,0,7);g.fill()}g.fillStyle=i===on?col:"rgba(0,0,0,.35)";g.beginPath();g.arc(t[0],ly,r,0,7);g.fill()}continue}
+    if(it.k==="me"){const k=/modely|modelx/.test(T.model||"")?"suv":/cyber/.test(T.model||"")?"truck":"sedan",m=vzModel(4.72,1.9,k==="suv"?1.62:1.44,k);const brk=inp.brk>0.05||sys.hold;
+      if(brk){const p=Pj(-3.2,0,0);if(p){const r=Fc/p[2]*2.6,gl=g.createRadialGradient(p[0],p[1],0,p[0],p[1],r);gl.addColorStop(0,"rgba(255,30,30,.45)");gl.addColorStop(1,"rgba(255,30,30,0)");g.fillStyle=gl;g.beginPath();g.ellipse(p[0],p[1],r,r*0.45,0,0,7);g.fill()}}
+      drawModel(m,0,0,0,0,dark?[244,245,247]:[252,252,252],{roof:[22,24,27],glass:[30,33,37],tail:brk?"rgba(255,45,45,1)":"rgba(150,20,25,.95)"})}}
+  // top: gear, speed, set speed, limit, hold, lights, Autopilot / FSD status
+  const ink=dark?"#e8ecef":"#1c1f23",soft=dark?"#5b636b":"#9aa1a8",u=big?1:0.78;
+  g.textAlign="left";g.textBaseline="alphabetic";g.font=`600 ${15*u}px ${hudF}`;["P","R","N","D"].forEach((k,i)=>{g.fillStyle=st.gear===k?ink:soft;g.fillText(k,x+14+i*17*u,y+24*u)});
+  g.font=`500 ${44*u}px ${hudF}`;g.fillStyle=ink;g.fillText(Math.round(spdUnit(sp)),x+14,y+70*u);g.font=F_(11*u);g.fillStyle=soft;g.fillText(st.units==="mph"?"MPH":"KM/H",x+16,y+86*u);
+  let iy=y+112*u;const icon=(on,col,txt,draw)=>{g.save();g.translate(x+30*u,iy);g.strokeStyle=on?col:soft;g.fillStyle=on?col:soft;g.lineWidth=2*u;draw(u);g.restore();if(txt){g.font=`600 ${11*u}px ${hudF}`;g.textAlign="center";g.fillStyle=on?col:soft;g.fillText(txt,x+30*u,iy+28*u);g.textAlign="left"}iy+=txt?50*u:36*u};
+  if(sys.hold)icon(true,ink,"HOLD",s=>{g.beginPath();g.arc(0,0,11*s,0,7);g.stroke();g.beginPath();g.arc(0,0,16*s,-0.9,0.9);g.stroke();g.beginPath();g.arc(0,0,16*s,Math.PI-0.9,Math.PI+0.9);g.stroke();g.font=`700 ${12*s}px ${hudF}`;g.textAlign="center";g.fillText("H",0,4.5*s)});
+  icon(st.lights||st.night,ink,"",s=>{g.beginPath();g.arc(4*s,0,9*s,-Math.PI/2,Math.PI/2);g.lineTo(4*s,-9*s);g.stroke();for(let i=-2;i<=2;i++){g.beginPath();g.moveTo(-14*s,i*4*s);g.lineTo(-6*s,i*4*s);g.stroke()}g.font=`700 ${9*s}px ${hudF}`;g.textAlign="center";g.fillText("A",5*s,3.5*s)});
+  {const ix=x+w-(sys.limit?(big?96:80):24),iyy=y+16*u;if(st.acc||ap){g.textAlign="center";g.fillStyle=ap||st.acc?ink:soft;g.font=`500 ${30*u}px ${hudF}`;g.fillText(fsdA?"":Math.round(spdUnit(st.accSet)),ix,iyy+28*u);g.font=`600 ${11*u}px ${hudF}`;g.fillText(fsdA?"FSD":"MAX",ix,iyy+44*u)}
+   if(sys.limit){const sw=40*u,sh=50*u,sx=x+w-sw-12,sy=y+10;g.fillStyle="#f4f4f2";rr2(g,sx,sy,sw,sh,6*u);g.fill();g.strokeStyle="#1a1a1a";g.lineWidth=1.4;rr2(g,sx+3,sy+3,sw-6,sh-6,4*u);g.stroke();g.fillStyle="#1a1a1a";g.textAlign="center";g.font=`600 ${7*u}px ${hudF}`;g.fillText("SPEED",sx+sw/2,sy+13*u);g.fillText("LIMIT",sx+sw/2,sy+21*u);g.font=`600 ${19*u}px ${hudF}`;g.fillText(sys.limit,sx+sw/2,sy+sh-8*u)}}
+  {const ix=x+w/2,iyy=y+30*u;if(ap||st.acc){g.strokeStyle=ap?"#3e6ae1":ink;g.lineWidth=2.4*u;g.beginPath();g.arc(ix,iyy,9*u,0,7);g.stroke();g.beginPath();g.moveTo(ix-9*u,iyy);g.lineTo(ix+9*u,iyy);g.moveTo(ix,iyy);g.lineTo(ix,iyy+9*u);g.stroke()}
+   const arrow=(sg)=>{g.fillStyle="#30d158";g.beginPath();g.moveTo(ix+sg*48*u,iyy);g.lineTo(ix+sg*36*u,iyy-9*u);g.lineTo(ix+sg*36*u,iyy-4*u);g.lineTo(ix+sg*26*u,iyy-4*u);g.lineTo(ix+sg*26*u,iyy+4*u);g.lineTo(ix+sg*36*u,iyy+4*u);g.lineTo(ix+sg*36*u,iyy+9*u);g.closePath();g.fill()};
+   if((st.signal===-1||st.hazard)&&st.blink)arrow(-1);if((st.signal===1||st.hazard)&&st.blink)arrow(1)}
   // banner: nags, status
   let msg="",col=ink,blue=false;
-  if(sys.aebState==="braking"||sys.fcw){msg="Emergency braking";col="#e0322a"}
-  else if(sys.nag===2){msg="Take control immediately";col="#e0322a"}else if(sys.nag===1){msg=fsdA?"Pay attention to the road":"Apply slight turning force to steering wheel";blue=true}
-  else if(sys.apStrike){msg="Autosteer unavailable for the rest of this drive";col="#e0322a"}
-  else if(fsdA){msg=`Self-Driving · ${sys.fsdState||""}`;col="#3e6ae1"}else if(ap){msg="Autosteer";col="#3e6ae1"}else if(st.acc){msg="Traffic-Aware Cruise Control";col="#3e6ae1"}
-  if(msg){const bh=big?24:18;g.fillStyle=blue?(performance.now()%700<350?"#3e6ae1":"#2b4fb8"):dark?"rgba(20,24,28,.85)":"rgba(255,255,255,.88)";rr2(g,x+8,y+h-bh-6,w-16,bh,bh/2);g.fill();g.fillStyle=blue?"#fff":col;g.font=F(big?12:10);g.textAlign="center";g.fillText(msg,cx,y+h-6-bh/2+4)}
+  if(sys.aebState==="braking"||sys.fcw){msg="Emergency braking";col="#ff453a"}
+  else if(sys.nag===2){msg="Take control immediately";col="#ff453a"}else if(sys.nag===1){msg=fsdA?"Pay attention to the road":"Apply slight turning force to steering wheel";blue=true}
+  else if(sys.apStrike){msg="Autosteer unavailable for the rest of this drive";col="#ff453a"}
+  else if(fsdA){msg=`Self-Driving · ${sys.fsdState||""}`;col="#6f93ff"}else if(ap){msg="Autosteer";col="#6f93ff"}else if(st.acc){msg="Traffic-Aware Cruise Control";col="#6f93ff"}
+  if(msg){const bh=big?26:19;g.fillStyle=blue?(performance.now()%700<350?"#3e6ae1":"#2b4fb8"):dark?"rgba(24,27,31,.88)":"rgba(255,255,255,.9)";rr2(g,x+10,y+h-bh-8,w-20,bh,bh/2);g.fill();g.fillStyle=blue?"#fff":col;g.font=F_(big?12:10);g.textAlign="center";g.fillText(msg,cx,y+h-8-bh/2+4)}
   g.restore()}
 
 // ---- in-car screens on a Tesla: Autopilot settings and Upgrades (buy FSD like you would in the real car)
@@ -5568,7 +5846,7 @@ function bvmDraw(g,x,y,w,h,L){
 // when you're in the driver's seat; from outside the car they show as a normal message
 const CMSG={q:[]};
 // v154: car alerts are normal on-screen messages again, not cards in the cluster
-function carMsg(m){if(CMSG.on&&st.cam===1&&st.started&&!st.walk&&st.power!==false){CMSG.q=CMSG.q.filter(x=>x.m!==m);CMSG.q.push({m:String(m),t0:performance.now()});if(CMSG.q.length>2)CMSG.q.shift();try{beep(1320,0.06,"sine",0.05)}catch(e){}}else toast0(m)}
+function carMsg(m){m=impText(String(m));if(CMSG.on&&st.cam===1&&st.started&&!st.walk&&st.power!==false){CMSG.q=CMSG.q.filter(x=>x.m!==m);CMSG.q.push({m:String(m),t0:performance.now()});if(CMSG.q.length>2)CMSG.q.shift();try{beep(1320,0.06,"sine",0.05)}catch(e){}}else toast0(m)}
 function cmsgCur(){const now=performance.now();CMSG.q=CMSG.q.filter(x=>now-x.t0<4800);return CMSG.q[CMSG.q.length-1]||null}
 // ---- warning lights and alert icons for the cluster: simple line symbols in the usual colours (red = stop, amber = check, green / blue / white = on)
 function telIco(g,n,cx,cy,s,c){g.save();g.translate(cx,cy);g.scale(s/24,s/24);g.strokeStyle=c;g.fillStyle=c;g.lineWidth=2;g.lineCap="round";g.lineJoin="round";const P=(...a)=>{g.beginPath();g.moveTo(a[0],a[1]);for(let i=2;i<a.length;i+=2)g.lineTo(a[i],a[i+1]);g.stroke()},C=(x,y,r,f)=>{g.beginPath();g.arc(x,y,r,0,7);f?g.fill():g.stroke()};
@@ -5966,7 +6244,7 @@ function drawVWCluster(g,W,H,v){const C=cluCommon();g.fillStyle="#04070c";g.fill
   if(!(C.ev||C.hyb)){g.font=CF2(9);g.fillText("1/min",LX-34,CY+18);g.fillText("x1000",LX-34,CY+28)}
   // side bars: coolant and fuel
   const bar=(x,f,lab,col)=>{for(let i=0;i<8;i++){g.fillStyle=i/8<f?col:"rgba(255,255,255,.18)";g.fillRect(x,CY+50-i*12,10,8)}g.fillStyle="#cfd8e6";g.font=CF2(10);g.fillText(lab,x+5,CY+66)};
-  bar(26,st.power===true?clamp((OWN.ct-50)/80,0.1,1):0,"°C",OWN.ct>112?"#ff4a4a":"#e8eef8");bar(W-36,C.ev?C.soc:C.fuelF,C.ev?"%":"⛽",(C.ev?C.soc:C.fuelF)<0.12?"#ff4a4a":"#e8eef8");
+  bar(26,st.power===true?clamp((OWN.ct-50)/80,0.1,1):0,"°F",OWN.ct>112?"#ff4a4a":"#e8eef8");bar(W-36,C.ev?C.soc:C.fuelF,C.ev?"%":"⛽",(C.ev?C.soc:C.fuelF)<0.12?"#ff4a4a":"#e8eef8");
   // top line: compass, speed limit, clock, temperature
   const hd=((90-car.psi*180/Math.PI)%360+360)%360;g.font=CF2(13,600);g.fillStyle="#e8eef8";g.fillText(["N","NE","E","SE","S","SW","W","NW"][Math.round(hd/45)%8],W/2-110,18);
   if(sys.limit){g.fillStyle="#fff";g.beginPath();g.arc(W/2-70,18,11,0,Math.PI*2);g.fill();g.strokeStyle="#d21";g.lineWidth=3;g.stroke();g.fillStyle="#111";g.font=CF2(10,800);g.fillText(String(sys.limit),W/2-70,19)}
@@ -6146,7 +6424,7 @@ function mbHome(g,top,bot,W){const h=bot-top,bg=g.createRadialGradient(W/2,bot,2
   g.fillStyle="#cfe0ff";g.font=FONT(13);g.textAlign="left";g.textBaseline="middle";g.fillText("⌂  Profile",12,top+16);g.textAlign="center";g.fillText("⌕  Search",W/2,top+16);
   const A=[["♫","Media",()=>SCR.page="media"],["✿","Comfort",()=>SCR.page="climate"],["ⓘ","Info",()=>SCR.page="controls"]];const cw=W/3;A.forEach(([i,l,fn],k)=>luxIcon(g,k*cw,top+30,cw,h-70,i,l,fn,k===1?"#7fd0ff":"#fff",44));
   g.fillStyle="rgba(255,255,255,.6)";g.font=FONT(11);g.fillText("THEME WORLDS",W/2,bot-14)}
-function bmwHome(g,top,bot,W){const h=bot-top;g.fillStyle="#07090d";g.fillRect(0,top,W,h);const cw=(W-20)/4,cards=[["ASSISTANT","Hi, how can I help?","#2a3f6a"],["VALUES SINCE INDIVIDUAL",`${(st.tripA/1000||0).toFixed(1)} km`,"#c7643f"],["WEATHER",ambF()+"°F  Westport","#4a74b8"],["ROUTE PREVIEW",NAV.dest?NAV.dest.name:"No route","#1d4f70"]];
+function bmwHome(g,top,bot,W){const h=bot-top;g.fillStyle="#07090d";g.fillRect(0,top,W,h);const cw=(W-20)/4,cards=[["ASSISTANT","Hi, how can I help?","#2a3f6a"],["VALUES SINCE INDIVIDUAL",`${((st.tripA||0)/1609).toFixed(1)} mi`,"#c7643f"],["WEATHER",ambF()+"°F  Westport","#4a74b8"],["ROUTE PREVIEW",NAV.dest?NAV.dest.name:"No route","#1d4f70"]];
   cards.forEach(([t,s,c],i)=>{const x=10+i*cw;g.fillStyle="#11151c";g.fillRect(x+3,top+8,cw-6,h-60);g.fillStyle=c;g.beginPath();g.moveTo(x+cw*0.45,top+8);g.lineTo(x+cw-3,top+8);g.lineTo(x+cw-3,top+8+(h-60)*0.6);g.closePath();g.fill();
     g.fillStyle="#9fc4ff";g.font=FONT(11);g.textAlign="left";g.textBaseline="middle";g.fillText(t,x+12,top+24);g.strokeStyle="#1c69d4";g.lineWidth=2;g.beginPath();g.moveTo(x+12,top+34);g.lineTo(x+cw-14,top+34);g.stroke();g.fillStyle="#fff";g.font=FONT(18);g.fillText(s,x+12,top+(h-60)*0.6);
     hit(x,top+8,cw,h-60,[null,()=>SCR.page="controls",()=>SCR.page="apps",()=>SCR.page="map"][i]||(()=>{}))});
@@ -6271,9 +6549,9 @@ function scrPhevFlow(g,top,bot,W){const T=TRIMS[st.trim],H=car.hyb,D=DRIVES[st.t
   if(pm>0)flow([xB+bw,midY],[xM,midY],pm,"#35c2bf");else flow([xM,midY],[xB+bw,midY],-pm,H.eng?"#ffb340":"#55d68c");
   const toW=pe+Math.max(pm,0);if(toW>0.8)flow([xM+bw,midY],[xW,midY],toW,H.eng?"#ffb340":"#35c2bf");else if(pm<-1&&!H.eng)flow([xW,midY],[xM+bw,midY],-pm,"#55d68c");
   if(PL&&chg)flow([xB+bw/2,yC],[xB+bw/2,midY+bh/2],(PB.chg||7200)/1000,"#ffd60a");
-  box(xM,yE,bw,bh,D.cvt||!par?"Engine (Atkinson)":"Engine",H.eng?`${Math.round(H.rpm)} rpm · ${Math.round(pe)} kW`:"Off",H.eng?"#ffb340":"#2c3e44");
+  box(xM,yE,bw,bh,D.cvt||!par?"Engine (Atkinson)":"Engine",H.eng?`${Math.round(H.rpm)} rpm · ${hpN(pe)} hp`:"Off",H.eng?"#ffb340":"#2c3e44");
   {const pb=PBv;box(xB,midY-bh/2,bw,bh,"Battery",`${Math.round(pb*100)} %${PL?` · ${Math.round(pb*EVM)} mi`:""}`,"#35c2bf")}
-  box(xM,midY-bh/2,bw,bh,D.cvt||!par?"Motor-generators":"Electric motor",`${pm<0?"+":""}${Math.round(Math.abs(pm))} kW`,Math.abs(pm)>1?"#35c2bf":"#2c3e44");
+  box(xM,midY-bh/2,bw,bh,D.cvt||!par?"Motor-generators":"Electric motor",`${pm<0?"+":""}${hpN(Math.abs(pm))} hp`,Math.abs(pm)>1?"#35c2bf":"#2c3e44");
   box(xW,midY-bh/2,bw,bh,"Wheels",fmtSpeed(car.vx));
   if(PL)box(xB,yC,bw,bh,"Charge port",chg?`Charging ${((PB.chg||7200)/1000).toFixed(1)} kW`:"Unplugged",chg?"#ffd60a":"#2c3e44");
   g.textAlign="right";g.textBaseline="alphabetic";g.fillStyle="#e6eef0";g.font=FONT(20);g.fillText(state,W-24,bot-46);g.fillStyle="#9fb4b7";g.font=FONT(13);g.fillText(`${PL?"Plug-in hybrid":"Hybrid"} · ${mode}${PL?` · ${(PB.kWh||17).toFixed(1)} kWh pack`:""}`,W-24,bot-26);
@@ -6295,7 +6573,7 @@ function scrTeslaEnergy(g,top,bot,W){const T=TRIMS[st.trim],Hy=car.hyb,P=car.tq.
   const cw=Math.min(92,W*0.13),ch=Math.min(bot-top-40,200),cx=W*0.86,cy=(top+bot)/2;g.strokeStyle="#cfd6da";g.lineWidth=2;rr2(g,cx-cw/2,cy-ch/2,cw,ch,cw*0.38);g.stroke();
   g.fillStyle="#1b282d";rr2(g,cx-cw*0.36,cy-ch*0.26,cw*0.72,ch*0.52,6);g.fill();g.fillStyle=socShow(Hy)<0.15?"#ff4d40":"#55d68c";rr2(g,cx-cw*0.36,cy+ch*0.26-ch*0.52*socShow(Hy),cw*0.72,ch*0.52*socShow(Hy),6);g.fill();
   const pf=(car.tq[0]*car.w[0]+car.tq[1]*car.w[1])/1000,pr=(car.tq[2]*car.w[2]+car.tq[3]*car.w[3])/1000,n=teslaMotors();
-  const mot=(x,y,p,l)=>{g.fillStyle=Math.abs(p)<1?"#2c3e44":p<0?"#55d68c":"#3e6ae1";g.beginPath();g.arc(x,y,9,0,7);g.fill();g.fillStyle="#cfd6da";g.font=FONT(11);g.textAlign="right";g.fillText(`${l} ${Math.round(p)} kW`,cx-cw/2-8,y+4)};
+  const mot=(x,y,p,l)=>{g.fillStyle=Math.abs(p)<1?"#2c3e44":p<0?"#55d68c":"#3e6ae1";g.beginPath();g.arc(x,y,9,0,7);g.fill();g.fillStyle="#cfd6da";g.font=FONT(11);g.textAlign="right";g.fillText(`${l} ${hpN(p)} hp`,cx-cw/2-8,y+4)};
   if(n>=2)mot(cx,cy-ch*0.36,pf,"Front");if(n===3){mot(cx-cw*0.2,cy+ch*0.36,pr/2,"Rear (×2)");mot(cx+cw*0.2,cy+ch*0.36,pr/2,"")}else mot(cx,cy+ch*0.36,pr,"Rear");g.textAlign="left"}
 function teslaMenu(){const sx=["models_","modelx"].includes(TRIMS[st.trim].model);return [["controls","Controls","⚙"],["pedals",sx?"Pedals & Steering":"Dynamics","◎"],...(sx?[["susp","Suspension","⇕"]]:[]),["charging","Charging","⚡"],["autopilot","Autopilot","◈"],["locks","Locks","🔒"],["lights","Lights","☀"],["display","Display","▭"],["trips","Trips","↯"],["nav","Navigation","➤"],["safety","Safety","⚠"],["service","Service","✎"],["software","Software","⤓"],["upgrades","Upgrades","⬆"]]}
 function tRow(g,y,W,label,opts,cur,fn){g.fillStyle="#9fb4b7";g.font=FONT(12);g.textAlign="left";g.textBaseline="middle";g.fillText(label,14,y+6);const x0=14,bw=(W-x0-10)/opts.length,yy=y+16;
@@ -6338,7 +6616,7 @@ function tCharging(g,top,bot,W){const Hy=car.hyb;let y=top+16;g.fillStyle="#e6ee
 function tLocks(g,top,bot,W){let y=top+14;tTog(g,y,W,"Walk-Away Door Lock",TOPT.walkLock,v=>TOPT.walkLock=v);y+=38;tTog(g,y,W,"Lock Confirmation Sound",TOPT.lockSound,v=>TOPT.lockSound=v);y+=38;tTog(g,y,W,"Child Lock",TOPT.childLock,v=>TOPT.childLock=v);y+=38;tTog(g,y,W,"Unlock on Park",TOPT.unlockPark,v=>TOPT.unlockPark=v);y+=38;tTog(g,y,W,"Sentry Mode",TSL.sentry,v=>TSL.sentry=v)}
 function tLights(g,top,bot,W){let y=top+14;tRow(g,y,W,"Headlights",[["off","Off"],["auto","Auto"],["on","On"]],st.lights?"on":"auto",k=>{st.lights=k==="on"});y+=52;tTog(g,y,W,"Auto High Beam",TOPT.autoHigh,v=>TOPT.autoHigh=v);y+=38;tRow(g,y,W,"Dome Lights",[["off","Off"],["auto","Auto"],["on","On"]],TOPT.dome,k=>TOPT.dome=k);y+=52;tTog(g,y,W,"Headlights After Exit",TOPT.after!==false,v=>TOPT.after=v)}
 function tDisplay(g,top,bot,W){let y=top+14;tRow(g,y,W,"Appearance",[[true,"Dark"],[false,"Light"]],TOPT.dark,k=>TOPT.dark=k);y+=52;tRow(g,y,W,"Brightness",[[40,"40"],[70,"70"],[100,"100"]],TOPT.bright,k=>TOPT.bright=k);y+=52;
-  tRow(g,y,W,"Units",[["mph","mi"],["kmh","km"]],st.units==="mph"?"mph":"kmh",k=>{st.units=k==="mph"?"mph":"kmh"});y+=52;tTog(g,y,W,"Show Rainbow Road (Toybox)",TSL.rainbow,v=>TSL.rainbow=v)}
+  tTog(g,y,W,"Show Rainbow Road (Toybox)",TSL.rainbow,v=>TSL.rainbow=v)}
 function tTrips(g,top,bot,W){const mi=TE.totD/1609.34;let y=top+22;g.textAlign="left";g.textBaseline="middle";const line=(a,b)=>{g.fillStyle="#9fb4b7";g.font=FONT(12.5);g.fillText(a,14,y);g.fillStyle="#e6eef0";g.font=FONT(15);g.fillText(b,W*0.5,y);y+=30};
   g.fillStyle="#e6eef0";g.font=FONT(15);g.fillText("Since Last Charge",14,y);y+=30;line("Distance",`${mi.toFixed(1)} mi`);line("Energy",`${(TE.totWh/1000).toFixed(2)} kWh`);line("Average",`${mi>0.05?Math.round(TE.totWh/mi):"–"} Wh/mi`);line("Trip A",`${((st.tripA||0)/1609.34).toFixed(1)} mi`);line("Odometer",`${Math.floor(odoMiles()).toLocaleString("en-US")} mi`)}
 function tNav(g,top,bot,W){let y=top+14;tTog(g,y,W,"Online Routing",TOPT.online,v=>TOPT.online=v,"Uses live traffic to pick the fastest route");y+=54;tTog(g,y,W,"Avoid Tolls",TOPT.tolls,v=>TOPT.tolls=v);y+=38;tTog(g,y,W,"Automatic Navigation",!!TOPT.autoNav,v=>TOPT.autoNav=v)}
@@ -6560,7 +6838,7 @@ function scrHybMonitor(g,top,bot,W){const h=bot-top,F=FONT,T=TRIMS[st.trim],toy=
   g.textAlign="right";g.font=F(14);g.fillStyle=S.state==="EV"?"#2ee6a6":S.regen||S.plugCh?"#4db8ff":S.eng?"#ffb35c":"#cfe7ff";g.fillText(S.state,W-16,top+22);
   // read-outs along the bottom
   const items=[["Battery",Math.round(S.soc*100)+"%"]];if(S.PL)items.push(["EV range",S.rng.toFixed(0)+" mi"]);
-  if(S.ep)items.push(["Generator",S.pe>0.5?S.pe.toFixed(0)+" kW":"off"],["Motors",(S.P>=0?"":"−")+Math.abs(S.P).toFixed(0)+" kW"]);else items.push(["Engine",S.pe>0.5?S.pe.toFixed(0)+" kW":"off"],["Motor",(S.pm>=0?"":"−")+Math.abs(S.pm).toFixed(0)+" kW"]);
+  if(S.ep)items.push(["Generator",S.pe>0.5?hpN(S.pe)+" hp":"off"],["Motors",(S.P>=0?"":"−")+hpN(Math.abs(S.P))+" hp"]);else items.push(["Engine",S.pe>0.5?hpN(S.pe)+" hp":"off"],["Motor",(S.pm>=0?"":"−")+hpN(Math.abs(S.pm))+" hp"]);
   {const H=S.H;items.push(["Trip",H.used>0.01?((H.trip/1609)/(H.used/3.785)).toFixed(1)+" mpg":"– mpg"])}
   if(S.PL&&T.eModes){const m=T.eModes.find(m=>m[0]===(st.eMode||"hyb"));if(m)items.push(["Mode",m[1]])}
   const n=items.length,bw=Math.min(118,(W-24)/n-6),y=bot-46;g.textAlign="center";
@@ -6570,7 +6848,7 @@ const H_PORT=(W,h)=>h*0.9;
 // HUD panel version (the box at the right of the screen)
 function drawFlowHud(){const w=sensor.width,h=sensor.height;sg.clearRect(0,0,w,h);const S=hybFlowDraw(sg,w/2,h*0.45,w,h*0.78,true,false);
   sg.textAlign="center";sg.textBaseline="middle";sg.font=FONT(15);sg.fillStyle="#fff";sg.fillText(Math.round(S.soc*100)+"%"+(S.PL?` · ${S.rng.toFixed(0)} mi EV`:""),w/2,h-36);
-  sg.font=FONT(12);sg.fillStyle="#9fb4c6";sg.fillText(`Engine ${S.pe>0.5?S.pe.toFixed(0)+" kW":"off"} · Motor ${S.pm.toFixed(0)} kW`,w/2,h-16);sg.textBaseline="alphabetic";
+  sg.font=FONT(12);sg.fillStyle="#9fb4c6";sg.fillText(`Engine ${S.pe>0.5?hpN(S.pe)+" hp":"off"} · Motor ${S.pm.toFixed(0)} kW`,w/2,h-16);sg.textBaseline="alphabetic";
   $("sensorCap").textContent=S.state}
 function scrToyotaEnergy(g,top,bot,W){const H=car.hyb,t=SCR.t,F=FONT,h=bot-top;const bg=g.createLinearGradient(0,top,0,bot);bg.addColorStop(0,"#0d3a5c");bg.addColorStop(1,"#06182b");g.fillStyle=bg;g.fillRect(0,top,W,h);
   g.fillStyle="#fff";g.font=F(20);g.textAlign="left";g.textBaseline="middle";g.fillText("Energy Monitor",16,top+22);
@@ -7074,7 +7352,7 @@ function assist(dt){
   // ---- evasive steering assist: driver swerves in an emergency, the car adds steering into a free lane and steadies it
   if(sys.esa&&!st.esa){sys.esa=null}
   if(sys.esa){const E=sys.esa;E.t+=dt;sys.esaDelta=pathDelta(M,he,E.target,0.07,3.0);
-    if(E.t>5||(Math.abs(M.off-E.target)<0.35&&Math.abs(he)<0.02&&E.t>1)){logResult(`Evasive steering assist moved the car ${Math.abs(M.off-E.off0).toFixed(1)} m into the ${E.dir>0?"left":"right"} lane`);sys.esa=null;sys.esaDelta=0}}
+    if(E.t>5||(Math.abs(M.off-E.target)<0.35&&Math.abs(he)<0.02&&E.t>1)){logResult(`Evasive steering assist moved the car ${ftS(Math.abs(M.off-E.off0))} into the ${E.dir>0?"left":"right"} lane`);sys.esa=null;sys.esaDelta=0}}
   else sys.esaDelta=0;
   if(st.esa&&!sys.esa&&lead&&ttc<3.0&&sp>8&&Math.abs(inp.steer)>0.12){
     const dir=inp.steer<0?1:-1, tgtLane=laneOf(M.off)+dir;
@@ -7093,7 +7371,7 @@ function assist(dt){
   if(sys.aebState==="braking"&&lead&&!evading){const cl=Math.max(0,sp-Math.max(lead.v,0)),need=cl*cl/(2*Math.max(gap-2.0,0.25))*1.12,aM=sys.aebPV!=null?(sys.aebPV-sp)/Math.max(dt,1e-3):need;sys.aebB2=clamp((sys.aebB2??0.8)+(need-aM)*(need>aM?0.9:0.35)*dt,0.12,1);if(need>9)sys.aebB2=1;sys.aebBrake=sys.aebB2}else sys.aebB2=null;sys.aebPV=sp;
   if(evading&&sys.aebState!=="held"){sys.aebBrake=0;if(sys.aebState==="braking")sys.aebState="ready"}
   if(sys.aebBrake>0&&sys.aebState==="braking"&&(sp<0.2||!lead||sp-lead.v<0.2)){
-    sys.aebState="held";const who=sys.aebWho||"the car ahead";const msg=lead&&lead.v<0.5&&sp<0.3?`AEB stopped the car ${Math.max(gap,0).toFixed(1)} m short of ${who} (from ${fmtSpeed(sys.aebStart.v)})`:lead?`AEB slowed you from ${fmtSpeed(sys.aebStart.v)} to ${fmtSpeed(sp)}, ${Math.max(gap,0).toFixed(1)} m behind ${who}`:`AEB braked for ${who} (from ${fmtSpeed(sys.aebStart.v)} to ${fmtSpeed(sp)})`;
+    sys.aebState="held";const who=sys.aebWho||"the car ahead";const msg=lead&&lead.v<0.5&&sp<0.3?`AEB stopped the car ${ftS(Math.max(gap,0))} short of ${who} (from ${fmtSpeed(sys.aebStart.v)})`:lead?`AEB slowed you from ${fmtSpeed(sys.aebStart.v)} to ${fmtSpeed(sp)}, ${ftS(Math.max(gap,0))} behind ${who}`:`AEB braked for ${who} (from ${fmtSpeed(sys.aebStart.v)} to ${fmtSpeed(sp)})`;
     logResult(msg);toast(msg);sys.aebHold=lead&&lead.v<0.5?1.5:0.3}
   if(sys.aebState==="held"){sys.aebHold-=dt;sys.aebBrake=1;if(sys.aebHold<=0){sys.aebBrake=0;sys.aebState="ready"}}
   if(sys.aebState==="ready"&&sys.aebBrake>0&&!(ttc<aebT(1)))sys.aebBrake=Math.max(0,sys.aebBrake-dt*2);
@@ -7219,7 +7497,7 @@ function assist(dt){
   if(sys.ldw&&!sys.ldwWas&&!(brandS()==="Kia"&&playS("kia_ldw",0.6))){beep(880,.09,"sine",.2);setTimeout(()=>beep(660,.12,"sine",.2),110)}
   sys.ldwWas=sys.ldw;
   if(sys.driftT>0){sys.driftT-=dt;sys.drift=-0.012*(1-Math.exp(-(6-sys.driftT)));sys.lkaLog.maxE=Math.max(sys.lkaLog.maxE,Math.abs(e));
-    if(sys.driftT<=0){sys.drift=0;logResult(`Lane keep test: max drift ${sys.lkaLog.maxE.toFixed(2)} m from lane centre${st.lka?"":" (LKA off)"}`)}}
+    if(sys.driftT<=0){sys.drift=0;logResult(`Lane keep test: max drift ${ftS(sys.lkaLog.maxE)} from lane centre${st.lka?"":" (LKA off)"}`)}}
   else sys.drift=0;
   sys.cruiseThr=0; if(sys.driftT>0&&inp.thr<0.05&&inp.brk<0.05)sys.cruiseThr=clamp((sys.cruiseV-sp)*0.4+0.12,0,0.6);
   // ---- adaptive cruise control: holds the set speed, follows the car ahead at the chosen gap, stops and goes
@@ -8799,7 +9077,7 @@ function scrCamera(g,top,bot,W){
     else{if(cm_==="rear"){g.translate(MX+MW,top+mh);g.scale(-MW/480,-mh/288)}else{g.translate(MX,top+mh);g.scale(MW/480,-mh/288)}g.drawImage(SCR.camCv,0,0)}
     g.restore();
     if(cm_==="rear")drawGuides(g,MX,top,MW,mh,true);else if(cm_==="front")drawGuides(g,MX,top,MW,mh,false,true);
-    const P=sys.pdc;if(P&&cm_!=="side"){const n=Math.min(...(cm_==="rear"?P.r:P.f));if(n<2.5){g.fillStyle="rgba(8,14,16,.85)";rr2(g,MX+MW/2-60,top+10,120,36,9);g.fill();g.fillStyle=n<0.3?"#ff4d40":n<0.6?"#ffb340":"#cfe0e2";g.font=FONT(18);g.textAlign="center";g.fillText(`${n.toFixed(1)} m`,MX+MW/2,top+29)}}
+    const P=sys.pdc;if(P&&cm_!=="side"){const n=Math.min(...(cm_==="rear"?P.r:P.f));if(n<2.5){g.fillStyle="rgba(8,14,16,.85)";rr2(g,MX+MW/2-60,top+10,120,36,9);g.fill();g.fillStyle=n<0.3?"#ff4d40":n<0.6?"#ffb340":"#cfe0e2";g.font=FONT(18);g.textAlign="center";g.fillText(`${(n*3.281).toFixed(n<3?1:0)} ft`,MX+MW/2,top+29)}}
     const lab=(t,x,y)=>{g.font=FONT(13);g.textAlign="center";const w=g.measureText(t).width+18;g.fillStyle="rgba(0,0,0,.6)";rr2(g,x-w/2,y,w,22,6);g.fill();g.fillStyle="#fff";g.fillText(t,x,y+15)};
     lab("Top View",LW/2,top+8);lab({rear:"Rear View",front:"Front View",side:"Side View"}[cm_]||"",MX+MW/2,cm_==="side"?top+8:top+(P&&Math.min(...(cm_==="rear"?P.r:P.f))<2.5?52:8));
     if(!slow){g.fillStyle="rgba(0,0,0,.6)";rr2(g,MX+MW/2-120,top+mh-34,240,26,7);g.fill();g.fillStyle="#ffd60a";g.font=FONT(13);g.textAlign="center";g.fillText("Check surroundings for safety",MX+MW/2,top+mh-17)}
@@ -8814,7 +9092,7 @@ return}
     [[1.0,"#ff4d40"],[2.0,"#ffb340"],[3.2,"#55d68c"]].forEach(([dm,col],i)=>{const y1=y0-(i+1)*(h*0.2),w0=W*0.32-(i)*W*0.07,b=st_*(i+1)*(i+1)*14;
       g.strokeStyle=col;g.lineWidth=4;g.beginPath();g.moveTo(cx-w0-(i?0:20)+(i?st_*i*i*14:0),y0-(i)*(h*0.2));g.lineTo(cx-w0+W*0.035+b,y1);g.moveTo(cx+w0+(i?0:20)+(i?st_*i*i*14:0),y0-(i)*(h*0.2));g.lineTo(cx+w0-W*0.035+b,y1);g.stroke();
       g.beginPath();g.moveTo(cx-w0+W*0.035+b,y1);g.lineTo(cx-w0+W*0.035+b+22,y1);g.moveTo(cx+w0-W*0.035+b,y1);g.lineTo(cx+w0-W*0.035+b-22,y1);g.stroke()});
-    const P=sys.pdc;if(P){const n=Math.min(...P.r);if(n<2.5){g.fillStyle="rgba(8,14,16,.85)";rr2(g,W/2-60,top+10,120,36,9);g.fill();g.fillStyle=n<0.3?"#ff4d40":n<0.6?"#ffb340":"#cfe0e2";g.font=FONT(18);g.textAlign="center";g.fillText(`${n.toFixed(1)} m`,W/2,top+29)}}}
+    const P=sys.pdc;if(P){const n=Math.min(...P.r);if(n<2.5){g.fillStyle="rgba(8,14,16,.85)";rr2(g,W/2-60,top+10,120,36,9);g.fill();g.fillStyle=n<0.3?"#ff4d40":n<0.6?"#ffb340":"#cfe0e2";g.font=FONT(18);g.textAlign="center";g.fillText(`${(n*3.281).toFixed(n<3?1:0)} ft`,W/2,top+29)}}}
   else{const P=sys.pdc,cx=W/2,cy=top+h/2;if(P){const col=d=>d<0.3?"#ff4d40":d<0.6?"#ff7a3a":d<1.2?"#ffb340":"#55d68c";
     for(const [arr,dir] of [[P.f,-1],[P.r,1]])arr.forEach((dd,z)=>{if(dd>2.0)return;g.fillStyle=col(dd);g.globalAlpha=0.75;g.fillRect(cx-44+z*22,cy+dir*(58+ (2-dd)*6)-(dir<0?10:0),20,10)});g.globalAlpha=1}}
   if(SCR.cam==="dash")dashOverlay(g,top,bot,W);
@@ -8840,14 +9118,14 @@ function scrEnergy(g,top,bot,W){const T_=TRIMS[st.trim];if(isHybT(st.trim)){scrH
   const flow=(a,b,kw,col)=>{if(Math.abs(kw)<1)return;g.strokeStyle=col;g.lineWidth=3+Math.min(7,Math.abs(kw)/30);g.setLineDash([10,8]);g.lineDashOffset=-t*60*Math.sign(kw);g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(b[0],b[1]);g.stroke();g.setLineDash([])};
   const by=top+26,midY=(top+bot)/2;
   box(30,midY-40,140,80,"Battery",`${Math.round(socShow(Hy)*100)} %`,"#35c2bf");
-  box(250,midY-40,140,80,T.hybrid?"Motors":"Motors",`${Math.round(Math.abs(P))} kW`);
+  box(250,midY-40,140,80,T.hybrid?"Motors":"Motors",`${hpN(Math.abs(P))} hp`);
   box(470,midY-40,110,80,"Wheels",fmtSpeed(car.vx));
   if(T.hybrid){box(250,by-6,140,62,"Engine",Hy.eng?`${Math.round(Hy.rpm)} rpm`:"off",Hy.eng?"#ffb340":"#2c3e44");flow([320,by+56],[320,midY-40],Hy.eng?(Hy.Pe/1000):0,"#ffb340")}
   flow([170,midY],[250,midY],P>0?P:-Math.abs(Math.min(P,0)),P>=0?"#35c2bf":"#55d68c");flow([390,midY],[470,midY],P,P>=0?"#35c2bf":"#55d68c");
   // charge bar
   g.fillStyle="#132026";rr2(g,30,bot-58,290,22,8);g.fill();g.fillStyle=socShow(Hy)<0.15?"#ff4d40":"#35c2bf";rr2(g,30,bot-58,290*clamp(socShow(Hy),0,1),22,8);g.fill();
   g.fillStyle="#cfe0e2";g.font=FONT(14);g.textAlign="left";g.fillText(`${Math.round(evRange()/1.609)} mi electric${T.hybrid?` · ${Math.round(fuelRange())} mi fuel`:""}`,30,bot-76);
-  g.textAlign="right";g.fillStyle=P<0?"#55d68c":"#cfe0e2";g.font=FONT(30);g.fillText(`${P<0?"+":""}${Math.round(-P<0?P:-P)} kW`,W-30,bot-44);
+  g.textAlign="right";g.fillStyle=P<0?"#55d68c":"#cfe0e2";g.font=FONT(30);g.fillText(`${P<0?"+":""}${hpN(-P<0?P:-P)} hp`,W-30,bot-44);
   g.font=FONT(13);g.fillStyle="#9fb4b7";g.fillText(P<-2?"Regenerating":Hy.charging?"Charging":Hy.refuel?"Refuelling":P>2?"Driving":"Ready",W-30,bot-20);
 }
 // ---- Media: three generated radio stations
@@ -9582,7 +9860,7 @@ function gigApp(){const S=GIG_SVC[GIG.svc],O=GIG.offer,J=GIG.job;let h=phHdr("Gi
   h+=`<div class="card bal"><small>${S.name} · earnings</small><b>${money2(GIG.earned)}</b><span>${GIG.trips} jobs done · paid straight to checking</span></div>`;
   if(GIG.svc==="valet")return h+valetCard();
   if(J){const st_=J.stops[J.i],el=(st.clock||0)-J.t0,left=J.limit?Math.max(0,J.limit-el):null,d=Math.hypot(st_.x-(st.walk?st.walk.x:car.px),st_.y-(st.walk?st.walk.y:car.py));
-    h+=`<div class="card"><small>${GIG_SVC[J.svc].ic} On a job · stop ${J.i+1} of ${J.stops.length}</small><b>${st_.label}</b>${J.svc==="taxi"&&J.i>0?`<span>🚕 Meter: ${money2(3.5+(J.dist||0)/1609.34*2.8)} · ${((J.dist||0)/1609.34).toFixed(2)} mi</span>`:""}<span>${Math.round(d)} m away (straight line) · stop within 20 m${left!=null?` · ⏱ ${Math.floor(left/60)}:${String(Math.floor(left%60)).padStart(2,"0")} left`:""}</span><span>Pays ${money2(J.pay)}${J.tip?` + ${money2(J.tip)} tip`:""}</span>
+    h+=`<div class="card"><small>${GIG_SVC[J.svc].ic} On a job · stop ${J.i+1} of ${J.stops.length}</small><b>${st_.label}</b>${J.svc==="taxi"&&J.i>0?`<span>🚕 Meter: ${money2(3.5+(J.dist||0)/1609.34*2.8)} · ${((J.dist||0)/1609.34).toFixed(2)} mi</span>`:""}<span>${ftS(d)} away (straight line) · stop within 20 m${left!=null?` · ⏱ ${Math.floor(left/60)}:${String(Math.floor(left%60)).padStart(2,"0")} left`:""}</span><span>Pays ${money2(J.pay)}${J.tip?` + ${money2(J.tip)} tip`:""}</span>
       <div class="chips"><button data-a="gignav">Navigate</button><button data-a="gigcancel">Cancel job</button></div></div>`}
   else if(O){const s=Math.max(0,Math.ceil((O.exp-performance.now())/1000));h+=`<div class="card"><small>${GIG_SVC[O.svc].ic} New offer · ${s}s</small><b>${money2(O.pay+O.tip)}</b><span>${O.svc==="pkg"?`${O.stops.length-1} packages`:O.svc==="food"?O.stops[0].name.split(" · ")[0]:O.stops[0].who+" · rider"} · ${O.mi} mi · about ${O.mins} min${O.tip?` · incl. ${money2(O.tip)} tip`:""}</span>
       <div class="chips"><button data-a="gigyes">Accept</button><button data-a="gigno">Decline</button></div></div>`}
@@ -9760,7 +10038,7 @@ function vsRows(cat){const T=TRIMS[st.trim],R=[],t=(k,n,d,on,fn,dis)=>R.push({n,
     for(let i=0;i<(T.modes||MODES.length);i++)R.push({n:modeName(i),d:MD(i).d,on:st.mode===i,radio:true,fn:()=>{st.mode=i;toast(`Drive mode: ${modeName()}`);tick(1)}})}
   if(cat==="lights"){t("lights","Headlights","Low beams · L",st.lights,null,false);t(null,"Automatic headlights","On at dusk, off at dawn",st.autoLights!==false,()=>{st.autoLights=st.autoLights===false;tick(1)},false);t("autoHigh","High Beam Assist","Dips for other cars",st.autoHigh);t(null,"Fog lights","K",!!st.fog,()=>{st.fog=!st.fog;tick(1)},false);t("matrix",T.matrixName||"Adaptive headlights","Shades other drivers out of the beam",!!st.matrix);t("night",st.night?"Night (tap for day)":"Day (tap for night)",`Clock ${gtClock()} · 1 game hour = 1 real minute`,st.night,null,false)}
   if(cat==="hud"){const ok=hasHUD();R.push({n:"Head-Up Display",d:ok?"Speed, limit, cruise and directions on the windshield":"Not equipped on this car",on:ok&&st.hudOn,dis:!ok,fn:()=>{st.hudOn=!st.hudOn;tick(1)}})}
-  if(cat==="clu"){R.push({n:"Zoom into the cluster",d:"N on PC · the 🔍 button on mobile",on:!!SCR.focusClu,fn:()=>{SCR.focusClu=!SCR.focusClu;SCR.focus=false}});R.push({n:"Units",d:st.units==="mph"?"mph, miles":"km/h, km",on:true,fn:()=>{st.units=st.units==="mph"?"kmh":"mph";tick(1)}})}
+  if(cat==="clu"){R.push({n:"Zoom into the cluster",d:"N on PC · the 🔍 button on mobile",on:!!SCR.focusClu,fn:()=>{SCR.focusClu=!SCR.focusClu;SCR.focus=false}});}
   if(cat==="sound"){R.push({n:"Engine sound",d:["Quiet","Normal","Loud"][st.engVol??1],on:true,fn:()=>{st.engVol=((st.engVol??1)+1)%3;tick(1)}});t("avas","Pedestrian warning sound","Low-speed sound for EVs and hybrids",st.avas);t("traffic","Traffic sounds","Other cars around you",st.aiSnd!==false,null,false)}
   if(cat==="comfort"){for(const [f,n] of comfortItems())R.push({n,d:f==="none"?"Add heated seats and more in the builder":"Tap to change",on:!!CF[f],val:comfortLabel(f),dis:f==="none",fn:()=>comfortAct(f)})}
   if(cat==="cam"){R.push({n:"Guidance lines",d:"Always shown below 15 mph",on:!st.noGuides,fn:()=>{st.noGuides=!st.noGuides}});R.push({n:"Front camera when shifting to Drive",d:hasFrontCam()?"Stays on until 15 mph":"No front camera on this car",on:hasFrontCam()&&st.autoFront!==false,dis:!hasFrontCam(),fn:()=>{st.autoFront=st.autoFront===false}});R.push({n:"Side cameras",d:has360()?"In the camera screen (Side)":"Needs the 360° camera",on:has360(),dis:!has360(),info:true})}
@@ -10082,7 +10360,7 @@ function drawCluster(){
     g.strokeStyle=f<0?"#55d68c":ac;g.beginPath();if(f>=0)g.arc(cx,cy,R,a0,a0+Math.PI*1.2*f);else g.arc(cx,cy,R,a0+Math.PI*1.2*f,a0);g.stroke();
     g.fillStyle="#8fa1a6";g.font=F(12);g.textAlign="center";g.fillText("CHARGE",cx-R+28,cy+46);g.fillText("POWER",cx+R-30,cy+46);
     g.fillStyle=T.hybrid&&Hy.eng?"#ffb340":"#55d68c";g.font=F(16);g.fillText(T.hybrid?(Hy.eng?"ENGINE":"EV"):"READY",cx,cy+6);
-    g.fillStyle="#e6eef0";g.font=F(14);g.fillText(`${Math.round(Math.abs(P))} kW`,cx,cy+26)}
+    g.fillStyle="#e6eef0";g.font=F(14);g.fillText(`${hpN(Math.abs(P))} hp`,cx,cy+26)}
   // centre: speed, gear, limit, cruise
   g.textAlign="center";g.fillStyle="#f4f8f8";g.font=`600 84px ${getComputedStyle(document.body).getPropertyValue("--f-hud")}`;g.fillText(Math.round(spdUnit(v)),W/2,126);
   g.font=F(16);g.fillStyle="#8fa1a6";g.fillText(st.units==="mph"?"MPH":"KM/H",W/2,150);
@@ -10490,7 +10768,7 @@ function toast0(msg){msg=String(msg);let el=$("nstack");if(!el){el=document.crea
   const x={m:msg,el:r};x.t=setTimeout(()=>nstDrop(x),dur);NST.list.push(x);while(NST.list.length>(document.body.classList.contains("pc")?7:4)){const o=NST.list[0];clearTimeout(o.t);o.el.remove();NST.list.shift()}}
 function nstDrop(x){x.el.classList.add("out");NST.list=NST.list.filter(y=>y!==x);setTimeout(()=>x.el.remove(),400)}
 const NONCAR=/\$|💵|💰|🎁|🎉|bank|loan|credit|checking|gig|order|rider|deliver|passenger|phone|text from|call from|spotify|music|song|podcast|radio|account|signed|saved|level|xp\b|achiev|online|player|version|garage|dealer|bought|sold|lease|financ|insurance|ticket|fine\b|toll|e-zpass|photo|replay|clip|test drive|weather|tutorial|settings|graphics|walk|house|home|stock|valet|guest|friend|welcome|camera:|view|seat|units|controls|reset|spawn|teleport|police|cop|wanted|star|race|lap|leaderboard|map|route|destination|navigation|arriv|parked in|park assist|my mode ·|chime|haptic|sound/i;
-function toast(msg){try{if(typeof carMsg==="function"&&CMSG.on&&st.cam===1&&st.started&&!st.walk&&st.power!==false&&!NONCAR.test(String(msg)))return carMsg(msg)}catch(e){}toast0(msg)}
+function toast(msg){msg=impText(msg);try{if(typeof carMsg==="function"&&CMSG.on&&st.cam===1&&st.started&&!st.walk&&st.power!==false&&!NONCAR.test(String(msg)))return carMsg(msg)}catch(e){}toast0(msg)}
 const LOG=[];
 function logResult(msg){LOG.unshift(`${new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit",second:"2-digit"})} · ${TRIMS[st.trim].short} · ${msg}`);if(LOG.length>40)LOG.pop();if(st.tab==="log"&&!$("drawer").hidden)renderTab()}
 function ic(label,cls){return `<span class="ic ${cls||""}"><i></i>${label}</span>`}
@@ -10526,7 +10804,7 @@ function hud(dt){
    if(T.ice){$("ppos").style.width=(clamp(H.rpm/8000,0,1)*100)+"%";$("ppos").classList.toggle("hot",H.rpm>DRIVES[st.trim].red*0.92);$("pred").style.left=(DRIVES[st.trim].red/80)+"%";$("pneg").style.width="0";
      $("plab").textContent=H.ssOff?"Engine auto-stopped":H.crank>0?"Starting…":`${Math.round(H.rpm/50)*50} rpm`}
    else{const P=car.tq.reduce((a,q,i)=>a+q*car.w[i],0)/1000,mx=T.kW;$("ppos").style.width=(clamp(P/mx,0,1)*50)+"%";$("pneg").style.width=(clamp(-P/(mx*0.4),0,1)*50)+"%";$("ppos").classList.remove("hot");
-     $("plab").textContent=P<-2?`Regen ${Math.round(-P)} kW`:P>2?`${Math.round(P)} kW`:["Regen off","Regen low","Regen standard","One-pedal"][st.regen]}}
+     $("plab").textContent=P<-2?`Regen ${hpN(-P)} hp`:P>2?`${hpN(P)} hp`:["Regen off","Regen low","Regen standard","One-pedal"][st.regen]}}
   if(car.abs&&inp.brk>0.05&&navigator.vibrate&&!hud.vib){hud.vib=1;navigator.vibrate([18,50,18,50,18])}if(!car.abs)hud.vib=0;
   hudT-=dt; if(toastT>0){toastT-=dt;if(toastT<=0)$("toast").hidden=true}
   const al=$("alert"); let alert=null,amber=false;
@@ -10543,7 +10821,7 @@ function hud(dt){
   $("prnd").innerHTML=["P","R","N","D"].map(x=>x===st.gear?`<b>${x}${x==="D"&&T.ice&&!T.cvt?car.hyb.gear:""}</b>`:x).join(" "); document.querySelectorAll("#gears button").forEach(b=>b.classList.toggle("on",b.dataset.g===st.gear));$("dEpb").classList.toggle("on",!!sys.epb);
   const mp=$("modePill"); mp.textContent=modeName(); mp.style.color=MD().col;
   const ar=$("accRead"); ar.textContent=st.acc?`ACC ${Math.round(spdUnit(st.accSet))} · ${"▮".repeat(st.accGap)}${"▯".repeat(3-st.accGap)}${sys.accState==="following"?" · following":""}`:"ACC off"; ar.classList.toggle("on",st.acc);
-  $("scrMode").textContent=modeName()+(T.height&&MD().height?` · ${Math.round(MD().height*1000)} mm`:"")+(terr()?" · "+terrList().o[st.terr-1]:"");
+  $("scrMode").textContent=modeName()+(T.height&&MD().height?` · ${inS(MD().height*1000)}`:"")+(terr()?" · "+terrList().o[st.terr-1]:"");
   // fixed telltales (always the same place) + one line for the most important message
   const TT=[["AEB",sys.aebState==="braking"?"alert":sys.ttc<2.8&&st.aeb?"warn":st.aeb?"on":""],["LKA",sys.ldw||sys.lkaState==="nudge"?"warn":sys.lkaState==="ready"||sys.lkaState==="pilot"?"on":""],
     ["BSM",sys.lcw?"alert":(sys.bsmL||sys.bsmR)?"warn":st.bsm?"on":""],[st.pilot?"PLT":"ACC",st.pilot?(sys.pilotState==="active"||sys.pilotState==="changing"?"on":"info"):st.acc?"on":""],
@@ -10576,7 +10854,7 @@ function hud(dt){
   else if(car.offroad){msg=`Off road · ${(car.gnd[0]&&car.gnd[0].kind)||"grass"}`;mc="warn"}
   else if(st.high&&(st.lights||st.night)&&st.matrix&&sys.masked){msg=`Matrix beam · ${sys.masked} car${sys.masked>1?"s":""} shaded`}
   else if(sys.over){msg=`Over the ${sys.limit} mph limit`;mc="warn"}
-  else if(H.f.reg>3e3){msg=`Regen ${Math.round(H.f.reg/1000)} kW`;mc="on"}
+  else if(H.f.reg>3e3){msg=`Regen ${hpN(H.f.reg/1000)} hp`;mc="on"}
   const me_=$("msg");me_.textContent=msg;me_.className=mc;
   $("brake").classList.toggle("pulse",car.abs&&inp.brk>0.05);
   const ts=$("tsr");$("tss").hidden=!(sys.stopSign&&sys.stopSign.d<60);ts.hidden=!sys.limit;if(sys.limit){ts.lastChild.textContent=sys.limit;ts.classList.toggle("over",!!sys.over)}
@@ -10636,7 +10914,7 @@ function drawEnergy(){
   const mode=H.refuel?"REFUELLING":H.charging?"PLUGGED IN":F.reg>3e3?"REGEN":eng&&H.eng&&F.batM>5e3?"ENGINE + EV":eng&&H.eng&&F.engB>3e3&&F.engW<2e3?"CHARGING":eng&&H.eng?"ENGINE":Math.abs(car.vx)>0.5||F.batM>1e3?"EV":"READY";
   sg.fillStyle=mode==="REGEN"||mode==="CHARGING"?"#55d68c":mode.startsWith("ENGINE")?"#ffb340":"#bff3ef";sg.fillText(mode,cx,24);
   sg.font="500 17px "+getComputedStyle(document.body).getPropertyValue("--f-hud");sg.fillStyle="#c9d4d6";
-  const kw=(F.engW+F.engB+F.batM-F.reg-(F.plug||0))/1000;sg.fillText(`${Math.round(soc*100)}% · ${kw>=0?"":"−"}${Math.abs(kw).toFixed(0)} kW`,cx,h-34);
+  const kw=(F.engW+F.engB+F.batM-F.reg-(F.plug||0))/1000;sg.fillText(`${Math.round(soc*100)}% · ${kw>=0?"":"−"}${hpN(Math.abs(kw))} hp`,cx,h-34);
   sg.fillStyle="#8fa1a6";sg.fillText(T.hybrid?`Fuel ${Math.round(H.fuel/H.tank*100)}% · ${Math.round(fuelRange())} mi${T.phev?` · EV ${Math.round(evRange())}`:""}`:`EV range ${Math.round(evRange())} mi`,cx,h-12);
   if(T.hybrid){const fx=w-16,fh=h-90;sg.fillStyle="#1d2b30";sg.fillRect(fx-5,40,10,fh);sg.fillStyle=H.fuel/H.tank<0.12?"#ff4d40":"#ffb340";sg.fillRect(fx-5,40+fh*(1-H.fuel/H.tank),10,fh*H.fuel/H.tank);
     sg.font="600 14px "+getComputedStyle(document.body).getPropertyValue("--f-hud");sg.fillText("F",fx,34);sg.fillText(H.refuel?"⛽":"E",fx,40+fh+16)}
@@ -10718,7 +10996,7 @@ function drawSensor(){if(isTesla()){vizTesla(sg,0,0,sensor.width,sensor.height,f
     const tq=clamp(car.drive[i]/maxF,-1.4,1.4);sg.fillStyle=tq>=0?"#bff3ef":"#ff4d40";sg.fillRect(x*px+(x<0?-9:5),y*scl+0.36*scl-Math.abs(tq)*0.7*scl,4,Math.abs(tq)*0.7*scl)});
   sg.restore();
   if(st.acc&&sys.accState==="following"&&sys.lead){const y=meY-sys.lead.ds*scl;sg.strokeStyle="rgba(85,214,140,.8)";sg.lineWidth=2;sg.beginPath();sg.moveTo(w/2,meY-2.6*scl);sg.lineTo(w/2,y+2.6*scl);sg.stroke()}
-  $("sensorCap").textContent=sys.lead&&sys.gap<120?`${sys.gap.toFixed(0)} m`:"Sensors";
+  $("sensorCap").textContent=sys.lead&&sys.gap<120?`${Math.round(sys.gap*3.281)} ft`:"Sensors";
 }
 function rr(x,y,w,h,r){sg.beginPath();sg.moveTo(x+r,y);sg.arcTo(x+w,y,x+w,y+h,r);sg.arcTo(x+w,y+h,x,y+h,r);sg.arcTo(x,y+h,x,y,r);sg.arcTo(x,y,x+w,y,r);sg.fill()}
 
@@ -10733,7 +11011,7 @@ function act(a){ {const T0=TRIMS[st.trim];if(T0.real&&!has(a)){toast(`The real $
     case "terrain":{const L=terrList();if(!L&&TRIMS[st.trim].terrain){const T=TRIMS[st.trim],L=T.terrain;const i=L.indexOf(terrM(T)),nx=L[(i+1)%L.length];if(T.terrSync){const j=L.indexOf(nx);st.mode=j>0?T.terrSync[j-1]:T.terrBase}else st.terrainM=nx;carMsg(`${terrSys(T)}: ${nx}`+(T.terrSync?` · ${MD().d}`:""));break}if(!L){toast("This car has no terrain select");break}st.terr=((st.terr||0)+1)%(L.o.length+1);toast(st.terr?`${L.sys}: ${L.o[st.terr-1]} · traction control lets the wheels slip ${TER[L.o[st.terr-1]].kt>0.15?"more":"less"} to find grip`:`${L.sys} off`);break}
     case "crawl":{if(!hasCrawl()){toast("This car has no Crawl Control");break}if(Math.abs(car.vx)>4.5){toast(`${crawlName()} works below 10 mph`);break}st.crawl=((st.crawl||0)+1)%6;toast(st.crawl?`${crawlName()} ${st.crawl}/5: holds ${["about 1","about 2","about 3","about 4","about 5"][st.crawl-1]} mph, feet off the pedals, you steer`:`${crawlName()} off`);break}
     case "dac":{if(!hasDAC()){toast("This car has no hill descent control");break}st.dac=!st.dac;toast(st.dac?"Downhill Assist on: holds about 5 mph going down hills below 15 mph":"Downhill Assist off");break}
-    case "mode":if((T.modes||1)<2){toast("This car has no drive mode selector");break}st.mode=(st.mode+1)%T.modes;carMsg(`Drive mode: ${modeName()} · ${MD().d}`+(T.height&&MD().height?` · lowered ${Math.round(-MD().height*1000)} mm`:""));break;
+    case "mode":if((T.modes||1)<2){toast("This car has no drive mode selector");break}st.mode=(st.mode+1)%T.modes;carMsg(`Drive mode: ${modeName()} · ${MD().d}`+(T.height&&MD().height?` · lowered ${inS(-MD().height*1000)}`:""));break;
     case "crab":if(T.crab){st.crab=!st.crab;toast(st.crab?"Crab walk on: below 18 mph all four wheels steer the same way":"Crab walk off")}else toast("Crab walk needs the Quad trim");break;
     case "aeb":st.aeb=!st.aeb;toast(st.aeb?"Automatic emergency braking on":"AEB off: you have to brake yourself");break;
     case "lka":st.lka=!st.lka;toast(st.lka?"Lane keep on (above 40 mph)":"Lane keep off");break;
@@ -10895,7 +11173,7 @@ function placeTest(kind){
 const TABS={
   car(){const T=TRIMS[st.trim];return `<div class="grid2"><button class="opt" data-build="1"><b>Change car</b><small>Model, trim, paint, wheels</small></button></div>
     <h3>Go to</h3><div class="grid2">${Object.entries(STARTS).map(([k,m])=>opt(`data-map="${k}"`,k===st.map,m.name,m.desc)).join("")}</div>
-    <h3>Drive mode</h3><div class="grid2">${Array.from({length:dmList()?T.modes:MODES.length},(_,i)=>opt(`data-mode="${i}"`,i===st.mode,modeName(i),dmList()?MD(i).d:["Soft throttle, normal height","Direct throttle"+(T.height?", −20 mm":""),"Loosest TCS/ESC"+(T.height?", −30 mm":"")][i],i>=T.modes)).join("")}</div>${(()=>{const S=mmSpec();if(!S)return "";const o=mmGet(),on=MD().type==="custom";return `<h3>My Mode settings${on?" · active now":""}</h3><div class="std">Set each one like the car's Drive Mode app (pencil icon). Pick <b>My Mode</b> above to drive with them.</div>`+S.map(([id,n,opts])=>`<div class="rcRow"><span>${n}</span><div class="seg5">${opts.map((x,i)=>`<button class="${o[id]===x?"on":""}" data-mym="${id}:${i}">${x}</button>`).join("")}</div></div>`).join("")})()}
+    <h3>Drive mode</h3><div class="grid2">${Array.from({length:dmList()?T.modes:MODES.length},(_,i)=>opt(`data-mode="${i}"`,i===st.mode,modeName(i),dmList()?MD(i).d:["Soft throttle, normal height","Direct throttle"+(T.height?", −0.8 in":""),"Loosest TCS/ESC"+(T.height?", −1.2 in":"")][i],i>=T.modes)).join("")}</div>${(()=>{const S=mmSpec();if(!S)return "";const o=mmGet(),on=MD().type==="custom";return `<h3>My Mode settings${on?" · active now":""}</h3><div class="std">Set each one like the car's Drive Mode app (pencil icon). Pick <b>My Mode</b> above to drive with them.</div>`+S.map(([id,n,opts])=>`<div class="rcRow"><span>${n}</span><div class="seg5">${opts.map((x,i)=>`<button class="${o[id]===x?"on":""}" data-mym="${id}:${i}">${x}</button>`).join("")}</div></div>`).join("")})()}
     <h3>HUD size</h3><div class="grid2">${[[0.7,"Small"],[0.82,"Medium"],[0.92,"Large"],[1,"Extra large"]].map(([v,n])=>opt(`data-a="uiz:${v}"`,Math.abs((st.uiz||(PC.on?0.82:0.85))-v)<0.04,n,v===0.82?"Default":"")).join("")}${opt(`data-a="uihide"`,document.body.classList.contains("uihide"),"Hide the HUD","Eye button top left, or F2")}</div>
     <h3>HUD look</h3><div class="grid2">${opt(`data-a="uilook:glass"`,st.uilook!=="solid","Glass","See-through frosted panels")}${opt(`data-a="uilook:solid"`,st.uilook==="solid","Solid","Opaque dark panels, no blur. Easier to read, lighter on older devices")}</div>
     <h3>Your character</h3><div class="grid2">${[["Adult_Man","Man","On foot and at the wheel"],["Adult_Woman","Woman","On foot and at the wheel"]].map(([k,n,d])=>opt(`data-a="char:${k}"`,PLAYER_MK===k,n,d)).join("")}</div>
@@ -10958,8 +11236,8 @@ TABS.controls=()=>{const T=TRIMS[st.trim],H=car.hyb,ev=!T.ice&&!T.hybrid,o=(attr
   <h3>Load · ${Math.round(T.mass+loadKg())} kg total</h3><div class="grid2">
    </div>${(T.ice||T.hybrid)?`<label class="slRow"><span>⛽ Fuel</span><input type="range" min="1" max="100" step="1" data-sl="fuel" value="${Math.round(fl*100)}"><b id="sl_fuel">${Math.round(fl*100)}%</b></label>`:""}
    ${(ev||T.plug||T.hybrid&&!T.ice)?`<label class="slRow"><span>⚡ ${T.plug?"Battery":"Charge"}</span><input type="range" min="1" max="100" step="1" data-sl="chg" value="${Math.round(lv*100)}"><b id="sl_chg">${Math.round(lv*100)}%</b></label>`:""}
-  <div class="grid2">${[0,80,160,320].map(k=>o(`data-set="cargoKg:${k}"`,(st.cargoKg||0)===k,k?`Cargo ${k} kg`:"No cargo",k?"Boxes in the back: heavier, slower, softer":"")).join("")}</div>
-  <div class="grid2">${[0,1,2,3,4].map(k=>o(`data-set="dummies:${k}"`,(st.dummies||0)===k,k?`${k} test ${k>1?"dummies":"dummy"}`:"No passengers","")).join("")}${[50,75,100,120].map(k=>o(`data-set="dummyKg:${k}"`,(st.dummyKg||75)===k,`Dummy ${k} kg`,"")).join("")}</div>`}
+  <div class="grid2">${[0,80,160,320].map(k=>o(`data-set="cargoKg:${k}"`,(st.cargoKg||0)===k,k?`Cargo ${Math.round(k*2.205)} lb`:"No cargo",k?"Boxes in the back: heavier, slower, softer":"")).join("")}</div>
+  <div class="grid2">${[0,1,2,3,4].map(k=>o(`data-set="dummies:${k}"`,(st.dummies||0)===k,k?`${k} test ${k>1?"dummies":"dummy"}`:"No passengers","")).join("")}${[50,75,100,120].map(k=>o(`data-set="dummyKg:${k}"`,(st.dummyKg||75)===k,`Dummy ${Math.round(k*2.205)} lb`,"")).join("")}</div>`}
 TABS.world=()=>`<h3>Calendar · ${calFmt(null,true)}</h3>${calHtml()}<div class="grid2">${[["day","1 day"],["week","1 week"],["month","1 month"],["year","1 year"]].map(([k,l])=>`<button class="opt" data-a="skip_${k}"><b>⏩ Skip ${l}</b><small>Payments, leases, the used-car lot and car wear move on</small></button>`).join("")}</div>`+ALLS().filter(p=>secOf(p)==="world").join("");
 TABS.cars=()=>ALLS().filter(p=>secOf(p)==="cars").join("");
 TABS.assists=()=>ALLS().filter(p=>secOf(p)==="assists").join("")+sfHtml()+ownHtml();
@@ -10999,7 +11277,7 @@ TABS.spawn=()=>`<div class="grid2"><button class="opt" data-a="resetPos"><b>↺ 
 function slSet(k,n){const H=car.hyb,T=TRIMS[st.trim];if(k==="fuel")H.fuel=H.tank*n;else if(k==="chg"){if(T.plug)H.pb=n;else H.soc=socRaw(n)}}
 document.addEventListener("input",e=>{const el=e.target;if(!el||!el.dataset||!el.dataset.sl)return;const k=el.dataset.sl,n=clamp(+el.value/100,0.01,1);slSet(k,n);const b=document.getElementById("sl_"+k);if(b)b.textContent=Math.round(n*100)+"%"});
 function setSearchApply(){const q=($("setSearch")&&$("setSearch").value||"").trim().toLowerCase();document.querySelectorAll("#tabBody .opt,#tabBody .cRow,#tabBody .slRow").forEach(el=>{el.style.display=!q||el.textContent.toLowerCase().includes(q)?"":"none"})}
-function renderTab(){if(!["graphics","world","cars","features","controls","assists","sound","online","spawn","tests","log"].includes(st.tab))st.tab="cars";$("tabBody").innerHTML=TABS[st.tab]();setSearchApply();document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t.dataset.tab===st.tab))}
+function renderTab(){if(!["graphics","world","cars","features","controls","assists","sound","online","spawn","tests","log"].includes(st.tab))st.tab="cars";$("tabBody").innerHTML=impText(TABS[st.tab]());setSearchApply();document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t.dataset.tab===st.tab))}
 function openDrawer(){renderTab();$("drawer").hidden=false}
 function closeDrawer(){$("drawer").hidden=true}
 $("tabs").addEventListener("click",e=>{const t=e.target.closest(".tab");if(t){st.tab=t.dataset.tab;renderTab()}});
@@ -11009,7 +11287,7 @@ $("tabBody").addEventListener("click",e=>{const b=e.target.closest("button");if(
   else if(d.spawn!==undefined){const n=+d.spawn;if(n===0){cars=cars.filter(c=>c.kind!=="ai");toast("Traffic cleared")}else{spawnTraffic(n);toast(`${n} AI cars added`)}}
   else if(d.aebs){st.aebSens=d.aebs;toast(`Collision warning: ${d.aebs}`)}
   else if(d.set){const [k,v]=d.set.split(":"),n=+v,H=car.hyb,T=TRIMS[st.trim];if(k==="fuel"){H.fuel=H.tank*n;toast(`Fuel set to ${n*100}%`)}else if(k==="chg"){if(T.plug)H.pb=n;else H.soc=socRaw(n);toast(`Charge set to ${n*100}%`)}else{st[k]=n;if(k==="wheelUI")document.body.classList.toggle("wheelMode",!!n)}
-    if(k==="cargoKg"||k==="dummies"||k==="dummyKg"){car.cargo=loadKg();toast(`Load: ${loadKg()} kg`)}}
+    if(k==="cargoKg"||k==="dummies"||k==="dummyKg"){car.cargo=loadKg();toast(`Load: ${Math.round(loadKg()*2.205)} lb`)}}
   else if(d.rch!==undefined||d.rcb!==undefined){if(d.rch!==undefined)ROADC.holes=+d.rch;if(d.rcb!==undefined)ROADC.bumps=+d.rcb;try{localStorage.setItem("strata.roadc",JSON.stringify(ROADC))}catch(e){}genBumps();SCN.bumps=bumpMesh();toast(`Road condition: potholes ${ROADC_N[ROADC.holes].toLowerCase()}, bumps ${ROADC_N[ROADC.bumps].toLowerCase()}`);renderTab()}
   else if(d.mir!==undefined){st.mirrors=d.mir==="1";toast(st.mirrors?"Realistic mirrors on":"Simple mirrors")}else if(d.gfx){setGfx(d.gfx);toast(`Graphics: ${GFX.q==="auto"?"Auto":G().label}. Traffic amount changes next time you add cars`)}else if(d.regen!==undefined){st.regen=+d.regen;act("noop")}else if(d.ev!==undefined){st.engVol=+d.ev}else if(d.wx){setWeather(d.wx,true);toast(`Weather: ${d.wx}`)}else if(d.evf){st.events=d.evf;EV.t=Math.min(EV.t,20)}else if(d.ppl){st.people=st.people===false;if(st.people===false){peds=[];cars=cars.filter(c=>c.kind!=="bike")}else spawnBikes(Math.max(2,Math.round(G().traffic/6)))}else if(d.build){closeDrawer();openBuilder();return}else if(d.test)placeTest(d.test);else if(d.reset){const M=me();resetCar(M.s,laneOf(M.off));closeDrawer()}
   renderTab()});
@@ -11258,7 +11536,7 @@ function paUpdate(dt){const A=sys.pa;if(!A)return null;
     else if(A.ph==="adj"){const d=relS(M.s,A.sT);st.gear=d>0.15?"D":d<-0.15?"R":st.gear;const fwd=st.gear==="D";
       steer=clamp((fwd?1:-1)*(2.5*he+0.6*(M.off-A.oT)),-0.6,0.6);vt=Math.abs(d)>0.15?clamp(Math.abs(d)*0.6,0.25,0.7):0;A.msg="Centring";
       if((fwd&&fr<0.45)||(!fwd&&rr<0.45))vt=0;
-      if((vt===0)&&Math.abs(v)<0.03){paStop(`Parked: ${Math.min(fr,rr).toFixed(1)} m clearance, ${Math.abs(M.off-A.oT).toFixed(2)} m from the kerb line`,true);return null}}}
+      if((vt===0)&&Math.abs(v)<0.03){paStop(`Parked: ${ftS(Math.min(fr,rr))} clearance, ${Math.abs(M.off-A.oT).toFixed(2)} m from the kerb line`,true);return null}}}
   else if(A.type==="perp"){
     if(A.ph==="pos"){st.gear="D";const o=ppSteer(A,A.fp,A.fc,3.2);steer=o.steer;vt=clamp(o.left*0.45,0,2.0);A.msg="Positioning";if(fr<0.5)vt=0;
       if(o.left<0.12&&Math.abs(v)<0.05){A.ph="rev";A.idx=0}}
@@ -11269,7 +11547,7 @@ function paUpdate(dt){const A=sys.pa;if(!A)return null;
         const axis=Math.atan2(-A.u[1],-A.u[0]),he_=wrapPi(car.psi-axis),cx=car.px,cy=car.py,lat=(cx-A.t.x)*(-A.u[1])+(cy-A.t.y)*A.u[0];
         if((Math.abs(he_)>0.06||Math.abs(lat)>0.28)&&A.tries<3&&fr>1.2){A.tries++;A.ph="fix";const r0=rearAx(),F=[A.E[0]-A.u[0]*1.6,A.E[1]-A.u[1]*1.6];const fpts=[];for(let q=0;q<=1.0001;q+=0.05){const e=q*q*(3-2*q);fpts.push([r0[0]+(F[0]-r0[0])*q+(-A.u[0])*0*e,r0[1]+(F[1]-r0[1])*q])}
           A.xp=fpts;A.xc=cumOf(fpts);A.idx=0;A.msg=`Adjusting (${A.tries})`}
-        else{paStop(`Parked in the stall${rr<3?`: ${rr.toFixed(1)} m behind you`:""}${A.tries?`, after ${A.tries} adjustment${A.tries>1?"s":""}`:""}`,true);return null}}}}
+        else{paStop(`Parked in the stall${rr<3?`: ${ftS(rr)} behind you`:""}${A.tries?`, after ${A.tries} adjustment${A.tries>1?"s":""}`:""}`,true);return null}}}}
     else if(A.ph==="fix"){st.gear="D";const o=ppSteer(A,A.xp,A.xc,1.6);steer=o.steer;vt=clamp(o.left*0.45,0,0.7);if(fr<0.5)vt=0;A.msg=`Adjusting (${A.tries})`;
       if((o.left<0.15||fr<0.5)&&Math.abs(v)<0.04){const r0=rearAx(),depth=(A.t.x+A.u[0]*(2.9-0.25+B-2.9)-r0[0])*A.u[0]+(A.t.y+A.u[1]*(2.9-0.25+B-2.9)-r0[1])*A.u[1];
         const rp=[];const end=[A.t.x+A.u[0]*(B-0.25),A.t.y+A.u[1]*(B-0.25)];for(let q=0;q<=1.0001;q+=0.04)rp.push([r0[0]+(end[0]-r0[0])*q,r0[1]+(end[1]-r0[1])*q]);A.rp=rp;A.rc=cumOf(rp);A.idx=0;A.ph="rev"}}}
@@ -11277,7 +11555,7 @@ function paUpdate(dt){const A=sys.pa;if(!A)return null;
     const last=A.si===A.segs.length-1;A.msg=last?(left>2?"Reversing in":"Straightening"):`${rev?"Reversing":"Pulling forward"} (move ${A.si+1} of ${A.segs.length})`;
     const lag=Math.abs(car.dF-(-(0.35*Math.abs(steer)+0.65*steer*steer)*Math.sign(steer)*0.576));vt=Math.abs(v)<0.1&&lag>0.08?0:clamp(left*0.45,0.2,lag>0.12?0.2:0.55);
     if((!rev&&fr<0.1)||(rev&&rr<0.1))vt=0;if(!rev&&fr<0.6||rev&&rr<0.6)vt=Math.min(vt,0.3);
-    if(left<0.1){vt=0;if(Math.abs(v)<0.04){if(last){paStop(`Parked in the stall${A.segs.length>1?` (${A.segs.length}-point turn)`:""}${rr<3?`: ${rr.toFixed(1)} m behind you`:""}`,true);return null}A.si++;A.idx=0}}
+    if(left<0.1){vt=0;if(Math.abs(v)<0.04){if(last){paStop(`Parked in the stall${A.segs.length>1?` (${A.segs.length}-point turn)`:""}${rr<3?`: ${ftS(rr)} behind you`:""}`,true);return null}A.si++;A.idx=0}}
     A.stuck=vt===0&&Math.abs(v)<0.03&&left>=0.1?A.stuck+dt:0;
     if(A.stuck>1.5){A.stuck=0;const L=A.replans<3?planPerpH(A.t,150000,true):null;if(L){A.replans++;A.segs=L.segs;A.si=0;A.idx=0}else{paStop("Park assist stopped: not enough room",false);return null}}}
   else if(A.type==="exit"){
@@ -11296,7 +11574,7 @@ function paUpdate(dt){const A=sys.pa;if(!A)return null;
   else{const pts=A.path,o=ppSteer(A,pts,A.cum,A.cum[A.cum.length-1]-A.cum[A.idx]<5?2.4:3.4),left=o.left;
     st.gear="D";steer=o.steer;vt=clamp(left*0.5,0,3.4);A.msg="Pulling into bay "+(A.bay+1);
     if(fr<0.45)vt=0;
-    if((left<0.3||fr<0.45)&&Math.abs(v)<0.03){paStop(`Parked in bay ${A.bay+1}: ${fr.toFixed(1)} m from the charger`,true);return null}}
+    if((left<0.3||fr<0.45)&&Math.abs(v)<0.03){paStop(`Parked in bay ${A.bay+1}: ${ftS(fr)} from the charger`,true);return null}}
   // speed control that copes with ramps: speed is measured in the direction of the gear (rolling back counts as negative),
   // an integral term finds the extra throttle a slope needs, and the brake holds the car while it builds
   const dirS=st.gear==="R"?-1:1,sp=v*dirS,err=vt-sp;
@@ -11556,7 +11834,7 @@ const VRM={open:false,cv:null,g:null,tex:null,dirty:true,hov:-1,poke:0,tabW:null
 const VRM_ITEMS=()=>[["Recenter seat",()=>"",()=>{XR.o=null;toast0("Seat recentered")}],["View",()=>st.cam===1?"Driver":"Outside",()=>{st.cam=st.cam===1?0:1;XR.o=null}],
   ["Seat height",()=>({"-0.05":"Low","0":"Middle","0.06":"High","0.12":"Higher","0.18":"Highest"})[String(st.seatH||0)]||"Custom",()=>{const L=[-0.05,0,0.06,0.12,0.18],i=L.indexOf(st.seatH||0);st.seatH=L[(i+1)%L.length];XR.o=null}],
   ["Haptics",()=>st.haptic===0?"Off":"On",()=>{st.haptic=st.haptic===0?null:0}],["Graphics",()=>GFX.q,()=>{const L=Object.keys(GQ),i=L.indexOf(GFX.q);setGfx(L[(i+1)%L.length])}],
-  ["Units",()=>st.units==="mph"?"mph":"km/h",()=>{st.units=st.units==="mph"?"kmh":"mph"}],["Manual gearbox",()=>st.manual?"On":"Off",()=>{try{if(manOK())act("manual")}catch(e){}}],
+  ["Manual gearbox",()=>st.manual?"On":"Off",()=>{try{if(manOK())act("manual")}catch(e){}}],
   ["Wipers",()=>["Off","Intermittent","Low","High"][SAFE.wipMode||0],()=>{try{sfWiperCycle()}catch(e){}}],["Exit VR",()=>"",()=>{VRM.open=false;xrToggle()}]];
 function vrmPaint(){if(!VRM.cv){VRM.cv=document.createElement("canvas");VRM.cv.width=640;VRM.cv.height=440;VRM.g=VRM.cv.getContext("2d")}const g=VRM.g,I=VRM_ITEMS();
   g.fillStyle="#0b1316";g.fillRect(0,0,640,440);g.fillStyle="#2bb3a3";g.font="700 30px system-ui,sans-serif";g.textAlign="left";g.textBaseline="middle";g.fillText("Mission Strata VR",28,40);g.fillStyle="#9fb0b4";g.font="500 17px system-ui,sans-serif";g.fillText("Point and pull the trigger, or touch a button",28,74);
@@ -12644,7 +12922,7 @@ function ownHtml(){const T=TRIMS[st.trim],r=[];const o=(attr,on,b,s)=>opt(attr,o
   if(A){const sel=OWN.air[st.trim]??2;h+=`<h3>${A.sys}</h3><div class="grid2">${A.L.map(([n,v,x],i)=>o(`data-own="air:${i}"`,sel===i,`${n} (${v>0?"+":""}${(v*39.37).toFixed(1)} in.)`,x==="park"?"Lowers itself when you park and get out":x==="hwy"?"Drops automatically above 55 mph":typeof x==="number"?`Up to ${x} mph`:"Everyday height")).join("")}</div><p class="note">Right now: ${OWN.airNow||"Normal"}</p>`}
   if(nv||rm||cg||pm){h+=`<h3>More car features</h3><div class="grid2">${nv?o('data-own="nv"',OWN.nv,nv,"Thermal picture at night with people and animals boxed in yellow"):""}${rm?o('data-own="rm"',st["sf_rm"]!==false,rm,"Blips the engine on manual downshifts"):""}${cg?o('data-own="guard"',isTesla()?!!TSL.sentry:OWN.guard,cg,"Cameras watch the parked car, flash the lights and save a clip"):""}${pm?o('data-own="pet"',isTesla()?!!TSL.dog:OWN.pet,pm,"Keeps the cabin at 70°F for your dog and says so on the screen"):""}</div>`}
   const P=portSideNow(),an=alarmName(),dn=dashName()||(hasDash()?"Dashcam":""),ota=otaBrand(),O=OWN.ota[st.trim]||{},R=OWN.rec[st.trim]||{},n=fuelNeed(),oc=OWN.oct[st.trim];
-  h+=`<h3>Your car</h3><p class="note">🌡️ Outside ${ambF()}°F${heatWave()?" (heat advisory)":""} · engine ${(T.ice||T.hybrid)?Math.round(OWN.ct)+" °C":"electric"}${OWN.acCut?" · A/C off to cool the engine":""}<br>⛽ ${(T.ice||T.hybrid)?`Fuel: ${n==="required"?"premium required":n==="recommended"?"regular OK, premium recommended":n}${oc!=null?` · in the tank now: ${Math.round(oc)} octane`:""}`:"Electric"}${P?` · ${(T.ice||T.hybrid)?"fuel door":"charge port"} on the ${P.s<0?"driver's side":P.s>0?"passenger side":"front"}${P.at&&P.at!=="nose"?" "+P.at:""}`:""}<br>🛞 Alignment: ${Math.abs(alignOf())>0.001?`off, pulls to the ${alignOf()<0?"right":"left"}`:"good"}<br>🚨 Theft alarm${an?` with ${an} alerts`:""}${dn?` · 🎥 ${dn}: replays after crashes and near misses (F8 replays the last 30 s)`:" · no dashcam (add one at the dealer)"}<br>🛣️ Toll tag: ${OWN.tag?"E-ZPass on the windshield":"none (tolls get billed by plate with a $5 fee)"}<br>🛡️ Insurance: ${st.noIns?"none":`${money2(insWeekly(PRICE[st.trim]||30000))}/week · ${OWN.ins.claims.length} claim(s), ${OWN.ins.tickets.length} ticket(s)`}<br>📡 ${ota?`${ota}${O.pend?": an update is waiting":` · up to date${O.v?` (${O.v} installed)`:""}`}`:"No over-the-air updates on this car"}${R.open?`<br>⚠️ Open recall: ${(RECALLS.find(x=>x[0]===R.open)||[])[1]} · free fix at Tread Center's service bay`:""}</p>`;
+  h+=`<h3>Your car</h3><p class="note">🌡️ Outside ${ambF()}°F${heatWave()?" (heat advisory)":""} · engine ${(T.ice||T.hybrid)?degF(OWN.ct)+"°F":"electric"}${OWN.acCut?" · A/C off to cool the engine":""}<br>⛽ ${(T.ice||T.hybrid)?`Fuel: ${n==="required"?"premium required":n==="recommended"?"regular OK, premium recommended":n}${oc!=null?` · in the tank now: ${Math.round(oc)} octane`:""}`:"Electric"}${P?` · ${(T.ice||T.hybrid)?"fuel door":"charge port"} on the ${P.s<0?"driver's side":P.s>0?"passenger side":"front"}${P.at&&P.at!=="nose"?" "+P.at:""}`:""}<br>🛞 Alignment: ${Math.abs(alignOf())>0.001?`off, pulls to the ${alignOf()<0?"right":"left"}`:"good"}<br>🚨 Theft alarm${an?` with ${an} alerts`:""}${dn?` · 🎥 ${dn}: replays after crashes and near misses (F8 replays the last 30 s)`:" · no dashcam (add one at the dealer)"}<br>🛣️ Toll tag: ${OWN.tag?"E-ZPass on the windshield":"none (tolls get billed by plate with a $5 fee)"}<br>🛡️ Insurance: ${st.noIns?"none":`${money2(insWeekly(PRICE[st.trim]||30000))}/week · ${OWN.ins.claims.length} claim(s), ${OWN.ins.tickets.length} ticket(s)`}<br>📡 ${ota?`${ota}${O.pend?": an update is waiting":` · up to date${O.v?` (${O.v} installed)`:""}`}`:"No over-the-air updates on this car"}${R.open?`<br>⚠️ Open recall: ${(RECALLS.find(x=>x[0]===R.open)||[])[1]} · free fix at Tread Center's service bay`:""}</p>`;
   if(O.pend)h+=`<div class="grid2">${o('data-own="ota"',false,"⬇️ Install the update","About 30 seconds, parked")}</div>`;
   if(!OWN.tag)h+=`<div class="grid2">${o('data-own="tag"',false,"🛣️ Get an E-ZPass tag · $10","Drive through the E-ZPass lanes at the toll plaza without stopping")}</div>`;
   if(OWN.clips.length||RPL.buf.length>20)h+=`<h3>Replays</h3><div class="grid2">${OWN.clips.map((c,i)=>o(`data-own="rp:${i}"`,false,"▶ "+c.what,c.t)).join("")}${o('data-own="rp:-1"',false,"▶ Last 30 seconds","F8")}</div>`;
@@ -12714,7 +12992,7 @@ function valetInto(){if(!VALET.on)return;if(!DMAT.vMark){DMAT.vMark=[[1,0.8,0.1]
 function valetCard(){const S=valetStandPt(),T=VALET.task;let h="";
   if(!VALET.on)return h+`<div class="card"><small>🔑 Westport Valet · Cass Ave garage</small><b>Valet parking</b><span>Guests pull up at the stand outside the garage. Park their cars in free stalls and bring them back when they leave. $7 a car plus tips for speed; dents come out of your pay. 15 mph max in the garage.</span></div><button class="big" data-a="v_start">Start a shift</button>`;
   const P=st.walk?{x:st.walk.x,y:st.walk.y}:{x:car.px,y:car.py},d=S?Math.round(Math.hypot(S.x-P.x,S.y-P.y)):0;
-  h+=`<div class="card"><small>🔑 On shift · ${VALET.cars} cars · ${money2(VALET.earned)}</small><b>${VALET.cur?(T&&T.type==="fetch"?`Bring ticket #${T.rec.ticket} to the stand`:`Park ${T&&T.rec?T.rec.who+"'s car":"the car"} in a free stall`):T?(T.type==="park"?`${T.rec.who} is waiting with a ${TRIMS[T.rec.trim].short||TRIMS[T.rec.trim].name}`:`Ticket #${T.rec.ticket}: level ${T.rec.level}`):d>45?"Walk to the valet stand":"Waiting for the next guest…"}</b><span>${d} m from the stand${VALET.lot.length?` · in the garage: ${VALET.lot.map(r=>`#${r.ticket} (L${r.level})`).join(", ")}`:""}</span>
+  h+=`<div class="card"><small>🔑 On shift · ${VALET.cars} cars · ${money2(VALET.earned)}</small><b>${VALET.cur?(T&&T.type==="fetch"?`Bring ticket #${T.rec.ticket} to the stand`:`Park ${T&&T.rec?T.rec.who+"'s car":"the car"} in a free stall`):T?(T.type==="park"?`${T.rec.who} is waiting with a ${TRIMS[T.rec.trim].short||TRIMS[T.rec.trim].name}`:`Ticket #${T.rec.ticket}: level ${T.rec.level}`):d>45?"Walk to the valet stand":"Waiting for the next guest…"}</b><span>${ftS(d)} from the stand${VALET.lot.length?` · in the garage: ${VALET.lot.map(r=>`#${r.ticket} (L${r.level})`).join(", ")}`:""}</span>
     <div class="chips"><button data-a="v_nav">Navigate to the stand</button><button data-a="v_run">Run there</button><button data-a="v_end">End shift</button></div></div>`;return h}
 function valetAct(a){if(a==="v_start")valetStart();else if(a==="v_end")valetEnd();else if(a==="v_run")valetRun();else if(a==="v_nav"){const S=valetStandPt();if(S)navTo({x:S.x,y:S.y,h:S.h,name:"Valet stand"})}}
 
@@ -12777,9 +13055,9 @@ function susDraw(full){const el=$("susUI"),T=tuneCur(),on=!!T.co,S=on?{...SUS_DE
       <div class="suGrid">${sl("drop")}<span></span>${sl("kf")}${sl("kr")}${sl("df")}${sl("dr")}${sl("af")}${sl("ar")}${sl("cf")}${sl("cr")}</div>
       <div class="suR">${SUS_UI.xray?`<button data-s="vw:F"${SUS_UI.wheel==="F"?' class="suOn"':""}>Front wheel</button><button data-s="vw:R"${SUS_UI.wheel==="R"?' class="suOn"':""}>Rear wheel</button><button data-s="unview">Back to the diagram</button>`:`<button data-s="view">👀 See it on the car</button><button data-s="remove">Refit stock suspension</button>`}<button class="suGo" data-s="close">Done</button></div>`
       :`<p class="fine">Your car is on its stock suspension${T.low?" with lowering springs":""}. Adjustable coilovers let you set ride height, springs, dampers, anti-roll bars and camber, front and rear.</p><div class="suR"><button class="suGo" data-s="buy">Fit adjustable coilovers · ${money(1800)}</button></div>`}</div>`}
-  for(const k of Object.keys(SUS_RANGE)){const v=$("susV_"+k);if(!v)continue;const x=S[k];v.textContent=k==="drop"?(x>=0?`${x} mm lower`:`${-x} mm higher`):k[0]==="c"?`−${x.toFixed(1)}°`:`${Math.round(x*100)}%`}
+  for(const k of Object.keys(SUS_RANGE)){const v=$("susV_"+k);if(!v)continue;const x=S[k];v.textContent=k==="drop"?(x>=0?`${inS(x)} lower`:`${inS(-x)} higher`):k[0]==="c"?`−${x.toFixed(1)}°`:`${Math.round(x*100)}%`}
   const st_=susStats(S),sEl=$("susSt");if(sEl){const balTxt=st_.bal>0.03?"more understeer (pushes wide)":st_.bal<-0.03?"more oversteer (rear steps out)":"neutral, like stock";
-    sEl.innerHTML=`<span>Ride <b>${st_.ff.toFixed(2)} / ${st_.fr.toFixed(2)} Hz</b></span><span>Body roll at 0.8 g <b>${st_.roll.toFixed(1)}°</b> <small>(stock ${st_.stockRoll.toFixed(1)}°)</small></span><span>Ground clearance <b>${st_.clear} mm</b></span><span>Balance <b>${balTxt}</b></span>`}
+    sEl.innerHTML=`<span>Ride <b>${st_.ff.toFixed(2)} / ${st_.fr.toFixed(2)} Hz</b></span><span>Body roll at 0.8 g <b>${st_.roll.toFixed(1)}°</b> <small>(stock ${st_.stockRoll.toFixed(1)}°)</small></span><span>Ground clearance <b>${inS(st_.clear)}</b></span><span>Balance <b>${balTxt}</b></span>`}
   const cv=$("susCv");if(!cv)return;const narrow=el.clientWidth<620;if(full){cv.width=narrow?450:880;cv.height=narrow?740:380}const g=cv.getContext("2d"),W=cv.width,H=380;g.clearRect(0,0,cv.width,cv.height);g.fillStyle="#0d181c";g.fillRect(0,0,cv.width,cv.height);
   // ---- side view (left half): body, wheels, springs; nose to the right
   const gy=H-46,dropPx=S.drop*0.55,rollDeg=st_.roll;
@@ -12793,7 +13071,7 @@ function susDraw(full){const el=$("susUI"),T=tuneCur(),on=!!T.co,S=on?{...SUS_DE
       g.strokeStyle="#f2c94c";g.lineWidth=lw;g.beginPath();for(let q=0;q<=turns*10;q++){const t=q/(turns*10),y=top+(bot-top)*t,xx=x+Math.sin(t*turns*2*Math.PI)*9;q?g.lineTo(xx,y):g.moveTo(xx,y)}g.stroke();
       g.fillStyle="#111";g.beginPath();g.arc(x,gy-wr,wr,0,7);g.fill();g.fillStyle="#9aa6aa";g.beginPath();g.arc(x,gy-wr,wr*0.55,0,7);g.fill()}
     g.fillStyle="#9fb0b4";g.font="600 15px system-ui";g.textAlign="center";g.fillText("SIDE",x0+w/2,24);
-    g.fillStyle="#8ee6da";g.font="600 13px system-ui";g.fillText(S.drop>=0?`${S.drop} mm lower`:`${-S.drop} mm higher`,x0+w/2,44)};
+    g.fillStyle="#8ee6da";g.font="600 13px system-ui";g.fillText(S.drop>=0?`${inS(S.drop)} lower`:`${inS(-S.drop)} higher`,x0+w/2,44)};
   side(narrow?10:16,430);g.save();if(narrow)g.translate(-475,360);
   // ---- front view (right half), leaning as it would in a hard right-hand corner, wheels showing camber
   const fx0=500,fw=360,cx=fx0+fw/2,wr=36,tw=150,cam=S.cf*Math.PI/180*3.2,roll=rollDeg*Math.PI/180*3,body=gy-2*wr-6+dropPx;
