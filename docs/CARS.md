@@ -1462,3 +1462,8 @@ Specs: The Truth About Cars 2026 Grand Cherokee L review (trim prices incl. dest
 
 Kia bodies (v138): K4 hatchback, Seltos, Sportage, Sorento, Telluride, Carnival, Niro Hybrid, Niro EV, EV6 and EV9 were replaced with the Kia lineup pack (glass roofs tinted dark). The EV3, Soul, Optima and 2007 Sportage keep their old bodies.
 Kia Terrain Mode (Snow/Mud/Sand) added to the AWD Sorento, Sportage, EV6 and EV9 trims.
+
+## Batch 11 (Oct 25 2026)
+- **Ford F-150 · 2022** (`f150_22` model, uploaded XLT SuperCrew 5.5 ft): `f150_22_xl`, `f150_22_stx`, `f150_22_xlt`, `f150_22_lariat`, `f150_22_kr`, `f150_22_plat`, `f150_22_ltd` (PowerBoost), `f150_22_tremor`, `f150_22_raptor`. Engines per Edmunds; prices estimated. Data: `tools/research/f150_22.py`.
+- **Genesis / Chevrolet Bolt / Malibu / Nissan Altima**: full US lineups, drive modes, suspension and packages (`tools/research/new_batch11.py`). `gen_g90_35t` stays the 409 hp e-SC; the 375 hp G90 is `gen_g90_35t_std`. `gen_gv80c_35t` stays the e-SC coupe; the 375 hp coupe is `gen_gv80c_35ta`.
+- Apply both with `python3 tools/research/apply_batch11.py` (already applied).
