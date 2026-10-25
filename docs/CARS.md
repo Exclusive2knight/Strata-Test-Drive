@@ -1467,3 +1467,9 @@ Kia Terrain Mode (Snow/Mud/Sand) added to the AWD Sorento, Sportage, EV6 and EV9
 - **Ford F-150 · 2022** (`f150_22` model, uploaded XLT SuperCrew 5.5 ft): `f150_22_xl`, `f150_22_stx`, `f150_22_xlt`, `f150_22_lariat`, `f150_22_kr`, `f150_22_plat`, `f150_22_ltd` (PowerBoost), `f150_22_tremor`, `f150_22_raptor`. Engines per Edmunds; prices estimated. Data: `tools/research/f150_22.py`.
 - **Genesis / Chevrolet Bolt / Malibu / Nissan Altima**: full US lineups, drive modes, suspension and packages (`tools/research/new_batch11.py`). `gen_g90_35t` stays the 409 hp e-SC; the 375 hp G90 is `gen_g90_35t_std`. `gen_gv80c_35t` stays the e-SC coupe; the 375 hp coupe is `gen_gv80c_35ta`.
 - Apply both with `python3 tools/research/apply_batch11.py` (already applied).
+
+## Audi Q5 · 2025 (q5_25, new model)
+Third-generation Q5 SUV, imported from the uploaded Audi_Q5_2025.zip (procedural approximation). `tools/research/q5_25.py` builds and applies the trims.
+- Q5 Premium / Premium Plus / Prestige: 2.0 TFSI 268 hp / 295 lb-ft, 7-speed S tronic, quattro; $52,200 / $56,700 / $60,600 (Autoblog).
+- SQ5 Premium / Premium Plus / Prestige: 3.0 TFSI V6 MHEV 362 hp / 406 lb-ft; prices estimated ($63,800 / $67,600 / $72,500).
+- Status: estimate. Sportback bodies not added (no model).
