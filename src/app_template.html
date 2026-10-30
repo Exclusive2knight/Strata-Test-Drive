@@ -1262,6 +1262,7 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
   <div class="nc">
     <div class="nh"><small>What's new</small><h2>Version 173 · A brand new look, cruise button, real Tesla visualization</h2></div>
     <div class="nb">
+      <h4>🚫 No parking zones</h4><ul><li>The parking garage entrance and exit are clear again: no more parked cars or parking meters in front of the gates.</li><li>No parking in front of parking lots and drive-thru entrances, plus red-kerb stretches with NO PARKING signs around town. Park on a red kerb and you get a warning, then a $50 ticket after a minute.</li></ul>
       <h4>🎨 Graphics settings, RAV4 gauges and a mini car on your screens</h4><ul><li><b>New Ultra graphics</b> and a full <b>custom graphics</b> section (Settings › Graphics): resolution, view distance, traffic detail, trees, car shadows, mirror/screen refresh, anti-aliasing (MSAA or FXAA), ambient occlusion, bloom, light rays, depth of field, motion blur (and whether your own car blurs) and Simple/Full lighting. Picking a preset resets the custom rows.</li><li><b>Your own car on the screens:</b> the Tesla visualization and the assist view now show a real mini model of your car in your paint, with headlights, brake lights and blinkers lighting up. On a Tesla, shift to Park and the car swings round to a studio view with Open Frunk / Open Trunk, the lock and the charge port.</li><li><b>2019 RAV4 gauges redone from real photos:</b> LE/XLE get two real dials (tachometer, or the hybrid CHG/ECO/PWR meter) with the small screen in the middle; Limited, Adventure and XSE Hybrid get the 7-in. screen on the left and a real speedometer. The middle screen shows the lane lines with your car between them (only on trims with lane assist), and the line you cross flashes yellow. Startup does the warning-light bulb check like the real car.</li><li>2019 RAV4: cleaner blinker clicks from the real recording, and the hybrid only makes its AVAS hum in reverse (no cabin beep).</li><li>Full Self-Driving no longer creeps into a car that's right on its nose in a long queue.</li><li>Infotainment screens on every brand (except Tesla) now have a Home button.</li></ul>
       <h4>🚙 New: 2025 Audi Q5 and SQ5</h4><ul>
 <li>The all-new <b>2025 Audi Q5</b> (new model) in every US trim: <b>Q5 Premium, Premium Plus and Prestige</b> (2.0 TFSI, 268 hp, 295 lb-ft, 7-speed S tronic, quattro, 0-60 in about 5.8 s) and <b>SQ5 Premium, Premium Plus and Prestige</b> (3.0 TFSI V6 mild hybrid, 362 hp, 406 lb-ft, 0-60 in about 4.4 s).</li>
@@ -5143,14 +5144,25 @@ function walkCtx(){const W=st.walk,T=TRIMS[st.trim];if(!W)return null;
 // ---- metered street parking (the new world): spaces on the shopping streets, a meter at each. $1 buys 15 minutes, 2 hours at most.
 // Park in a space and walk to its meter to pay; stay unpaid (or past your time) and an enforcement officer leaves a ticket
 const METER={spaces:[],cur:null,paid:0,arrive:0,ticketed:false,warned:false,price:1,step:15*60,max:2*3600};
-function meterSetup(){METER.spaces.length=0;if(!W2)return;
-  for(const e of EDGES){if(!e.T.park)continue;const m=eAt(e,e.L/2);if(!(e.name==="Mill St"||inCity(m.x,m.y)))continue;e.mtr=[];
+// no parking: in front of the garage gates and every parking lot / drive-thru entrance, plus some red-kerb stretches with signs
+function noParkHere(x,y){if(x>GAR.wEdge-16&&x<GAR.eEdge+16&&y>GAR.y0-14&&y<GAR.y1+14)return true;
+  for(const X of XSITES){if(X.U==null||X.N==null)continue;const dx=x-X.x,dy=y-X.y,u=Math.abs(dx*X.U[0]+dy*X.U[1])-(X.L||0)/2,n=Math.abs(dx*X.N[0]+dy*X.N[1])-(X.D||0)/2;if(Math.hypot(Math.max(0,u),Math.max(0,n))<6)return true}return false}
+function meterSetup(){METER.spaces.length=0;METER.nop=[];if(!W2)return;let sd_=91;const rnd=()=>(sd_=(sd_*16807)%2147483647)/2147483647;
+  for(const e of EDGES){if(!e.T.park)continue;const m=eAt(e,e.L/2);if(!(e.name==="Mill St"||inCity(m.x,m.y)))continue;e.mtr=[];e.nop=[];
     const W=e.m/2+e.n*LANE,off=W+e.T.park/2,u0=kerbTrim(e,0)+9,u1=e.L-kerbTrim(e,1)-9;
-    for(const sd of [1,-1])for(let u=u0;u+6.4<=u1;u+=6.4){const c=ePt(e,u+3.2,sd*off),mt=ePt(e,u+(sd>0?0.6:5.8),sd*(W+e.T.park+0.55)),en=ePt(e,u+6.4,sd*off);
-      const S={e,sd,u0:u,u1:u+6.4,off:sd*off,x:c[0],y:c[1],h:c[2],mx:mt[0],my:mt[1],ex:en[0],ey:en[1]};METER.spaces.push(S);e.mtr.push(S)}}}
+    for(const sd of [1,-1]){let red=0;for(let u=u0;u+6.4<=u1;u+=6.4){const c=ePt(e,u+3.2,sd*off),mt=ePt(e,u+(sd>0?0.6:5.8),sd*(W+e.T.park+0.55)),en=ePt(e,u+6.4,sd*off);
+      const S={e,sd,u0:u,u1:u+6.4,off:sd*off,x:c[0],y:c[1],h:c[2],mx:mt[0],my:mt[1],ex:en[0],ey:en[1]};
+      if(red<=0&&rnd()<0.07)red=2+Math.floor(rnd()*3);   // a red-kerb stretch, 2-4 spaces long
+      if(red>0||noParkHere(c[0],c[1])||noParkHere(mt[0],mt[1])){const k=ePt(e,u+3.2,sd*(W+e.T.park-0.12));S.kx=k[0];S.ky=k[1];S.first=!e.nop.length||e.nop[e.nop.length-1].u1!==u||e.nop[e.nop.length-1].sd!==sd;if(red>0)red--;METER.nop.push(S);e.nop.push(S);continue}
+      METER.spaces.push(S);e.mtr.push(S)}}}}
+function noParkAt(x,y){for(const e of gAt(GRID.e,x,y)){if(!e.nop)continue;const p=eProj(e,x,y);for(const S of e.nop)if(p.u>=S.u0&&p.u<=S.u1&&Math.abs(p.t-S.off)<1.7)return S}return null}
 function meterAt(x,y){for(const e of gAt(GRID.e,x,y)){if(!e.mtr)continue;const p=eProj(e,x,y);for(const S of e.mtr)if(p.u>=S.u0-0.6&&p.u<=S.u1+0.6&&Math.abs(p.t-S.off)<1.7)return S}return null}
 const meterLeft=()=>Math.max(0,METER.paid-st.clock);
 function meterTick(dt){if(!W2||!METER.spaces.length||!st.started)return;const M=METER,now=st.clock,parkedNow=Math.abs(car.vx)<0.3&&(st.walk||st.gear==="P"||!st.power);
+  // parked in a no parking zone (red kerb, in front of a gate or a lot entrance): a warning, then a $50 ticket after a minute
+  {const N=parkedNow&&!st.walk?noParkAt(car.px,car.py):(M.np&&M.np.S&&Math.hypot(car.px-M.np.S.x,car.py-M.np.S.y)<5&&parkedNow?M.np.S:null);
+   if(!N)M.np=null;else{if(!M.np||M.np.S!==N){M.np={S:N,t:now,warned:false,tk:false};toast("🚫 No parking here · red kerb. Move or you'll get a ticket")}
+     else if(!M.np.tk&&now-M.np.t>60){M.np.tk=true;const fine=50;ECON.cash-=fine;try{bankTx("Parking ticket · no parking zone",-fine);bankSave()}catch(e){}toast(`📝 Parking ticket: ${money(fine)} for parking in a no parking zone`);beep(520,.15,"square",.12)}}}
   if(M.cur){const S=M.cur,still=Math.hypot(car.px-S.x,car.py-S.y)<5;
     if(!still){if(Math.abs(car.vx)>1)M.cur=null;return}
     const left=meterLeft();if(left>0&&left<120&&!M.warned){M.warned=true;toast(`🅿️ Your meter runs out in ${Math.ceil(left/60)} min`)}
@@ -8893,6 +8905,7 @@ function worldScenery(){W2P.length=0;
         if(w2Free(x,y,Math.max(f[1],f[3])-1)&&fits(kk,x,y,t+Math.PI,0.6))w2Put(kk,x,y,t+Math.PI)}}
     // metered parking in front of the shops: a meter at every space, painted space ends
     meterSetup();for(const S of METER.spaces){const z=hillZ(S.mx,S.my);B(post,S.mx,S.my,z,1.15,0.09,0.09);B(signK,S.mx,S.my,z+1.15,0.42,0.22,0.16,S.h);B(stall,S.ex,S.ey,z+0.012,0.012,0.12,2.3,S.h);collAdd({t:"c",x:S.mx,y:S.my,r:0.12,what:"a parking meter"})}
+    for(const S of METER.nop){const z=hillZ(S.kx,S.ky);B(stopR,S.kx,S.ky,z+0.03,0.03,6.4,0.22,S.h);if(S.first){B(post,S.mx,S.my,z,2.1,0.07,0.07);B(signW,S.mx,S.my,z+2.0,0.46,0.34,0.03,S.h+Math.PI/2);B(stopR,S.mx,S.my,z+2.02,0.36,0.26,0.035,S.h+Math.PI/2);collAdd({t:"c",x:S.mx,y:S.my,r:0.08,what:"a no parking sign"})}}
     {const [mx,my]=W2C.MT;let n=0;for(let k=0;k<9000&&n<1600;k++){const rr=Math.sqrt(r())*1150,t=r()*6.28,x=mx+Math.cos(t)*rr,y=my+Math.sin(t)*rr,d=dfAt(x,y);if(d<9||d<30&&roadDist(x,y,8)<7||riverD(x,y)<RIVER.w/2+6||!w2Free(x,y,3))continue;
       w2Put(r()<0.65?"t_pine_tall":"t_pine_small",x,y,r()*6.28,terrainH(x,y,d)-0.25);n++}}
   }
@@ -11936,7 +11949,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=188;   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="173",BUILD_VER=189;   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){const k=GFX.q==="auto"?GFX.eff:GFX.q;if(G.k!==k||G.v!==GFX.ovV||!G.m){G.k=k;G.v=GFX.ovV;const m={...GQ[k]};for(const o of GOPT)if(GFX.ov[o[0]]!==undefined)Object.assign(m,o[4](GFX.ov[o[0]]));if(Object.keys(GFX.ov).length)m.label=GQ[k].label+" (custom)";G.m=m}return G.m}
