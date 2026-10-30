@@ -6107,7 +6107,7 @@ function scrToybox(g,top,bot,W){const h=bot-top;
 
 // ======================================================================= Lincoln SYNC 3 (Aviator, Corsair): the real layout
 const isSync=()=>!isTesla()&&["aviator","corsair"].includes(TRIMS[st.trim].model);
-const fmOf=i=>(RADIO[i]&&RADIO[i].freq)||[98.1,104.1,106.5][i-(RADIO.findIndex(r=>!r.live)>0?RADIO.findIndex(r=>!r.live):0)]||101.1;
+const fmOf=i=>(RADIO[i]&&RADIO[i].freq)||88.1;
 function syncTile(g,x,y,w,h,on){g.fillStyle=on?"rgba(140,170,220,.22)":"rgba(120,150,200,.10)";g.fillRect(x,y,w,h);g.strokeStyle="rgba(200,212,235,.6)";g.lineWidth=1.5;g.strokeRect(x+.5,y+.5,w-1,h-1)}
 function syncBg(g,W,H){const gr=g.createLinearGradient(0,0,0,H);gr.addColorStop(0,"#2a3852");gr.addColorStop(0.5,"#1a2539");gr.addColorStop(1,"#0e1524");g.fillStyle=gr;g.fillRect(0,0,W,H)}
 function syncStatus(g,W){const d=gDate(),hh=d.getHours()%12||12,mm=String(d.getMinutes()).padStart(2,"0");g.fillStyle="rgba(10,16,28,.55)";g.fillRect(0,0,W,36);
@@ -6699,7 +6699,7 @@ function rav19Screen(g,W,H,M){const F=CF2;g.fillStyle="#1a1b1e";g.fillRect(0,0,W
   g.translate(x0,0);SCR.ox=x0;
   if(SCR.page==="media"){const Lm=["Source","Presets","Radio Replay","Station List","Options","Sound"];Lm.forEach((t,i)=>{const y=top+10+i*32,on=i===1;if(on){g.fillStyle="rgba(120,150,230,.35)";g.fillRect(6,y,150,28)}g.fillStyle="#fff";g.font=F(13,600);g.textAlign="left";g.fillText(t,16,y+15)});
     g.font=F(15,600);g.fillText(`FM ${fmOf(au.station||0).toFixed(1)}`,176,top+22);g.font=F(12);g.fillStyle="#bcc6e0";g.fillText(SCR.radioOn?RADIO[au.station||0].name:"Radio off · tap a preset",176,top+44);
-    const pr=[87.7,87.9,88.1,88.3,88.5,88.7];pr.forEach((f,i)=>{const x=170+(i%3)*((pw-186)/3),y=bot-96+Math.floor(i/3)*42,w=(pw-186)/3-6,on=SCR.radioOn&&(au.station||0)===i%RADIO.length;g.fillStyle=on?"rgba(120,150,230,.55)":"rgba(40,60,120,.6)";g.fillRect(x,y,w,36);g.fillStyle="#fff";g.font=F(12,600);g.textAlign="left";g.fillText(`${i+1}   ${f}`,x+8,y+18);hit(x,y,w,36,()=>radioPlay(i%RADIO.length))})}
+    const pr=[0,1,2,3,4,5].map(i=>i<RADIO.length?fmOf(i).toFixed(1):"—");pr.forEach((f,i)=>{const x=170+(i%3)*((pw-186)/3),y=bot-96+Math.floor(i/3)*42,w=(pw-186)/3-6,on=SCR.radioOn&&(au.station||0)===i%RADIO.length;g.fillStyle=on?"rgba(120,150,230,.55)":"rgba(40,60,120,.6)";g.fillRect(x,y,w,36);g.fillStyle="#fff";g.font=F(12,600);g.textAlign="left";g.fillText(`${i+1}   ${f}`,x+8,y+18);hit(x,y,w,36,()=>i<RADIO.length?radioPlay(i):toast("Preset empty"))})}
   else if(SCR.page==="home"){ravHome(g,top,bot,pw,M);SCR.ox=x0}
   else ({map:scrMap,park:scrPark,camera:scrCamera,energy:scrEnergy,controls:scrVehSettings,phone:scrPhone,apps:scrApps,climate:scrClimate})[SCR.page]?.(g,top,bot,pw,M);
   g.restore();SCR.ox=0}
@@ -9789,7 +9789,7 @@ function scrEnergy(g,top,bot,W){const T_=TRIMS[st.trim];if(isHybT(st.trim)){scrH
 // what's playing, for home screens and clusters: Spotify (song, playlist), Bluetooth or the radio
 function audioSave(){try{localStorage.setItem("std.audio",JSON.stringify({src:SCR.src||"fm",uri:SPOT.uri,name:SPOT.name,station:au.station||0,radio:!!SCR.radioOn,phone:!!st.phoneConn,vol:au.vol}))}catch(e){}}
 function audioRestore(){try{const a=JSON.parse(localStorage.getItem("std.audio")||"null");if(!a)return;au.station=a.station||0;if(a.vol!=null)au.vol=a.vol;st.phoneConn=!!a.phone;
-  if(a.src==="spotify"&&a.uri){SCR.src="spotify";SPOT.uri=a.uri;SPOT.name=a.name||"Spotify"}else{SCR.src=a.src==="bt"&&!a.phone?"fm":(a.src||"fm");if(a.radio)SCR.resumeRadio=true}}catch(e){}}
+  if(a.src==="spotify"&&a.uri){SCR.src="spotify";SPOT.uri=a.uri;SPOT.name=a.name||"Spotify"}else{SCR.src=a.src==="bt"&&!a.phone?"fm":(a.src||"fm");}}catch(e){}}   // the radio never switches itself on: press play
 function npR(){if(SCR.src==="spotify"&&SPOT.uri)return {on:true,sp:true,name:SPOT.trackName||"Spotify",genre:`${SPOT.paused?"Paused · ":""}Spotify · ${SPOT.name}`,freq:"Spotify"};
   const r=RADIO[au.station||0];return {on:SCR.radioOn,name:r.name,genre:r.genre,freq:SCR.src==="bt"?"Bluetooth":fmOf(au.station||0).toFixed(1)}}
 // what's playing right now, as a song line and a source line (Spotify track, or the radio station's current song)
@@ -10729,14 +10729,13 @@ function vsCar(g,top,bot,W){const F=FONT,h=bot-top,cx=W*0.5,cy=top+h*0.56,t=SCR.
   box(10,bot-44,bw,"Parking Safety","park",cx-70*s,cy+50*s);box(W-bw-10,bot-44,bw,"Blind-Spot Safety","bsm",cx+95*s,cy+45*s);
   if(sys.limit){const x=W/2-24,y=bot-66;g.fillStyle="#f4f4f0";rr2(g,x,y,48,58,5);g.fill();g.fillStyle="#111";g.font=F(9);g.textAlign="center";g.fillText("SPEED",x+24,y+12);g.fillText("LIMIT",x+24,y+21);g.font=F(22);g.fillText(sys.limit,x+24,y+42)}}
 // ---- radio: generated music (chords, bass, drums) so it works offline
-const RADIO=[{name:"Westport FM",genre:"Night drive · synthwave",bpm:96,kind:"synth",tracks:["Neon Causeway","Harbor Lights","Slow Merge","Afterglow"],
-    prog:[[57,60,64],[53,57,60],[48,52,55],[55,59,62]]},
-  {name:"Lo-Fi Lane",genre:"Chill beats",bpm:78,kind:"keys",tracks:["Rainy Exit 2","Parallel Parking","Coffee at 7","Green Wave"],prog:[[50,53,57,60],[55,59,62,65],[48,52,55,59],[57,61,64,67]]},
-  {name:"Coastline 101",genre:"Deep house",bpm:120,kind:"house",tracks:["Hwy 7 Sunrise","Service Plaza","Torque Vector","Open Road"],prog:[[45,52,57,60],[41,48,53,57],[43,50,55,59],[40,47,52,55]]}];
+// the radio plays real live stations only (see liveLoad); this is what it shows until they're tuned in
+const RADIO_WAIT={name:"Tuning…",genre:"Finding live stations",live:true,url:null,tracks:["Tuning…"],freq:88.1};
+const RADIO=[{...RADIO_WAIT}];
 function radioInit(){const c=au.ctx;if(!c||au.radioG)return;au.radioG=c.createGain();au.radioG.gain.value=0;au.an=c.createAnalyser();au.an.fftSize=64;au.radioG.connect(au.an);au.an.connect(au.master);
   au.noiseBuf=c.createBuffer(1,c.sampleRate*0.5,c.sampleRate);const d=au.noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1}
 function radioVol(){const lv=RADIO[au.station]&&RADIO[au.station].live;if(au.radioG)au.radioG.gain.setTargetAtTime(SCR.radioOn&&!lv?0.32*(au.vol??0.5):0,au.ctx.currentTime,0.1);liveVol()}
-function radioPlay(i){setTimeout(audioSave,0);if(!au.ctx){toast("Tap Start first so sound can play");return}if(!RADIO[i])i=0;if(SPOT.ctl&&!SPOT.paused){try{SPOT.ctl.pause()}catch(e){}}if(SCR.src==="spotify")SCR.src="fm";radioInit();au.station=i;SCR.radioOn=true;au.step=0;au.nextT=au.ctx.currentTime+0.05;radioVol();
+function radioPlay(i){setTimeout(audioSave,0);if(!au.ctx){toast("Tap Start first so sound can play");return}if(!RADIO[i])i=0;if(!RADIO[i].url){SCR.radioOn=false;liveStop();toast(LRAD.busy?"📡 Still tuning in the live stations…":"📡 No live stations yet, trying again…");liveLoad(LRAD.src,true);return}if(SPOT.ctl&&!SPOT.paused){try{SPOT.ctl.pause()}catch(e){}}if(SCR.src==="spotify")SCR.src="fm";radioInit();au.station=i;SCR.radioOn=true;au.step=0;au.nextT=au.ctx.currentTime+0.05;radioVol();
   if(!au.radioTimer)au.radioTimer=setInterval(radioTick,60);if(RADIO[i].live)livePlay(RADIO[i]);else liveStop();toast(`${RADIO[i].live?"📡 ":""}${RADIO[i].name} · ${RADIO[i].genre}`)}
 // ad breaks: every few minutes the music dips and the station runs a local ad (spoken by the browser's voice) and its station ID
 const RADS={t:140,on:false};
@@ -10751,34 +10750,34 @@ function radAdTick(){if(!SCR.radioOn||!au.radioG||!("speechSynthesis" in window)
 setInterval(()=>{try{radAdTick()}catch(e){}},1000);
 // ---- live radio: real stations streamed from the Radio Browser directory (radio-browser.info), Detroit by default, or a genre from across the US
 const LRAD={src:(()=>{try{return localStorage.getItem("strata.radioSrc")||"detroit"}catch(e){return "detroit"}})(),el:null,busy:false,base:null,n:0,err:0};
-const LIVE_SRC=[["detroit","Detroit"],["hiphop","Hip-hop"],["pop","Pop"],["country","Country"],["rock","Rock"],["news","News & talk"],["game","Game stations"]];
+const LIVE_SRC=[["detroit","Detroit"],["hiphop","Hip-hop"],["pop","Pop"],["country","Country"],["rock","Rock"],["news","News & talk"]];if(!LIVE_SRC.some(x=>x[0]===LRAD.src))LRAD.src="detroit";
 const DET_CALLS=/\b(WDET|WJR|WRIF|WJLB|WMXD|WXYT|WWJ|WCSX|WDVD|WNIC|WKQI|WMGC|WOMC|WDZH|WLLZ|WMUZ|WGPR|WCHB|WYCD|WRCJ|WJZZ|WCAR|WDTK|WNZK|WMKM|WKBV|WDFN|WHTD|WPZR|WEXL|WUOM|WQBH|WFDF|WXDX|WMXD|WDRQ|WDTW|WHPR|WAKL|WGRV)\b/i;
 async function liveApi(path){const bases=LRAD.base?[LRAD.base]:[];if(!bases.length){try{const r=await fetch("https://all.api.radio-browser.info/json/servers");const j=await r.json();j.sort(()=>Math.random()-0.5).slice(0,3).forEach(x=>bases.push("https://"+x.name))}catch(e){}bases.push("https://de1.api.radio-browser.info","https://de2.api.radio-browser.info","https://fi1.api.radio-browser.info")}
   for(const b of bases){try{const r=await fetch(b+"/json/"+path);if(!r.ok)continue;const j=await r.json();LRAD.base=b;return j}catch(e){}}throw new Error("Radio directory unreachable")}
 function liveEntry(x,i){const nm=String(x.name||"Station").replace(/\s+/g," ").trim().slice(0,40),m=nm.match(/\b(8[89]|9\d|10[0-7])\.\d\b/),am=nm.match(/\b(5[3-9]\d|[6-9]\d\d|1[0-6]\d\d)\s*(AM|KHz)?\b/i),tags=String(x.tags||"").split(",").filter(Boolean);
   return {name:nm,genre:(tags.slice(0,2).join(" · ")||"Live radio").replace(/\b\w/g,c=>c.toUpperCase()),live:true,url:x.url_resolved||x.url,logo:x.favicon,freq:m?+m[0]:am&&(am[2]||/^W[A-Z]{2,3}\b/.test(nm))?Object.assign(new Number(+am[1]),{toFixed:()=>am[1]+" AM"}):null,tracks:[nm+" · LIVE"],uuid:x.stationuuid}}
 async function liveLoad(src,quiet){if(LRAD.busy)return;LRAD.busy=true;src=src||LRAD.src;try{
-  const game=RADIO.filter(r=>!r.live);let list=[];
-  if(src!=="game"){const q="countrycode=US&hidebroken=true&order=clickcount&reverse=true";
+  let list=[];
+  {const q="countrycode=US&hidebroken=true&order=clickcount&reverse=true";
     if(src==="detroit"){const [a,b]=await Promise.all([liveApi(`stations/search?${q}&state=Michigan&limit=400`),liveApi(`stations/search?${q}&name=detroit&limit=60`)]);
       const near=x=>x.geo_lat&&x.geo_long&&Math.abs(x.geo_lat-42.35)<0.6&&Math.abs(x.geo_long+83.1)<0.8;
       list=[...b,...a].filter(x=>/detroit/i.test((x.name||"")+" "+(x.tags||"")+" "+(x.state||""))||DET_CALLS.test(x.name||"")||near(x))}
     else{const tag={hiphop:"hip hop",pop:"pop",country:"country",rock:"rock",news:"news"}[src];list=await liveApi(`stations/search?${q}&tag=${encodeURIComponent(tag)}&tagExact=false&limit=80`)}
     const seen=new Set();list=list.filter(x=>{const u=x.url_resolved||x.url,k=(x.name||"").toLowerCase().replace(/[^a-z0-9]/g,"").slice(0,14);if(!u||seen.has(k)||/\.m3u8?($|\?)|\.pls($|\?)/i.test(u))return false;seen.add(k);return true})
       .sort((p,q)=>((q.url_resolved||"").startsWith("https")-(p.url_resolved||"").startsWith("https"))||(q.clickcount||0)-(p.clickcount||0)).slice(0,30)}
-  const cur=RADIO[au.station||0],was=SCR.radioOn;liveStop();RADIO.length=0;list.map(liveEntry).sort((p,q)=>(p.freq?+p.freq:999)-(q.freq?+q.freq:999)).forEach(r=>RADIO.push(r));
-  {let f=88.1;for(const r of RADIO)if(r.live&&!r.freq){while(RADIO.some(o=>o.freq&&Math.abs(o.freq-f)<0.05))f+=0.4;r.freq=+f.toFixed(1);f+=0.4}}RADIO.push(...game);
+  const cur=RADIO[au.station||0],was=SCR.radioOn;liveStop();RADIO.length=0;list.map(liveEntry).sort((p,q)=>(p.freq?+p.freq:999)-(q.freq?+q.freq:999)).forEach(r=>RADIO.push(r));if(!RADIO.length)RADIO.push({...RADIO_WAIT,name:"No signal",genre:"Live radio couldn't load",tracks:["No signal"]});
+  {let f=88.1;for(const r of RADIO)if(r.live&&!r.freq){while(RADIO.some(o=>o.freq&&Math.abs(o.freq-f)<0.05))f+=0.4;r.freq=+f.toFixed(1);f+=0.4}}
   LRAD.src=src;try{localStorage.setItem("strata.radioSrc",src)}catch(e){}
   let k=cur?RADIO.findIndex(r=>r.name===cur.name):-1;au.station=k>=0?k:0;if(was&&au.ctx)radioPlay(au.station);
-  if(!quiet)toast(src==="game"?"📻 Game stations":list.length?`📡 ${list.length} live ${LIVE_SRC.find(x=>x[0]===src)[1]} stations on the radio`:"No live stations found right now");
-}catch(e){if(!quiet)toast("📡 Couldn't reach live radio here, playing the game stations")}LRAD.busy=false}
+  if(!quiet)toast(list.length?`📡 ${list.length} live ${LIVE_SRC.find(x=>x[0]===src)[1]} stations on the radio`:"No live stations found right now");
+}catch(e){if(RADIO.length===1&&!RADIO[0].url){RADIO[0]={...RADIO_WAIT,name:"No signal",genre:"Live radio couldn't load",tracks:["No signal"]}}if(!quiet)toast("📡 Couldn't reach live radio right now")}LRAD.busy=false}
 function livePlay(R){if(!LRAD.el){LRAD.el=new Audio();LRAD.el.preload="none";LRAD.el.addEventListener("error",()=>{const R_=RADIO[au.station||0];if(!SCR.radioOn||!R_||!R_.live)return;if(++LRAD.err>4){LRAD.err=0;toast("📡 Live radio isn't loading");return}
-    toast(`📡 ${R_.name} is off the air, trying the next one`);let j=au.station;do{j=(j+1)%RADIO.length}while(!RADIO[j].live&&j!==au.station);radioPlay(j)});LRAD.el.addEventListener("playing",()=>{LRAD.err=0})}
+    toast(`📡 ${R_.name} is off the air, trying the next one`);const j=(au.station+1)%RADIO.length;if(j===au.station){SCR.radioOn=false;liveStop();return}radioPlay(j)});LRAD.el.addEventListener("playing",()=>{LRAD.err=0})}
   const u=String(R.url).replace(/^http:\/\//,location.protocol==="https:"?"https://":"http://");if(LRAD.el.src!==u)LRAD.el.src=u;liveVol();const p=LRAD.el.play();if(p&&p.catch)p.catch(()=>{})}
 function liveStop(){if(LRAD.el){try{LRAD.el.pause();LRAD.el.removeAttribute("src");LRAD.el.load()}catch(e){}}}
-function liveVol(){const R=RADIO[au.station||0];if(!LRAD.el)return;const on=SCR.radioOn&&R&&R.live&&st.power!==false;if(!on){if(!LRAD.el.paused)LRAD.el.pause();return}LRAD.el.volume=clamp(0.9*(au.vol??0.5)*(st.cam===1?1:0.6),0,1);if(LRAD.el.paused&&LRAD.el.src)LRAD.el.play().catch(()=>{})}
+function liveVol(){const R=RADIO[au.station||0];if(!LRAD.el)return;if(SCR.radioOn&&(st.power===false||st.walk&&Math.hypot(st.walk.x-car.px,st.walk.y-car.py)>4)){SCR.radioOn=false}const on=SCR.radioOn&&R&&R.live&&!!R.url&&st.power!==false;if(!on){if(!LRAD.el.paused)LRAD.el.pause();return}LRAD.el.volume=clamp(0.9*(au.vol??0.5)*(st.cam===1?1:0.6),0,1);if(LRAD.el.paused&&LRAD.el.src)LRAD.el.play().catch(()=>{})}
 setInterval(()=>{try{liveVol()}catch(e){}},500);
-setTimeout(()=>{if(LRAD.src!=="game")liveLoad(LRAD.src,true)},4000);
+setTimeout(()=>liveLoad(LRAD.src,true),4000);
 function radioStop(){SCR.radioOn=false;radioVol();setTimeout(audioSave,0)}
 function mtof(m){return 440*Math.pow(2,(m-69)/12)}
 function rNote(t,f,dur,type,vol,cut){const c=au.ctx,o=c.createOscillator(),g=c.createGain(),fl=c.createBiquadFilter();o.type=type;o.frequency.value=f;fl.type="lowpass";fl.frequency.value=cut||2200;
@@ -11887,7 +11886,7 @@ const TABS={
     ${T.bMode?`<h3>Shift position</h3><div class="grid2">${[[1,"D","Normal"],[2,"B","More regen when you lift, for long downhills"]].map(([v,n,d])=>opt(`data-regen="${v}"`,st.regen===v,n,d)).join("")}</div>`:""}
     ${T.ice||T.bMode?"":`<h3>Regenerative braking</h3><div class="grid2">${["Off","Low","Standard","One-pedal"].slice(0,(T.regenMax??3)+1).map((n,i)=>opt(`data-regen="${i}"`,st.regen===i,n,["Coasts like a gas car","Gentle slowing when you lift","About 0.1 g when you lift","Slows to a stop and holds, no brake needed"][i])).join("")}</div>`}
     <h3>Sound</h3><div class="grid2">${["Quiet","Normal","Loud"].map((n,i)=>opt(`data-ev="${i}"`,(st.engVol??1)===i,`Engine: ${n}`,i===1?"Default":"")).join("")}${tog("traffic","Traffic sounds","Nearby cars, quietly",st.aiSnd)}</div>
-    <h3>Sound: radio stations</h3><div class="grid2">${LIVE_SRC.map(([k,n])=>opt(`data-rsrc="${k}"`,LRAD.src===k,n,k==="detroit"?"Real Detroit stations, live":k==="game"?"The made-up stations, works offline":"Real US stations, live")).join("")}</div><p class="note">Live stations stream from the free Radio Browser directory, with their real ads and DJs. Use SEEK or the presets on the car's radio.</p>
+    <h3>Sound: radio stations</h3><div class="grid2">${LIVE_SRC.map(([k,n])=>opt(`data-rsrc="${k}"`,LRAD.src===k,n,k==="detroit"?"Real Detroit stations, live":"Real US stations, live")).join("")}</div><p class="note">Live stations stream from the free Radio Browser directory, with their real ads and DJs. Use SEEK or the presets on the car's radio.</p>
     <h3>Graphics</h3><div class="grid2">${["auto","lowest","low","medium","high","ultra"].map(k=>opt(`data-gfx="${k}"`,GFX.q===k&&!Object.keys(GFX.ov).length,k==="auto"?"Auto":GQ[k].label,k==="auto"?`Now ${G().label} · ${Math.round(GFX.fps)} fps`:k==="ultra"?"Every effect on. Needs a fast graphics card":k==="high"?"Bloom and light rays":"")).join("")}</div>
     <h3>Graphics: custom${Object.keys(GFX.ov).length?` · <button class="opt" style="display:inline;padding:3px 10px;width:auto;font-size:12px" data-gfxreset="1">Back to ${GQ[GFX.q==="auto"?GFX.eff:GFX.q].label}</button>`:""}</h3>${(()=>{const g=G();return GOPT.map(([k,n,d,vals,,get])=>{const cur=get(g);return `<div class="rcRow"><span>${n}</span><div class="seg5" style="grid-template-columns:repeat(${vals.length},1fr)">${vals.map(([v,l])=>`<button class="${cur===v?"on":""}" data-gopt="${k}:${v}">${l}</button>`).join("")}</div>${d?`<small>${d}</small>`:""}</div>`}).join("")})()}
     <div class="rcRow"><span>Lighting</span><div class="seg5" style="grid-template-columns:repeat(2,1fr)">${[["1","Simple"],["0","Full"]].map(([v,l])=>`<button class="${(GFX_LITE?"1":"0")===v?"on":""}" data-glite="${v}">${l}</button>`).join("")}</div><small>Full has shiny paint, reflections and lit headlight beams. Simple is faster on old laptops. Reloads the game</small></div>
