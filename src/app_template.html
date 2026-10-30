@@ -1262,6 +1262,7 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
   <div class="nc">
     <div class="nh"><small>What's new</small><h2>Version 173 · A brand new look, cruise button, real Tesla visualization</h2></div>
     <div class="nb">
+      <h4>🎨 Graphics settings, RAV4 gauges and a mini car on your screens</h4><ul><li><b>New Ultra graphics</b> and a full <b>custom graphics</b> section (Settings › Graphics): resolution, view distance, traffic detail, trees, car shadows, mirror/screen refresh, anti-aliasing (MSAA or FXAA), ambient occlusion, bloom, light rays, depth of field, motion blur (and whether your own car blurs) and Simple/Full lighting. Picking a preset resets the custom rows.</li><li><b>Your own car on the screens:</b> the Tesla visualization and the assist view now show a real mini model of your car in your paint, with headlights, brake lights and blinkers lighting up. On a Tesla, shift to Park and the car swings round to a studio view with Open Frunk / Open Trunk, the lock and the charge port.</li><li><b>2019 RAV4 gauges redone from real photos:</b> LE/XLE get two real dials (tachometer, or the hybrid CHG/ECO/PWR meter) with the small screen in the middle; Limited, Adventure and XSE Hybrid get the 7-in. screen on the left and a real speedometer. The middle screen shows the lane lines with your car between them (only on trims with lane assist), and the line you cross flashes yellow. Startup does the warning-light bulb check like the real car.</li><li>2019 RAV4: cleaner blinker clicks from the real recording, and the hybrid only makes its AVAS hum in reverse (no cabin beep).</li><li>Full Self-Driving no longer creeps into a car that's right on its nose in a long queue.</li><li>Infotainment screens on every brand (except Tesla) now have a Home button.</li></ul>
       <h4>🚙 New: 2025 Audi Q5 and SQ5</h4><ul>
 <li>The all-new <b>2025 Audi Q5</b> (new model) in every US trim: <b>Q5 Premium, Premium Plus and Prestige</b> (2.0 TFSI, 268 hp, 295 lb-ft, 7-speed S tronic, quattro, 0-60 in about 5.8 s) and <b>SQ5 Premium, Premium Plus and Prestige</b> (3.0 TFSI V6 mild hybrid, 362 hp, 406 lb-ft, 0-60 in about 4.4 s).</li>
 <li>Audi drive select with all six modes (comfort, balanced, dynamic, efficiency, offroad, individual). The SQ5 gets S sport suspension with damper control as standard; adaptive air suspension is an option on the Q5 Prestige and the SQ5.</li>
@@ -1946,7 +1947,7 @@ and <b>Rivian</b> (no home screen, like the real one: the map with a media colum
 <script>
 "use strict";
 // ---- account saves load here, before anything else reads the saved game: the page that asked for them may have written its own copy while closing
-const ACCT_SKIP=new Set(["strata.ver","strata.reloadFor","strata.gfx","strata.uiFull","strata.kThr","mstrata.lowend","mstrata.dkmin","mstrata.uiz","mstrata.uihide","mstrata.uilook","mstrata.hudtheme","mstrata.photos"]);
+const ACCT_SKIP=new Set(["strata.ver","strata.reloadFor","strata.gfx","strata.gfxov","strata.lite","strata.uiFull","strata.kThr","mstrata.lowend","mstrata.dkmin","mstrata.uiz","mstrata.uihide","mstrata.uilook","mstrata.hudtheme","mstrata.photos"]);
 try{const P=localStorage.getItem("msPending");if(P){localStorage.removeItem("msPending");const S=JSON.parse(P);for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))localStorage.removeItem(k);
   for(const [k,v] of Object.entries(S.ls||{}))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))localStorage.setItem(k,v)}}catch(e){}
 // ---- boot safety net: if anything stops the game from starting, show what went wrong and offer a safe start instead of a frozen loading screen
@@ -4618,7 +4619,8 @@ function pathGap(c,pts,OB){let gap=Infinity,vL=0,who=null;
   for(const o of OB){if(o.o===c)continue;const dx=o.x-c.wx,dy=o.y-c.wy;if(dx*dx+dy*dy>8100)continue;if(o.z!==undefined&&Math.abs(o.z-(c.wz||0))>3)continue;
     if(c.ghostT>0&&o.o!=="me"&&Math.abs(wrapPi(o.h-c.wh))>0.8)continue;
     let bd=o.t2||4.84,bi=-1;for(let q=0;q<pts.length;q++){const ex=o.x-pts[q][0],ey=o.y-pts[q][1],d=ex*ex+ey*ey;if(d<bd){bd=d;bi=q}}
-    if(bi<0)continue;const al=pts[bi][2];if(al<1.2)continue;const g=al-((c.len||CARLEN)+((o.o&&o.o.len)||CARLEN))/2;
+    // FSD: something right on our nose still counts (it used to be skipped, so the car crept into it)
+    if(bi<0)continue;let al=pts[bi][2];if(al<1.2){if(c.kind!=="fsd")continue;const fx=(o.x-c.wx)*Math.cos(c.wh)+(o.y-c.wy)*Math.sin(c.wh);if(fx<0.5)continue;al=Math.max(al,fx)}const g=al-((c.len||CARLEN)+((o.o&&o.o.len)||CARLEN))/2;
     if(g<gap){gap=g;vL=Math.max(0,o.v*Math.cos(o.h-pts[bi][4]));who=o.o}}
   return {gap,v:vL,who}}
 // ---- right of way
@@ -5470,7 +5472,7 @@ function viewDraw(){const c=$("u2vc");if(!c||c.offsetParent===null)return;const 
       if(st.acc){g.strokeStyle=amb;g.lineWidth=2;for(let i=0;i<3;i++){const yy=y+6+i*7;if(yy<92){g.beginPath();g.moveTo(98-(8+i*2),yy);g.lineTo(98+(8+i*2),yy);g.stroke()}}}
       txt(`gap ${(sys.lead.ds/Math.max(1,Math.abs(car.vx))).toFixed(1)} s`,188,14,dim,9,"right")}
     if(sys.bsmL){g.fillStyle=amb;rr2(g,30,66,22,15,3);g.fill()}if(sys.bsmR){g.fillStyle=amb;rr2(g,144,66,22,15,3);g.fill()}
-    car3d(g,98,86,27,0.34,{brk:inp.brk>0.05||sys.hold});
+    MINI.use=performance.now();if(!miniDraw(g,98,82,13))car3d(g,98,86,27,0.34,{brk:inp.brk>0.05||sys.hold});
     txt(st.acc?`ACC ${Math.round(spdUnit(st.accSet))}`:"ACC off",8,14,st.acc?amb:dim,10,"left",700);txt(st.lka?(lk?"LKA active":"LKA on"):"LKA off",8,27,st.lka?ink:dim,9);return}
   if(v==="trip"){viewSample();const ev=!T.ice&&!T.hybrid,mi=(st.tripA||0)/1609;let avg="–",unit=ev?"mi/kWh":"mpg";
     if(ev){const wh=(typeof TE==="object"&&TE.totWh)||0,dm=(typeof TE==="object"&&TE.totD||0)/1609;if(wh>50&&dm>0.05)avg=(dm/(wh/1000)).toFixed(1)}else if(H.used>0.01)avg=((H.trip/1609)/(H.used/3.785)).toFixed(1);
@@ -5908,6 +5910,9 @@ function vizTesla(g,x,y,w,h,big){w=Math.round(w);h=Math.round(h);if(w<8||h<8)ret
   if(!C){const cv=document.createElement("canvas");cv.width=w;cv.height=h;C=VZ.c[key]={cv,g:cv.getContext("2d"),t:-1e9}}
   if(now-C.t>45){C.t=now;vizDraw(C.g,0,0,w,h,big)}g.drawImage(C.cv,x,y,w,h)}
 function vizDraw(g,x,y,w,h,big){const M=me(),T=TRIMS[st.trim],dark=st.night,sp=Math.abs(car.vx),F_=FONT,hudF=getComputedStyle(document.body).getPropertyValue("--f-hud");
+  // Park (Teslas): the view swings round from behind the car to its front three-quarter in a studio, like the real screen does
+  const nowV=performance.now();MINI.use=nowV;{const want=isTesla()&&st.gear==="P"&&sp<0.3&&!st.walk&&st.power!==false,dtv=Math.min(0.2,(nowV-(VZ.lt||nowV))/1000);VZ.lt=nowV;VZ.pk=clamp((VZ.pk||0)+(want?1:-1)*dtv/1.3,0,1)}
+  const pk=VZ.pk||0,pe=pk*pk*(3-2*pk);MINI.ang=pe*2.6;MINI.el=0.38-0.1*pe;MINI.fov=0.3-0.13*pe;
   const pal=dark?{bg:[18,20,23],gnd:[37,40,44],side:[52,55,59],road:[13,14,16],line:[226,228,230],yel:[214,178,40],car:[196,199,203],glass:[92,98,105],tyre:[30,32,35]}
                 :{bg:[214,217,221],gnd:[196,199,203],side:[178,181,186],road:[132,136,141],line:[250,250,250],yel:[236,190,40],car:[236,238,240],glass:[120,126,133],tyre:[60,63,67]};
   const rgb=(c,a)=>a===undefined?`rgb(${c[0]|0},${c[1]|0},${c[2]|0})`:`rgba(${c[0]|0},${c[1]|0},${c[2]|0},${a})`,mix=(a,b,t)=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t];
@@ -5982,7 +5987,10 @@ function vizDraw(g,x,y,w,h,big){const M=me(),T=TRIMS[st.trim],dark=st.night,sp=M
       for(let i=0;i<3;i++){const ly=t[1]+hh*(0.2+0.3*i),r=ww*0.3;if(i===on){const gl=g.createRadialGradient(t[0],ly,0,t[0],ly,r*3.2);gl.addColorStop(0,col);gl.addColorStop(0.35,col+"aa");gl.addColorStop(1,col+"00");g.fillStyle=gl;g.beginPath();g.arc(t[0],ly,r*3.2,0,7);g.fill()}g.fillStyle=i===on?col:"rgba(0,0,0,.35)";g.beginPath();g.arc(t[0],ly,r,0,7);g.fill()}continue}
     if(it.k==="me"){const m=meModel();const brk=inp.brk>0.05||sys.hold;
       if(brk){const p=Pj(-3.2,0,0);if(p){const r=Fc/p[2]*2.6,gl=g.createRadialGradient(p[0],p[1],0,p[0],p[1],r);gl.addColorStop(0,"rgba(255,30,30,.45)");gl.addColorStop(1,"rgba(255,30,30,0)");g.fillStyle=gl;g.beginPath();g.ellipse(p[0],p[1],r,r*0.45,0,0,7);g.fill()}}
-      drawModel(m,0,0,0,0,dark?[244,245,247]:[252,252,252],{roof:[22,24,27],glass:[30,33,37],tail:brk?"rgba(255,45,45,1)":"rgba(150,20,25,.95)"})}}
+      // headlights on: two soft beams on the road ahead
+      if(st.lights&&st.power!==false){for(const sd of [-1,1]){const a=Pj(2.3,sd*0.7,0.05),b=Pj(26,sd*2.8+0.9*sd,0.05),c=Pj(26,sd*0.2,0.05);if(a&&b&&c){const gr=g.createLinearGradient(a[0],a[1],(b[0]+c[0])/2,(b[1]+c[1])/2);gr.addColorStop(0,st.high?"rgba(255,250,225,.55)":"rgba(255,250,225,.38)");gr.addColorStop(1,"rgba(255,250,225,0)");g.fillStyle=gr;g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(b[0],b[1]);g.lineTo(c[0],c[1]);g.closePath();g.fill()}}}
+      // your own car: the real 3D model in its paint, with its real brake lights, indicators and tail lamps
+      const pc=Pj(0,0,0.7);if(pe<0.01&&!(pc&&miniDraw(g,pc[0],pc[1],Fc/pc[2])))drawModel(m,0,0,0,0,(()=>{const c=myPaint();return [0,1,2].map(i=>Math.pow(clamp(c[i],0,1),1/2.2)*255)})(),{roof:[22,24,27],glass:[30,33,37],tail:brk?"rgba(255,45,45,1)":"rgba(150,20,25,.95)"})}}
   // top: gear, speed, set speed, limit, hold, lights, Autopilot / FSD status
   const ink=dark?"#e8ecef":"#1c1f23",soft=dark?"#5b636b":"#9aa1a8",u=big?1:0.78;
   if(tes||big){
@@ -6004,6 +6012,17 @@ function vizDraw(g,x,y,w,h,big){const M=me(),T=TRIMS[st.trim],dark=st.night,sp=M
   else if(sys.apStrike){msg=(tes?"Autosteer":pn)+" unavailable for the rest of this drive";col="#ff453a"}
   else if(fsdA){msg=`Self-Driving · ${sys.fsdState||""}`;col="#6f93ff"}else if(ap){msg=tes?"Autosteer":pn;col="#6f93ff"}else if(lkaOn){msg="Lane Keeping Assist";col="#34c759"}else if(st.acc){msg=tes?"Traffic-Aware Cruise Control":"Adaptive Cruise Control";col="#6f93ff"}else if(!tes&&sys.bsmL&&st.signal<0||!tes&&sys.bsmR&&st.signal>0){msg="Vehicle in blind spot";col="#ff9f0a"}
   if(msg){const bh=big?26:19;g.fillStyle=blue?(performance.now()%700<350?"#3e6ae1":"#2b4fb8"):dark?"rgba(24,27,31,.88)":"rgba(255,255,255,.9)";rr2(g,x+10,y+h-bh-8,w-20,bh,bh/2);g.fill();g.fillStyle=blue?"#fff":col;g.font=F_(big?12:10);g.textAlign="center";g.fillText(msg,cx,y+h-8-bh/2+4)}
+  if(pe>0.001)vizPark(g,x,y,w,h,pe,dark,Pj,Fc);
+  g.restore()}
+// the parked view: a studio with the car in its paint at a front three-quarter angle, Open Frunk / Open Trunk, the lock and the charge port
+function vizPark(g,x,y,w,h,pe,dark,Pj,Fc){g.save();g.globalAlpha=Math.min(1,pe*1.5);const bg=g.createLinearGradient(0,y,0,y+h);
+  if(dark){bg.addColorStop(0,"#16181c");bg.addColorStop(0.6,"#1f2226");bg.addColorStop(1,"#0d0e10")}else{bg.addColorStop(0,"#f3f4f6");bg.addColorStop(0.6,"#e3e5e8");bg.addColorStop(1,"#cdd0d4")}g.fillStyle=bg;g.fillRect(x,y,w,h);
+  const cx=x+w*0.52,cy=y+h*0.6,sh=g.createRadialGradient(cx,cy+h*0.13,4,cx,cy+h*0.13,w*0.4);sh.addColorStop(0,dark?"rgba(0,0,0,.6)":"rgba(0,0,0,.28)");sh.addColorStop(1,"rgba(0,0,0,0)");g.fillStyle=sh;g.beginPath();g.ellipse(cx,cy+h*0.13,w*0.4,h*0.1,0,0,7);g.fill();
+  g.globalAlpha=1;const p0=Pj(0,0,0.7),ppm0=p0?Fc/p0[2]:1,ppm1=h*1.35/(2*MINI.dist*Math.tan(0.15)),ppm=ppm0+(ppm1-ppm0)*pe,px=p0?p0[0]+(cx-p0[0])*pe:cx,py=p0?p0[1]+(cy-p0[1])*pe:cy;miniDraw(g,px,py,ppm);
+  if(pe>0.8){const a=(pe-0.8)/0.2,ink=dark?"#f2f4f6":"#1c1f23",sub=dark?"#9aa1a8":"#5b636b";g.globalAlpha=a;g.textAlign="center";g.textBaseline="middle";const fs=Math.max(10,h*0.045);
+    g.fillStyle=ink;g.font=`600 ${fs}px system-ui,sans-serif`;g.fillText("Open",x+w*0.27,y+h*0.24);g.fillText("Frunk",x+w*0.27,y+h*0.24+fs*1.15);g.fillText("Open",x+w*0.76,y+h*0.25);g.fillText("Trunk",x+w*0.76,y+h*0.25+fs*1.15);
+    const lx=x+w*0.5,ly=y+h*0.14,r=fs*0.55;g.strokeStyle=ink;g.lineWidth=Math.max(1.5,fs*0.13);g.beginPath();g.arc(lx,ly-r*0.35,r*0.55,Math.PI,0);g.stroke();g.fillStyle=ink;g.fillRect(lx-r*0.8,ly-r*0.3,r*1.6,r*1.25);
+    g.fillStyle=sub;g.font=`500 ${fs*0.8}px system-ui,sans-serif`;g.fillText(st.locked?"Locked":"Unlocked",lx,ly+r*1.7);{const bx=x+w*0.85,by=y+h*0.47,k=fs*0.06;g.fillStyle="#3e6ae1";g.beginPath();[[2,-9],[-5,1],[-0.5,1],[-2,9],[5,-1],[0.5,-1]].forEach(([u,v],i)=>i?g.lineTo(bx+u*k,by+v*k):g.moveTo(bx+u*k,by+v*k));g.closePath();g.fill()}}
   g.restore()}
 
 // ---- in-car screens on a Tesla: Autopilot settings and Upgrades (buy FSD like you would in the real car)
@@ -6581,19 +6600,68 @@ function vwDock(g,bot,PW,H){const cy=bot+(H-bot)/2;sys.tL=sys.tL||70;sys.tR=sys.
   it(PW-184,44,"A/C",sys.climate?"#2fd36b":"#9aa0a6",()=>{sys.climate=!sys.climate},11);it(PW-130,30,"−","#4c8bf5",()=>sys.tR--);it(PW-98,48,`${sys.tR}°`,"#fff",null,18);it(PW-50,44,"+","#ff5a4a",()=>sys.tR++)}
 
 // ---------------------------------------------------------------- 2019 RAV4: 7-in. hybrid cluster and the 8-in. Entune 3.0 with its hard buttons
-function drawRav19Cluster(g,W,H,v){const C=cluCommon();const bg=g.createLinearGradient(0,0,0,H);bg.addColorStop(0,"#121a36");bg.addColorStop(1,"#2a1f4a");g.fillStyle=bg;g.fillRect(0,0,W,H);
-  const LX=150,RX=W-150,CY=132,R=100,blue="#2f9bff";
-  if(C.hyb||C.ev){const a0=Math.PI*0.9,a1=Math.PI*1.75;g.lineWidth=16;g.strokeStyle="rgba(40,70,140,.55)";g.beginPath();g.arc(LX,CY,R,a0,a1);g.stroke();const pf=C.pf;g.strokeStyle=pf<0?"#3ee08a":"#5ab4ff";g.beginPath();pf>=0?g.arc(LX,CY,R,a0+(a1-a0)*0.25,a0+(a1-a0)*(0.25+0.75*pf)):g.arc(LX,CY,R,a0+(a1-a0)*0.25*(1+pf),a0+(a1-a0)*0.25);g.stroke();
-    g.fillStyle="#cfe0ff";g.font=CF2(11,700);g.textAlign="center";g.fillText("CHARGE",LX-R+18,CY+28);g.fillText("ECO",LX-60,CY-70);g.fillText("POWER",LX+40,CY-86);
-    g.font=CF2(10);g.fillText("Trip Average",LX,CY-10);g.fillStyle="#5ab4ff";g.font=CF2(16,700);g.fillText(`${(C.T.mpg||40).toFixed(1)} MPG`,LX,CY+10);if(C.ready){g.fillStyle="#3ee06a";g.font=CF2(10,800);g.fillText("READY",LX-70,CY+60)}if(C.evMode&&C.ready){g.fillStyle="#3ee06a";g.fillText("EV",LX-70,CY+74)}}
-  else dial2(g,LX,CY,R,Math.PI*0.75,Math.PI*1.75,["0","1","2","3","4","5","6","7","8"],rpmF(C),{ring:blue,rz:0.75,num:"#dbe7ff"});
-  const mx=st.units==="mph"?140:220;dial2(g,RX,CY,R,Math.PI*0.75,Math.PI*1.95,spdLabs(mx,20),spdUnit(v)/mx,{ring:blue,num:"#dbe7ff",fs:12,ndl:"#ffffff"});
-  g.fillStyle="#fff";g.textAlign="center";g.font=CF2(40,300);g.fillText(String(Math.round(spdUnit(v))),W/2,CY-24);g.font=CF2(10);g.fillText(st.units==="mph"?"MPH":"km/h",W/2,CY);g.font=CF2(20,600);g.fillText(st.gear,W/2,CY+24);
-  g.font=CF2(13);g.fillText("38°F",W/2-110,24);g.fillText(C.clock,W/2+60,20);
-  const n=npR();g.font=CF2(11,600);g.fillText(st.phoneConn?(projKind()==="cp"?"Apple CarPlay":"Android Auto"):"Radio",RX,CY-40);g.font=CF2(12,700);g.fillText(n.on?(n.sp?n.name:n.freq):"—",RX,CY-20);
-  g.font=CF2(13,700);g.fillText(`${C.rng(C.ev?evRange():fuelRange())}${C.ru}`,RX,CY+40);if(st.gear==="P"){g.fillStyle="#ff6a3c";g.font=CF2(11,700);g.fillText("PARK",RX+40,CY+64)}if(!st.belt){g.fillStyle="#ff3b30";g.fillText("🔔",RX-30,CY+64)}
-  g.strokeStyle="rgba(255,255,255,.5)";g.strokeRect(LX-50,H-26,100,6);g.fillStyle="#fff";g.fillRect(LX-50,H-26,100*C.fuelF,6);g.font=CF2(9);g.fillText("E",LX-58,H-22);g.fillText("F",LX+58,H-22);
-  cluArrows(g,C,W/2-110,W/2+110,22)}
+// ---------------------------------------------------------------- 2019 RAV4 clusters, matched to owners' photos:
+// LE / XLE (and XLE Premium gas): two real dials (tachometer, or the hybrid CHG/ECO/PWR meter) with a 4.2-in. screen between them
+// Limited / Adventure / XSE Hybrid: the left dial and centre become one 7-in. screen, the speedometer stays a real dial
+const RAV19={pw:false,t0:0};
+const rav7=()=>/Limited|Ltd|Adventure|XSE/.test(TRIMS[st.trim].name||"");
+function rav19Dial(g,cx,cy,R,a0,a1,o){const fade=o.fade??1;g.save();g.globalAlpha=fade;
+  if(!o.digital){const bz=g.createLinearGradient(cx-R,cy-R,cx+R,cy+R);bz.addColorStop(0,"#d9dde2");bz.addColorStop(0.5,"#6d727a");bz.addColorStop(1,"#c8ccd2");g.strokeStyle=bz;g.lineWidth=3.5;g.beginPath();g.arc(cx,cy,R+4,0,Math.PI*2);g.stroke();
+    const fc=g.createRadialGradient(cx,cy-R*0.3,4,cx,cy,R);fc.addColorStop(0,"#15171b");fc.addColorStop(1,"#050506");g.fillStyle=fc;g.beginPath();g.arc(cx,cy,R+2,0,Math.PI*2);g.fill()}
+  const A=f=>a0+(a1-a0)*f,lit=o.lit||"#f4f6f8";
+  for(const b of o.bands||[]){g.lineWidth=b.w||6;g.strokeStyle=b.c;g.beginPath();g.arc(cx,cy,R-(b.r||4),A(b.f0),A(b.f1));g.stroke()}
+  const N=o.ticks||0;for(let i=0;i<=N;i++){const f=i/N,a=A(f),maj=i%(o.maj||2)===0,red=o.red!=null&&f>=o.red-1e-6,L=maj?R*0.15:R*0.08;g.strokeStyle=red?"#ff3b2e":lit;g.lineWidth=maj?3:1.6;g.beginPath();g.moveTo(cx+Math.cos(a)*(R-2),cy+Math.sin(a)*(R-2));g.lineTo(cx+Math.cos(a)*(R-2-L),cy+Math.sin(a)*(R-2-L));g.stroke()}
+  g.textAlign="center";g.textBaseline="middle";(o.labels||[]).forEach(([f,t,red,fs])=>{const a=A(f);g.fillStyle=red?"#ff3b2e":lit;g.font=CF2(fs||R*0.17,600);g.fillText(t,cx+Math.cos(a)*R*(o.lr||0.7),cy+Math.sin(a)*R*(o.lr||0.7))});
+  if(o.inner){const [mx,step,top]=o.inner;g.font=CF2(R*0.075,600);g.fillStyle="#cfd3d8";for(let k=step;k<=mx;k+=step){const f=k/(top||mx);if(f>1)break;const a=A(f);g.fillText(String(k),cx+Math.cos(a)*R*0.47,cy+Math.sin(a)*R*0.47);g.strokeStyle="#cfd3d8";g.lineWidth=1;g.beginPath();g.moveTo(cx+Math.cos(a)*R*0.55,cy+Math.sin(a)*R*0.55);g.lineTo(cx+Math.cos(a)*R*0.6,cy+Math.sin(a)*R*0.6);g.stroke()}}
+  (o.text||[]).forEach(([x,y,t,fs,c])=>{g.fillStyle=c||lit;g.font=CF2(fs,700);g.fillText(t,cx+x*R,cy+y*R)});
+  g.restore()}
+function rav19Needle(g,cx,cy,R,a,col,fade,hub){g.save();g.globalAlpha=fade;g.shadowColor=col;g.shadowBlur=8;g.strokeStyle=col;g.lineCap="round";g.lineWidth=4;g.beginPath();g.moveTo(cx-Math.cos(a)*R*0.12,cy-Math.sin(a)*R*0.12);g.lineTo(cx+Math.cos(a)*R*0.9,cy+Math.sin(a)*R*0.9);g.stroke();g.shadowBlur=0;
+  if(hub!==false){g.fillStyle="#08090a";g.beginPath();g.arc(cx,cy,R*0.17,0,Math.PI*2);g.fill();g.strokeStyle="#2c2f34";g.lineWidth=2;g.stroke()}g.restore()}
+// a small sub-gauge (fuel, coolant): E..F or C..H along a short arc
+function rav19Sub(g,cx,cy,r,f,l0,l1,col,fade,warnLow){g.save();g.globalAlpha=fade;const a0=Math.PI*1.18,a1=Math.PI*1.82;g.strokeStyle="#e9ecef";g.lineWidth=1.6;for(let i=0;i<=4;i++){const a=a0+(a1-a0)*i/4;g.beginPath();g.moveTo(cx+Math.cos(a)*r,cy+Math.sin(a)*r);g.lineTo(cx+Math.cos(a)*(r-(i%2?4:7)),cy+Math.sin(a)*(r-(i%2?4:7)));g.stroke()}
+  g.fillStyle="#e9ecef";g.font=CF2(11,700);g.textAlign="center";g.textBaseline="middle";g.fillText(l0,cx+Math.cos(a0)*(r+8),cy+Math.sin(a0)*(r+8)+3);g.fillStyle=l1==="H"?"#ff3b2e":"#e9ecef";g.fillText(l1,cx+Math.cos(a1)*(r+8),cy+Math.sin(a1)*(r+8)+3);
+  const a=a0+(a1-a0)*clamp(f,0,1);g.strokeStyle=warnLow&&f<0.12?"#ff9a2a":col;g.lineWidth=3;g.lineCap="round";g.beginPath();g.moveTo(cx+Math.cos(a)*r*0.15,cy+Math.sin(a)*r*0.15);g.lineTo(cx+Math.cos(a)*(r-2),cy+Math.sin(a)*(r-2));g.stroke();g.restore()}
+function rav19Lamp(g,x,y,t,col,fs){g.save();g.fillStyle=col;g.shadowColor=col;g.shadowBlur=6;g.font=CF2(fs||10,800);g.textAlign="center";g.textBaseline="middle";g.fillText(t,x,y);g.restore()}
+// the centre screen: eco bar and lane lines, outside temp and clock, speed, distance to empty, seat belts, gear and odometer
+function rav19Mid(g,x,y,w,h,C,v,fade,boot){g.save();g.beginPath();rr2(g,x,y,w,h,6);g.clip();g.fillStyle=boot?"#3b3f46":"#06080b";g.fillRect(x,y,w,h);if(boot||fade<=0){g.restore();return}g.globalAlpha=fade;
+  const cx=x+w/2,k=h/204;g.textAlign="center";g.textBaseline="middle";
+  {const gb=g.createLinearGradient(0,y,0,y+14*k);gb.addColorStop(0,C.hyb?"#7fe07a":"#7fb6e0");gb.addColorStop(1,C.hyb?"#2f8f3a":"#2f5f8f");g.fillStyle=gb;rr2(g,x+8,y+4*k,w-16,10*k,4);g.fill()}
+  // lane lines with your car between them (the same mini model as the other screens: your paint, lights, brake lights, blinkers); the line you cross flashes yellow
+  {const t0=y+20*k,t1=y+58*k,on=st.lka&&sys.lkaState!=="off",fl=sys.ldw||performance.now()-(sys.ldwT||0)<900,blink=Math.floor(performance.now()/180)%2===0;
+   if(has("lka")){for(const sd of [-1,1]){const hit=fl&&(sys.ldwSide||0)===sd,lx=cx+sd*w*0.2;g.strokeStyle=hit?(blink?"#ffd21f":"#6b5a10"):on?"#f2f5f8":"#5d636b";g.lineWidth=hit?3.4:2.6;g.beginPath();g.moveTo(lx,t0);g.lineTo(lx,t1);g.stroke()}
+   MINI.use=performance.now();if(!(VZ.pk>0.01)){MINI.ang=0;MINI.el=0.38;MINI.fov=0.3}if(!miniDraw(g,cx,t1-9*k,10*k)){g.fillStyle="#cfd5dc";rr2(g,cx-9*k,t1-16*k,18*k,12*k,3);g.fill()}}
+   if(C.hyb){g.fillStyle="#56d66a";g.font=CF2(8*k,800);g.textAlign="left";g.fillText("ECO",x+8,y+24*k)}}
+  g.fillStyle="#7fb6ff";g.font=CF2(8*k,600);g.textAlign="left";g.fillText("Outside",x+8,y+68*k);g.fillStyle="#fff";g.font=CF2(11*k,600);g.fillText(`${Math.round(typeof ambF==="function"?ambF():68)}°F`,x+8,y+80*k);g.textAlign="right";g.font=CF2(13*k,600);g.fillText(C.clock,x+w-8,y+76*k);
+  g.textAlign="center";g.font=CF2(28*k,500);g.fillText(String(Math.round(spdUnit(v))),cx-6,y+108*k);g.font=CF2(8*k,700);g.fillText(st.units==="mph"?"MPH":"km/h",cx+Math.max(22,18*k),y+116*k);
+  g.fillStyle="#7fb6ff";g.font=CF2(9*k,600);g.fillText("Distance to Empty",cx,y+136*k);g.fillStyle="#fff";g.font=CF2(13*k,600);g.fillText(`${C.rng(fuelRange())} ${st.units==="mph"?"miles":"km"}`,cx,y+151*k);
+  {const by=y+176*k,belt=!st.belt;g.fillStyle="#d8282a";g.font=CF2(8*k,800);g.textAlign="left";g.fillText("REAR",x+10,by);g.font=CF2(10*k,800);g.fillText("♙♙♙",x+40,by);if(belt){g.fillStyle="#ff3b2e";g.fillText("♙",x+w-20,by)}}
+  {const gy=y+h-12*k;g.fillStyle="rgba(255,255,255,.12)";g.fillRect(x+4,gy-9*k,w-8,1);g.textAlign="left";g.fillStyle="#fff";g.font=CF2(16*k,700);g.fillText(st.gear==="D"&&C.hyb&&st.regen===2?"B":st.gear,x+8,gy);g.textAlign="right";g.font=CF2(10*k,600);g.fillText(`ODO ${Math.floor(odoMiles())} mi`,x+w-8,gy)}
+  g.restore()}
+function drawRav19Cluster(g,W,H,v){const C=cluCommon(),now=performance.now();if(!RAV19.pw){RAV19.pw=true;RAV19.t0=now}const t=(now-RAV19.t0)/1000,seven=rav7();
+  g.fillStyle="#000";g.fillRect(0,0,W,H);
+  const fade=clamp((t-0.45)/0.8,0,1),bulb=t>0.12&&t<2.7,boot=t<1.15,CY=H*0.5,R=H*0.42,LX=W*0.19,RX=W*0.81,S=Math.PI*0.83,E=Math.PI*2.17;
+  const ndl=C.hyb?"#3fa2ff":"#ff5a26";
+  // speedometer (a real dial on every trim): mph outside, km/h inside, fuel at the bottom
+  const mx=st.units==="mph"?140:220,lab=[];for(let k=0;k<=mx;k+=20)lab.push([k/mx,String(k)]);
+  rav19Dial(g,RX,CY,R,S,E,{fade,ticks:mx/5,maj:2,labels:lab,inner:st.units==="mph"?[220,20,225.3]:null,text:[[0.17,0.5,st.units==="mph"?"MPH":"km/h",10],[-0.17,0.5,st.units==="mph"?"km/h":"",7]]});
+  rav19Sub(g,RX+R*0.05,CY+R*0.86,R*0.26,C.fuelF,"E","F","#ff5a26",fade,true);
+  rav19Needle(g,RX,CY,R,S+(E-S)*clamp(spdUnit(v)/mx,0,1),ndl,fade);
+  if(st.gear==="P"&&!bulb)rav19Lamp(g,RX+R*0.42,CY-R*0.05,"PARK","#ff3b2e",11);
+  // left: tachometer or hybrid meter (a real dial, or drawn on the 7-in. screen)
+  const pf=C.pf,hy=C.hyb;
+  if(seven){g.save();g.globalAlpha=fade*0.95+0.05;const sx=10,sw=W*0.63,sg=g.createLinearGradient(0,0,0,H);sg.addColorStop(0,"#0c1424");sg.addColorStop(1,"#05070c");g.fillStyle=boot?"#2a2d33":sg;rr2(g,sx,10,sw,H-20,10);g.fill();g.restore()}
+  if(!seven||!boot){const dig=seven,o={fade,digital:dig,lit:dig?"#dfe9ff":"#f4f6f8"};
+    if(hy){const z=0.24;Object.assign(o,{ticks:16,maj:4,bands:[{f0:0,f1:z,c:"#2f7dff",w:7},{f0:z,f1:0.56,c:"#33c9a0",w:7}],lr:0.6,labels:[[0.1,"CHG",false,R*0.11],[0.42,"ECO",false,R*0.12],[0.8,"PWR",false,R*0.12]],text:[[-0.62,0.5,"OFF",R*0.09,"#9aa3ad"]]});
+      rav19Dial(g,LX,CY,R,S,Math.PI*1.95,o);const nf=!C.ready?-0.04:pf>=0?z+pf*(1-z):z+pf*z;rav19Needle(g,LX,CY,R,S+(Math.PI*1.95-S)*nf,ndl,fade,!dig);
+      if(C.ready&&!bulb){rav19Lamp(g,LX+R*0.02,CY+R*0.42,"READY","#47e05a",R*0.12);if(C.evMode)rav19Lamp(g,LX+R*0.45,CY+R*0.42,"EV","#47e05a",R*0.1)}}
+    else{rav19Dial(g,LX,CY,R,S,Math.PI*2.05,{...o,ticks:16,maj:2,red:0.8125,labels:[...Array(9)].map((_,i)=>[i/8,String(i),i>=7]),text:[[0.42,0.34,"x1000",8],[0.42,0.43,"RPM",8]]});rav19Needle(g,LX,CY,R,S+(Math.PI*2.05-S)*rpmF(C),ndl,fade,!dig)}
+    rav19Sub(g,LX+R*0.25,CY+R*0.86,R*0.24,Math.min(0.5,0.18+t/150),"C","H",ndl,fade)}
+  // the info screen: on its own between the dials, or inside the 7-in. screen
+  if(seven)rav19Mid(g,W*0.37,22,W*0.24,H-44,C,v,clamp((t-1.15)/0.4,0,1),false);else rav19Mid(g,W/2-W*0.095,16,W*0.19,H-32,C,v,clamp((t-1.15)/0.4,0,1),boot);
+  // bulb check at start: every warning light on for a couple of seconds
+  if(bulb){const am="#ffb21f",rd="#ff3b2e",gr="#47e05a";[[LX-R*0.32,CY-R*0.3,"⚙",am,16],[LX+R*0.05,CY-R*0.3,"🛞",am,13],[LX-R*0.42,CY+R*0.05,"VSC",am],[LX-R*0.02,CY+R*0.2,"READY",gr],[LX+R*0.35,CY+R*0.2,"EV",gr],[LX+R*0.3,CY-R*0.05,"TRAC",am],
+    [RX+R*0.42,CY-R*0.05,"PARK",rd,11],[RX+R*0.18,CY+R*0.28,"ABS",am,11],[RX+R*0.5,CY+R*0.28,"BRAKE",rd,11],[RX+R*0.35,CY+R*0.48,"P",am,11],[RX+R*0.12,CY+R*0.12,"⚠",rd,14],[RX+R*0.5,CY+R*0.12,"⛐",am,12]].forEach(([x,y,s,c,f])=>{if(s==="EV"&&!hy)return;rav19Lamp(g,x,y,s,c,f)})}
+  cluArrows(g,C,W/2-W*0.13,W/2+W*0.13,18)}
 function rav19Screen(g,W,H,M){const F=CF2;g.fillStyle="#1a1b1e";g.fillRect(0,0,W,H);const bz=66,x0=bz,x1=W-bz,top=34,bot=H-24;
   // the hard buttons down both sides
   const L=[["HOME",()=>{SCR.page="home"}],["MENU",()=>{SCR.page="apps"}],["AUDIO",()=>{SCR.page="media"}],["MAP",()=>{SCR.page="map"}]],R=[["SEEK ›",()=>{au.station=((au.station||0)+1)%RADIO.length;radioPlay(au.station)}],["‹ TRACK",()=>{au.station=((au.station||0)+RADIO.length-1)%RADIO.length;radioPlay(au.station)}],["PHONE",()=>{SCR.page="phone"}],["APPS",()=>{SCR.page="apps"}]];
@@ -7810,7 +7878,7 @@ function assist(dt){
     if(Math.abs(inp.steer)>0.06){sys.lkaDelta=0;sys.lkaHold=1.5;sys.lkaState="paused"}
     sys.lkaDelta=clamp(sys.lkaDelta,-0.03,0.03)}
   if(sys.lkaHold>0)sys.lkaHold-=dt;
-  if(st.lka&&!pilotOn&&Math.abs(e)>0.8&&sp>17.9&&!st.signal&&!M.inJ)sys.ldw=true;
+  if(st.lka&&!pilotOn&&Math.abs(e)>0.8&&sp>17.9&&!st.signal&&!M.inJ){sys.ldw=true;sys.ldwSide=Math.sign(e);sys.ldwT=performance.now()}
   if(sys.ldw&&!sys.ldwWas&&!(brandS()==="Kia"&&playS("kia_ldw",0.6))){beep(880,.09,"sine",.2);setTimeout(()=>beep(660,.12,"sine",.2),110)}
   sys.ldwWas=sys.ldw;
   if(sys.driftT>0){sys.driftT-=dt;sys.drift=-0.012*(1-Math.exp(-(6-sys.driftT)));sys.lkaLog.maxE=Math.max(sys.lkaLog.maxE,Math.abs(e));
@@ -7981,7 +8049,7 @@ function mpHorn(o){const c=au.ctx,b=sfxLoad("horn");if(!c||!b)return;const d=Mat
 function hornOff(now){const H=au.horn;if(!H)return;au.horn=null;const t=au.ctx.currentTime;H.g.gain.setTargetAtTime(0,t,now?0.004:0.025);try{H.s.stop(t+(now?0.03:0.15))}catch(e){}}
 // Ford and Lincoln: the cabin chime that repeats once a second while you're in reverse (recorded)
 function revChime(dt){const T=TRIMS[st.trim],hy=!T.ice||!!(T.hybrid||T.plug||T.phev||(DRIVES[st.trim]||{}).par),gasOnly=T.ice&&!T.hybrid&&!T.plug&&!T.phev&&!(DRIVES[st.trim]||{}).par,toy=/^(Toyota|Lexus)/.test(T.group||"");
-  if(toy){if(gasOnly){au.tbOn=false;return}toyRevBeep(dt);return}
+  if(toy){if(gasOnly||isRav19()){au.tbOn=false;return}toyRevBeep(dt);return}   // the 2019 RAV4 hybrid only makes its AVAS hum in reverse, no cabin beep
   const on=st.started&&st.power!==false&&st.gear==="R"&&!st.walk&&/Ford|Lincoln/.test(T.group||T.name||"")&&(!T.ice||T.hybrid||T.plug||T.phev||(DRIVES[st.trim]||{}).par);
   if(!on){if(au.rcSrc){try{au.rcSrc.stop()}catch(e){}au.rcSrc=null}return}if(!au.ctx||au.rcSrc)return;const b=sfxLoad("rchime_ford");if(!b)return;
   const s_=au.ctx.createBufferSource(),g=au.ctx.createGain();s_.buffer=b;s_.loop=true;g.gain.value=st.cam===1?0.6:0.25;s_.connect(g);g.connect(au.master);s_.start();au.rcSrc=s_;au.rcG=g}
@@ -8066,7 +8134,7 @@ if(!gl){bootFail("WebGL is not available","Your browser has 3D graphics turned o
 cv.addEventListener("webglcontextlost",e=>{e.preventDefault();try{toast("The graphics card reset. Reload the page to keep playing.")}catch(_){}});
 const VS=`attribute vec3 aP;attribute vec3 aN;attribute vec3 aC;varying vec3 vC;uniform mat4 uM,uVP;uniform vec4 uDent[8];uniform float uDentOn;uniform vec4 uFl;uniform vec3 uFlD;varying vec3 vW,vN,vL;varying float vDent;
 void main(){vC=aC;vec3 p=aP;vDent=0.0;if(uDentOn>0.5){for(int i=0;i<8;i++){vec4 d=uDent[i];if(d.w<=0.0)continue;vec3 c=vec3(d.x,d.y,d.z);float r=0.28+d.w*0.55;float q=1.0-smoothstep(0.0,r,distance(p,c));if(q<=0.0)continue;vec3 dir=normalize(vec3(-c.x,-0.15*(c.y-0.8),-c.z*0.35)+vec3(0.0001));float crk=0.75+0.25*sin(p.x*41.0+p.z*29.0)*sin(p.y*37.0);p+=dir*q*q*d.w*0.34*crk;vDent=max(vDent,q*min(1.0,d.w*1.6));}}if(uFl.x>0.0){vec2 dd=uFlD.yz;float d=dot(p.yz,dd),lim=uFl.y-uFl.x,r=length(p.yz);if(d>lim)p.yz-=dd*(d-lim);float nb=smoothstep(lim-0.09,uFl.y,d)*smoothstep(uFl.z,uFl.z+0.04,r);p.x+=sign(p.x-uFlD.x)*uFl.w*nb;}vL=p;vec4 w=uM*vec4(p,1.0);vW=w.xyz;vN=(uM*vec4(aN,0.0)).xyz;gl_Position=uVP*w;}`;
-const GFX_LITE=(()=>{let q="auto";try{q=localStorage.getItem("strata.gfx")||"auto"}catch(e){}return q==="low"||(q==="auto"&&gfxDetect()==="low")})();   // lighter shader on weak GPUs
+const GFX_LITE=(()=>{let q="auto";try{const l=localStorage.getItem("strata.lite");if(l==="1"||l==="0")return l==="1";q=localStorage.getItem("strata.gfx")||"auto"}catch(e){}return q==="low"||(q==="auto"&&gfxDetect()==="low")})();   // lighter shader on weak GPUs
 const FS=`#ifdef GL_FRAGMENT_PRECISION_HIGH
 precision highp float;
 #else
@@ -9160,6 +9228,85 @@ gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParamet
 MIR.rb=gl.createRenderbuffer();gl.bindRenderbuffer(gl.RENDERBUFFER,MIR.rb);gl.renderbufferStorage(gl.RENDERBUFFER,gl.DEPTH_COMPONENT16,MIR.w,MIR.h);
 gl.bindFramebuffer(gl.FRAMEBUFFER,MIR.fbo);gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,MIR.tex,0);gl.framebufferRenderbuffer(gl.FRAMEBUFFER,gl.DEPTH_ATTACHMENT,gl.RENDERBUFFER,MIR.rb);
 MIR.ok=gl.checkFramebufferStatus(gl.FRAMEBUFFER)===gl.FRAMEBUFFER_COMPLETE;gl.bindFramebuffer(gl.FRAMEBUFFER,null);
+// off-screen target for the little model of your own car in the driving visualizations: the real 3D car in its paint, with its real lights
+const MINI={w:400,h:250,ang:0,el:0.38,dist:21.5,fov:0.3,t:0,use:0};MINI.fbo=gl.createFramebuffer();MINI.tex=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,MINI.tex);
+gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,MINI.w,MINI.h,0,gl.RGBA,gl.UNSIGNED_BYTE,null);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+MINI.rb=gl.createRenderbuffer();gl.bindRenderbuffer(gl.RENDERBUFFER,MINI.rb);gl.renderbufferStorage(gl.RENDERBUFFER,gl.DEPTH_COMPONENT16,MINI.w,MINI.h);
+gl.bindFramebuffer(gl.FRAMEBUFFER,MINI.fbo);gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,MINI.tex,0);gl.framebufferRenderbuffer(gl.FRAMEBUFFER,gl.DEPTH_ATTACHMENT,gl.RENDERBUFFER,MINI.rb);
+MINI.ok=gl.checkFramebufferStatus(gl.FRAMEBUFFER)===gl.FRAMEBUFFER_COMPLETE;gl.bindFramebuffer(gl.FRAMEBUFFER,null);
+MINI.px=new Uint8Array(MINI.w*MINI.h*4);MINI.cv0=document.createElement("canvas");MINI.cv0.width=MINI.w;MINI.cv0.height=MINI.h;MINI.g0=MINI.cv0.getContext("2d");MINI.img=MINI.g0.createImageData(MINI.w,MINI.h);
+MINI.cv=document.createElement("canvas");MINI.cv.width=MINI.w;MINI.cv.height=MINI.h;MINI.g=MINI.cv.getContext("2d");
+const miniFresh=()=>MINI.ok&&performance.now()-MINI.t<2000;
+// ---- post-processing: the scene renders into a texture, then FXAA, ambient occlusion, bloom, sun rays, depth of field and motion blur go on top
+const POST={ok:false,w:0,h:0,dt:null,prev:null,on:false};
+POST.dx=gl.getExtension("WEBGL_depth_texture");
+{const PV=`attribute vec2 aQ;varying vec2 vU;void main(){vU=aQ*0.5+0.5;gl_Position=vec4(aQ,0.0,1.0);}`,PR=`#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
+precision mediump float;
+#endif
+varying vec2 vU;`;
+ const mk=(fs,names)=>{try{const p=gl.createProgram();gl.attachShader(p,sh(gl.VERTEX_SHADER,PV));gl.attachShader(p,sh(gl.FRAGMENT_SHADER,PR+fs));gl.bindAttribLocation(p,0,"aQ");gl.linkProgram(p);if(!gl.getProgramParameter(p,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(p));const u={p};names.forEach(n=>u[n]=gl.getUniformLocation(p,n));return u}catch(e){console.warn("post shader",e);return null}};
+ // quarter-size copy: colour, and in alpha how much of it is open sky (for sun rays)
+ POST.pDS=mk(`uniform sampler2D uS,uD;uniform vec2 uPx;uniform float uHasD;
+void main(){vec3 c=vec3(0.0);float s=0.0;for(int i=0;i<4;i++){vec2 o=vec2(i==0||i==2?-1.0:1.0,i<2?-1.0:1.0)*uPx;vec3 t=texture2D(uS,vU+o).rgb;c+=t;s+=uHasD>0.5?step(0.99996,texture2D(uD,vU+o).r):step(0.82,dot(t,vec3(0.3,0.5,0.2)));}gl_FragColor=vec4(c*0.25,s*0.25);}`,["uS","uD","uPx","uHasD"]);
+ POST.pBL=mk(`uniform sampler2D uS;uniform vec2 uDir;
+void main(){vec4 c=texture2D(uS,vU)*0.227;c+=(texture2D(uS,vU+uDir*1.385)+texture2D(uS,vU-uDir*1.385))*0.316;c+=(texture2D(uS,vU+uDir*3.231)+texture2D(uS,vU-uDir*3.231))*0.0703;gl_FragColor=c;}`,["uS","uDir"]);
+ POST.pC=mk(`uniform sampler2D uS,uD,uB;uniform vec2 uPx,uNF,uSunP;uniform mat4 uRe;uniform vec4 uF,uG;uniform float uHasD,uPS,uFoc,uNear;
+float lin(float d){float z=d*2.0-1.0;return 2.0*uNF.x*uNF.y/(uNF.y+uNF.x-z*(uNF.y-uNF.x));}
+vec3 fxaa(vec2 uv){vec3 L=vec3(0.299,0.587,0.114);vec3 nw=texture2D(uS,uv+vec2(-1.0,-1.0)*uPx).rgb,ne=texture2D(uS,uv+vec2(1.0,-1.0)*uPx).rgb,sw=texture2D(uS,uv+vec2(-1.0,1.0)*uPx).rgb,se=texture2D(uS,uv+vec2(1.0,1.0)*uPx).rgb,m=texture2D(uS,uv).rgb;
+ float a=dot(nw,L),b=dot(ne,L),c=dot(sw,L),d=dot(se,L),e=dot(m,L),mn=min(e,min(min(a,b),min(c,d))),mx=max(e,max(max(a,b),max(c,d)));if(mx-mn<max(0.04,mx*0.12))return m;
+ vec2 dir=vec2(-((a+b)-(c+d)),(a+c)-(b+d));float r=1.0/(min(abs(dir.x),abs(dir.y))+max((a+b+c+d)*0.03125,0.0078125));dir=clamp(dir*r,vec2(-8.0),vec2(8.0))*uPx;
+ vec3 A=0.5*(texture2D(uS,uv+dir*(-0.1667)).rgb+texture2D(uS,uv+dir*0.1667).rgb),B=A*0.5+0.25*(texture2D(uS,uv-dir*0.5).rgb+texture2D(uS,uv+dir*0.5).rgb);float lb=dot(B,L);return (lb<mn||lb>mx)?A:B;}
+void main(){vec2 uv=vU;vec3 c=uF.x>0.5?fxaa(uv):texture2D(uS,uv).rgb;float d=uHasD>0.5?texture2D(uD,uv).r:1.0,Ld=lin(d);
+ if(uF.w>0.5&&uHasD>0.5){vec4 p=uRe*vec4(uv*2.0-1.0,d*2.0-1.0,1.0);vec2 v=(uv-(p.xy/p.w*0.5+0.5))*uG.z;v*=smoothstep(uNear,uNear*1.6,Ld);float m=length(v/uPx);if(m>1.5&&m<400.0){v*=min(1.0,28.0/m);vec3 a=c;for(int i=0;i<7;i++){vec2 q=uv-v*((float(i)+0.5)/7.0-0.5);a+=lin(texture2D(uD,q).r)<uNear?c:texture2D(uS,q).rgb;}c=a*0.125;}}
+ if(uF.y>0.5&&uHasD>0.5&&d<0.99996){float R=clamp(0.55*uPS/Ld,2.0,40.0),o=0.0;for(int i=0;i<4;i++){float an=float(i)*0.785+0.4;vec2 q=vec2(cos(an),sin(an))*R*uPx*(i==1||i==3?0.6:1.0);float l1=lin(texture2D(uD,uv+q).r),l2=lin(texture2D(uD,uv-q).r),dz=Ld-2.0/(1.0/l1+1.0/l2);o+=smoothstep(0.015*Ld+0.02,0.12+0.03*Ld,dz)*(1.0-smoothstep(0.9,2.2,dz));}c*=1.0-o*0.16;}
+ vec4 bb=texture2D(uB,uv);
+ if(uF.z>0.5&&uHasD>0.5){float k=smoothstep(uFoc*2.2,uFoc*9.0,Ld);c=mix(c,bb.rgb,k*0.85);}
+ if(uG.x>0.0){vec3 h=max(bb.rgb-vec3(0.6),vec3(0.0));c+=h*h*uG.x*2.6;}
+ if(uG.y>0.0){vec2 dl=(uSunP-uv)/20.0;vec2 q=uv;float acc=0.0,w=1.0;for(int i=0;i<20;i++){q+=dl;acc+=texture2D(uB,q).a*w;w*=0.95;}float f=1.0-smoothstep(0.0,0.9,distance(uv*vec2(1.6,1.0),uSunP*vec2(1.6,1.0)));c+=vec3(1.0,0.86,0.62)*acc*0.05*uG.y*f;}
+ gl_FragColor=vec4(c,1.0);}`,["uS","uD","uB","uPx","uNF","uSunP","uRe","uF","uG","uHasD","uPS","uFoc","uNear"]);
+ POST.q=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,POST.q);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
+ POST.ok=!!(POST.pDS&&POST.pBL&&POST.pC)}
+function postTex(w,h,lin){const t=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,w,h,0,gl.RGBA,gl.UNSIGNED_BYTE,null);const f=lin?gl.LINEAR:gl.NEAREST;gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,f);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,f);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);return t}
+function postFbo(t,depth){const f=gl.createFramebuffer();gl.bindFramebuffer(gl.FRAMEBUFFER,f);gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,t,0);if(depth){if(depth.tex)gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.DEPTH_ATTACHMENT,gl.TEXTURE_2D,depth.tex,0);else gl.framebufferRenderbuffer(gl.FRAMEBUFFER,gl.DEPTH_ATTACHMENT,gl.RENDERBUFFER,depth.rb)}return f}
+function postSize(w,h){if(POST.w===w&&POST.h===h&&POST.fbo)return POST.good;
+  for(const k of ["tS","tD","tA","tB"])if(POST[k])gl.deleteTexture(POST[k]);for(const k of ["fbo","fA","fB"])if(POST[k])gl.deleteFramebuffer(POST[k]);if(POST.rb)gl.deleteRenderbuffer(POST.rb);POST.tD=POST.rb=null;
+  POST.w=w;POST.h=h;POST.qw=Math.max(1,w>>2);POST.qh=Math.max(1,h>>2);POST.tS=postTex(w,h,true);let dep=null;
+  if(POST.dx){POST.tD=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,POST.tD);gl.texImage2D(gl.TEXTURE_2D,0,gl.DEPTH_COMPONENT,w,h,0,gl.DEPTH_COMPONENT,gl.UNSIGNED_INT,null);for(const [p,v] of [[gl.TEXTURE_MIN_FILTER,gl.NEAREST],[gl.TEXTURE_MAG_FILTER,gl.NEAREST],[gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE],[gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE]])gl.texParameteri(gl.TEXTURE_2D,p,v);dep={tex:POST.tD}}
+  else{POST.rb=gl.createRenderbuffer();gl.bindRenderbuffer(gl.RENDERBUFFER,POST.rb);gl.renderbufferStorage(gl.RENDERBUFFER,gl.DEPTH_COMPONENT16,w,h);dep={rb:POST.rb}}
+  POST.fbo=postFbo(POST.tS,dep);let good=gl.checkFramebufferStatus(gl.FRAMEBUFFER)===gl.FRAMEBUFFER_COMPLETE;
+  if(!good&&POST.tD){gl.deleteTexture(POST.tD);POST.tD=null;POST.dx=null;gl.deleteFramebuffer(POST.fbo);POST.rb=gl.createRenderbuffer();gl.bindRenderbuffer(gl.RENDERBUFFER,POST.rb);gl.renderbufferStorage(gl.RENDERBUFFER,gl.DEPTH_COMPONENT16,w,h);POST.fbo=postFbo(POST.tS,{rb:POST.rb});good=gl.checkFramebufferStatus(gl.FRAMEBUFFER)===gl.FRAMEBUFFER_COMPLETE}
+  POST.tA=postTex(POST.qw,POST.qh,true);POST.fA=postFbo(POST.tA);POST.tB=postTex(POST.qw,POST.qh,true);POST.fB=postFbo(POST.tB);
+  gl.bindFramebuffer(gl.FRAMEBUFFER,null);POST.good=good;if(!good)console.warn("post-processing off: framebuffer incomplete");return good}
+// which effects are on right now (from the graphics settings)
+function postWant(){const g=G();if(!POST.ok||(XR&&XR.on))return null;const f={fxaa:g.aa!=="off",ao:!!g.ao,bloom:!!g.bloom,rays:!!g.rays,dof:!!g.dof,mb:g.mb|0,mbMe:!!g.mbMe};if(g.aa==="msaa"&&!f.ao&&!f.bloom&&!f.rays&&!f.dof&&!f.mb)return null;return f}
+function postBegin(W,H,sky){const f=postWant();POST.on=false;if(!f||!postSize(W,H))return false;POST.f=f;POST.on=true;gl.bindFramebuffer(gl.FRAMEBUFFER,POST.fbo);gl.viewport(0,0,W,H);gl.clearColor(sky[0],sky[1],sky[2],1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);return true}
+function inv4(m){const a=m,o=new Float32Array(16),b00=a[0]*a[5]-a[1]*a[4],b01=a[0]*a[6]-a[2]*a[4],b02=a[0]*a[7]-a[3]*a[4],b03=a[1]*a[6]-a[2]*a[5],b04=a[1]*a[7]-a[3]*a[5],b05=a[2]*a[7]-a[3]*a[6],b06=a[8]*a[13]-a[9]*a[12],b07=a[8]*a[14]-a[10]*a[12],b08=a[8]*a[15]-a[11]*a[12],b09=a[9]*a[14]-a[10]*a[13],b10=a[9]*a[15]-a[11]*a[13],b11=a[10]*a[15]-a[11]*a[14];
+  let det=b00*b11-b01*b10+b02*b09+b03*b08-b04*b07+b05*b06;if(!det)return null;det=1/det;
+  o[0]=(a[5]*b11-a[6]*b10+a[7]*b09)*det;o[1]=(a[2]*b10-a[1]*b11-a[3]*b09)*det;o[2]=(a[13]*b05-a[14]*b04+a[15]*b03)*det;o[3]=(a[10]*b04-a[9]*b05-a[11]*b03)*det;o[4]=(a[6]*b08-a[4]*b11-a[7]*b07)*det;o[5]=(a[0]*b11-a[2]*b08+a[3]*b07)*det;o[6]=(a[14]*b02-a[12]*b05-a[15]*b01)*det;o[7]=(a[8]*b05-a[10]*b02+a[11]*b01)*det;
+  o[8]=(a[4]*b10-a[5]*b08+a[7]*b06)*det;o[9]=(a[1]*b08-a[0]*b10-a[3]*b06)*det;o[10]=(a[12]*b04-a[13]*b02+a[15]*b00)*det;o[11]=(a[9]*b02-a[8]*b04-a[11]*b00)*det;o[12]=(a[5]*b07-a[4]*b09-a[6]*b06)*det;o[13]=(a[0]*b09-a[1]*b07+a[2]*b06)*det;o[14]=(a[13]*b01-a[12]*b03-a[14]*b00)*det;o[15]=(a[8]*b03-a[9]*b01+a[10]*b00)*det;return o}
+function mulMV(m,v){return [0,1,2,3].map(i=>m[i]*v[0]+m[4+i]*v[1]+m[8+i]*v[2]+m[12+i]*v[3])}
+function postEnd(o){if(!POST.on)return;POST.on=false;const W=POST.w,H=POST.h,f=POST.f,hasD=POST.tD?1:0;
+  gl.disable(gl.DEPTH_TEST);gl.disable(gl.BLEND);gl.disable(gl.CULL_FACE);gl.depthMask(false);
+  gl.bindBuffer(gl.ARRAY_BUFFER,POST.q);gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);for(let i=1;i<4;i++)gl.disableVertexAttribArray(i);
+  const tex=(u,t,unit)=>{gl.activeTexture(gl.TEXTURE0+unit);gl.bindTexture(gl.TEXTURE_2D,t);gl.uniform1i(u,unit)};
+  const needB=f.bloom||f.rays||f.dof;
+  if(needB){let P=POST.pDS;gl.useProgram(P.p);gl.bindFramebuffer(gl.FRAMEBUFFER,POST.fA);gl.viewport(0,0,POST.qw,POST.qh);tex(P.uS,POST.tS,0);if(hasD)tex(P.uD,POST.tD,1);else tex(P.uD,POST.tS,1);gl.uniform2f(P.uPx,1/W,1/H);gl.uniform1f(P.uHasD,hasD);gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
+    P=POST.pBL;gl.useProgram(P.p);for(let k=0;k<2;k++){gl.bindFramebuffer(gl.FRAMEBUFFER,POST.fB);tex(P.uS,POST.tA,0);gl.uniform2f(P.uDir,(1+k)/POST.qw,0);gl.drawArrays(gl.TRIANGLE_STRIP,0,4);gl.bindFramebuffer(gl.FRAMEBUFFER,POST.fA);tex(P.uS,POST.tB,0);gl.uniform2f(P.uDir,0,(1+k)/POST.qh);gl.drawArrays(gl.TRIANGLE_STRIP,0,4)}}
+  const P=POST.pC;gl.useProgram(P.p);gl.bindFramebuffer(gl.FRAMEBUFFER,null);gl.viewport(0,0,W,H);
+  tex(P.uS,POST.tS,0);tex(P.uD,hasD?POST.tD:POST.tS,1);tex(P.uB,needB?POST.tA:POST.tS,2);
+  gl.uniform2f(P.uPx,1/W,1/H);gl.uniform2f(P.uNF,o.near,o.far);gl.uniform1f(P.uHasD,hasD);gl.uniform1f(P.uPS,H/(2*Math.tan(o.fov/2)));gl.uniform1f(P.uFoc,o.focus);gl.uniform1f(P.uNear,f.mbMe?0:o.meCut);
+  let re=null;if(f.mb&&POST.prev){const iv=inv4(o.VP);if(iv)re=M4.mul(POST.prev,iv)}POST.prev=Float32Array.from(o.VP);gl.uniformMatrix4fv(P.uRe,false,re||M4.id());
+  const sv=o.night?0:(()=>{const s=mulMV(o.VP,[o.eye[0]+o.sun[0]*3000,o.eye[1]+o.sun[1]*3000,o.eye[2]+o.sun[2]*3000,1]);if(s[3]<=0)return 0;const x=s[0]/s[3]*0.5+0.5,y=s[1]/s[3]*0.5+0.5;gl.uniform2f(P.uSunP,x,y);return Math.max(0,1-Math.max(0,Math.abs(x-0.5)-0.6)*3-Math.max(0,Math.abs(y-0.5)-0.6)*3)})();
+  gl.uniform4f(P.uF,f.fxaa?1:0,f.ao?1:0,f.dof?1:0,re?1:0);gl.uniform4f(P.uG,f.bloom?(o.night?1.6:0.7):0,f.rays?sv*(o.rayK??1):0,(f.mb===2?1:0.5)*clamp((1/60)/Math.max(o.dt||1/60,1/240),0.25,1.5),0);
+  gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
+  // hand the GL state back to the scene shader
+  gl.activeTexture(gl.TEXTURE2);gl.bindTexture(gl.TEXTURE_2D,null);gl.activeTexture(gl.TEXTURE1);gl.bindTexture(gl.TEXTURE_2D,null);gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,null);
+  gl.useProgram(prog);gl.enable(gl.DEPTH_TEST);gl.depthMask(true);gl.disableVertexAttribArray(0);if(aC>=0){gl.disableVertexAttribArray(aC);gl.vertexAttrib3f(aC,1,1,1)}bind.col=false}
+// draw the little car centred on screen point (cx,cy) where one metre at the car is ppm pixels
+function miniDraw(g,cx,cy,ppm){if(!miniFresh())return false;const hm=2*MINI.dist*Math.tan((MINI.rf||MINI.fov)/2),hh=hm*ppm,ww=hh*MINI.w/MINI.h;g.drawImage(MINI.cv,cx-ww/2,cy-hh/2,ww,hh);return true}
 // glass panels in the car frame: centre, half width, half height, and which part of the rear view each one shows (u0,u1,v0,v1)
 function mirrorGlass(){const m=VEH.mirror,E=VEH.eye,KT=kitOf(TRIMS[st.trim].model),K=KT.mirG,rv=KT.rvG;
   const g=K||{c:[m[0]-0.115,m[1]-0.01,m[2]+0.075],hw:0.095,hh:0.062},r=rv||{c:[0,E[1]+0.12,E[2]-0.45],hw:0.12,hh:0.035};
@@ -9177,7 +9324,7 @@ function volvoBezel(P,q,sz){if(q.h>q.w*1.15)return;const u=sub(q.br,q.bl),v=sub(
   for(let i=0;i<P.length;i+=3){const d=[P[i]-bc[0],P[i+1]-bc[1],P[i+2]-bc[2]],a=d[0]*U[0]+d[1]*U[1]+d[2]*U[2],b=d[0]*V[0]+d[1]*V[1]+d[2]*V[2],n=d[0]*N[0]+d[1]*N[1]+d[2]*N[2];
     if(Math.abs(a)>lu/2+0.035||b<-0.035||b>lv+0.035||Math.abs(n)>0.07)continue;const a2=a*sx,b2=b<0?b:b*sy;for(let j=0;j<3;j++)P[i+j]=bc[j]+U[j]*a2+V[j]*b2+N[j]*n}}
 // screen and cluster sharpness: full on Medium/High, a bit softer on Low/Lowest (or when zoomed in, always full) so they can redraw every frame without lag
-function scrRes(){const q=GFX.q==="auto"?GFX.eff:GFX.q,z=SCR.focus||SCR.focusClu,s=z?2:q==="high"?2:q==="medium"?1.5:1.25;
+function scrRes(){const q=GFX.q==="auto"?GFX.eff:GFX.q,z=SCR.focus||SCR.focusClu,s=z?2:q==="high"||q==="ultra"?2:q==="medium"?1.5:1.25;
   if(s!==SS){SS=s;SCR.cv.width=SCR.W*SS;SCR.cv.height=SCR.H*SS}if(s!==CLU.k){CLU.k=s;CLU.cv.width=CLU.W*s;CLU.cv.height=CLU.H*s}}
 function setScreenFrame(){const s=VEH.screen;let q=VEH.scr;if(isVolvo()&&q&&!q.vp){q=VEH.scr=Object.assign(volvoPortrait(q,TRIMS[st.trim].model),{vp:1})}{const portrait=q&&q.h>q.w*1.15,W_=portrait?420:680,H_=portrait?620:400;if(SCR.W!==W_){SCR.W=W_;SCR.H=H_;SCR.cv.width=W_*SS;SCR.cv.height=H_*SS}}SCR_N=[0,0.2419,0.9703];if(q){const f=fitQuad(q,SCR.W/SCR.H);SCR_BL=f.bl;SCR_BR=f.br;SCR_TL=f.tl;SCR_C=q.c;SCR_N=q.n}else if(!s){SCR_BL=[-0.17,0.9405,-0.5111];SCR_BR=[0.17,0.9405,-0.5111];SCR_TL=[-0.17,1.1346,-0.5595];SCR_C=[0,1.0375,-0.5353]}
   else{const [x,y,z]=s;SCR_BL=[x-0.17,y-0.097,z+0.024];SCR_BR=[x+0.17,y-0.097,z+0.024];SCR_TL=[x-0.17,y+0.097,z-0.024];SCR_C=[x,y,z]}
@@ -9194,7 +9341,7 @@ function dragArea(x,y,w,h,fn){(SCR.drags||(SCR.drags=[])).push({x:x+(SCR.ox||0),
 function scrDragFind(x,y){const L=SCR.drags||[];for(let i=L.length-1;i>=0;i--){const d=L[i];if(x>=d.x&&x<=d.x+d.w&&y>=d.y&&y<=d.y+d.h)return d}return null}
 // a map drawn inside a panel: keep its buttons (shifted to where the panel is) instead of throwing them away
 function keepHits(saved,inner,dx,x0,x1){SCR.hits=saved;for(const h of inner){const X=h.x+dx;if(X+h.w>=x0&&X<=x1)SCR.hits.push({...h,x:X})}}
-function pagesFor(){{const th=!isTesla()&&!isSync()&&!isVolvo()&&scrTheme();if(th&&th.mz5)return [["home","Home"],["map","Maps"],["media","Music"],["apps","Apps"],["phone","Phone"],["climate","Climate"],["camera","Camera"],...(has("autopark")?[["park","Park"]]:[]),...(isHybT(st.trim)?[["energy","Energy"]]:[]),["controls","Settings"]];if(th&&th.ui==="Mazda Connect")return [["home","Home"],["map","Navigation"],["media","Media"],["phone","Phone"],["camera","Camera"],...(isHybT(st.trim)?[["energy","Energy"]]:[]),["controls","Settings"]];if(th&&th.toy)return [["map","Navigation"],["media","Audio"],["phone","Phone"],["camera","Camera"],...(has("autopark")?[["park","Park"]]:[]),...(TRIMS[st.trim].ice&&!isHybT(st.trim)?[]:[["energy","Energy"]]),["controls","Vehicle"]]}if(isSync())return [["home","Home"],["media","Audio"],["phone","Phone"],["map","Nav"],["apps","Apps"],["controls","Settings"],["camera","Camera"],["energy","Energy"],...(has("autopark")?[["park","Park"]]:[])];const P=isTesla()?[["map","Map"],["camera","Camera"],["energy","Energy"],["autopilot","Autopilot"],["toybox","Toybox"],["upgrades","Upgrades"],["controls","Controls"],["climate","Climate"]]:PAGES.filter(p=>!(p[0]==="energy"&&TRIMS[st.trim].ice&&!(DRIVES[st.trim]||{}).par&&!TRIMS[st.trim].plug));if(has("autopark"))P.splice(2,0,["park","Park"]);return P}
+function pagesFor(){{const th=!isTesla()&&!isSync()&&!isVolvo()&&scrTheme();if(th&&th.mz5)return [["home","Home"],["map","Maps"],["media","Music"],["apps","Apps"],["phone","Phone"],["climate","Climate"],["camera","Camera"],...(has("autopark")?[["park","Park"]]:[]),...(isHybT(st.trim)?[["energy","Energy"]]:[]),["controls","Settings"]];if(th&&th.ui==="Mazda Connect")return [["home","Home"],["map","Navigation"],["media","Media"],["phone","Phone"],["camera","Camera"],...(isHybT(st.trim)?[["energy","Energy"]]:[]),["controls","Settings"]];if(th&&th.toy)return [["home","Home"],["map","Navigation"],["media","Audio"],["phone","Phone"],["camera","Camera"],...(has("autopark")?[["park","Park"]]:[]),...(TRIMS[st.trim].ice&&!isHybT(st.trim)?[]:[["energy","Energy"]]),["controls","Vehicle"]]}if(isSync())return [["home","Home"],["media","Audio"],["phone","Phone"],["map","Nav"],["apps","Apps"],["controls","Settings"],["camera","Camera"],["energy","Energy"],...(has("autopark")?[["park","Park"]]:[])];const P=isTesla()?[["map","Map"],["camera","Camera"],["energy","Energy"],["autopilot","Autopilot"],["toybox","Toybox"],["upgrades","Upgrades"],["controls","Controls"],["climate","Climate"]]:PAGES.filter(p=>!(p[0]==="energy"&&TRIMS[st.trim].ice&&!(DRIVES[st.trim]||{}).par&&!TRIMS[st.trim].plug));if(has("autopark"))P.splice(2,0,["park","Park"]);if(!isTesla()&&!P.some(p=>p[0]==="home"))P.unshift(["home","Home"]);return P}
 // ---- Park: the park assist menu and its progress, on the car's own screen
 function scrPark(g,top,bot,W){const h=bot-top;g.fillStyle="#0a1013";g.fillRect(0,top,W,h);g.textBaseline="alphabetic";
   if(!PA.mode&&!sys.pa){g.fillStyle="#e6eef0";g.font=FONT(15);g.textAlign="left";g.fillText("PARK ASSIST",16,top+24);
@@ -10787,8 +10934,8 @@ function drawEVRingCluster(g,W,H,T,Hy,v){const F=FONT;g.textBaseline="alphabetic
 function drawCluster(){
   scrRes();const g=CLU.g,W=CLU.W,H=CLU.H,T=TRIMS[st.trim],Hy=car.hyb,D=DRIVES[st.trim],v=Math.abs(car.vx),F=FONT;g.setTransform(CLU.k,0,0,CLU.k,0,0);
   g.fillStyle="#020405";g.fillRect(0,0,W,H);
-  if(st.power===false&&sys.roaT>0){roaCluster(g,W,H);gl.bindTexture(gl.TEXTURE_2D,CLU.tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);(cluFcw(),gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,CLU.cv));gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);return}
-  if(st.power===false){gl.bindTexture(gl.TEXTURE_2D,CLU.tex);(cluFcw(),gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,CLU.cv));return}
+  if(st.power===false&&sys.roaT>0){RAV19.pw=false;roaCluster(g,W,H);gl.bindTexture(gl.TEXTURE_2D,CLU.tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);(cluFcw(),gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,CLU.cv));gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);return}
+  if(st.power===false){RAV19.pw=false;gl.bindTexture(gl.TEXTURE_2D,CLU.tex);(cluFcw(),gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,CLU.cv));return}
   if(isTesla()){vizTesla(g,0,0,W,H,false);cluNav(g,W,H);gl.bindTexture(gl.TEXTURE_2D,CLU.tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);(cluFcw(),gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,CLU.cv));gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);return}
   if(ANALOG.has(st.trim)||isVolvo()){if(ANALOG.has(st.trim))drawAnalogCluster(g,W,H,T,Hy,D,v);else drawVolvoCluster(g,W,H,T,Hy,v);cluNav(g,W,H);gl.bindTexture(gl.TEXTURE_2D,CLU.tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);(cluFcw(),gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,CLU.cv));gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);return}
   {const br=brandS();const ana=cluAnalog();if(br==="Volkswagen"){drawVWCluster(g,W,H,v);cluUpload();return}if(br==="Lucid"){drawLucidCluster(g,W,H,v);cluUpload();return}if(isRav19()){drawRav19Cluster(g,W,H,v);cluUpload();return}if(br==="Honda"&&!ana){drawHondaCluster(g,W,H,v);cluUpload();return}if(br==="Audi"&&modelOf()==="q5"&&!ana){drawAudiOldCluster(g,W,H,v);cluUpload();return}if(br==="Cadillac"&&isEsc()){drawEscCluster(g,W,H,v);cluUpload();return}if(br==="Chrysler"&&!ana){drawChryslerCluster(g,W,H,v);cluUpload();return}if(br==="Ram"&&!ana){drawRamCluster(g,W,H,v);cluUpload();return}if(br==="Ford"){drawFordCluster(g,W,H,v);cluUpload();return}if(br==="Mazda"){drawMazdaCluster(g,W,H,v);cluUpload();return}if(br==="Lexus"){drawLexusCluster(g,W,H,v);cluUpload();return}if(br==="Toyota"){drawToyotaCluster(g,W,H,v);cluUpload();return}if(br==="Hyundai"){drawHyundaiCluster(g,W,H,v);cluUpload();return}if(br==="Cadillac"&&!cluAnalog()){drawCadillacCluster(g,W,H,v);cluUpload();return}if(br==="BMW"){drawBMWCluster(g,W,H,v);cluUpload();return}if(br==="Mercedes-Benz"||br==="Mercedes-Maybach"){drawMBCluster(g,W,H,v);cluUpload();return}const bk=BCLU_OF[br]||((TRIMS[st.trim].group||"").startsWith("INFINITI")?"Infiniti":null);if(bk){drawBrandCluster(g,W,H,v,bk);cluUpload();return}}
@@ -11048,7 +11195,7 @@ function render(dt){
   if(st.cam===1){const f=norm(sub(tgt,eye)),rt=norm(cross(f,up)),u2=cross(rt,f),ty=Math.tan(fov/2),O=M4.p(cm,SCR_BL);SCR.info={eye,f,rt,up:u2,tx:ty*asp,ty,cm};
     SCR.quad={O,U:sub(M4.p(cm,SCR_BR),O),V:sub(M4.p(cm,SCR_TL),O),N:M4.d(cm,SCR_N)}}
   gl.uniformMatrix4fv(U.uVP,false,VP); gl.uniform3fv(U.uEye,eye);cullSet(VP,eye);
-  {const az=(GT.min/1440)*Math.PI*2-Math.PI/2,e=Math.max(0.12,GT.el??0.8);gl.uniform3fv(U.uSun,norm(D_<0.15?[0.3,0.5,0.2]:[Math.cos(az)*0.8,e+0.1,Math.sin(az)*0.6+0.25]))}
+  {const az=(GT.min/1440)*Math.PI*2-Math.PI/2,e=Math.max(0.12,GT.el??0.8);gl.uniform3fv(U.uSun,POST.sun=norm(D_<0.15?[0.3,0.5,0.2]:[Math.cos(az)*0.8,e+0.1,Math.sin(az)*0.6+0.25]))}
   gl.uniform3fv(U.uSunC,[0.03,0.035,0.05].map((v,i)=>lerp(v,[1.05,1.0,0.92][i]*[1,0.78+0.22*D_,0.55+0.45*D_][i],D_)).map(v=>v*(1-(wsky?ww*0.55:0)))); gl.uniform3fv(U.uAmb,[0.014,0.016,0.024].map((v,i)=>lerp(v,[0.30,0.34,0.40][i],D_)));
   gl.uniform3fv(U.uFog,sky);gl.uniform1f(U.uNt,clamp(1-(GT.D??(night?0:1))*1.4,0,1));gl.uniform1i(U.uTex,0); {const fd=(night?0.004:0.0011)+(wsky?ww*{rain:0.0032,snow:0.0055,fog:0.021}[wk]:0);gl.uniform1f(U.uFD,fd);CULL.maxD=Math.min(G().cullD||4800,3.6/Math.max(1e-4,fd))}
   const lampsOn=(st.lights||night)&&st.power!==false;
@@ -11056,6 +11203,10 @@ function render(dt){
   const braking=car.brake>0.05; gl.uniform3fv(U.uTP,M4.p(cm,VEH.tail)); gl.uniform1f(U.uTail,braking?1:(lampsOn?0.25:0));
   if(GFX.frame%90===0||DD_N<0)try{ddAssign()}catch(e){}
   const pass=(VP,eye,tgt,cam2)=>{gl.uniformMatrix4fv(U.uVP,false,VP);gl.uniform3fv(U.uEye,eye);cullSet(VP,eye);CULL.sec=!!cam2;
+  if(cam2==="mini"){gl.disable(gl.CULL_FACE);gl.uniformMatrix4fv(U.uM,false,M4.id());gl.depthMask(true);gl.disable(gl.BLEND);
+    const lo=(st.lights||night)&&st.power!==false,bk=car.brake>0.05||inp.brk>0.05&&st.power!==false,fl=sys.flashT>0&&((sys.flashT*6|0)%2===0),so=((st.signal||st.hazard)&&st.blink)||fl,AM=[2.2,1.0,0.08],OF=[0,0,0];
+    const litM={head:lo?[1.6,1.6,1.5]:[0.35,0.36,0.38],tail:bk?[1.4,0.04,0.02]:(lo?[0.45,0.01,0.01]:OF),sigL:so&&(fl||st.hazard||st.signal===-1)?AM:OF,sigR:so&&(fl||st.hazard||st.signal===1)?AM:OF,rev:st.gear==="R"?[1.4,1.4,1.4]:OF};
+    gl.uniform3fv(U.uTP,M4.p(cm,VEH.tail));gl.uniform1f(U.uTail,bk?1:(lo?0.25:0));dentOn(true);WHL_ME=true;drawCar(cm,myPaint(),litM,car.spin,car.dF,car.dR,false,car.height-tuneLow(),false,car.defl.map(d=>d));drawCar(cm,myPaint(),litM,car.spin,car.dF,car.dR,true,car.height-tuneLow(),false);WHL_ME=false;dentOn(false);gl.depthMask(true);gl.disable(gl.BLEND);return}
   gl.disable(gl.CULL_FACE);gl.uniformMatrix4fv(U.uM,false,M4.id());
   // layered flat surfaces: push lower layers back in depth so the road and paint never flicker at distance
   gl.enable(gl.POLYGON_OFFSET_FILL);
@@ -11194,9 +11345,17 @@ function render(dt){
   if(mirOn()&&GFX.frame%(G().camEvery||2)===0){gl.bindFramebuffer(gl.FRAMEBUFFER,MIR.fbo);gl.viewport(0,0,MIR.w,MIR.h);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
     const E=VEH.eye,e2=M4.p(cm,[0,E[1]+0.1,VEH.tail[2]+0.12]),t2=M4.p(cm,[0,E[1]-0.6,VEH.tail[2]+40]);pass(M4.mul(M4.persp(0.62,MIR.w/MIR.h,0.15,900),M4.look(e2,t2,M4.d(cm,[0,1,0]))),e2,t2,"rear");
     gl.bindFramebuffer(gl.FRAMEBUFFER,null);gl.viewport(0,0,W,H);MIR.fresh=true}
+  if(MINI.ok&&!st.walk&&performance.now()-MINI.use<1500&&GFX.frame%2===0){try{gl.bindFramebuffer(gl.FRAMEBUFFER,MINI.fbo);gl.viewport(0,0,MINI.w,MINI.h);gl.clearColor(1,0,1,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+    const a=MINI.ang,R_=MINI.dist,el=MINI.el,e2=M4.p(cm,[-Math.sin(a)*R_*Math.cos(el),R_*Math.sin(el)+0.7,Math.cos(a)*R_*Math.cos(el)]),t2=M4.p(cm,[0,0.7,0]);
+    // the shader alpha isn't coverage, so the magenta background is keyed out below
+    pass(M4.mul(M4.persp(MINI.fov,MINI.w/MINI.h,0.5,300),M4.look(e2,t2,[0,1,0])),e2,t2,"mini");gl.readPixels(0,0,MINI.w,MINI.h,gl.RGBA,gl.UNSIGNED_BYTE,MINI.px);{const P_=MINI.px;for(let i=0;i<P_.length;i+=4)P_[i+3]=P_[i]>250&&P_[i+1]<6&&P_[i+2]>250?0:255}MINI.img.data.set(MINI.px);MINI.g0.putImageData(MINI.img,0,0);
+    MINI.g.clearRect(0,0,MINI.w,MINI.h);MINI.g.save();MINI.g.scale(1,-1);MINI.g.drawImage(MINI.cv0,0,-MINI.h);MINI.g.restore();MINI.t=performance.now();MINI.rf=MINI.fov}catch(e){console.error(e)}
+    gl.bindFramebuffer(gl.FRAMEBUFFER,null);gl.viewport(0,0,W,H);gl.clearColor(skyS[0],skyS[1],skyS[2],1)}
   if(st.cam===1&&CLU_BL)drawCluster();   // the cluster redraws every frame: needles and numbers move smoothly
   if((st.cam===1||dogShow())&&GFX.frame%G().scrEvery===0){drawScreen(dt*G().scrEvery);if(VEH.xs&&(GFX.frame/G().scrEvery|0)%2===0)xsDraw();if(PANO.on&&(PANO.style!=="lin"||(GFX.frame/G().scrEvery|0)%2===1))panoDraw()}
-  if(!(XR.on&&XR.inFrame&&xrDraw(cm,pass,eye,tgt)))pass(VP,eye,tgt,false);
+  if(!(XR.on&&XR.inFrame&&xrDraw(cm,pass,eye,tgt))){const PB=postBegin(W,H,skyS);pass(VP,eye,tgt,false);
+    if(PB){const dc=Math.hypot(eye[0]-cm[12],eye[1]-cm[13],eye[2]-cm[14]),inCar=st.cam===1&&!st.walk;
+      postEnd({VP,eye,fov,near:PM.on?0.08:st.cam===1?0.06:0.3,far:4800,focus:inCar?40:Math.max(20,dc),meCut:st.walk?0:inCar?3:dc+(VEH.len||4.8)*0.6+0.5,night,sun:POST.sun||[0,1,0],rayK:clamp(D_*1.4-0.2,0,1)*(1-ww*0.8),dt})}}
 }
 
 // ======================================================================= HUD
@@ -11630,7 +11789,10 @@ const TABS={
     ${T.bMode?`<h3>Shift position</h3><div class="grid2">${[[1,"D","Normal"],[2,"B","More regen when you lift, for long downhills"]].map(([v,n,d])=>opt(`data-regen="${v}"`,st.regen===v,n,d)).join("")}</div>`:""}
     ${T.ice||T.bMode?"":`<h3>Regenerative braking</h3><div class="grid2">${["Off","Low","Standard","One-pedal"].slice(0,(T.regenMax??3)+1).map((n,i)=>opt(`data-regen="${i}"`,st.regen===i,n,["Coasts like a gas car","Gentle slowing when you lift","About 0.1 g when you lift","Slows to a stop and holds, no brake needed"][i])).join("")}</div>`}
     <h3>Sound</h3><div class="grid2">${["Quiet","Normal","Loud"].map((n,i)=>opt(`data-ev="${i}"`,(st.engVol??1)===i,`Engine: ${n}`,i===1?"Default":"")).join("")}${tog("traffic","Traffic sounds","Nearby cars, quietly",st.aiSnd)}</div>
-    <h3>Graphics</h3><div class="grid2">${["auto","lowest","low","medium","high"].map(k=>opt(`data-gfx="${k}"`,GFX.q===k,k==="auto"?"Auto":GQ[k].label,k==="auto"?`Now ${G().label} · ${Math.round(GFX.fps)} fps`:"")).join("")}</div>
+    <h3>Graphics</h3><div class="grid2">${["auto","lowest","low","medium","high","ultra"].map(k=>opt(`data-gfx="${k}"`,GFX.q===k&&!Object.keys(GFX.ov).length,k==="auto"?"Auto":GQ[k].label,k==="auto"?`Now ${G().label} · ${Math.round(GFX.fps)} fps`:k==="ultra"?"Every effect on. Needs a fast graphics card":k==="high"?"Bloom and light rays":"")).join("")}</div>
+    <h3>Graphics: custom${Object.keys(GFX.ov).length?` · <button class="opt" style="display:inline;padding:3px 10px;width:auto;font-size:12px" data-gfxreset="1">Back to ${GQ[GFX.q==="auto"?GFX.eff:GFX.q].label}</button>`:""}</h3>${(()=>{const g=G();return GOPT.map(([k,n,d,vals,,get])=>{const cur=get(g);return `<div class="rcRow"><span>${n}</span><div class="seg5" style="grid-template-columns:repeat(${vals.length},1fr)">${vals.map(([v,l])=>`<button class="${cur===v?"on":""}" data-gopt="${k}:${v}">${l}</button>`).join("")}</div>${d?`<small>${d}</small>`:""}</div>`}).join("")})()}
+    <div class="rcRow"><span>Lighting</span><div class="seg5" style="grid-template-columns:repeat(2,1fr)">${[["1","Simple"],["0","Full"]].map(([v,l])=>`<button class="${(GFX_LITE?"1":"0")===v?"on":""}" data-glite="${v}">${l}</button>`).join("")}</div><small>Full has shiny paint, reflections and lit headlight beams. Simple is faster on old laptops. Reloads the game</small></div>
+    ${POST.ok?(POST.dx?"":`<p class="note">This device can't read depth in the browser, so ambient occlusion, depth of field and motion blur stay off.</p>`):`<p class="note">Effects aren't supported on this device.</p>`}
     <h3>Weather · now ${WX.w>0.05?WX.cur:"clear"}</h3><div class="grid2">${[["auto","Auto","Changes every few minutes"],["clear","Clear","Dry road"],["rain","Rain","Wet road, about 70% grip"],["snow","Snow","About 30% grip: try TCS and ABS"],["fog","Fog","You see a lot less"]].map(([k,n,d])=>opt(`data-wx="${k}"`,st.weather===k,n,d)).join("")}</div>
     <h3>Road condition</h3><div class="rcRow"><span>Potholes</span><div class="seg5">${ROADC_N.map((n,i)=>`<button class="${ROADC.holes===i?"on":""}" data-rch="${i}">${n}</button>`).join("")}</div><small>${["Perfect pavement","A pothole now and then","Like most towns","Spring after a hard winter","Every few metres","Craters everywhere, some a car-length wide"][ROADC.holes]}</small></div>
     <div class="rcRow"><span>Bumps</span><div class="seg5">${ROADC_N.map((n,i)=>`<button class="${ROADC.bumps===i?"on":""}" data-rcb="${i}">${n}</button>`).join("")}</div><small>${["Glass smooth","Smooth","Like most towns: heaves, manholes, patches","Bumpy","Washboard everywhere","Broken up and heaved like an earthquake hit"][ROADC.bumps]}</small></div>
@@ -11736,7 +11898,7 @@ $("tabBody").addEventListener("click",e=>{const b=e.target.closest("button");if(
   else if(d.set){const [k,v]=d.set.split(":"),n=+v,H=car.hyb,T=TRIMS[st.trim];if(k==="fuel"){H.fuel=H.tank*n;toast(`Fuel set to ${n*100}%`)}else if(k==="chg"){if(T.plug)H.pb=n;else H.soc=socRaw(n);toast(`Charge set to ${n*100}%`)}else{st[k]=n;if(k==="wheelUI")document.body.classList.toggle("wheelMode",!!n)}
     if(k==="cargoKg"||k==="dummies"||k==="dummyKg"){car.cargo=loadKg();toast(`Load: ${Math.round(loadKg()*2.205)} lb`)}}
   else if(d.rch!==undefined||d.rcb!==undefined){if(d.rch!==undefined)ROADC.holes=+d.rch;if(d.rcb!==undefined)ROADC.bumps=+d.rcb;try{localStorage.setItem("strata.roadc",JSON.stringify(ROADC))}catch(e){}genBumps();SCN.bumps=bumpMesh();toast(`Road condition: potholes ${ROADC_N[ROADC.holes].toLowerCase()}, bumps ${ROADC_N[ROADC.bumps].toLowerCase()}`);renderTab()}
-  else if(d.mir!==undefined){st.mirrors=d.mir==="1";toast(st.mirrors?"Realistic mirrors on":"Simple mirrors")}else if(d.gfx){setGfx(d.gfx);toast(`Graphics: ${GFX.q==="auto"?"Auto":G().label}. Traffic amount changes next time you add cars`)}else if(d.regen!==undefined){st.regen=+d.regen;act("noop")}else if(d.ev!==undefined){st.engVol=+d.ev}else if(d.wx){setWeather(d.wx,true);toast(`Weather: ${d.wx}`)}else if(d.evf){st.events=d.evf;EV.t=Math.min(EV.t,20)}else if(d.ppl){st.people=st.people===false;if(st.people===false){peds=[];cars=cars.filter(c=>c.kind!=="bike")}else spawnBikes(Math.max(2,Math.round(G().traffic/6)))}else if(d.build){closeDrawer();openBuilder();return}else if(d.test)placeTest(d.test);else if(d.reset){const M=me();resetCar(M.s,laneOf(M.off));closeDrawer()}
+  else if(d.mir!==undefined){st.mirrors=d.mir==="1";toast(st.mirrors?"Realistic mirrors on":"Simple mirrors")}else if(d.gfx){setGfx(d.gfx);toast(`Graphics: ${GFX.q==="auto"?"Auto":G().label}. Traffic amount changes next time you add cars`)}else if(d.gopt){const k=d.gopt.split(":")[0];gfxOpt(k,d.gopt.slice(k.length+1))}else if(d.gfxreset){GFX.ov={};GFX.ovV++;try{localStorage.removeItem("strata.gfxov")}catch(e){}}else if(d.glite!==undefined){if((GFX_LITE?"1":"0")!==d.glite){try{localStorage.setItem("strata.lite",d.glite)}catch(e){}toast("Reloading with the new lighting…");setTimeout(()=>location.reload(),700)}}else if(d.regen!==undefined){st.regen=+d.regen;act("noop")}else if(d.ev!==undefined){st.engVol=+d.ev}else if(d.wx){setWeather(d.wx,true);toast(`Weather: ${d.wx}`)}else if(d.evf){st.events=d.evf;EV.t=Math.min(EV.t,20)}else if(d.ppl){st.people=st.people===false;if(st.people===false){peds=[];cars=cars.filter(c=>c.kind!=="bike")}else spawnBikes(Math.max(2,Math.round(G().traffic/6)))}else if(d.build){closeDrawer();openBuilder();return}else if(d.test)placeTest(d.test);else if(d.reset){const M=me();resetCar(M.s,laneOf(M.off));closeDrawer()}
   renderTab()});
 $("drawer").addEventListener("click",e=>{if(e.target.id==="drawer"||e.target.id==="close")closeDrawer()});
 $("redo").addEventListener("click",()=>redoCar());
@@ -11747,8 +11909,25 @@ $("dPilot").onclick=()=>act("pilot");$("dSigL").onclick=()=>act("sigL"); $("dSig
 // ---- graphics quality. Auto picks from the device, then lowers the render resolution by itself if the frame rate drops
 const GQ={lowest:{cullD:1300,res:0.5,fullCars:3,traffic:6,onc:5,lod:38,hz:300,trees:false,shadow:false,aiSnd:false,scrEvery:2,camEvery:4,label:"Lowest",cap:30},low:{cullD:1900,res:0.62,fullCars:6,traffic:9,onc:8,lod:60,hz:400,trees:false,shadow:false,aiSnd:false,scrEvery:2,camEvery:3,label:"Low"},
   medium:{cullD:2800,res:1.0,fullCars:10,traffic:16,onc:16,lod:120,hz:600,trees:true,shadow:true,aiSnd:true,scrEvery:2,camEvery:2,label:"Medium"},
-  high:{res:1.5,fullCars:18,traffic:40,onc:32,lod:260,hz:600,trees:true,shadow:true,aiSnd:true,scrEvery:1,camEvery:2,label:"High"}};
-const GFX={q:"auto",eff:"medium",dyn:1,fps:60,t:0,slow:0,frame:0};
+  high:{res:1.5,fullCars:18,traffic:40,onc:32,lod:260,hz:600,trees:true,shadow:true,aiSnd:true,scrEvery:1,camEvery:2,label:"High",aa:"fxaa",bloom:1,rays:1},
+  ultra:{res:2,fullCars:28,traffic:60,onc:48,lod:420,hz:900,trees:true,shadow:true,aiSnd:true,scrEvery:1,camEvery:1,label:"Ultra",aa:"fxaa",bloom:1,rays:1,ao:1,dof:1,mb:1}};
+for(const k in GQ)GQ[k]={aa:"msaa",bloom:0,rays:0,ao:0,dof:0,mb:0,mbMe:0,...GQ[k]};
+// custom graphics: each row overrides part of the preset (like a PC game's advanced settings)
+const GOPT=[
+  ["res","Resolution","Sharper picture costs the most speed",[["0.5","50%"],["0.75","75%"],["1","100%"],["1.5","150%"],["2","200%"]],v=>({res:+v}),g=>String([0.5,0.75,1,1.5,2].reduce((a,b)=>Math.abs(b-g.res)<Math.abs(a-g.res)?b:a))],
+  ["dist","View distance","How far scenery and cars are drawn",[["s","Short"],["m","Medium"],["f","Far"],["x","Max"]],v=>({s:{cullD:1300,hz:300,lod:38},m:{cullD:1900,hz:400,lod:60},f:{cullD:2800,hz:600,lod:120},x:{cullD:undefined,hz:900,lod:420}}[v]),g=>!g.cullD?"x":g.cullD>=2800?"f":g.cullD>=1900?"m":"s"],
+  ["traf","Traffic detail","How many cars are around you and how many are fully detailed",[["l","Light"],["n","Normal"],["h","Heavy"],["p","Packed"]],v=>({l:{traffic:6,onc:5,fullCars:4},n:{traffic:16,onc:16,fullCars:10},h:{traffic:40,onc:32,fullCars:18},p:{traffic:60,onc:48,fullCars:28}}[v]),g=>g.traffic>=60?"p":g.traffic>=40?"h":g.traffic>=16?"n":"l"],
+  ["trees","Trees","",[["0","Off"],["1","On"]],v=>({trees:v==="1"}),g=>g.trees?"1":"0"],
+  ["shadow","Car shadows","Soft shadows under every car",[["0","Off"],["1","On"]],v=>({shadow:v==="1"}),g=>g.shadow?"1":"0"],
+  ["scr","Mirrors & screens","How often mirrors, cameras and the centre screen redraw",[["2:4","Saver"],["2:2","Normal"],["1:1","Every frame"]],v=>{const [a,b]=v.split(":").map(Number);return {scrEvery:a,camEvery:b}},g=>g.camEvery>=4?"2:4":g.camEvery<=1&&g.scrEvery<=1?"1:1":"2:2"],
+  ["aa","Anti-aliasing","Smooths jagged edges. MSAA is the browser's own; with any effect below on, FXAA is used",[["off","Off"],["msaa","MSAA"],["fxaa","FXAA"]],v=>({aa:v}),g=>g.aa],
+  ["ao","Ambient occlusion","Soft shading where things meet: tyres on the road, kerbs, building corners",[["0","Off"],["1","On"]],v=>({ao:+v}),g=>String(g.ao|0)],
+  ["bloom","Bloom","Bright lights and sky glow, strongest at night",[["0","Off"],["1","On"]],v=>({bloom:+v}),g=>String(g.bloom|0)],
+  ["rays","Light rays","Sun shafts through trees and buildings",[["0","Off"],["1","On"]],v=>({rays:+v}),g=>String(g.rays|0)],
+  ["dof","Depth of field","Faraway scenery goes slightly soft",[["0","Off"],["1","On"]],v=>({dof:+v}),g=>String(g.dof|0)],
+  ["mb","Motion blur","The world blurs with speed and when the camera turns",[["0","Off"],["1","Low"],["2","High"]],v=>({mb:+v}),g=>String(g.mb|0)],
+  ["mbMe","Blur your own car","Motion blur on the car you drive too",[["0","Off"],["1","On"]],v=>({mbMe:+v}),g=>String(g.mbMe|0)]];
+const GFX={q:"auto",eff:"medium",dyn:1,fps:60,t:0,slow:0,frame:0,ov:{},ovV:0};try{const o=JSON.parse(localStorage.getItem("strata.gfxov")||"{}");if(o&&typeof o==="object")GFX.ov=o}catch(e){}
 function gpuName(){try{const c=document.createElement("canvas").getContext("webgl"),e=c&&c.getExtension("WEBGL_debug_renderer_info");return e?String(c.getParameter(e.UNMASKED_RENDERER_WEBGL)):""}catch(_){return ""}}
 function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwareConcurrency||4,touch=matchMedia("(pointer:coarse)").matches,gpu=gpuName();
   if(mem<=3||cores<=3)return "low";
@@ -11757,11 +11936,12 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=187;   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="173",BUILD_VER=188;   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
-function G(){return GQ[GFX.q==="auto"?GFX.eff:GFX.q]}
-function setGfx(q){GFX.q=q;GFX.dyn=1;try{localStorage.setItem("strata.gfx",q)}catch(e){}}
+function G(){const k=GFX.q==="auto"?GFX.eff:GFX.q;if(G.k!==k||G.v!==GFX.ovV||!G.m){G.k=k;G.v=GFX.ovV;const m={...GQ[k]};for(const o of GOPT)if(GFX.ov[o[0]]!==undefined)Object.assign(m,o[4](GFX.ov[o[0]]));if(Object.keys(GFX.ov).length)m.label=GQ[k].label+" (custom)";G.m=m}return G.m}
+function gfxOpt(k,v){const o=GOPT.find(x=>x[0]===k);if(!o)return;const base={...GQ[GFX.q==="auto"?GFX.eff:GFX.q]};if(o[5](base)===v)delete GFX.ov[k];else GFX.ov[k]=v;GFX.ovV++;GFX.dyn=1;try{localStorage.setItem("strata.gfxov",JSON.stringify(GFX.ov))}catch(e){}}
+function setGfx(q){GFX.q=q;GFX.dyn=1;GFX.ov={};GFX.ovV++;try{localStorage.setItem("strata.gfx",q);localStorage.removeItem("strata.gfxov")}catch(e){}}
 function gfxTick(dt){GFX.fps=lerp(GFX.fps,1/Math.max(dt,1e-3),0.05);GFX.t+=dt;GFX.frame++;
   if(GFX.q!=="auto"||!st.started||GFX.t<1)return;GFX.t=0;
   if(GFX.fps<52){GFX.dyn=Math.max(0.5,GFX.dyn-(GFX.fps<40?0.1:0.05));if(GFX.fps<30||GFX.dyn<=0.5)GFX.slow++;if(GFX.slow>5&&GFX.eff!=="lowest"){GFX.eff=GFX.eff==="high"?"medium":GFX.eff==="medium"?"low":"lowest";GFX.slow=0;GFX.dyn=1;toast(`Graphics lowered to ${G().label} to keep it smooth`)}}
@@ -13598,7 +13778,7 @@ function renderCfg(){renderSiteNav();if(st.site&&st.site!=="new"){renderSite();r
   else{const base=PRICE[st.trim],tot=cfgTotal(),pp=paintPrice(),opt=tot-base-pp;
     h=`<h3>Price</h3><div class="sumBox"><div><span>${short(T)}</span><b>${money(base)}</b></div><div><span>${paintName()}</span><b>${pp===0?"Included":money(pp)}</b></div>${opt>0?`<div><span>Options and accessories</span><b>${money(opt)}</b></div>`:""}<div class="sumT"><span>As built</span><b>${money(tot)}</b></div></div>
     <h3>Start the drive at</h3>${Object.entries(STARTS).map(([k,m])=>`<button class="cRow ${st.map===k?"on":""}" data-cm="${k}"><span><b>${m.name}</b><small>${m.desc}</small></span></button>`).join("")}
-    <h3>Graphics</h3>${["auto","lowest","low","medium","high"].map(k=>`<button class="cRow ${GFX.q===k?"on":""}" data-gfx="${k}"><span><b>${k==="auto"?`Auto (${GQ[GFX.eff].label} on this device)`:GQ[k].label}</b><small>${{auto:"Recommended: picks for your device and lowers the resolution by itself if it starts to lag",lowest:"Surface Go and the slowest laptops: half resolution, very few cars, 30 fps",low:"Older laptops and phones: lighter shading, fewer cars",medium:"Most phones and laptops",high:"New phones and PCs: full resolution, 40 cars, trees and shadows"}[k]}</small></span></button>`).join("")}`}
+    <h3>Graphics</h3>${["auto","lowest","low","medium","high","ultra"].map(k=>`<button class="cRow ${GFX.q===k?"on":""}" data-gfx="${k}"><span><b>${k==="auto"?`Auto (${GQ[GFX.eff].label} on this device)`:GQ[k].label}</b><small>${{auto:"Recommended: picks for your device and lowers the resolution by itself if it starts to lag",lowest:"Surface Go and the slowest laptops: half resolution, very few cars, 30 fps",low:"Older laptops and phones: lighter shading, fewer cars",medium:"Most phones and laptops",high:"New phones and PCs: full resolution, 40 cars, trees and shadows"}[k]}</small></span></button>`).join("")}`}
   return h};
   h=step==="model"?sec("model"):T.real?(cfgTabs(T)+((st.cfgTab||"color")==="color"?sec("color").replace(/<h3>Wheel finish<\/h3>[\s\S]*$/,""):"")+((st.cfgTab||"color")==="acc"?sec("drive"):"")):["color","options","drive"].map(sec).join("");
   {const key=step+"/"+(st.cfgTab||""),y=b.scrollTop,same=b._step===key;b.innerHTML=h;b.scrollTop=same?y:0;b._step=key}cfgGoLabel();
@@ -13669,7 +13849,7 @@ function garModelLoad(){if(GARM.loading||GARM.g)return;GARM.loading=true;
         meshFrom.noChunk=n<65000;const m=meshFrom(P,N,I);meshFrom.noChunk=false;const c=[(mn[0]+mx[0])/2,(mn[1]+mx[1])/2,(mn[2]+mx[2])/2];m.c=c;m.r=Math.hypot(mx[0]-c[0],mx[1]-c[1],mx[2]-c[2]);meshes.push(m)}
       out.push({ms:meshes,c:g.c,e:g.e,n:g.n,mt:g.mt,detail,solid:!/marking|yellow|Blue|green|LED/i.test(g.n)})}
     GARM.g=out;delete MODELS.garage_helix}).catch(()=>{GARM.loading=false;setTimeout(garModelLoad,5000)})}
-function garModelDraw(night){if(!GARM.g)return;const e=CULL.eye;if(!e||Math.hypot(e[0]-GAR.cx,e[2]+GAR.cy)>(CULL.maxD||2000)+80)return;if(!sphVis(GAR.cx,12,-GAR.cy,62,CULL.sec?450:(CULL.maxD||2000)))return;const cull=gl.isEnabled(gl.CULL_FACE),lod=GFX.q==="high"||(GFX.q==="auto"&&GFX.eff==="high")?70:45,inside=Math.abs(e[0]-GAR.cx)<46&&Math.abs(e[2]+GAR.cy)<22;
+function garModelDraw(night){if(!GARM.g)return;const e=CULL.eye;if(!e||Math.hypot(e[0]-GAR.cx,e[2]+GAR.cy)>(CULL.maxD||2000)+80)return;if(!sphVis(GAR.cx,12,-GAR.cy,62,CULL.sec?450:(CULL.maxD||2000)))return;const cull=gl.isEnabled(gl.CULL_FACE),lod=GFX.q==="high"||GFX.q==="ultra"||(GFX.q==="auto"&&GFX.eff==="high")?70:45,inside=Math.abs(e[0]-GAR.cx)<46&&Math.abs(e[2]+GAR.cy)<22;
   for(const g of GARM.g){const paint=!g.solid;if(paint){gl.enable(gl.POLYGON_OFFSET_FILL);gl.polygonOffset(-1,-3);gl.disable(gl.CULL_FACE)}else gl.enable(gl.CULL_FACE);
     const em=g.e&&g.e[0]>0?(night?[1.8,1.8,1.7]:[0.5,0.5,0.5]):null,conc=/concrete|driving/i.test(g.n);mat(g.c.map(v=>Math.min(1,v*1.15)),em,g.mt>0.5?0.7:0.12,g.mt>0.5?50:10,1,conc?2:0);
     for(const m of g.ms){if(g.detail&&(Math.hypot(m.c[0]-e[0],m.c[1]-e[1],m.c[2]-e[2])-m.r>lod||(inside&&Math.abs(m.c[1]-e[1])>5.5)))continue;   // inside: fine detail on other levels is hidden by the decks anyway
