@@ -1262,6 +1262,7 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
   <div class="nc">
     <div class="nh"><small>What's new</small><h2>Version 173 · A brand new look, cruise button, real Tesla visualization</h2></div>
     <div class="nb">
+      <h4>🌲 Trees off means off, and straighter RAV4 lane lines</h4><ul><li>Turning Trees off (Settings › Graphics › custom, or the Low and Lowest presets) now removes every tree on the map, including the ones you could crash into: no more invisible trees to hit.</li><li>The mini car on the screens redraws less often on Low and Lowest graphics, which helps slow laptops like the Surface Go.</li><li>2019 RAV4: the lane lines on the middle screen are straight again, angled like the real car, with your car between them, and the line that flashes is the one you are actually crossing.</li></ul>
       <h4>🚫 No parking zones</h4><ul><li>The parking garage entrance and exit are clear again: no more parked cars or parking meters in front of the gates.</li><li>No parking in front of parking lots and drive-thru entrances, plus red-kerb stretches with NO PARKING signs around town. Park on a red kerb and you get a warning, then a $50 ticket after a minute.</li></ul>
       <h4>🎨 Graphics settings, RAV4 gauges and a mini car on your screens</h4><ul><li><b>New Ultra graphics</b> and a full <b>custom graphics</b> section (Settings › Graphics): resolution, view distance, traffic detail, trees, car shadows, mirror/screen refresh, anti-aliasing (MSAA or FXAA), ambient occlusion, bloom, light rays, depth of field, motion blur (and whether your own car blurs) and Simple/Full lighting. Picking a preset resets the custom rows.</li><li><b>Your own car on the screens:</b> the Tesla visualization and the assist view now show a real mini model of your car in your paint, with headlights, brake lights and blinkers lighting up. On a Tesla, shift to Park and the car swings round to a studio view with Open Frunk / Open Trunk, the lock and the charge port.</li><li><b>2019 RAV4 gauges redone from real photos:</b> LE/XLE get two real dials (tachometer, or the hybrid CHG/ECO/PWR meter) with the small screen in the middle; Limited, Adventure and XSE Hybrid get the 7-in. screen on the left and a real speedometer. The middle screen shows the lane lines with your car between them (only on trims with lane assist), and the line you cross flashes yellow. Startup does the warning-light bulb check like the real car.</li><li>2019 RAV4: cleaner blinker clicks from the real recording, and the hybrid only makes its AVAS hum in reverse (no cabin beep).</li><li>Full Self-Driving no longer creeps into a car that's right on its nose in a long queue.</li><li>Infotainment screens on every brand (except Tesla) now have a Home button.</li></ul>
       <h4>🚙 New: 2025 Audi Q5 and SQ5</h4><ul>
@@ -2757,10 +2758,10 @@ if(W2){const sOn=(ax,ay,bx,by,u,dir=1)=>{const e=ePick(ax,ay,bx,by);if(!e)return
   st_("proving","Proving ground","Suspension test course off County Rd 1: whoops, washboard, cobbles, potholes, humps, articulation, hills up to 40%, gravel, rock crawl, mud, snow, sand, skidpad",{x:TCL[0],y:TC.y0+30,h:Math.PI/2,free:true});
   {const p=PAD.e?fpt(PAD.e,PAD.dir,PAD.s0-90,0):[0,0,0];st_("station","Service plaza","Gas pumps and fast chargers beside I-38 between Maple Rd and Fairhaven",{x:p[0],y:p[1],h:p[2]})}}
 
-const COLL={g:new Map(),C:25}, BLD_LIST=[];
-const COLL_KEEP=[];function collReset(){COLL.g=new Map();BLD_LIST.length=0;for(const o of COLL_KEEP)collAdd(o)}
-function collAdd(o){const Rr=o.t==="c"?o.r:Math.hypot(o.hl,o.hw),C=COLL.C;for(let i=Math.floor((o.x-Rr)/C);i<=Math.floor((o.x+Rr)/C);i++)for(let j=Math.floor((o.y-Rr)/C);j<=Math.floor((o.y+Rr)/C);j++){const k=i*100003+j;let a=COLL.g.get(k);if(!a)COLL.g.set(k,a=[]);a.push(o)}}
-function collNear(x,y){return COLL.g.get(Math.floor(x/COLL.C)*100003+Math.floor(y/COLL.C))||[]}
+const COLL={g:new Map(),gN:new Map(),C:25}, BLD_LIST=[];   // gN: the same grid without trees (used when trees are turned off)
+const COLL_KEEP=[];function collReset(){COLL.g=new Map();COLL.gN=new Map();BLD_LIST.length=0;for(const o of COLL_KEEP)collAdd(o)}
+function collAdd(o){const Rr=o.t==="c"?o.r:Math.hypot(o.hl,o.hw),C=COLL.C;for(let i=Math.floor((o.x-Rr)/C);i<=Math.floor((o.x+Rr)/C);i++)for(let j=Math.floor((o.y-Rr)/C);j<=Math.floor((o.y+Rr)/C);j++){const k=i*100003+j;let a=COLL.g.get(k);if(!a)COLL.g.set(k,a=[]);a.push(o);if(!o.tree){let b=COLL.gN.get(k);if(!b)COLL.gN.set(k,b=[]);b.push(o)}}}
+function collNear(x,y){return (COLL.nt?COLL.gN:COLL.g).get(Math.floor(x/COLL.C)*100003+Math.floor(y/COLL.C))||[]}
 
 // ======================================================================= trims & modes
 const PAINTS={teal:[0.03,0.30,0.34],white:[0.80,0.81,0.82],blue:[0.03,0.06,0.17],red:[0.55,0.05,0.04],graphite:[0.16,0.17,0.18],
@@ -6640,7 +6641,7 @@ function rav19Mid(g,x,y,w,h,C,v,fade,boot){g.save();g.beginPath();rr2(g,x,y,w,h,
   {const gb=g.createLinearGradient(0,y,0,y+14*k);gb.addColorStop(0,C.hyb?"#7fe07a":"#7fb6e0");gb.addColorStop(1,C.hyb?"#2f8f3a":"#2f5f8f");g.fillStyle=gb;rr2(g,x+8,y+4*k,w-16,10*k,4);g.fill()}
   // lane lines with your car between them (the same mini model as the other screens: your paint, lights, brake lights, blinkers); the line you cross flashes yellow
   {const t0=y+20*k,t1=y+58*k,on=st.lka&&sys.lkaState!=="off",fl=sys.ldw||performance.now()-(sys.ldwT||0)<900,blink=Math.floor(performance.now()/180)%2===0;
-   if(has("lka")){for(const sd of [-1,1]){const hit=fl&&(sys.ldwSide||0)===sd,lx=cx+sd*w*0.2;g.strokeStyle=hit?(blink?"#ffd21f":"#6b5a10"):on?"#f2f5f8":"#5d636b";g.lineWidth=hit?3.4:2.6;g.beginPath();g.moveTo(lx,t0);g.lineTo(lx,t1);g.stroke()}
+   if(has("lka")){for(const sd of [-1,1]){const hit=fl&&(sys.ldwSide||0)===sd;g.strokeStyle=hit?(blink?"#ffd21f":"#6b5a10"):on?"#f2f5f8":"#5d636b";g.lineWidth=hit?3.4:2.6;g.lineCap="butt";g.beginPath();g.moveTo(cx+sd*w*0.07,t0);g.lineTo(cx+sd*w*0.3,t1);g.stroke()}
    MINI.use=performance.now();if(!(VZ.pk>0.01)){MINI.ang=0;MINI.el=0.38;MINI.fov=0.3}if(!miniDraw(g,cx,t1-9*k,10*k)){g.fillStyle="#cfd5dc";rr2(g,cx-9*k,t1-16*k,18*k,12*k,3);g.fill()}}
    if(C.hyb){g.fillStyle="#56d66a";g.font=CF2(8*k,800);g.textAlign="left";g.fillText("ECO",x+8,y+24*k)}}
   g.fillStyle="#7fb6ff";g.font=CF2(8*k,600);g.textAlign="left";g.fillText("Outside",x+8,y+68*k);g.fillStyle="#fff";g.font=CF2(11*k,600);g.fillText(`${Math.round(typeof ambF==="function"?ambF():68)}°F`,x+8,y+80*k);g.textAlign="right";g.font=CF2(13*k,600);g.fillText(C.clock,x+w-8,y+76*k);
@@ -7890,7 +7891,7 @@ function assist(dt){
     if(Math.abs(inp.steer)>0.06){sys.lkaDelta=0;sys.lkaHold=1.5;sys.lkaState="paused"}
     sys.lkaDelta=clamp(sys.lkaDelta,-0.03,0.03)}
   if(sys.lkaHold>0)sys.lkaHold-=dt;
-  if(st.lka&&!pilotOn&&Math.abs(e)>0.8&&sp>17.9&&!st.signal&&!M.inJ){sys.ldw=true;sys.ldwSide=Math.sign(e);sys.ldwT=performance.now()}
+  if(st.lka&&!pilotOn&&Math.abs(e)>0.8&&sp>17.9&&!st.signal&&!M.inJ){sys.ldw=true;sys.ldwSide=-Math.sign(e);sys.ldwT=performance.now()}
   if(sys.ldw&&!sys.ldwWas&&!(brandS()==="Kia"&&playS("kia_ldw",0.6))){beep(880,.09,"sine",.2);setTimeout(()=>beep(660,.12,"sine",.2),110)}
   sys.ldwWas=sys.ldw;
   if(sys.driftT>0){sys.driftT-=dt;sys.drift=-0.012*(1-Math.exp(-(6-sys.driftT)));sys.lkaLog.maxE=Math.max(sys.lkaLog.maxE,Math.abs(e));
@@ -8661,7 +8662,7 @@ function retailInto(SM,lamp,treeAt){let sd=91;const r=()=>(sd=(sd*16807)%2147483
     const rows=Math.floor((R.lotD-7)/18),wide=a1-a0>110,isl=wide?[[a0,a0+4],[(a0+a1)/2-1.6,(a0+a1)/2+1.6],[a1-4,a1]]:[[a0,a0+4],[a1-4,a1]];
     const inIsl=a=>isl.some(([p,q])=>a>p-1.35&&a<q+1.35);let chg=R.chg,acc=4;
     for(let k=0;k<rows;k++){const bR=RB0+7+k*18;BX("paint",(a0+a1)/2,bR+5.5,0.006,0.004,a1-a0-8,0.12);
-      for(const [p,q] of isl){const ic=(p+q)/2;BX("grass",ic,bR+5.5,0,0.14,q-p-0.4,10.6);BX("kerb",ic,bR+5.5,0,0.16,q-p,0.2);if(k%2===0||!wide){const tz=0.14;treeAt(ic,s*(bR+2.5),tz,false);collAdd({t:"c",x:ic,y:s*(bR+2.5),r:0.3})}
+      for(const [p,q] of isl){const ic=(p+q)/2;BX("grass",ic,bR+5.5,0,0.14,q-p-0.4,10.6);BX("kerb",ic,bR+5.5,0,0.16,q-p,0.2);if(k%2===0||!wide){const tz=0.14;treeAt(ic,s*(bR+2.5),tz,false);collAdd({tree:1,t:"c",x:ic,y:s*(bR+2.5),r:0.3})}
         lamp(ic,s*(bR+8),s>0?-Math.PI/2:Math.PI/2,0.6)}
       for(const half of [0,1]){const b0=bR+half*5.5,head=s*(half?-1:1)*Math.PI/2;
         for(let a=a0+5.4;a<a1-4;a+=2.7){if(inIsl(a))continue;BX("paint",a-1.35,b0+2.75,0.006,0.004,0.11,5.3);
@@ -8831,8 +8832,8 @@ async function w2PropsBuild(onlyTrees){if(!W2||W2P_BUSY||!W2P.length)return;W2P_
             B.I[B.ni++]=ix[v]}}}
       // walls you bump into (floors and roofs are left out: you walk on the ground, and nobody drives on a roof)
       if(onlyTrees)continue;const cb=COLB&&COLB[o.k];if(cb)for(const [cx,cy,cz,sx,sy,sz,nm] of cb){if(sy<0.5&&cy<0.4||/roof/i.test(nm||""))continue;const w=w2Xf(o,cx,cy,cz);
-        collAdd({t:"b",x:w[0],y:w[1],h:o.a+Math.PI/2,hl:sx/2,hw:sz/2,z0:w[2]-sy/2,z1:w[2]+sy/2,what:tree?"a tree":/door/i.test(nm||"")?"a door":"a wall"})}
-      if(tree&&!cb)collAdd({t:"c",x:o.x,y:o.y,r:0.4,what:"a tree"})}
+        collAdd({t:"b",x:w[0],y:w[1],h:o.a+Math.PI/2,hl:sx/2,hw:sz/2,z0:w[2]-sy/2,z1:w[2]+sy/2,tree:tree,what:tree?"a tree":/door/i.test(nm||"")?"a door":"a wall"})}
+      if(tree&&!cb)collAdd({t:"c",x:o.x,y:o.y,r:0.4,tree:1,what:"a tree"})}
     for(const k in BK)flush(k,BK[k]);
     if(performance.now()-tY>14){pub();await new Promise(r=>setTimeout(r,0));tY=performance.now()}}
   pub();W2P_BUSY=false}
@@ -8911,7 +8912,7 @@ function worldScenery(){W2P.length=0;
   }
   for(const CB of FLAT){if(CB[4]!=="city")continue;const [X0,X1,Y0,Y1]=CB,main=CB===CITY_BOX;B(plate,(X0+X1)/2,(Y0+Y1)/2,-0.05,0.04,X1-X0,Y1-Y0);
   const PARKB=[-1140,-1010,160,290];  {const g=M_();B(g,(PARKB[0]+PARKB[1])/2,(PARKB[2]+PARKB[3])/2,-0.03,0.03,PARKB[1]-PARKB[0],PARKB[3]-PARKB[2]);green.P.push(...g.P);const k0=green.P.length/3-g.P.length/3;green.N.push(...g.N);green.I.push(...g.I.map(i=>i+k0))}
-  if(main)for(let n=0;n<30;n++){const x=PARKB[0]+6+r()*(PARKB[1]-PARKB[0]-12),y=PARKB[2]+6+r()*(PARKB[3]-PARKB[2]-12);treeAt(x,y,0,true);collAdd({t:"c",x,y,r:0.35})}
+  if(main)for(let n=0;n<30;n++){const x=PARKB[0]+6+r()*(PARKB[1]-PARKB[0]-12),y=PARKB[2]+6+r()*(PARKB[3]-PARKB[2]-12);treeAt(x,y,0,true);collAdd({tree:1,t:"c",x,y,r:0.35})}
   const core=main?[-925,0]:[(X0+X1)/2,(Y0+Y1)/2],big=main?1:0.25,coreR=main?330:220;
   for(let gx=X0+14;gx<X1-10;gx+=29)for(let gy=Y0+14;gy<Y1-10;gy+=29){
     const w=16+r()*9,d=16+r()*9,x=gx+(r()-0.5)*3,y=gy+(r()-0.5)*3,rad=Math.hypot(w,d)/2;
@@ -8927,11 +8928,11 @@ function worldScenery(){W2P.length=0;
           for(const k of [-0.8,0.8])B(furn,p[0]+Math.cos(a)*k,p[1]+Math.sin(a)*k,0,0.42,0.06,0.45,a);collAdd({t:"b",x:p[0],y:p[1],h:a,hl:0.9,hw:0.3,z0:-0.3,z1:1,what:"a bench"})}
         if(clear(q[0],q[1],0.4)){B(furn,q[0],q[1],0,0.95,0.55,0.55,0);collAdd({t:"c",x:q[0],y:q[1],r:0.3,z0:-0.3,z1:1,what:"a trash can"})}}
       for(let u=k0+4;u<k1;u+=36)for(const sd of [1,-1]){const p=ePt(e,u,sd*(W+1.2));if(clear(p[0],p[1],0.8))lamp(p[0],p[1],p[2]-sd*Math.PI/2,1.0)}
-      for(let u=k0+16;u<k1;u+=18)for(const sd of [1,-1]){const p=ePt(e,u,sd*(W+2.6));if(Math.abs(((u-k0-4)%36)-0)<3)continue;if(clear(p[0],p[1],1.6)){treeAt(p[0],p[1],SZ(p[0],p[1]),false);collAdd({t:"c",x:p[0],y:p[1],r:0.3})}}}
+      for(let u=k0+16;u<k1;u+=18)for(const sd of [1,-1]){const p=ePt(e,u,sd*(W+2.6));if(Math.abs(((u-k0-4)%36)-0)<3)continue;if(clear(p[0],p[1],1.6)){treeAt(p[0],p[1],SZ(p[0],p[1]),false);collAdd({tree:1,t:"c",x:p[0],y:p[1],r:0.3})}}}
     if(e.type==="blvd"){const k0m=e.tp?e.tp[1]:k0;for(let u=k0m+10;u<k1-4;u+=50){if(nearBr(...ePt(e,u,0)))continue;const p=ePt(e,u,0);B(post,p[0],p[1],0,9,0.18,0.18);collAdd({t:"c",x:p[0],y:p[1],r:0.15});
         for(const sd of [1,-1]){const q=ePt(e,u,sd*(e.m/2-0.6));B(head,q[0],q[1],8.9,0.12,0.5,e.m-1.2,p[2]+Math.PI/2)}}
-      for(let u=k0m+30;u<k1-10;u+=25){const p=ePt(e,u,(r()-0.5)*3);if(nearBr(p[0],p[1]))continue;treeAt(p[0],p[1],0,true);collAdd({t:"c",x:p[0],y:p[1],r:0.35})}
-      for(let u=k0+20;u<k1;u+=60)for(const sd of [1,-1]){const p=ePt(e,u,sd*(W+T.walk+1.5));if(clear(p[0],p[1],1.5)){treeAt(p[0],p[1],SZ(p[0],p[1]),false);collAdd({t:"c",x:p[0],y:p[1],r:0.3})}}}
+      for(let u=k0m+30;u<k1-10;u+=25){const p=ePt(e,u,(r()-0.5)*3);if(nearBr(p[0],p[1]))continue;treeAt(p[0],p[1],0,true);collAdd({tree:1,t:"c",x:p[0],y:p[1],r:0.35})}
+      for(let u=k0+20;u<k1;u+=60)for(const sd of [1,-1]){const p=ePt(e,u,sd*(W+T.walk+1.5));if(clear(p[0],p[1],1.5)){treeAt(p[0],p[1],SZ(p[0],p[1]),false);collAdd({tree:1,t:"c",x:p[0],y:p[1],r:0.3})}}}
     if(e.type==="res"||e.type==="col"){
       for(let u=k0+8;u<k1;u+=60){const sd=(Math.floor(u/60)%2)?1:-1,p=ePt(e,u,sd*(W+T.walk+0.9));if(clear(p[0],p[1],0.8))lamp(p[0],p[1],p[2]-sd*Math.PI/2,1.2)}
       SCN_TMP.ext=house;const zn_=zoneName((e.a.x+e.b.x)/2,(e.a.y+e.b.y)/2);if(e.type==="res"&&(zn_==="sub"||zn_==="gated"))for(const sd of [1,-1])for(let u=k0+8;u<k1-8;u+=26){
@@ -8944,7 +8945,7 @@ function worldScenery(){W2P.length=0;
         else{B(house,p[0],p[1],-0.05,hh,w,d,a);collAdd({t:"b",x:p[0],y:p[1],h:a,hl:w/2,hw:d/2,what:"a house"})}
         const dr0=W+T.walk+0.4,dr1=back-d/2;if(openH){stripInto(drive,e,sd*(W+0.1),sd*(back-d/2+0.35),0.003,u+w/2+0.3,u+w/2+6.3);const H=OPEN_HOUSES[OPEN_HOUSES.length-1],c=ePt(e,u+w/2+3.3,sd*((W+back-d/2)/2));
           XSITES.push({kind:"lot",custom:true,x:c[0],y:c[1],L:6,D:back-d/2-W+0.3,U:[Math.cos(c[2]),Math.sin(c[2])],N:[-Math.sin(c[2])*sd,Math.cos(c[2])*sd],stalls:[]})}else stripInto(drive,e,sd*dr0,sd*dr1,0.003,u+w/2-3.4,u+w/2-0.4);
-        if(r()<0.7){const q=ePt(e,u-w/2-3,sd*(W+T.walk+5+r()*3));if(W2&&(q[1]>2000||zn_==="gated")){const TK=["t_maple_street","t_autumn_maple","t_oak_large","t_ornamental_tree"];w2Put(TK[Math.floor(r()*TK.length)],q[0],q[1],r()*6.28,SZ(q[0],q[1]))}else{treeAt(q[0],q[1],SZ(q[0],q[1]),r()<0.5);collAdd({t:"c",x:q[0],y:q[1],r:0.3})}}}}}
+        if(r()<0.7){const q=ePt(e,u-w/2-3,sd*(W+T.walk+5+r()*3));if(W2&&(q[1]>2000||zn_==="gated")){const TK=["t_maple_street","t_autumn_maple","t_oak_large","t_ornamental_tree"];w2Put(TK[Math.floor(r()*TK.length)],q[0],q[1],r()*6.28,SZ(q[0],q[1]))}else{treeAt(q[0],q[1],SZ(q[0],q[1]),r()<0.5);collAdd({tree:1,t:"c",x:q[0],y:q[1],r:0.3})}}}}}
   // ---- strip malls along Maple Blvd: parking lots in front, low buildings behind
   if(!W2)for(const [xa,xb] of [[-60,100],[230,470],[530,770],[830,1070],[1130,1370]])for(const sd of [1,-1]){
     const cx=(xa+xb)/2;B(lot,cx,sd*44,-0.04,0.045,xb-xa-30,36);for(let x=xa+22;x<xb-18;x+=4.8)B(stall,x,sd*44,0.008,0.012,0.12,8);
@@ -9013,8 +9014,8 @@ function worldScenery(){W2P.length=0;
   let nt=0;const NT=W2?4200:1300;for(let n=0;n<(W2?32000:9000)&&nt<NT;n++){const x=WORLD.x0+r()*(WORLD.x1-WORLD.x0),y=WORLD.y0+r()*(WORLD.y1-WORLD.y0);if(cityW(x,y)>0.05||riverD(x,y)<RIVER.w/2+10||inTC(x,y,25)||orNoTree(x,y)||W2&&inFarm(x,y,12))continue;const d=dfAt(x,y);if(d<16)continue;
     if(d<40&&!clear(x,y,12))continue;if(Math.hypot(x-PAD.cx,y-PAD.cy)<90)continue;if(tree.P.length/3>200000)break;
     if(W2&&Math.hypot(x-W2C.MT[0],y-W2C.MT[1])<1150){if(W2P.length<4000&&r()<0.55&&w2Free(x,y,4)){w2Put(r()<0.6?"t_pine_tall":"t_pine_small",x,y,r()*6.28,terrainH(x,y,d)-0.25);nt++}continue}
-    if(r()<0.55&&d>30){const cx=x,cy=y;for(let k=0;k<4;k++){const tx=cx+(r()-0.5)*30,ty=cy+(r()-0.5)*30;if(dfAt(tx,ty)<14||riverD(tx,ty)<RIVER.w/2+8||orNoTree(tx,ty)||W2&&inFarm(tx,ty,6))continue;treeAt(tx,ty,terrainH(tx,ty,dfAt(tx,ty))-0.3,true);nt++;if(dfAt(tx,ty)<40||inOR(tx,ty))collAdd({t:"c",x:tx,y:ty,r:0.35})}}
-    else{treeAt(x,y,terrainH(x,y,d)-0.3,true);nt++;if(d<40||inOR(x,y))collAdd({t:"c",x,y,r:0.35})}}
+    if(r()<0.55&&d>30){const cx=x,cy=y;for(let k=0;k<4;k++){const tx=cx+(r()-0.5)*30,ty=cy+(r()-0.5)*30;if(dfAt(tx,ty)<14||riverD(tx,ty)<RIVER.w/2+8||orNoTree(tx,ty)||W2&&inFarm(tx,ty,6))continue;treeAt(tx,ty,terrainH(tx,ty,dfAt(tx,ty))-0.3,true);nt++;if(dfAt(tx,ty)<40||inOR(tx,ty))collAdd({tree:1,t:"c",x:tx,y:ty,r:0.35})}}
+    else{treeAt(x,y,terrainH(x,y,d)-0.3,true);nt++;if(d<40||inOR(x,y))collAdd({tree:1,t:"c",x,y,r:0.35})}}
   for(let n=0;n<(W2?900:400);n++){const x=WORLD.x0+r()*(WORLD.x1-WORLD.x0),y=WORLD.y0+r()*(WORLD.y1-WORLD.y0);if(cityW(x,y)>0.05||riverD(x,y)<RIVER.w/2+20||inTC(x,y,40)||inOR(x,y,40)||W2&&inFarm(x,y,15))continue;const d=dfAt(x,y);if(d<45||d>160)continue;
     const hb=terrainH(x,y,d)-0.4,a=r()*Math.PI;B(house,x,y,hb,5.5,9+r()*4,7+r()*3,a);B(roofs,x,y,hb+5.5,1.6,7,5,a);collAdd({t:"b",x,y,h:a,hl:6,hw:4.5,what:"a house"})}
   // ---- the new world's old bridges: a red covered wooden bridge, a rusty steel truss, a stone bridge; gravel fords get marker posts
@@ -9153,7 +9154,7 @@ function worldScenery(){W2P.length=0;
         if(yes&&run===null)run=x;if(!yes&&run!==null){B(lawn,(run+x)/2,y+C/2,-0.03,0.035,x-run,C);run=null}}}
     {const k0=green.P.length/3;green.P.push(...lawn.P);green.N.push(...lawn.N);green.I.push(...lawn.I.map(i=>i+k0))}
     // trees: kept well back from the decks so no crown pokes through a floor; a ring of shrubs along the base
-    const T=[];for(let n=0;n<900&&T.length<70;n++){const x=xa+r()*(xb-xa),y=ya+r()*(yb-ya);if(!ok(x,y,7,3)||T.some(t=>Math.hypot(t[0]-x,t[1]-y)<7))continue;T.push([x,y]);treeAt(x,y,0,r()<0.45);collAdd({t:"c",x,y,r:0.35,what:"a tree"})}
+    const T=[];for(let n=0;n<900&&T.length<70;n++){const x=xa+r()*(xb-xa),y=ya+r()*(yb-ya);if(!ok(x,y,7,3)||T.some(t=>Math.hypot(t[0]-x,t[1]-y)<7))continue;T.push([x,y]);treeAt(x,y,0,r()<0.45);collAdd({tree:1,t:"c",x,y,r:0.35,what:"a tree"})}
     for(let a=0;a<Math.PI*2;a+=0.02){for(const [X,Z] of [[24+21.6*Math.cos(a),21.6*Math.sin(a)],[-24-21.6*Math.cos(a),21.6*Math.sin(a)]]){if(Math.abs(X)<24)continue;const x=G.cx+X,y=G.cy+Z;if(ok(x,y,1.0,1)&&r()<0.8)B(hedge,x,y,0,0.7+r()*0.5,1.1+r()*0.5,1.1+r()*0.5,r()*3)}}
     for(let X=-24;X<=24;X+=1.4)for(const Z of [21.6,-21.6]){const x=G.cx+X,y=G.cy+Z;if(ok(x,y,1.0,1)&&r()<0.85)B(hedge,x,y,0,0.7+r()*0.5,1.2,1.1,0)}
     SCN_TMP.hedge=hedge}
@@ -11358,7 +11359,8 @@ function render(dt){
   if(mirOn()&&GFX.frame%(G().camEvery||2)===0){gl.bindFramebuffer(gl.FRAMEBUFFER,MIR.fbo);gl.viewport(0,0,MIR.w,MIR.h);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
     const E=VEH.eye,e2=M4.p(cm,[0,E[1]+0.1,VEH.tail[2]+0.12]),t2=M4.p(cm,[0,E[1]-0.6,VEH.tail[2]+40]);pass(M4.mul(M4.persp(0.62,MIR.w/MIR.h,0.15,900),M4.look(e2,t2,M4.d(cm,[0,1,0]))),e2,t2,"rear");
     gl.bindFramebuffer(gl.FRAMEBUFFER,null);gl.viewport(0,0,W,H);MIR.fresh=true}
-  if(MINI.ok&&!st.walk&&performance.now()-MINI.use<1500&&GFX.frame%2===0){try{gl.bindFramebuffer(gl.FRAMEBUFFER,MINI.fbo);gl.viewport(0,0,MINI.w,MINI.h);gl.clearColor(1,0,1,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+  if(MINI.ok&&!st.walk&&performance.now()-MINI.use<1500&&GFX.frame%(G().camEvery>=3?6:2)===0){   // fewer redraws on the Low graphics: reading the image back stalls slow GPUs
+  try{gl.bindFramebuffer(gl.FRAMEBUFFER,MINI.fbo);gl.viewport(0,0,MINI.w,MINI.h);gl.clearColor(1,0,1,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
     const a=MINI.ang,R_=MINI.dist,el=MINI.el,e2=M4.p(cm,[-Math.sin(a)*R_*Math.cos(el),R_*Math.sin(el)+0.7,Math.cos(a)*R_*Math.cos(el)]),t2=M4.p(cm,[0,0.7,0]);
     // the shader alpha isn't coverage, so the magenta background is keyed out below
     pass(M4.mul(M4.persp(MINI.fov,MINI.w/MINI.h,0.5,300),M4.look(e2,t2,[0,1,0])),e2,t2,"mini");gl.readPixels(0,0,MINI.w,MINI.h,gl.RGBA,gl.UNSIGNED_BYTE,MINI.px);{const P_=MINI.px;for(let i=0;i<P_.length;i+=4)P_[i+3]=P_[i]>250&&P_[i+1]<6&&P_[i+2]>250?0:255}MINI.img.data.set(MINI.px);MINI.g0.putImageData(MINI.img,0,0);
@@ -11949,10 +11951,10 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=189;   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="173",BUILD_VER=190;   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
-function G(){const k=GFX.q==="auto"?GFX.eff:GFX.q;if(G.k!==k||G.v!==GFX.ovV||!G.m){G.k=k;G.v=GFX.ovV;const m={...GQ[k]};for(const o of GOPT)if(GFX.ov[o[0]]!==undefined)Object.assign(m,o[4](GFX.ov[o[0]]));if(Object.keys(GFX.ov).length)m.label=GQ[k].label+" (custom)";G.m=m}return G.m}
+function G(){const k=GFX.q==="auto"?GFX.eff:GFX.q;if(G.k!==k||G.v!==GFX.ovV||!G.m){G.k=k;G.v=GFX.ovV;const m={...GQ[k]};for(const o of GOPT)if(GFX.ov[o[0]]!==undefined)Object.assign(m,o[4](GFX.ov[o[0]]));if(Object.keys(GFX.ov).length)m.label=GQ[k].label+" (custom)";G.m=m;COLL.nt=!m.trees}return G.m}
 function gfxOpt(k,v){const o=GOPT.find(x=>x[0]===k);if(!o)return;const base={...GQ[GFX.q==="auto"?GFX.eff:GFX.q]};if(o[5](base)===v)delete GFX.ov[k];else GFX.ov[k]=v;GFX.ovV++;GFX.dyn=1;try{localStorage.setItem("strata.gfxov",JSON.stringify(GFX.ov))}catch(e){}}
 function setGfx(q){GFX.q=q;GFX.dyn=1;GFX.ov={};GFX.ovV++;try{localStorage.setItem("strata.gfx",q);localStorage.removeItem("strata.gfxov")}catch(e){}}
 function gfxTick(dt){GFX.fps=lerp(GFX.fps,1/Math.max(dt,1e-3),0.05);GFX.t+=dt;GFX.frame++;
@@ -12083,7 +12085,7 @@ function planPerp(t){const u=[t.ux,t.uy],c=Math.cos(car.psi),s=Math.sin(car.psi)
 function planPerpH(t,budget,tight){const u=[t.ux,t.uy],z=t.z||0,Rm=WB/Math.tan(0.47)+0.15,thG=Math.atan2(-u[1],-u[0]),G=[t.x+u[0]*(B-0.05),t.y+u[1]*(B-0.05)],M=[t.x-u[0]*3.6,t.y-u[1]*3.6];
   // obstacles near the stall, gathered once (parked cars on this tier, walls, rails and pillars at this height)
   const OB=[],seenO=new Set();for(const p of parked){if(p.wx===undefined||p.kind==="xing"||Math.abs((p.wz||0)-z)>1.2||Math.hypot(p.wx-t.x,p.wy-t.y)>22)continue;OB.push({t:"b",x:p.wx,y:p.wy,h:p.wh,hl:2.35,hw:0.95})}
-  for(let gx=Math.floor((t.x-22)/COLL.C);gx<=Math.floor((t.x+22)/COLL.C);gx++)for(let gy=Math.floor((t.y-22)/COLL.C);gy<=Math.floor((t.y+22)/COLL.C);gy++)for(const o of (COLL.g.get(gx*100003+gy)||[])){if(seenO.has(o))continue;seenO.add(o);if(o.z1!==undefined&&(z<o.z0-0.6||z>o.z1))continue;OB.push(o)}
+  for(let gx=Math.floor((t.x-22)/COLL.C);gx<=Math.floor((t.x+22)/COLL.C);gx++)for(let gy=Math.floor((t.y-22)/COLL.C);gy<=Math.floor((t.y+22)/COLL.C);gy++)for(const o of ((COLL.nt?COLL.gN:COLL.g).get(gx*100003+gy)||[])){if(seenO.has(o))continue;seenO.add(o);if(o.z1!==undefined&&(z<o.z0-0.6||z>o.z1))continue;OB.push(o)}
   const bodyClear=(x,y,h,z_,m)=>{const cx=x+Math.cos(h)*B,cy=y+Math.sin(h)*B,HL=BODY_HL+m,HW=BODY_HW+m,c=Math.cos(h),s=Math.sin(h);
     for(const o of OB){const dx=o.x-cx,dy=o.y-cy;if(dx*dx+dy*dy>(o.t==="c"?(HL+o.r+1)**2:(HL+Math.hypot(o.hl,o.hw)+0.5)**2))continue;
       if(o.t==="c"){const lx=Math.abs(dx*c+dy*s)-HL,ly=Math.abs(-dx*s+dy*c)-HW;if(Math.hypot(Math.max(lx,0),Math.max(ly,0))<o.r)return false}else if(obbSAT(cx,cy,h,HL,HW,o.x,o.y,o.h,o.hl,o.hw))return false}return true};
