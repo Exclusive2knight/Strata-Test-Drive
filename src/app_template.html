@@ -1262,6 +1262,7 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
   <div class="nc">
     <div class="nh"><small>What's new</small><h2>Version 173 · A brand new look, cruise button, real Tesla visualization</h2></div>
     <div class="nb">
+      <h4>🅿️ Side parking sensors and smarter AEB</h4><ul><li>Cars with automatic parking now use their side sensors too, like Audi's park assist with 360° display. Three zones down each side warn you about walls, pillars, posts and cars beside you, and a steady tone sounds if you're about to scrape one.</li><li>Parking sensors now pick up walls, pillars and posts, not just cars, so the garage beeps for real.</li><li>Audis get the real parking system plus display on the screen: your car from above with white, orange and red segments front, rear and along the sides, and STOP when you're close.</li><li>Traffic cones no longer set off automatic emergency braking or the collision warning (front or rear). The parking sensors still beep for them.</li></ul>
       <h4>📻 New radio page on most cars</h4><ul><li>The Media page on Toyota, Lexus, Hyundai, Kia, Nissan, Subaru, Mazda, VW, Ford, GM, Jeep, Ram and more is redone like the real bZ4X screen: sources on the left (Favorites, Tune, FM, AM, SiriusXM, Bluetooth), your live stations as tiles with their dial numbers, and a now-playing bar with skip and pause. No more overlapping buttons.</li><li>The Ram home screen's map no longer has buttons piled on top of the Search bar.</li></ul>
       <h4>🌈 Ambient Lighting, McIntosh and Performance Pages</h4><ul><li>New Ambient Lighting page for every car that has it (Settings › Seats & Comfort › Ambient Lighting): six colour swatches, a brightness slider, and the cabin from above glowing in your colour. It changes the real lights in the car.</li><li>Jeeps with McIntosh audio get the blue McIntosh VU meters, and the needles move with the music. Open it from the McIntosh tile on the Jeep home screen or Settings › Sound.</li><li>Ram, Jeep, Dodge and Chrysler get Performance Pages (Settings › Drive Mode, or the Perf Pages tile on Jeeps): a G-force meter with a trail and peak, gauges for engine, power, speed and fuel, and a 0–60 timer.</li></ul>
       <h4>🔴 Audi and 🟤 Genesis screens</h4><ul><li>New Audi MMI on the 2025 Q5, Q6 e-tron, A6 allroad and Q3: black screen with white type and red highlights, your car from above with live energy flow lines, tiles for Navigation, Media, Phone and Audi drive select (tap it to change modes), and the real bottom bar with temperatures.</li><li>2019 Q5 gets MMI navigation plus: the car picture with the main menu (Navigation, Radio, Media, Telephone, Car, Camera).</li><li>Genesis gets the new wide-screen home with the date and a row of tall picture tiles (Navigation, Media, Vehicle, Climate, Energy, Phone), a new bottom bar, and the white-face dials from the GV70, with your car on the road in the middle.</li></ul>
@@ -7844,7 +7845,7 @@ function assist(dt){
   // ---- AEB + forward collision warning (paused while ESA steers around)
   sys.fcw=false;
   const evading=sys.esa&&lead&&Math.abs(lead.lat-latPred(lead.ds))>1.2;
-  if(st.aeb&&has("aeb")&&st.gear==="D"&&sp>2&&!evading){   // only cars that really have forward collision warning / AEB
+  if(st.aeb&&has("aeb")&&st.gear==="D"&&sp>2&&!evading&&!(lead&&lead.o&&lead.o.kind==="cone")){   // cones never set off FCW / AEB (only cars that really have forward collision warning / AEB
     const sure=sys.leadT>(lead&&lead.vru?0.12:0.25);
     if(ttc<aebT(0)&&inp.brk<0.6&&sure&&reqDec>2)sys.fcw=true;
     if(st.aebAuto===false){if(ttc<aebT(1)&&sure&&reqDec>2)sys.fcw=true}
@@ -7877,7 +7878,7 @@ function assist(dt){
    sys.stopSign=ss;sys.ssWarn=!!(ss&&ss.d>1&&sp>4&&ss.d<sp*sp/(2*3.0)+8&&inp.brk<0.2&&!st.acc)}
   // ---- rear auto brake while reversing
   sys.rAebBrake=0;
-  if(st.rAeb&&st.gear==="R"&&sp<-0.3){for(const t of S.list){if(t.ds<0&&Math.abs(t.lat)<1.8){const g=-t.ds-CARLEN, close=-sp+t.v;
+  if(st.rAeb&&st.gear==="R"&&sp<-0.3){for(const t of S.list){if(t.ds<0&&Math.abs(t.lat)<1.8&&!(t.o&&t.o.kind==="cone")){const g=-t.ds-CARLEN, close=-sp+t.v;
     if(close>0.2&&(g/close<1.5||g<2.0)){if(!sys.rAebWas){beep(1200,.15,"square",.25);toast("Rear auto brake")}sys.rAebBrake=1}}}}
   // ---- rear cross traffic alert: cars crossing behind you while you back out; cars with rear auto brake also brake for them
   sys.rcta=0;
@@ -10003,11 +10004,19 @@ const isAudiNew=()=>brandS()==="Audi"&&["q5_25","audi_q6_etron","audi_q6_sportba
 const isAudiOld=()=>brandS()==="Audi"&&TRIMS[st.trim].model==="q5";
 function audiNewScreen(g,W,H,M){const F=CF2,C=cluCommon(),red="#f50537";const P={bg:"#000",card:"#151515",card2:"#222",line:"#2a2a2a",ink:"#f2f2f2",sub:"#8a8a8a",sel:red,selInk:"#fff"};g.fillStyle="#000";g.fillRect(0,0,W,H);g.textBaseline="middle";sys.tL=sys.tL||70;sys.tR=sys.tR||70;
   const top=30,barH=56,bot=H-barH;g.fillStyle=P.ink;g.font=F(12,500);g.textAlign="left";g.fillText(C.clock,16,15);g.textAlign="right";g.fillStyle=P.sub;g.fillText(`${typeof ambF==="function"?ambF():68}°F`,W-16,15);rivIco(g,"sig",W-64,15,12,P.sub);rivIco(g,"bt",W-80,15,12,P.sub);
-  bPage(g,top,bot,W,P,M,audiNewHome);
+  bPage(g,top,bot,W,P,M,audiNewHome);if(sys.parkOn&&SCR.page!=="camera")audiPdc(g,W-190,top+8,180,bot-top-16);
   g.fillStyle="#070707";g.fillRect(0,bot,W,barH);g.fillStyle=P.line;g.fillRect(0,bot,W,1);const cy=bot+barH/2;
   const tp=(x,k)=>{g.fillStyle=P.ink;g.font=F(18,300);g.textAlign="center";g.fillText(`${sys[k]}.0`,x,cy);g.fillStyle=P.sub;g.font=F(13);g.fillText("‹",x-34,cy);g.fillText("›",x+34,cy);hit(x-48,bot,30,barH,()=>sys[k]--);hit(x+18,bot,30,barH,()=>sys[k]++)};tp(56,"tL");tp(W-56,"tR");
   const IT=[["home",null],["map","nav"],["media","music"],["phone","phone"],["controls","car"],["camera","cam"],["climate",null]],sp=Math.min(64,(W-260)/IT.length),x0=W/2-sp*(IT.length-1)/2;
   IT.forEach(([k,ic],i)=>{const x=x0+i*sp,on=(SCR.page||"home")===k,c=on?"#fff":P.sub;if(on){g.fillStyle=red;g.fillRect(x-14,bot+barH-5,28,3)}if(ic)rivIco(g,ic,x,cy,20,c);else if(k==="home"){g.strokeStyle=c;g.lineWidth=1.8;g.beginPath();g.moveTo(x-8,cy);g.lineTo(x,cy-8);g.lineTo(x+8,cy);g.moveTo(x-6,cy-2);g.lineTo(x-6,cy+7);g.lineTo(x+6,cy+7);g.lineTo(x+6,cy-2);g.stroke()}else{g.strokeStyle=c;g.lineWidth=1.5;for(let a=0;a<3;a++){g.beginPath();g.ellipse(x+Math.cos(a*2.09)*5,cy+Math.sin(a*2.09)*5,6,2.6,a*2.09,0,7);g.stroke()}}hit(x-sp/2,bot,sp,barH,()=>{SCR.page=k;SCR.autoCam=false})})}
+// Audi parking system plus / park assist with 360° display: the car from above with white and red segments all round it,
+// side segments too on cars with park assist (the lateral sensors)
+function audiPdc(g,x,y,w,h){const P=sys.pdc;if(!P)return;const F=CF2;g.fillStyle="#050505";rr2(g,x,y,w,h,10);g.fill();g.strokeStyle="#333";g.lineWidth=1;rr2(g,x,y,w,h,10);g.stroke();
+  const cx=x+w/2,cy=y+h/2+4,cw=Math.min(w*0.26,46),cl=Math.min(h*0.48,104);g.fillStyle="#d9d9d9";rr2(g,cx-cw/2,cy-cl/2,cw,cl,cw*0.35);g.fill();g.fillStyle="#1a1a1a";rr2(g,cx-cw/2+5,cy-cl/2+cl*0.22,cw-10,cl*0.3,5);g.fill();rr2(g,cx-cw/2+5,cy+cl*0.12,cw-10,cl*0.2,4);g.fill();
+  const col=d=>d<0.3?"#f50537":d<0.6?"#ff7a3a":"#ffffff";
+  for(const [arr,dir] of [[P.f,-1],[P.r,1]])arr.forEach((d,z)=>{if(d>1.5)return;const a0=dir<0?Math.PI*(1.12+z*0.19):Math.PI*(0.12+z*0.19);g.strokeStyle=col(d);g.lineWidth=7;g.beginPath();g.ellipse(cx,cy+dir*cl*0.12,cw*0.95+d*10,cl*0.48+8+d*16,0,a0,a0+Math.PI*0.17);g.stroke()});
+  if(sideOK()&&P.sl)for(const [arr,sd] of [[P.sl,-1],[P.sr,1]])arr.forEach((d,z)=>{if(d>1.4)return;g.fillStyle=col(d);g.fillRect(cx+sd*(cw/2+6+d*10)-(sd<0?5:0),cy-cl/2+6+z*(cl-12)/3,5,(cl-12)/3-5)});
+  const n=Math.min(...P.f,...P.r,...(sideOK()&&P.sl?[...P.sl,...P.sr]:[]));g.fillStyle=n<0.3?"#f50537":"#fff";g.font=F(11,600);g.textAlign="center";g.textBaseline="middle";g.fillText(n<0.3?"STOP":n<2?`${Math.round(n*100)} cm`:"Parking system plus",cx,y+12)}
 function audiNewHome(g,top,bot,W,P,M){const F=CF2,C=cluCommon(),red="#f50537",h=bot-top;g.fillStyle="#000";g.fillRect(0,top,W,h);
   // the car from above with energy flow (like the photo), then tiles to the right
   const vw=W*0.42,cx=vw/2+10,cy=top+h/2;g.fillStyle=P.card;rr2(g,10,top+8,vw,h-16,10);g.fill();g.save();g.translate(cx,cy);const s=Math.min(vw/260,h/220);g.scale(s,s);
@@ -10275,7 +10284,7 @@ return}
       g.beginPath();g.moveTo(cx-w0+W*0.035+b,y1);g.lineTo(cx-w0+W*0.035+b+22,y1);g.moveTo(cx+w0-W*0.035+b,y1);g.lineTo(cx+w0-W*0.035+b-22,y1);g.stroke()});
     const P=sys.pdc;if(P){const n=Math.min(...P.r);if(n<2.5){g.fillStyle="rgba(8,14,16,.85)";rr2(g,W/2-60,top+10,120,36,9);g.fill();g.fillStyle=n<0.3?"#ff4d40":n<0.6?"#ffb340":"#cfe0e2";g.font=FONT(18);g.textAlign="center";g.fillText(`${(n*3.281).toFixed(n<3?1:0)} ft`,W/2,top+29)}}}
   else{const P=sys.pdc,cx=W/2,cy=top+h/2;if(P){const col=d=>d<0.3?"#ff4d40":d<0.6?"#ff7a3a":d<1.2?"#ffb340":"#55d68c";
-    for(const [arr,dir] of [[P.f,-1],[P.r,1]])arr.forEach((dd,z)=>{if(dd>2.0)return;g.fillStyle=col(dd);g.globalAlpha=0.75;g.fillRect(cx-44+z*22,cy+dir*(58+ (2-dd)*6)-(dir<0?10:0),20,10)});g.globalAlpha=1}}
+    for(const [arr,dir] of [[P.f,-1],[P.r,1]])arr.forEach((dd,z)=>{if(dd>2.0)return;g.fillStyle=col(dd);g.globalAlpha=0.75;g.fillRect(cx-44+z*22,cy+dir*(58+ (2-dd)*6)-(dir<0?10:0),20,10)});if(sideOK()&&P.sl)for(const [arr,sd] of [[P.sl,-1],[P.sr,1]])arr.forEach((dd,z)=>{if(dd>1.6)return;g.fillStyle=dd<0.3?"#ff2d20":dd<0.6?"#ff7a3a":"#ffffff";g.globalAlpha=0.85;g.fillRect(cx+sd*(40+(1.6-dd)*5)-(sd<0?8:0),cy-46+z*32,8,28)});g.globalAlpha=1}}
   if(SCR.cam==="dash")dashOverlay(g,top,bot,W);
   if(sys.rcta&&SCR.cam==="rear"){const L=sys.rcta<0,x=L?16:W-16,y=top+(bot-top)*0.55;g.fillStyle=performance.now()%500<300?"#ff3b30":"#a01a14";g.beginPath();g.moveTo(x,y);g.lineTo(x+(L?44:-44),y-24);g.lineTo(x+(L?44:-44),y+24);g.closePath();g.fill();g.fillStyle="#fff";g.font=FONT(13);g.textAlign=L?"left":"right";g.fillText("Cross traffic",x+(L?52:-52),y+5)}
   if(sys.pa||PA.mode){g.fillStyle="rgba(8,12,14,.88)";rr2(g,10,top+52,W-200,30,8);g.fill();g.fillStyle=sys.pa?"#ffd060":"#e8eef0";g.font=FONT(15);g.textAlign="left";g.fillText(sys.pa?"Parking Assist Active, Be Ready to Brake":sys.paSpot?"Space found: stop and tap Park":"Searching for Parking Space…",22,top+72)}
@@ -12146,21 +12155,30 @@ function drawEnergy(){
   $("sensorCap").textContent="Energy";
 }
 // ---- parking sensors: four zones front and rear, distance to the nearest car in each
+// side sensing (Audi park assist with 360° display, and other cars with automatic parking): the side ultrasonic sensors
+// watch three zones down each side, front / middle / rear, for walls, pillars and cars beside you
+function pkSide(out,lx,ly,r){if(lx>2.3||lx<-2.3)return;const a=Math.abs(ly)-0.95-(r||0);if(a<-0.3||a>1.6)return;const z=lx>0.8?0:lx<-0.8?2:1,k=ly>0?"sl":"sr";out[k][z]=Math.min(out[k][z],Math.max(0,a))}
+const sideOK=()=>has("autopark")&&!isTesla();
 function parkSensors(){
-  const out={f:[9,9,9,9],r:[9,9,9,9]},c=Math.cos(car.psi),sn=Math.sin(car.psi),zones=[[0.5,1.15],[0,0.5],[-0.5,0],[-1.15,-0.5]];
+  const out={f:[9,9,9,9],r:[9,9,9,9],sl:[9,9,9],sr:[9,9,9]},c=Math.cos(car.psi),sn=Math.sin(car.psi),zones=[[0.5,1.15],[0,0.5],[-0.5,0],[-1.15,-0.5]];
   const zc=car.zb||0,objs=cars.concat(parked).filter(o=>o.wx!==undefined&&Math.abs((o.wz||0)-zc)<1.6).map(o=>[o.wx,o.wy,o.wh]);   // only things on this floor (the garage has decks above and below)
   for(const [ox,oy,oh] of objs){if(Math.hypot(ox-car.px,oy-car.py)>9)continue;const ch=Math.cos(oh),shh=Math.sin(oh);
     for(const [a,b] of [[2.4,0.95],[2.4,-0.95],[-2.4,0.95],[-2.4,-0.95],[2.4,0],[-2.4,0],[0,0.95],[0,-0.95],[1.2,0.95],[1.2,-0.95],[-1.2,0.95],[-1.2,-0.95]]){
       const wx=ox+a*ch-b*shh, wy=oy+a*shh+b*ch, dx=wx-car.px, dy=wy-car.py, lx=dx*c+dy*sn, ly=-dx*sn+dy*c;
       zones.forEach(([lo,hi],z)=>{if(ly<lo-0.25||ly>hi+0.25)return;
-        if(lx>2.3)out.f[z]=Math.min(out.f[z],lx-2.4);if(lx<-2.3)out.r[z]=Math.min(out.r[z],-2.4-lx)})}}
+        if(lx>2.3)out.f[z]=Math.min(out.f[z],lx-2.4);if(lx<-2.3)out.r[z]=Math.min(out.r[z],-2.4-lx)});pkSide(out,lx,ly)}}
+  // walls, pillars, posts and kerb-side things the ultrasonic sensors would see (only near the car, on this floor)
+  {const seen=new Set();for(let i=-1;i<=1;i++)for(let j=-1;j<=1;j++)for(const o of collNear(car.px+i*COLL.C,car.py+j*COLL.C)){if(seen.has(o))continue;seen.add(o);if(o.z0!=null&&(zc<o.z0-0.5||zc>o.z1))continue;
+    const pts=[];if(o.t==="c"){pts.push([o.x,o.y])}else{const ch=Math.cos(o.h),shh=Math.sin(o.h),nL=Math.min(12,Math.ceil(o.hl/0.5)),nW=Math.min(6,Math.ceil(o.hw/0.5));for(let a=-nL;a<=nL;a++)for(const b of [-1,1])pts.push([o.x+(a/nL)*o.hl*ch-b*o.hw*shh,o.y+(a/nL)*o.hl*shh+b*o.hw*ch]);for(let b=-nW;b<=nW;b++)for(const a of [-1,1])pts.push([o.x+a*o.hl*ch-(b/nW)*o.hw*shh,o.y+a*o.hl*shh+(b/nW)*o.hw*ch])}
+    const rr_=o.t==="c"?o.r:0;for(const [wx,wy] of pts){const dx=wx-car.px,dy=wy-car.py;if(dx*dx+dy*dy>64)continue;const lx=dx*c+dy*sn,ly=-dx*sn+dy*c;
+      zones.forEach(([lo,hi],z)=>{if(ly<lo-0.1-rr_||ly>hi+0.1+rr_)return;if(lx>2.3)out.f[z]=Math.min(out.f[z],lx-2.4-rr_);if(lx<-2.3)out.r[z]=Math.min(out.r[z],-2.4-lx-rr_)});pkSide(out,lx,ly,rr_)}}}
   if(Math.hypot(car.px-PAD.cx,car.py-PAD.cy)<110)for(const [px,py] of stnWorld("chargers").concat(stnWorld("pumps"))){const dx=px-car.px,dy=py-car.py;if(Math.hypot(dx,dy)>9)continue;
     const lx=dx*c+dy*sn, ly=-dx*sn+dy*c;zones.forEach(([lo,hi],z)=>{if(ly<lo-0.5||ly>hi+0.5)return;if(lx>2.3)out.f[z]=Math.min(out.f[z],lx-2.4-0.25);if(lx<-2.3)out.r[z]=Math.min(out.r[z],-2.4-lx-0.25)})}
   return out}
 let parkBeepT=0;
 function updatePark(dt){
   const sp=Math.abs(car.vx); const P=parkSensors(); sys.pdc=P;
-  const near=Math.min(...P.f,...P.r), relevant=st.gear==="R"?Math.min(...P.r):sp<0.3?near:car.vx>0?Math.min(...P.f):Math.min(...P.r);
+  const sd=sideOK()?Math.min(...P.sl,...P.sr):9,near=Math.min(...P.f,...P.r,sd);let relevant=st.gear==="R"?Math.min(...P.r):sp<0.3?near:car.vx>0?Math.min(...P.f):Math.min(...P.r);if(sp>0.1&&sd<0.3)relevant=Math.min(relevant,sd);
   {const on=st.parkAssist&&st.gear!=="P"&&!st.walk&&sp<4.5&&(st.gear==="R"||near<(sys.parkOn?3.2:2.5));if(on)sys.parkOnT=2.5;else sys.parkOnT=(sys.parkOnT||0)-dt;sys.parkOn=on||(sys.parkOnT>0&&st.gear!=="P"&&sp<4.5)}
   if(!sys.parkOn||relevant>1.6){parkBeepT=0;return}
   parkBeepT-=dt; if(relevant<0.3){if(parkBeepT<=0){beep(1050,.11,"sine",.18);parkBeepT=0.1}}
@@ -12174,7 +12192,8 @@ function drawPark(){
     const a0=Math.PI*(dirY<0?1.18+z*0.16:0.18+z*0.16), a1=a0+0.15;
     for(let k=0;k<bars;k++){const R=cl/2+10+(3-k)*11;sg.strokeStyle=col(d);sg.lineWidth=7;sg.globalAlpha=k===bars-1?1:0.55;
       sg.beginPath();sg.ellipse(cx,cy,R*0.62,R,0,a0,a1);sg.stroke()}sg.globalAlpha=1});
-  const near=Math.min(...P.f,...P.r);
+  if(sideOK()&&P.sl)for(const [arr,sd] of [[P.sl,-1],[P.sr,1]])arr.forEach((d,z)=>{if(d>1.6)return;const x=cx+sd*(cw/2+8),y=cy-cl/2+12+z*(cl-24)/3;sg.fillStyle=col(d);sg.fillRect(x-(sd<0?6:0),y,6,(cl-24)/3-6);if(d<0.6){sg.fillRect(x+sd*9-(sd<0?6:0),y,6,(cl-24)/3-6)}});
+  const near=Math.min(...P.f,...P.r,...(sideOK()&&P.sl?[...P.sl,...P.sr]:[]));
   sg.fillStyle="#eaf1f2";sg.font="600 22px "+getComputedStyle(document.body).getPropertyValue("--f-hud");sg.textAlign="center";
   sg.fillText(near<2.5?(near<0.3?"STOP":`${Math.round(near*100)} cm`):"Clear",cx,h-8);
   $("sensorCap").textContent="Parking";
@@ -12558,7 +12577,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=204;   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="173",BUILD_VER=205;   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){const k=GFX.q==="auto"?GFX.eff:GFX.q;if(G.k!==k||G.v!==GFX.ovV||!G.m){G.k=k;G.v=GFX.ovV;const m={...GQ[k]};for(const o of GOPT)if(GFX.ov[o[0]]!==undefined)Object.assign(m,o[4](GFX.ov[o[0]]));if(Object.keys(GFX.ov).length)m.label=GQ[k].label+" (custom)";G.m=m;COLL.nt=!m.trees}return G.m}
