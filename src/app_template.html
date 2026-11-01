@@ -1268,6 +1268,8 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
   <div class="nc">
     <div class="nh"><small>What's new</small><h2 id="newsVer">Version 223 · Real weather, snow plows and tow trucks</h2></div>
     <div class="nb">
+      <h4>🛣️ The freeways loop now</h4><ul><li>I-38 and I-61 no longer stop dead at a traffic light at the edge of the map. They join up into one big loop round the whole map: head west on I-38 and it curves south and round onto I-61, head east and it runs up the east side, along the top (over the river on a bridge) and down into I-61.</li><li>County Rd 1, County Rd 11, County Rd 40 and Ridge Rd now cross over the freeway on bridges instead of meeting it at a light.</li></ul>
+      <h4>🚗 Spawned traffic stays</h4><ul><li>Cars you add from the Spawn tab (Add 5 / 10 / 20) now stay in the world on top of the normal traffic, instead of being thinned back out after a few seconds. "Clear traffic" still removes them all.</li></ul>
       <h4>💡 New streetlights</h4><ul><li>Every street now has the new single-arm streetlights reaching out over the road, and downtown sidewalks get short sidewalk lamps in between. They light up at night.</li><li>None stand on or near bridges, overpasses or the river.</li></ul>
       <h4>🔧 Fixes</h4><ul><li>Fixed the roads disappearing and everything looking grey on Medium graphics and up.</li><li>Fixed 3D grass growing on roads and house driveways.</li><li>Cones, drums and road work signs are orange again instead of grey.</li><li>Billboards are only along the freeway now, on the right side, facing traffic.</li><li>Amber message boards and road work signs face drivers, with the pole behind the sign.</li></ul>
       <h4>🚌 Buses</h4><ul><li>New city transit buses drive the main streets all day and stop every few blocks to pick people up.</li><li>New school bus (mornings and mid-afternoon on neighbourhood streets): the amber lights come on, then the red lights flash, and the stop arm and crossing arm swing out. Traffic behind it and coming the other way stops. Passing it is still a $250 ticket.</li></ul>
@@ -2182,13 +2184,13 @@ function buildNet2(){
   const zB=d=>W2C.CLH*(1-smooth01(150,460,Math.abs(d)));     // I-61's height near the crossing
   for(const d of [CLD.dX,CLD.dM,CLD.dOX,CLD.dOM])for(const sg of [1,-1]){N(ccx+sg*d,ccy,{ctrl:"merge"});N(ccx,ccy+sg*d,{ctrl:"merge",zo:zB(d)})}
   const nA=d=>[ccx+d,ccy],nB=d=>[ccx,ccy+d];
-  // ---- I-38: west end at County Rd 1, east end at County Rd 11 (at-grade signals where the freeway ends)
-  N(-4400,-1500,{ctrl:"signal"});N(4500,-1500,{ctrl:"signal"});
-  mkR("xway","I-38",[[-4400,-1500],icN(I38[0],-1),icN(I38[0],1),nA(-CLD.dOM),nA(-CLD.dOX),nA(-CLD.dM),nA(-CLD.dX),nA(CLD.dX),nA(CLD.dM),nA(CLD.dOX),nA(CLD.dOM),
-    icN(I38[1],-1),icN(I38[1],1),icN(I38[2],-1),icN(I38[2],1),icN(I38[3],-1),icN(I38[3],1),[4500,-1500]]);
-  N(-2300,-3300,{ctrl:"signal"});N(-2300,3000,{ctrl:"signal"});
-  mkR("xway","I-61",[[-2300,-3300],nB(-CLD.dOM),nB(-CLD.dOX),nB(-CLD.dM),nB(-CLD.dX),nB(CLD.dX),nB(CLD.dM),nB(CLD.dOX),nB(CLD.dOM),
-    icN(I61[0],-1),icN(I61[0],1),icN(I61[1],-1),icN(I61[1],1),[-2300,3000]]);
+  // ---- the freeways join up into one big loop round the map: I-38 west curves south and round into I-61 south,
+  // I-38 east curves north up the east edge, along the top and down into I-61 north. County roads bridge over where they cross
+  mkR("xway","I-38",[[-2300,-2850],[-2300,-3450,450],[-4650,-3450,450],[-4650,-1500,420],icN(I38[0],-1),icN(I38[0],1),nA(-CLD.dOM),nA(-CLD.dOX),nA(-CLD.dM),nA(-CLD.dX),nA(CLD.dX),nA(CLD.dM),nA(CLD.dOX),nA(CLD.dOM),
+    icN(I38[1],-1),icN(I38[1],1),icN(I38[2],-1),icN(I38[2],1),icN(I38[3],-1),icN(I38[3],1),[4100,-1500]]);
+  mkR("xway","I-61",[[4100,-1500],[4700,-1500,300],[4650,3450,450],[-2300,3450,380],[-2300,2600]]);
+  mkR("xway","I-61",[[-2300,-2850],nB(-CLD.dOM),nB(-CLD.dOX),nB(-CLD.dM),nB(-CLD.dX),nB(CLD.dX),nB(CLD.dM),nB(CLD.dOX),nB(CLD.dOM),
+    icN(I61[0],-1),icN(I61[0],1),icN(I61[1],-1),icN(I61[1],1),[-2300,2600]]);
   for(const I of [...I38,...I61])icRamps(I);
   // the ramps of the cloverleaf: quarter (sx, sy); P is the freeway coming in towards the crossing there, Q the one leaving
   const NM={A:["I-38","I-38"],B:["I-61","I-61"]},dirName=v=>v[0]>0.5?"E":v[0]<-0.5?"W":v[1]>0.5?"N":"S";
@@ -2237,11 +2239,11 @@ function buildNet2(){
   mkR("road","County Rd 3",[[-3600,-3300],[-3600,-2400],[-3600,-1910]],{lim:55});
   mkR("art","County Rd 3",[[-3600,-1910],[-3600,-1650],[-3600,-1350],[-3600,-1090]],{lim:45});
   mkR("road","County Rd 3",[[-3600,-1090],[-3600,0],[-3600,1000],[-4100,1800,300],[-4252,3050]],{lim:50});
-  mkR("road","County Rd 1",[[-4400,-3300],[-4400,-2400],[-4400,-1500],[-4400,0]],{lim:55});
-  mkR("road","County Rd 11",[[4500,-3300],[4500,-2400],[4500,-1500],[4500,0]],{lim:55});
+  mkR("road","County Rd 1",[[-4400,-3300],[-4400,-2400],[-4400,0]],{lim:55});
+  mkR("road","County Rd 11",[[4500,-3300],[4500,-2400],[4500,0]],{lim:55});
   mkR("road","County Rd 9",[[4000,-3300],[4000,-2400],[4000,0],[4000,1500,300],[3300,2300,300],[2750,2700]],{lim:55});
   mkR("road","County Rd 30",[[-4400,-2400],[-3600,-2400],[-1000,-2400],[1000,-2400],[2600,-2400],[3300,-2400],[4000,-2400],[4500,-2400]],{lim:55});
-  mkR("road","County Rd 40",[[-4400,-3300],[-3600,-3300],[-2300,-3300],[-1000,-3300],[-300,-3300],[1000,-3300],[2600,-3300],[3300,-3300],[4000,-3300],[4500,-3300]],{lim:55});
+  mkR("road","County Rd 40",[[-4400,-3300],[-3600,-3300],[-1000,-3300],[-300,-3300],[1000,-3300],[2600,-3300],[3300,-3300],[4000,-3300],[4500,-3300]],{lim:55});
   mkR("dirt","Quarry Rd",[[-1000,-3300],[-1000,-3480,60],[-300,-3480,60],[-300,-3300]]);
   mkR("dirt","Gravel Pit Rd",[[3300,-2400],[3380,-2850,120],[3300,-3300]]);
   // ---- Fairhaven: a small grid of 150 m blocks, Commerce Pkwy in from the west (the shops), Oakridge subdivision to the north
@@ -2277,8 +2279,7 @@ function buildNet2(){
   mkR("road","Kestrel Rd",[[-2710,1500],[-2850,1560]],{lim:40});
   mkR("road","Kestrel Rd",[[-2850,1560],[-3250,1320,350],[-3600,1000]],{lim:45});
   // ---- Ridge Rd: round the north side of the mountain, past the end of I-61, over the river to Millbrook
-  mkR("road","Ridge Rd",[[-4252,3050],[-3800,3400,300],[-2800,3400,300],[-2300,3000]],{lim:45});
-  mkR("road","Ridge Rd",[[-2300,3000],[-1200,3150,300],[-300,3200,300],[800,3100,300],[1500,3000,250],[1900,2900]],{lim:50});
+  mkR("road","Ridge Rd",[[-4252,3050],[-3800,3400,300],[-2800,3400,300],[-2300,3000,200],[-1200,3150,300],[-300,3200,300],[800,3100,300],[1500,3000,250],[1900,2900]],{lim:50});
   // ---- Mount Kestrel: switchbacks up the south-east face, a flowing pass road down the north-west side, a loop round the summit
   const top1=w2Climb(-2850,1560,{s0:-1,g:0.07,dTh:0.45,Rh:18,rEnd:235,step:22,nodeEvery:14});
   const top2=w2Climb(-4252,3050,{s0:1,g:0.065,dTh:0.7,Rh:34,rEnd:235,step:24,nodeEvery:14});
@@ -2303,7 +2304,7 @@ function buildNet2(){
       if(!best||nb.d<best.d)best={cx,cy,d:nb.d,n:nb.n,lx,ly}}
     if(best){W2C.orp=[best.cx-C0[0],best.cy-C0[1]];rd("dirt","Kestrel Trailhead Rd",[[best.n.x,best.n.y],[Math.round(best.lx+40),Math.round(best.ly)]],{lim:20});W2C.orpEnd=[best.lx+40,best.ly]}}
   // ---- I-61's climb over I-38 (a smooth profile on each of its edges near the crossing)
-  for(const e of EDGES)if(e.name==="I-61"&&Math.min(Math.abs(e.a.y-ccy),Math.abs(e.b.y-ccy))<500)e.zo=u=>zB(eAt(e,u).y-ccy);
+  for(const e of EDGES)if(e.name==="I-61"&&Math.abs(e.a.x-ccx)<1&&Math.abs(e.b.x-ccx)<1&&Math.min(Math.abs(e.a.y-ccy),Math.abs(e.b.y-ccy))<500)e.zo=u=>zB(eAt(e,u).y-ccy);
   W2C.zB=zB;
 }
 // a road up a mountain: legs across the slope at grade g, a hairpin wherever a leg reaches the edge of its face (dTh either side of the start)
@@ -5358,7 +5359,7 @@ function jamMul(c){if(c.stopT>0||c.tStop>0||c.sbHold)return 0.002;   // a bus at
   if(EV.crz&&EV.crz.length&&!c.emv){for(const v of EV.crz){const d=Math.hypot(c.wx-v.x,c.wy-v.y);if(d<220){const fw=c.e.type==="xway";return Math.min(1,(fw?0.38:0.62)+(1-(fw?0.38:0.62))*Math.max(0,d-60)/160)*jamMul0(c)}}}
   return jamMul0(c)}
 function jamMul0(c){  if(!JAM.zones.length||c.e.type!=="xway")return 1;for(const z of JAM.zones)if(z.e===c.e&&z.dir===c.dir&&c.s>z.s0-60&&c.s<z.s1){const k=c.s<z.s0?(z.s0-c.s)/60:c.s>z.s1-80?(c.s-(z.s1-80))/80:0;return z.m+(1-z.m)*clamp(k,0,1)}return 1}
-function trafTOD(dt){try{jamTick(TOD.t>0?0:2.5)}catch(e){}TOD.t-=dt;if(TOD.t>0||!st.started)return;TOD.t=2.5;const M_=me(),onFw=M_&&M_.e&&(M_.e.type==="xway"||M_.e.type==="ramp"),want=Math.round(G().traffic*todMul()*(onFw?1.4:1)),ai=cars.filter(c=>c.kind==="ai");
+function trafTOD(dt){try{jamTick(TOD.t>0?0:2.5)}catch(e){}TOD.t-=dt;if(TOD.t>0||!st.started)return;TOD.t=2.5;const M_=me(),onFw=M_&&M_.e&&(M_.e.type==="xway"||M_.e.type==="ramp"),want=Math.round(G().traffic*todMul()*(onFw?1.4:1))+(TOD.add||0),ai=cars.filter(c=>c.kind==="ai");   // cars you added stay on top of the normal amount
   if(ai.length<want){for(let k=0;k<Math.min(3,want-ai.length);k++){const p=randomSpot(350,900);if(p)cars.push(newCar(p.e,p.dir,p.s,p.i))}}
   else if(ai.length>want+2){let n=Math.min(3,ai.length-want);for(const c of ai){if(n<=0)break;const d=Math.hypot(c.wx-car.px,c.wy-car.py),ahead=(c.wx-car.px)*Math.cos(car.psi)+(c.wy-car.py)*Math.sin(car.psi);if(d>300||d>140&&ahead<0){const k=cars.indexOf(c);if(k>=0){cars.splice(k,1);n--}}}}
   st.trafficN=cars.filter(c=>c.kind==="ai").length}
@@ -5614,7 +5615,7 @@ const boardPaint=(bg,fg,lines)=>(x,W,H)=>{x.fillStyle=bg;x.fillRect(0,0,W,H);x.s
 // a board on a post beside the road (u along the edge, t sideways), read by people driving along heading hd
 function w2Board(e,u,t,w,h,lines,bg,fg,hd){const p=ePt(e,u,t),z=(e.hz||e.zp?ez(e,u):hillZ(p[0],p[1])),H=hd===undefined?p[2]:hd;txbAdd(p[0],p[1],z+1.6+h/2,w,h,H,boardPaint(bg,fg,lines),380);W2L.posts.push([p[0],p[1],z,1.6+h*0.5,H])}
 // the work zone on I-38: the longest plain stretch of freeway, eastbound
-function wzSpot(){const e=EDGES.filter(e=>e.name==="I-38"&&e.type==="xway"&&!e.br&&!e.ov).sort((a,b)=>b.L-a.L)[0];if(!e||e.L<1300)return null;const dir=1,s0=rStart(e,dir)+520,s1=Math.min(s0+650,e.L-rEnd(e,dir)-250);return s1>s0+200?{e,dir,s0,s1}:null}
+function wzSpot(){const e=EDGES.filter(e=>e.name==="I-38"&&e.type==="xway"&&!e.br&&!e.ov&&Math.abs(e.a.y-e.b.y)<1).sort((a,b)=>b.L-a.L)[0];if(!e||e.L<1300)return null;const dir=1,s0=rStart(e,dir)+520,s1=Math.min(s0+650,e.L-rEnd(e,dir)-250);return s1>s0+200?{e,dir,s0,s1}:null}
 function w2LifeSetup(){if(W2L.set)return;W2L.set=true;W2L.posts=[];
   // Kestrel Estates barrier arms, on the gatehouse posts
   {const g=EDGES.find(e=>e.name==="Estates Dr"&&Math.abs(e.a.x+1000)<1&&Math.abs(e.a.y-1000)<1);if(g){const u=g.L*0.55+2.5,W=hwOf(g),c=ePt(g,u,0),z=hillZ(c[0],c[1]);
@@ -13375,7 +13376,7 @@ $("tabs").addEventListener("click",e=>{const t=e.target.closest(".tab");if(t){st
 $("tabBody").addEventListener("keydown",e=>{const t=e.target;if(t&&t.tagName==="INPUT"){e.stopPropagation();if(e.key==="Enter"){if(t.id==="mpCode")netAct("code");else if(t.id==="mpName")netAct("name");else if(t.id==="mpSrv")netAct("create","pub")}}});
 $("tabBody").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;const d=b.dataset;
   if(d.map){setMap(d.map);closeDrawer()}else if(d.trim){const k=d.trim;if(!MODELS[TRIMS[k].model]){toast("Loading that car…");loadModel(TRIMS[k].model).then(()=>{setTrim(k);renderTab()}).catch(()=>{toast("Couldn't load that car. Check your connection and tap it again.");try{renderCfg()}catch(e){}});return}setTrim(k)}else if(d.mym){const [id,i]=d.mym.split(":");mmSet(id,+i);const S=mmSpec().find(x=>x[0]===id);toast(`My Mode · ${S[1]}: ${S[2][+i]}`)}else if(d.mode){st.mode=+d.mode;toast(`Drive mode: ${modeName()}`)}else if(d.mp)netAct(d.mp,d.v);else if(d.sf){const k=d.sf;st["sf_"+k]=st["sf_"+k]===false;toast(`${sfName(k)} ${st["sf_"+k]===false?"off":"on"}`);renderTab()}else if(d.sfa){sfAct(d.sfa);renderTab()}else if(d.own){ownAct(d.own);if(!$("drawer").hidden)renderTab()}else if(d.tog)act(d.tog);else if(d.a)act(d.a);
-  else if(d.spawn!==undefined){const n=+d.spawn;if(n===0){cars=cars.filter(c=>c.kind!=="ai");toast("Traffic cleared")}else{spawnTraffic(n);toast(`${n} AI cars added`)}}
+  else if(d.spawn!==undefined){const n=+d.spawn;if(n===0){cars=cars.filter(c=>c.kind!=="ai");TOD.add=0;toast("Traffic cleared")}else{spawnTraffic(n);TOD.add=Math.min(200,(TOD.add||0)+n);toast(`${n} AI cars added`)}}
   else if(d.aebs){st.aebSens=d.aebs;toast(`Collision warning: ${d.aebs}`)}
   else if(d.set){const [k,v]=d.set.split(":"),n=+v,H=car.hyb,T=TRIMS[st.trim];if(k==="fuel"){H.fuel=H.tank*n;toast(`Fuel set to ${n*100}%`)}else if(k==="chg"){if(T.plug)H.pb=n;else H.soc=socRaw(n);toast(`Charge set to ${n*100}%`)}else{st[k]=n;if(k==="wheelUI")document.body.classList.toggle("wheelMode",!!n)}
     if(k==="cargoKg"||k==="dummies"||k==="dummyKg"){car.cargo=loadKg();toast(`Load: ${Math.round(loadKg()*2.205)} lb`)}}
@@ -13418,7 +13419,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=233;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="173",BUILD_VER=234;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){const k=GFX.q==="auto"?GFX.eff:GFX.q;if(G.k!==k||G.v!==GFX.ovV||!G.m){G.k=k;G.v=GFX.ovV;const m={...GQ[k]};for(const o of GOPT)if(GFX.ov[o[0]]!==undefined)Object.assign(m,o[4](GFX.ov[o[0]]));if(Object.keys(GFX.ov).length)m.label=GQ[k].label+" (custom)";G.m=m;COLL.nt=!m.trees}return G.m}
