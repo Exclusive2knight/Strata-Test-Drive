@@ -1268,6 +1268,8 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
   <div class="nc">
     <div class="nh"><small>What's new</small><h2 id="newsVer">Version 223 · Real weather, snow plows and tow trucks</h2></div>
     <div class="nb">
+      <h4>🛑 Stop signs fixed</h4><ul><li>Fixed AI cars creeping forward at stop signs and never actually going. Something from the school bus update was holding their speed near zero. Cars at 4-way stops now wait about 2 seconds on average instead of 40.</li><li>Smarter 4-way stops: cars going opposite ways straight through go at the same time like real drivers do, and only cars whose paths actually cross take turns. Once a driver decides to go, they commit instead of stopping and starting.</li></ul>
+      <h4>🧠 The traffic brain</h4><ul><li>Drivers and pedestrians now learn from what happens to them and remember it between sessions.</li><li>Lots of long waits at stop signs make drivers a bit bolder: they accept shorter gaps and wait less for their turn. Crashes and near misses make them more careful again.</li><li>Pedestrians who wait ages at corners get less patient and cross when the nearest car is still far off. Close calls make them warier.</li><li>Everyone also has their own patience now.</li><li>See how far it's learned in Spawn › Traffic brain (generation, stops and crossings learned from, average wait). Tap it to reset.</li></ul>
       <h4>🧠 Drivers with feelings</h4><ul><li>Cut someone off and they stamp on the brakes, lean on the horn and flash you. A little 😱 pops up over the car, then 😡.</li><li>Run a light or pull out in front of someone and they panic stop with a long horn.</li><li>Sit at a green light and the car behind gives you a tap on the horn after a few seconds (pushy drivers sooner, calm ones later). If they're already annoyed it's a long blast 😤.</li><li>Keep annoying a driver (honking, tailgating, cutting in) and they can lose it: road rage for a while, driving faster and closer, flashing and passing you.</li><li>Getting scared makes drivers hang back and leave bigger gaps for a while. A crash nearby makes people put their hazards on 😳.</li><li>Drivers don't all pull away the instant the light changes or the car ahead moves. Each one takes a moment, and now and then someone's on their phone and takes a few seconds.</li><li>Every car has its own horn pitch. Calm drivers who let you in show a 🙂.</li><li>You can turn the faces off in Spawn › Driver reactions.</li></ul>
       <h4>🚦 Traffic spawns like BeamNG</h4><ul><li>The traffic around you is now a pool of cars. New ones appear where you can't see them, mostly on the roads ahead of you.</li><li>When a car is far behind you and out of sight, it disappears and pops back in somewhere ahead of you. Cars never vanish or appear in front of your eyes.</li><li>How far out they live depends on graphics: about 650 m on High, 560 m on Medium, 480 m on Low.</li></ul>
       <h4>🚓 Crashes get cleared</h4><ul><li>When two AI cars crash, the police come with two tow trucks. The rollback winches one wreck up onto its bed and the wrecker takes the other, then they drive off with them. The police pick up the cones and leave, and the lanes open back up.</li><li>A crash now clears in about a minute instead of blocking traffic for over two.</li></ul>
@@ -4684,7 +4686,7 @@ const EW=[];{let a=0;for(const e of EDGES){a+=spW(e);EW.push(a)}}
 function laneIdx(c){return clamp(Math.round(c.offT/LANE)-loOf(c.e.n),0,c.e.n-1)}
 function carPose(c){if(c.fixed||c.dyn)return;if(c.jn){const P=c.jn.P,q=pathAt(P,c.jn.d);c.wx=q[0];c.wy=q[1];c.wh=q[2];c.wz=P.z0+(P.z1-P.z0)*clamp(c.jn.d/Math.max(P.L,0.1),0,1);c.wp=0}
   else{const q=fpt(c.e,c.dir,c.s,c.off+(c.wob||0));c.wx=q[0];c.wy=q[1];c.wh=q[2]+(c.head||0);if(c.e.hz){const u=c.dir>0?c.s:c.e.L-c.s;c.wz=ez(c.e,u);c.wp=Math.atan((ez(c.e,u+c.dir)-ez(c.e,u-c.dir))/2)}else{c.wz=0;c.wp=0}}}
-function planMove(c,prefer){const n=endNode(c.e,c.dir),inL=arrLeg(c.e,c.dir);c.mv=null;c.stopDone=false;c.stopT=0;c.waitT=0;c.goYellow=false;c.needLane=null;if(!inL)return;
+function planMove(c,prefer){const n=endNode(c.e,c.dir),inL=arrLeg(c.e,c.dir);c.mv=null;c.stopDone=false;c.stopT=0;c.waitT=0;c.goC=0;c.goYellow=false;c.needLane=null;if(!inL)return;
   let ms=movesFrom(n,inL);if(RW.closed.size){const ok=ms.filter(m=>!RW.closed.has(m.e));if(ok.length)ms=ok}if(c.kind==="bike")ms=ms.filter(m=>m.t!=="U"&&BIKE_T.has(m.e.type)||m.e.type==="blvd"&&m.t==="S");if(!ms.length)return;let pick=prefer?ms.find(m=>m.t===prefer):null;if(!pick&&c.route){const Q=c.route,nk=c.e===Q.dest.e&&c.dir===Q.dest.dir&&c.s>Q.dest.s+3?Q.loop:Q.next.get(skey(c.e,c.dir));if(nk!=null)pick=ms.find(m=>skey(m.e,m.dir)===nk)||null}
   // a roundabout: go round at most a couple of exits, then take one (nobody does laps)
   if(n.rbt){if(!inL.major)c.rbN=0;else{c.rbN=(c.rbN||0)+1;if(!pick&&!c.route&&c.rbN>=3)pick=ms.find(m=>m.t==="R")||null}}
@@ -4733,7 +4735,23 @@ function pathGap(c,pts,OB){let gap=Infinity,vL=0,who=null;
     if(g<gap){gap=g;vL=Math.max(0,o.v*Math.cos(o.h-pts[bi][4]));who=o.o}}
   return {gap,v:vL,who}}
 // ---- right of way
-const withinFor=e=>e.lim/2.23694*5.5+14;
+// the traffic brain: drivers and pedestrians learn from what happens to them and keep it between sessions.
+// Long waits at stop signs make drivers a bit bolder (shorter gaps, less waiting their turn); crashes and near misses make them
+// more careful again. Same for people crossing: waiting ages makes them less patient, close calls make them warier.
+const BRAIN=(()=>{const b={gen:1,ev:0,stops:0,cross:0,wait:3,stopWait:6,gapK:1,pedPat:45,pedGapK:1,scares:0,crashes:0};try{Object.assign(b,JSON.parse(localStorage.getItem("strata.brain")||"{}"))}catch(e){}return b})();
+function brainSave(){try{localStorage.setItem("strata.brain",JSON.stringify(BRAIN))}catch(e){}}
+function brainLearn(k,v){const B=BRAIN;B.ev++;B.gen=1+Math.floor(B.ev/250);
+  if(k==="stop"){B.stops++;B.wait+=(v-B.wait)*0.03;if(v>8){B.stopWait=Math.max(2.5,B.stopWait*0.98);B.gapK=Math.max(0.72,B.gapK*0.995)}else if(v<2.5){B.stopWait=Math.min(8,B.stopWait*1.003);B.gapK=Math.min(1.3,B.gapK*1.001)}}
+  else if(k==="scare"){B.scares++;B.gapK=Math.min(1.5,B.gapK*1.03);B.stopWait=Math.min(9,B.stopWait*1.02)}
+  else if(k==="crash"){B.crashes++;B.gapK=Math.min(1.5,B.gapK*1.05)}
+  else if(k==="cross"){B.cross++;if(v>30)B.pedPat=Math.max(12,B.pedPat*0.98);else if(v<8)B.pedPat=Math.min(70,B.pedPat*1.004)}
+  else if(k==="pedScare"){B.scares++;B.pedGapK=Math.min(1.6,B.pedGapK*1.04);B.pedPat=Math.min(70,B.pedPat*1.03)}
+  if(B.ev%20===0)brainSave()}
+// do two paths through a junction cross (within about 2.4 m)? Used so drivers going opposite ways straight through an all-way stop can go together
+function pathsCross(P,a0,Q,b0){if(!P||!Q)return true;for(let a=Math.max(0,a0);a<=P.L;a+=2){const p=pathAt(P,a);for(let b=Math.max(0,b0);b<=Q.L;b+=2){const q=pathAt(Q,b);if((p[0]-q[0])**2+(p[1]-q[1])**2<5.8)return true}}return false}
+function boxConf(n,c){let P=null;for(const o of cars){if(o===c||!o.jn||o.jn.n!==n)continue;if(!P){try{P=mvP(c)}catch(e){return true}}if(pathsCross(P,0,o.jn.P,o.jn.d))return true}
+  return c&&c.kind!=="fsd"&&Math.hypot(car.px-n.x,car.py-n.y)<Math.max(n.pr,10)+2}
+const withinFor=e=>(e.lim/2.23694*5.5+14)*BRAIN.gapK;
 function approaching(n,leg,within,except){const dir=leg.end===1?1:-1,e=leg.e,meToo=!(except&&except.kind==="fsd");
   for(const o of cars){if(o===except||o.jn||o.e!==e||o.dir!==dir)continue;const d=e.L-o.s;if(d<within&&(o.v>0.8||d<rEnd(e,dir)+7))return true}
   const M=me();if(meToo&&M.e===e&&M.dir===dir){const d=M.L-M.s;if(d>-2&&d<within&&(car.vx>0.8||d<rEnd(e,dir)+7))return true}
@@ -4756,7 +4774,7 @@ function oppClear(c,n,L){const O=oppLeg(n,L);if(!O)return true;const dir=O.end==
     if(o.v<0.8){if(d<rEnd(e,dir)+3&&!(o.mv&&o.mv.t==="L"))return false;continue}if(d/o.v<4.5)return false}
   const M=me();if(c.kind!=="fsd"&&!st.walk&&M.e===e&&M.dir===dir){const d=M.L-M.s;if(d>-2&&d<90&&car.vx>0.8&&d/car.vx<4.5)return false}
   return true}
-function firstInLine(c,n){for(const o of cars)if(o!==c&&!o.jn&&o.mvNode===n&&o.stopDone&&o.arrT<c.arrT)return false;return true}
+function firstInLine(c,n){let P=null;for(const o of cars)if(o!==c&&!o.jn&&o.mvNode===n&&o.stopDone&&o.arrT<c.arrT&&o.mv){if(!P){try{P=mvP(c)}catch(e){return false}}let Q=null;try{Q=mvP(o)}catch(e){}if(pathsCross(P,0,Q,0))return false}return true}
 function exitClear(c){const m=c.mv,sMin=rStart(m.e,m.dir),one=m.e.n<2;let myJ=null;
   for(const o of cars){if(o===c)continue;
     if(!o.jn&&o.e===m.e&&o.dir===m.dir&&o.s<sMin+9&&o.v<1.5)return false;
@@ -4807,10 +4825,10 @@ function ctrlGap(c,dStop,dt){const n=c.mvNode,mv=c.mv,L=c.mvLeg;if(!mv)return dS
       if(S==="yellow"&&!c.goYellow){if(dStop>c.v*c.v/(2*3.2)+1.5)return at;c.goYellow=true}
       if(mv.t==="L"&&!oppClear(c,n,L)){if(stopped)c.waitT+=dt;return at}
       if(!exitClear(c))return at;return Infinity}
-    case "allstop":{if(!c.stopDone){fullStop();return at}c.waitT+=dt;
-      if(boxBusy(n,c)||(!firstInLine(c,n)&&c.waitT<(c.kind==="fsd"?2.5:8))||!exitClear(c))return at;return Infinity}   // FSD doesn't sit behind a car that's waiting for it
+    case "allstop":{if(!c.stopDone){fullStop();return at}if(c.goC>0){c.goC-=dt;return Infinity}c.waitT+=dt;
+      if(boxConf(n,c)||(!firstInLine(c,n)&&c.waitT<(c.kind==="fsd"?2.5:BRAIN.stopWait))||!exitClear(c))return at;c.goC=2.5;if(c.kind==="ai")brainLearn("stop",c.waitT);return Infinity}   // FSD doesn't sit behind a car that's waiting for it
     case "minor":{if(L.major){if(mv.t==="L"&&!oppClear(c,n,L))return at;return Infinity}
-      if(!c.stopDone&&!n.rbt){fullStop();return at}if(n.rbt&&dStop>14)return Math.max(at,dStop*0.6);c.waitT+=dt;if(boxBusy(n,c)||!gapClear(c,n,L,mv)||n.rbt&&!rbClear(c,n)||!exitClear(c))return at;return Infinity}
+      if(!c.stopDone&&!n.rbt){fullStop();return at}if(n.rbt&&dStop>14)return Math.max(at,dStop*0.6);if(c.goC>0){c.goC-=dt;return Infinity}c.waitT+=dt;if(boxConf(n,c)||!gapClear(c,n,L,mv)||n.rbt&&!rbClear(c,n)||!exitClear(c))return at;c.goC=n.rbt?1.2:2.5;if(c.kind==="ai"&&!n.rbt)brainLearn("stop",c.waitT);return Infinity}
     case "merge":{if(L.major)return Infinity;if(mergeClear(c,n,mv)){c.waitT=0;return Infinity}if(stopped)c.waitT+=dt;return at}
     default:if(mv.t==="U"){const O=oppLeg(n,L);if(O&&approaching(n,O,withinFor(O.e),c)){if(stopped)c.waitT+=dt;return at}}return Infinity}}
 function advance(c,ds,P){
@@ -4832,7 +4850,7 @@ function aiVsPlayer(c,L,dt){if(st.walk||!st.started)return null;const dx=c.wx-ca
   if(same&&fw<-2&&fw>-40){const inLane=Math.abs(lt)<1.7,gB=-fw-CARLEN;if(inLane&&c.wasSide&&gB<Math.max(6,c.v*0.55)&&c.v>6&&!(c.coCd>0)){c.coCd=12;c.hardT=0.3+rnd()*0.3;c.fear=(c.fear||0)+0.6;c.anger=(c.anger||0)+(ag?0.6:0.35);c.flashT=1.2;aiHonk(c,ag||c.anger>0.6?1.1:0.45);emoB(c,"scared",1.4,"mad")}c.wasSide=Math.abs(lt)>2.6}else c.wasSide=false;
   if(c.coCd>0)c.coCd-=dt;
   // a near miss across my path (you ran the light, pulled out on me): panic stop, long horn
-  if(!same&&dx*dx+dy*dy<49&&pv>6&&c.v>2&&Math.abs(Math.abs(wrapPi(c.wh-car.psi))-Math.PI/2)<1&&!(c.nmCd>0)){c.nmCd=10;c.hardT=0.6;c.fear=(c.fear||0)+0.8;c.anger=(c.anger||0)+0.4;aiHonk(c,1.2);emoB(c,"scared",1.5,"mad")}
+  if(!same&&dx*dx+dy*dy<49&&pv>6&&c.v>2&&Math.abs(Math.abs(wrapPi(c.wh-car.psi))-Math.PI/2)<1&&!(c.nmCd>0)){c.nmCd=10;brainLearn("scare");c.hardT=0.6;c.fear=(c.fear||0)+0.8;c.anger=(c.anger||0)+0.4;aiHonk(c,1.2);emoB(c,"scared",1.5,"mad")}
   if(c.nmCd>0)c.nmCd-=dt;
   // stuck behind you at a green light: a tap on the horn after a moment (sooner for pushy drivers), a long blast if they're already annoyed
   if(L.who==="me"&&c.v<0.3&&Math.abs(pv)<0.3&&L.gap<12&&!(c.cg<1e6)){c.grT=(c.grT||0)+dt;const k=c.pers&&c.pers.k,lim=ag?1.3:k==="brisk"?2.2:k==="calm"?6:3.5;
@@ -4930,6 +4948,7 @@ function updateTraffic(dt){try{sfTick(dt)}catch(e){console.error(e)}
     if(c.kind==="ai"&&!c.jn){for(const o of cars){if(o===c||o.e!==c.e||o.dir!==c.dir||!(o.haz&&(o.v||0)<0.5))continue;const d=o.s-c.s;if(d>0&&d<70){c.v0*=0.75;break}}}
     // speed for the curves and turns ahead (about 0.27 g)
     let vc=c.v0;for(const p of pts)if(p[3]>1e-3){const vk=Math.sqrt(2.6/p[3]);vc=Math.min(vc,Math.sqrt(vk*vk+4*p[2]))}
+    c.lw=L.who;c.lg=L.gap;
     const PR=c.kind==="ai"?aiVsPlayer(c,L,dt):null,hurry=c.honkT>0||c.passT>0;
     let a=c.v0<=0?-9:idm(c.v,vc,L.gap,L.v,c.pers&&c.pers.T*(hurry?0.75:1)*(1+0.7*Math.min(1,c.fear||0))*(c.rageT>0?0.7:1),c.pers&&c.pers.a*(hurry?1.4:1),c.pers&&c.pers.b);a=clamp(a,-8.5,hurry?3.2:2.2);if(c.hardT>0){c.hardT-=dt;a=-7.5}
     if(c.bcT>0){c.bcT-=dt;a=Math.min(a,-5.2)}   // brake check
@@ -5253,7 +5272,7 @@ function pedSmart(p,dt){if(p.mode==="walk"){let want=0,slow=1;const hw=(p.e.T.wa
     {const ux=Math.cos(p.wh||0),uy=Math.sin(p.wh||0),B=pedAhead(p,ux,uy);if(B){const dx=p.wx-B.x,dy=p.wy-B.y,away=(-uy*dx+ux*dy)>=0?1:-1;p.latT=clamp((p.lat||0)+away*1.2,-hw,hw);p.vMul=Math.min(p.vMul,0.15);p.blk=(p.blk||0)+dt;if(p.blk>3){p.du=-p.du;p.blk=0}}else p.blk=0}}
   if(p.mode==="cross"){let danger=false,near=false;for(const c of cars){if(c.wx===undefined||c.kind==="cone"||c.kind==="parked")continue;const dx=p.wx-c.wx,dy=p.wy-c.wy,d=Math.hypot(dx,dy);if(d>30)continue;const vh=(c.v||0);if(vh<1.5)continue;
       const tow=(dx*Math.cos(c.wh)+dy*Math.sin(c.wh))/d;if(tow<0.85)continue;near=true;if(d<9)danger=true}
-    {const dx=p.wx-car.px,dy=p.wy-car.py,d=Math.hypot(dx,dy);if(!st.walk&&d<30&&Math.abs(car.vx)>1.5&&(dx*Math.cos(car.psi)+dy*Math.sin(car.psi))/d>0.85){near=true;if(d<9)danger=true}}
+    {const dx=p.wx-car.px,dy=p.wy-car.py,d=Math.hypot(dx,dy);if(!st.walk&&d<30&&Math.abs(car.vx)>1.5&&(dx*Math.cos(car.psi)+dy*Math.sin(car.psi))/d>0.85){near=true;if(d<9){danger=true;if(!p.scared&&Math.abs(car.vx)>6){p.scared=true;brainLearn("pedScare")}}}}
     p.vMul=danger?0:near?1.4:1}}
 function pedObs(p){const O=[];if(!st.walk&&Math.abs((p.wz||0)-(car.zb||0))<1.6&&Math.hypot(car.px-p.wx,car.py-p.wy)<9)O.push({x:car.px,y:car.py,h:car.psi,hl:BODY_HL,hw:BODY_HW,me:true});
   for(const c of cars){if(c.wx===undefined||c.kind==="cone"||c.kind==="bike")continue;const d=Math.hypot(c.wx-p.wx,c.wy-p.wy);if(d>8)continue;if(c._hl===undefined){let m=null;try{m=MODELS[trafficModel(c)]}catch(e){}c._hl=m&&m.meta?m.meta.length/2:2.35;c._hw=m&&m.meta?m.meta.width/2:0.95}O.push({x:c.wx,y:c.wy,h:c.wh,hl:c._hl,hw:c._hw})}return O}
@@ -5278,8 +5297,10 @@ function pedTick(dt){if(st.people===false){peds=[];return}
     if(p.mode==="toX"){if(pedTarget(p,p.tx,p.ty,p.v0,dt)){p.mode="waitX";p.wait=0}continue}
     if(p.mode==="waitX"){p.v=0;p.wait+=dt;const n=p.node,L=p.leg;let ok=false;
       if(n.ctrl==="signal")ok=sigState(n,L.grp,st.clock||0)==="red"&&sigState(n,L.grp,(st.clock||0)+6)==="red";
-      else ok=!approaching(n,L,22)&&!cars.some(c=>c.jn&&c.jn.n===n)&&!(!st.walk&&Math.abs(car.vx)>0.5&&Math.hypot(car.px-n.x,car.py-n.y)<Math.max(n.pr||10,10)+6);
-      if(ok||p.wait>70){p.mode="cross"}continue}
+      else ok=!approaching(n,L,22*BRAIN.pedGapK)&&!cars.some(c=>c.jn&&c.jn.n===n)&&!(!st.walk&&Math.abs(car.vx)>0.5&&Math.hypot(car.px-n.x,car.py-n.y)<Math.max(n.pr||10,10)+6);
+      // fed up waiting (each person has their own patience): go when the nearest car is still a good way off, even against the light
+      if(!ok&&p.wait>BRAIN.pedPat*(p.pat||(p.pat=0.6+Math.random()*0.8))){const fx=n.x,fy=n.y;let close=!st.walk&&Math.abs(car.vx)>0.5&&Math.hypot(car.px-fx,car.py-fy)<45;if(!close)for(const c of cars)if((c.v||0)>1&&Math.hypot(c.wx-fx,c.wy-fy)<40*BRAIN.pedGapK){close=true;break}if(!close)ok=true}
+      if(ok||p.wait>90){p.mode="cross";brainLearn("cross",p.wait)}continue}
     if(p.mode==="cross"||p.mode==="jay"){const v=p.mode==="jay"?1.75:Math.max(p.v0,1.35)*(p.vMul??1);if(v<0.05){p.v=0;continue}if(pedTarget(p,p.cx,p.cy,v,dt)){p.side=-p.side;p.u=p.cu;p.du=p.mode==="jay"?p.du:-p.du;p.mode="walk"}continue}
     if(p.mode==="corner"){if(pedTarget(p,p.tx,p.ty,p.v0,dt)){Object.assign(p,p.nxt);p.mode="walk"}continue}
     if(p.mode==="shop"){const t=p.path[p.k];if(!t){p.gone=true;continue}if(p.pause>0){p.pause-=dt;p.v=0;continue}if(pedTarget(p,t[0],t[1],p.v0*(p.cart?0.8:1),dt)){p.k++;if(p.k===p.path.length-1&&p.out)p.pause=1.5}continue}}
@@ -5395,7 +5416,7 @@ const JAM={zones:[],t:20};
 function jamTick(dt){JAM.t-=dt;JAM.zones=JAM.zones.filter(z=>(z.left-=dt)>0);if(JAM.t>0)return;const rush=todMul()>1.3;JAM.t=rush?40+Math.random()*40:90+Math.random()*90;if(JAM.zones.length>=(rush?3:2))return;
   const E=(W2?nearEdges(1500).E:EDGES).filter(e=>e.type==="xway"&&e.L>500);if(!E.length)return;const e=E[Math.floor(Math.random()*E.length)],dir=e.ow?1:Math.random()<0.5?1:-1,len=250+Math.random()*450,s0=rStart(e,dir)+40+Math.random()*Math.max(1,e.L-len-120);
   JAM.zones.push({e,dir,s0,s1:s0+len,m:rush?0.18+Math.random()*0.2:0.3+Math.random()*0.25,left:120+Math.random()*180})}
-function jamMul(c){if(c.stopT>0||c.tStop>0||c.sbHold)return 0.002;   // a bus at its stop, or traffic held by a stopped school bus
+function jamMul(c){if(c.sbT>0||c.tStop>0||c.sbHold)return 0.002;   // a bus at its stop, or traffic held by a stopped school bus
   if(EV.crz&&EV.crz.length&&!c.emv){for(const v of EV.crz){const d=Math.hypot(c.wx-v.x,c.wy-v.y);if(d<220){const fw=c.e.type==="xway";return Math.min(1,(fw?0.38:0.62)+(1-(fw?0.38:0.62))*Math.max(0,d-60)/160)*jamMul0(c)}}}
   return jamMul0(c)}
 function jamMul0(c){  if(!JAM.zones.length||c.e.type!=="xway")return 1;for(const z of JAM.zones)if(z.e===c.e&&z.dir===c.dir&&c.s>z.s0-60&&c.s<z.s1){const k=c.s<z.s0?(z.s0-c.s)/60:c.s>z.s1-80?(c.s-(z.s1-80))/80:0;return z.m+(1-z.m)*clamp(k,0,1)}return 1}
@@ -5407,7 +5428,7 @@ function trafTOD(dt){try{jamTick(TOD.t>0?0:2.5)}catch(e){}TOD.t-=dt;if(TOD.t>0||
 function evCrashTick(v,dt){v.pt+=dt;const [L_,F]=v.pair;
   if(v.phase===0){if(!cars.includes(L_)||!cars.includes(F)){v.t=0;return}const hit=Math.hypot(L_.wx-F.wx,L_.wy-F.wy)<4.5||(F.e===L_.e&&F.s>L_.s-4.6);
     if(hit){for(const [c,h] of [[L_,0.35],[F,-0.45]]){c.kind="wreck";c.haz=true;c.v=0;c.v0=0;c.head=h;c.distractT=0;c.hardT=0;carPose(c)}v.items.push(L_,F);v.phase=1;v.pt=0;v.x=L_.wx;v.y=L_.wy;v.label="Crash";v.quiet=false;
-      for(const o of cars)if(o.kind==="ai"&&o!==L_&&o!==F&&Math.hypot(o.wx-L_.wx,o.wy-L_.wy)<50){o.fear=(o.fear||0)+0.7;emoB(o,"shock",2.5);if(rnd()<0.4)aiHonk(o,0.5)}
+      brainLearn("crash");for(const o of cars)if(o.kind==="ai"&&o!==L_&&o!==F&&Math.hypot(o.wx-L_.wx,o.wy-L_.wy)<50){o.fear=(o.fear||0)+0.7;emoB(o,"shock",2.5);if(rnd()<0.4)aiHonk(o,0.5)}
       const d=Math.hypot(L_.wx-car.px,L_.wy-car.py);if(d<260&&au.ctx){try{rNoiseFx(au.ctx.currentTime,0.6,clamp(1-d/260,0.1,1)*0.6)}catch(e){}}logResult(`Crash between two cars ${distTxt(d)} away`);
       const lo=F.off;for(const k of [12,18,24])v.items.push(evStatic("cone",F.e,F.dir,Math.max(2,F.s-k),lo+(24-k)*0.05))}
     else if(v.pt>9){F.distractT=0;v.t=0}return}
@@ -5594,8 +5615,8 @@ function busTick(dt){const h=hourNow(),on=h>=7&&h<9.5||h>=14.5&&h<16.5;let n=0;f
   for(const c of cars)c.sbHold=false;
   for(const b of cars){if(!b.bus||!b.flash||b.v>1.5)continue;for(const c of cars){if(c===b||c.kind!=="ai"||c.e!==b.e)continue;const d=(c.s-b.s)*(c.dir===b.dir?1:-1);if(c.dir===b.dir&&d<0&&d>-45||c.dir!==b.dir&&!(b.e.m>0)&&Math.abs((b.e.L-c.s)-b.s)<45&&((b.e.L-c.s)>b.s))c.sbHold=true}}
   for(const c of cars){if(!c.bus)continue;c.sbArm=(c.sbArm||0)+Math.sign((c.flash&&c.v<0.8?1:0)-(c.sbArm||0))*Math.min(Math.abs((c.flash&&c.v<0.8?1:0)-(c.sbArm||0)),dt/1.2);
-    if(c.stopT>0){c.stopT-=dt;c.v0=0.01;if(c.stopT<=0){c.v0=10;c.stopIn=90+Math.random()*160;c.flash=false}}
-    else if(!c.jn&&/res|col|st/.test(c.e.type)){c.stopIn-=c.v*dt;if(c.stopIn<=0&&c.s>20&&c.s<c.e.L-30){c.stopT=14;c.flash=true;c.passed=false}}
+    if(c.sbT>0){c.sbT-=dt;c.v0=0.01;if(c.sbT<=0){c.v0=10;c.stopIn=90+Math.random()*160;c.flash=false}}
+    else if(!c.jn&&/res|col|st/.test(c.e.type)){c.stopIn-=c.v*dt;if(c.stopIn<=0&&c.s>20&&c.s<c.e.L-30){c.sbT=14;c.flash=true;c.passed=false}}
     if(c.flash&&c.v<0.6&&!st.walk&&!c.passed){const dx=car.px-c.wx,dy=car.py-c.wy;if(Math.hypot(dx,dy)<13&&Math.abs(car.vx)>2.5&&dx*Math.cos(c.wh)+dy*Math.sin(c.wh)>-4){c.passed=true;const fine=250;ECON.cash-=fine;
         try{bankTx("Ticket · passed a stopped school bus",-fine);bankSave()}catch(e){}toast(`🚌 You passed a stopped school bus with its red lights flashing: ${money(fine)} ticket`);beep(520,.2,"square",.15)}}}}
 // ---- the Kestrel hill climb: a timer from the foot of the switchbacks to the summit loop, best times kept on this device
@@ -5645,7 +5666,7 @@ function w2Dyn(near){
   const G=W2C.gate;if(G&&near(G.x,G.y,250))for(const lp of G.posts){const A=(G.a||0)*Math.PI*0.47,h=lp.h,ux=Math.cos(h),uy=Math.sin(h),L=lp.L;
     dBox("gateW",lp.x,lp.y,lp.z,0.35,1.0,0.35,0);const c0=[lp.x+ux*L/2*Math.cos(A),lp.z+1.0+L/2*Math.sin(A),-(lp.y+uy*L/2*Math.cos(A))];obbInto(dB("gateR"),c0,[ux*L/2*Math.cos(A),L/2*Math.sin(A),-uy*L/2*Math.cos(A)],[-ux*Math.sin(A)*0.06,Math.cos(A)*0.06,uy*Math.sin(A)*0.06],[-uy*0.05,0,-ux*0.05])}
   for(const c of cars){if(!c.bus||!near(c.wx,c.wy,300))continue;const h=c.wh,fx=Math.cos(h),fy=Math.sin(h),z=c.wz||0,hl=(c.len||9.7)/2+0.02;
-    const nm=c.mdl==="city_schoolbus",lz=nm?2.86:2.62,st_=Math.floor(st.clock*2.5),amb=c.flash&&(c.stopT||0)>11.5;   // amber first while it pulls up, then red
+    const nm=c.mdl==="city_schoolbus",lz=nm?2.86:2.62,st_=Math.floor(st.clock*2.5),amb=c.flash&&(c.sbT||0)>11.5;   // amber first while it pulls up, then red
     for(const s of [hl,-hl])for(const l of nm?[-1.08,-0.85,0.85,1.08]:[-0.75,0.75]){const red=!nm||Math.abs(l)>1,on=c.flash&&(amb?!red:red)&&(l*(st_%4<2?1:-1)>0);const ox=c.wx+fx*s-fy*l,oy=c.wy+fy*s+fx*l;dBox(on?(red?"busRL":"busAL"):red?"busR":"busA",ox,oy,z+lz,0.22,0.22,0.08,h+Math.PI/2)}
     if(nm)continue;for(const s of [hl-0.25,-hl+0.25])dBox("busY",c.wx+fx*s,c.wy+fy*s,z+2.45,2.0,0.4,0.12,h+Math.PI/2);
     // the stop arm swings out from the driver's side
@@ -13348,6 +13369,7 @@ const TABS={
   traffic(){const n=cars.filter(c=>c.kind==="ai").length;return `<h3>AI traffic · ${n} car${n===1?"":"s"} in town and on Hwy 7</h3><div class="grid2">
     ${[5,10,20].map(k=>`<button class="opt" data-spawn="${k}"><b>Add ${k}</b><small>Random lanes and speeds</small></button>`).join("")}
     <button class="opt" data-spawn="0"><b>Clear traffic</b><small>Remove every AI car</small></button>
+    <button class="opt" data-brain="1"><b>🧠 Traffic brain · Gen ${BRAIN.gen}</b><small>Learned from ${BRAIN.stops.toLocaleString()} stops and ${BRAIN.cross.toLocaleString()} crossings · ${BRAIN.wait.toFixed(1)} s average wait at stop signs · tap to reset</small></button>
     <button class="opt${st.emo!==false?" on":""}" data-emo="1"><b>Driver reactions ${st.emo!==false?"on":"off"}</b><small>😡😱😤 faces over drivers when they react to you</small></button></div>
     <p class="note">AI cars keep their distance, overtake slower cars after signalling, and move back right when there is room. They react to you, so you can test adaptive cruise, blind spot warnings and lane changes in real traffic.</p>`},
   tests(){return `<h3>Scenarios</h3><div class="grid2">
@@ -13432,6 +13454,7 @@ $("tabs").addEventListener("click",e=>{const t=e.target.closest(".tab");if(t){st
 $("tabBody").addEventListener("keydown",e=>{const t=e.target;if(t&&t.tagName==="INPUT"){e.stopPropagation();if(e.key==="Enter"){if(t.id==="mpCode")netAct("code");else if(t.id==="mpName")netAct("name");else if(t.id==="mpSrv")netAct("create","pub")}}});
 $("tabBody").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;const d=b.dataset;
   if(d.map){setMap(d.map);closeDrawer()}else if(d.trim){const k=d.trim;if(!MODELS[TRIMS[k].model]){toast("Loading that car…");loadModel(TRIMS[k].model).then(()=>{setTrim(k);renderTab()}).catch(()=>{toast("Couldn't load that car. Check your connection and tap it again.");try{renderCfg()}catch(e){}});return}setTrim(k)}else if(d.mym){const [id,i]=d.mym.split(":");mmSet(id,+i);const S=mmSpec().find(x=>x[0]===id);toast(`My Mode · ${S[1]}: ${S[2][+i]}`)}else if(d.mode){st.mode=+d.mode;toast(`Drive mode: ${modeName()}`)}else if(d.mp)netAct(d.mp,d.v);else if(d.sf){const k=d.sf;st["sf_"+k]=st["sf_"+k]===false;toast(`${sfName(k)} ${st["sf_"+k]===false?"off":"on"}`);renderTab()}else if(d.sfa){sfAct(d.sfa);renderTab()}else if(d.own){ownAct(d.own);if(!$("drawer").hidden)renderTab()}else if(d.tog)act(d.tog);else if(d.a)act(d.a);
+  else if(d.brain!==undefined){for(const k of Object.keys(BRAIN))delete BRAIN[k];Object.assign(BRAIN,{gen:1,ev:0,stops:0,cross:0,wait:3,stopWait:6,gapK:1,pedPat:45,pedGapK:1,scares:0,crashes:0});brainSave();toast("Traffic brain reset: drivers and people start learning again");renderTab&&renderTab()}
   else if(d.emo!==undefined){st.emo=st.emo===false;toast(st.emo?"Driver reaction faces on":"Driver reaction faces off");renderTab&&renderTab()}
   else if(d.spawn!==undefined){const n=+d.spawn;if(n===0){cars=cars.filter(c=>c.kind!=="ai");TOD.add=0;toast("Traffic cleared")}else{spawnTraffic(n);TOD.add=Math.min(200,(TOD.add||0)+n);toast(`${n} AI cars added`)}}
   else if(d.aebs){st.aebSens=d.aebs;toast(`Collision warning: ${d.aebs}`)}
@@ -13476,7 +13499,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=235;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="173",BUILD_VER=236;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){const k=GFX.q==="auto"?GFX.eff:GFX.q;if(G.k!==k||G.v!==GFX.ovV||!G.m){G.k=k;G.v=GFX.ovV;const m={...GQ[k]};for(const o of GOPT)if(GFX.ov[o[0]]!==undefined)Object.assign(m,o[4](GFX.ov[o[0]]));if(Object.keys(GFX.ov).length)m.label=GQ[k].label+" (custom)";G.m=m;COLL.nt=!m.trees}return G.m}
