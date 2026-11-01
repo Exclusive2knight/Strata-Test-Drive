@@ -15,8 +15,8 @@ from web_export import pack
 WHEEL = {"wheel_front_left": "FL", "wheel_front_right": "FR", "wheel_rear_left": "RL", "wheel_rear_right": "RR",
          "wheel_0_1": "FL", "wheel_0_-1": "FR", "wheel_1_1": "RL", "wheel_1_-1": "RR"}   # the heavy work-truck chassis names them by axle
 # work equipment that moves (plows, salt spreader, rollback deck, wheel-lift): each its own object, centred on its box
-EQUIP = re.compile(r"^(plow_A_frame|blade_left|blade_right|hopper|spinner_chute|rollback_deck|underlift|boom|warning_bar|tipping_body|gutter_brush_-?1)$")
-CABIN = re.compile(r"^(interior|headliner|cabin_.*|driver_cluster|cluster_information_display|panoramic_display|center_touchscreen|steering_wheel)$")
+EQUIP = re.compile(r"^(plow_A_frame|blade_left|blade_right|hopper|spinner_chute|rollback_deck|underlift|boom|warning_bar|tipping_body|gutter_brush_-?1|stop_arm|crossing_arm|(red|amber)_(left|right)_(front|rear))$")
+CABIN = re.compile(r"^(interior|headliner|driver_cab|passenger_seats|cabin_.*|driver_cluster|cluster_information_display|panoramic_display|center_touchscreen|steering_wheel)$")
 SCREEN_M = re.compile(r"blank display surface|display glass|display graphics|navigation", re.I)
 
 
@@ -33,16 +33,30 @@ def main(src, key, budget=60000, cab_budget=42000, wheels_only=False):
     M.NODES = {}
     parts, _ = M.load_gltf(src)
     # GLB (X left, Y up, Z forward)  ->  vehicle space for pack(): +X left, -Y front, Z up
+    extra = []
+    for p in parts:   # wheel nodes sometimes carry a stray far-away piece in the same mesh: give those triangles to the body
+        hub = M.NODES.get(p["node"]) if p["node"].startswith("wheel") else None
+        if hub is None: continue
+        far = np.linalg.norm(p["V"][p["F"]].mean(1) - np.array(hub), axis=1) > 0.9
+        if far.any() and not far.all():
+            extra.append({**p, "node": "body", "F": p["F"][far]}); p["F"] = p["F"][~far]
+        elif far.all(): p["node"] = "body"
+    parts += extra
     for p in parts:
         V = p["V"]; p["V"] = np.stack([V[:, 0], -V[:, 2], V[:, 1]], 1)
     cam = M.NODES.get("driver_camera"); cam = np.array([cam[0], -cam[2], cam[1]]) if cam is not None else None
+    for p in parts:   # buses: wheel_<1|-1>_<z> nodes, shell / driver_cab / passenger_seats
+        m_ = re.match(r"^wheel_(-?1)_(-?[\d.]+)$", p["node"])
+        if m_: WHEEL[p["node"]] = ("F" if float(m_.group(2)) > 0 else "R") + ("L" if m_.group(1) == "1" else "R")
+    for p in parts:   # a stray part filed under a wheel node (high up: a mirror) belongs to the body
+        if p["node"] in WHEEL and p["V"][:, 2].mean() > 1.4: p["node"] = "body"
     wheels = {WHEEL[p["node"]]: [] for p in parts if p["node"] in WHEEL}
     for p in parts:
         if p["node"] in WHEEL: wheels[WHEEL[p["node"]]].append(p)
     if len(wheels) != 4: sys.exit("needs the four wheel_* nodes")
     hubs, R = {}, []
     for w, L in wheels.items():
-        P = np.concatenate([q["V"] for q in L]); lo, hi = P.min(0), P.max(0); hubs[w] = (lo + hi) / 2; R.append((hi[2] - lo[2]) / 2)
+        P = np.concatenate([q["V"][np.unique(q["F"])] for q in L]); lo, hi = P.min(0), P.max(0); hubs[w] = (lo + hi) / 2; R.append((hi[2] - lo[2]) / 2)
     R = float(np.mean(R))
     allV = np.concatenate([p["V"] for p in parts])
     midY = float(np.mean([h[1] for h in hubs.values()])); dz = float(np.mean([h[2] for h in hubs.values()]) - R)

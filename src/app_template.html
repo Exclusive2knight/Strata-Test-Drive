@@ -1268,6 +1268,9 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
   <div class="nc">
     <div class="nh"><small>What's new</small><h2 id="newsVer">Version 223 · Real weather, snow plows and tow trucks</h2></div>
     <div class="nb">
+      <h4>🚌 Buses</h4><ul><li>New city transit buses drive the main streets all day and stop every few blocks to pick people up.</li><li>New school bus (mornings and mid-afternoon on neighbourhood streets): the amber lights come on, then the red lights flash, and the stop arm and crossing arm swing out. Traffic behind it and coming the other way stops. Passing it is still a $250 ticket.</li></ul>
+      <h4>🚧 Real road work</h4><ul><li>Road work zones use real cones, orange drums, ROAD WORK AHEAD and LANE CLOSED signs, and a portable message board whose amber pages flip between ROAD WORK and SLOW AHEAD.</li><li>Road closures get DETOUR arrow signs and a DETOUR AHEAD / TURN LEFT message board.</li><li>Billboards along the freeway and the main streets.</li></ul>
+      <h4>💥 Live crashes</h4><ul><li>Traffic crashes happen around you about every minute, close enough to see.</li><li>Rubberneckers: everyone slows down to look when they pass a crash, both directions. It's worse on the freeway, so you get real backups.</li><li>Police and a tow truck now drive to the scene with lights flashing instead of appearing there. Move over for them.</li></ul>
       <h4>🚗 Freeway traffic and road work</h4><ul><li>More cars on the freeway and its on-ramps, and more traffic around you while you're on the freeway.</li><li>Freeway slowdowns: now and then a stretch of freeway backs up and you get real stop-and-go queues, more often at rush hour.</li><li>Road work never goes on the freeway, its ramps or the streets that meet them anymore. The I-38 lane closure is gone.</li><li>More road closures with detours: up to 3 streets a day, and traffic and navigation route around them.</li></ul>
       <h4>💼 New jobs for the work trucks</h4><ul><li><b>Repo agent</b> (Rollback or Wrecker): find the car on the bank's list, hook it and drop it at the recovery lot. Pays $150–400 like real repo work. Some owners come out if you hang around too long.</li><li><b>Roadside Rescue</b> (truck, van or SUV): jump starts, lockouts, flat tires and gas delivery. Park next to the car and stay stopped while you work. $38–65 plus tips.</li><li><b>Tow &amp; Recovery</b>: with the Rollback the car goes onto the bed, with the Wrecker it goes on the wheel-lift, and either pays 40% more than towing with a regular truck.</li><li><b>City Snow Routes</b> (plow truck or a pickup with a plow): plow each street on your route with the blade down, $30 a street, +$8 if you salt it too. Routes only come in when it snows.</li><li>All in the Gig Jobs app on your phone.</li></ul>
       <h4>🏙️ New city service vehicles</h4><ul><li>New city trucks drive around in traffic: street sweeper (its gutter brushes spin), garbage truck, utility bucket truck, sewer vacuum truck, dump truck and traffic maintenance van. They replace the old city vehicles and load in the background a little after you start.</li><li>You can drive all six too, under Work Trucks. Raise the dump truck's bed, and turn the sweeper's brushes on and off with the buttons on the left.</li></ul>
@@ -5012,12 +5015,15 @@ function eqParts(M,K,E,S,o,drawObj){const off=o.off||[0,0,0];
   if(E.warning_bar)eqPiece(M,K,E,"warning_bar",o.roofOff||off,null,null,drawObj);
   if(E.rollback_deck){const d=E.rollback_deck,t=S.deck||0,pv=[0,d.lo[1],d.hi[2]],R=chain(M4.T(0,-0.42*t,2.0*t),M4.rX(0.19*t));eqPiece(M,K,E,"rollback_deck",off,pv,R,drawObj);
     if(S.load&&o.me){const Mc=chain(M,M4.T(pv[0],pv[1],pv[2]),M4.T(0,-0.42*t,2.0*t),M4.rX(0.19*t),M4.T(-pv[0],1.02-pv[1],d.c[2]+0.4-pv[2]));kitNext=kitOf(S.load.mdl);drawCar0(Mc,paintRGB(S.load.paint),{},[0,0,0,0],0,0,false,0,true)}}
+  if(E.stop_arm){const q=E.stop_arm,a=S.arm||0;eqPiece(M,K,E,"stop_arm",off,[q.lo[0],q.c[1],q.lo[2]],M4.rY(-1.5708*a),drawObj)}
+  if(E.crossing_arm){const q=E.crossing_arm,a=S.arm||0;eqPiece(M,K,E,"crossing_arm",off,[q.hi[0],q.c[1],q.c[2]],M4.rY(-1.4*a),drawObj)}
   if(E.tipping_body){const q=E.tipping_body,t=S.dump||0;eqPiece(M,K,E,"tipping_body",off,[0,q.lo[1],q.hi[2]],M4.rX(0.85*t),drawObj)}
   for(const n of ["gutter_brush_-1","gutter_brush_1"])if(E[n]){const q=E[n],sp=S.sweep?(performance.now()/1000*7)*(q.c[0]>0?1:-1):0;eqPiece(M,K,E,n,off,q.c,M4.rY(sp%6.2832),drawObj)}
   if(E.underlift){const u=E.underlift,t=S.lift||0;eqPiece(M,K,E,"underlift",off,[0,u.c[1],u.lo[2]],M4.T(0,-0.1*t,0.55*t),drawObj)}
   if(E.boom){const b=E.boom,t=S.lift||0;eqPiece(M,K,E,"boom",off,[0,b.lo[1],b.lo[2]],M4.rX(-0.16*t),drawObj)}}
+var EQC=null;
 function eqDraw(M,K,drawObj){const me=WHL_ME;
-  if(K.meta&&K.meta.equip&&!K.meta.donor)eqParts(M,K,K.meta.equip,me?EQ:EQ_AI,{me,spin:true},drawObj);
+  if(K.meta&&K.meta.equip&&!K.meta.donor)eqParts(M,K,K.meta.equip,me?EQ:EQC&&EQC.bus?{...EQ_AI,sweep:false,arm:EQC.sbArm||0}:EQ_AI,{me,spin:true},drawObj);
   if(me){const a=eqAcc();if(!a)return;const dk=EQ_ACC[a][0];if(!MODELS[dk]){loadModel(dk).catch(()=>{});return}const D=kitOf(dk),dm=MODELS[dk].meta,tm=MODELS[TRIMS[st.trim].model].meta;
     const tk=TRIMS[st.trim].model;if(tm._front===undefined){let z=0;try{const q=b64(MODELS[tk].objects.body.p,Int16Array);for(let i=2;i<q.length;i+=3)z=Math.min(z,q[i]/1000)}catch(e){z=tm.head[2]-0.2}tm._front=z}
     const fz=dm.equip.plow_A_frame?tm._front+0.3-dm.equip.plow_A_frame.hi[2]:0;   // the plow frame tucks 30 cm under the front bumper
@@ -5181,7 +5187,8 @@ function deerInto(d){if(!d.down){if(d.mk===undefined)d.mk=Math.random()<0.5?"Dee
   if(d.down){dBox("deer",d.wx,d.wy,z,1.3,0.45,0.6,h+1.2);return}
   dBox("deer",d.wx,d.wy,z+0.72,1.3,0.55,0.42,h);const n=L(0.68,0);dBox("deer",n[0],n[1],z+1.05,0.25,0.55,0.18,h);const hd=L(0.82,0);dBox("deer",hd[0],hd[1],z+1.5,0.36,0.2,0.16,h);
   for(const [f,l,k] of [[0.5,0.14,0],[0.5,-0.14,1],[-0.5,0.14,1],[-0.5,-0.14,0]]){const p=L(f+Math.sin(ph+k*Math.PI)*0.12,l);dBox("deer",p[0],p[1],z,0.08,0.74,0.08,h)}}
-function coneInto(c){const z=c.wz||0;if(c.down){dBox("cone",c.wx,c.wy,z,0.7,0.2,0.24,c.wh+0.9);return}dBox("cone",c.wx,c.wy,z,0.4,0.05,0.4,0);dBox("cone",c.wx,c.wy,z+0.05,0.22,0.62,0.22,0);dBox("coneW",c.wx,c.wy,z+0.36,0.235,0.1,0.235,0)}
+function coneInto(c){const z=c.wz||0;if(!c.down&&PROPS[c.rwK||"rw_cone28"])return;   // drawn as the real cone / drum model
+  if(c.down){dBox("cone",c.wx,c.wy,z,0.7,0.2,0.24,c.wh+0.9);return}dBox("cone",c.wx,c.wy,z,0.4,0.05,0.4,0);dBox("cone",c.wx,c.wy,z+0.05,0.22,0.62,0.22,0);dBox("coneW",c.wx,c.wy,z+0.36,0.235,0.1,0.235,0)}
 
 // ---- pedestrians: walk the sidewalks, turn corners, cross at crosswalks when traffic on that street has a red (or nobody is coming at a stop sign)
 let peds=[];
@@ -5267,6 +5274,23 @@ function spawnBikes(n){for(let k=0;k<n;k++){let p=null;for(let t=0;t<20&&!p;t++)
 
 // ---- random events: a crash ahead, a breakdown on the shoulder, road work closing a lane, a deer, someone jaywalking, a car braking hard
 const EV={t:50,list:[],crit:[]};
+// road work props: cones and drums, signs, and portable message boards that flip between their two pages every 2 seconds
+const RW_PROPS=["rw_cone28","rw_drum","rw_road_work","rw_lane_closed","rw_detour_left","rw_detour_right","rw_detour_ahead","rw_mb_roadwork","rw_mb_roadwork_1","rw_mb_roadwork_2","rw_mb_detour","rw_mb_detour_1","rw_mb_detour_2"];
+function rwPropsDraw(){if(!RW.pl){RW.pl=1;let i=0;const nx=()=>{if(i<RW_PROPS.length)propLoad(RW_PROPS[i++]).finally(()=>setTimeout(nx,60))};nx()}
+  const e=CULL.eye,ex=e[0],ey=-e[2],night=clamp(1-(GT.D??1)*1.4,0,1),gz=(x,y)=>groundAt(x,y).h||0;
+  for(const c of RW.items){if(c.kind!=="cone"||c.down||Math.abs(c.wx-ex)>180||Math.abs(c.wy-ey)>180)continue;const k=c.rwK||"rw_cone28";if(PROPS[k])propDraw(k,carMatrix(c.wx,c.wy,c.wh,c.wz||0,0,0),{head:0})}
+  for(const z of RW.zones){if((z.x-ex)**2+(z.y-ey)**2>380*380)continue;for(const q of z.props||[])if(PROPS[q.k])propDraw(q.k,carMatrix(q.x,q.y,q.h,gz(q.x,q.y),0,0),{head:0});
+    const m=z.mb;if(m&&PROPS[m.k]){const M=carMatrix(m.x,m.y,m.h,gz(m.x,m.y),0,0);propDraw(m.k,M,{head:0});const pg=m.k+"_"+(1+Math.floor(performance.now()/2000)%2);if(PROPS[pg])propDraw(pg,M,{glow:1.6+night})}}
+  bbDraw(ex,ey,night)}
+// billboards: big ones along the freeway, smaller ones on the main streets, set back on open ground
+const BB={list:null};
+function bbBuild(){const L=[];let h=12345;const rr=()=>{h=(h*1103515245+12345)>>>0;return h/4294967296};
+  const clearOf=(x,y,me,r)=>{for(const o of gAt(GRID.e,x,y)){if(o===me)continue;const q=eProj(o,x,y);if(q.u>-10&&q.u<o.L+10&&Math.abs(q.t)<(o.W||5)+r)return false}return true};
+  for(const e of EDGES){const fw=e.type==="xway",main=/art|ave|road|st/.test(e.type)&&e.n>=2;if(!fw&&!main||e.L<300)continue;const step=fw?900:700;
+    for(let u=step*0.5+rr()*200;u<e.L-150;u+=step){const dir=rr()<0.5?1:-1,off=(e.W||8)+(fw?24:8),p=fpt(e,dir,u,off),g=groundAt(p[0],p[1]);if(!g||g.kind==="water"||!clearOf(p[0],p[1],e,8)||inGarage(p[0],p[1]))continue;
+      let clear=true;for(const q of L)if(Math.hypot(q.x-p[0],q.y-p[1])<120){clear=false;break}if(clear)L.push({k:fw?"bb_highway":"bb_hood",x:p[0],y:p[1],h:p[2],far:fw?1100:650})}}
+  BB.list=L;propLoad("bb_highway");propLoad("bb_hood")}
+function bbDraw(ex,ey,night){if(!BB.list){try{bbBuild()}catch(e){BB.list=[]}}for(const b of BB.list){if((b.x-ex)**2+(b.y-ey)**2>b.far*b.far||!PROPS[b.k])continue;propDraw(b.k,carMatrix(b.x,b.y,b.h,groundAt(b.x,b.y).h||0,0,0),{head:night})}}
 // road work that moves day to day: lanes coned off on a few busy roads, and one road closed outright with a detour round it
 const RW={day:-1,zones:[],items:[],closed:new Set(),warned:new Set()};
 function rwTick(){if(!st.started)return;const day=GT.day||1;if(RW.day===day)return;RW.day=day;const old=new Set(RW.items);cars=cars.filter(c=>!old.has(c));RW.items=[];RW.zones=[];RW.closed=new Set();RW.warned=new Set();
@@ -5275,9 +5299,11 @@ function rwTick(){if(!st.started)return;const day=GT.day||1;if(RW.day===day)retu
   const multi=EDGES.filter(e=>e.n>=2&&e.L>380&&offFw(e)&&!e.br&&!e.ov),two=EDGES.filter(e=>e.n===1&&!e.ow&&e.L>160&&e.L<700&&/res|st|col/.test(e.type)&&offFw(e)&&!e.br&&!e.ov&&!e.dip);
   for(let k=0;k<3&&multi.length;k++){const e=pick(multi),dir=rr()<0.5?1:-1;if(RW.zones.some(z=>z.e===e))continue;const s0=rStart(e,dir)+60+rr()*Math.max(1,e.L-rEnd(e,dir)-rStart(e,dir)-260),lo=loOf(e.n),it=[];
     for(let d=0;d<=40;d+=8)it.push(evStatic("cone",e,dir,s0+d,lo*LANE-1.7+d/40*3.3));for(let d=50;d<=150;d+=12)it.push(evStatic("cone",e,dir,s0+d,(lo+0.5)*LANE-0.25));
-    it.push(evStatic("wreck",e,dir,s0+90,lo*LANE,{haz:true,paint:"yellow"}));RW.items.push(...it);const p=fpt(e,dir,Math.max(2,s0-90),lo*LANE-LANE/2-1.6);RW.zones.push({e,dir,s0,x:it[0].wx,y:it[0].wy,sign:p,label:"ROAD WORK"})}
+    it.slice(0,6).forEach(c=>c.rwK="rw_drum");it.push(evStatic("wreck",e,dir,s0+90,lo*LANE,{haz:true,paint:"yellow"}));RW.items.push(...it);const p=fpt(e,dir,Math.max(2,s0-90),lo*LANE-LANE/2-1.6);
+    const side=(s_,k)=>{const q=fpt(e,dir,Math.max(2,s_),lo*LANE-LANE/2-2.2);return {k,x:q[0],y:q[1],h:q[2]}};
+    RW.zones.push({e,dir,s0,x:it[0].wx,y:it[0].wy,sign:p,label:"ROAD WORK",props:[{k:"rw_road_work",x:p[0],y:p[1],h:p[2]},side(s0-45,"rw_lane_closed")],mb:side(s0-150,"rw_mb_roadwork")})}
   for(let k=0;k<3&&two.length;k++){const e=pick(two);if(RW.closed.has(e))continue;RW.closed.add(e);for(const dir of [1,-1]){const s0=rStart(e,dir)+12,it=[];for(let t=-1;t<=1;t+=0.5)it.push(evStatic("cone",e,dir,s0,t*LANE));RW.items.push(...it);
-      const p=fpt(e,dir,s0,0);RW.zones.push({e,dir,s0,x:p[0],y:p[1],barrier:p,label:"ROAD CLOSED · DETOUR"})}}
+      const p=fpt(e,dir,s0,0),q=fpt(e,dir,s0-2,LANE*1.6),q2=fpt(e,dir,s0-6,-LANE*1.7);RW.zones.push({e,dir,s0,x:p[0],y:p[1],barrier:p,label:"ROAD CLOSED · DETOUR",props:[{k:rr()<0.5?"rw_detour_left":"rw_detour_right",x:q[0],y:q[1],h:q[2]}],mb:{k:"rw_mb_detour",x:q2[0],y:q2[1],h:q2[2]}})}}
   // the new world: a long-running lane closure on I-38 eastbound, with a flagger and a 45 mph limit
   if(false&&W2){const Z=wzSpot();if(Z){   // the I-38 lane closure is retired: road work stays off the freeways
 const {e,dir,s0,s1}=Z,lo=loOf(e.n),it=[];for(let d=0;d<=80;d+=10)it.push(evStatic("cone",e,dir,s0+d,lo*LANE-1.7+d/80*3.3));for(let d=95;d<=s1-s0;d+=16)it.push(evStatic("cone",e,dir,s0+d,(lo+0.5)*LANE-0.25));
@@ -5285,7 +5311,7 @@ const {e,dir,s0,s1}=Z,lo=loOf(e.n),it=[];for(let d=0;d<=80;d+=10)it.push(evStati
       const f=fpt(e,dir,s0-30,lo*LANE-LANE/2-1.8);W2L.wz={e,dir,s0,s1,fx:f[0],fy:f[1],fz:ez(e,dir>0?s0-30:e.L-s0+30),fh:f[2]}}}
   try{if(NAV.dest&&NAV.place)navTo(NAV.place)}catch(e){}}
 function rwInto(ex,ey){for(const z of RW.zones){if((z.x-ex)**2+(z.y-ey)**2>350*350)continue;
-    if(z.sign){const [x,y,h]=z.sign,g=groundAt(x,y).h||0;dBox("gateP",x,y,g,0.08,1.6,0.08,h);dBox("cone",x,y,g+1.25,0.9,0.9,0.05,h+0.785)}
+    if(z.sign&&!PROPS.rw_road_work){const [x,y,h]=z.sign,g=groundAt(x,y).h||0;dBox("gateP",x,y,g,0.08,1.6,0.08,h);dBox("cone",x,y,g+1.25,0.9,0.9,0.05,h+0.785)}
     if(z.barrier){const [x,y,h]=z.barrier,g=groundAt(x,y).h||0;for(const o of [-2.4,0,2.4]){const bx=x-Math.sin(h)*o,by=y+Math.cos(h)*o;dBox("gateW",bx,by,g+0.55,2.1,0.25,0.06,h+Math.PI/2);dBox("cone",bx,by,g+0.85,2.1,0.12,0.07,h+Math.PI/2);dBox("gateP",bx,by,g,0.08,0.55,0.08,h)}}}
   // a heads-up when you're coming up to a closed road
   const M=me();if(M&&M.e&&RW.closed.has(M.e)&&!RW.warned.has(M.e)){RW.warned.add(M.e);toast("🚧 Road closed ahead · detour: turn round or take the next street")}}
@@ -5297,7 +5323,7 @@ function startEvent(type){const M=me();let made=null;
     const a=evStatic("wreck",A.e,A.dir,A.s,ln,{haz:true,head:0.4}),b=evStatic("wreck",A.e,A.dir,A.s+5.6,ln+0.7,{haz:true,head:-0.6});
     const cs=[-14,-20,-26].map(d=>evStatic("cone",A.e,A.dir,A.s+d,ln+(d+26)*0.06));made={type,label:"Crash",x:a.wx,y:a.wy,t:170,items:[a,b,...cs]}}
   else if(type==="aicrash"){   // two traffic cars ahead of you: the front one brakes hard and the one behind isn't looking
-    let pair=null;for(const L_ of cars){if(L_.kind!=="ai"||L_.jn||L_.v<8||L_.mdl&&L_.mdl.startsWith("city_"))continue;const d=Math.hypot(L_.wx-car.px,L_.wy-car.py);if(d<140||d>480)continue;
+    let pair=null;for(const L_ of cars){if(L_.kind!=="ai"||L_.jn||L_.v<8||L_.mdl&&L_.mdl.startsWith("city_"))continue;const d=Math.hypot(L_.wx-car.px,L_.wy-car.py);if(d<70||d>420)continue;
       for(const F of cars){if(F===L_||F.kind!=="ai"||F.jn||F.e!==L_.e||F.dir!==L_.dir||laneIdx(F)!==laneIdx(L_))continue;const g=L_.s-F.s;if(g>10&&g<45&&F.v>8){pair=[L_,F];break}}if(pair)break}
     if(!pair)return null;const [L_,F]=pair;L_.hardT=3.2;F.distractT=6;made={type,label:"Crash",x:L_.wx,y:L_.wy,t:240,items:[],pair,phase:0,pt:0,quiet:true}}
   else if(type==="breakdown"){const A=aheadOnRoad(M,240+rnd()*260);if(!fits(A)||A.e.side<1.2)return null;const lo=loOf(A.e.n);
@@ -5320,7 +5346,10 @@ const JAM={zones:[],t:20};
 function jamTick(dt){JAM.t-=dt;JAM.zones=JAM.zones.filter(z=>(z.left-=dt)>0);if(JAM.t>0)return;const rush=todMul()>1.3;JAM.t=rush?40+Math.random()*40:90+Math.random()*90;if(JAM.zones.length>=(rush?3:2))return;
   const E=(W2?nearEdges(1500).E:EDGES).filter(e=>e.type==="xway"&&e.L>500);if(!E.length)return;const e=E[Math.floor(Math.random()*E.length)],dir=e.ow?1:Math.random()<0.5?1:-1,len=250+Math.random()*450,s0=rStart(e,dir)+40+Math.random()*Math.max(1,e.L-len-120);
   JAM.zones.push({e,dir,s0,s1:s0+len,m:rush?0.18+Math.random()*0.2:0.3+Math.random()*0.25,left:120+Math.random()*180})}
-function jamMul(c){if(!JAM.zones.length||c.e.type!=="xway")return 1;for(const z of JAM.zones)if(z.e===c.e&&z.dir===c.dir&&c.s>z.s0-60&&c.s<z.s1){const k=c.s<z.s0?(z.s0-c.s)/60:c.s>z.s1-80?(c.s-(z.s1-80))/80:0;return z.m+(1-z.m)*clamp(k,0,1)}return 1}
+function jamMul(c){if(c.stopT>0||c.tStop>0||c.sbHold)return 0.002;   // a bus at its stop, or traffic held by a stopped school bus
+  if(EV.crz&&EV.crz.length&&!c.emv){for(const v of EV.crz){const d=Math.hypot(c.wx-v.x,c.wy-v.y);if(d<220){const fw=c.e.type==="xway";return Math.min(1,(fw?0.38:0.62)+(1-(fw?0.38:0.62))*Math.max(0,d-60)/160)*jamMul0(c)}}}
+  return jamMul0(c)}
+function jamMul0(c){  if(!JAM.zones.length||c.e.type!=="xway")return 1;for(const z of JAM.zones)if(z.e===c.e&&z.dir===c.dir&&c.s>z.s0-60&&c.s<z.s1){const k=c.s<z.s0?(z.s0-c.s)/60:c.s>z.s1-80?(c.s-(z.s1-80))/80:0;return z.m+(1-z.m)*clamp(k,0,1)}return 1}
 function trafTOD(dt){try{jamTick(TOD.t>0?0:2.5)}catch(e){}TOD.t-=dt;if(TOD.t>0||!st.started)return;TOD.t=2.5;const M_=me(),onFw=M_&&M_.e&&(M_.e.type==="xway"||M_.e.type==="ramp"),want=Math.round(G().traffic*todMul()*(onFw?1.4:1)),ai=cars.filter(c=>c.kind==="ai");
   if(ai.length<want){for(let k=0;k<Math.min(3,want-ai.length);k++){const p=randomSpot(350,900);if(p)cars.push(newCar(p.e,p.dir,p.s,p.i))}}
   else if(ai.length>want+2){let n=Math.min(3,ai.length-want);for(const c of ai){if(n<=0)break;const d=Math.hypot(c.wx-car.px,c.wy-car.py),ahead=(c.wx-car.px)*Math.cos(car.psi)+(c.wy-car.py)*Math.sin(car.psi);if(d>300||d>140&&ahead<0){const k=cars.indexOf(c);if(k>=0){cars.splice(k,1);n--}}}}
@@ -5332,12 +5361,13 @@ function evCrashTick(v,dt){v.pt+=dt;const [L_,F]=v.pair;
       const d=Math.hypot(L_.wx-car.px,L_.wy-car.py);if(d<260&&au.ctx){try{rNoiseFx(au.ctx.currentTime,0.6,clamp(1-d/260,0.1,1)*0.6)}catch(e){}}logResult(`Crash between two cars ${distTxt(d)} away`);
       const lo=F.off;for(const k of [12,18,24])v.items.push(evStatic("cone",F.e,F.dir,Math.max(2,F.s-k),lo+(24-k)*0.05))}
     else if(v.pt>9){F.distractT=0;v.t=0}return}
-  if(v.phase===1&&v.pt>16){v.phase=2;const F2=v.pair[1],side=loOf(F2.e.n)*LANE-LANE/2-Math.max(0.6,F2.e.side/2);
-    const tw_=towMdl(Math.random()<0.5);for(const [m,ds,paint,kind] of [["city_ambulance",-34,"white","amb"],[tw_,-48,tw_==="city_tow"?"white":TOW_PAINT[tw_],"tow"]]){if(!MODELS[m])continue;const c=evStatic("wreck",F2.e,F2.dir,Math.max(2,F2.s+ds),side,{haz:true,mdl:m,paint,beacon:kind});const md=MODELS[m].meta;if(md.length>5.4){c.len=md.length;c.wid=md.width}v.items.push(c)}v.beacons=true}
-  if(v.phase===2&&v.pt>110){v.t=0}}
+  if(v.phase===1&&v.pt>6){v.phase=2;const F2=v.pair[1];
+    const sent=emvSend(0,0,[["city_police",-22,"cop"],[towMdl(Math.random()<0.5),-40,"tow"]],{e:F2.e,dir:F2.dir,s:F2.s,L:F2.e.L});for(const c of sent){if(c.mdl==="city_police")c.paint=Math.random()<0.5?"white":"black";v.items.push(c)}v.beacons=true;
+    const d=Math.hypot(F2.wx-car.px,F2.wy-car.py);if(d<600&&sent.length)carMsg("🚓 Police and a tow truck are heading to a crash nearby: move over for them")}
+  if(v.phase===2&&v.pt>150){v.t=0}}
 function evBeaconInto(){if(!DMAT.ambR){DMAT.ambR=[[1,0.1,0.08],[6,0.25,0.2]];DMAT.ambW=[[1,1,1],[5,5,5]];DMAT.towA=[[1,0.6,0.1],[6,3,0.3]];DMAT.bcOff=[[0.2,0.2,0.22]]}const on=(performance.now()%600)<300;
   for(const v of EV.list){if(!v.beacons)continue;for(const c of v.items){if(!c.beacon||Math.hypot(c.wx-car.px,c.wy-car.py)>250)continue;const md=MODELS[c.mdl];if(!md)continue;const M=aiMat(c),h=md.meta.height+0.05,z=-(md.meta.length||5)*0.3;
-    if(c.beacon==="amb"){dBoxM(on?"ambR":"ambW",M,c.wh,[0.6,h,z],0.3,0.12,0.2);dBoxM(on?"ambW":"ambR",M,c.wh,[-0.6,h,z],0.3,0.12,0.2)}else{dBoxM(on?"towA":"bcOff",M,c.wh,[0.45,h,z],0.35,0.1,0.18);dBoxM(on?"bcOff":"towA",M,c.wh,[-0.45,h,z],0.35,0.1,0.18)}}}}
+    if(c.beacon==="amb"){dBoxM(on?"ambR":"ambW",M,c.wh,[0.6,h,z],0.3,0.12,0.2);dBoxM(on?"ambW":"ambR",M,c.wh,[-0.6,h,z],0.3,0.12,0.2)}else if(c.beacon==="cop"){if(!DMAT.copB)DMAT.copB=[[0.1,0.3,1],[0.3,1.2,7]];const zz=-(md.meta.length||5)*0.05;dBoxM(on?"ambR":"bcOff",M,c.wh,[0.4,h,zz],0.5,0.1,0.22);dBoxM(on?"bcOff":"copB",M,c.wh,[-0.4,h,zz],0.5,0.1,0.22)}else{dBoxM(on?"towA":"bcOff",M,c.wh,[0.45,h,z],0.35,0.1,0.18);dBoxM(on?"bcOff":"towA",M,c.wh,[-0.45,h,z],0.35,0.1,0.18)}}}}
 // ---- crime around you: a gas-station robbery with a getaway car you can stop or tail for a reward, and at night someone trying your door at a stop
 const CRIME={t:70,rob:null,jack:null,stillT:0};
 function scrPed(x,y,h){const e=EDGES[0],p=newPed(e,0,1);Object.assign(p,{mode:"scr",wx:x,wy:y,wz:groundAt(x,y).h||0,wh:h,v:0,shirt:9,pants:1,hair:0});peds.push(p);return p}
@@ -5372,8 +5402,10 @@ function evTick(dt){try{crimeTick(dt)}catch(e){console.error(e)}for(const v of E
   EV.list=EV.list.filter(v=>v.t>0);
   for(const d of EV.crit){d.life-=dt;if(d.down){d.v=0;continue}d.wx+=Math.cos(d.wh)*d.v*dt;d.wy+=Math.sin(d.wh)*d.v*dt;d.ph+=dt*11;GREF=d.wz;d.wz=groundAt(d.wx,d.wy).h}
   EV.crit=EV.crit.filter(d=>d.life>0||d.down&&d.life>-20);
-  const mul=EV_MUL[st.events]??1;if(!mul||!st.started)return;EV.t-=dt*mul;if(EV.t>0)return;EV.t=55+Math.random()*75;
-  const M=me(),opts=["aicrash","aicrash"];if(M.n>=2)opts.push("crash","roadwork");if(M.side>=1.2)opts.push("breakdown");if(zoneName(car.px,car.py)==="rural"||M.zone==="h")opts.push("deer");if(st.night)opts.push("deer");
+  EV.crz=[];for(const v of EV.list)if(v.label==="Crash"&&(v.phase===undefined||v.phase>=1)&&v.x!==undefined)EV.crz.push(v);   // live crash scenes: traffic slows to look
+  const mul=EV_MUL[st.events]??1;if(!mul||!st.started)return;EV.lt=(EV.lt??45)-dt*mul;if(EV.lt<=0){EV.lt=50+Math.random()*60;if(!EV.list.some(v=>v.pair&&v.t>0))startEvent("aicrash")}   // a live crash in the traffic around you every minute or so
+  EV.t-=dt*mul;if(EV.t>0)return;EV.t=55+Math.random()*75;
+  const M=me(),opts=["aicrash","aicrash","aicrash","aicrash"];if(M.n>=2)opts.push("crash","roadwork");if(M.side>=1.2)opts.push("breakdown");if(zoneName(car.px,car.py)==="rural"||M.zone==="h")opts.push("deer");if(st.night)opts.push("deer");
   if(M.zone==="c")opts.push("jaywalk","jaywalk");opts.push("hardbrake");
   for(let k=0;k<6;k++){const t=opts[Math.floor(Math.random()*opts.length)];if(startEvent(t))break}}
 
@@ -5487,11 +5519,17 @@ function estGateTick(dt){const G=W2C.gate;if(!G)return null;let want=false;const
   return null}
 // ---- school buses: on neighbourhood streets in the morning and mid-afternoon; they stop with red lights flashing, and passing one is a ticket
 function busTick(dt){const h=hourNow(),on=h>=7&&h<9.5||h>=14.5&&h<16.5;let n=0;for(const c of cars)if(c.bus)n++;
-  if(false&&on&&!MODELS.city_bus&&!W2L.busLoad){   // the old city bus model was retired
-W2L.busLoad=1;try{loadModel("city_bus").catch(()=>{})}catch(e){}}
-  if(on&&n<2&&st.started&&MODELS.city_bus){W2L.busT-=dt;if(W2L.busT<=0){W2L.busT=25;const p=randomSpot(150,700);if(p&&/res|col|st/.test(p.e.type)&&p.e.n===1){const c=newCar(p.e,p.dir,p.s,0),m=MODELS.city_bus.meta;c.bus=true;c.mdl="city_bus";c.len=m.length;c.wid=m.width;c.paint="yellow";c.v0=Math.min(c.v0,11);c.stopIn=40+Math.random()*100;cars.push(c)}}}
+  if(on&&!MODELS.city_schoolbus&&!W2L.busLoad){W2L.busLoad=1;try{loadModel("city_schoolbus").catch(()=>{})}catch(e){}}
+  if(on&&n<2&&st.started&&MODELS.city_schoolbus){W2L.busT-=dt;if(W2L.busT<=0){W2L.busT=25;const p=randomSpot(150,700);if(p&&/res|col|st/.test(p.e.type)&&p.e.n===1){const c=newCar(p.e,p.dir,p.s,0),m=MODELS.city_schoolbus.meta;c.bus=true;c.mdl="city_schoolbus";c.len=m.length;c.wid=m.width;c.paint="yellow";c.v0=Math.min(c.v0,11);c.stopIn=40+Math.random()*100;cars.push(c)}}}
   if(!on)for(const c of cars)if(c.bus&&!c.flash&&Math.hypot(c.wx-car.px,c.wy-car.py)>400)c.bus=false;   // done for the day: just a bus
-  for(const c of cars){if(!c.bus)continue;
+  // city transit buses on the main streets all day: they stop every few blocks to pick people up
+  {const day=h>=6&&h<22;let nt=0;for(const c of cars)if(c.transit)nt++;if(day&&!MODELS.city_bus&&!W2L.tbLoad){W2L.tbLoad=1;loadModel("city_bus").catch(()=>{})}
+   if(day&&nt<(G().fullCars>=10?3:2)&&st.started&&MODELS.city_bus){W2L.tbT=(W2L.tbT??5)-dt;if(W2L.tbT<=0){W2L.tbT=20;const p=randomSpot(150,800);if(p&&p.e.n>=2&&!/xway|ramp|dirt|lane|res/.test(p.e.type)){const c=newCar(p.e,p.dir,p.s,0),m=MODELS.city_bus.meta;c.transit=true;c.mdl="city_bus";c.len=m.length;c.wid=m.width;c.paint="white";c.stopIn=150+Math.random()*250;cars.push(c)}}}
+   for(const c of cars){if(!c.transit)continue;if(c.tStop>0){c.tStop-=dt;c.v0=0.01;if(c.tStop<=0)c.stopIn=300+Math.random()*300}else if(!c.jn){c.v0=Math.min(c.v0,13.5);c.stopIn-=c.v*dt;if(c.stopIn<=0&&c.s>25&&c.s<c.e.L-40&&laneIdx(c)===0){c.tStop=9+Math.random()*6}}
+     if(!day&&Math.hypot(c.wx-car.px,c.wy-car.py)>400)c.transit=false}}
+  for(const c of cars)c.sbHold=false;
+  for(const b of cars){if(!b.bus||!b.flash||b.v>1.5)continue;for(const c of cars){if(c===b||c.kind!=="ai"||c.e!==b.e)continue;const d=(c.s-b.s)*(c.dir===b.dir?1:-1);if(c.dir===b.dir&&d<0&&d>-45||c.dir!==b.dir&&!(b.e.m>0)&&Math.abs((b.e.L-c.s)-b.s)<45&&((b.e.L-c.s)>b.s))c.sbHold=true}}
+  for(const c of cars){if(!c.bus)continue;c.sbArm=(c.sbArm||0)+Math.sign((c.flash&&c.v<0.8?1:0)-(c.sbArm||0))*Math.min(Math.abs((c.flash&&c.v<0.8?1:0)-(c.sbArm||0)),dt/1.2);
     if(c.stopT>0){c.stopT-=dt;c.v0=0.01;if(c.stopT<=0){c.v0=10;c.stopIn=90+Math.random()*160;c.flash=false}}
     else if(!c.jn&&/res|col|st/.test(c.e.type)){c.stopIn-=c.v*dt;if(c.stopIn<=0&&c.s>20&&c.s<c.e.L-30){c.stopT=14;c.flash=true;c.passed=false}}
     if(c.flash&&c.v<0.6&&!st.walk&&!c.passed){const dx=car.px-c.wx,dy=car.py-c.wy;if(Math.hypot(dx,dy)<13&&Math.abs(car.vx)>2.5&&dx*Math.cos(c.wh)+dy*Math.sin(c.wh)>-4){c.passed=true;const fine=250;ECON.cash-=fine;
@@ -5543,10 +5581,11 @@ function w2Dyn(near){
   const G=W2C.gate;if(G&&near(G.x,G.y,250))for(const lp of G.posts){const A=(G.a||0)*Math.PI*0.47,h=lp.h,ux=Math.cos(h),uy=Math.sin(h),L=lp.L;
     dBox("gateW",lp.x,lp.y,lp.z,0.35,1.0,0.35,0);const c0=[lp.x+ux*L/2*Math.cos(A),lp.z+1.0+L/2*Math.sin(A),-(lp.y+uy*L/2*Math.cos(A))];obbInto(dB("gateR"),c0,[ux*L/2*Math.cos(A),L/2*Math.sin(A),-uy*L/2*Math.cos(A)],[-ux*Math.sin(A)*0.06,Math.cos(A)*0.06,uy*Math.sin(A)*0.06],[-uy*0.05,0,-ux*0.05])}
   for(const c of cars){if(!c.bus||!near(c.wx,c.wy,300))continue;const h=c.wh,fx=Math.cos(h),fy=Math.sin(h),z=c.wz||0,hl=(c.len||9.7)/2+0.02;
-    const on=c.flash&&Math.floor(st.clock*2.5)%2===0;for(const s of [hl,-hl])for(const l of [-0.75,0.75]){const ox=c.wx+fx*s-fy*l,oy=c.wy+fy*s+fx*l;dBox(on&&l*(Math.floor(st.clock*2.5)%4<2?1:-1)>0?"busRL":"busR",ox,oy,z+2.62,0.3,0.3,0.1,h+Math.PI/2)}
-    for(const s of [hl-0.25,-hl+0.25])dBox("busY",c.wx+fx*s,c.wy+fy*s,z+2.45,2.0,0.4,0.12,h+Math.PI/2);
+    const nm=c.mdl==="city_schoolbus",lz=nm?2.86:2.62,st_=Math.floor(st.clock*2.5),amb=c.flash&&(c.stopT||0)>11.5;   // amber first while it pulls up, then red
+    for(const s of [hl,-hl])for(const l of nm?[-1.08,-0.85,0.85,1.08]:[-0.75,0.75]){const red=!nm||Math.abs(l)>1,on=c.flash&&(amb?!red:red)&&(l*(st_%4<2?1:-1)>0);const ox=c.wx+fx*s-fy*l,oy=c.wy+fy*s+fx*l;dBox(on?(red?"busRL":"busAL"):red?"busR":"busA",ox,oy,z+lz,0.22,0.22,0.08,h+Math.PI/2)}
+    if(nm)continue;for(const s of [hl-0.25,-hl+0.25])dBox("busY",c.wx+fx*s,c.wy+fy*s,z+2.45,2.0,0.4,0.12,h+Math.PI/2);
     // the stop arm swings out from the driver's side
-    const A=c.flash?1:0,ax=c.wx+fx*(hl-2.2)-fy*(1.25+A*0.45),ay=c.wy+fy*(hl-2.2)+fx*(1.25+A*0.45);dBox(on?"busRL":"busR",ax,ay,z+1.35,A?0.06:0.55,0.55,A?0.55:0.06,h+Math.PI/2)}
+    const A=c.flash?1:0,ax=c.wx+fx*(hl-2.2)-fy*(1.25+A*0.45),ay=c.wy+fy*(hl-2.2)+fx*(1.25+A*0.45);dBox(c.flash&&st_%2===0?"busRL":"busR",ax,ay,z+1.35,A?0.06:0.55,0.55,A?0.55:0.06,h+Math.PI/2)}
   for(const [x,y,z,h] of W2L.posts||[])if(near(x,y,300))dBox("gateP",x,y,z,0.12,h,0.12,0);
   const Z=W2L.wz;if(Z&&near(Z.fx,Z.fy,400)){const z=Z.fz;dBox("pants0",Z.fx,Z.fy,z,0.4,0.85,0.25,0);dBox("vest",Z.fx,Z.fy,z+0.85,0.48,0.62,0.3,0);dBox("skin1",Z.fx,Z.fy,z+1.5,0.22,0.24,0.22,0);dBox("gateW",Z.fx+0.35,Z.fy,z+0.9,0.04,1.2,0.04,0);dBox("busR",Z.fx+0.35,Z.fy,z+2.0,0.05,0.42,0.42,Z.fh)}}
 // ---- the Friday-night car meet: the big lot on Fairhaven Blvd fills up after 8 pm
@@ -5559,7 +5598,7 @@ function w2LifeTick(dt){if(!W2)return;let b=null;
   try{dbTick(dt)}catch(e){console.error(e)}try{meetTick()}catch(e){console.error(e)}if(!st.started){plBtn(null);return}
   try{busTick(dt)}catch(e){console.error(e)}try{hillTick()}catch(e){console.error(e)}try{wzTick()}catch(e){console.error(e)}
   try{b=dtTick(dt)||dealTick()||estGateTick(dt)}catch(e){console.error(e)}plBtn(b&&b[0],b&&b[1])}
-Object.assign(DMAT,{dbLit:[[1,0.12,0.08],[1.6,0.1,0.05]],busRL:[[1,0.12,0.08],[1.8,0.12,0.06]],busR:[[0.45,0.05,0.04],null,0.6,40],busY:[[0.98,0.72,0.05],null,0.4,30],
+Object.assign(DMAT,{dbLit:[[1,0.12,0.08],[1.6,0.1,0.05]],busRL:[[1,0.12,0.08],[1.8,0.12,0.06]],busAL:[[1,0.6,0.08],[2.2,1.2,0.08]],busA:[[0.5,0.3,0.04],null,0.6,40],busR:[[0.45,0.05,0.04],null,0.6,40],busY:[[0.98,0.72,0.05],null,0.4,30],
   boatW:[[0.93,0.93,0.9],null,0.5,40],boatB:[[0.12,0.22,0.42],null,0.4,30],vest:[[1,0.55,0.05],[0.25,0.12,0]],dbDeck:[[0.32,0.33,0.35],null,0.15,10]});
 // a plain board: lines of [text, size]
 const boardPaint=(bg,fg,lines)=>(x,W,H)=>{x.fillStyle=bg;x.fillRect(0,0,W,H);x.strokeStyle=fg;x.lineWidth=H*0.035;x.strokeRect(H*0.05,H*0.05,W-H*0.1,H-H*0.1);x.fillStyle=fg;x.textAlign="center";x.textBaseline="middle";
@@ -12626,7 +12665,7 @@ function render(dt){
   gl.disable(gl.CULL_FACE);gl.uniformMatrix4fv(U.uM,false,M4.id());
   // layered flat surfaces: push lower layers back in depth so the road and paint never flicker at distance
   gl.enable(gl.POLYGON_OFFSET_FILL);
-  gl.polygonOffset(8,8);mat(st.surface==="snow"&&!wxOn()?[0.8,0.82,0.86]:MAP.ground,null,0.02,8,1,MAP.gpat);draw(SCN.ground);if(!CULL.sec)grassDraw();
+  gl.polygonOffset(8,8);mat(st.surface==="snow"&&!wxOn()?[0.8,0.82,0.86]:MAP.ground,null,0.02,8,1,MAP.gpat);draw(SCN.ground);if(!CULL.sec){grassDraw();try{rwPropsDraw()}catch(e){}}
   gl.polygonOffset(7,7);mat([0.33,0.33,0.32],null,0.05,10,1,2);draw(SCN.plate);
   if(SCN.tc){const T_=SCN.tc;mat([0.42,0.42,0.4],null,0.05,10,1,2);draw(T_.conc);mat([0.55,0.5,0.43],null,0.08,12,1,2);draw(T_.sec);mat([0.09,0.09,0.095],null,0.2,30,1,2);draw(T_.asph);mat([0.33,0.29,0.25],null,0.1,10,1,2);draw(T_.cob);mat([0.36,0.3,0.22],null,0.05,8,1,1);draw(T_.grav);mat([0.40,0.38,0.35],null,0.1,10,1,2);draw(T_.rock);mat([0.20,0.14,0.09],null,0.25,30,1,1);draw(T_.mud);mat([0.92,0.94,0.97],null,0.2,20,1,2);draw(T_.snow);mat([0.76,0.66,0.47],null,0.03,6,1,1);draw(T_.sand);
     mat([0.85,0.7,0.1],null,0.2,20);draw(T_.paint);mat([0.95,0.38,0.05],null,0.2,20);draw(T_.dark);mat([0.55,0.55,0.55],null,0.3,20);draw(T_.post);mat([0.1,0.35,0.75],null,0.2,20);draw(T_.board);if(T_.rail){mat([0.62,0.64,0.66],null,0.6,40);draw(T_.rail)}try{orDraw()}catch(e){}tcSignsDraw()}
@@ -12704,7 +12743,7 @@ function render(dt){
   for(const [dist,c] of vis){
     const om=aiMat(c);const sOn=(c.sig||c.haz)&&st.blink;
     const fl=c.flashT>0&&(c.flashT%0.55)>0.25,rmt=c.kind==="remote",lc={head:rmt?(c.li===2?[4.2,4.2,3.9]:c.li?[1.2,1.2,1.1]:[0.3,0.3,0.32]):fl?[4.2,4.2,3.9]:lampsOn?[1.2,1.2,1.1]:[0.3,0.3,0.32],tail:c.kind==="parked"?OFF:c.brk||c.v<0.1?[1.3,0.04,0.02]:(lampsOn?[0.4,0.01,0.01]:OFF),sigL:sOn&&(c.haz||c.sig<0)?AMB:OFF,sigR:sOn&&(c.haz||c.sig>0)?AMB:OFF};{const aL=!!(c.haz||c.sig<0),aR=!!(c.haz||c.sig>0);lc.act=[aL,aR];lc.on=[aL&&st.blink,aR&&st.blink];lc.ph=blinkPh()}
-    if(dist<lodD&&nFull<capFull&&(c.mdl===undefined||KITS[c.mdl]||nFull<2)){nFull++;kitNext=kitOf(trafficModel(c));CAR_FAR=dist>(cam2?10:18);drawCar(om,paintRGB(c.paint),lc,[c.spin,c.spin,c.spin,c.spin],c.kind==="remote"?(c.steer||0):0,0,false,0,true);CAR_FAR=false;drawn.push([om,c])}else drawProxy(om,paintRGB(c.paint),c.brk,dist)}pxFlush();
+    if(dist<lodD&&nFull<capFull&&(c.mdl===undefined||KITS[c.mdl]||nFull<2)){nFull++;EQC=c;kitNext=kitOf(trafficModel(c));CAR_FAR=dist>(cam2?10:18);drawCar(om,paintRGB(c.paint),lc,[c.spin,c.spin,c.spin,c.spin],c.kind==="remote"?(c.steer||0):0,0,false,0,true);CAR_FAR=false;drawn.push([om,c])}else drawProxy(om,paintRGB(c.paint),c.brk,dist)}pxFlush();
   TREAD_OK=PM.on||G().trees&&!cam2&&!(st.cam===1&&!st.walk)&&Math.hypot(eye[0]-cm[12],eye[1]-cm[13],eye[2]-cm[14])<16;
   if(cam2!=="rear"&&cam2!=="dash"){dentOn(true);WHL_ME=true;drawCar(cm,myPaint(),lit,car.spin,car.dF,car.dR,false,car.height-tuneLow(),false,car.defl.map(d=>d));WHL_ME=false;dentOn(false);}
   if(!cam2&&mirOn()&&MIR.fresh){gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,MIR.tex);bind(SCN.box);
@@ -13140,7 +13179,7 @@ function shiftTo(g){const v=car.vx,from=st.gear;if(g===from)return;if(sys.hose&&
 function modeName(i=st.mode){const T=TRIMS[st.trim];return (T.modeNames&&T.modeNames[i])||MD(i).name}
 // city vehicles (bus, garbage truck, fire engine, police...) only ever drive as traffic: they have no trim, so you can't pick them
 const CITY_PAINT={city_police:["white","black"]};
-function trafficModel(c){if(c.mdl===undefined){const city=Object.keys(MODELS).filter(k=>k.startsWith("city_"));
+function trafficModel(c){if(c.mdl===undefined){const city=Object.keys(MODELS).filter(k=>k.startsWith("city_")&&k!=="city_bus"&&k!=="city_schoolbus");
     const city2=st.police===false?city.filter(k=>k!=="city_police"):city;if(st.police!==false&&city.length&&c.kind==="ai"&&MODELS.city_police&&Math.random()<0.05)c.mdl="city_police";else if(city2.length&&c.kind==="ai"&&Math.random()<0.08)c.mdl=city2[Math.floor(Math.random()*city2.length)];
     else if(TRAFFIC_NEW.size&&Math.random()<0.3){const nk=[...TRAFFIC_NEW].filter(k=>MODELS[k]&&MODELS[k].objects&&MODELS[k].objects.body&&!/^(eq_|wk_)/.test(k));c.mdl=nk.length?nk[Math.floor(Math.random()*nk.length)]:undefined}if(c.mdl===undefined){const okM=k=>!k.startsWith("city_")&&!/^(eq_|wk_|garage)/.test(k)&&MODELS[k]&&MODELS[k].objects&&MODELS[k].objects.body;let ks=Object.keys(MODELS).filter(k=>!LAZY_ALL.has(k)&&okM(k));if(!ks.length)ks=Object.keys(MODELS).filter(okM);c.mdl=ks[Math.floor(Math.random()*ks.length)]}
     const m=MODELS[c.mdl]&&MODELS[c.mdl].meta;if(m&&m.length>5.4){c.len=m.length;c.wid=m.width}if(CITY_PAINT[c.mdl])c.paint=CITY_PAINT[c.mdl][Math.random()<0.5?0:1]}return c.mdl}
@@ -13372,7 +13411,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=230;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="173",BUILD_VER=231;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){const k=GFX.q==="auto"?GFX.eff:GFX.q;if(G.k!==k||G.v!==GFX.ovV||!G.m){G.k=k;G.v=GFX.ovV;const m={...GQ[k]};for(const o of GOPT)if(GFX.ov[o[0]]!==undefined)Object.assign(m,o[4](GFX.ov[o[0]]));if(Object.keys(GFX.ov).length)m.label=GQ[k].label+" (custom)";G.m=m;COLL.nt=!m.trees}return G.m}
@@ -14315,7 +14354,7 @@ function propLoad(k){if(PROPS[k])return Promise.resolve(PROPS[k]);if(!PROPL[k])P
 // draw a prop with model matrix M; lit = {head, brake} light strengths
 function propDraw(k,M,lit){const P=PROPS[k];if(!P)return;gl.disable(gl.CULL_FACE);gl.uniform1f(U.uBackOn,1);
   for(const o of P.objs){bind(o);gl.uniformMatrix4fv(U.uM,false,M);for(const [mi,start,count] of o.groups){const m=P.mats[mi],c=[m[0],m[1],m[2]],nm=m[7]||"",sp=0.25+m[5]*1.1*(1-m[6]*0.6),sh=12+(1-m[6])*110;
-      let e=null;if(m[4]){const k_=/Brake/.test(nm)?(lit&&lit.brake)||0:/Indicator/.test(nm)?0:(lit&&lit.head)||0;if(k_>0)e=c.map(v=>v*k_*3)}
+      let e=null;if(lit&&lit.glow)e=c.map(v=>v*lit.glow);else if(m[4]){const k_=/Brake/.test(nm)?(lit&&lit.brake)||0:/Indicator/.test(nm)?0:(lit&&lit.head)||0;if(k_>0)e=c.map(v=>v*k_*3)}
       mat(c,e,sp,sh,m[3]<0.99?Math.max(0.25,m[3]):undefined);gl.drawElements(gl.TRIANGLES,count,gl.UNSIGNED_SHORT,start*2)}}
   gl.uniform1f(U.uBackOn,0);gl.enable(gl.CULL_FACE)}
 const TRAIN={s:0,v:22,pts:null};
@@ -14648,7 +14687,7 @@ function wipDraw(cm){const G=wipGeom();if(!G)return;bind(SCN.box);mat([0.035,0.0
     gl.uniformMatrix4fv(U.uM,false,chain(cm,new Float32Array([d[0]*L,d[1]*L,d[2]*L,0,sd[0]*0.022,sd[1]*0.022,sd[2]*0.022,0,n[0]*0.02,n[1]*0.02,n[2]*0.02,0,c[0],c[1],c[2],1])));gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_SHORT,0)}}
 function sfWiperCycle(){SAFE.wipMode=(SAFE.wipMode+1)%4;const auto=sfOn("rainWiper");carMsg("🌧 Wipers: "+["Off"+(auto?" (rain sensor on: they start by themselves)":""),"Intermittent","Low","High"][SAFE.wipMode])}
 // ---- emergency vehicles that drive in with lights and siren; traffic slows down and makes room; your car warns you if it has the alert
-function emvSend(x,y,list){const F=me();if(!F||!F.e)return [];const out=[];const side=loOf(F.e.n)*LANE-LANE/2-Math.max(0.6,(F.e.side||0)/2);let back=150;
+function emvSend(x,y,list,F0){const F=F0||me();if(!F||!F.e)return [];const out=[];const side=loOf(F.e.n)*LANE-LANE/2-Math.max(0.6,(F.e.side||0)/2);let back=150;
   for(const [m,ds,kind] of list){if(!MODELS[m])continue;const s0=F.s-back;const c=newCar(F.e,F.dir,clamp(s0,4,F.L-4),0);c.mdl=m;c.paint=TOW_PAINT[m]||"white";c.beacon=kind;c.haz=false;c.emv={t:0,park:{e:F.e,dir:F.dir,s:clamp(F.s+ds,3,F.L-3),off:side}};c.v=14;c.pers={k:"aggr",v:1.35,T:0.7,lc:0.3,a:2.6,b:4};const md=MODELS[m].meta;if(md.length>5.4){c.len=md.length;c.wid=md.width}carPose(c);cars.push(c);out.push(c);back+=25}return out}
 function emvTick(dt){SAFE.emvList=cars.filter(c=>c.emv);let near=1e9;for(const c of SAFE.emvList){const P=c.emv.park;if(c.e===P.e&&c.dir===P.dir&&c.s>P.s-12||(c.emv.t+=dt)>45){Object.assign(c,{kind:"wreck",e:P.e,dir:P.dir,s:P.s,off:P.off,offT:P.off,v:0,haz:true,jn:null});delete c.emv;carPose(c);continue}near=Math.min(near,Math.hypot(c.wx-car.px,c.wy-car.py))}
   // siren

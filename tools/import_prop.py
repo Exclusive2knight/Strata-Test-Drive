@@ -4,6 +4,10 @@ Positions int16 mm, normals int8, uint16 indices; one group per material; all no
 import json,struct,sys,base64
 import numpy as np
 src,key=sys.argv[1],sys.argv[2]
+ONLY=SKIP=None   # optional: --only a,b  /  --skip a,b  (node names) to split animated pieces into their own props
+for i,a in enumerate(sys.argv):
+    if a=='--only':ONLY=set(sys.argv[i+1].split(','))
+    if a=='--skip':SKIP=set(sys.argv[i+1].split(','))
 b=open(src,'rb').read();l=struct.unpack('<I',b[12:16])[0];J=json.loads(b[20:20+l]);o=20+l;bl=struct.unpack('<I',b[o:o+4])[0];BIN=b[o+8:o+8+bl]
 CT={5126:np.float32,5123:np.uint16,5125:np.uint32,5121:np.uint8};NC={'SCALAR':1,'VEC3':3,'VEC2':2,'VEC4':4}
 def acc(i):
@@ -25,6 +29,8 @@ nodes={}
 for i,n in enumerate(J['nodes']):
     nodes[n.get('name',str(i))]=[round(float(v),3) for v in wt(i)]
     if 'mesh' not in n:continue
+    if ONLY is not None and n.get('name') not in ONLY:continue
+    if SKIP is not None and n.get('name') in SKIP:continue
     T=wt(i)
     for pr in J['meshes'][n['mesh']]['primitives']:
         P=acc(pr['attributes']['POSITION']).astype(float)+T;N=acc(pr['attributes']['NORMAL']).astype(float)
