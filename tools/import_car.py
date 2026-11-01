@@ -12,7 +12,10 @@ import import_model as M
 from strata_mesh import clean, auto_smooth
 from web_export import pack
 
-WHEEL = {"wheel_front_left": "FL", "wheel_front_right": "FR", "wheel_rear_left": "RL", "wheel_rear_right": "RR"}
+WHEEL = {"wheel_front_left": "FL", "wheel_front_right": "FR", "wheel_rear_left": "RL", "wheel_rear_right": "RR",
+         "wheel_0_1": "FL", "wheel_0_-1": "FR", "wheel_1_1": "RL", "wheel_1_-1": "RR"}   # the heavy work-truck chassis names them by axle
+# work equipment that moves (plows, salt spreader, rollback deck, wheel-lift): each its own object, centred on its box
+EQUIP = re.compile(r"^(plow_A_frame|blade_left|blade_right|hopper|spinner_chute|rollback_deck|underlift|boom|warning_bar)$")
 CABIN = re.compile(r"^(interior|headliner|cabin_.*|driver_cluster|cluster_information_display|panoramic_display|center_touchscreen|steering_wheel)$")
 SCREEN_M = re.compile(r"blank display surface|display glass|display graphics|navigation", re.I)
 
@@ -90,7 +93,11 @@ def main(src, key, budget=60000, cab_budget=42000):
                 bud = int(bud * 0.8); return build(data, bud, ctr)
 
     out = {"wheelZ": R, "wheelR": R, "wheels": {}, "objects": {}, "meta": {}}
-    out["objects"]["body"] = build(collect(lambda p: p["node"] not in WHEEL and not CABIN.match(p["node"]) and p["node"] != "driver_camera"), budget)
+    out["objects"]["body"] = build(collect(lambda p: p["node"] not in WHEEL and not CABIN.match(p["node"]) and not EQUIP.match(p["node"]) and p["node"] != "driver_camera"), budget)
+    eq = {}
+    for nd in sorted({p["node"] for p in parts if EQUIP.match(p["node"])}):
+        d = collect(lambda p, nd=nd: p["node"] == nd); Vu = d[0][np.unique(d[1])]; lo_, hi_ = Vu.min(0), Vu.max(0); c_ = (lo_ + hi_) / 2
+        out["objects"]["eq_" + nd] = build(d, 9000, c_); eq[nd] = (c_, lo_, hi_)
     cab = collect(lambda p: CABIN.match(p["node"]) and p["node"] != "steering_wheel")
     if cab: out["objects"]["cabin"] = build(cab, cab_budget)
     sw = collect(lambda p: p["node"] == "steering_wheel"); steer_c = None
@@ -153,6 +160,10 @@ def main(src, key, budget=60000, cab_budget=42000):
     elif quad("driver_cluster"): m["clu"] = quad("driver_cluster")
     s = quad("center_touchscreen")
     if s: m["scr"] = s
+    if eq:   # page coords: centre and box of each equipment piece
+        def box(lo_, hi_):
+            a, b = np.array(P(lo_)), np.array(P(hi_)); return [round(float(v), 4) for v in np.minimum(a, b)], [round(float(v), 4) for v in np.maximum(a, b)]
+        m["equip"] = {k: {"c": P(c_), "lo": box(lo_, hi_)[0], "hi": box(lo_, hi_)[1]} for k, (c_, lo_, hi_) in eq.items()}
     dst = f"models/{key}.json"
     open(dst, "w").write(json.dumps(out, separators=(",", ":")))
     import base64, os
