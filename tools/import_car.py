@@ -13,7 +13,7 @@ from strata_mesh import clean, auto_smooth
 from web_export import pack
 
 WHEEL = {"wheel_front_left": "FL", "wheel_front_right": "FR", "wheel_rear_left": "RL", "wheel_rear_right": "RR"}
-CABIN = re.compile(r"^(interior|headliner|cabin_.*|driver_cluster|panoramic_display|center_touchscreen|steering_wheel)$")
+CABIN = re.compile(r"^(interior|headliner|cabin_.*|driver_cluster|cluster_information_display|panoramic_display|center_touchscreen|steering_wheel)$")
 SCREEN_M = re.compile(r"blank display surface|display glass|display graphics|navigation", re.I)
 
 
