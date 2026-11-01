@@ -163,3 +163,7 @@ def main(src, key, budget=60000, cab_budget=42000):
 
 if __name__ == "__main__":
     main(sys.argv[1], sys.argv[2])
+    # these zips seat the driver under the steering wheel: move the seats back, then fit the eye height to the cabin
+    import subprocess
+    subprocess.run([sys.executable, "tools/fix_seats.py", "--write", sys.argv[2]])
+    subprocess.run([sys.executable, "tools/fix_eye.py", "--write", sys.argv[2]])
