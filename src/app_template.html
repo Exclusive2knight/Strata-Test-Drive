@@ -4998,8 +4998,9 @@ function eqParts(M,K,E,S,o,drawObj){const off=o.off||[0,0,0];
 function eqDraw(M,K,drawObj){const me=WHL_ME;
   if(K.meta&&K.meta.equip&&!K.meta.donor)eqParts(M,K,K.meta.equip,me?EQ:EQ_AI,{me,spin:true},drawObj);
   if(me){const a=eqAcc();if(!a)return;const dk=EQ_ACC[a][0];if(!MODELS[dk]){loadModel(dk).catch(()=>{});return}const D=kitOf(dk),dm=MODELS[dk].meta,tm=MODELS[TRIMS[st.trim].model].meta;
-    const front=v=>v.head[2]-0.35;   // the plow frame sits just ahead of the headlights
-    eqParts(M,D,dm.equip,EQ,{me,spin:true,plowOff:[0,0,front(tm)-front(dm)],bedOff:[0,(tm.tail[1]-dm.tail[1])*0.6,tm.tail[2]-dm.tail[2]],roofOff:[0,tm.height-dm.height,tm.eye[2]-dm.eye[2]+0.35]},drawObj)}}
+    const tk=TRIMS[st.trim].model;if(tm._front===undefined){let z=0;try{const q=b64(MODELS[tk].objects.body.p,Int16Array);for(let i=2;i<q.length;i+=3)z=Math.min(z,q[i]/1000)}catch(e){z=tm.head[2]-0.2}tm._front=z}
+    const fz=dm.equip.plow_A_frame?tm._front+0.3-dm.equip.plow_A_frame.hi[2]:0;   // the plow frame tucks 30 cm under the front bumper
+    eqParts(M,D,dm.equip,EQ,{me,spin:true,plowOff:[0,0,fz],bedOff:[0,(tm.tail[1]-dm.tail[1])*0.6,tm.tail[2]-dm.tail[2]],roofOff:[0,tm.height-dm.height,tm.eye[2]-dm.eye[2]+0.35]},drawObj)}}
 // controls (the work-gear panel at the left)
 function eqTick(dt){const k=eqKind(),has=eqHas()&&st.started&&!st.walk;
   EQ.up+=Math.sign(EQ.upT-EQ.up)*Math.min(Math.abs(EQ.upT-EQ.up),dt/1.4);EQ.deck+=Math.sign(EQ.deckT-EQ.deck)*Math.min(Math.abs(EQ.deckT-EQ.deck),dt/6);EQ.lift+=Math.sign(EQ.liftT-EQ.lift)*Math.min(Math.abs(EQ.liftT-EQ.lift),dt/3.5);
