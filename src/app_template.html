@@ -1268,6 +1268,7 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
   <div class="nc">
     <div class="nh"><small>What's new</small><h2 id="newsVer">Version 223 · Real weather, snow plows and tow trucks</h2></div>
     <div class="nb">
+      <h4>🚗 Freeway traffic and road work</h4><ul><li>More cars on the freeway and its on-ramps, and more traffic around you while you're on the freeway.</li><li>Freeway slowdowns: now and then a stretch of freeway backs up and you get real stop-and-go queues, more often at rush hour.</li><li>Road work never goes on the freeway, its ramps or the streets that meet them anymore. The I-38 lane closure is gone.</li><li>More road closures with detours: up to 3 streets a day, and traffic and navigation route around them.</li></ul>
       <h4>💼 New jobs for the work trucks</h4><ul><li><b>Repo agent</b> (Rollback or Wrecker): find the car on the bank's list, hook it and drop it at the recovery lot. Pays $150–400 like real repo work. Some owners come out if you hang around too long.</li><li><b>Roadside Rescue</b> (truck, van or SUV): jump starts, lockouts, flat tires and gas delivery. Park next to the car and stay stopped while you work. $38–65 plus tips.</li><li><b>Tow &amp; Recovery</b>: with the Rollback the car goes onto the bed, with the Wrecker it goes on the wheel-lift, and either pays 40% more than towing with a regular truck.</li><li><b>City Snow Routes</b> (plow truck or a pickup with a plow): plow each street on your route with the blade down, $30 a street, +$8 if you salt it too. Routes only come in when it snows.</li><li>All in the Gig Jobs app on your phone.</li></ul>
       <h4>🏙️ New city service vehicles</h4><ul><li>New city trucks drive around in traffic: street sweeper (its gutter brushes spin), garbage truck, utility bucket truck, sewer vacuum truck, dump truck and traffic maintenance van. They replace the old city vehicles and load in the background a little after you start.</li><li>You can drive all six too, under Work Trucks. Raise the dump truck's bed, and turn the sweeper's brushes on and off with the buttons on the left.</li></ul>
       <h4>🔧 Fix</h4><ul><li>Fixed the game failing to start ("Something went wrong") after the last few updates.</li></ul>
@@ -4669,7 +4670,8 @@ function checkCollision(){
 // takes turns at all-way stops, waits for a gap from a side street, yields to oncoming traffic before a left turn and before a
 // median U-turn, and brakes for anything (you included) that is on the path it is about to drive.
 let seedR=12345,CAR_ID=0; const rnd=()=>(seedR=(seedR*16807)%2147483647)/2147483647;
-const EW=[];{let a=0;for(const e of EDGES){a+=e.L*e.n;EW.push(a)}}
+const spW=e=>e.L*e.n*(e.type==="xway"?2.2:e.type==="ramp"?3:1);   // freeways and ramps get more of the traffic
+const EW=[];{let a=0;for(const e of EDGES){a+=spW(e);EW.push(a)}}
 function laneIdx(c){return clamp(Math.round(c.offT/LANE)-loOf(c.e.n),0,c.e.n-1)}
 function carPose(c){if(c.fixed||c.dyn)return;if(c.jn){const P=c.jn.P,q=pathAt(P,c.jn.d);c.wx=q[0];c.wy=q[1];c.wh=q[2];c.wz=P.z0+(P.z1-P.z0)*clamp(c.jn.d/Math.max(P.L,0.1),0,1);c.wp=0}
   else{const q=fpt(c.e,c.dir,c.s,c.off+(c.wob||0));c.wx=q[0];c.wy=q[1];c.wh=q[2]+(c.head||0);if(c.e.hz){const u=c.dir>0?c.s:c.e.L-c.s;c.wz=ez(c.e,u);c.wp=Math.atan((ez(c.e,u+c.dir)-ez(c.e,u-c.dir))/2)}else{c.wz=0;c.wp=0}}}
@@ -4692,7 +4694,7 @@ function freeSpot(e,dir,s,i,gap){for(const o of cars){if(o.jn||o.e!==e||o.dir!==
 // the new world is big: pick from the roads near you (the list is redone when you have moved 150 m)
 const NEAR_E={x:1e9,y:1e9,d:0,E:[],W:[]};
 function nearEdges(maxD){if(Math.hypot(car.px-NEAR_E.x,car.py-NEAR_E.y)<150&&NEAR_E.d===maxD)return NEAR_E;Object.assign(NEAR_E,{x:car.px,y:car.py,d:maxD,E:[],W:[]});let a=0;
-  for(const e of EDGES){const c=eAt(e,e.L/2);if(Math.hypot(c.x-car.px,c.y-car.py)>maxD+e.L/2)continue;a+=e.L*e.n;NEAR_E.E.push(e);NEAR_E.W.push(a)}return NEAR_E}
+  for(const e of EDGES){const c=eAt(e,e.L/2);if(Math.hypot(c.x-car.px,c.y-car.py)>maxD+e.L/2)continue;a+=spW(e);NEAR_E.E.push(e);NEAR_E.W.push(a)}return NEAR_E}
 function randomSpot(minD,maxD){const NE=W2?nearEdges(maxD):{E:EDGES,W:EW};if(!NE.E.length)return null;
   for(let k=0;k<80;k++){const x=rnd()*NE.W[NE.W.length-1];let a=0,b=NE.W.length-1;while(a<b){const m=(a+b)>>1;if(NE.W[m]<x)a=m+1;else b=m}const e=NE.E[a];
     const dir=e.ow||rnd()<0.5?1:-1,s0=rStart(e,dir)+4,s1=e.L-rEnd(e,dir)-12;if(s1<=s0)continue;const s=s0+rnd()*(s1-s0),i=Math.floor(rnd()*e.n);
@@ -4866,7 +4868,7 @@ function updateTraffic(dt){try{sfTick(dt)}catch(e){console.error(e)}
     if(c.kind==="ai"&&c.pers===undefined&&(hourNow()>=22||hourNow()<4.5)){const r_=rnd();c.pers=r_<0.15?{k:"calm",v:0.93,T:1.7,lc:1.6,a:1.25,b:2.4}:r_<0.5?{k:"normal",v:1,T:1.3,lc:1,a:1.6,b:2.8}:r_<0.72?{k:"brisk",v:1.08,T:1.0,lc:0.6,a:2.1,b:3.2}:{k:"aggr",v:1.18,T:0.7,lc:0.35,a:2.8,b:4}; if(rnd()<0.07)c.drunk={ph:rnd()*6.28}}
     if(c.drunk){const t_=st.clock*0.55+c.drunk.ph;c.wob=Math.sin(t_)*0.75+Math.sin(t_*2.3)*0.25}
     if(c.kind==="ai"&&c.pers===undefined){const r_=rnd();c.pers=r_<0.25?{k:"calm",v:0.93,T:1.7,lc:1.6,a:1.25,b:2.4}:r_<0.72?{k:"normal",v:1,T:1.3,lc:1,a:1.6,b:2.8}:r_<0.88?{k:"brisk",v:1.06,T:1.0,lc:0.6,a:2.1,b:3.2}:{k:"aggr",v:1.1,T:0.8,lc:0.4,a:2.6,b:3.8}}
-    if(c.kind==="ai")c.v0=c.e.lim/2.23694*c.vf*wxSpeed()*(c.pers?c.pers.v:1)*(c.drunk?1+0.12*Math.sin(st.clock*0.3+c.drunk.ph):1)*(c.e.n>1?[0.96,1,1.05][Math.min(2,laneIdx(c))]:1);
+    if(c.kind==="ai")c.v0=c.e.lim/2.23694*c.vf*wxSpeed()*(c.pers?c.pers.v:1)*(c.drunk?1+0.12*Math.sin(st.clock*0.3+c.drunk.ph):1)*(c.e.n>1?[0.96,1,1.05][Math.min(2,laneIdx(c))]:1)*jamMul(c);
     if(c.kind==="ai"&&SAFE.emvList.length)emvYield(c);if(c.kind==="ai"&&TOLL.e)tollAI(c);if(c.kind==="ai"){if(c.honkT>0){c.honkT-=dt;c.v0*=1.14}if(c.passT>0){c.passT-=dt;c.v0*=1.2}if(c.flashT>0)c.flashT-=dt;if(c.bcCd>0)c.bcCd-=dt;if(c.flCd>0)c.flCd-=dt}
     let P=null,dStop=Infinity;if(!c.jn&&c.mv){P=mvP(c);dStop=P.s0-c.s}
     const pts=futurePath(c,P,85);
@@ -5269,14 +5271,16 @@ const EV={t:50,list:[],crit:[]};
 const RW={day:-1,zones:[],items:[],closed:new Set(),warned:new Set()};
 function rwTick(){if(!st.started)return;const day=GT.day||1;if(RW.day===day)return;RW.day=day;const old=new Set(RW.items);cars=cars.filter(c=>!old.has(c));RW.items=[];RW.zones=[];RW.closed=new Set();RW.warned=new Set();
   let h=(day*2654435761)>>>0;const rr=()=>{h=(h*1103515245+12345)>>>0;return h/4294967296},pick=L=>L[Math.floor(rr()*L.length)];
-  const multi=EDGES.filter(e=>e.n>=2&&e.L>380&&e.type!=="xway"&&!e.br&&!e.ov),two=EDGES.filter(e=>e.n===1&&!e.ow&&e.L>160&&e.L<700&&/res|st|col/.test(e.type)&&!e.br&&!e.ov&&!e.dip);
+  const fwN=new Set();for(const e of EDGES)if(e.type==="xway"||e.type==="ramp"){fwN.add(e.a);fwN.add(e.b)}const offFw=e=>e.type!=="xway"&&e.type!=="ramp"&&!fwN.has(e.a)&&!fwN.has(e.b);   // road work stays off the freeway, its ramps and the streets that meet them
+  const multi=EDGES.filter(e=>e.n>=2&&e.L>380&&offFw(e)&&!e.br&&!e.ov),two=EDGES.filter(e=>e.n===1&&!e.ow&&e.L>160&&e.L<700&&/res|st|col/.test(e.type)&&offFw(e)&&!e.br&&!e.ov&&!e.dip);
   for(let k=0;k<3&&multi.length;k++){const e=pick(multi),dir=rr()<0.5?1:-1;if(RW.zones.some(z=>z.e===e))continue;const s0=rStart(e,dir)+60+rr()*Math.max(1,e.L-rEnd(e,dir)-rStart(e,dir)-260),lo=loOf(e.n),it=[];
     for(let d=0;d<=40;d+=8)it.push(evStatic("cone",e,dir,s0+d,lo*LANE-1.7+d/40*3.3));for(let d=50;d<=150;d+=12)it.push(evStatic("cone",e,dir,s0+d,(lo+0.5)*LANE-0.25));
     it.push(evStatic("wreck",e,dir,s0+90,lo*LANE,{haz:true,paint:"yellow"}));RW.items.push(...it);const p=fpt(e,dir,Math.max(2,s0-90),lo*LANE-LANE/2-1.6);RW.zones.push({e,dir,s0,x:it[0].wx,y:it[0].wy,sign:p,label:"ROAD WORK"})}
-  if(two.length){const e=pick(two);RW.closed.add(e);for(const dir of [1,-1]){const s0=rStart(e,dir)+12,it=[];for(let t=-1;t<=1;t+=0.5)it.push(evStatic("cone",e,dir,s0,t*LANE));RW.items.push(...it);
-      const p=fpt(e,dir,s0,0);RW.zones.push({e,dir,s0,x:p[0],y:p[1],barrier:p,label:"ROAD CLOSED"})}}
+  for(let k=0;k<3&&two.length;k++){const e=pick(two);if(RW.closed.has(e))continue;RW.closed.add(e);for(const dir of [1,-1]){const s0=rStart(e,dir)+12,it=[];for(let t=-1;t<=1;t+=0.5)it.push(evStatic("cone",e,dir,s0,t*LANE));RW.items.push(...it);
+      const p=fpt(e,dir,s0,0);RW.zones.push({e,dir,s0,x:p[0],y:p[1],barrier:p,label:"ROAD CLOSED · DETOUR"})}}
   // the new world: a long-running lane closure on I-38 eastbound, with a flagger and a 45 mph limit
-  if(W2){const Z=wzSpot();if(Z){const {e,dir,s0,s1}=Z,lo=loOf(e.n),it=[];for(let d=0;d<=80;d+=10)it.push(evStatic("cone",e,dir,s0+d,lo*LANE-1.7+d/80*3.3));for(let d=95;d<=s1-s0;d+=16)it.push(evStatic("cone",e,dir,s0+d,(lo+0.5)*LANE-0.25));
+  if(false&&W2){const Z=wzSpot();if(Z){   // the I-38 lane closure is retired: road work stays off the freeways
+const {e,dir,s0,s1}=Z,lo=loOf(e.n),it=[];for(let d=0;d<=80;d+=10)it.push(evStatic("cone",e,dir,s0+d,lo*LANE-1.7+d/80*3.3));for(let d=95;d<=s1-s0;d+=16)it.push(evStatic("cone",e,dir,s0+d,(lo+0.5)*LANE-0.25));
       it.push(evStatic("wreck",e,dir,s0+(s1-s0)/2,lo*LANE,{haz:true,paint:"orange"}));RW.items.push(...it);const p=fpt(e,dir,Math.max(2,s0-250),lo*LANE-LANE/2-2.2);RW.zones.push({e,dir,s0,x:it[0].wx,y:it[0].wy,sign:p,label:"ROAD WORK"});
       const f=fpt(e,dir,s0-30,lo*LANE-LANE/2-1.8);W2L.wz={e,dir,s0,s1,fx:f[0],fy:f[1],fz:ez(e,dir>0?s0-30:e.L-s0+30),fh:f[2]}}}
   try{if(NAV.dest&&NAV.place)navTo(NAV.place)}catch(e){}}
@@ -5311,7 +5315,13 @@ function startEvent(type){const M=me();let made=null;
 // traffic follows the clock: rush hour is busy, the small hours are nearly empty
 const TOD={t:0};const hourNow=()=>((GT.min||0)/60)%24;
 function todMul(){const h=hourNow();return h<5?0.3:h<6.5?0.6:h<9.5?1.45:h<15.5?1:h<18.5?1.5:h<22?0.85:0.5}
-function trafTOD(dt){TOD.t-=dt;if(TOD.t>0||!st.started)return;TOD.t=2.5;const want=Math.round(G().traffic*todMul()),ai=cars.filter(c=>c.kind==="ai");
+// freeway slowdowns: a stretch where traffic crawls (more often at rush hour), so real queues and stop-and-go waves form behind it
+const JAM={zones:[],t:20};
+function jamTick(dt){JAM.t-=dt;JAM.zones=JAM.zones.filter(z=>(z.left-=dt)>0);if(JAM.t>0)return;const rush=todMul()>1.3;JAM.t=rush?40+Math.random()*40:90+Math.random()*90;if(JAM.zones.length>=(rush?3:2))return;
+  const E=(W2?nearEdges(1500).E:EDGES).filter(e=>e.type==="xway"&&e.L>500);if(!E.length)return;const e=E[Math.floor(Math.random()*E.length)],dir=e.ow?1:Math.random()<0.5?1:-1,len=250+Math.random()*450,s0=rStart(e,dir)+40+Math.random()*Math.max(1,e.L-len-120);
+  JAM.zones.push({e,dir,s0,s1:s0+len,m:rush?0.18+Math.random()*0.2:0.3+Math.random()*0.25,left:120+Math.random()*180})}
+function jamMul(c){if(!JAM.zones.length||c.e.type!=="xway")return 1;for(const z of JAM.zones)if(z.e===c.e&&z.dir===c.dir&&c.s>z.s0-60&&c.s<z.s1){const k=c.s<z.s0?(z.s0-c.s)/60:c.s>z.s1-80?(c.s-(z.s1-80))/80:0;return z.m+(1-z.m)*clamp(k,0,1)}return 1}
+function trafTOD(dt){try{jamTick(TOD.t>0?0:2.5)}catch(e){}TOD.t-=dt;if(TOD.t>0||!st.started)return;TOD.t=2.5;const M_=me(),onFw=M_&&M_.e&&(M_.e.type==="xway"||M_.e.type==="ramp"),want=Math.round(G().traffic*todMul()*(onFw?1.4:1)),ai=cars.filter(c=>c.kind==="ai");
   if(ai.length<want){for(let k=0;k<Math.min(3,want-ai.length);k++){const p=randomSpot(350,900);if(p)cars.push(newCar(p.e,p.dir,p.s,p.i))}}
   else if(ai.length>want+2){let n=Math.min(3,ai.length-want);for(const c of ai){if(n<=0)break;const d=Math.hypot(c.wx-car.px,c.wy-car.py),ahead=(c.wx-car.px)*Math.cos(car.psi)+(c.wy-car.py)*Math.sin(car.psi);if(d>300||d>140&&ahead<0){const k=cars.indexOf(c);if(k>=0){cars.splice(k,1);n--}}}}
   st.trafficN=cars.filter(c=>c.kind==="ai").length}
@@ -13362,7 +13372,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=229;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="173",BUILD_VER=230;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){const k=GFX.q==="auto"?GFX.eff:GFX.q;if(G.k!==k||G.v!==GFX.ovV||!G.m){G.k=k;G.v=GFX.ovV;const m={...GQ[k]};for(const o of GOPT)if(GFX.ov[o[0]]!==undefined)Object.assign(m,o[4](GFX.ov[o[0]]));if(Object.keys(GFX.ov).length)m.label=GQ[k].label+" (custom)";G.m=m;COLL.nt=!m.trees}return G.m}
