@@ -15,7 +15,7 @@ from web_export import pack
 WHEEL = {"wheel_front_left": "FL", "wheel_front_right": "FR", "wheel_rear_left": "RL", "wheel_rear_right": "RR",
          "wheel_0_1": "FL", "wheel_0_-1": "FR", "wheel_1_1": "RL", "wheel_1_-1": "RR"}   # the heavy work-truck chassis names them by axle
 # work equipment that moves (plows, salt spreader, rollback deck, wheel-lift): each its own object, centred on its box
-EQUIP = re.compile(r"^(plow_A_frame|blade_left|blade_right|hopper|spinner_chute|rollback_deck|underlift|boom|warning_bar)$")
+EQUIP = re.compile(r"^(plow_A_frame|blade_left|blade_right|hopper|spinner_chute|rollback_deck|underlift|boom|warning_bar|tipping_body|gutter_brush_-?1)$")
 CABIN = re.compile(r"^(interior|headliner|cabin_.*|driver_cluster|cluster_information_display|panoramic_display|center_touchscreen|steering_wheel)$")
 SCREEN_M = re.compile(r"blank display surface|display glass|display graphics|navigation", re.I)
 
@@ -183,7 +183,8 @@ def main(src, key, budget=60000, cab_budget=42000, wheels_only=False):
 if __name__ == "__main__":
     if "--wheels" in sys.argv:
         main(sys.argv[1], sys.argv[2], wheels_only=True); sys.exit()
-    main(sys.argv[1], sys.argv[2])
+    nums = [int(a) for a in sys.argv[3:] if a.isdigit()]   # optional triangle budgets: body [cabin] (lighter for traffic-only vehicles)
+    main(sys.argv[1], sys.argv[2], *nums)
     # these zips seat the driver under the steering wheel: move the seats back, then fit the eye height to the cabin
     import subprocess
     subprocess.run([sys.executable, "tools/fix_normals.py", "--write", sys.argv[2]])   # panels facing inward look grey
