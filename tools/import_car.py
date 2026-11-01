@@ -29,7 +29,7 @@ def hexcol(c, pre="col_"):
     return pre + "".join(f"{int(round(v * 255)):02x}" for v in np.clip(c, 0, 1))   # linear, like the earlier imports
 
 
-def main(src, key, budget=60000, cab_budget=42000):
+def main(src, key, budget=60000, cab_budget=42000, wheels_only=False):
     M.NODES = {}
     parts, _ = M.load_gltf(src)
     # GLB (X left, Y up, Z forward)  ->  vehicle space for pack(): +X left, -Y front, Z up
@@ -54,7 +54,7 @@ def main(src, key, budget=60000, cab_budget=42000):
 
     def mname(p, tri_c):
         n = p["mat"]["name"]; nl = n.lower(); node = p["node"]
-        if node in WHEEL: return "strata_tire" if "rubber" in nl else "strata_rim"
+        if node in WHEEL: return "strata_tire" if "rubber" in nl else "strata_rim" if max(p["mat"]["color"]) > 0.25 else hexcol(p["mat"]["color"])   # dark wheel faces stay dark (not silver)
         if CABIN.match(node):
             if SCREEN_M.search(n): return "strata_screen"
             return hexcol(p["mat"]["color"])
@@ -93,6 +93,14 @@ def main(src, key, budget=60000, cab_budget=42000):
                 bud = int(bud * 0.8); return build(data, bud, ctr)
 
     out = {"wheelZ": R, "wheelR": R, "wheels": {}, "objects": {}, "meta": {}}
+    if wheels_only:   # rebuild only the wheels of an already imported model, keep everything else
+        cur = json.load(open(f"models/{key}.json"))
+        for w in ("FL", "RL", "FR", "RR"):
+            h = hubs[w]
+            tire = collect(lambda p, w=w: p["node"] in WHEEL and WHEEL[p["node"]] == w and "rubber" in p["mat"]["name"].lower())
+            rim = collect(lambda p, w=w: p["node"] in WHEEL and WHEEL[p["node"]] == w and "rubber" not in p["mat"]["name"].lower())
+            cur["objects"]["tire_" + w] = build(tire, 2500, h); cur["objects"]["rim_" + w] = build(rim if rim else tire, 3000, h)
+        open(f"models/{key}.json", "w").write(json.dumps(cur, separators=(",", ":"))); print(key, "wheels rebuilt"); return cur
     out["objects"]["body"] = build(collect(lambda p: p["node"] not in WHEEL and not CABIN.match(p["node"]) and not EQUIP.match(p["node"]) and p["node"] != "driver_camera"), budget)
     eq = {}
     for nd in sorted({p["node"] for p in parts if EQUIP.match(p["node"])}):
@@ -173,6 +181,8 @@ def main(src, key, budget=60000, cab_budget=42000):
 
 
 if __name__ == "__main__":
+    if "--wheels" in sys.argv:
+        main(sys.argv[1], sys.argv[2], wheels_only=True); sys.exit()
     main(sys.argv[1], sys.argv[2])
     # these zips seat the driver under the steering wheel: move the seats back, then fit the eye height to the cabin
     import subprocess
