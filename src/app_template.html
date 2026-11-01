@@ -1268,6 +1268,9 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
   <div class="nc">
     <div class="nh"><small>What's new</small><h2 id="newsVer">Version 223 · Real weather, snow plows and tow trucks</h2></div>
     <div class="nb">
+      <h4>🧠 Drivers with feelings</h4><ul><li>Cut someone off and they stamp on the brakes, lean on the horn and flash you. A little 😱 pops up over the car, then 😡.</li><li>Run a light or pull out in front of someone and they panic stop with a long horn.</li><li>Sit at a green light and the car behind gives you a tap on the horn after a few seconds (pushy drivers sooner, calm ones later). If they're already annoyed it's a long blast 😤.</li><li>Keep annoying a driver (honking, tailgating, cutting in) and they can lose it: road rage for a while, driving faster and closer, flashing and passing you.</li><li>Getting scared makes drivers hang back and leave bigger gaps for a while. A crash nearby makes people put their hazards on 😳.</li><li>Drivers don't all pull away the instant the light changes or the car ahead moves. Each one takes a moment, and now and then someone's on their phone and takes a few seconds.</li><li>Every car has its own horn pitch. Calm drivers who let you in show a 🙂.</li><li>You can turn the faces off in Spawn › Driver reactions.</li></ul>
+      <h4>🚦 Traffic spawns like BeamNG</h4><ul><li>The traffic around you is now a pool of cars. New ones appear where you can't see them, mostly on the roads ahead of you.</li><li>When a car is far behind you and out of sight, it disappears and pops back in somewhere ahead of you. Cars never vanish or appear in front of your eyes.</li><li>How far out they live depends on graphics: about 650 m on High, 560 m on Medium, 480 m on Low.</li></ul>
+      <h4>🚓 Crashes get cleared</h4><ul><li>When two AI cars crash, the police come with two tow trucks. The rollback winches one wreck up onto its bed and the wrecker takes the other, then they drive off with them. The police pick up the cones and leave, and the lanes open back up.</li><li>A crash now clears in about a minute instead of blocking traffic for over two.</li></ul>
       <h4>🛣️ The freeways loop now</h4><ul><li>I-38 and I-61 no longer stop dead at a traffic light at the edge of the map. They join up into one big loop round the whole map: head west on I-38 and it curves south and round onto I-61, head east and it runs up the east side, along the top (over the river on a bridge) and down into I-61.</li><li>County Rd 1, County Rd 11, County Rd 40 and Ridge Rd now cross over the freeway on bridges instead of meeting it at a light.</li></ul>
       <h4>🚗 Spawned traffic stays</h4><ul><li>Cars you add from the Spawn tab (Add 5 / 10 / 20) now stay in the world on top of the normal traffic, instead of being thinned back out after a few seconds. "Clear traffic" still removes them all.</li></ul>
       <h4>💡 New streetlights</h4><ul><li>Every street now has the new single-arm streetlights reaching out over the road, and downtown sidewalks get short sidewalk lamps in between. They light up at night.</li><li>None stand on or near bridges, overpasses or the river.</li></ul>
@@ -4538,7 +4541,7 @@ function copTick(dt){if(st.police===false){if(COP.stars)copClear();return}if(!st
 function copInto(){copMats();const on=(performance.now()%500)<250;for(const c of COP.chase){if(!c.lights)continue;const M=aiMat(c),h=(MODELS.city_police?MODELS.city_police.meta.height:1.8)+0.04;
     dBoxM(on?"copR":"copOff",M,c.wh,[0.32,h,0.1],0.32,0.08,0.18);dBoxM(on?"copOff":"copB",M,c.wh,[-0.32,h,0.1],0.32,0.08,0.18)}
   for(const S of COP.spikes){for(let k=-3;k<=3;k++){const x=S.x-Math.sin(S.h)*k*0.6,y=S.y+Math.cos(S.h)*k*0.6;dBox(k%2?"spikeY":"spike",x,y,0.02,0.5,0.05,0.12,S.h+Math.PI/2)}}}
-function crashFx(v,what){const now=performance.now();if(v<0.6||now-(sys.lastHitT||0)<450)return;try{ACH.clean=0;if(VALET.on&&VALET.cur)VALET.ding=true;}catch(e){}if(v>9)setTimeout(()=>{try{txt("Mom","I just saw a crash on the news. Was that you?? Call me!","crash"+(GT.day||1))}catch(e){}},9000);sys.lastHitT=now;if(st.dale){try{if(/pedestrian|deer|cyclist/.test(String(what)))daleGore(v);else if(v>6.5)daleBoom()}catch(e){}}try{if(/pedestrian|cyclist/.test(String(what))&&(copWatch(250)||Math.random()<0.4))copOffense(2,`Hit ${what}`)}catch(e){}haptic(Math.min(450,70+v*30),Math.min(1,0.4+v/10));if(v>1.5)dashClip("Impact: "+what);try{sfCrash(v)}catch(e){}
+function crashFx(v,what){const now=performance.now();if(v<0.6||now-(sys.lastHitT||0)<450)return;if(v>4)try{for(const o of cars)if(o.kind==="ai"&&Math.hypot(o.wx-car.px,o.wy-car.py)<45){o.fear=(o.fear||0)+0.8;o.hzT=3+rnd()*4;emoB(o,"shock",2.5)}}catch(e){}try{ACH.clean=0;if(VALET.on&&VALET.cur)VALET.ding=true;}catch(e){}if(v>9)setTimeout(()=>{try{txt("Mom","I just saw a crash on the news. Was that you?? Call me!","crash"+(GT.day||1))}catch(e){}},9000);sys.lastHitT=now;if(st.dale){try{if(/pedestrian|deer|cyclist/.test(String(what)))daleGore(v);else if(v>6.5)daleBoom()}catch(e){}}try{if(/pedestrian|cyclist/.test(String(what))&&(copWatch(250)||Math.random()<0.4))copOffense(2,`Hit ${what}`)}catch(e){}haptic(Math.min(450,70+v*30),Math.min(1,0.4+v/10));if(v>1.5)dashClip("Impact: "+what);try{sfCrash(v)}catch(e){}
   const sev=clamp(v/12,0.15,1);if(au.ctx){const c=au.ctx,t=c.currentTime;rNoiseFx(t,0.25+sev*0.4,0.25+sev*0.5);beep(90+sev*40,0.25+sev*0.3,"sawtooth",0.12+sev*0.2)}
   if(v>1.5){logResult(`Hit ${what} at ${fmtSpeed(v)}${st.aeb?"":" (AEB off)"}`);toast(`Impact: ${what} at ${fmtSpeed(v)}`)}
   if(navigator.vibrate)navigator.vibrate(Math.round(40+sev*120));if(v>3)car.crashed=1.0;dmgHit(v,what)}
@@ -4706,7 +4709,7 @@ function randomSpot(minD,maxD){const NE=W2?nearEdges(maxD):{E:EDGES,W:EW};if(!NE
     const dir=e.ow||rnd()<0.5?1:-1,s0=rStart(e,dir)+4,s1=e.L-rEnd(e,dir)-12;if(s1<=s0)continue;const s=s0+rnd()*(s1-s0),i=Math.floor(rnd()*e.n);
     const p=fpt(e,dir,s,laneOff(e,i)),d=Math.hypot(p[0]-car.px,p[1]-car.py);if(d<minD||d>maxD)continue;if(!freeSpot(e,dir,s,i,30))continue;return {e,dir,s,i}}
   return null}
-function spawnTraffic(n){for(let k=0;k<n;k++){const p=randomSpot(45,900);if(p)cars.push(newCar(p.e,p.dir,p.s,p.i))}st.trafficN=cars.filter(c=>c.kind==="ai").length}
+function spawnTraffic(n){for(let k=0;k<n;k++){const p=poolSpot(60)||randomSpot(45,900);if(p)cars.push(newCar(p.e,p.dir,p.s,p.i))}st.trafficN=cars.filter(c=>c.kind==="ai").length}
 function spawnOncoming(){}
 function idm(v,v0,gap,vL,Th,aM,bM){const s0=2.5,T=Th||1.3,a=aM||1.6,b=bM||2.8;
   const ss=s0+Math.max(0,v*T+v*(v-vL)/(2*Math.sqrt(a*b)));return a*(1-Math.pow(v/Math.max(v0,0.1),4)-Math.pow(ss/Math.max(gap,0.1),2))}
@@ -4824,20 +4827,49 @@ function laneSafe(c,i){if(i<0||i>=c.e.n)return false;const g=laneGaps(c,i);retur
 // ---- how AI drivers react to you: the horn hurries them up, a slow driver ahead gets high beams and is passed
 // (aggressive drivers go round you quickly), and a tailgater can get brake-checked
 function aiVsPlayer(c,L,dt){if(st.walk||!st.started)return null;const dx=c.wx-car.px,dy=c.wy-car.py;if(Math.abs(dx)>70||Math.abs(dy)>70){c.tgT=0;c.slowT=0;return null}
-  const cp=Math.cos(car.psi),sp=Math.sin(car.psi),fw=dx*cp+dy*sp,lt=-dx*sp+dy*cp,same=Math.abs(wrapPi(c.wh-car.psi))<0.5,ag=c.pers&&c.pers.k==="aggr",pv=car.vx;
+  const cp=Math.cos(car.psi),sp=Math.sin(car.psi),fw=dx*cp+dy*sp,lt=-dx*sp+dy*cp,same=Math.abs(wrapPi(c.wh-car.psi))<0.5,ag=c.pers&&c.pers.k==="aggr"||c.rageT>0,pv=car.vx;
+  // you cut in right in front of me: stamp on the brakes, lean on the horn, flash; scared first, then mad
+  if(same&&fw<-2&&fw>-40){const inLane=Math.abs(lt)<1.7,gB=-fw-CARLEN;if(inLane&&c.wasSide&&gB<Math.max(6,c.v*0.55)&&c.v>6&&!(c.coCd>0)){c.coCd=12;c.hardT=0.3+rnd()*0.3;c.fear=(c.fear||0)+0.6;c.anger=(c.anger||0)+(ag?0.6:0.35);c.flashT=1.2;aiHonk(c,ag||c.anger>0.6?1.1:0.45);emoB(c,"scared",1.4,"mad")}c.wasSide=Math.abs(lt)>2.6}else c.wasSide=false;
+  if(c.coCd>0)c.coCd-=dt;
+  // a near miss across my path (you ran the light, pulled out on me): panic stop, long horn
+  if(!same&&dx*dx+dy*dy<49&&pv>6&&c.v>2&&Math.abs(Math.abs(wrapPi(c.wh-car.psi))-Math.PI/2)<1&&!(c.nmCd>0)){c.nmCd=10;c.hardT=0.6;c.fear=(c.fear||0)+0.8;c.anger=(c.anger||0)+0.4;aiHonk(c,1.2);emoB(c,"scared",1.5,"mad")}
+  if(c.nmCd>0)c.nmCd-=dt;
+  // stuck behind you at a green light: a tap on the horn after a moment (sooner for pushy drivers), a long blast if they're already annoyed
+  if(L.who==="me"&&c.v<0.3&&Math.abs(pv)<0.3&&L.gap<12&&!(c.cg<1e6)){c.grT=(c.grT||0)+dt;const k=c.pers&&c.pers.k,lim=ag?1.3:k==="brisk"?2.2:k==="calm"?6:3.5;
+    if(c.grT>lim&&!(c.gHk>0)){aiHonk(c,(c.anger||0)>0.5?0.9:0.2);c.anger=(c.anger||0)+0.2;c.gHk=(c.anger||0)>0.6?2.5:5;emoB(c,(c.anger||0)>0.6?"mad":"annoyed",2.4)}}else c.grT=0;
+  if(c.gHk>0)c.gHk-=dt;
   if(same&&fw>2&&fw<45&&Math.abs(lt)<2.3){   // this car is just ahead of you
-    if(st.hornAt&&st.clock-st.hornAt<0.35&&c.hornSeen!==st.hornAt){c.hornSeen=st.hornAt;c.anger=(c.anger||0)+0.3;c.honkT=ag||c.anger>0.6?7:4.5;if(c.v<0.5)c.waitT=Math.max(c.waitT||0,30)}
+    if(st.hornAt&&st.clock-st.hornAt<0.35&&c.hornSeen!==st.hornAt){c.hornSeen=st.hornAt;c.anger=(c.anger||0)+0.3;if(ag||c.anger>0.7){emoB(c,"mad",2.2);if(rnd()<0.5)setTimeout(()=>aiHonk(c,0.6),500+rnd()*500)}else emoB(c,"annoyed",1.8);c.honkT=ag||c.anger>0.6?7:4.5;if(c.v<0.5)c.waitT=Math.max(c.waitT||0,30)}
     const gap=fw-CARLEN,tail=pv>7&&gap<Math.max(3,pv*0.5)&&c.v>7;c.tgT=tail?(c.tgT||0)+dt:Math.max(0,(c.tgT||0)-dt*2);
     if(c.tgT>2.2&&(ag||(c.anger||0)>0.6||c.pers&&c.pers.k==="brisk"&&c.tgT>5)&&!(c.bcCd>0)&&L.gap>35){c.bcT=0.6+rnd()*0.4;c.bcCd=18;c.tgT=0;c.anger=(c.anger||0)+0.2}}
   else c.tgT=0;
   if(L.who==="me"&&same&&fw<-3&&fw>-45){const gap=-fw-CARLEN,slow=pv<c.v0*0.72&&gap<32&&c.v0>8;
     c.slowT=slow?(c.slowT||0)+dt:Math.max(0,(c.slowT||0)-dt);
-    if(c.slowT>(ag?2:4)&&!(c.flCd>0)){c.flashT=1.1;c.flCd=ag?5:9;c.anger=(c.anger||0)+0.15;if(ag&&gap<20&&Math.hypot(dx,dy)<40&&rnd()<0.5)aiHonk(c)}
+    if(c.slowT>(ag?2:4)&&!(c.flCd>0)){c.flashT=1.1;c.flCd=ag?5:9;c.anger=(c.anger||0)+0.15;if(ag&&gap<20&&Math.hypot(dx,dy)<40&&rnd()<0.5){aiHonk(c);emoB(c,"annoyed",2)}}
     if((ag&&c.slowT>2.5||c.slowT>8)&&!c.jn&&c.e.n>1&&!c.lcPending&&Math.abs(c.offT-c.off)<0.05){const li=laneIdx(c);
       for(const t of [li+1,li-1]){if(t<0||t>=c.e.n)continue;const g=laneGaps(c,t);if(g.lg>(ag?8:14)&&g.fg>(ag?5:10)){c.lcTarget=t;c.lcPending=ag?0.4:1.2;c.sig=t>li?-1:1;c.passT=ag?9:6;c.slowT=0;break}}}}
   else c.slowT=Math.max(0,(c.slowT||0)-dt);
-  if(c.anger>0)c.anger=Math.max(0,c.anger-dt*0.01);return true}
-function aiHonk(c){if(!au.ctx)return;const d=Math.hypot(c.wx-car.px,c.wy-car.py),v=0.16*Math.max(0,1-d/60);if(v>0.01){beep(415,0.35,"sawtooth",v);beep(523,0.35,"sawtooth",v*0.8)}}
+  if(c.anger>0)c.anger=Math.max(0,c.anger-dt*(c.pers&&c.pers.k==="calm"?0.025:0.012));return true}
+function aiHonk(c,dur){if(!au.ctx)return;const T=dur||0.35,f=c.hornF||(c.hornF=[370,400,415,440,470][Math.floor(rnd()*5)]),d=Math.hypot(c.wx-car.px,c.wy-car.py),v=0.16*Math.max(0,1-d/75);if(v>0.01){beep(f,T,"sawtooth",v);beep(f*1.26,T,"sawtooth",v*0.8)}}
+// drivers' feelings: a little face over the car for a moment when something happens (😱 cut off or nearly hit, 😡 road rage, 😤 waiting on you at a green, 😳 a crash nearby, 🙂 letting you in)
+const EMO={mad:"😡",scared:"😱",annoyed:"😤",shock:"😳",nice:"🙂"};
+function emoB(c,k,t,next){c.bub={e:EMO[k],t:t||2.2,nx:next?EMO[next]:null}}
+function emoDraw(){let box=$("emoL");if(!box){box=document.createElement("div");box.id="emoL";box.style.cssText="position:fixed;inset:0;pointer-events:none;z-index:6;overflow:hidden";document.body.appendChild(box)}
+  box.hidden=false;clearTimeout(emoDraw.to);emoDraw.to=setTimeout(()=>{box.hidden=true},400);
+  const M=CULL.vp,cv=$("gl");let n=0;const kids=box.children;
+  if(M&&cv&&st.emo!==false&&!(typeof PM!=="undefined"&&PM.on&&PM.hidePanel)){const r=cv.getBoundingClientRect();
+    for(const c of cars){if(!c.bub||n>=8)continue;const dx=c.wx-car.px,dy=c.wy-car.py;if(dx*dx+dy*dy>60*60)continue;const md=MODELS[c.mdl],x=c.wx,y=(c.wz||0)+((md&&md.meta.height)||1.5)+0.6,z=-c.wy;
+      const cw=M[3]*x+M[7]*y+M[11]*z+M[15];if(cw<0.5)continue;const sx=(M[0]*x+M[4]*y+M[8]*z+M[12])/cw,sy=(M[1]*x+M[5]*y+M[9]*z+M[13])/cw;if(Math.abs(sx)>1.05||Math.abs(sy)>1.05)continue;
+      let el=kids[n];if(!el){el=document.createElement("span");el.style.cssText="position:absolute;transform:translate(-50%,-100%);line-height:1;filter:drop-shadow(0 2px 3px rgba(0,0,0,.55))";box.appendChild(el)}
+      if(el.textContent!==c.bub.e)el.textContent=c.bub.e;el.style.left=(r.left+(sx*0.5+0.5)*r.width).toFixed(1)+"px";el.style.top=(r.top+(0.5-sy*0.5)*r.height).toFixed(1)+"px";el.style.fontSize=Math.round(clamp(700/cw,14,30))+"px";el.hidden=false;n++}}
+  for(let i=n;i<kids.length;i++)kids[i].hidden=true}
+// traffic pool (like BeamNG): a fixed number of cars lives around you. They appear where you can't see them, mostly on the roads ahead,
+// and once one is far behind and out of sight it is quietly moved to a new spot instead of driving off into nowhere
+function aiR(){const lb=G().label;return lb==="Ultra"||lb==="High"?650:lb==="Medium"?560:480}
+function aiSeen(x,y,z){if(!CULL.pl)return Math.hypot(x-car.px,y-car.py)<60;return sphVis(x,(z||0)+1,-y,8,1e9)}
+function poolSpot(minD,ok){const R=aiR();for(let k=0;k<16;k++){const p=randomSpot(minD??140,R-40);if(!p)continue;if(ok&&!ok(p))continue;const q=fpt(p.e,p.dir,p.s,laneOff(p.e,p.i)),d=Math.hypot(q[0]-car.px,q[1]-car.py);
+    if(d<R*0.8&&aiSeen(q[0],q[1],p.e.hz?ez(p.e,p.dir>0?p.s:p.e.L-p.s):0))continue;const ah=(q[0]-car.px)*Math.cos(car.psi)+(q[1]-car.py)*Math.sin(car.psi);if(ah<0&&k<10&&rnd()<0.55)continue;return p}return null}
+function poolKeep(c){return c.emv||c.bus||c.plow||c.transit||c.towing||(typeof GIG!=="undefined"&&GIG.job&&GIG.job.towCar===c)}
 // AI cars get the same suspension as the cars you drive: the suspension of their own model (passive coils, adaptive, magnetic or air),
 // four corner springs and dampers, anti-roll bars, the real mass, and road bumps and potholes under each wheel
 const AI_TRIM={};function aiTrimOf(mdl){if(AI_TRIM[mdl]===undefined){AI_TRIM[mdl]=Object.keys(TRIMS).find(k=>TRIMS[k].model===mdl)||null}return AI_TRIM[mdl]}
@@ -4875,11 +4907,16 @@ function updateTraffic(dt){try{sfTick(dt)}catch(e){console.error(e)}
     if(c.drunk){const t_=st.clock*0.55+c.drunk.ph;c.wob=Math.sin(t_)*0.75+Math.sin(t_*2.3)*0.25}
     if(c.kind==="ai"&&c.pers===undefined){const r_=rnd();c.pers=r_<0.25?{k:"calm",v:0.93,T:1.7,lc:1.6,a:1.25,b:2.4}:r_<0.72?{k:"normal",v:1,T:1.3,lc:1,a:1.6,b:2.8}:r_<0.88?{k:"brisk",v:1.06,T:1.0,lc:0.6,a:2.1,b:3.2}:{k:"aggr",v:1.1,T:0.8,lc:0.4,a:2.6,b:3.8}}
     if(c.kind==="ai")c.v0=c.e.lim/2.23694*c.vf*wxSpeed()*(c.pers?c.pers.v:1)*(c.drunk?1+0.12*Math.sin(st.clock*0.3+c.drunk.ph):1)*(c.e.n>1?[0.96,1,1.05][Math.min(2,laneIdx(c))]:1)*jamMul(c);
-    if(c.kind==="ai"&&SAFE.emvList.length)emvYield(c);if(c.kind==="ai"&&TOLL.e)tollAI(c);if(c.kind==="ai"){if(c.honkT>0){c.honkT-=dt;c.v0*=1.14}if(c.passT>0){c.passT-=dt;c.v0*=1.2}if(c.flashT>0)c.flashT-=dt;if(c.bcCd>0)c.bcCd-=dt;if(c.flCd>0)c.flCd-=dt}
+    if(c.kind==="ai"&&SAFE.emvList.length)emvYield(c);if(c.kind==="ai"&&TOLL.e)tollAI(c);if(c.kind==="ai"){if(c.honkT>0){c.honkT-=dt;c.v0*=1.14}if(c.passT>0){c.passT-=dt;c.v0*=1.2}if(c.flashT>0)c.flashT-=dt;if(c.bcCd>0)c.bcCd-=dt;if(c.flCd>0)c.flCd-=dt;
+      // fear makes a driver hang back for a while, anger can boil over into road rage (faster, closer, pushy)
+      if(c.fear>0){c.fear=Math.max(0,c.fear-dt*0.06);c.v0*=1-0.2*Math.min(1,c.fear)}
+      if(c.rageT>0){c.rageT-=dt;c.v0*=1.12}else if((c.anger||0)>0.9&&!c.emv){c.rageT=20+rnd()*15;emoB(c,"mad",3)}
+      if(c.bub){c.bub.t-=dt;if(c.bub.t<=0)c.bub=c.bub.nx?{e:c.bub.nx,t:2.4}:null}
+      if(c.hzT>0){c.hzT-=dt;c.haz=c.hzT>0}}
     let P=null,dStop=Infinity;if(!c.jn&&c.mv){P=mvP(c);dStop=P.s0-c.s}
     const pts=futurePath(c,P,85);
     let L=pathGap(c,pts,OB);if(c.distractT>0){c.distractT-=dt;L={gap:1e9,v:0,who:null}}
-    if(!c.jn){const g=ctrlGap(c,dStop,dt);if(g<L.gap)L={gap:g,v:0,who:"ctrl"}}
+    c.cg=Infinity;if(!c.jn){const g=ctrlGap(c,dStop,dt);c.cg=g;if(g<L.gap)L={gap:g,v:0,who:"ctrl"}}
     // inside a junction: if my path crosses someone else's and they get there first, wait for them
     if(c.kind==="ai"&&(c.jn||P&&dStop<6)){const jg=jnConflict(c,P);if(jg&&jg.gap<L.gap)L=jg}
     // freeway merges work like a zipper: whoever is behind at the merge point follows whoever is ahead
@@ -4888,14 +4925,16 @@ function updateTraffic(dt){try{sfTick(dt)}catch(e){console.error(e)}
     if(c.kind==="ai"&&!c.jn&&st.signal&&!st.walk){const M=me();if(M.e===c.e&&M.dir===c.dir){const pl=laneOf(M.off)-loOf(c.e.n),tl=pl+(st.signal===-1?1:-1),d=M.s-c.s;
       // only when you're moving and ahead of it, and only drivers who feel like it (most calm ones, few aggressive ones): they ease off the gas, they don't stop
       if(laneIdx(c)===tl&&d>5&&d<35&&car.vx>3){if(c.yieldSig!==sys.sigN){c.yieldSig=sys.sigN;const k=c.pers&&c.pers.k;c.yieldOK=rnd()<(k==="calm"?0.85:k==="brisk"?0.4:k==="aggr"?0.1:0.65)}
-        if(c.yieldOK){c.v0=Math.min(c.v0,Math.max(car.vx*0.9,c.v-1.5));c.yieldT=1}}}}
+        if(c.yieldOK){c.v0=Math.min(c.v0,Math.max(car.vx*0.9,c.v-1.5));if(!c.yieldT&&!c.bub)emoB(c,"nice",1.8);c.yieldT=1}}}}
     // move over: slow down passing a stopped car with its hazards on, or change lanes away from it
     if(c.kind==="ai"&&!c.jn){for(const o of cars){if(o===c||o.e!==c.e||o.dir!==c.dir||!(o.haz&&(o.v||0)<0.5))continue;const d=o.s-c.s;if(d>0&&d<70){c.v0*=0.75;break}}}
     // speed for the curves and turns ahead (about 0.27 g)
     let vc=c.v0;for(const p of pts)if(p[3]>1e-3){const vk=Math.sqrt(2.6/p[3]);vc=Math.min(vc,Math.sqrt(vk*vk+4*p[2]))}
     const PR=c.kind==="ai"?aiVsPlayer(c,L,dt):null,hurry=c.honkT>0||c.passT>0;
-    let a=c.v0<=0?-9:idm(c.v,vc,L.gap,L.v,c.pers&&c.pers.T*(hurry?0.75:1),c.pers&&c.pers.a*(hurry?1.4:1),c.pers&&c.pers.b);a=clamp(a,-8.5,hurry?3.2:2.2);if(c.hardT>0){c.hardT-=dt;a=-7.5}
+    let a=c.v0<=0?-9:idm(c.v,vc,L.gap,L.v,c.pers&&c.pers.T*(hurry?0.75:1)*(1+0.7*Math.min(1,c.fear||0))*(c.rageT>0?0.7:1),c.pers&&c.pers.a*(hurry?1.4:1),c.pers&&c.pers.b);a=clamp(a,-8.5,hurry?3.2:2.2);if(c.hardT>0){c.hardT-=dt;a=-7.5}
     if(c.bcT>0){c.bcT-=dt;a=Math.min(a,-5.2)}   // brake check
+    // people don't all pull away the instant the car ahead moves: a short reaction delay, longer for calm drivers, and now and then someone looking at their phone
+    if(c.kind==="ai"&&!c.emv&&!c.jn&&!(dStop<12&&endNode(c.e,c.dir).ctrl!=="signal")){if(c.v<0.2&&a>0.3){if(c.goDl===undefined){const k=c.pers&&c.pers.k;c.goDl=(0.3+rnd()*0.7)*(k==="calm"?1.4:k==="aggr"?0.45:k==="brisk"?0.7:1)+(rnd()<0.05?2+rnd()*2.5:0)}if(c.goDl>0){c.goDl-=dt;a=Math.min(a,0)}}else if(c.v>1.5)c.goDl=undefined}
     c.brk=a<-1.2;const v0_=c.v;c.v=Math.max(0,c.v+a*dt);c.ax=(c.v-v0_)/Math.max(dt,1e-3);
     // stuck behind something that is itself waiting across our path: after a while, edge past it
     if(c.v<0.1&&L.who&&L.who!=="ctrl"&&L.who!=="me"&&L.who.kind==="ai"&&Math.abs(wrapPi((L.who.wh||0)-c.wh))>0.8){c.blockT=(c.blockT||0)+dt;if(c.blockT>10){c.ghostT=4;c.blockT=0}}else c.blockT=0;
@@ -4921,12 +4960,13 @@ function updateTraffic(dt){try{sfTick(dt)}catch(e){console.error(e)}
           if(t!==null&&laneSafe(c,t)){c.lcTarget=t;c.lcPending=3+rnd()*1.5;c.sig=t>li?-1:1}}}}
     c.spin+=c.v/0.36*dt;c.idle=c.v<0.1?(c.idle||0)+dt:0;
     carPose(c);aiSusp(c,dt)}
-  // keep traffic around you: cars far away (or stuck for ages) reappear somewhere 300-900 m from you
+  // keep traffic around you: cars far behind you and out of sight (or stuck for ages) are moved to a new spot you can't see
   respT-=dt;if(respT<=0){respT=1;
     for(const c of cars){if(c.kind!=="ai"&&c.kind!=="bike")continue;const d=Math.hypot(c.wx-car.px,c.wy-car.py);
-      if(d>1150||(c.kind==="bike"?c.idle>25&&d>110:c.idle>50&&d>160)){let p=null;for(let t=0;t<(c.kind==="bike"?20:1)&&!p;t++){const q=randomSpot(300,900);if(q&&(c.kind!=="bike"||BIKE_T.has(q.e.type)))p=q}
+      if(poolKeep(c))continue;const R_=aiR(),seen=aiSeen(c.wx,c.wy,c.wz);
+      if(d>R_&&!seen||d>R_+450||(c.kind==="bike"?c.idle>25&&d>110:c.idle>50&&d>160)&&!seen){const p=poolSpot(140,q=>c.kind!=="bike"||BIKE_T.has(q.e.type));
         if(p){const bike=c.kind==="bike",n=newCar(p.e,p.dir,p.s,bike?0:p.i,c.kind);if(bike){n.paint=c.paint;n.mdl=c.mdl}else if(c.kind!=="ai"){n.paint=c.paint;n.mdl=c.mdl}if(bike){n.v0=c.v0;n.rider=c.rider;n.off=n.offT=bikeOff(n.e)}Object.keys(c).forEach(k=>delete c[k]);Object.assign(c,n);carPose(c)}}}}
-  pedTick(dt);evTick(dt);try{txtTick(dt)}catch(e){}try{trlTick(dt)}catch(e){}try{trafTOD(dt)}catch(e){}
+  try{towedTick(dt)}catch(e){}pedTick(dt);evTick(dt);try{txtTick(dt)}catch(e){}try{trlTick(dt)}catch(e){}try{trafTOD(dt)}catch(e){}
 }
 
 // ======================================================================= life: weather, pedestrians, cyclists, people in cars, random events, getting out
@@ -5285,7 +5325,7 @@ function rwPropsDraw(){if(!RW.pl){RW.pl=1;let i=0;const nx=()=>{if(i<RW_PROPS.le
   for(const c of RW.items){if(c.kind!=="cone"||c.down||Math.abs(c.wx-ex)>180||Math.abs(c.wy-ey)>180)continue;const k=c.rwK||"rw_cone28";if(PROPS[k])propDraw(k,carMatrix(c.wx,c.wy,c.wh,c.wz||0,0,0),{head:0})}
   for(const z of RW.zones){if((z.x-ex)**2+(z.y-ey)**2>380*380)continue;for(const q of z.props||[])if(PROPS[q.k])propDraw(q.k,carMatrix(q.x,q.y,q.h+Math.PI,gz(q.x,q.y),0,0),{head:0});
     const m=z.mb;if(m&&PROPS[m.k]){const M=carMatrix(m.x,m.y,m.h+Math.PI,gz(m.x,m.y),0,0);propDraw(m.k,M,{head:0});const pg=m.k+"_"+(1+Math.floor(performance.now()/2000)%2);if(PROPS[pg])propDraw(pg,M,{glow:1.6+night})}}
-  bbDraw(ex,ey,night);slDraw(ex,ey,night)}
+  bbDraw(ex,ey,night);slDraw(ex,ey,night);try{emoDraw()}catch(e){}}
 // billboards: big ones along the freeway, smaller ones on the main streets, set back on open ground
 const BB={list:null};
 function bbBuild(){const L=[];let h=12345;const rr=()=>{h=(h*1103515245+12345)>>>0;return h/4294967296};
@@ -5360,20 +5400,35 @@ function jamMul(c){if(c.stopT>0||c.tStop>0||c.sbHold)return 0.002;   // a bus at
   return jamMul0(c)}
 function jamMul0(c){  if(!JAM.zones.length||c.e.type!=="xway")return 1;for(const z of JAM.zones)if(z.e===c.e&&z.dir===c.dir&&c.s>z.s0-60&&c.s<z.s1){const k=c.s<z.s0?(z.s0-c.s)/60:c.s>z.s1-80?(c.s-(z.s1-80))/80:0;return z.m+(1-z.m)*clamp(k,0,1)}return 1}
 function trafTOD(dt){try{jamTick(TOD.t>0?0:2.5)}catch(e){}TOD.t-=dt;if(TOD.t>0||!st.started)return;TOD.t=2.5;const M_=me(),onFw=M_&&M_.e&&(M_.e.type==="xway"||M_.e.type==="ramp"),want=Math.round(G().traffic*todMul()*(onFw?1.4:1))+(TOD.add||0),ai=cars.filter(c=>c.kind==="ai");   // cars you added stay on top of the normal amount
-  if(ai.length<want){for(let k=0;k<Math.min(3,want-ai.length);k++){const p=randomSpot(350,900);if(p)cars.push(newCar(p.e,p.dir,p.s,p.i))}}
-  else if(ai.length>want+2){let n=Math.min(3,ai.length-want);for(const c of ai){if(n<=0)break;const d=Math.hypot(c.wx-car.px,c.wy-car.py),ahead=(c.wx-car.px)*Math.cos(car.psi)+(c.wy-car.py)*Math.sin(car.psi);if(d>300||d>140&&ahead<0){const k=cars.indexOf(c);if(k>=0){cars.splice(k,1);n--}}}}
+  if(ai.length<want){for(let k=0;k<Math.min(3,want-ai.length);k++){const p=poolSpot(160);if(p)cars.push(newCar(p.e,p.dir,p.s,p.i))}}
+  else if(ai.length>want+2){let n=Math.min(3,ai.length-want);for(const c of ai){if(n<=0)break;const d=Math.hypot(c.wx-car.px,c.wy-car.py),ahead=(c.wx-car.px)*Math.cos(car.psi)+(c.wy-car.py)*Math.sin(car.psi);if(!poolKeep(c)&&!aiSeen(c.wx,c.wy,c.wz)&&(d>300||d>140&&ahead<0)){const k=cars.indexOf(c);if(k>=0){cars.splice(k,1);n--}}}}
   st.trafficN=cars.filter(c=>c.kind==="ai").length}
 // a crash between two traffic cars: they stop where they hit, hazards on; an ambulance and a tow truck turn up, then the tow clears it
 function evCrashTick(v,dt){v.pt+=dt;const [L_,F]=v.pair;
   if(v.phase===0){if(!cars.includes(L_)||!cars.includes(F)){v.t=0;return}const hit=Math.hypot(L_.wx-F.wx,L_.wy-F.wy)<4.5||(F.e===L_.e&&F.s>L_.s-4.6);
     if(hit){for(const [c,h] of [[L_,0.35],[F,-0.45]]){c.kind="wreck";c.haz=true;c.v=0;c.v0=0;c.head=h;c.distractT=0;c.hardT=0;carPose(c)}v.items.push(L_,F);v.phase=1;v.pt=0;v.x=L_.wx;v.y=L_.wy;v.label="Crash";v.quiet=false;
+      for(const o of cars)if(o.kind==="ai"&&o!==L_&&o!==F&&Math.hypot(o.wx-L_.wx,o.wy-L_.wy)<50){o.fear=(o.fear||0)+0.7;emoB(o,"shock",2.5);if(rnd()<0.4)aiHonk(o,0.5)}
       const d=Math.hypot(L_.wx-car.px,L_.wy-car.py);if(d<260&&au.ctx){try{rNoiseFx(au.ctx.currentTime,0.6,clamp(1-d/260,0.1,1)*0.6)}catch(e){}}logResult(`Crash between two cars ${distTxt(d)} away`);
       const lo=F.off;for(const k of [12,18,24])v.items.push(evStatic("cone",F.e,F.dir,Math.max(2,F.s-k),lo+(24-k)*0.05))}
     else if(v.pt>9){F.distractT=0;v.t=0}return}
   if(v.phase===1&&v.pt>6){v.phase=2;const F2=v.pair[1];
-    const sent=emvSend(0,0,[["city_police",-22,"cop"],[towMdl(Math.random()<0.5),-40,"tow"]],{e:F2.e,dir:F2.dir,s:F2.s,L:F2.e.L});for(const c of sent){if(c.mdl==="city_police")c.paint=Math.random()<0.5?"white":"black";v.items.push(c)}v.beacons=true;
-    const d=Math.hypot(F2.wx-car.px,F2.wy-car.py);if(d<600&&sent.length)carMsg("🚓 Police and a tow truck are heading to a crash nearby: move over for them")}
-  if(v.phase===2&&v.pt>150){v.t=0}}
+    const sent=emvSend(0,0,[["city_police",-24,"cop"],[towMdl(false),16,"tow"],[towMdl(true),30,"tow"]],{e:F2.e,dir:F2.dir,s:F2.s,L:F2.e.L});for(const c of sent){if(c.mdl==="city_police")c.paint=Math.random()<0.5?"white":"black";v.items.push(c)}v.beacons=true;
+    const d=Math.hypot(F2.wx-car.px,F2.wy-car.py);if(d<600&&sent.length)carMsg("🚓 Police and tow trucks are heading to a crash nearby: move over for them")}
+  // clearing up: once everyone has parked, the tow trucks hook up the wrecks (one each) and drive off with them, then the police pick up the cones and leave
+  if(v.phase===2){const RS=v.items.filter(c=>c.beacon&&cars.includes(c)),tows=RS.filter(c=>c.beacon==="tow");
+    const rel=c=>{const k=v.items.indexOf(c);if(k>=0)v.items.splice(k,1);c.kind="ai";c.haz=false;c.v=0;c.jn=null;c.idle=0;c.pers={k:"normal",v:1,T:1.4,lc:1,a:1.4,b:2.8};c.offT=laneOff(c.e,0);c.stopDone=false;try{planMove(c)}catch(e){}};
+    if(v.clr===undefined&&(RS.length&&RS.every(c=>!c.emv)||v.pt>40))v.clr=v.pt;
+    if(v.clr!==undefined&&!v.hooked&&v.pt-v.clr>14){v.hooked=1;v.hookT=v.pt;const W=v.pair.filter(c=>cars.includes(c)&&c.kind==="wreck");
+      tows.forEach((t,i)=>{const w=W[i];if(!w)return;const k=v.items.indexOf(w);if(k>=0)v.items.splice(k,1);w.kind="towed";w.fixed=true;w.towBy=t;w.hk=0;w.h0=[w.wx,w.wy,w.wh,w.wz||0];w.haz=false;t.towing=w})}
+    if(v.hooked===1&&v.pt-v.hookT>6){v.hooked=2;for(const t of tows)rel(t)}
+    if(v.hooked===2&&v.pt-v.hookT>14){for(const c of RS)if(c.beacon==="cop")rel(c);v.t=0}   // what's left (cones, a wreck no tow could take) goes with the police
+    if(v.pt>150)v.t=0}}
+// a wreck on a tow truck: slides up onto the rollback's deck, or is lifted by the front and dragged behind the wrecker, facing backwards
+function towedTick(dt){let dead=false;for(const w of cars){if(w.kind!=="towed"||!w.towBy)continue;const t=w.towBy;if(!cars.includes(t)||t.towing!==w){w.dead=true;dead=true;continue}
+    const md=MODELS[t.mdl],Lt=(md&&md.meta.length)||7.5,roll=!/wrecker/.test(t.mdl||""),off=roll?-Lt*0.12:-(Lt/2+1.6),lift=roll?1.05:0.32,yaw=roll?0:Math.PI;
+    const tx=t.wx+Math.cos(t.wh)*off,ty=t.wy+Math.sin(t.wh)*off,tz=(t.wz||0)+lift;w.hk=Math.min(1,(w.hk||0)+dt/4);const k=w.hk*w.hk*(3-2*w.hk);
+    w.wx=w.h0[0]+(tx-w.h0[0])*k;w.wy=w.h0[1]+(ty-w.h0[1])*k;w.wh=w.h0[2]+wrapPi(t.wh+yaw-w.h0[2])*k;w.wz=w.h0[3]+(tz-w.h0[3])*k;w.wp=(roll?0:0.09)*k;w.wr=0;w.v=t.v;w.head=0}
+  if(dead)cars=cars.filter(c=>!c.dead)}
 function evBeaconInto(){if(!DMAT.ambR){DMAT.ambR=[[1,0.1,0.08],[6,0.25,0.2]];DMAT.ambW=[[1,1,1],[5,5,5]];DMAT.towA=[[1,0.6,0.1],[6,3,0.3]];DMAT.bcOff=[[0.2,0.2,0.22]]}const on=(performance.now()%600)<300;
   for(const v of EV.list){if(!v.beacons)continue;for(const c of v.items){if(!c.beacon||Math.hypot(c.wx-car.px,c.wy-car.py)>250)continue;const md=MODELS[c.mdl];if(!md)continue;const M=aiMat(c),h=md.meta.height+0.05,z=-(md.meta.length||5)*0.3;
     if(c.beacon==="amb"){dBoxM(on?"ambR":"ambW",M,c.wh,[0.6,h,z],0.3,0.12,0.2);dBoxM(on?"ambW":"ambR",M,c.wh,[-0.6,h,z],0.3,0.12,0.2)}else if(c.beacon==="cop"){if(!DMAT.copB)DMAT.copB=[[0.1,0.3,1],[0.3,1.2,7]];const zz=-(md.meta.length||5)*0.05;dBoxM(on?"ambR":"bcOff",M,c.wh,[0.4,h,zz],0.5,0.1,0.22);dBoxM(on?"bcOff":"copB",M,c.wh,[-0.4,h,zz],0.5,0.1,0.22)}else{dBoxM(on?"towA":"bcOff",M,c.wh,[0.45,h,z],0.35,0.1,0.18);dBoxM(on?"bcOff":"towA",M,c.wh,[-0.45,h,z],0.35,0.1,0.18)}}}}
@@ -8761,7 +8816,7 @@ function mat(c,e,sp,shin,a,pat){gl.uniform3fv(U.uC,c);gl.uniform3fv(U.uE,e||[0,0
 const CULL={pl:null,eye:[0,0,0],maxD:1e9,n:0,skip:0};
 function cullSet(VP,eye,maxD){const m=VP,pl=[];const r=i=>[m[i],m[4+i],m[8+i],m[12+i]];const r0=r(0),r1=r(1),r2=r(2),r3=r(3);
   for(const [a,sg] of [[r0,1],[r0,-1],[r1,1],[r1,-1],[r2,1]]){const q=[r3[0]+sg*a[0],r3[1]+sg*a[1],r3[2]+sg*a[2],r3[3]+sg*a[3]],l=Math.hypot(q[0],q[1],q[2])||1;pl.push([q[0]/l,q[1]/l,q[2]/l,q[3]/l])}
-  CULL.pl=pl;CULL.eye=eye;if(maxD!==undefined)CULL.maxD=maxD}
+  CULL.pl=pl;CULL.eye=eye;CULL.vp=VP;if(maxD!==undefined)CULL.maxD=maxD}
 function sphVis(x,y,z,r,maxD){const e=CULL.eye;if(Math.hypot(x-e[0],y-e[1],z-e[2])-r>maxD)return false;if(CULL.pl)for(const p of CULL.pl)if(p[0]*x+p[1]*y+p[2]*z+p[3]<-r)return false;return true}
 function chunkVis(c,dd){const e=CULL.eye,d=Math.hypot(c.c[0]-e[0],c.c[1]-e[1],c.c[2]-e[2])-c.r,k=G().ddK||1,lim=CULL.sec?Math.min(CULL.maxD,420,dd?dd*0.6*k:1e9):dd?Math.min(dd*k,CULL.maxD):CULL.maxD;if(d>lim)return false;if(!CULL.pl)return true;
   for(const p of CULL.pl)if(p[0]*c.c[0]+p[1]*c.c[1]+p[2]*c.c[2]+p[3]<-c.r)return false;return true}
@@ -13292,7 +13347,8 @@ const TABS={
     <button data-a="gap" style="width:auto;padding:0 12px;font-size:13px">Gap ${"▮".repeat(st.accGap)}${"▯".repeat(3-st.accGap)}</button></div>`},
   traffic(){const n=cars.filter(c=>c.kind==="ai").length;return `<h3>AI traffic · ${n} car${n===1?"":"s"} in town and on Hwy 7</h3><div class="grid2">
     ${[5,10,20].map(k=>`<button class="opt" data-spawn="${k}"><b>Add ${k}</b><small>Random lanes and speeds</small></button>`).join("")}
-    <button class="opt" data-spawn="0"><b>Clear traffic</b><small>Remove every AI car</small></button></div>
+    <button class="opt" data-spawn="0"><b>Clear traffic</b><small>Remove every AI car</small></button>
+    <button class="opt${st.emo!==false?" on":""}" data-emo="1"><b>Driver reactions ${st.emo!==false?"on":"off"}</b><small>😡😱😤 faces over drivers when they react to you</small></button></div>
     <p class="note">AI cars keep their distance, overtake slower cars after signalling, and move back right when there is room. They react to you, so you can test adaptive cruise, blind spot warnings and lane changes in real traffic.</p>`},
   tests(){return `<h3>Scenarios</h3><div class="grid2">
     ${test("stop","AEB: stopped car","150 m ahead in your lane")}${test("slow","AEB: slow car","20 mph car ahead")}${test("cutin","Cut-in","A car swerves into your lane")}
@@ -13376,6 +13432,7 @@ $("tabs").addEventListener("click",e=>{const t=e.target.closest(".tab");if(t){st
 $("tabBody").addEventListener("keydown",e=>{const t=e.target;if(t&&t.tagName==="INPUT"){e.stopPropagation();if(e.key==="Enter"){if(t.id==="mpCode")netAct("code");else if(t.id==="mpName")netAct("name");else if(t.id==="mpSrv")netAct("create","pub")}}});
 $("tabBody").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;const d=b.dataset;
   if(d.map){setMap(d.map);closeDrawer()}else if(d.trim){const k=d.trim;if(!MODELS[TRIMS[k].model]){toast("Loading that car…");loadModel(TRIMS[k].model).then(()=>{setTrim(k);renderTab()}).catch(()=>{toast("Couldn't load that car. Check your connection and tap it again.");try{renderCfg()}catch(e){}});return}setTrim(k)}else if(d.mym){const [id,i]=d.mym.split(":");mmSet(id,+i);const S=mmSpec().find(x=>x[0]===id);toast(`My Mode · ${S[1]}: ${S[2][+i]}`)}else if(d.mode){st.mode=+d.mode;toast(`Drive mode: ${modeName()}`)}else if(d.mp)netAct(d.mp,d.v);else if(d.sf){const k=d.sf;st["sf_"+k]=st["sf_"+k]===false;toast(`${sfName(k)} ${st["sf_"+k]===false?"off":"on"}`);renderTab()}else if(d.sfa){sfAct(d.sfa);renderTab()}else if(d.own){ownAct(d.own);if(!$("drawer").hidden)renderTab()}else if(d.tog)act(d.tog);else if(d.a)act(d.a);
+  else if(d.emo!==undefined){st.emo=st.emo===false;toast(st.emo?"Driver reaction faces on":"Driver reaction faces off");renderTab&&renderTab()}
   else if(d.spawn!==undefined){const n=+d.spawn;if(n===0){cars=cars.filter(c=>c.kind!=="ai");TOD.add=0;toast("Traffic cleared")}else{spawnTraffic(n);TOD.add=Math.min(200,(TOD.add||0)+n);toast(`${n} AI cars added`)}}
   else if(d.aebs){st.aebSens=d.aebs;toast(`Collision warning: ${d.aebs}`)}
   else if(d.set){const [k,v]=d.set.split(":"),n=+v,H=car.hyb,T=TRIMS[st.trim];if(k==="fuel"){H.fuel=H.tank*n;toast(`Fuel set to ${n*100}%`)}else if(k==="chg"){if(T.plug)H.pb=n;else H.soc=socRaw(n);toast(`Charge set to ${n*100}%`)}else{st[k]=n;if(k==="wheelUI")document.body.classList.toggle("wheelMode",!!n)}
@@ -13419,7 +13476,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=234;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="173",BUILD_VER=235;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){const k=GFX.q==="auto"?GFX.eff:GFX.q;if(G.k!==k||G.v!==GFX.ovV||!G.m){G.k=k;G.v=GFX.ovV;const m={...GQ[k]};for(const o of GOPT)if(GFX.ov[o[0]]!==undefined)Object.assign(m,o[4](GFX.ov[o[0]]));if(Object.keys(GFX.ov).length)m.label=GQ[k].label+" (custom)";G.m=m;COLL.nt=!m.trees}return G.m}
@@ -14697,7 +14754,7 @@ function sfWiperCycle(){SAFE.wipMode=(SAFE.wipMode+1)%4;const auto=sfOn("rainWip
 // ---- emergency vehicles that drive in with lights and siren; traffic slows down and makes room; your car warns you if it has the alert
 function emvSend(x,y,list,F0){const F=F0||me();if(!F||!F.e)return [];const out=[];const side=loOf(F.e.n)*LANE-LANE/2-Math.max(0.6,(F.e.side||0)/2);let back=150;
   for(const [m,ds,kind] of list){if(!MODELS[m])continue;const s0=F.s-back;const c=newCar(F.e,F.dir,clamp(s0,4,F.L-4),0);c.mdl=m;c.paint=TOW_PAINT[m]||"white";c.beacon=kind;c.haz=false;c.emv={t:0,park:{e:F.e,dir:F.dir,s:clamp(F.s+ds,3,F.L-3),off:side}};c.v=14;c.pers={k:"aggr",v:1.35,T:0.7,lc:0.3,a:2.6,b:4};const md=MODELS[m].meta;if(md.length>5.4){c.len=md.length;c.wid=md.width}carPose(c);cars.push(c);out.push(c);back+=25}return out}
-function emvTick(dt){SAFE.emvList=cars.filter(c=>c.emv);let near=1e9;for(const c of SAFE.emvList){const P=c.emv.park;if(c.e===P.e&&c.dir===P.dir&&c.s>P.s-12||(c.emv.t+=dt)>45){Object.assign(c,{kind:"wreck",e:P.e,dir:P.dir,s:P.s,off:P.off,offT:P.off,v:0,haz:true,jn:null});delete c.emv;carPose(c);continue}near=Math.min(near,Math.hypot(c.wx-car.px,c.wy-car.py))}
+function emvTick(dt){SAFE.emvList=cars.filter(c=>c.emv);let near=1e9;for(const c of SAFE.emvList){const P=c.emv.park;if(c.e===P.e&&c.dir===P.dir&&c.s>P.s-12||(c.emv.t+=dt)>30){Object.assign(c,{kind:"wreck",e:P.e,dir:P.dir,s:P.s,off:P.off,offT:P.off,v:0,haz:true,jn:null});delete c.emv;carPose(c);continue}near=Math.min(near,Math.hypot(c.wx-car.px,c.wy-car.py))}
   // siren
   const c_=au.ctx;if(c_){const vol=near<500?clamp(1-near/500,0,1):0;if(vol>0.01&&!SAFE.sir){const o=c_.createOscillator(),l=c_.createOscillator(),lg=c_.createGain(),g=c_.createGain();o.type="triangle";o.frequency.value=1050;l.type="square";l.frequency.value=0.9;lg.gain.value=230;l.connect(lg);lg.connect(o.frequency);o.connect(g);g.gain.value=0;g.connect(au.master||c_.destination);o.start();l.start();SAFE.sir={o,l,g}}
     if(SAFE.sir)SAFE.sir.g.gain.setTargetAtTime(vol*0.05,c_.currentTime,0.2);if(vol<=0.01&&SAFE.sir){const S=SAFE.sir;S.g.gain.setTargetAtTime(0,c_.currentTime,0.1);setTimeout(()=>{try{S.o.stop();S.l.stop()}catch(e){}},500);SAFE.sir=null}}
