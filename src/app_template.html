@@ -4956,11 +4956,11 @@ function wxWindSound(){if(!au.ctx)return;const c=au.ctx;if(!au.wind){const s=c.c
 const GRS={cells:new Map(),mesh:null,key:"",busy:0};
 function grassOn(){return st.grass!==undefined?!!st.grass:!!G().trees}
 function grassCell(cx,cy){const S=8,P=[],C=[];let h=((cx*73856093)^(cy*19349663))>>>0;const rr=()=>{h=(h*1103515245+12345)>>>0;return h/4294967296};
-  const n=G().label==="Ultra"||G().label==="High"?90:55;
+  const n=G().label==="Ultra"||G().label==="High"?150:90;
   for(let i=0;i<n;i++){const x=cx*S+rr()*S,y=cy*S+rr()*S,q=groundAt(x,y);if(!q||q.kind!=="grass")continue;const z=q.h-0.02,dry=0.75+0.35*rr();
-    for(let b=0;b<3;b++){const a=rr()*6.283,hh=0.18+0.28*rr(),w=0.022+0.015*rr(),la=rr()*6.283,ln=0.04+0.08*rr(),ca=Math.cos(a),sa=Math.sin(a),ox=(rr()-0.5)*0.12,oy=(rr()-0.5)*0.12;
+    for(let b=0;b<3;b++){const a=rr()*6.283,hh=0.11+0.2*rr(),w=0.016+0.012*rr(),la=rr()*6.283,ln=0.04+0.08*rr(),ca=Math.cos(a),sa=Math.sin(a),ox=(rr()-0.5)*0.12,oy=(rr()-0.5)*0.12;
       P.push(x+ox-ca*w,z,-(y+oy-sa*w), x+ox+ca*w,z,-(y+oy+sa*w), x+ox+Math.cos(la)*ln,z+hh,-(y+oy+Math.sin(la)*ln));
-      C.push(0.5*dry,0.6,0.42, 0.5*dry,0.6,0.42, 0.9*dry,1.0,0.62+0.2*(dry-0.75))}}
+      C.push(0.45*dry,0.6,0.4, 0.45*dry,0.6,0.4, 0.78*dry,1.0,0.55+0.2*(dry-0.75))}}
   return {P,C}}
 function grassUpdate(){const e=CULL.eye;if(!e||!grassOn()){if(GRS.mesh){GRS.mesh=null}return}const S=8,R=3,ex=e[0],ey=-e[2],cx=Math.floor(ex/S),cy=Math.floor(ey/S),key=cx+","+cy;
   let made=0,missing=false;for(let i=-R;i<=R;i++)for(let j=-R;j<=R;j++){if(i*i+j*j>R*R+1)continue;const k=(cx+i)+","+(cy+j);if(!GRS.cells.has(k)){if(made<4){GRS.cells.set(k,grassCell(cx+i,cy+j));made++}else missing=true}}
@@ -4970,7 +4970,7 @@ function grassUpdate(){const e=CULL.eye;if(!e||!grassOn()){if(GRS.mesh){GRS.mesh
   const nv=P.length/3,I=new Uint16Array(nv);for(let i=0;i<nv;i++)I[i]=i;const N=new Float32Array(P.length);for(let i=1;i<N.length;i+=3)N[i]=1;
   if(GRS.mesh)for(const b of [GRS.mesh.p,GRS.mesh.n,GRS.mesh.i,GRS.mesh.cb])gl.deleteBuffer(b);GRS.mesh=nv?upload(new Float32Array(P),N,I,new Float32Array(C)):null}
 function grassDraw(){if(!grassOn()||WXR.snow>0.8)return;try{grassUpdate()}catch(e){return}const M=GRS.mesh;if(!M)return;
-  gl.disable(gl.CULL_FACE);gl.uniformMatrix4fv(U.uM,false,M4.id());const k=1-WXR.snow;gl.uniform4f(U.uGr,1,performance.now()/1000,WXR.wind[0]*k,-WXR.wind[1]*k);mat([0.27,0.5,0.15],null,0.03,8,1,0);draw(M);gl.uniform4f(U.uGr,0,0,0,0);gl.enable(gl.CULL_FACE);bind.col=true}
+  gl.disable(gl.CULL_FACE);gl.uniformMatrix4fv(U.uM,false,M4.id());const k=1-WXR.snow;gl.uniform4f(U.uGr,1,performance.now()/1000,WXR.wind[0]*k,-WXR.wind[1]*k);mat([0.2,0.4,0.11],null,0.03,8,1,0);draw(M);gl.uniform4f(U.uGr,0,0,0,0);gl.enable(gl.CULL_FACE);bind.col=true}
 // ---- work trucks and snow clearing: plows you can raise and angle, a salt spreader, a rollback bed that tilts and winches a car on,
 // a wheel-lift wrecker that hooks a car; plows clear the snow where they pass and salt melts it (a 3 m grid around you, also drawn on the ground)
 const EQ={up:1,ang:0,vm:0,salt:false,deck:0,deckT:0,lift:0,liftT:0,load:null,hooked:false,upT:1,t:0,sig:""};
