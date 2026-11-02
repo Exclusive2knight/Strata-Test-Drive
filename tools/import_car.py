@@ -164,8 +164,8 @@ def main(src, key, budget=60000, cab_budget=42000, wheels_only=False):
     for z in rowz[1:]: seats += [[-xs, sy, round(z, 3)], [xs, sy, round(z, 3)], [0.0, round(sy - 0.046, 3), round(z, 3)]]
     m["seats"] = seats   # vehicle Y (-front) is the same as page z (-front)
     if steer_c is not None: m["steer"] = P(steer_c)
-    def quad(node, f0=0.0, f1=1.0):
-        pts = [p["V"][np.unique(p["F"])] for p in parts if p["node"] == node and SCREEN_M.search(p["mat"]["name"])]
+    def quad(node, f0=0.0, f1=1.0, pts=None):
+        if pts is None: pts = [p["V"][np.unique(p["F"])] for p in parts if p["node"] == node and SCREEN_M.search(p["mat"]["name"])]
         if not pts: return None
         Q = np.array([P(v) for v in np.concatenate(pts)]); c = Q.mean(0); U, S, Vt = np.linalg.svd(Q - c); n = Vt[2]
         if n[2] < 0: n = -n
@@ -193,6 +193,23 @@ def main(src, key, budget=60000, cab_budget=42000, wheels_only=False):
             m["clu"] = {"bl": r(bl), "br": r(br), "tl": r(tl), "c": r(cc), "n": [0.0, 0.0, 1.0], "w": round(float(hi_[0] - lo_[0]), 4), "h": round(float(hi_[2] - lo_[2]), 4)}
     s = quad("center_touchscreen") or quad("flush_center_screen") or quad("center_display")
     if s: m["scr"] = s
+    if ("clu" not in m or "scr" not in m) and cam is not None:
+        # no named screen nodes (a refreshed cabin): the display glass in the dashboard, split into separate panels side by side;
+        # the one in front of the driver is the cluster, the one nearest the middle is the centre screen
+        F_ = [(p["V"], p["F"]) for p in parts if CABIN.match(p["node"]) and SCREEN_M.search(p["mat"]["name"])]
+        if F_:
+            tri = np.concatenate([V[F] for V, F in F_]); x0_ = tri[:, :, 0].min(1); x1_ = tri[:, :, 0].max(1); o_ = np.argsort(x0_); groups = []; cur = [o_[0]]; hi_x = x1_[o_[0]]
+            for b_ in o_[1:]:   # panels: runs of triangles whose x spans overlap (a big panel's two triangles stay together)
+                if x0_[b_] > hi_x + 0.03: groups.append(cur); cur = []; hi_x = x1_[b_]
+                cur.append(b_); hi_x = max(hi_x, x1_[b_])
+            groups.append(cur)
+            area = lambda g: float(np.linalg.norm(np.cross(tri[g, 1] - tri[g, 0], tri[g, 2] - tri[g, 0]), axis=1).sum() / 2)
+            G_ = [(tri[g].reshape(-1, 3), float((x0_[g].min() + x1_[g].max()) / 2), area(g)) for g in groups if len(g) >= 2]
+            if "clu" not in m:
+                d_ = [g for g in G_ if abs(g[1] - cam[0]) < 0.25]
+                if d_: g = min(d_, key=lambda g: abs(g[1] - cam[0])); m["clu"] = quad(None, pts=[g[0]]); G_ = [x for x in G_ if x is not g]
+            if "scr" not in m and G_:
+                g = max(G_, key=lambda g: g[2] / (1 + 3 * abs(g[1]))); m["scr"] = quad(None, pts=[g[0]])   # the biggest panel, near the middle
     if eq:   # page coords: centre and box of each equipment piece
         def box(lo_, hi_):
             a, b = np.array(P(lo_)), np.array(P(hi_)); return [round(float(v), 4) for v in np.minimum(a, b)], [round(float(v), 4) for v in np.maximum(a, b)]
