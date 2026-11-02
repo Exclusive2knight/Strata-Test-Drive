@@ -16,7 +16,7 @@ WHEEL = {"wheel_front_left": "FL", "wheel_front_right": "FR", "wheel_rear_left":
          "wheel_0_1": "FL", "wheel_0_-1": "FR", "wheel_1_1": "RL", "wheel_1_-1": "RR"}   # the heavy work-truck chassis names them by axle
 # work equipment that moves (plows, salt spreader, rollback deck, wheel-lift): each its own object, centred on its box
 EQUIP = re.compile(r"^(plow_A_frame|blade_left|blade_right|hopper|spinner_chute|rollback_deck|underlift|boom|warning_bar|tipping_body|gutter_brush_-?1|stop_arm|crossing_arm|(red|amber)_(left|right)_(front|rear))$")
-CABIN = re.compile(r"^(interior|headliner|driver_cab|passenger_seats|cabin_.*|driver_cluster|cluster_information_display|panoramic_display|center_touchscreen|steering_wheel)$")
+CABIN = re.compile(r"^(interior|headliner|driver_cab|passenger_seats|cabin_.*|driver_cluster|cluster_information_display|panoramic_display|center_touchscreen|flush_center_screen|period_dashboard|dash|dashboard_trim|steering_wheel)$")
 SCREEN_M = re.compile(r"blank display surface|display glass|display graphics|navigation", re.I)
 
 
@@ -180,13 +180,30 @@ def main(src, key, budget=60000, cab_budget=42000, wheels_only=False):
         m["pano"] = quad("panoramic_display"); m["clu"] = quad("panoramic_display", 0, 0.2304)
         m["xs"] = {"nav": quad("panoramic_display", 0.3074, 0.5996), "pas": quad("panoramic_display", 0.6826, 1.0)}
     elif quad("driver_cluster"): m["clu"] = quad("driver_cluster")
-    s = quad("center_touchscreen")
+    elif quad("cluster_information_display"): m["clu"] = quad("cluster_information_display")
+    elif steer_c is not None and any(p["node"] == "period_dashboard" for p in parts):
+        # older dashboards: the gauge bezels (bright trim) sit in the dash right behind the steering wheel; the cluster screen covers them
+        pts = [p["V"][np.unique(p["F"])] for p in parts if p["node"] == "period_dashboard" and re.search(r"machined alloy|led headlight", p["mat"]["name"].lower())]
+        pts = np.concatenate(pts) if pts else np.zeros((0, 3))
+        pts = pts[(np.abs(pts[:, 0] - steer_c[0]) < 0.25) & (pts[:, 2] > steer_c[2]) & (pts[:, 2] < steer_c[2] + 0.35)] if len(pts) else pts
+        if len(pts) > 8:
+            lo_, hi_ = pts.min(0), pts.max(0); yf = hi_[1] + 0.004   # vehicle space: -Y is forward, so this is just in front of the bezels, on the driver side
+            r = lambda q: [round(float(t), 4) for t in q]
+            bl = P([hi_[0], yf, lo_[2]]); br = P([lo_[0], yf, lo_[2]]); tl = P([hi_[0], yf, hi_[2]]); cc = P([(lo_[0] + hi_[0]) / 2, yf, (lo_[2] + hi_[2]) / 2])
+            m["clu"] = {"bl": r(bl), "br": r(br), "tl": r(tl), "c": r(cc), "n": [0.0, 0.0, 1.0], "w": round(float(hi_[0] - lo_[0]), 4), "h": round(float(hi_[2] - lo_[2]), 4)}
+    s = quad("center_touchscreen") or quad("flush_center_screen")
     if s: m["scr"] = s
     if eq:   # page coords: centre and box of each equipment piece
         def box(lo_, hi_):
             a, b = np.array(P(lo_)), np.array(P(hi_)); return [round(float(v), 4) for v in np.minimum(a, b)], [round(float(v), 4) for v in np.maximum(a, b)]
         m["equip"] = {k: {"c": P(c_), "lo": box(lo_, hi_)[0], "hi": box(lo_, hi_)[1]} for k, (c_, lo_, hi_) in eq.items()}
     dst = f"models/{key}.json"
+    if KEEP_SCREENS:   # a refreshed body on the same cabin with its screen graphics taken out: keep the screen spots from the model it replaces
+        import os
+        if os.path.exists(dst):
+            old = json.load(open(dst)).get("meta", {})
+            for k_ in ("scr", "clu", "pano", "xs"):
+                if k_ not in m and k_ in old: m[k_] = old[k_]
     open(dst, "w").write(json.dumps(out, separators=(",", ":")))
     import base64, os
     tris = sum(len(base64.b64decode(o["i"])) // 6 for o in out["objects"].values())
@@ -194,7 +211,9 @@ def main(src, key, budget=60000, cab_budget=42000, wheels_only=False):
     return out
 
 
+KEEP_SCREENS = "--keep-screens" in sys.argv
 if __name__ == "__main__":
+    sys.argv = [a for a in sys.argv if a != "--keep-screens"]
     if "--wheels" in sys.argv:
         main(sys.argv[1], sys.argv[2], wheels_only=True); sys.exit()
     nums = [int(a) for a in sys.argv[3:] if a.isdigit()]   # optional triangle budgets: body [cabin] (lighter for traffic-only vehicles)
