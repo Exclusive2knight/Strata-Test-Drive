@@ -1268,6 +1268,7 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
   <div class="nc">
     <div class="nh"><small>What's new</small><h2 id="newsVer">Version 223 · Real weather, snow plows and tow trucks</h2></div>
     <div class="nb">
+      <h4>🌃 Night lights, new exits, smarter people</h4><ul><li>Streetlights now actually light the road and sidewalks at night: warm pools of light under the lamps near you.</li><li>Two new exits on the freeway loop: County Rd 30 out west and Harbor Rd up north (off the Millbrook roundabout), each with its own ramps and traffic lights.</li><li>The big roundabouts get a double-arm streetlight on their middle island.</li><li>Pick what the amber road work boards say in Spawn › Message boards: ROAD WORK AHEAD, LEFT LANE CLOSED, DETOUR, SLOW DOWN / WORKERS AHEAD, BUCKLE UP / PHONES DOWN, or write your own two pages. Your text shows up in amber LED dots.</li><li>Errands: drivers near you now pull into store lots, park in a free spot for a while, then back out and drive off. Cars already parked in lots near you leave the same way.</li><li>Police pull over AI drivers too: a patrol car behind a speeder or someone in a road rage lights up. The driver eases off, signals, stops on the shoulder with the cop behind them, and after a bit they both drive on.</li><li>Weather changes how people drive: in rain and snow, AI leave bigger gaps, pull away gently and brake earlier. On snow and ice someone near you sometimes slides, puts their hazards on, then carries on slowly.</li><li>Pedestrians: people get off the city bus at its stops and walk off, and people waiting nearby walk to the door and get on. Honk near people and they jump and hurry on. Some people jog now.</li><li>Spawn › Traffic brain now shows what it's learned: how long drivers wait their turn, how big a gap they want, and how patient pedestrians are.</li></ul>
       <h4>🏠 Houses and stores are back</h4><ul><li>Fixed the houses, shops, dealerships, fast food places and service centres not showing up on the map. A typo had been stopping them from loading.</li><li>Removed the attention reminders: no more "Apply slight turning force to steering wheel", "Pay attention to the road", "Keep your hands on the wheel", Autosteer strikes, the eyes-on-the-road phone check or the take-the-wheel emergency stop. Autopilot, FSD and the other lane-centring systems just keep driving.</li></ul>
       <h4>🚲 Bikes, sirens and a shared traffic brain</h4><ul><li>Fixed cyclists getting stuck at intersections. They can ride round roundabouts and turning circles now, and turn back at dead ends instead of waiting there forever.</li><li>Cars and bikes that run into a road closed off with cones turn round and find another way instead of sitting at the cones. Traffic no longer spawns on closed roads.</li><li>Sirens are much quieter and fade out properly as they get further away (police chases and emergency vehicles).</li><li>Help the AI learn (optional): you can agree to send anonymous traffic stats so every player's traffic brain learns together. The game asks once after a few minutes of driving, and you can turn it on or off in Spawn › Help the AI learn. Nothing personal is sent.</li></ul>
       <h4>🔧 Fixes</h4><ul><li>Fixed a "null is not an object (A.h)" game error that could pop up while driving.</li><li>The truck buttons (plow, angle, salt, bed, winch and so on) moved to a row across the top middle of the screen, so they don't cover the lock / phone / pair buttons on the left any more.</li></ul>
@@ -2194,12 +2195,15 @@ function buildNet2(){
   const nA=d=>[ccx+d,ccy],nB=d=>[ccx,ccy+d];
   // ---- the freeways join up into one big loop round the map: I-38 west curves south and round into I-61 south,
   // I-38 east curves north up the east edge, along the top and down into I-61 north. County roads bridge over where they cross
-  mkR("xway","I-38",[[-2300,-2850],[-2300,-3450,450],[-4650,-3450,450],[-4650,-1500,420],icN(I38[0],-1),icN(I38[0],1),nA(-CLD.dOM),nA(-CLD.dOX),nA(-CLD.dM),nA(-CLD.dX),nA(CLD.dX),nA(CLD.dM),nA(CLD.dOX),nA(CLD.dOM),
+  // two exits on the loop: County Rd 30 out west, and Harbor Rd up north off the Millbrook roundabout (narrower diamonds: the map edge is close)
+  const ILW=mkIC([-4650,-2400],[0,1],400,110,"County Rd 30"),ILN=mkIC([1900,3450],[-1,0],400,110,"Harbor Rd");
+  mkR("xway","I-38",[[-2300,-2850],[-2300,-3450,450],[-4650,-3450,450],icN(ILW,-1),icN(ILW,1),[-4650,-1500,420],icN(I38[0],-1),icN(I38[0],1),nA(-CLD.dOM),nA(-CLD.dOX),nA(-CLD.dM),nA(-CLD.dX),nA(CLD.dX),nA(CLD.dM),nA(CLD.dOX),nA(CLD.dOM),
     icN(I38[1],-1),icN(I38[1],1),icN(I38[2],-1),icN(I38[2],1),icN(I38[3],-1),icN(I38[3],1),[4100,-1500]]);
-  mkR("xway","I-61",[[4100,-1500],[4700,-1500,300],[4650,3450,450],[-2300,3450,380],[-2300,2600]]);
+  mkR("xway","I-61",[[4100,-1500],[4700,-1500,300],[4650,3450,450],icN(ILN,-1),icN(ILN,1),[-2300,3450,380],[-2300,2600]]);
   mkR("xway","I-61",[[-2300,-2850],nB(-CLD.dOM),nB(-CLD.dOX),nB(-CLD.dM),nB(-CLD.dX),nB(CLD.dX),nB(CLD.dM),nB(CLD.dOX),nB(CLD.dOM),
     icN(I61[0],-1),icN(I61[0],1),icN(I61[1],-1),icN(I61[1],1),[-2300,2600]]);
-  for(const I of [...I38,...I61])icRamps(I);
+  for(const I of [...I38,...I61,ILW,ILN])icRamps(I);
+  mkR("road","Harbor Rd",[[1900,2900],ILN.P(0,ILN.T(1)),ILN.P(0,ILN.T(-1))],{lim:40});
   // the ramps of the cloverleaf: quarter (sx, sy); P is the freeway coming in towards the crossing there, Q the one leaving
   const NM={A:["I-38","I-38"],B:["I-61","I-61"]},dirName=v=>v[0]>0.5?"E":v[0]<-0.5?"W":v[1]>0.5?"N":"S";
   for(const sx of [1,-1])for(const sy of [1,-1]){const AinP=sx===sy,ex=[1,0],ey=[0,1];
@@ -2250,7 +2254,7 @@ function buildNet2(){
   mkR("road","County Rd 1",[[-4400,-3300],[-4400,-2400],[-4400,0]],{lim:55});
   mkR("road","County Rd 11",[[4500,-3300],[4500,-2400],[4500,0]],{lim:55});
   mkR("road","County Rd 9",[[4000,-3300],[4000,-2400],[4000,0],[4000,1500,300],[3300,2300,300],[2750,2700]],{lim:55});
-  mkR("road","County Rd 30",[[-4400,-2400],[-3600,-2400],[-1000,-2400],[1000,-2400],[2600,-2400],[3300,-2400],[4000,-2400],[4500,-2400]],{lim:55});
+  mkR("road","County Rd 30",[ILW.P(0,ILW.T(1)),ILW.P(0,ILW.T(-1)),[-4400,-2400],[-3600,-2400],[-1000,-2400],[1000,-2400],[2600,-2400],[3300,-2400],[4000,-2400],[4500,-2400]],{lim:55});
   mkR("road","County Rd 40",[[-4400,-3300],[-3600,-3300],[-1000,-3300],[-300,-3300],[1000,-3300],[2600,-3300],[3300,-3300],[4000,-3300],[4500,-3300]],{lim:55});
   mkR("dirt","Quarry Rd",[[-1000,-3300],[-1000,-3480,60],[-300,-3480,60],[-300,-3300]]);
   mkR("dirt","Gravel Pit Rd",[[3300,-2400],[3380,-2850,120],[3300,-3300]]);
@@ -4910,7 +4914,7 @@ function aiR(){const lb=G().label;return lb==="Ultra"||lb==="High"?650:lb==="Med
 function aiSeen(x,y,z){if(!CULL.pl)return Math.hypot(x-car.px,y-car.py)<60;return sphVis(x,(z||0)+1,-y,8,1e9)}
 function poolSpot(minD,ok){const R=aiR();for(let k=0;k<16;k++){const p=randomSpot(minD??140,R-40);if(!p)continue;if(ok&&!ok(p))continue;const q=fpt(p.e,p.dir,p.s,laneOff(p.e,p.i)),d=Math.hypot(q[0]-car.px,q[1]-car.py);
     if(d<R*0.8&&aiSeen(q[0],q[1],p.e.hz?ez(p.e,p.dir>0?p.s:p.e.L-p.s):0))continue;const ah=(q[0]-car.px)*Math.cos(car.psi)+(q[1]-car.py)*Math.sin(car.psi);if(ah<0&&k<10&&rnd()<0.55)continue;return p}return null}
-function poolKeep(c){return c.emv||c.bus||c.plow||c.transit||c.towing||(typeof GIG!=="undefined"&&GIG.job&&GIG.job.towCar===c)}
+function poolKeep(c){return c.emv||c.bus||c.plow||c.transit||c.towing||c.errand||c.pullH||c.pullCop||c.pullTg||(typeof GIG!=="undefined"&&GIG.job&&GIG.job.towCar===c)}
 // AI cars get the same suspension as the cars you drive: the suspension of their own model (passive coils, adaptive, magnetic or air),
 // four corner springs and dampers, anti-roll bars, the real mass, and road bumps and potholes under each wheel
 const AI_TRIM={};function aiTrimOf(mdl){if(AI_TRIM[mdl]===undefined){AI_TRIM[mdl]=Object.keys(TRIMS).find(k=>TRIMS[k].model===mdl)||null}return AI_TRIM[mdl]}
@@ -4940,15 +4944,16 @@ function updateTraffic(dt){try{sfTick(dt)}catch(e){console.error(e)}
   try{dynTick(dt)}catch(e){console.error(e)}
   for(const c of cars){
     if(c.dyn)continue;
-    if(c.kind==="wreck"||c.kind==="cone"||c.kind==="cop"||c.kind==="towed")continue;
-    if(c.stunned>0){c.stunned-=dt;c.v=Math.max(0,c.v-6*dt);advance(c,c.v*dt);if(c.stunned<=0){c.haz=false;if(!c.jn)c.offT=laneOff(c.e,laneIdx(c))}carPose(c);continue}
+    if(c.kind==="wreck"||c.kind==="cone"||c.kind==="cop"||c.kind==="towed"||c.kind==="errand")continue;
+    if(c.stunned>0){c.stunned-=dt;c.v=Math.max(0,c.v-6*dt);advance(c,c.v*dt);if(c.stunned<=0){c.haz=false;if(c.slid){c.head=0;c.slid=false}if(!c.jn)c.offT=laneOff(c.e,laneIdx(c))}carPose(c);continue}
     if(c.script)c.script(c,dt);
     if(c.wait){c.v=0;carPose(c);continue}
     if(c.kind==="ai"&&c.pers===undefined&&(hourNow()>=22||hourNow()<4.5)){const r_=rnd();c.pers=r_<0.15?{k:"calm",v:0.93,T:1.7,lc:1.6,a:1.25,b:2.4}:r_<0.5?{k:"normal",v:1,T:1.3,lc:1,a:1.6,b:2.8}:r_<0.72?{k:"brisk",v:1.08,T:1.0,lc:0.6,a:2.1,b:3.2}:{k:"aggr",v:1.18,T:0.7,lc:0.35,a:2.8,b:4}; if(rnd()<0.07)c.drunk={ph:rnd()*6.28}}
     if(c.drunk){const t_=st.clock*0.55+c.drunk.ph;c.wob=Math.sin(t_)*0.75+Math.sin(t_*2.3)*0.25}
     if(c.kind==="ai"&&c.pers===undefined){const r_=rnd();c.pers=r_<0.25?{k:"calm",v:0.93,T:1.7,lc:1.6,a:1.25,b:2.4}:r_<0.72?{k:"normal",v:1,T:1.3,lc:1,a:1.6,b:2.8}:r_<0.88?{k:"brisk",v:1.06,T:1.0,lc:0.6,a:2.1,b:3.2}:{k:"aggr",v:1.1,T:0.8,lc:0.4,a:2.6,b:3.8}}
     if(c.kind==="ai")c.v0=c.e.lim/2.23694*c.vf*wxSpeed()*(c.pers?c.pers.v:1)*(c.drunk?1+0.12*Math.sin(st.clock*0.3+c.drunk.ph):1)*(c.e.n>1?[0.96,1,1.05][Math.min(2,laneIdx(c))]:1)*jamMul(c);
-    if(c.kind==="ai"&&SAFE.emvList.length)emvYield(c);if(c.kind==="ai"&&TOLL.e)tollAI(c);if(c.kind==="ai"){if(c.honkT>0){c.honkT-=dt;c.v0*=1.14}if(c.passT>0){c.passT-=dt;c.v0*=1.2}if(c.flashT>0)c.flashT-=dt;if(c.bcCd>0)c.bcCd-=dt;if(c.flCd>0)c.flCd-=dt;
+    if(c.kind==="ai"&&SAFE.emvList.length)emvYield(c);if(c.kind==="ai"&&TOLL.e)tollAI(c);if(c.kind==="ai"){if(c.honkT>0){c.honkT-=dt;c.v0*=1.14}if(c.passT>0){c.passT-=dt;c.v0*=1.2}if(c.pullCop&&PULL.cur&&PULL.cur.ph==="chase")c.v0*=1.5;if(c.pullTg&&!c.jn&&c.pmE!==c.e){c.pmE=c.e;if(c.mv&&c.mv.t!=="S"){try{planMove(c,"S")}catch(e){}}}   // a driver being followed by police keeps straight on
+      if(c.pullTg&&PULL.cur&&PULL.cur.ph==="chase"&&Math.hypot(PULL.cur.cop.wx-c.wx,PULL.cur.cop.wy-c.wy)<160){c.v0=Math.min(c.v0,c.e.lim/2.237*0.8);c.rageT=0;c.passT=0;c.honkT=0}   // they see the lights in the mirror and ease offif(c.flashT>0)c.flashT-=dt;if(c.bcCd>0)c.bcCd-=dt;if(c.flCd>0)c.flCd-=dt;
       // fear makes a driver hang back for a while, anger can boil over into road rage (faster, closer, pushy)
       if(c.fear>0){c.fear=Math.max(0,c.fear-dt*0.06);c.v0*=1-0.2*Math.min(1,c.fear)}
       if(c.rageT>0){c.rageT-=dt;c.v0*=1.12}else if((c.anger||0)>0.9&&!c.emv){c.rageT=20+rnd()*15;emoB(c,"mad",3)}
@@ -4973,7 +4978,7 @@ function updateTraffic(dt){try{sfTick(dt)}catch(e){console.error(e)}
     let vc=c.v0;for(const p of pts)if(p[3]>1e-3){const vk=Math.sqrt(2.6/p[3]);vc=Math.min(vc,Math.sqrt(vk*vk+4*p[2]))}
     c.lw=L.who;c.lg=L.gap;
     const PR=c.kind==="ai"?aiVsPlayer(c,L,dt):null,hurry=c.honkT>0||c.passT>0;
-    let a=c.v0<=0?-9:idm(c.v,vc,L.gap,L.v,c.pers&&c.pers.T*(hurry?0.75:1)*(1+0.7*Math.min(1,c.fear||0))*(c.rageT>0?0.7:1),c.pers&&c.pers.a*(hurry?1.4:1),c.pers&&c.pers.b);a=clamp(a,-8.5,hurry?3.2:2.2);if(c.hardT>0){c.hardT-=dt;a=-7.5}
+    let a=c.v0<=0?-9:idm(c.v,vc,L.gap,L.v,(c.pers?c.pers.T:1.3)*(hurry?0.75:1)*(1+0.7*Math.min(1,c.fear||0))*(c.rageT>0?0.7:1)*(1+0.7*SLK.v),(c.pers?c.pers.a:1.6)*(hurry?1.4:1)*(1-0.4*SLK.v),(c.pers?c.pers.b:2.8)*(1-0.4*SLK.v));a=clamp(a,-8.5,hurry?3.2:2.2);if(c.hardT>0){c.hardT-=dt;a=-7.5}
     if(c.bcT>0){c.bcT-=dt;a=Math.min(a,-5.2)}   // brake check
     // people don't all pull away the instant the car ahead moves: a short reaction delay, longer for calm drivers, and now and then someone looking at their phone
     if(c.kind==="ai"&&!c.emv&&!c.jn&&!(dStop<12&&endNode(c.e,c.dir).ctrl!=="signal")){if(c.v<0.2&&a>0.3){if(c.goDl===undefined){const k=c.pers&&c.pers.k;c.goDl=(0.3+rnd()*0.7)*(k==="calm"?1.4:k==="aggr"?0.45:k==="brisk"?0.7:1)+(rnd()<0.05?2+rnd()*2.5:0)}if(c.goDl>0){c.goDl-=dt;a=Math.min(a,0)}}else if(c.v>1.5)c.goDl=undefined}
@@ -5011,7 +5016,7 @@ function updateTraffic(dt){try{sfTick(dt)}catch(e){console.error(e)}
       if(poolKeep(c))continue;const R_=aiR(),seen=aiSeen(c.wx,c.wy,c.wz);
       if(d>R_&&!seen||d>R_+450||(c.kind==="bike"?c.idle>25&&d>110:c.idle>50&&d>160)&&!seen){const p=poolSpot(140,q=>c.kind!=="bike"||BIKE_T.has(q.e.type));
         if(p){const bike=c.kind==="bike",n=newCar(p.e,p.dir,p.s,bike?0:p.i,c.kind);if(bike){n.paint=c.paint;n.mdl=c.mdl}else if(c.kind!=="ai"){n.paint=c.paint;n.mdl=c.mdl}if(bike){n.v0=c.v0;n.rider=c.rider;n.off=n.offT=bikeOff(n.e)}Object.keys(c).forEach(k=>delete c[k]);Object.assign(c,n);carPose(c)}}}}
-  try{towedTick(dt)}catch(e){}try{brainTick(dt)}catch(e){}pedTick(dt);evTick(dt);try{txtTick(dt)}catch(e){}try{trlTick(dt)}catch(e){}try{trafTOD(dt)}catch(e){}
+  try{towedTick(dt)}catch(e){}try{brainTick(dt)}catch(e){}try{errTick(dt)}catch(e){console.warn(e)}pedTick(dt);evTick(dt);try{txtTick(dt)}catch(e){}try{trlTick(dt)}catch(e){}try{trafTOD(dt)}catch(e){}
 }
 
 // ======================================================================= life: weather, pedestrians, cyclists, people in cars, random events, getting out
@@ -5286,10 +5291,13 @@ const walkT=e=>(mAt(e,e.L/2)/2+e.n*LANE+e.side)+0.35+e.T.walk/2;          // sid
 function pedSpot(minD,maxD){for(let k=0;k<60;k++){const x=rnd()*EW[EW.length-1];let a=0,b=EW.length-1;while(a<b){const m=(a+b)>>1;if(EW[m]<x)a=m+1;else b=m}const e=EDGES[a];
     if(!PED_T.has(e.type)||!e.T.walk)continue;const k0=kerbTrim(e,0)+2,k1=e.L-kerbTrim(e,1)-2;if(k1<=k0)continue;const u=k0+rnd()*(k1-k0),side=rnd()<0.5?1:-1,p=ePt(e,u,side*walkT(e)),d=Math.hypot(p[0]-car.px,p[1]-car.py);
     if(d<minD||d>maxD||onBridge(e,u)&&e.type!=="blvd")continue;return {e,u,side}}return null}
-function newPed(e,u,side){const long=rnd()<0.4;return {kind:"ped",e,u,side,du:rnd()<0.5?1:-1,v0:1.1+rnd()*0.5,v:0,mode:"walk",ph:rnd()*6,skin:Math.floor(rnd()*4),shirt:Math.floor(rnd()*10),pants:Math.floor(rnd()*4),hair:Math.floor(rnd()*4),long,skirt:long&&rnd()<0.35,
+function newPed(e,u,side){const long=rnd()<0.4,jog=rnd()<0.07;return {kind:"ped",e,u,side,du:rnd()<0.5?1:-1,v0:jog?2.5+rnd()*0.7:1.1+rnd()*0.5,jog,v:0,mode:"walk",ph:rnd()*6,skin:Math.floor(rnd()*4),shirt:Math.floor(rnd()*10),pants:Math.floor(rnd()*4),hair:Math.floor(rnd()*4),long,skirt:long&&rnd()<0.35,
   bag:rnd()<0.25?(rnd()<0.5?1:-1):0,shoe:rnd()<0.3?1:0,sc:0.88+rnd()*0.22,wd:0.9+rnd()*0.25,wx:0,wy:0,wz:0,wh:0}}
 function pedPos(p){const q=ePt(p.e,p.u,p.side*(walkT(p.e)+(p.lat||0)));return [q[0],q[1],p.e.hz?ez(p.e,p.u):0]}
 // people look out for each other and for cars: keep right when meeting someone, pass slower walkers, pause or hurry on a crosswalk
+// your horn: people nearby jump, look, and hurry on (faster still if they're crossing in front of you)
+function pedHorn(p,dt){if(st.hornAt&&st.clock-st.hornAt<0.3&&p.hornSeen!==st.hornAt&&!st.walk&&Math.hypot(p.wx-car.px,p.wy-car.py)<16){p.hornSeen=st.hornAt;p.startT=0.5;p.hurryT=3;brainLearn("pedScare")}
+  if(p.startT>0){p.startT-=dt;p.vMul=0}else if(p.hurryT>0){p.hurryT-=dt;p.vMul=Math.max(p.vMul??1,1.7)}}
 function pedSmart(p,dt){if(p.mode==="walk"){let want=0,slow=1;const hw=(p.e.T.walk||2)/2-0.35;
     for(const o of peds){if(o===p||o.mode!=="walk"||o.e!==p.e||o.side!==p.side)continue;const d=(o.u-p.u)*p.du;if(d<0||d>4.5)continue;
       if(o.du!==p.du)want=0.55*-p.du*p.side;else if(o.v0<p.v0-0.05){want=0.5*p.du*p.side;if(d<1.3)slow=Math.min(slow,0.6)}else if(d<1.2)slow=Math.min(slow,0.7)}
@@ -5316,7 +5324,8 @@ function pedTick(dt){if(st.people===false){peds=[];return}
   if(peds.length<want){const s=pedSpot(60,330);if(s){const p=newPed(s.e,s.u,s.side);const q=pedPos(p);p.wx=q[0];p.wy=q[1];p.wz=q[2];peds.push(p)}}
   for(const p of peds){if(p.mode==="scr")continue;p.ph+=p.v*dt*4.2;
     if(p.mode==="down"){p.v=0;p.downT-=dt;if(p.downT<=0){if(p.site){p.mode="shop";continue}p.mode="walk";const q=pedPos(p);p.wx=q[0];p.wy=q[1]}continue}
-    pedSmart(p,dt);
+    pedSmart(p,dt);pedHorn(p,dt);
+    if(p.mode==="board"){if(pedTarget(p,p.tx,p.ty,p.v0*1.2,dt)||!(p.bus&&cars.includes(p.bus)&&p.bus.tStop>0))p.gone=true;continue}
     if(p.mode==="walk"){const e=p.e;p.u+=p.du*p.v0*(p.vMul??1)*dt;const q=pedPos(p);p.wh=Math.atan2(q[1]-p.wy,q[0]-p.wx)||p.wh;p.wx=q[0];p.wy=q[1];p.wz=q[2];p.v=p.v0*(p.vMul??1);
       const end=p.du>0?e.L-kerbTrim(e,1)-0.8:kerbTrim(e,0)+0.8;
       if((p.du>0&&p.u>=end)||(p.du<0&&p.u<=end))pedAtCorner(p);continue}
@@ -5365,13 +5374,35 @@ function spawnBikes(n){for(let k=0;k<n;k++){let p=null;for(let t=0;t<20&&!p;t++)
 
 // ---- random events: a crash ahead, a breakdown on the shoulder, road work closing a lane, a deer, someone jaywalking, a car braking hard
 const EV={t:50,list:[],crit:[]};
+// how slippery it is for the AI: snow (worse below freezing), then rain. Drivers leave bigger gaps, pull away gently and brake earlier;
+// on snow and ice someone near you loses it now and then: a slide, hazards on, a scared face, then they carry on slowly
+const SLK={v:0,t:0,slide:60};
+function slkTick(dt){SLK.t-=dt;if(SLK.t<=0){SLK.t=1;let sn=0,wt=0;try{sn=Math.max(WXR.snow||0,WX.cur==="snow"?WX.w:0);wt=Math.max(WXR.wet||0,WX.cur==="rain"?WX.w:0)}catch(e){}let cold=1;try{cold=ambF()<34?1:0.45}catch(e){}SLK.v=clamp(sn*cold+wt*0.35,0,1)}
+  if(SLK.v<0.4||!st.started)return;SLK.slide-=dt*SLK.v;if(SLK.slide>0)return;SLK.slide=50+Math.random()*70;
+  const C=cars.filter(c=>c.kind==="ai"&&!c.jn&&!poolKeep(c)&&c.v>9&&!c.stunned&&Math.hypot(c.wx-car.px,c.wy-car.py)>40&&Math.hypot(c.wx-car.px,c.wy-car.py)<260);const c=C[Math.floor(Math.random()*C.length)];if(!c)return;
+  c.stunned=3+Math.random()*2.5;c.slid=true;c.head=(Math.random()<0.5?-1:1)*(0.45+Math.random()*0.5);c.haz=true;c.fear=(c.fear||0)+1;emoB(c,"scared",2.5);if(Math.random()<0.5)aiHonk(c,0.4)}
 // road work props: cones and drums, signs, and portable message boards that flip between their two pages every 2 seconds
 const RW_PROPS=["rw_cone28","rw_drum","rw_road_work","rw_lane_closed","rw_detour_left","rw_detour_right","rw_detour_ahead","rw_mb_roadwork","rw_mb_roadwork_1","rw_mb_roadwork_2","rw_mb_detour","rw_mb_detour_1","rw_mb_detour_2"];
+// your own words on the amber message boards: each page is drawn once as dot-matrix LED text and reused
+const MB_TEX=new Map();
+const MB_PRESETS=[["Auto (the board's own pages)",null],["ROAD WORK AHEAD / EXPECT DELAYS",[["ROAD WORK","AHEAD"],["EXPECT","DELAYS"]]],["LEFT LANE CLOSED / MERGE RIGHT",[["LEFT LANE","CLOSED"],["MERGE","RIGHT"]]],["DETOUR AHEAD / FOLLOW SIGNS",[["DETOUR","AHEAD"],["FOLLOW","SIGNS"]]],["SLOW DOWN / WORKERS AHEAD",[["SLOW","DOWN"],["WORKERS","AHEAD"]]],["BUCKLE UP / PHONES DOWN",[["BUCKLE","UP"],["PHONES","DOWN"]]]];
+function mbTex(lines){const key=lines.join("|");let T=MB_TEX.get(key);if(T)return T;const c=document.createElement("canvas"),W=256,H=192;c.width=W;c.height=H;const g=c.getContext("2d");g.fillStyle="#050403";g.fillRect(0,0,W,H);
+  const L=lines.slice(0,3),fs=Math.min(64,Math.floor(H/L.length*0.72));g.font=`900 ${fs}px "Arial Black",Impact,system-ui,sans-serif`;g.textAlign="center";g.textBaseline="middle";
+  const off=document.createElement("canvas");off.width=W;off.height=H;const o=off.getContext("2d");o.font=g.font;o.textAlign="center";o.textBaseline="middle";o.fillStyle="#fff";
+  L.forEach((t,i)=>{const y=H/2+(i-(L.length-1)/2)*fs*1.15;let f=fs;o.font=`900 ${f}px "Arial Black",Impact,system-ui,sans-serif`;while(o.measureText(t).width>W*0.92&&f>12){f-=2;o.font=`900 ${f}px "Arial Black",Impact,system-ui,sans-serif`}o.fillText(t,W/2,y)});
+  const d=o.getImageData(0,0,W,H).data,st_=6;for(let y=st_/2;y<H;y+=st_)for(let x=st_/2;x<W;x+=st_){const a=d[(Math.floor(y)*W+Math.floor(x))*4+3];g.fillStyle=a>90?"#ffb21c":"#1a1206";g.beginPath();g.arc(x,y,st_*0.38,0,6.283);g.fill()}
+  const t=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,c);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+  T={t};MB_TEX.set(key,T);if(MB_TEX.size>24){const k0=MB_TEX.keys().next().value;try{gl.deleteTexture(MB_TEX.get(k0).t)}catch(e){}MB_TEX.delete(k0)}return T}
+function mbLed(m,M,lines,night){const T=mbTex(lines);const P=v=>M4.p(M,v),z=0.14,O=P([-0.57,2.12,z]),A=P([0.57,2.12,z]),B=P([-0.57,2.98,z]),U_=[A[0]-O[0],A[1]-O[1],A[2]-O[2]],V_=[B[0]-O[0],B[1]-O[1],B[2]-O[2]];
+  if(!m.ledM||m.ledK!==m.x+","+m.y){const C=[A[0]+V_[0],A[1]+V_[1],A[2]+V_[2]],n=[0,0,1];m.ledM=meshFrom([...O,...A,...C,...B],[...n,...n,...n,...n],[0,1,2,0,2,3,0,2,1,0,3,2]);m.ledK=m.x+","+m.y}
+  gl.uniformMatrix4fv(U.uM,false,M4.id());gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,T.t);gl.uniform3fv(U.uSO,O);gl.uniform3fv(U.uSU,U_);gl.uniform3fv(U.uSV,V_);mat([1.1+night*0.6,0,0],null,0,1,1,5);draw(m.ledM)}
 function rwPropsDraw(){if(!RW.pl){RW.pl=1;let i=0;const nx=()=>{if(i<RW_PROPS.length)propLoad(RW_PROPS[i++]).finally(()=>setTimeout(nx,60))};nx()}
   const e=CULL.eye,ex=e[0],ey=-e[2],night=clamp(1-(GT.D??1)*1.4,0,1),gz=(x,y)=>groundAt(x,y).h||0;
   for(const c of RW.items){if(c.kind!=="cone"||c.down||Math.abs(c.wx-ex)>180||Math.abs(c.wy-ey)>180)continue;const k=c.rwK||"rw_cone28";if(PROPS[k])propDraw(k,carMatrix(c.wx,c.wy,c.wh,c.wz||0,0,0),{head:0})}
   for(const z of RW.zones){if((z.x-ex)**2+(z.y-ey)**2>380*380)continue;for(const q of z.props||[])if(PROPS[q.k])propDraw(q.k,carMatrix(q.x,q.y,q.h+Math.PI,gz(q.x,q.y),0,0),{head:0});
-    const m=z.mb;if(m&&PROPS[m.k]){const M=carMatrix(m.x,m.y,m.h+Math.PI,gz(m.x,m.y),0,0);propDraw(m.k,M,{head:0});const pg=m.k+"_"+(1+Math.floor(performance.now()/2000)%2);if(PROPS[pg])propDraw(pg,M,{glow:1.6+night})}}
+    const m=z.mb;if(m&&PROPS[m.k]){const M=carMatrix(m.x,m.y,m.h+Math.PI,gz(m.x,m.y),0,0);propDraw(m.k,M,{head:0});const pi=Math.floor(performance.now()/2000)%2;
+      if(st.mbMsg&&st.mbMsg.length)mbLed(m,M,st.mbMsg[pi%st.mbMsg.length],night);else{const pg=m.k+"_"+(1+pi);if(PROPS[pg])propDraw(pg,M,{glow:1.6+night})}}}
   bbDraw(ex,ey,night);slDraw(ex,ey,night);try{emoDraw()}catch(e){}}
 // billboards: big ones along the freeway, smaller ones on the main streets, set back on open ground
 const BB={list:null};
@@ -5442,7 +5473,7 @@ const JAM={zones:[],t:20};
 function jamTick(dt){JAM.t-=dt;JAM.zones=JAM.zones.filter(z=>(z.left-=dt)>0);if(JAM.t>0)return;const rush=todMul()>1.3;JAM.t=rush?40+Math.random()*40:90+Math.random()*90;if(JAM.zones.length>=(rush?3:2))return;
   const E=(W2?nearEdges(1500).E:EDGES).filter(e=>e.type==="xway"&&e.L>500);if(!E.length)return;const e=E[Math.floor(Math.random()*E.length)],dir=e.ow?1:Math.random()<0.5?1:-1,len=250+Math.random()*450,s0=rStart(e,dir)+40+Math.random()*Math.max(1,e.L-len-120);
   JAM.zones.push({e,dir,s0,s1:s0+len,m:rush?0.18+Math.random()*0.2:0.3+Math.random()*0.25,left:120+Math.random()*180})}
-function jamMul(c){if(c.sbT>0||c.tStop>0||c.sbHold)return 0.002;   // a bus at its stop, or traffic held by a stopped school bus
+function jamMul(c){if(c.sbT>0||c.tStop>0||c.sbHold||c.pullH)return 0.002;   // a bus at its stop, or traffic held by a stopped school bus
   if(EV.crz&&EV.crz.length&&!c.emv){for(const v of EV.crz){const d=Math.hypot(c.wx-v.x,c.wy-v.y);if(d<220){const fw=c.e.type==="xway";return Math.min(1,(fw?0.38:0.62)+(1-(fw?0.38:0.62))*Math.max(0,d-60)/160)*jamMul0(c)}}}
   return jamMul0(c)}
 function jamMul0(c){  if(!JAM.zones.length||c.e.type!=="xway")return 1;for(const z of JAM.zones)if(z.e===c.e&&z.dir===c.dir&&c.s>z.s0-60&&c.s<z.s1){const k=c.s<z.s0?(z.s0-c.s)/60:c.s>z.s1-80?(c.s-(z.s1-80))/80:0;return z.m+(1-z.m)*clamp(k,0,1)}return 1}
@@ -5470,13 +5501,62 @@ function evCrashTick(v,dt){v.pt+=dt;const [L_,F]=v.pair;
     if(v.hooked===1&&v.pt-v.hookT>6){v.hooked=2;for(const t of tows)rel(t)}
     if(v.hooked===2&&v.pt-v.hookT>14){for(const c of RS)if(c.beacon==="cop")rel(c);v.t=0}   // what's left (cones, a wreck no tow could take) goes with the police
     if(v.pt>150)v.t=0}}
+// errands: now and then a driver near you heads for a store, turns into its lot, parks in a free stall for a while, then backs out
+// and drives off. Cars already parked in the lots near you leave the same way, so the lots fill up and empty out
+const ERR={t:12,out:8};
+function lotEntry(S){if(S._ent!==undefined)return S._ent;let best=null;for(const e of edgesNear(S.x,S.y,110)){if(/xway|ramp|rbt|dirt/.test(e.type)||e.ow||e.n<1)continue;const p=eProj(e,S.x,S.y);if(p.u<18||p.u>e.L-18)continue;const d=Math.abs(p.t);if(!best||d<best.d)best={e,u:p.u,d,side:Math.sign(p.t)||1}}S._ent=best;return best}
+function stallFree(q){for(const o of parked)if(Math.abs(o.wx-q.p[0])<2.3&&Math.abs(o.wy-q.p[1])<2.3)return false;for(const c of cars)if(Math.abs(c.wx-q.p[0])<2.6&&Math.abs(c.wy-q.p[1])<2.6)return false;return true}
+function errPath(S,q,en,dir){const h=q.h,ax=q.p[0]-Math.cos(h)*6.2,ay=q.p[1]-Math.sin(h)*6.2,gate=ePt(en.e,en.u,en.side*((en.e.W||5)+5)),s=dir>0?en.u:en.e.L-en.u,R=fpt(en.e,dir,s,laneOff(en.e,0));return {A:[ax,ay],G:[gate[0],gate[1]],R:[R[0],R[1],R[2]],s}}
+function errStart(c,P,rev0){c.kind="errand";c.fixed=true;c.v=0;c.errand.ph=c.errand.ph||"in";c.errand.P=P;c.errand.k=0;c.errand.rev0=rev0}
+function errAnim(c,dt){const E=c.errand,P=E.P;if(E.k>=P.length-1){errDone(c);return}const a=P[E.k],b=P[E.k+1],rev=!!b[2];
+  if(E.ph==="out"&&E.k===P.length-2){const R=E.R;for(const o of cars){if(o===c||o.kind!=="ai"||o.e!==E.e||o.dir!==E.dir)continue;const ds=E.s-o.s;if(ds>-8&&ds<38){c.v=0;return}}}   // wait for a gap before pulling out onto the street
+  const sp=rev?1.8:3.4;c.v=sp;const dx=b[0]-c.wx,dy=b[1]-c.wy,d=Math.hypot(dx,dy),st_=Math.min(d,sp*dt);if(d<0.25){E.k++;return}
+  c.wx+=dx/d*st_;c.wy+=dy/d*st_;const want=rev?Math.atan2(-dy,-dx):Math.atan2(dy,dx);c.wh+=wrapPi(want-c.wh)*Math.min(1,dt*(rev?2.2:3));c.wz=(groundAt(c.wx,c.wy).h)||0;c.wp=0;c.wr=0;c.spin+=(rev?-1:1)*sp/0.36*dt;c.brk=false;c.sig=E.ph==="out"&&E.k>=P.length-3?(E.dir>0?-1:-1):0}
+function errDone(c){const E=c.errand;if(E.ph==="in"){const k=cars.indexOf(c);if(k>=0)cars.splice(k,1);parked.push({fixed:true,kind:"parked",wx:E.q.p[0],wy:E.q.p[1],wh:E.q.h,wz:(groundAt(E.q.p[0],E.q.p[1]).h)||0,v:0,spin:0,sig:0,head:0,paint:c.paint,mdl:c.mdl,errAt:st.clock+35+Math.random()*90,errS:E.S,errQ:E.q})}
+  else{Object.assign(c,{kind:"ai",fixed:false,errand:null,jn:null,e:E.e,dir:E.dir,s:E.s,off:laneOff(E.e,0),offT:laneOff(E.e,0),v:3,head:0,idle:0});c.wp=0;try{planMove(c)}catch(e){}carPose(c)}}
+function errOut(o,S,q){const en=lotEntry(S);if(!en)return false;const dir=en.e.ow?1:Math.random()<0.5?1:-1,X=errPath(S,q,en,dir),i=parked.indexOf(o);if(i<0)return false;parked.splice(i,1);
+  const c=newCar(en.e,dir,X.s,0);c.mdl=o.mdl;c.paint=o.paint;c.wx=o.wx;c.wy=o.wy;c.wh=o.wh;c.wz=o.wz;c.errand={ph:"out",S,q,e:en.e,dir,s:X.s,R:X.R};cars.push(c);
+  errStart(c,[[o.wx,o.wy],[X.A[0],X.A[1],1],[X.G[0],X.G[1]],[X.R[0],X.R[1]]]);return true}
+function errTick(dt){if(!W2||!st.started)return;
+  for(const c of cars){const E=c.errand;if(!E)continue;
+    if(E.ph==="go"){E.t+=dt;if(!c.jn&&c.e===E.e&&c.dir===E.dir&&Math.abs(c.s-E.s)<14){const X=errPath(E.S,E.q,lotEntry(E.S),E.dir);if(!stallFree(E.q)){c.errand=null;c.route=null;continue}c.route=null;errStart(c,[[c.wx,c.wy],[X.G[0],X.G[1]],[X.A[0],X.A[1]],[E.q.p[0],E.q.p[1]]]);E.ph="in"}
+      else if(E.t>160){c.errand=null;c.route=null}}
+    else errAnim(c,dt)}
+  ERR.t-=dt;ERR.out-=dt;
+  // someone parked near you is done shopping and leaves (yours first, then anybody in a lot near you)
+  if(ERR.out<=0){ERR.out=10+Math.random()*14;let done=null;for(const o of parked)if(o.errAt&&st.clock>o.errAt&&Math.hypot(o.wx-car.px,o.wy-car.py)<450){done=o;break}
+    if(done)errOut(done,done.errS,done.errQ);
+    else{const L=XSITES.filter(S=>S.kind==="lot"&&S.stalls&&S.stalls.length&&Math.hypot(S.x-car.px,S.y-car.py)<320);const S=L[Math.floor(Math.random()*L.length)];if(S){const q=S.stalls[Math.floor(Math.random()*S.stalls.length)];const o=parked.find(o=>o.kind==="parked"&&Math.abs(o.wx-q.p[0])<1.2&&Math.abs(o.wy-q.p[1])<1.2);if(o&&Math.hypot(o.wx-car.px,o.wy-car.py)>25)errOut(o,S,q)}}}
+  if(ERR.t>0)return;ERR.t=14+Math.random()*16;if(cars.filter(c=>c.errand).length>=3)return;
+  // a driver near you decides to stop at a store
+  const L=XSITES.filter(S=>S.kind==="lot"&&S.stalls&&S.stalls.length&&Math.hypot(S.x-car.px,S.y-car.py)<500);if(!L.length)return;const S=L[Math.floor(Math.random()*L.length)],en=lotEntry(S);if(!en)return;
+  const fr=S.stalls.filter(stallFree);if(!fr.length)return;const q=fr[Math.floor(Math.random()*fr.length)];
+  const C=cars.filter(c=>c.kind==="ai"&&!c.errand&&!poolKeep(c)&&!c.emv&&c.mdl!=="city_police"&&!(c.len>5.6)&&!c.route&&Math.hypot(c.wx-S.x,c.wy-S.y)<480&&Math.hypot(c.wx-S.x,c.wy-S.y)>70);if(!C.length)return;const c=C[Math.floor(Math.random()*C.length)];
+  const rp=ePt(en.e,en.u,0),f=findFrame(rp[0],rp[1],rp[2]+(Math.random()<0.5?0:Math.PI),null);if(!f||f.e!==en.e)return;try{c.route=navBuild(f)}catch(e){return}c.errand={ph:"go",S,q,e:f.e,dir:f.dir,s:f.s,t:0}}
+// police pull over AI drivers too: a patrol car behind a speeder or someone in a road rage lights up, the driver signals and pulls onto
+// the shoulder, the cop stops behind them, and after a while they both drive on (the driver's calmed down)
+const PULL={t:40,cur:null};
+function pullShoulder(e){return loOf(e.n)*LANE-LANE/2-Math.max(0.6,(e.side||0)/2)}
+function pullEnd(){const P=PULL.cur;PULL.cur=null;if(!P)return;for(const c of [P.cop,P.tg]){if(!c)continue;c.pullH=false;c.pullCop=false;c.pullTg=false;c.sig=0;if(c.e&&!c.jn)c.offT=laneOff(c.e,0)}if(P.tg){P.tg.anger=0;P.tg.rageT=0;if(P.ph==="wait")emoB(P.tg,"annoyed",2.5)}}
+function pullTick(dt){if(!st.started)return;const P=PULL.cur;
+  if(P){P.t+=dt;const cop=P.cop,tg=P.tg;if(!cars.includes(cop)||!cars.includes(tg)||cop.kind!=="ai"||tg.kind!=="ai"||P.t>150){pullEnd();return}const d=Math.hypot(cop.wx-tg.wx,cop.wy-tg.wy);
+    if(P.ph==="chase"){if(!cop.jn&&cop.e===tg.e&&cop.dir===tg.dir&&tg.mv&&P.mvFor!==tg.mv){P.mvFor=tg.mv;try{planMove(cop,tg.mv.t)}catch(e){}}
+      if(d>300){pullEnd();return}if(d<60&&!tg.jn&&!cop.jn&&tg.e===cop.e&&tg.dir===cop.dir&&tg.s>cop.s){P.ph="over";tg.sig=1;tg.offT=pullShoulder(tg.e);tg.pullH=true;emoB(tg,"shock",2.2)}}
+    else if(P.ph==="over"){cop.offT=pullShoulder(cop.e);if(cop.e===tg.e&&tg.s-cop.s<16)cop.pullH=true;if(tg.v<0.3&&cop.v<0.3){P.ph="wait";P.w=0;tg.haz=false}}
+    else if(P.ph==="wait"){P.w+=dt;if(P.w>22+Math.random()*0.1){pullEnd()}}
+    return}
+  PULL.t-=dt;if(PULL.t>0)return;PULL.t=45+Math.random()*40;
+  for(const cop of cars){if(cop.kind!=="ai"||cop.mdl!=="city_police"||cop.emv||cop.jn||Math.hypot(cop.wx-car.px,cop.wy-car.py)>420)continue;
+    let best=null;for(const o of cars){if(o===cop||o.kind!=="ai"||poolKeep(o)||o.jn||o.e!==cop.e||o.dir!==cop.dir)continue;const ds=o.s-cop.s;if(ds<20||ds>160)continue;
+      const bad=o.rageT>0||o.v>(o.e.lim/2.237)*1.1||o.pers&&o.pers.k==="aggr"&&Math.random()<0.5;if(bad&&(!best||ds<best.ds))best={o,ds}}
+    if(best){PULL.cur={cop,tg:best.o,ph:"chase",t:0};cop.pullCop=true;best.o.pullTg=true;if(au.ctx&&Math.hypot(cop.wx-car.px,cop.wy-car.py)<200){beep(620,0.22,"triangle",0.05);setTimeout(()=>beep(880,0.22,"triangle",0.05),240)}return}}}
 // a wreck on a tow truck: slides up onto the rollback's deck, or is lifted by the front and dragged behind the wrecker, facing backwards
 function towedTick(dt){let dead=false;for(const w of cars){if(w.kind!=="towed"||!w.towBy)continue;const t=w.towBy;if(!cars.includes(t)||t.towing!==w){w.dead=true;dead=true;continue}
     const md=MODELS[t.mdl],Lt=(md&&md.meta.length)||7.5,roll=!/wrecker/.test(t.mdl||""),off=roll?-Lt*0.12:-(Lt/2+1.6),lift=roll?1.05:0.32,yaw=roll?0:Math.PI;
     const tx=t.wx+Math.cos(t.wh)*off,ty=t.wy+Math.sin(t.wh)*off,tz=(t.wz||0)+lift;w.hk=Math.min(1,(w.hk||0)+dt/4);const k=w.hk*w.hk*(3-2*w.hk);
     w.wx=w.h0[0]+(tx-w.h0[0])*k;w.wy=w.h0[1]+(ty-w.h0[1])*k;w.wh=w.h0[2]+wrapPi(t.wh+yaw-w.h0[2])*k;w.wz=w.h0[3]+(tz-w.h0[3])*k;w.wp=(roll?0:0.09)*k;w.wr=0;w.v=t.v;w.head=0}
   if(dead)cars=cars.filter(c=>!c.dead)}
-function evBeaconInto(){if(!DMAT.ambR){DMAT.ambR=[[1,0.1,0.08],[6,0.25,0.2]];DMAT.ambW=[[1,1,1],[5,5,5]];DMAT.towA=[[1,0.6,0.1],[6,3,0.3]];DMAT.bcOff=[[0.2,0.2,0.22]]}const on=(performance.now()%600)<300;
+function evBeaconInto(){if(PULL.cur&&PULL.cur.cop&&PULL.cur.cop.pullCop){const c=PULL.cur.cop,md=MODELS[c.mdl];if(md&&Math.hypot(c.wx-car.px,c.wy-car.py)<300){if(!DMAT.ambR){DMAT.ambR=[[1,0.1,0.08],[6,0.25,0.2]];DMAT.bcOff=[[0.2,0.2,0.22]]}if(!DMAT.copB)DMAT.copB=[[0.1,0.3,1],[0.3,1.2,7]];const on=(performance.now()%600)<300,M=aiMat(c),h=md.meta.height+0.05,zz=-(md.meta.length||5)*0.05;dBoxM(on?"ambR":"bcOff",M,c.wh,[0.4,h,zz],0.5,0.1,0.22);dBoxM(on?"bcOff":"copB",M,c.wh,[-0.4,h,zz],0.5,0.1,0.22)}}if(!DMAT.ambR){DMAT.ambR=[[1,0.1,0.08],[6,0.25,0.2]];DMAT.ambW=[[1,1,1],[5,5,5]];DMAT.towA=[[1,0.6,0.1],[6,3,0.3]];DMAT.bcOff=[[0.2,0.2,0.22]]}const on=(performance.now()%600)<300;
   for(const v of EV.list){if(!v.beacons)continue;for(const c of v.items){if(!c.beacon||Math.hypot(c.wx-car.px,c.wy-car.py)>250)continue;const md=MODELS[c.mdl];if(!md)continue;const M=aiMat(c),h=md.meta.height+0.05,z=-(md.meta.length||5)*0.3;
     if(c.beacon==="amb"){dBoxM(on?"ambR":"ambW",M,c.wh,[0.6,h,z],0.3,0.12,0.2);dBoxM(on?"ambW":"ambR",M,c.wh,[-0.6,h,z],0.3,0.12,0.2)}else if(c.beacon==="cop"){if(!DMAT.copB)DMAT.copB=[[0.1,0.3,1],[0.3,1.2,7]];const zz=-(md.meta.length||5)*0.05;dBoxM(on?"ambR":"bcOff",M,c.wh,[0.4,h,zz],0.5,0.1,0.22);dBoxM(on?"bcOff":"copB",M,c.wh,[-0.4,h,zz],0.5,0.1,0.22)}else{dBoxM(on?"towA":"bcOff",M,c.wh,[0.45,h,z],0.35,0.1,0.18);dBoxM(on?"bcOff":"towA",M,c.wh,[-0.45,h,z],0.35,0.1,0.18)}}}}
 // ---- crime around you: a gas-station robbery with a getaway car you can stop or tail for a reward, and at night someone trying your door at a stop
@@ -5507,7 +5587,7 @@ function crimeTick(dt){if(!st.started)return;const mul=EV_MUL[st.events]??1;
     const pd=scrPed(S.x+6,S.y+4,0);CRIME.rob={ped:pd,car:cr,t:0,tail:0};toast("🚨 Gas station robbery! The robber is running to a "+(cr.paint)+" getaway car · ram it or stay on its tail for a reward");return}
   // night carjack try: stopped in town
   if(M&&M.zone==="c"&&(h>=21||h<5)&&CRIME.stillT>2&&Math.random()<0.5){const sx=car.px-Math.sin(car.psi)*7-Math.cos(car.psi)*6,sy=car.py+Math.cos(car.psi)*7-Math.sin(car.psi)*6;CRIME.jack={ped:scrPed(sx,sy,car.psi),t:0,phase:0}}}
-function evTick(dt){try{crimeTick(dt)}catch(e){console.error(e)}for(const v of EV.list)if(v.pair)try{evCrashTick(v,dt)}catch(e){v.t=0}
+function evTick(dt){try{slkTick(dt)}catch(e){}try{pullTick(dt)}catch(e){}try{crimeTick(dt)}catch(e){console.error(e)}for(const v of EV.list)if(v.pair)try{evCrashTick(v,dt)}catch(e){v.t=0}
   try{rwTick()}catch(e){}
   for(const v of EV.list){v.t-=dt;if(v.t<=0&&v.items.length){const S=new Set(v.items);cars=cars.filter(c=>!S.has(c))}}
   EV.list=EV.list.filter(v=>v.t>0);
@@ -5629,6 +5709,11 @@ function estGateTick(dt){const G=W2C.gate;if(!G)return null;let want=false;const
     return ["🎫 Guest pass for Kestrel Estates · $20",()=>{if(ECON.cash<20){toast("Not enough money");return}ECON.cash-=20;try{bankTx("Kestrel Estates guest pass",-20);bankSave()}catch(e){}G.pass=st.clock+240;beep(1100,.06,"sine",.12);toast("🎫 Welcome to Kestrel Estates · pass good for 4 minutes")}]}
   return null}
 // ---- school buses: on neighbourhood streets in the morning and mid-afternoon; they stop with red lights flashing, and passing one is a ticket
+// at a bus stop people get off and walk away along the sidewalk, and people waiting nearby walk to the door and get on
+function busPeds(c){if(Math.hypot(c.wx-car.px,c.wy-car.py)>220||st.people===false)return;const e=c.e,u=c.dir>0?c.s:e.L-c.s,ux=Math.cos(c.wh),uy=Math.sin(c.wh);
+  const a=ePt(e,u,walkT(e)),b=ePt(e,u,-walkT(e)),side=Math.hypot(a[0]-c.wx,a[1]-c.wy)<Math.hypot(b[0]-c.wx,b[1]-c.wy)?1:-1,cs=ePt(e,u,side*walkT(e)),door=[c.wx+(cs[0]-c.wx)*0.35+ux*2.5,c.wy+(cs[1]-c.wy)*0.35+uy*2.5];
+  const nOff=Math.floor(Math.random()*3);for(let i=0;i<nOff;i++){const p=newPed(e,clamp(u+(Math.random()-0.5)*6,2,e.L-2),side);const q=pedPos(p);Object.assign(p,{wx:door[0],wy:door[1],wz:q[2],mode:"corner",tx:q[0],ty:q[1],nxt:{mode:"walk"}});peds.push(p)}
+  for(const p of peds){if(p.mode!=="walk"||p.e!==e||p.side!==side||Math.abs(p.u-u)>28||Math.random()<0.4)continue;p.mode="board";p.tx=door[0];p.ty=door[1];p.bus=c}}
 function busTick(dt){const h=hourNow(),on=h>=7&&h<9.5||h>=14.5&&h<16.5;let n=0;for(const c of cars)if(c.bus)n++;
   if(on&&!MODELS.city_schoolbus&&!W2L.busLoad){W2L.busLoad=1;try{loadModel("city_schoolbus").catch(()=>{})}catch(e){}}
   if(on&&n<2&&st.started&&MODELS.city_schoolbus){W2L.busT-=dt;if(W2L.busT<=0){W2L.busT=25;const p=randomSpot(150,700);if(p&&/res|col|st/.test(p.e.type)&&p.e.n===1){const c=newCar(p.e,p.dir,p.s,0),m=MODELS.city_schoolbus.meta;c.bus=true;c.mdl="city_schoolbus";c.len=m.length;c.wid=m.width;c.paint="yellow";c.v0=Math.min(c.v0,11);c.stopIn=40+Math.random()*100;cars.push(c)}}}
@@ -5636,7 +5721,7 @@ function busTick(dt){const h=hourNow(),on=h>=7&&h<9.5||h>=14.5&&h<16.5;let n=0;f
   // city transit buses on the main streets all day: they stop every few blocks to pick people up
   {const day=h>=6&&h<22;let nt=0;for(const c of cars)if(c.transit)nt++;if(day&&!MODELS.city_bus&&!W2L.tbLoad){W2L.tbLoad=1;loadModel("city_bus").catch(()=>{})}
    if(day&&nt<(G().fullCars>=10?3:2)&&st.started&&MODELS.city_bus){W2L.tbT=(W2L.tbT??5)-dt;if(W2L.tbT<=0){W2L.tbT=20;const p=randomSpot(150,800);if(p&&p.e.n>=2&&!/xway|ramp|dirt|lane|res/.test(p.e.type)){const c=newCar(p.e,p.dir,p.s,0),m=MODELS.city_bus.meta;c.transit=true;c.mdl="city_bus";c.len=m.length;c.wid=m.width;c.paint="white";c.stopIn=150+Math.random()*250;cars.push(c)}}}
-   for(const c of cars){if(!c.transit)continue;if(c.tStop>0){c.tStop-=dt;c.v0=0.01;if(c.tStop<=0)c.stopIn=300+Math.random()*300}else if(!c.jn){c.v0=Math.min(c.v0,13.5);c.stopIn-=c.v*dt;if(c.stopIn<=0&&c.s>25&&c.s<c.e.L-40&&laneIdx(c)===0){c.tStop=9+Math.random()*6}}
+   for(const c of cars){if(!c.transit)continue;if(c.tStop>0){c.tStop-=dt;c.v0=0.01;if(c.tStop<=0)c.stopIn=300+Math.random()*300}else if(!c.jn){c.v0=Math.min(c.v0,13.5);c.stopIn-=c.v*dt;if(c.stopIn<=0&&c.s>25&&c.s<c.e.L-40&&laneIdx(c)===0){c.tStop=9+Math.random()*6;try{busPeds(c)}catch(e){}}}
      if(!day&&Math.hypot(c.wx-car.px,c.wy-car.py)>400)c.transit=false}}
   for(const c of cars)c.sbHold=false;
   for(const b of cars){if(!b.bus||!b.flash||b.v>1.5)continue;for(const c of cars){if(c===b||c.kind!=="ai"||c.e!==b.e)continue;const d=(c.s-b.s)*(c.dir===b.dir?1:-1);if(c.dir===b.dir&&d<0&&d>-45||c.dir!==b.dir&&!(b.e.m>0)&&Math.abs((b.e.L-c.s)-b.s)<45&&((b.e.L-c.s)>b.s))c.sbHold=true}}
@@ -8650,7 +8735,7 @@ precision highp float;
 #else
 precision mediump float;
 #endif
-varying vec3 vW,vN,vL,vC;varying float vDent;uniform vec2 uTy;uniform vec3 uC,uE,uSun,uSunC,uAmb,uEye,uFog,uTP;uniform vec3 uLP[3];uniform vec3 uLD[3];uniform float uLI[3];uniform vec2 uLC[3];uniform vec4 uMask[6];uniform float uHigh;uniform float uSp,uSh,uA,uFD,uPat,uTail;uniform vec4 uLm,uLs,uLg,uLw;
+varying vec3 vW,vN,vL,vC;varying float vDent;uniform vec2 uTy;uniform vec3 uC,uE,uSun,uSunC,uAmb,uEye,uFog,uTP;uniform vec3 uLP[3];uniform vec3 uLD[3];uniform float uLI[3];uniform vec2 uLC[3];uniform vec4 uMask[6];uniform vec4 uSL[6];uniform float uHigh;uniform float uSp,uSh,uA,uFD,uPat,uTail;uniform vec4 uLm,uLs,uLg,uLw;
 uniform vec2 uShC,uShF,uWX;uniform float uNt;uniform sampler2D uSnT;uniform vec3 uSnO;uniform vec4 uKO[10];uniform float uKOn;uniform float uBackOn;uniform sampler2D uTex;uniform vec3 uSO,uSU,uSV;
 float h(vec2 p){return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453);}
 float n2(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}
@@ -8691,6 +8776,7 @@ void main(){
    if(i<2){s*=mix(1.0-smoothstep(0.0,0.03,rd.y-uLD[i].y),1.0,uHigh);                 // low beam: sharp cut-off above the beam axis
      if(uHigh>0.5)for(int j=0;j<6;j++){s*=1.0-uHigh*0.92*step(0.5,uMask[j].w)*smoothstep(uMask[j].w,uMask[j].w+0.0015,dot(rd,uMask[j].xyz));}}   // matrix: shade other cars
    L+=vec3(1.0,0.94,0.82)*uLI[i]*s*max(dot(N,l),0.0)*140.0/(d*d+4.0);}
+ for(int i=0;i<6;i++){vec4 q=uSL[i];if(q.w<=0.0)continue;vec3 l=q.xyz-vW;float d=length(l);l/=d;float f=max(0.0,1.0-d/28.0);L+=vec3(1.0,0.8,0.52)*q.w*max(dot(N,l),0.0)*f*f*260.0/(d*d+10.0);}   // pools of light under the streetlights at night
  vec3 tl=uTP-vW;float td=length(tl);L+=vec3(1.0,0.06,0.03)*uTail*max(dot(N,tl/td),0.0)*1.5/(td*td+0.6);
  vec3 lE=uE;
  // lamps: the blinker part of the real headlight / taillight (outer half, the whole DRL on switchback cars, sweeping on sequential ones), amber or red, plus welcome sweeps
@@ -8715,7 +8801,7 @@ function sh(type,src){const s=gl.createShader(type);gl.shaderSource(s,src);gl.co
 function mkProg(lite){const p=gl.createProgram();gl.attachShader(p,sh(gl.VERTEX_SHADER,VS));gl.attachShader(p,sh(gl.FRAGMENT_SHADER,(lite?"#define LITE\n":"")+FS));gl.linkProgram(p);if(!gl.getProgramParameter(p,gl.LINK_STATUS))throw new Error("link: "+gl.getProgramInfoLog(p));return p}
 let prog;try{prog=mkProg(GFX_LITE)}catch(e){console.warn("full shader failed, using the light one",e);prog=mkProg(true)}gl.useProgram(prog);
 const U={};["uM","uVP","uC","uE","uSun","uSunC","uAmb","uEye","uFog","uTP","uHigh","uSp","uSh","uA","uFD","uPat","uTail","uShC","uShF","uNt","uBackOn","uTex","uSO","uSU","uSV","uTy","uKOn","uDentOn","uFl","uFlD","uLm","uLs","uLg","uLw","uWX","uGr","uSnT","uSnO"].forEach(n=>U[n]=gl.getUniformLocation(prog,n));U.uDent=gl.getUniformLocation(prog,"uDent");U.uKO=gl.getUniformLocation(prog,"uKO");
-["uLP","uLD","uLI","uLC","uMask"].forEach(n=>U[n]=gl.getUniformLocation(prog,n+"[0]"));
+["uLP","uLD","uLI","uLC","uMask","uSL"].forEach(n=>U[n]=gl.getUniformLocation(prog,n+"[0]"));
 const aP=gl.getAttribLocation(prog,"aP"), aN=gl.getAttribLocation(prog,"aN"), aC=gl.getAttribLocation(prog,"aC");if(aC>=0){gl.disableVertexAttribArray(aC);gl.vertexAttrib3f(aC,1,1,1)}
 gl.enable(gl.DEPTH_TEST);
 function b64(s,T){const bin=atob(s),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return new T(u.buffer)}
@@ -9391,6 +9477,7 @@ function worldScenery(){W2P.length=0;
   const tree=M_(),trunk=M_(),bld=[M_(),M_(),M_(),M_(),M_()],post=M_(),head=M_(),xl=SCN.stopLB,pole=M_(),pad=M_(),chg=M_(),stall=M_(),zebra=SCN.zebraB,
     plate=M_(),green=SCN.greenB,signW=M_(),signK=M_(),signG=M_(),signGW=M_(),house=M_(),roofs=M_(),patchD=M_(),patchL=M_(),crack=M_(),stopR=M_(),sigH=M_(),lens=M_(),sigPole=M_(),sigBP=M_(),sigY=M_(),lot=M_(),drive=M_(),furn=M_();
   collReset();SL.list=[];for(const e of EDGES)e.drv=null;
+  if(typeof W2_RB!=="undefined"&&W2)for(const b of W2_RB)if(!b.cul&&b.R>=20){SL.list.push({k:"sl_double",x:b.x,y:b.y,z:hillZ(b.x,b.y),h:(b.x*0.013+b.y*0.007)%Math.PI});collAdd({t:"c",x:b.x,y:b.y,r:0.2,what:"a streetlight"})}   // a double-arm light on each big roundabout's island
   const B=(m,x,y,z0,h,w,d,a)=>boxInto(m,x,z0+h/2,-y,w,h,d,a||0);
   const TE=(m,e,dir,s,o,z0,h,ls,lo)=>{const p=fpt(e,dir,s,o),zz=e.hz?ez(e,dir>0?s:e.L-s):0;boxInto(m,p[0],z0+zz+h/2,-p[1],ls,h,lo,p[2]);return p};
   const treeAt=(x,y,hb,big)=>{const hgt=(big?7:5)+r()*(big?9:3.5),rad=(big?2:1.5)+r()*(big?2:1.1),seg=7,z=-y;TREEP.set(Math.round(x*2)+","+Math.round(y*2),{h:hgt,r:rad,g:hb});
@@ -12633,7 +12720,16 @@ function headlights(cm,fwd,on){
     cand.sort((a,b)=>a[0]-b[0]);for(const [d,u] of cand.slice(0,6)){MK.set([u[0],u[1],u[2],Math.cos(Math.atan(1.5/d)+0.012)],n*4);n++}
     sys.masked=n}
   gl.uniform3fv(U.uLP,P);gl.uniform3fv(U.uLD,D);gl.uniform1fv(U.uLI,I);gl.uniform2fv(U.uLC,C);gl.uniform4fv(U.uMask,MK);gl.uniform1f(U.uHigh,high?1:0);
+  try{slLights()}catch(e){}
 }
+// the 6 streetlight heads nearest the camera light the road at night (the heads are where the arms end)
+const SLU=new Float32Array(24);
+function slLights(){SLU.fill(0);const nt=clamp(1-(GT.D??1)*1.4,0,1);if(nt>0.02&&SL.list.length&&U.uSL){const e=CULL.eye||[car.px,0,-car.py],ex=e[0],ey=-e[2],H=[];
+    for(const l of SL.list){const dx=l.x-ex,dy=l.y-ey;if(Math.abs(dx)>110||Math.abs(dy)>110)continue;const d2=dx*dx+dy*dy;if(H.length>=6&&d2>=H[H.length-1][0])continue;
+      const arms=l.k==="sl_double"?[2.4,-2.4]:[l.k==="sl_sidewalk"?0.9:2.3],zz=(l.z||0)+(l.k==="sl_sidewalk"?4.1:8.6),w=l.k==="sl_sidewalk"?0.55:1;
+      for(const a of arms){H.push([d2,l.x+Math.cos(l.h)*a,l.y+Math.sin(l.h)*a,zz,w])}H.sort((a,b)=>a[0]-b[0]);if(H.length>6)H.length=6}
+    H.forEach((q,i)=>SLU.set([q[1],q[3],-q[2],q[4]*nt],i*4))}
+  if(U.uSL)gl.uniform4fv(U.uSL,SLU)}
 // people (on foot, on bikes, in cars), deer, cones and falling rain / snow for this frame
 let dynFrame=-1;
 function dynBuild(eye,cm){if(dynFrame===GFX.frame)return;dynFrame=GFX.frame;CHARS=[];const ex=eye[0],ey=-eye[2],near=(x,y,r)=>(x-ex)*(x-ex)+(y-ey)*(y-ey)<r*r;if(W2)try{w2Dyn(near)}catch(e){console.error(e)}
@@ -13388,7 +13484,9 @@ const TABS={
     ${[5,10,20].map(k=>`<button class="opt" data-spawn="${k}"><b>Add ${k}</b><small>Random lanes and speeds</small></button>`).join("")}
     <button class="opt" data-spawn="0"><b>Clear traffic</b><small>Remove every AI car</small></button>
     <button class="opt" data-brain="1"><b>🧠 Traffic brain · Gen ${BRAIN.gen}</b><small>${BSYNC.shared?`Shared brain: ${(+BSYNC.shared.stops||0).toLocaleString()} stops and ${(+BSYNC.shared.cross||0).toLocaleString()} crossings from ${BSYNC.shared.devices} players · `:""}This device: ${BRAIN.stops.toLocaleString()} stops, ${BRAIN.cross.toLocaleString()} crossings, ${BRAIN.wait.toFixed(1)} s average wait · tap to reset</small></button>
+    <div class="note" style="grid-column:1/-1;margin:2px 0 6px;font-size:12.5px;line-height:1.5">🧠 What the brain has learned so far: drivers wait <b>${BRAIN.stopWait.toFixed(1)} s</b> for their turn at 4-way stops (started at 6), want <b>${Math.round(BRAIN.gapK*100)}%</b> of a normal gap before pulling out, and pedestrians give up waiting after <b>${Math.round(BRAIN.pedPat)} s</b> (started at 45)${BRAIN.pedGapK>1.01?` and leave <b>${Math.round(BRAIN.pedGapK*100)}%</b> more room to cars`:""}. ${BRAIN.scares} close calls and ${BRAIN.crashes} crashes taught it to be careful.</div>
     <button class="opt${brainOK()==="yes"?" on":""}" data-brainok="1"><b>Help the AI learn: ${brainOK()==="yes"?"on":"off"}</b><small>${brainOK()==="yes"?"Your traffic adds to the shared brain (anonymous). Tap to stop":"Send anonymous traffic stats so everyone's AI gets smarter. Tap to read and join"}</small></button>
+    <button class="opt" data-mbset="1"><b>🟧 Message boards: ${(MB_PRESETS.find(p=>JSON.stringify(p[1])===JSON.stringify(st.mbMsg||null))||["Your own text"])[0]}</b><small>Tap to change what the amber road work boards say (or write your own)</small></button>
     <button class="opt${st.emo!==false?" on":""}" data-emo="1"><b>Driver reactions ${st.emo!==false?"on":"off"}</b><small>😡😱😤 faces over drivers when they react to you</small></button></div>
     <p class="note">AI cars keep their distance, overtake slower cars after signalling, and move back right when there is room. They react to you, so you can test adaptive cruise, blind spot warnings and lane changes in real traffic.</p>`},
   tests(){return `<h3>Scenarios</h3><div class="grid2">
@@ -13473,6 +13571,11 @@ $("tabs").addEventListener("click",e=>{const t=e.target.closest(".tab");if(t){st
 $("tabBody").addEventListener("keydown",e=>{const t=e.target;if(t&&t.tagName==="INPUT"){e.stopPropagation();if(e.key==="Enter"){if(t.id==="mpCode")netAct("code");else if(t.id==="mpName")netAct("name");else if(t.id==="mpSrv")netAct("create","pub")}}});
 $("tabBody").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;const d=b.dataset;
   if(d.map){setMap(d.map);closeDrawer()}else if(d.trim){const k=d.trim;if(!MODELS[TRIMS[k].model]){toast("Loading that car…");loadModel(TRIMS[k].model).then(()=>{setTrim(k);renderTab()}).catch(()=>{toast("Couldn't load that car. Check your connection and tap it again.");try{renderCfg()}catch(e){}});return}setTrim(k)}else if(d.mym){const [id,i]=d.mym.split(":");mmSet(id,+i);const S=mmSpec().find(x=>x[0]===id);toast(`My Mode · ${S[1]}: ${S[2][+i]}`)}else if(d.mode){st.mode=+d.mode;toast(`Drive mode: ${modeName()}`)}else if(d.mp)netAct(d.mp,d.v);else if(d.sf){const k=d.sf;st["sf_"+k]=st["sf_"+k]===false;toast(`${sfName(k)} ${st["sf_"+k]===false?"off":"on"}`);renderTab()}else if(d.sfa){sfAct(d.sfa);renderTab()}else if(d.own){ownAct(d.own);if(!$("drawer").hidden)renderTab()}else if(d.tog)act(d.tog);else if(d.a)act(d.a);
+  else if(d.mbset!==undefined){const i=MB_PRESETS.findIndex(p=>JSON.stringify(p[1])===JSON.stringify(st.mbMsg||null));const nx=i<0?0:i+1;
+    if(nx<MB_PRESETS.length){st.mbMsg=MB_PRESETS[nx][1];toast("Message boards: "+MB_PRESETS[nx][0])}
+    else{let t=null;try{t=prompt("Write your own message board text.\nUse / between the two pages and | for a new line.\nExample: ROAD WORK|AHEAD / EXPECT|DELAYS","")}catch(e){}
+      if(t&&t.trim()){st.mbMsg=t.toUpperCase().slice(0,80).split("/").map(pg=>pg.split("|").map(x=>x.trim().slice(0,14)).filter(Boolean).slice(0,3)).filter(pg=>pg.length).slice(0,3);toast("Message boards: your own text")}else{st.mbMsg=null;toast("Message boards: Auto")}}
+    renderTab&&renderTab()}
   else if(d.brainok!==undefined){if(brainOK()==="yes"){try{localStorage.setItem("mstrata.brainOK","no")}catch(e){}toast("Stopped sending traffic stats");renderTab&&renderTab()}else brainAsk()}
   else if(d.brain!==undefined){for(const k of Object.keys(BRAIN))delete BRAIN[k];Object.assign(BRAIN,{gen:1,ev:0,stops:0,cross:0,wait:3,stopWait:6,gapK:1,pedPat:45,pedGapK:1,scares:0,crashes:0});brainSave();toast("Traffic brain reset: drivers and people start learning again");renderTab&&renderTab()}
   else if(d.emo!==undefined){st.emo=st.emo===false;toast(st.emo?"Driver reaction faces on":"Driver reaction faces off");renderTab&&renderTab()}
@@ -13519,7 +13622,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=239;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="173",BUILD_VER=240;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){const k=GFX.q==="auto"?GFX.eff:GFX.q;if(G.k!==k||G.v!==GFX.ovV||!G.m){G.k=k;G.v=GFX.ovV;const m={...GQ[k]};for(const o of GOPT)if(GFX.ov[o[0]]!==undefined)Object.assign(m,o[4](GFX.ov[o[0]]));if(Object.keys(GFX.ov).length)m.label=GQ[k].label+" (custom)";G.m=m;COLL.nt=!m.trees}return G.m}
