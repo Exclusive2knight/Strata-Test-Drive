@@ -1268,6 +1268,7 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
   <div class="nc">
     <div class="nh"><small>What's new</small><h2 id="newsVer">Version 223 · Real weather, snow plows and tow trucks</h2></div>
     <div class="nb">
+<h4>🚦 Red lights, screens and the mountain</h4><ul><li>AI drivers no longer swing out and go round you (or anyone else) when you're stopped at a red light or a stop line. They wait behind like normal people. They still go round cars that are actually broken down or crashed.</li><li>Autopilot and Full Self-Driving won't change lanes to get past cars waiting at a red light anymore. They queue up behind them.</li><li>Fixed the screens not lighting up in the refreshed Toyota, Lexus and Volvo models (Camry, RAV4, Highlander, Tacoma, Tundra, RX, LX, NX, XC90, XC60, EX90 and the rest). The cluster and centre screen now sit on the actual screens in the new dashboards.</li><li>Fixed the messed-up roundabout at the bottom of Mount Kestrel: Kestrel Pass and Ridge Rd used to come off the ring almost on top of each other in one squashed mouth. Kestrel Pass now leaves on its own to the south-east.</li><li>Fixed the dark slabs on the grass next to the mountain roads. The ground beside roads on a hillside used to stop dead in a sheer wall; it's a proper sloped bank now.</li></ul>
       <h4>🚗 Smarter AI on narrow roads</h4><ul><li>AI drivers now go round things blocking a two-lane road: a crash, cones, a broken-down or parked car. They wait for a gap in oncoming traffic, signal, cross the centre line, pass it, and pull back into their lane.</li><li>If they stopped too close to swing out, they back up a little first, then go round.</li><li>Fixed AI cars jumping sideways as they turned onto a new road. They now ease smoothly from their lane into the turn.</li></ul>
       <h4>🔧 Cars show up, wheels turn</h4><ul><li>The older cars (2018 RAV4, 2022 Camry, Land Cruiser 200, GX 460 and the rest) now show in the dealer and garage lists. They were in the game but missing from the list.</li><li>The refreshed Toyota, Lexus, Volvo, Honda and Nissan models and the new cars now load in the Claude version too. It was getting old copies of the cars from a cache.</li><li>Resetting your car no longer fills your tank or battery: fuel and charge stay where they were. If you call Roadside Assistance on empty, they leave you 2 gallons of gas, or a small charge for an EV.</li><li>AI cars turn their front wheels when they steer.</li></ul>
       <h4>💸 A real economy, robotaxis and fixes</h4><ul><li>The economy is alive. Oil prices move every day and jump on news (OPEC cuts, refinery fires, hurricanes, demand slumps). Pump prices follow wholesale up fast and come down slowly, like real life. Summer gas costs more, diesel goes up in winter, and every station prices a little differently (freeway stations charge more). Big moves show up as Market news on your phone.</li><li>Inflation slowly raises prices and gig pay. Loan rates follow a Fed rate that changes now and then. New-car prices and used-car values move with the market. Charging costs more at the afternoon peak, and Superchargers are cheaper late at night.</li><li>Your phone's wallet shows the economy: average gas and this week's change, the oil price, inflation, the Fed rate and the used-car market.</li><li>Tesla Cybercab robotaxis now drive around town. Nobody's at the wheel (there isn't one). They pull over with their hazards on to pick up and drop off riders. They're part of traffic only, so you can't drive or buy one.</li><li>Fixed invisible cones at crash scenes and breakdowns: you could hit them but not see them.</li><li>Billboards, amber message boards and road work signs now face the drivers coming toward them.</li><li>Attention reminders are back like the real cars (hands on the wheel, eyes on the road, Autosteer strikes). You can turn them off in Settings › Driver attention.</li></ul>
@@ -2298,7 +2299,7 @@ function buildNet2(){
   mkR("road","Ridge Rd",[[-4252,3050],[-3800,3400,300],[-2800,3400,300],[-2300,3000,200],[-1200,3150,300],[-300,3200,300],[800,3100,300],[1500,3000,250],[1900,2900]],{lim:50});
   // ---- Mount Kestrel: switchbacks up the south-east face, a flowing pass road down the north-west side, a loop round the summit
   const top1=w2Climb(-2850,1560,{s0:-1,g:0.07,dTh:0.45,Rh:18,rEnd:235,step:22,nodeEvery:14});
-  const top2=w2Climb(-4252,3050,{s0:1,g:0.065,dTh:0.7,Rh:34,rEnd:235,step:24,nodeEvery:14});
+  const top2=[[-4252,3050],[-4190,2990,22],...w2Climb(-4190,2990,{s0:1,g:0.065,dTh:0.7,Rh:34,rEnd:235,step:24,nodeEvery:14}).slice(1)];   // leaves the roundabout to the south-east, well clear of Ridge Rd (they used to share one squashed mouth)
   mkR("road","Kestrel Switchbacks",top1,{lim:25,mtn:1});
   mkR("road","Kestrel Pass",top2,{lim:35,mtn:1});
   {const [mx,my]=W2C.MT,a=top1[top1.length-1],b=top2[top2.length-1],t1=Math.atan2(a[1]-my,a[0]-mx);let t2=Math.atan2(b[1]-my,b[0]-mx);
@@ -2702,7 +2703,7 @@ function w2Blend(x,y,base){let sw=0,sz=0,A=0,under=1e9;
     if(e.ov&&overDeck(e,u)||e.br&&Math.abs(u-e.br.uc)<e.br.half)continue;
     const mm=mAt(e,u),dd=Math.abs(p.t)-(mm/2+e.n*LANE+e.side+auxW(e,u,p.t)+(e.T.walk||0)),zr=e.hz?ez(e,u):0;
     // never above the road (or its shoulder): a margin either side so the ground mesh can't slope up over the edge
-    if(dd<16&&p.u>=-2&&p.u<=e.L+2)under=Math.min(under,zr-0.15+Math.max(0,dd-1)*0.16);
+    if(p.u>=-2&&p.u<=e.L+2)under=Math.min(under,zr-0.15+Math.max(0,dd-1)*0.16+Math.max(0,dd-12)*0.7);   // then a cutting bank up to the hillside (it used to stop dead 16 m out, leaving a sheer dark wall on slopes)
     if(e.dip&&onDip(e,u)){under=Math.min(under,zr-0.3+Math.max(0,dd-12)*0.42);continue}   // the freeway cut: flat beside the shoulder, then the grass bank
     const a=1-smooth01(5,32,dd);if(a<=0)continue;const w=a*a*a+1e-4;sw+=w;sz+=w*zr;if(a>A)A=a}
   for(const n of gAt(GRID.n,x,y)){if(!n.pr)continue;const dd=Math.hypot(x-n.x,y-n.y)-n.pr;if(dd<0.6)under=Math.min(under,n.z-0.12);const a=1-smooth01(0.6,30,dd);if(a<=0)continue;const w=a*a*a+1e-4;sw+=w;sz+=w*n.z;if(a>A)A=a}
@@ -4897,7 +4898,7 @@ function aiVsPlayer(c,L,dt){if(st.walk||!st.started)return null;const dx=c.wx-ca
     const gap=fw-CARLEN,tail=pv>7&&gap<Math.max(3,pv*0.5)&&c.v>7;c.tgT=tail?(c.tgT||0)+dt:Math.max(0,(c.tgT||0)-dt*2);
     if(c.tgT>2.2&&(ag||(c.anger||0)>0.6||c.pers&&c.pers.k==="brisk"&&c.tgT>5)&&!(c.bcCd>0)&&L.gap>35){c.bcT=0.6+rnd()*0.4;c.bcCd=18;c.tgT=0;c.anger=(c.anger||0)+0.2}}
   else c.tgT=0;
-  if(L.who==="me"&&same&&fw<-3&&fw>-45){const gap=-fw-CARLEN,slow=pv<c.v0*0.72&&gap<32&&c.v0>8;
+  if(L.who==="me"&&same&&fw<-3&&fw>-45){const gap=-fw-CARLEN,slow=pv<c.v0*0.72&&pv>2.5&&gap<32&&c.v0>8&&!(c.cg<1e6);
     c.slowT=slow?(c.slowT||0)+dt:Math.max(0,(c.slowT||0)-dt);
     if(c.slowT>(ag?2:4)&&!(c.flCd>0)){c.flashT=1.1;c.flCd=ag?5:9;c.anger=(c.anger||0)+0.15;if(ag&&gap<20&&Math.hypot(dx,dy)<40&&rnd()<0.5){aiHonk(c);emoB(c,"annoyed",2)}}
     if((ag&&c.slowT>2.5||c.slowT>8)&&!c.jn&&c.e.n>1&&!c.lcPending&&Math.abs(c.offT-c.off)<0.05){const li=laneIdx(c);
@@ -5036,7 +5037,7 @@ function updateTraffic(dt){try{sfTick(dt)}catch(e){console.error(e)}
       if(c.lcPending){c.lcPending-=dt;if(c.lcPending<=0&&c.v<2.5&&dStop<40)c.lcPending=0.3;if(c.lcPending<=0){c.lcPending=0;if(laneSafe(c,c.lcTarget))c.offT=laneOff(c.e,c.lcTarget);else c.sig=0}}
       else if(Math.abs(c.offT-c.off)<0.05){c.lcT-=dt;
         if(c.needLane!==null&&li!==c.needLane&&dStop<35&&!c.lanePinned){const was=c.mv&&c.mv.t;planMove(c,"S");if(!c.mv)planMove(c,was);c.lanePinned=true}       // missed the lane: go straight on instead
-        const W_=L.who,blocked=W_&&W_!=="me"&&W_!=="ctrl"&&L.gap<90&&(W_.kind==="wreck"||W_.kind==="cone"||((W_.v||0)<0.3&&(W_.haz||(W_.idle||0)>6)));
+        const W_=L.who,blocked=W_&&W_!=="me"&&W_!=="ctrl"&&L.gap<90&&(W_.kind==="wreck"||W_.kind==="cone"||((W_.v||0)<0.3&&(W_.haz||(W_.idle||0)>6)&&!(W_.cg<1e6)&&W_.lw!=="ctrl"&&!W_.jn));
         if(blocked&&!c.lcPending){for(const t of [li+1,li-1])if(t>=0&&t<c.e.n&&laneSafe(c,t)){c.lcTarget=t;c.lcPending=1.0;c.sig=t>li?-1:1;break}}
         const want=c.needLane!==null&&dStop<260?Math.sign(c.needLane-li):0;
         if(want&&laneSafe(c,li+want)){c.lcTarget=li+want;c.lcPending=2.5;c.sig=want>0?-1:1}
@@ -6289,9 +6290,9 @@ function fsdDrive(dt,M,S){const prof={sloth:[0.96,1.7,1.9],chill:[1.0,2.0,1.6],s
   // where we drive next, and what is in the way
   const pts=futurePath(A,P,95);sys.fsdPts=pts;
   const OB=fsdObstacles(),G=pathGap(A,pts,OB);let gap=G.gap,vL=G.v;
-  {const W_=G.who,still=W_&&W_!=="me"&&W_!=="ctrl"&&(W_.kind==="wreck"||W_.kind==="cone"||W_.kind==="parked"||((W_.v||0)<0.3&&(W_.haz||(W_.idle||0)>8)));
+  {const W_=G.who,still=W_&&W_!=="me"&&W_!=="ctrl"&&(W_.kind==="wreck"||W_.kind==="cone"||W_.kind==="parked"||((W_.v||0)<0.3&&(W_.haz||(W_.idle||0)>8)&&!(W_.cg<1e6)&&W_.lw!=="ctrl"&&!W_.jn));   // a car waiting its turn at a light isn't "stuck"
    const c=Math.cos(car.psi),sn=Math.sin(car.psi),rel=o=>{const dx=o.x-car.px,dy=o.y-car.py;return [dx*c+dy*sn,-dx*sn+dy*c]};
-   const blockedIn=(lat,dmax)=>OB.some(o=>{if(o.o==="me")return false;const k=o.o.kind,st_=k==="wreck"||k==="cone"||k==="parked"||(o.v<0.3&&(o.o.haz||(o.o.idle||0)>8));if(!st_)return false;const [lx,ly]=rel(o);return lx>-6&&lx<dmax&&Math.abs(ly-lat)<1.9});
+   const blockedIn=(lat,dmax)=>OB.some(o=>{if(o.o==="me")return false;const k=o.o.kind,st_=k==="wreck"||k==="cone"||k==="parked"||(o.v<0.3&&(o.o.haz||(o.o.idle||0)>8)&&!(o.o.cg<1e6)&&o.o.lw!=="ctrl");if(!st_)return false;const [lx,ly]=rel(o);return lx>-6&&lx<dmax&&Math.abs(ly-lat)<1.9});
    if(!A.jn&&still&&G.gap<70&&!FSD.around&&!FSD.lcT&&!FSD.lcDoing){const li=laneIdx(A);let t=null;
      for(const k of [li+1,li-1])if(k>=0&&k<A.e.n&&laneSafe(A,k)&&!blockedIn(laneOff(A.e,k)-A.off,G.gap+40)){t=k;break}
      if(t!==null){FSD.lcT=0.9;FSD.lcTo=t;st.signal=t>li?-1:1;st.signalT=0;sys.fsdWhy="going around"}
@@ -8493,7 +8494,7 @@ function assist(dt){
   else{
     const lane=laneOf(M.off); let waiting=false;
     if(!sys.pilotLC&&st.autoLC&&st.acc){   // pass slower traffic, then move back right
-      const slow=lead&&gap<90&&lead.v<st.accSet-2.2; sys.slowT=slow?(sys.slowT||0)+dt:0;
+      const slow=lead&&gap<90&&lead.v<st.accSet-2.2&&lead.v>3&&!(M.sStop!==undefined&&M.sStop-M.s<150); sys.slowT=slow?(sys.slowT||0)+dt:0;   // not a queue at a light
       const rightFree=lane>M.lo&&S.list.every(t=>Math.abs(t.off-(lane-1)*LANE)>2.2||t.ds<-35||t.ds>110); sys.rightT=rightFree?(sys.rightT||0)+dt:0;
       if(sys.slowT>5&&lane<M.hi&&laneClearFor(S,1,true)&&!st.signal){st.signal=-1;st.signalT=0;sys.slowT=0;toast("Pilot: passing slower traffic")}
       else if(sys.rightT>(sys.rightNeed||(sys.rightNeed=15+Math.random()*5))&&!st.signal&&!(lead&&gap<60)){sys.rightNeed=0;st.signal=1;st.signalT=0;sys.rightT=0;toast("Pilot: moving back to the right lane")}
@@ -13709,7 +13710,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=244;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="173",BUILD_VER=245;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){const k=GFX.q==="auto"?GFX.eff:GFX.q;if(G.k!==k||G.v!==GFX.ovV||!G.m){G.k=k;G.v=GFX.ovV;const m={...GQ[k]};for(const o of GOPT)if(GFX.ov[o[0]]!==undefined)Object.assign(m,o[4](GFX.ov[o[0]]));if(Object.keys(GFX.ov).length)m.label=GQ[k].label+" (custom)";G.m=m;COLL.nt=!m.trees}return G.m}
