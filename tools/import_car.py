@@ -16,8 +16,8 @@ WHEEL = {"wheel_front_left": "FL", "wheel_front_right": "FR", "wheel_rear_left":
          "wheel_0_1": "FL", "wheel_0_-1": "FR", "wheel_1_1": "RL", "wheel_1_-1": "RR"}   # the heavy work-truck chassis names them by axle
 # work equipment that moves (plows, salt spreader, rollback deck, wheel-lift): each its own object, centred on its box
 EQUIP = re.compile(r"^(plow_A_frame|blade_left|blade_right|hopper|spinner_chute|rollback_deck|underlift|boom|warning_bar|tipping_body|gutter_brush_-?1|stop_arm|crossing_arm|(red|amber)_(left|right)_(front|rear))$")
-CABIN = re.compile(r"^(interior|headliner|driver_cab|passenger_seats|cabin_.*|driver_cluster|cluster_information_display|panoramic_display|center_touchscreen|flush_center_screen|period_dashboard|dash|dashboard_trim|steering_wheel)$")
-SCREEN_M = re.compile(r"blank display surface|display glass|display graphics|navigation", re.I)
+CABIN = re.compile(r"^(interior|headliner|driver_cab|passenger_seats|cabin_.*|driver_cluster|cluster_information_display|panoramic_display|center_touchscreen|flush_center_screen|period_dashboard|dash|dashboard|dashboard_trim|center_display|steering_wheel|steering_yoke)$")
+SCREEN_M = re.compile(r"blank display surface|blank center display|display glass|display graphics|navigation", re.I)
 
 
 def srgb(c):
@@ -120,9 +120,9 @@ def main(src, key, budget=60000, cab_budget=42000, wheels_only=False):
     for nd in sorted({p["node"] for p in parts if EQUIP.match(p["node"])}):
         d = collect(lambda p, nd=nd: p["node"] == nd); Vu = d[0][np.unique(d[1])]; lo_, hi_ = Vu.min(0), Vu.max(0); c_ = (lo_ + hi_) / 2
         out["objects"]["eq_" + nd] = build(d, 9000, c_); eq[nd] = (c_, lo_, hi_)
-    cab = collect(lambda p: CABIN.match(p["node"]) and p["node"] != "steering_wheel")
+    cab = collect(lambda p: CABIN.match(p["node"]) and p["node"] not in ("steering_wheel", "steering_yoke"))
     if cab: out["objects"]["cabin"] = build(cab, cab_budget)
-    sw = collect(lambda p: p["node"] == "steering_wheel"); steer_c = None
+    sw = collect(lambda p: p["node"] in ("steering_wheel", "steering_yoke")); steer_c = None
     if sw:
         steer_c = (sw[0][np.unique(sw[1])].min(0) + sw[0][np.unique(sw[1])].max(0)) / 2
         out["objects"]["steer"] = build(sw, 6000, steer_c)
@@ -191,7 +191,7 @@ def main(src, key, budget=60000, cab_budget=42000, wheels_only=False):
             r = lambda q: [round(float(t), 4) for t in q]
             bl = P([hi_[0], yf, lo_[2]]); br = P([lo_[0], yf, lo_[2]]); tl = P([hi_[0], yf, hi_[2]]); cc = P([(lo_[0] + hi_[0]) / 2, yf, (lo_[2] + hi_[2]) / 2])
             m["clu"] = {"bl": r(bl), "br": r(br), "tl": r(tl), "c": r(cc), "n": [0.0, 0.0, 1.0], "w": round(float(hi_[0] - lo_[0]), 4), "h": round(float(hi_[2] - lo_[2]), 4)}
-    s = quad("center_touchscreen") or quad("flush_center_screen")
+    s = quad("center_touchscreen") or quad("flush_center_screen") or quad("center_display")
     if s: m["scr"] = s
     if eq:   # page coords: centre and box of each equipment piece
         def box(lo_, hi_):
