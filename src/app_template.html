@@ -1268,6 +1268,7 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
   <div class="nc">
     <div class="nh"><small>What's new</small><h2 id="newsVer">Version 223 · Real weather, snow plows and tow trucks</h2></div>
     <div class="nb">
+<h4>⚡ Smoother frame rate</h4><ul><li>The game does a lot less work every frame: each 3D object now gets drawn in one quick step instead of about ten setup calls, and colours and settings that haven't changed aren't sent to the graphics card again. In our tests the time spent per frame dropped by about a third.</li><li>Streetlights near you are now merged into a handful of pieces per block instead of being drawn one lamp at a time (they were adding almost 90 extra draws per frame since they came in).</li></ul>
 <h4>🚦 Red lights, screens and the mountain</h4><ul><li>AI drivers no longer swing out and go round you (or anyone else) when you're stopped at a red light or a stop line. They wait behind like normal people. They still go round cars that are actually broken down or crashed.</li><li>Autopilot and Full Self-Driving won't change lanes to get past cars waiting at a red light anymore. They queue up behind them.</li><li>Fixed the screens not lighting up in the refreshed Toyota, Lexus and Volvo models (Camry, RAV4, Highlander, Tacoma, Tundra, RX, LX, NX, XC90, XC60, EX90 and the rest). The cluster and centre screen now sit on the actual screens in the new dashboards.</li><li>Fixed the messed-up roundabout at the bottom of Mount Kestrel: Kestrel Pass and Ridge Rd used to come off the ring almost on top of each other in one squashed mouth. Kestrel Pass now leaves on its own to the south-east.</li><li>Fixed the dark slabs on the grass next to the mountain roads. The ground beside roads on a hillside used to stop dead in a sheer wall; it's a proper sloped bank now.</li></ul>
       <h4>🚗 Smarter AI on narrow roads</h4><ul><li>AI drivers now go round things blocking a two-lane road: a crash, cones, a broken-down or parked car. They wait for a gap in oncoming traffic, signal, cross the centre line, pass it, and pull back into their lane.</li><li>If they stopped too close to swing out, they back up a little first, then go round.</li><li>Fixed AI cars jumping sideways as they turned onto a new road. They now ease smoothly from their lane into the turn.</li></ul>
       <h4>🔧 Cars show up, wheels turn</h4><ul><li>The older cars (2018 RAV4, 2022 Camry, Land Cruiser 200, GX 460 and the rest) now show in the dealer and garage lists. They were in the game but missing from the list.</li><li>The refreshed Toyota, Lexus, Volvo, Honda and Nissan models and the new cars now load in the Claude version too. It was getting old copies of the cars from a cache.</li><li>Resetting your car no longer fills your tank or battery: fuel and charge stay where they were. If you call Roadside Assistance on empty, they leave you 2 gallons of gas, or a small charge for an EV.</li><li>AI cars turn their front wheels when they steer.</li></ul>
@@ -5455,7 +5456,30 @@ function bbBuild(){const L=[];let h=12345;const rr=()=>{h=(h*1103515245+12345)>>
   BB.list=L;propLoad("bb_highway");propLoad("bb_hood")}
 // streetlights: the owner's models (single arm on the streets, double arm down boulevard medians, short lamps on downtown walks)
 const SL={list:[],pl:0};
-function slDraw(ex,ey,night){if(!SL.pl){SL.pl=1;for(const k of ["sl_single","sl_double","sl_sidewalk"])propLoad(k)}const lb=G().label,R=lb==="Ultra"||lb==="High"?300:lb==="Medium"?220:150,R2=R*R;
+// lamps near you are merged per 200 m map cell into two meshes (posts, glowing heads): a couple of draws per cell instead of four per lamp
+const SLC={CS:110,raw:null,cells:new Map(),byCell:null};
+function slCellBuild(key,L){const B={b:{P:[],N:[],C:[],I:[]},h:{P:[],N:[],C:[],I:[]}};let mnx=1e9,mny=1e9,mxx=-1e9,mxy=-1e9,top=0;
+  for(const l of L){const R=SLC.raw[l.k];if(!R)return null;const c=Math.cos(l.h),s=Math.sin(l.h),z=l.z||0,X=l.x,Y=l.y;mnx=Math.min(mnx,X);mxx=Math.max(mxx,X);mny=Math.min(mny,Y);mxy=Math.max(mxy,Y);top=Math.max(top,z+12);
+    for(const ob of R.objs)for(const [mi,start,count] of ob.g){const m=R.mats[mi],head=!!(m[4]||/diffuser/i.test(m[7]||"")),T=head?B.h:B.b,map=new Map();
+      for(let q=start;q<start+count;q++){const v=ob.I[q];let ix=map.get(v);if(ix===undefined){ix=T.P.length/3;map.set(v,ix);const lx=ob.P[v*3],ly=ob.P[v*3+1],lz=ob.P[v*3+2],nx=ob.N[v*3],ny=ob.N[v*3+1],nz=ob.N[v*3+2];
+          T.P.push(X+c*lx+s*lz,z+ly,-Y-s*lx+c*lz);T.N.push(c*nx+s*nz,ny,-s*nx+c*nz);T.C.push(m[0],m[1],m[2])}T.I.push(ix)}}}
+  const mk=T=>T.I.length?meshFrom(T.P,T.N,T.I,T.C):null,cx=(mnx+mxx)/2,cy=(mny+mxy)/2;
+  return {b:mk(B.b),h:mk(B.h),x:cx,y:cy,z:top/2,r:Math.hypot(mxx-mnx,mxy-mny)/2+12,used:0}}
+function slFree(o){if(!o)return;if(o.chunks){o.chunks.forEach(slFree);return}if(o.vao&&VAOX){if(VAO_CUR===o.vao)vaoOff();VAOX.deleteVertexArrayOES(o.vao)}for(const k of ["p","n","i","cb"])if(o[k])gl.deleteBuffer(o[k])}
+function slDraw(ex,ey,night){if(!SL.pl){SL.pl=1;for(const k of ["sl_single","sl_double","sl_sidewalk"])propLoad(k);Promise.all(["sl_single","sl_double","sl_sidewalk"].map(k=>propRaw(k))).then(r=>{if(r.every(Boolean))SLC.raw={sl_single:r[0],sl_double:r[1],sl_sidewalk:r[2]}})}
+  const lb=G().label,R=lb==="Ultra"||lb==="High"?300:lb==="Medium"?220:150,R2=R*R;
+  if(SLC.raw&&SL.list.length){const CS=SLC.CS;if(!SLC.byCell){SLC.byCell=new Map();for(const l of SL.list){const k=(l.k==="sl_sidewalk"?"w":"")+Math.floor(l.x/CS)+","+Math.floor(l.y/CS);let L=SLC.byCell.get(k);if(!L)SLC.byCell.set(k,L=[]);L.push(l)}}
+    const f=(SLC.fr=(SLC.fr||0)+1);let built=0;const i0=Math.floor((ex-R)/CS),i1=Math.floor((ex+R)/CS),j0=Math.floor((ey-R)/CS),j1=Math.floor((ey+R)/CS);
+    const cf_=gl.isEnabled(gl.CULL_FACE);gl.disable(gl.CULL_FACE);gl.uniform1f(U.uBackOn,0);
+    for(const w of ["","w"])for(let i=i0;i<=i1;i++)for(let j=j0;j<=j1;j++){const k=w+i+","+j,L=SLC.byCell.get(k);if(!L)continue;const Rk=w?R*0.63:R;let C=SLC.cells.get(k);
+      if(!C){if(built>=1){for(const l of L){const dx=l.x-ex,dy=l.y-ey,d2=dx*dx+dy*dy;if(d2>Rk*Rk||!PROPS[l.k])continue;if(!sphVis(l.x,(l.z||0)+4.5,-l.y,6,R))continue;propDraw(l.k,carMatrix(l.x,l.y,l.h+Math.PI/2,l.z||0,0,0),{head:night*1.2})}gl.disable(gl.CULL_FACE);gl.uniform1f(U.uBackOn,0);continue}
+        built++;C=slCellBuild(k,L);if(!C)continue;SLC.cells.set(k,C)}
+      C.used=f;if(Math.hypot(C.x-ex,C.y-ey)-C.r>Rk||!sphVis(C.x,C.z,-C.y,C.r+8,Rk+C.r))continue;
+      if(C.b){mat([1,1,1],null,0.45,40);draw(C.b)}if(C.h){const k_=night*1.2*3;mat([1,1,1],k_>0?[0.94*k_,0.95*k_,0.84*k_]:null,0.3,20);draw(C.h)}}
+    if(aC>=0&&VAO_CUR)vaoOff();if(aC>=0){gl.disableVertexAttribArray(aC);gl.vertexAttrib3f(aC,1,1,1);bind.col=false}
+    if(cf_)gl.enable(gl.CULL_FACE);
+    if(f%120===0)for(const [k,C] of SLC.cells)if(f-C.used>600){slFree(C.b);slFree(C.h);SLC.cells.delete(k)}
+    return}
   for(const l of SL.list){const dx=l.x-ex,dy=l.y-ey,d2=dx*dx+dy*dy;if(d2>R2||!PROPS[l.k])continue;if(l.k==="sl_sidewalk"&&d2>R2*0.4)continue;if(!sphVis(l.x,(l.z||0)+4.5,-l.y,6,R))continue;
     propDraw(l.k,carMatrix(l.x,l.y,l.h+Math.PI/2,l.z||0,0,0),{head:night*1.2})}}
 function bbDraw(ex,ey,night){if(!BB.list){try{bbBuild()}catch(e){BB.list=[]}}for(const b of BB.list){if((b.x-ex)**2+(b.y-ey)**2>b.far*b.far||!PROPS[b.k])continue;propDraw(b.k,carMatrix(b.x,b.y,b.h,groundAt(b.x,b.y).h||0,0,0),{head:night})}}
@@ -8991,7 +9015,25 @@ function applyVehicle(T){const M=T&&T.model&&MODELS[T.model];
   if(typeof PANO!=="undefined")panoSetup();
   if(typeof CLU!=="undefined"){if(VEH.clu&&!/^ex30/.test((TRIMS[st.trim]||{}).model||"")){const f=fitQuad(VEH.clu,CLU.W/CLU.H);CLU_BL=f.bl;CLU_BR=f.br;CLU_TL=f.tl;
     SCN.cluQuad=meshFrom([...CLU_BL,...CLU_BR,...CLU_BR.map((v,i)=>v+CLU_TL[i]-CLU_BL[i]),...CLU_TL],[0,0,1,0,0,1,0,0,1,0,0,1],[0,1,2,0,2,3])}else CLU_BL=null}}
-function bind(o){if(!o)o=bind.nul||(bind.nul=upload(new Float32Array(9),new Float32Array(9),new Uint16Array(0)));gl.bindBuffer(gl.ARRAY_BUFFER,o.p);gl.enableVertexAttribArray(aP);gl.vertexAttribPointer(aP,3,gl.FLOAT,false,0,0);
+// vertex array objects: each mesh remembers its buffer setup, so a draw is one bind instead of ~10 calls (that was a third of every frame).
+// Any other code touching attributes or the index buffer first drops back to the default setup, so it can't change a mesh's saved one.
+const VAOX=gl.getExtension("OES_vertex_array_object");let VAO_IN=false,VAO_CUR=null;
+// uniform cache: material colours and the like were re-sent for every draw even when nothing changed (the other big chunk of a frame)
+{const C=["uniform1f","uniform3fv","uniformMatrix4fv"],K=Object.keys(WebGLRenderingContext.prototype).filter(n=>/^uniform/.test(n)&&!C.includes(n));
+  for(const n of K){const f=gl[n];if(typeof f!=="function")continue;gl[n]=function(l){if(l)l._c=undefined;return f.apply(gl,arguments)}}
+  const u1=gl.uniform1f,u3=gl.uniform3fv,m4=gl.uniformMatrix4fv;
+  gl.uniform1f=function(l,v){if(l){if(l._c===v)return;l._c=v}u1.call(gl,l,v)};
+  gl.uniform3fv=function(l,a){if(l){if(a.length===3){const c=l._c;if(c&&c[0]===a[0]&&c[1]===a[1]&&c[2]===a[2])return;if(c&&c.length===3){c[0]=a[0];c[1]=a[1];c[2]=a[2]}else l._c=[a[0],a[1],a[2]]}else l._c=undefined}u3.call(gl,l,a)};
+  gl.uniformMatrix4fv=function(l,t,a){if(l&&a.length===16){let c=l._c;if(c&&c.length===16){let same=true;for(let i=0;i<16;i++)if(c[i]!==a[i]){same=false;break}if(same)return}else c=l._c=new Float32Array(16);c.set(a)}else if(l)l._c=undefined;m4.call(gl,l,t,a)}}
+function vaoOff(){if(VAO_CUR){VAOX.bindVertexArrayOES(null);VAO_CUR=null}}
+if(VAOX){for(const n of ["vertexAttribPointer","enableVertexAttribArray","disableVertexAttribArray"]){const f=gl[n];gl[n]=function(){if(VAO_CUR&&!VAO_IN)vaoOff();return f.apply(gl,arguments)}}
+  const fb=gl.bindBuffer;gl.bindBuffer=function(t,b){if(VAO_CUR&&!VAO_IN&&t===gl.ELEMENT_ARRAY_BUFFER)vaoOff();return fb.call(gl,t,b)};
+  const fu=gl.useProgram;gl.useProgram=function(q){if(VAO_CUR&&q!==prog)vaoOff();return fu.call(gl,q)}}
+function bind(o){if(!o)o=bind.nul||(bind.nul=upload(new Float32Array(9),new Float32Array(9),new Uint16Array(0)));
+  if(VAOX&&!bind.noVao){if(o.vao){if(VAO_CUR!==o.vao){VAOX.bindVertexArrayOES(o.vao);VAO_CUR=o.vao}return}
+    o.vao=VAOX.createVertexArrayOES();VAOX.bindVertexArrayOES(o.vao);VAO_CUR=o.vao;VAO_IN=true;bind.col=undefined;try{bind0(o)}finally{VAO_IN=false}return}
+  bind0(o)}
+function bind0(o){gl.bindBuffer(gl.ARRAY_BUFFER,o.p);gl.enableVertexAttribArray(aP);gl.vertexAttribPointer(aP,3,gl.FLOAT,false,0,0);
   gl.bindBuffer(gl.ARRAY_BUFFER,o.n);gl.enableVertexAttribArray(aN);if(o.n8)gl.vertexAttribPointer(aN,3,gl.BYTE,true,4,0);else gl.vertexAttribPointer(aN,3,gl.FLOAT,false,0,0);
   if(aC>=0){if(o.cb){gl.bindBuffer(gl.ARRAY_BUFFER,o.cb);gl.enableVertexAttribArray(aC);if(o.c8)gl.vertexAttribPointer(aC,3,gl.UNSIGNED_BYTE,true,4,0);else gl.vertexAttribPointer(aC,3,gl.FLOAT,false,0,0)}else if(bind.col!==false){gl.disableVertexAttribArray(aC);gl.vertexAttrib3f(aC,1,1,1)}bind.col=!!o.cb}
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,o.i)}
@@ -13710,7 +13752,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=245;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="173",BUILD_VER=246;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){const k=GFX.q==="auto"?GFX.eff:GFX.q;if(G.k!==k||G.v!==GFX.ovV||!G.m){G.k=k;G.v=GFX.ovV;const m={...GQ[k]};for(const o of GOPT)if(GFX.ov[o[0]]!==undefined)Object.assign(m,o[4](GFX.ov[o[0]]));if(Object.keys(GFX.ov).length)m.label=GQ[k].label+" (custom)";G.m=m;COLL.nt=!m.trees}return G.m}
