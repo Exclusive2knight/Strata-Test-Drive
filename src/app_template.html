@@ -1268,6 +1268,7 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
   <div class="nc">
     <div class="nh"><small>What's new</small><h2 id="newsVer">Version 223 · Real weather, snow plows and tow trucks</h2></div>
     <div class="nb">
+<h4>🌄 Far-away ground</h4><ul><li>The ground far away no longer stops at the draw distance: a light, low-detail copy of the land fills in the distance, so valleys way off don't show as gaps.</li></ul>
 <h4>⛰️ Kestrel roundabout and a real reverse gear</h4><ul><li>Fixed the roundabout at the bottom of Mount Kestrel throwing you into the air. The ring is flat now (it used to dip and rise up to 3 m on the slope), and the roads into it ease onto it gently instead of meeting it with a jump. Kestrel Pass's first turn is wider too.</li><li>Less ground poking up through the edges of roads that are cut into hillsides.</li><li>Reverse works like a real car now: full power through the reverse gear (it used to give you less than a third), so backing up steep hills and ramps actually works, and you can reverse at up to about 20-25 mph like a real car.</li></ul>
 <h4>💸 Money, the Roadster and hold-to-press pedals</h4><ul><li>Every 5 minutes of driving now pays you $2,000.</li><li>Jobs pay 2.5 times more: deliveries, rides, taxi, towing, roadside, plowing, freight and valet.</li><li>The Tesla Roadster is now at the dealer for everyone: $2,000,000. The SpaceX thrusters have a full minute of gas (the panel shows the seconds left), and they refill twice as fast.</li><li>New pedal option (Settings › Controls › Touch pedals): keep "Slide" for full control, or pick "Hold" and just hold the pedal down. It presses in by itself at the speed you choose (slow, medium or fast), separately for the gas and the brake.</li><li>Fixed two game errors: one when a tow truck's beacon lights came on, and one that could pop up while driving (seen in the Corolla Cross).</li></ul>
 <h4>🛠️ Reset fix</h4><ul><li>Resetting or jumping to a start point while you were up on a bridge or overpass could drop you on a totally different road, sometimes facing a barrier so the car wouldn't go anywhere (people saw this as cars like the Sonata "not driving"). You now always land on the road you picked.</li></ul>
@@ -9054,7 +9055,7 @@ function cullSet(VP,eye,maxD){const m=VP,pl=[];const r=i=>[m[i],m[4+i],m[8+i],m[
   for(const [a,sg] of [[r0,1],[r0,-1],[r1,1],[r1,-1],[r2,1]]){const q=[r3[0]+sg*a[0],r3[1]+sg*a[1],r3[2]+sg*a[2],r3[3]+sg*a[3]],l=Math.hypot(q[0],q[1],q[2])||1;pl.push([q[0]/l,q[1]/l,q[2]/l,q[3]/l])}
   CULL.pl=pl;CULL.eye=eye;CULL.vp=VP;if(maxD!==undefined)CULL.maxD=maxD}
 function sphVis(x,y,z,r,maxD){const e=CULL.eye;if(Math.hypot(x-e[0],y-e[1],z-e[2])-r>maxD)return false;if(CULL.pl)for(const p of CULL.pl)if(p[0]*x+p[1]*y+p[2]*z+p[3]<-r)return false;return true}
-function chunkVis(c,dd){const e=CULL.eye,d=Math.hypot(c.c[0]-e[0],c.c[1]-e[1],c.c[2]-e[2])-c.r,k=G().ddK||1,lim=CULL.sec?Math.min(CULL.maxD,420,dd?dd*0.6*k:1e9):dd?Math.min(dd*k,CULL.maxD):CULL.maxD;if(d>lim)return false;if(!CULL.pl)return true;
+function chunkVis(c,dd){const e=CULL.eye,d=Math.hypot(c.c[0]-e[0],c.c[1]-e[1],c.c[2]-e[2])-c.r,k=G().ddK||1,lim=CULL.sec?Math.min(CULL.maxD,420,dd?dd*0.6*k:1e9):dd<0?Math.max(CULL.maxD,Math.min(-dd,CULL.fogD||-dd)):dd?Math.min(dd*k,CULL.maxD):CULL.maxD;/* dd<0: drawn out to -dd */if(d>lim)return false;if(!CULL.pl)return true;
   for(const p of CULL.pl)if(p[0]*c.c[0]+p[1]*c.c[1]+p[2]*c.c[2]+p[3]<-c.r)return false;return true}
 function draw(o){if(o.chunks){const dd=o.dd;for(const c of o.chunks){if(chunkVis(c,dd)){c.ko=o.ko;draw(c)}else CULL.skip+=c.count}return}if(!o.count)return;if(KO.on!==!!o.ko){KO.on=!!o.ko;gl.uniform1f(U.uKOn,KO.on?1:0)}bind(o);gl.drawElements(gl.TRIANGLES,o.count,o.type||gl.UNSIGNED_SHORT,0)}
 
@@ -9124,6 +9125,16 @@ const TERR={};
 // the height of the drawn ground (the triangles as rendered) at a point
 function terrDrawn(x,y){const {N,NY,h}=TERR,fx=(x-WORLD.x0)/(WORLD.x1-WORLD.x0)*N,fy=(y-WORLD.y0)/(WORLD.y1-WORLD.y0)*NY,i=Math.floor(fx),j=Math.floor(fy),a=fx-i,b=fy-j,W=N+1;if(i<0||j<0||i>=N||j>=NY)return -9;
   const h00=h[j*W+i],h10=h[j*W+i+1],h01=h[(j+1)*W+i],h11=h[(j+1)*W+i+1];return a+b<=1?h00+(h10-h00)*a+(h01-h00)*b:h11+(h01-h11)*(1-a)+(h10-h11)*(1-b)}
+// the ground beyond the normal draw distance: a coarse copy (every 5th point of the detailed grid, sunk 1.2 m so the real ground always wins
+// where both draw). Without it, far valleys just stopped and you saw grey fog through holes in the grass that came and went as you drove
+function terrainFar(){const K=5,N=TERR.N,NY=TERR.NY,X0=WORLD.x0,X1=WORLD.x1,Y0=WORLD.y0,Y1=WORLD.y1,n=Math.floor(N/K),ny=Math.floor(NY/K),P=[],Nn=[],I=[];
+  const h=(i,j)=>TERR.h[Math.min(NY,j*K)*(N+1)+Math.min(N,i*K)];const dx=(X1-X0)*K/N,dy=(Y1-Y0)*K/NY;
+  for(let j=0;j<=ny;j++)for(let i=0;i<=n;i++){const x=X0+i*dx,y=Y0+j*dy,z=h(i,j)-1.2,gx=(h(Math.min(n,i+1),j)-h(Math.max(0,i-1),j))/(2*dx),gy=(h(i,Math.min(ny,j+1))-h(i,Math.max(0,j-1)))/(2*dy),l=Math.hypot(gx,gy,1);
+    P.push(x,z,-y);Nn.push(-gx/l,1/l,gy/l)}
+  for(let j=0;j<ny;j++)for(let i=0;i<n;i++){const a=j*(n+1)+i;I.push(a,a+1,a+n+1,a+1,a+n+2,a+n+1)}
+  return meshFrom(P,Nn,I)}
+function drawGroundFar(){const G_=SCN.groundFar;if(!G_||!G_.chunks)return;const e=CULL.eye,far=CULL.fogD||4800,near=CULL.maxD-80;
+  for(const c of G_.chunks){const d=Math.hypot(c.c[0]-e[0],c.c[1]-e[1],c.c[2]-e[2])-c.r;if(d<near||d>far)continue;let ok=true;if(CULL.pl)for(const p of CULL.pl)if(p[0]*c.c[0]+p[1]*c.c[1]+p[2]*c.c[2]+p[3]<-c.r){ok=false;break}if(ok)draw(c)}}
 function terrainMesh(){const N=W2?800:360,X0=WORLD.x0,X1=WORLD.x1,Y0=WORLD.y0,Y1=WORLD.y1,P=[],Nn=[],I=[];const NY=Math.round(N*(Y1-Y0)/(X1-X0));
   const onPad=(x,y)=>Math.abs(x-PAD.cx)<PAD.rad+8&&Math.abs(y-PAD.cy)<PAD.rad+8&&[[0,0],[7,0],[-7,0],[0,7],[0,-7]].some(([a,b])=>padHit(x+a,y+b));
   const H2=(x,y)=>{if(inCity(x,y)||inTC(x,y,4)||inExtra(x,y,6)||onPad(x,y))return -0.14;const d=dfAt(x,y);let z=Math.max(d<45?hillZ(x,y)+riverCut(x,y):terrainH(x,y,d),embZ(x,y));z=Math.min(z,cutZ(x,y));if(d<40)z=w2Blend(x,y,z);return z-0.08};
@@ -9254,7 +9265,7 @@ function buildWorld(){retailSites();placeExtras();
       if(n.ctrl!=="minor"&&e.T.z==="c"&&!e.T.rumble)for(let t=-W+0.5;t<W-0.3;t+=1.2){if(e.m>0&&Math.abs(t)<m2)continue;stripInto(zebra,e,t,t+0.6,0.011,Math.min(uAt(l.r-0.4),uAt(l.r-3.4)),Math.max(uAt(l.r-0.4),uAt(l.r-3.4)))}}}
   SCN.roadZ=[["c",mf(road.c)],["h",mf(road.h)],["d",mf(road.d)]];SCN.wear=[["c",mf(wear.c)],["h",mf(wear.h)],["d",mf(wear.d)]];SCN.lines=[mf(white)];SCN.ylines=mf(yellow);SCN.kerbs=[mf(kerb)];SCN.walk=mf(walk);
   SCN.rumble=[mf(rumble)];SCN.bikeL=mf(bikeL);SCN.zebraB=zebra;SCN.stopLB=stopL;SCN.greenB=green;
-  SCN.ground=terrainMesh();SCN.bumps=bumpMesh();SCN.tc=tcMesh();if(!W2||W2C.orp){try{orBuild()}catch(e){console.error(e)}setTimeout(()=>{try{SCN.or=orMesh()}catch(e){console.error(e)}},2500)}   // v173: the off-road park mesh builds after the game is up (faster loading)
+  SCN.ground=terrainMesh();try{SCN.groundFar=terrainFar()}catch(e){console.error(e)}SCN.bumps=bumpMesh();SCN.tc=tcMesh();if(!W2||W2C.orp){try{orBuild()}catch(e){console.error(e)}setTimeout(()=>{try{SCN.or=orMesh()}catch(e){console.error(e)}},2500)}   // v173: the off-road park mesh builds after the game is up (faster loading)
   worldScenery();
 }
 // the proving ground: concrete pad, the test sections as real height-mapped surfaces, paint, cones and section boards
@@ -12988,7 +12999,7 @@ function render(dt){
   gl.uniformMatrix4fv(U.uVP,false,VP); gl.uniform3fv(U.uEye,eye);cullSet(VP,eye);
   {const az=(GT.min/1440)*Math.PI*2-Math.PI/2,e=Math.max(0.12,GT.el??0.8);gl.uniform3fv(U.uSun,POST.sun=norm(D_<0.15?[0.3,0.5,0.2]:[Math.cos(az)*0.8,e+0.1,Math.sin(az)*0.6+0.25]))}
   gl.uniform3fv(U.uSunC,[0.03,0.035,0.05].map((v,i)=>lerp(v,[1.05,1.0,0.92][i]*[1,0.78+0.22*D_,0.55+0.45*D_][i],D_)).map(v=>v*(1-(wsky?ww*0.55:0)))); gl.uniform3fv(U.uAmb,[0.014,0.016,0.024].map((v,i)=>lerp(v,[0.30,0.34,0.40][i],D_)));
-  gl.uniform3fv(U.uFog,sky);gl.uniform1f(U.uNt,clamp(1-(GT.D??(night?0:1))*1.4,0,1));gl.uniform1i(U.uTex,0);WXR.u=[WXR.snow,WXR.wet*(1-WXR.snow)];gl.uniform2f(U.uWX,WXR.u[0],WXR.u[1]);snmBind();gl.uniform4f(U.uGr,0,0,0,0);if(WXR.flash>0.02)gl.uniform3fv(U.uAmb,[0.014,0.016,0.024].map((v,i)=>lerp(v,[0.30,0.34,0.40][i],D_)+WXR.flash*[0.9,0.95,1.1][i])); {const fd=(night?0.004:0.0011)+(wsky?ww*{rain:0.0032,snow:0.0055,fog:0.021}[wk]*(1+WXR.storm*(wk==="snow"?2.2:0.8)):0);gl.uniform1f(U.uFD,fd);CULL.maxD=Math.min(G().cullD||4800,3.6/Math.max(1e-4,fd))}
+  gl.uniform3fv(U.uFog,sky);gl.uniform1f(U.uNt,clamp(1-(GT.D??(night?0:1))*1.4,0,1));gl.uniform1i(U.uTex,0);WXR.u=[WXR.snow,WXR.wet*(1-WXR.snow)];gl.uniform2f(U.uWX,WXR.u[0],WXR.u[1]);snmBind();gl.uniform4f(U.uGr,0,0,0,0);if(WXR.flash>0.02)gl.uniform3fv(U.uAmb,[0.014,0.016,0.024].map((v,i)=>lerp(v,[0.30,0.34,0.40][i],D_)+WXR.flash*[0.9,0.95,1.1][i])); {const fd=(night?0.004:0.0011)+(wsky?ww*{rain:0.0032,snow:0.0055,fog:0.021}[wk]*(1+WXR.storm*(wk==="snow"?2.2:0.8)):0);gl.uniform1f(U.uFD,fd);CULL.fogD=3.6/Math.max(1e-4,fd);CULL.maxD=Math.min(G().cullD||4800,CULL.fogD)}
   const lampsOn=(st.lights||night)&&st.power!==false;
   headlights(cm,fwd,lampsOn);
   const braking=car.brake>0.05; gl.uniform3fv(U.uTP,M4.p(cm,VEH.tail)); gl.uniform1f(U.uTail,braking?1:(lampsOn?0.25:0));
@@ -13001,7 +13012,7 @@ function render(dt){
   gl.disable(gl.CULL_FACE);gl.uniformMatrix4fv(U.uM,false,M4.id());
   // layered flat surfaces: push lower layers back in depth so the road and paint never flicker at distance
   gl.enable(gl.POLYGON_OFFSET_FILL);
-  gl.polygonOffset(8,8);mat(st.surface==="snow"&&!wxOn()?[0.8,0.82,0.86]:MAP.ground,null,0.02,8,1,MAP.gpat);draw(SCN.ground);if(!CULL.sec){grassDraw();try{rwPropsDraw()}catch(e){}}
+  gl.polygonOffset(8,8);mat(st.surface==="snow"&&!wxOn()?[0.8,0.82,0.86]:MAP.ground,null,0.02,8,1,MAP.gpat);draw(SCN.ground);if(!CULL.sec)drawGroundFar();if(!CULL.sec){grassDraw();try{rwPropsDraw()}catch(e){}}
   gl.polygonOffset(7,7);mat([0.33,0.33,0.32],null,0.05,10,1,2);draw(SCN.plate);
   if(SCN.tc){const T_=SCN.tc;mat([0.42,0.42,0.4],null,0.05,10,1,2);draw(T_.conc);mat([0.55,0.5,0.43],null,0.08,12,1,2);draw(T_.sec);mat([0.09,0.09,0.095],null,0.2,30,1,2);draw(T_.asph);mat([0.33,0.29,0.25],null,0.1,10,1,2);draw(T_.cob);mat([0.36,0.3,0.22],null,0.05,8,1,1);draw(T_.grav);mat([0.40,0.38,0.35],null,0.1,10,1,2);draw(T_.rock);mat([0.20,0.14,0.09],null,0.25,30,1,1);draw(T_.mud);mat([0.92,0.94,0.97],null,0.2,20,1,2);draw(T_.snow);mat([0.76,0.66,0.47],null,0.03,6,1,1);draw(T_.sand);
     mat([0.85,0.7,0.1],null,0.2,20);draw(T_.paint);mat([0.95,0.38,0.05],null,0.2,20);draw(T_.dark);mat([0.55,0.55,0.55],null,0.3,20);draw(T_.post);mat([0.1,0.35,0.75],null,0.2,20);draw(T_.board);if(T_.rail){mat([0.62,0.64,0.66],null,0.6,40);draw(T_.rail)}try{orDraw()}catch(e){}tcSignsDraw()}
@@ -13764,7 +13775,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=250;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="173",BUILD_VER=251;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}try{const P=JSON.parse(localStorage.getItem("strata.ped")||"null");if(P){st.pedHold=+P.pedHold||0;st.thrRate=+P.thrRate||2;st.brkRate=+P.brkRate||2}}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){const k=GFX.q==="auto"?GFX.eff:GFX.q;if(G.k!==k||G.v!==GFX.ovV||!G.m){G.k=k;G.v=GFX.ovV;const m={...GQ[k]};for(const o of GOPT)if(GFX.ov[o[0]]!==undefined)Object.assign(m,o[4](GFX.ov[o[0]]));if(Object.keys(GFX.ov).length)m.label=GQ[k].label+" (custom)";G.m=m;COLL.nt=!m.trees}return G.m}
