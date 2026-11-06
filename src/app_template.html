@@ -1267,8 +1267,9 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
 <script data-boot>(function(){var p=0;window.__bootP=0;var t=setInterval(function(){if(window.__bootReal){clearInterval(t);return}p+=(0.7-p)*0.025;window.__bootP=p;var a=document.getElementById("bootArc"),n=document.getElementById("bootNeedle"),c=document.getElementById("bootPct");if(a)a.setAttribute("stroke-dasharray",(p*100).toFixed(1)+" 100");if(n)n.style.setProperty("--a",(-135+p*270)+"deg");if(c)c.textContent=String(Math.round(p*100))},120)})()</script>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 274 · Tidier settings, real mild hybrids</h2></div>
+    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 275 · Paddle shifting for automatics</h2></div>
     <div class="nb">
+      <h4>🕹️ Paddle shifting for automatics · Porsche cabin fixes</h4><ul><li>Automatic cars now have a manual mode. Press <b>[</b> or <b>]</b> (or the − / + buttons by the gear on a phone) while in D to shift yourself.</li><li>The gear shows the way each maker labels it. BMW, Mercedes, Audi, VW, Porsche, Honda, Ford, Hyundai and others show <b>M1–M8</b> and hold the gear you pick. Toyota and Lexus show <b>S1–S6</b> and Chevrolet, GMC, Cadillac and Buick show <b>L1–L10</b>: those set the highest gear the box may use.</li><li>Like the real cars, it shifts up for you at the rev limiter and down before the engine would bog. When you paddle in D (not Sport), it goes back to normal D after about 20 seconds of steady driving. Select D again to leave manual mode straight away.</li><li>CVT cars get 7 fixed steps that act like gears.</li><li>EVs and hybrids with a B position: the − paddle selects <b>B</b> (strong regen) and + goes back to D, and the HUD shows <b>B</b>. Other EVs use the paddles to step the regen level up and down.</li><li>The gear readout on the HUD and on the car clusters now shows M3, S4, L2 or B instead of just D.</li><li>Porsche: the door-mirror glass and blind-spot lights now sit on the real mirrors. On the Cayenne, Macan and Taycan, your seat moved back, so the rear-view mirror, screens and steering wheel are no longer right in your face.</li></ul>
 <h4>🗂️ Tidier settings, real mild hybrids</h4><ul><li>Settings are sorted so things are easier to find. New Display tab: HUD size and colors, the cluster screen, gauge cluster type and the brand display styles. World now has weather, temperature, road conditions, random events, traffic crashes and people. Controls has your controls and character. Car keeps drive modes, driving, shifting and the chassis. Driver attention moved to Assists.</li><li>Mild hybrids now work like the real ones (the ActiveHybrid 7 and every "mild hybrid" BMW, Volvo B5, Mercedes, Audi, Ram eTorque and the rest): they never drive on electricity alone, but the motor adds a shove of torque when you accelerate, charges its small battery when you lift off or brake, restarts the engine almost instantly at stop/start, and in Eco mode the engine shuts off so you can coast at 30 to 100 mph until you touch a pedal. The ActiveHybrid 7 has its real 15 kW motor.</li></ul>
 <h4>🎛️ BMW mode animations, green-first parking sensors</h4><ul><li>BMW displays change with the drive mode like the real ones: switch to Sport and a red sweep crosses the screen and it redraws as the red Track layout; Eco Pro sweeps blue into the Ergonomic layout; back to Comfort or Personal returns your own style. You can turn this off in Settings › BMW display style › Follow drive mode.</li><li>The 2011 BMW 535i and ActiveHybrid 7 now use BMW's round chrome needle dials with orange-red markings and small fuel and temperature dials.</li><li>Parking sensors in every car now go green first while there's room, yellow as you get close, and red inside 30 cm (1 ft) with one solid tone, like Audi's MMI display.</li></ul>
 <h4>🔵 BMW display styles</h4><ul><li>BMWs with a digital cluster get 7 display styles in Settings › BMW display style: Comfort (two round gauges with red bands and your car in the middle), Technological (the Live Cockpit chevrons), Ergonomic (hexagons with an economy bar), Minimalist (speed and gear in the middle between slim arcs, M stripes), Track (bold red arcs), Simple (one sweeping speed bar) and Classic dials (round chrome-ringed needle dials with orange-red markings, like the F-series X5).</li><li>Every style follows the drive mode: Sport turns the fills red, Eco Pro blue.</li></ul>
@@ -4214,12 +4215,20 @@ function physics(dt){if(TOWH.ride){towRide(dt);return}
     if(H.sail&&(thr>0.02||inp.brk>0.02||sp<12||st.acc)){H.sail=false;H.ssOff=false}
     if(!H.eng&&!H.stalled&&H.fuel>0&&st.power!==false&&st.power!=="acc"&&!(PB&&H.evOK)&&!H.sail&&(!H.ssOff||(inp.brk<0.12&&!sys.hold)||thr>0.02||!st.autoSS||st.gear!=="D"||sp>0.3)){H.eng=true;H.ssOff=false;const cold=!H.everRan;H.coldS=cold&&startSound(st.cam===1&&!st.walk?0.5:0.8);H.crank=cold?(H.coldS?0.75:0.6):PB&&PB.mild?0.12:0.3;H.everRan=true;H.runT=0}   // a starter-generator restarts the warm engine in a blink
     if(H.fuel<=0){H.eng=false}
-    if(D.cvt&&!rev){const want=D.idle+400+Math.pow(thr,1.1)*(D.red-900-D.idle);H.cvtR=H.cvtR||D.rmax;H.cvtR+=(clamp(want/(Math.max(Math.abs(ws),0.5)*D.fd*9.549),D.rmin,D.rmax)-H.cvtR)*Math.min(1,dt*2.5);H.gear=1}
+    if(st.manA&&manPrefix()==="M"&&!(MD().lvl>0)&&st.clock-(st.manP||0)>20&&thr<0.6){st.manA=false;setTimeout(()=>toast("Back to D"),0)}   // paddle in D (not Sport): drops back to automatic after a while, like BMW / VW / Honda
+    if(D.cvt&&!rev){const want=D.idle+400+Math.pow(thr,1.1)*(D.red-900-D.idle);H.cvtR=H.cvtR||D.rmax;
+      if(st.manA&&st.gear==="D"){const n=manSteps(),r=D.rmax*Math.pow(D.rmin/D.rmax,(st.manG-1)/(n-1));H.cvtR+=(r-H.cvtR)*Math.min(1,dt*6);   // stepped CVT: fixed ratios like gears
+        const rr=Math.abs(ws)*H.cvtR*D.fd*9.549;if(rr>D.red-150&&st.manG<n){st.manG++;manFlash()}else if(rr<D.idle+120&&st.manG>1&&thr<0.3){st.manG--;manFlash()}}
+      else H.cvtR+=(clamp(want/(Math.max(Math.abs(ws),0.5)*D.fd*9.549),D.rmin,D.rmax)-H.cvtR)*Math.min(1,dt*2.5);H.gear=1}
     const ratio=(rev?D.rev:D.cvt?H.cvtR:G[Math.max(1,H.gear)-1])*D.fd, rT=Math.abs(ws)*ratio*60/(2*Math.PI), rAt=gg=>Math.abs(ws)*G[gg-1]*D.fd*60/(2*Math.PI);
     // 8-speed shift schedule: light throttle short-shifts, full throttle holds to near the redline, kickdown on a stab of throttle
     if(rev)H.gear=1;
+    else if(st.manA&&st.gear==="D"&&!MAN&&(H.eng||PB)&&!gN&&!D.cvt&&!((H.shiftT||0)>0)&&!manRange()){   // manual mode (M): holds the gear you pick; at the limiter it shifts up for you, near stalling it shifts down
+      const tg=st.manG;if(rT>D.red-120&&H.gear<G.length){st.manG=Math.min(G.length,H.gear+1);manFlash()}else if(rT<D.idle+120&&H.gear>1){st.manG=Math.max(1,H.gear-1);manFlash()}
+      if(H.gear<st.manG&&rAt(H.gear+1)>D.idle+60){H.gear++;H.shiftT=0.1}else if(H.gear>st.manG&&rAt(H.gear-1)<D.red-100){H.gear--;H.shiftT=0.12;if(thr>0.2)downSnd()}}
     else if(!MAN&&(H.eng||PB)&&!gN&&!D.cvt&&!((H.shiftT||0)>0)){const sport=MD().lvl>0,up=Math.min(D.red-300,D.idle+950+Math.pow(thr,1.25)*(D.red-D.idle-1300)+(sport?700:0)),dn=1000+thr*2000+(sport?600:0);
-      if(H.gear<G.length&&rT>up&&rAt(H.gear+1)>D.idle+200){H.gear++;H.shiftT=sport?0.12:0.2}
+      if(st.manA&&st.gear==="D"&&H.gear>st.manG&&rAt(H.gear-1)<D.red-150){H.gear--;H.shiftT=0.15}   // range limit (S4 / L3): never above that gear
+      else if(H.gear<G.length&&rT>up&&rAt(H.gear+1)>D.idle+200&&!(st.manA&&st.gear==="D"&&H.gear>=st.manG)){H.gear++;H.shiftT=sport?0.12:0.2}
       else if(H.gear>1&&(rT<dn||(thr>0.85&&rAt(H.gear-1)<D.red*0.85&&(H.kdT||0)<=0))&&rAt(H.gear-1)<D.red-200){H.gear--;H.shiftT=0.22;H.kdT=0.5;if(thr>0.3||T.hybrid)downSnd()}}
     H.kdT=(H.kdT||0)-dt;if(H.shiftT>0)H.shiftT-=dt;
     // torque converter: slips and multiplies torque when pulling away, locks up once you're moving
@@ -6057,7 +6066,7 @@ function viewGo(d){const c=$("u2vc"),gh=$("u2vg");if(!c)return;const i=(VIEWS.in
   setTimeout(()=>{VIEW.anim=0},460);viewHead()}
 function gaugeTick(){const T=TRIMS[st.trim],v=Math.abs(car.vx),mph=spdUnit(v),sb=$("u2sbf");if(!sb)return;viewHead();
   const top=(T.vmax?T.vmax*2.237:0)>150||(T.kW||0)>330?180:140;sb.style.width=(clamp(mph/top,0,1)*100).toFixed(1)+"%";sb.parentNode.classList.toggle("over",!!sys.over&&!!sys.limit);
-  const g=manOn()&&st.gear==="D"?"D":st.gear;document.querySelectorAll("#u2prnd span").forEach(s=>s.classList.toggle("on",s.textContent===g||(s.textContent==="D"&&g==="S")));
+  const g=st.gear,gl=gearLabel();document.querySelectorAll("#u2prnd span").forEach((s,i)=>{const L="PRND"[i];if(L==="D"){const t=g==="D"&&gl!=="D"&&!/^D\d/.test(gl)?gl:"D";if(s.textContent!==t)s.textContent=t}s.classList.toggle("on",L===g||(L==="D"&&g==="S"))});
   const P=car.tq.reduce((a,q,i)=>a+q*car.w[i],0)/1000,mx=T.kW||200;$("u2pp").style.width=(clamp(P/mx,0,1)*80).toFixed(1)+"%";$("u2pr").style.width=(clamp(-P/(mx*0.4),0,1)*20).toFixed(1)+"%";
   const H=car.hyb,gearTxt=st.gear==="D"&&T.ice&&!T.cvt&&H.gear?` · ${H.gear}`:"",t=P<-1?`Regen +${hpN(-P)} hp${gearTxt}`:`Power ${hpN(Math.max(0,P))} hp${gearTxt}`,el=$("u2hpv");if(el.textContent!==t)el.textContent=t;
   let rng="";try{rng=`${Math.round(T.ice||T.hybrid?fuelRange():evRange())} mi`}catch(e){}const r=`${rng}${typeof ambF==="function"?` · ${Math.round(ambF())}°F`:""} · ${gtClock()}`,b=$("u2stR");if(b&&b.textContent!==r)b.textContent=r;
@@ -6170,7 +6179,7 @@ function ui2Init(){{const u=$("ui2");u.addEventListener("pointerdown",e=>{const 
    for(const b of document.querySelectorAll("#ui2 .u2va")){b.addEventListener("pointerdown",e=>{e.stopPropagation();e.preventDefault();viewGo(+b.dataset.d)});b.addEventListener("click",e=>e.stopPropagation())}}modesInit();ccInit();on("u2clu",()=>{if(st.cam!==1){st.cam=1}SCR.focusClu=!SCR.focusClu;SCR.focus=false});on("u2assist",()=>{RADIAL.mode="assist";radialToggle()});on("u2comfort",()=>{if(RADIAL.open&&RADIAL.mode==="comfort"){radialToggle(false);return}RADIAL.mode="comfort";radialToggle(true)});
   const horn=$("u2horn");horn.addEventListener("pointerdown",e=>{e.preventDefault();hornOn(true)});for(const ev of ["pointerup","pointerleave","pointercancel"])horn.addEventListener(ev,()=>hornOff());
   on("u2vol",()=>{const L=[0.5,0.8,1,0,0.25];au.vol=L[(L.indexOf(au.vol??0.5)+1)%L.length];if(au.master)au.master.gain.value=0.7*(au.vol===0?0:Math.max(0.3,au.vol*1.4));toast(au.vol?`Volume ${Math.round(au.vol*100)}%`:"Muted")});
-  on("u2gearsel",()=>{$("u2gearpop").hidden=!$("u2gearpop").hidden});on("u2up",()=>act("shiftDn"));on("u2dn",()=>act("shiftUp"));on("u2exit",()=>walkAction());
+  on("u2gearsel",()=>{$("u2gearpop").hidden=!$("u2gearpop").hidden});on("u2up",()=>act(manOn()?"shiftDn":"padUp"));on("u2dn",()=>act(manOn()?"shiftUp":"padDn"));on("u2exit",()=>walkAction());
   {const g=$("u2prs");g.addEventListener("pointerdown",e=>{e.stopPropagation();const b=e.target.closest("button[data-g]");if(!b)return;e.preventDefault();act("g"+b.dataset.g)});g.addEventListener("click",e=>e.stopPropagation())}
   $("u2gearpop").addEventListener("click",e=>{const b=e.target.closest("button[data-g]");if(b){act("g"+b.dataset.g);$("u2gearpop").hidden=true}});
   {const tb=$("u2terr");tb.addEventListener("pointerdown",e=>e.stopPropagation());tb.addEventListener("click",e=>{e.stopPropagation();if(!document.body.classList.contains("pc")){modesToggle("terr");return}act("terrain");tick(1)})}
@@ -6187,7 +6196,7 @@ function dockTick(){const D={};const k=$("u2key");if(!k)return;const lk=!!st.loc
 function ui2Tick(){if(!document.body.classList.contains("ui2")||GFX.frame%4)return;try{dockTick()}catch(e){}{const L=$("u2lim");if(L){const on=!!sys.limit&&!st.walk;if(L.hidden===on){L.hidden=!on;L.parentNode.classList.toggle("haslim",on)}if(on){const t=String(st.units==="mph"?sys.limit:Math.round(sys.limit*1.609/5)*5);if(L.lastChild.textContent!==t)L.lastChild.textContent=t;L.classList.toggle("over",!!sys.over)}}}document.body.classList.toggle("incab",st.cam===1&&!st.walk);document.body.classList.toggle("onfoot",!!st.walk);const T=TRIMS[st.trim],H=car.hyb,v=Math.abs(car.vx),set=(id,t)=>{const el=$(id);if(el&&el.textContent!==t)el.textContent=t},tog=(id,c,on)=>{const el=$(id);if(el)el.classList.toggle(c,!!on)};
   set("u2cash",Math.floor(ECON.cash).toLocaleString());const now=gDate(),hh=now.getHours();set("u2clock",gtClock());
   set("u2l0",String(ECON.lvl));set("u2l1",String(ECON.lvl+1));set("u2xpt",`${ECON.xp}/${xpNeed(ECON.lvl)}`);$("u2xpf").style.width=(ECON.xp/xpNeed(ECON.lvl)*100).toFixed(1)+"%";
-  set("u2spd",String(Math.round(spdUnit(v))));set("u2unit",st.units==="mph"?"mph":"km/h");set("u2gear",manOn()&&st.gear==="D"?(H.gear?String(H.gear):"N"):st.gear==="D"&&T.ice&&!T.cvt?"D"+(H.gear||1):st.gear);
+  set("u2spd",String(Math.round(spdUnit(v))));set("u2unit",st.units==="mph"?"mph":"km/h");set("u2gear",gearLabel());
   $("u2thr").style.width=(Math.max(inp.thr,sys.accThr||0)*50)+"%";$("u2brk").style.width=(Math.max(inp.brk,sys.aebBrake||0)*50)+"%";
   const fuel=T.ice||T.hybrid?H.fuel/H.tank:H.soc;$("u2fuel").style.width=(clamp(fuel,0,1)*100).toFixed(1)+"%";$("u2fuel").style.background=fuel<0.15?"#ff3b30":"#f2f2f2";
   const D=car.dmg||{f:0,r:0,l:0,rt:0},dmg=(D.f+D.r+D.l+D.rt)/4;$("u2hp").style.width=(Math.max(0.04,dmg)*100).toFixed(1)+"%";
@@ -6205,7 +6214,7 @@ function ui2Tick(){if(!document.body.classList.contains("ui2")||GFX.frame%4)retu
     if(on){let t,sub;if(T_.eModes){const m=T_.eModes.find(m=>m[0]===(st.eMode||"hyb"))||T_.eModes[0];t=m[1].toUpperCase();sub="EV MODE";eb.classList.toggle("on",m[0]==="ev");eb.classList.toggle("save",m[0]==="save"||m[0]==="charge")}
       else{t=(T_.evName||"EV").toUpperCase().replace(/ MODE$/,"");sub=st.evMode?"ON":"MODE";eb.classList.toggle("on",!!st.evMode);eb.classList.remove("save")}
       const b=eb.firstChild;if(b.textContent!==t){b.textContent=t;b.style.fontSize=t.length>11?"7px":t.length>8?"8px":""}if(eb.lastChild.textContent!==sub)eb.lastChild.textContent=sub}}
-  document.querySelectorAll("#u2gearpop button,#u2prs button").forEach(b=>b.classList.toggle("on",b.dataset.g===st.gear));{const m=!!manOn();$("u2up").hidden=$("u2dn").hidden=!m}
+  document.querySelectorAll("#u2gearpop button,#u2prs button").forEach(b=>b.classList.toggle("on",b.dataset.g===st.gear));{const m=!!manOn()||st.gear==="D";$("u2up").hidden=$("u2dn").hidden=!m}
   const msg=st.walk?"":st.power===false?(PC.on?"Hold S and press F to start your vehicle":"Press the start button to start your vehicle"):st.power==="acc"?(PC.on?"Accessory mode · hold S and press F to start":"Accessory mode · hold the brake and press start"):!st.belt&&v>2.5?"Fasten your seatbelt":"";set("u2msg",msg);try{viewSample();viewDraw();lvHud();modesRender();ccTick();gaugeTick();{const P=car.tq.reduce((a,q,i)=>a+q*car.w[i],0)/1000,mx=T.kW||200;$("u2pwp").style.setProperty("--p",(clamp(P/mx,0,1)*100).toFixed(0)+"%");$("u2pwn").style.setProperty("--p",(clamp(-P/(mx*0.4),0,1)*100).toFixed(0)+"%")}}catch(e){}}
 // ignition, as in the car: off -> accessory (screens and radio, no engine) -> running. Brake + start button starts it; in an EV
 // (Tesla and co.) the car is simply on when you get in.
@@ -7025,7 +7034,7 @@ function drawBrandCluster(g,W,H,v,key){const S=BCLU[key],C=cluCommon(),F=(s,w)=>
     const mw=W*0.29,mh=H*0.66,mx=W/2-mw/2,my=CY-mh/2;g.fillStyle="#08090b";rr2(g,mx,my,mw,mh,8);g.fill();g.strokeStyle="rgba(255,255,255,.12)";g.lineWidth=1;g.stroke();
     g.fillStyle=S.ana.num;g.font=F(13);g.fillText(C.clock,W/2-mw*0.3,my+16);g.fillText("68°F",W/2+mw*0.3,my+16);
     g.font=F(34,600);g.fillText(String(Math.round(sp)),W/2,CY-6);g.font=F(10);g.globalAlpha=0.7;g.fillText(mph?"MPH":"km/h",W/2,CY+18);g.globalAlpha=1;
-    g.fillStyle=hi;g.font=F(18,700);g.fillText(st.gear==="D"&&car.gear&&!C.ev?`D${car.gear}`:st.gear,W/2,my+mh-34);
+    g.fillStyle=hi;g.font=F(18,700);g.fillText(gearLabel(),W/2,my+mh-34);
     g.fillStyle=S.ana.num;g.font=F(10);g.fillText(`${C.T.ice||C.hyb?"⛽":"🔋"} ${C.rng(C.T.ice||C.hyb?fuelRange():evRange())} ${C.ru}  ·  ${modeName()}`,W/2,my+mh-14)}
   else{// ---- digital
     const ring=(cx,cy,frac,labels,isSpd)=>{g.lineCap="round";
@@ -7039,7 +7048,7 @@ function drawBrandCluster(g,W,H,v,key){const S=BCLU[key],C=cluCommon(),F=(s,w)=>
     // Audi virtual cockpit: smaller dials pushed out, the map fills the middle
     ring(LX,CY,leftFrac,leftLab,false);ring(RX,CY,sp/vmax,spdLab,true);
     g.fillStyle=S.ac;g.font=F(44,S.font+100);g.fillText(String(Math.round(sp)),RX,CY);g.font=F(11);g.globalAlpha=0.7;g.fillText(mph?"mph":"km/h",RX,CY+28);g.globalAlpha=1;
-    g.font=F(30,600);g.fillStyle=S.ac;g.fillText(st.gear==="D"&&car.gear&&!C.ev?`D${car.gear}`:st.gear,LX,CY);g.font=F(11);g.fillStyle=hi;g.fillText(modeName().toUpperCase(),LX,CY+28);
+    g.font=F(30,600);g.fillStyle=S.ac;g.fillText(gearLabel(),LX,CY);g.font=F(11);g.fillStyle=hi;g.fillText(modeName().toUpperCase(),LX,CY+28);
     if((C.hyb||C.ev)&&C.ready){g.fillStyle="#3ee08a";g.font=F(11);g.fillText(C.evMode?"EV":"READY",LX,CY-28)}
     const cx=W/2,mw=S.mid==="map"?W*0.3:W*0.36;
     if(S.mid==="map"){g.fillStyle="#0e1418";rr2(g,cx-mw/2,H*0.12,mw,H*0.7,10);g.fill();g.strokeStyle="#2a3a44";g.lineWidth=2;for(let i=0;i<6;i++){g.beginPath();g.moveTo(cx-mw/2+10,H*0.2+i*18);g.lineTo(cx+mw/2-10,H*0.15+i*22);g.stroke()}g.strokeStyle=hi;g.lineWidth=4;g.beginPath();g.moveTo(cx,H*0.78);g.lineTo(cx,H*0.3);g.lineTo(cx+30,H*0.2);g.stroke();g.fillStyle="#fff";g.beginPath();g.moveTo(cx,H*0.62);g.lineTo(cx-7,H*0.74);g.lineTo(cx+7,H*0.74);g.closePath();g.fill()}
@@ -7102,7 +7111,7 @@ function drawMBStyled(g,W,H,v,sty){const C=cluCommon(),F=CF2,mph=st.units==="mph
   const cx=W/2,cy=H*0.56,R=H*0.42,a0=Math.PI*0.75,a1=Math.PI*2.25,frac=C.ev||C.hyb?Math.max(0,C.pf):((C.H&&C.H.rpm)||0)/7000;
   g.strokeStyle="#3a0a0e";g.lineWidth=10;g.beginPath();g.arc(cx,cy,R,a0,a1);g.stroke();const gr=g.createLinearGradient(cx-R,0,cx+R,0);gr.addColorStop(0,"#ff7a1a");gr.addColorStop(1,"#ff1a2e");g.strokeStyle=gr;g.beginPath();g.arc(cx,cy,R,a0,a0+(a1-a0)*clamp(frac,0,1));g.stroke();
   for(let i=0;i<=7;i++){const a=a0+(a1-a0)*i/7;g.fillStyle="#ffd0d0";g.font=F(10,600);g.fillText(C.ev||C.hyb?["0","","","50","","","","100"][i]:String(i),cx+Math.cos(a)*(R-20),cy+Math.sin(a)*(R-20))}
-  g.fillStyle="#fff";g.font=F(48,600);g.fillText(String(Math.round(sp)),cx,cy-6);g.fillStyle="#ff8a8a";g.font=F(10,600);g.fillText(mph?"MPH":"KM/H",cx,cy+24);g.fillStyle="#fff";g.font=F(16,700);g.fillText(st.gear==="D"&&car.gear&&!C.ev?`D${car.gear}`:st.gear,cx,cy+48);
+  g.fillStyle="#fff";g.font=F(48,600);g.fillText(String(Math.round(sp)),cx,cy-6);g.fillStyle="#ff8a8a";g.font=F(10,600);g.fillText(mph?"MPH":"KM/H",cx,cy+24);g.fillStyle="#fff";g.font=F(16,700);g.fillText(gearLabel(),cx,cy+48);
   g.fillStyle="#ffb0b0";g.font=F(11,600);g.textAlign="left";g.fillText(C.ev||C.hyb?"POWER %":"x1000/min",14,16);g.textAlign="right";g.fillText(modeName().toUpperCase(),W-14,16);g.textAlign="center";
   cluCard(g,14,H*0.28,W*0.22,H*0.6,{ink:"#fff",sub:"#ff9a9a",acc:"#ff3a3a",line:"#3a0a0e",card:"#1a0507",good:"#7fe0b0",F},cluView()[0]==="off"?"trip":cluView()[0]);g.textAlign="center";g.textBaseline="middle";
   const rx=W-14-W*0.22;g.fillStyle="#1a0507";rr2(g,rx,H*0.28,W*0.22,H*0.6,8);g.fill();g.fillStyle="#ffb0b0";g.font=F(10,600);g.fillText("G-FORCE",rx+W*0.11,H*0.34);const gx=rx+W*0.11,gy=H*0.62,gr2=H*0.18;g.strokeStyle="#5a1218";g.lineWidth=1;g.beginPath();g.arc(gx,gy,gr2,0,7);g.stroke();g.beginPath();g.arc(gx,gy,gr2/2,0,7);g.stroke();
@@ -7145,7 +7154,7 @@ function drawBMWCluster(g,W,H,v,force){const mn=(modeName()||"").toUpperCase(),n
 function drawBMWClusterS(g,W,H,v,k){
   const C=cluCommon(),F=(s,w)=>`${w||400} ${s}px system-ui,sans-serif`,mph=st.units==="mph",sp=spdUnit(v),vmax=mph?160:260,mn=(modeName()||"").toUpperCase(),sport=/SPORT|TRACK/.test(mn),eco=/ECO/.test(mn),
     acc=sport?"#e5262b":eco?"#2f7bff":"#d8372f",acc2=sport?"rgba(229,38,43,":eco?"rgba(47,123,255,":"rgba(216,55,47,",rpm=((C.H&&C.H.rpm)||0)/1000,rf=C.ev||C.hyb&&!(C.H&&C.H.eng)?0.25+0.6*Math.max(0,C.pf):rpm/8,
-    gear=st.gear==="D"&&C.H&&C.H.gear&&!C.ev&&sport?`M${C.H.gear}`:st.gear,odo=Math.round(((st.odo&&st.odo[st.trim])??(TRIMS[st.trim].odo0||0)*1609.34)/(mph?1609.34:1000)),trip=(st.tripA||0)/(mph?1609.34:1000);
+    gear=gearLabel(),odo=Math.round(((st.odo&&st.odo[st.trim])??(TRIMS[st.trim].odo0||0)*1609.34)/(mph?1609.34:1000)),trip=(st.tripA||0)/(mph?1609.34:1000);
   g.fillStyle="#020306";g.fillRect(0,0,W,H);g.textBaseline="middle";g.textAlign="center";
   const T=(t,x,y,f,c,al)=>{g.font=f;g.fillStyle=c||"#eef1f6";g.textAlign=al||"center";g.fillText(t,x,y)};
   // bottom bar: fuel / charge gauge and range, clock, mode, outside temperature
@@ -7224,7 +7233,7 @@ function drawBMWCluster0(g,W,H,v){const C=cluCommon(),F=(s,w)=>`${w||400} ${s}px
     if(frac>0.5){g.lineTo(...P[1]);g.lineTo(q[0],q[1])}else g.lineTo(q[0],q[1]);g.stroke()};
   scale(-1,sp/vmax,mph?["0","20","40","60","80","100","120","140","160"]:["0","30","60","90","120","150","200","260"]);
   if(C.ev||C.hyb)scale(1,0.3+0.7*Math.max(0,C.pf),["CHARGE","","EFF","","","BOOST"]);else scale(1,((C.H&&C.H.rpm)||0)/7000,["0","1","2","3","4","5","6","7"]);
-  g.fillStyle="#f2f4f8";g.font=F(54,200);g.fillText(String(Math.round(sp)),W/2,H*0.42);g.font=F(12);g.fillText(mph?"mph":"km/h",W/2,H*0.58);g.font=F(20,500);g.fillText(st.gear==="D"&&car.gear&&!C.ev?`D${car.gear}`:st.gear,W/2,H*0.74);
+  g.fillStyle="#f2f4f8";g.font=F(54,200);g.fillText(String(Math.round(sp)),W/2,H*0.42);g.font=F(12);g.fillText(mph?"mph":"km/h",W/2,H*0.58);g.font=F(20,500);g.fillText(gearLabel(),W/2,H*0.74);
   g.fillStyle=sport?"#ff4a3a":"#ffb066";g.font=F(11,600);g.fillText(modeName().toUpperCase(),W/2,H*0.9);
   g.fillStyle="#e2e6ee";g.font=F(12);g.textAlign="left";g.fillText(`${C.rng(C.T.ice||C.hyb?fuelRange():evRange())} ${C.ru}`,W*0.06,H*0.95);g.textAlign="right";g.fillText(C.clock,W*0.94,H*0.95);g.textAlign="center";
   g.fillStyle="#1c69d4";g.fillRect(W/2-14,H*0.18,9,3);g.fillStyle="#6aa9ff";g.fillRect(W/2-4,H*0.18,9,3);g.fillStyle="#e2231a";g.fillRect(W/2+6,H*0.18,9,3);
@@ -7428,7 +7437,7 @@ function rav19Mid(g,x,y,w,h,C,v,fade,boot){g.save();g.beginPath();rr2(g,x,y,w,h,
   g.textAlign="center";g.font=CF2(28*k,500);g.fillText(String(Math.round(spdUnit(v))),cx-6,y+108*k);g.font=CF2(8*k,700);g.fillText(st.units==="mph"?"MPH":"km/h",cx+Math.max(22,18*k),y+116*k);
   g.fillStyle="#7fb6ff";g.font=CF2(9*k,600);g.fillText("Distance to Empty",cx,y+136*k);g.fillStyle="#fff";g.font=CF2(13*k,600);g.fillText(`${C.rng(fuelRange())} ${st.units==="mph"?"miles":"km"}`,cx,y+151*k);
   {const by=y+176*k,belt=!st.belt;g.fillStyle="#d8282a";g.font=CF2(8*k,800);g.textAlign="left";g.fillText("REAR",x+10,by);g.font=CF2(10*k,800);g.fillText("♙♙♙",x+40,by);if(belt){g.fillStyle="#ff3b2e";g.fillText("♙",x+w-20,by)}}
-  {const gy=y+h-12*k;g.fillStyle="rgba(255,255,255,.12)";g.fillRect(x+4,gy-9*k,w-8,1);g.textAlign="left";g.fillStyle="#fff";g.font=CF2(16*k,700);g.fillText(st.gear==="D"&&C.hyb&&st.regen===2?"B":st.gear,x+8,gy);g.textAlign="right";g.font=CF2(10*k,600);g.fillText(`ODO ${Math.floor(odoMiles())} mi`,x+w-8,gy)}
+  {const gy=y+h-12*k;g.fillStyle="rgba(255,255,255,.12)";g.fillRect(x+4,gy-9*k,w-8,1);g.textAlign="left";g.fillStyle="#fff";g.font=CF2(16*k,700);g.fillText(gearLabel(),x+8,gy);g.textAlign="right";g.font=CF2(10*k,600);g.fillText(`ODO ${Math.floor(odoMiles())} mi`,x+w-8,gy)}
   g.restore()}
 function drawRav19Cluster(g,W,H,v){const C=cluCommon(),now=performance.now();if(!RAV19.pw){RAV19.pw=true;RAV19.t0=now}const t=(now-RAV19.t0)/1000,seven=rav7();
   g.fillStyle="#000";g.fillRect(0,0,W,H);
@@ -11079,7 +11088,7 @@ function drawAudiNewCluster(g,W,H,v){const C=cluCommon(),F=CF2,red="#f50537";g.f
   const R=H*0.4,cy=H*0.52;bDial(g,W*0.17,cy,R,cluLeftF(C),cluLeftL(C),C.ev||C.hyb?"%  POWER":"1/min x1000",{track:"#1a1a1a",sweep:red,tick:"#bdbdbd",num:"#e6e6e6",w:3,sub:2});
   bDial(g,W*0.83,cy,R,cluSpeedF(v),cluSpeedL(),"",{track:"#1a1a1a",sweep:red,tick:"#bdbdbd",num:"#e6e6e6",w:3,sub:2});
   g.fillStyle="#fff";g.font=F(34,300);g.fillText(String(Math.round(spdUnit(v))),W*0.83,cy-2);g.fillStyle="#8a8a8a";g.font=F(9);g.fillText(st.units==="mph"?"mph":"km/h",W*0.83,cy+22);
-  g.fillStyle="#fff";g.font=F(26,300);g.fillText(st.gear==="D"&&car.gear&&C.T.ice?`D${car.gear}`:st.gear,W*0.17,cy-2);g.fillStyle=red;g.font=F(9,600);g.fillText((modeName()||"").toUpperCase(),W*0.17,cy+22);
+  g.fillStyle="#fff";g.font=F(26,300);g.fillText(gearLabel(),W*0.17,cy-2);g.fillStyle=red;g.font=F(9,600);g.fillText((modeName()||"").toUpperCase(),W*0.17,cy+22);
   // middle: road and car (Classic) or the J card
   const V=cluView()[0];if(V==="off"||V==="assist"){const cx=W/2;g.strokeStyle="#3a3a3a";g.lineWidth=2;g.beginPath();g.moveTo(cx-60,H*0.88);g.lineTo(cx-18,H*0.2);g.moveTo(cx+60,H*0.88);g.lineTo(cx+18,H*0.2);g.stroke();if(has("lka")&&(st.pilot||st.lka)){g.strokeStyle="#3fd08a";g.lineWidth=3;g.beginPath();g.moveTo(cx-60,H*0.88);g.lineTo(cx-18,H*0.2);g.moveTo(cx+60,H*0.88);g.lineTo(cx+18,H*0.2);g.stroke()}
     if(st.acc&&sys.ttc<8){g.fillStyle="#9a9a9a";rr2(g,cx-10,H*0.32,20,28,5);g.fill()}cluMe(g,cx,H*0.7,36,()=>{g.fillStyle="#d9d9d9";rr2(g,cx-13,H*0.6,26,46,9);g.fill()});if(st.acc){g.fillStyle=red;g.font=F(13,600);g.fillText(`${Math.round(spdUnit(st.accSet))}`,cx,H*0.12)}}else{cluCard(g,W*0.35,H*0.14,W*0.3,H*0.7,{ink:"#fff",sub:"#8a8a8a",acc:red,line:"#2a2a2a",card:"#111",good:"#3fd08a",F},V);g.textAlign="center";g.textBaseline="middle"}
@@ -13525,7 +13534,7 @@ function hud(dt){
   if(hudT>0)return; hudT=0.08;hudAssist();
   const T=TRIMS[st.trim], v=Math.abs(car.vx);
   $("spd").textContent=Math.round(spdUnit(v)); $("unit").textContent=st.units==="mph"?"mph":"km/h";
-  $("prnd").innerHTML=["P","R","N","D"].map(x=>x===st.gear?`<b>${x}${x==="D"&&T.ice&&!T.cvt?car.hyb.gear:""}</b>`:x).join(" "); document.querySelectorAll("#gears button").forEach(b=>b.classList.toggle("on",b.dataset.g===st.gear));$("dEpb").classList.toggle("on",!!sys.epb);
+  $("prnd").innerHTML=["P","R","N","D"].map(x=>x===st.gear?`<b>${x==="D"?gearLabel():x}</b>`:x).join(" "); document.querySelectorAll("#gears button").forEach(b=>b.classList.toggle("on",b.dataset.g===st.gear));$("dEpb").classList.toggle("on",!!sys.epb);
   const mp=$("modePill"); mp.textContent=modeName(); mp.style.color=MD().col;
   const ar=$("accRead"); ar.textContent=st.acc?`ACC ${Math.round(spdUnit(st.accSet))} · ${"▮".repeat(st.accGap)}${"▯".repeat(3-st.accGap)}${sys.accState==="following"?" · following":""}`:"ACC off"; ar.classList.toggle("on",st.acc);
   $("scrMode").textContent=modeName()+(T.height&&MD().height?` · ${inS(MD().height*1000)}`:"")+(terr()?" · "+terrList().o[st.terr-1]:"");
@@ -13795,6 +13804,7 @@ function act(a){ if(a==="codes"){closeDrawer();codeOpen();return} if(typeof a===
     case "cam":st.cam=(st.cam+1)%(has("tech")?4:2);$("screen").hidden=true;SCR.focus=false;if(st.cam===1)setTimeout(()=>toast("Tap the centre screen or the dash buttons · \"Screen\" leans in"),900);toast(`View: ${CAMS[st.cam]}`);break;
     case "gear":shiftTo(st.gear==="R"?"D":"R");break;
     case "shiftUp":case "shiftDn":{if(manOn()&&["D","N","R"].includes(st.gear)){manShift(a==="shiftUp"?1:-1);break}const O=["P","R","N","D"],i=O.indexOf(st.gear),j=clamp(i+(a==="shiftUp"?-1:1),0,3);if(j!==i)shiftTo(O[j]);break}
+    case "padUp":paddle(1);break;case "padDn":paddle(-1);break;
     case "gP":shiftTo("P");break; case "gR":shiftTo("R");break; case "gN":shiftTo("N");break; case "gD":shiftTo("D");break;
     case "epb":{const v=Math.abs(car.vx);if(sys.epb){if(st.gear==="P"){toast("In Park: shift to D or R and press Go to release");break}if(inp.brk<0.2&&v<0.5){toast("Press the brake to release the parking brake");beep(500,.1,"square",.12);break}sys.epb=false;beep(330,.08,"square",.12);toast("Parking brake released")}
       else{sys.epb=true;beep(250,.12,"square",.14);if(v>=2){sys.epbStop=true;toast("Emergency stop with the parking brake")}else toast("Parking brake on")}}break;
@@ -13812,7 +13822,7 @@ function act(a){ if(a==="codes"){closeDrawer();codeOpen();return} if(typeof a===
   }
   hudT=0; if(!$("drawer").hidden)renderTab();
 }
-function shiftTo(g){const v=car.vx,from=st.gear;if(g===from)return;if(sys.hose&&sys.hose.kind==="plug"&&g!=="P"){toast("Unplug the charge cable first: the car stays in Park while it's plugged in");tick(1);return}if(st.power!==true&&st.power!==undefined&&g!=="P"&&!sys.pa){toast(isEVT()?"Press the brake and the start button first":"Start the engine first: hold S and press F");beep(500,.12,"square",.15);return}
+function shiftTo(g){const v=car.vx,from=st.gear;if(g==="D"&&from==="D"&&st.manA){st.manA=false;toast("Back to D");return}if(g===from)return;st.manA=false;if(sys.hose&&sys.hose.kind==="plug"&&g!=="P"){toast("Unplug the charge cable first: the car stays in Park while it's plugged in");tick(1);return}if(st.power!==true&&st.power!==undefined&&g!=="P"&&!sys.pa){toast(isEVT()?"Press the brake and the start button first":"Start the engine first: hold S and press F");beep(500,.12,"square",.15);return}
   if(g==="P"&&Math.abs(v)>0.8){toast("Stop before shifting to Park");beep(500,.12,"square",.15);return}
   if(from==="P"&&inp.brk<0.2&&!sys.hold&&!sys.pa&&PC.on){toast("Press the brake to shift out of Park");beep(500,.12,"square",.15);return}
   if((g==="R"&&v>2)||(g==="D"&&v<-2)){toast("Slow down before changing direction");beep(500,.12,"square",.15);return}
@@ -14077,7 +14087,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=274;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="173",BUILD_VER=275;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}try{const P=JSON.parse(localStorage.getItem("strata.ped")||"null");if(P){st.pedHold=+P.pedHold||0;st.thrRate=+P.thrRate||2;st.brkRate=+P.brkRate||2}}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){const k=GFX.q==="auto"?GFX.eff:GFX.q;if(G.k!==k||G.v!==GFX.ovV||!G.m){G.k=k;G.v=GFX.ovV;const m={...GQ[k]};for(const o of GOPT)if(GFX.ov[o[0]]!==undefined)Object.assign(m,o[4](GFX.ov[o[0]]));if(Object.keys(GFX.ov).length)m.label=GQ[k].label+" (custom)";G.m=m;COLL.nt=!m.trees}return G.m}
@@ -14132,7 +14142,7 @@ window.addEventListener("keydown",e=>{const k=(e.key||"").toLowerCase();{const t
   if(k==="r"&&st.started){resetNearest();return}if(e.key==="F2"){e.preventDefault();hudHide();return}if(k==="u"){const on=!(st.rAeb||st.aebAuto!==false);st.rAeb=on;st.aebAuto=on;if(!on){sys.rAebBrake=0;sys.aebBrake=0}toast(on?"Auto braking on, front and rear (U)":"Auto braking off, front and rear (U): the collision warnings still beep, but you have to brake");return}if(k==="j"&&!st.walk){cluViewNext(e.shiftKey?-1:1);return}if(k==="v"){st.cam=st.cam===1?0:1;$("screen").hidden=true;SCR.focus=false;toast(st.cam===1?"Inside view":"Outside view");return}
   if(k==="b"){st.belt=!st.belt;beep(st.belt?1400:700,.05,"square",.1);toast(st.belt?"Seatbelt fastened":"Seatbelt unfastened");return}
   if(k==="k"){st.fog=!st.fog;tick(1);toast(st.fog?"Fog lights on":"Fog lights off");return}
-  const KM={j:"high",l:"lights",z:"sigL",c:"sigR",x:"hazard",e:"shiftDn",q:"shiftUp",p:"epb","\\":"acc","+":"accUp","=":"accUp","-":"accDown","_":"accDown"};if(KM[k]&&!(st.walk&&["shiftUp","shiftDn","epb"].includes(KM[k])))act(KM[k]);
+  const KM={j:"high",l:"lights",z:"sigL",c:"sigR",x:"hazard",e:"shiftDn",q:"shiftUp","]":"padUp","[":"padDn",p:"epb","\\":"acc","+":"accUp","=":"accUp","-":"accDown","_":"accDown"};if(KM[k]&&!(st.walk&&["shiftUp","shiftDn","epb"].includes(KM[k])))act(KM[k]);
   if([" ","arrowup","arrowdown","arrowleft","arrowright"].includes(k))e.preventDefault()});
 window.addEventListener("keyup",e=>{const k=(e.key||"").toLowerCase();inp.keys[k]=false;if(k==="h")hornOff();if(k==="shift"){const tap=!inp.shUsed&&performance.now()-(inp.shT||0)<400;inp.shUsed=false;if(tap&&!st.walk&&!manOn())act("epb")}});
 document.addEventListener("gesturestart",e=>e.preventDefault());
@@ -15989,6 +15999,20 @@ try{if(localStorage.getItem("mstrata.manual"))st.manual=true}catch(e){}
 const MANUAL_REAL=new Set(["honda_civic_si_sedan_si","honda_civic_type_r_tr","acura_integra_tys","civic_si","must07_v6","must07_gt","must07_gtp","must07_gt500"]);
 function manOK(){const T=TRIMS[st.trim],D=DRIVES[st.trim];return !!(MANUAL_REAL.has(st.trim)&&T&&T.ice&&!T.hybrid&&D&&D.gears&&!D.cvt&&!D.par)}
 function manOn(){return !!(st.manual&&manOK())}
+// automatic gearboxes in manual mode, the way each maker does it: Toyota / Lexus "S" with the top gear allowed (S4), GM "L" range (L3),
+// everyone else "M" holding the gear you pick (M3). CVTs and Toyota hybrids get fixed steps. Hybrids and EVs also have "B" for strong regen.
+function manPrefix(){const b=brandS();return /^(Toyota|Lexus)$/.test(b)?"S":/^(Chevrolet|GMC|Cadillac|Buick)$/.test(b)?"L":"M"}
+function manRange(){return /^(Toyota|Lexus|Chevrolet|GMC|Cadillac|Buick)$/.test(brandS())}
+function manSteps(){const D=DRIVES[st.trim];return TRIMS[st.trim].hybrid?6:D&&D.cvt?7:(D&&D.gears?D.gears.length:6)}
+function manFlash(){st.manShow=performance.now()}
+function gearLabel(){const T=TRIMS[st.trim],H=car.hyb,D=DRIVES[st.trim]||{},g=st.gear;if(g!=="D")return g;if(manOn())return H.gear?String(H.gear):"N";
+  if(st.manA)return manPrefix()+st.manG;if(T.bMode&&st.regen===2)return "B";if(T.ice&&!D.cvt&&D.layout==="ice")return "D"+(H.gear||1);return "D"}
+function paddle(d){const T=TRIMS[st.trim],D=DRIVES[st.trim]||{},H=car.hyb;if(manOn()){manShift(d);return}if(st.gear!=="D"){toast("Paddles work in D");return}
+  if(isEVT()||D.layout!=="ice"){if(T.bMode){st.regen=d<0?2:1;toast(d<0?"B: strong regenerative braking":"D");beep(900,.05,"sine",.12)}   // B / D cars: the paddle picks B or D
+    else if(isEVT()){const mx=T.regenMax??3;st.regen=clamp(st.regen-d,0,mx);toast(["Regen off","Regen low","Regen standard","One-pedal"][st.regen]);beep(900,.05,"sine",.12)}   // EVs: paddles step the regen level (like Hyundai / Kia / GM)
+    else toast("No paddle shifters on this car");return}
+  const n=manSteps();if(!st.manA){st.manA=true;st.manG=D.cvt||T.hybrid?Math.max(1,Math.min(n,4)):Math.max(1,(H.gear||1));}
+  st.manG=clamp(st.manG+d,1,n);st.manP=st.clock;manFlash();beep(d>0?1100:800,.04,"square",.08)}
 function manClutchIn(){return !!((inp.keys.shift&&!st.walk)||MANUI.clutch||(WHL.clu!=null&&WHL.clu>0.85))}
 function manShift(d){const H=car.hyb,G=DRIVES[st.trim].gears;if(H.eng&&!manClutchIn()){beep(90,0.18,"sawtooth",0.22);toast("Grind! Press the clutch (Shift) to change gear");return}
   if(st.gear==="R"){if(d>0){shiftTo("D");H.gear=0}return}if(st.gear!=="D"){shiftTo("D");H.gear=0;return}
