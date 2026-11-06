@@ -1267,8 +1267,9 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
 <script data-boot>(function(){var p=0;window.__bootP=0;var t=setInterval(function(){if(window.__bootReal){clearInterval(t);return}p+=(0.7-p)*0.025;window.__bootP=p;var a=document.getElementById("bootArc"),n=document.getElementById("bootNeedle"),c=document.getElementById("bootPct");if(a)a.setAttribute("stroke-dasharray",(p*100).toFixed(1)+" 100");if(n)n.style.setProperty("--a",(-135+p*270)+"deg");if(c)c.textContent=String(Math.round(p*100))},120)})()</script>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 259 · Real traffic lights</h2></div>
+    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 260 · Protected lefts, span-wire lights, smarter AEB</h2></div>
     <div class="nb">
+<h4>🚦 Protected lefts, span-wire lights, smarter AEB</h4><ul><li>Lights on roads with two or more lanes each way now run real protected left turns: both directions get a green arrow first (7 s), then a yellow arrow, then the through green while lefts get a flashing yellow arrow (turn when it's clear). AI drivers follow it.</li><li>Downtown, those left lanes get the 5-lamp "doghouse" signal: red, yellow and green balls for going straight plus a green and yellow arrow for turning left. Out of town it's the 4-lamp flashing-yellow-arrow head.</li><li>Country crossroads now have lights hanging from steel cables strung between two poles instead of mast arms.</li><li>Walk signals wait until the through green, so they never clash with a protected left.</li><li>Automatic emergency braking now predicts where every nearby car is going over the next 2.5 seconds, not just the car ahead, so it can brake for someone running a red across you, turning left in front of you, or pulling out of a side street.</li><li>Parking sensors stop beeping once you've stopped (the warning bars on the screen stay).</li></ul>
 <h4>🚦 Real traffic lights</h4><ul><li>Every signal now uses real-looking signal heads: cast housings with service doors, tunnel visors and reflective-bordered backplates. Downtown heads are yellow, everywhere else they're black.</li><li>The left lane at bigger lights gets a real 4-lamp flashing-yellow-arrow head: red arrow, steady yellow arrow, and a flashing yellow arrow when you can turn left after yielding.</li></ul>
 <h4>🟢 Live traffic on Maps, guardrails, slower clock</h4><ul><li>Maps (phone and car) colours your route by live traffic: green where cars are moving, orange where they're slow, red where they're stopped or there's a crash.</li><li>The game clock runs slower: one game minute now takes 40 real seconds (it was 1 second), so days and nights last much longer. Arrival times in Maps follow the new clock.</li><li>New steel W-beam guardrails with flared ends along the freeways and ramps wherever the ground drops away beside the road. You can hit them.</li><li>The old pole lights down the freeway median are gone; the new double-arm streetlights replace them.</li><li>Tyres are round now: they roll up onto kerbs and over lips with the front of the tread instead of popping up all at once.</li><li>Gravity only pulls you down a slope through the tyres that are touching the ground, so in the air you keep your speed and line instead of sliding downhill.</li></ul>
 <h4>🚦 Wilder traffic, smooth ramps, no more grey grass</h4><ul><li>Fixed the grey patches that kept showing up over the grass around the map: the downtown pavement was sometimes being drawn out over the fields.</li><li>The freeway ramps at Kestrel Rd (on the mountain) no longer cut into the freeway. Where a ramp runs beside the freeway it now sits at the same height, so cars don't get kicked up when they merge or exit.</li><li>Traffic can crash into traffic for real now: if two cars actually hit each other, they stop with hazards on and the police and tow trucks come to clear it.</li><li>New reckless drivers (about 1 in 12, more late at night): they speed, tailgate, cut across lanes, floor it on yellow, sometimes run a fresh red, and roll through stop signs.</li><li>Drivers stuck behind something blocking a two-lane road decide for themselves: aggressive ones honk and go around fast with a tighter gap, calm ones wait longer and only pass with lots of room.</li><li>The proving ground is closed for now while it gets reworked.</li></ul>
@@ -2397,7 +2398,10 @@ function analyseNet(){
   // signal timing: the busier road gets the longer green; Main St and the boulevards run a green wave
   for(const n of NODES)if(n.ctrl==="signal"){const r0=Math.max(...n.legs.filter(l=>l.grp===0).map(l=>l.rank)),r1=Math.max(...n.legs.filter(l=>l.grp===1).map(l=>l.rank),0);
     const big=Math.max(r0,r1)>=5;n.cyc={g:[r0>=r1?(big?30:22):(big?18:18),r1>r0?(big?30:22):(big?18:18)],Y:big?4.2:3.6,AR:big?2:1.5};
-    if(r0===r1)n.cyc.g=[20,20];const C=n.cyc.g[0]+n.cyc.g[1]+2*(n.cyc.Y+n.cyc.AR);n.cyc.C=C;n.cyc.off=((-(n.x+n.y)/(big?17:12))%C+C)%C}
+    if(r0===r1)n.cyc.g=[20,20];
+    // protected left turns: where a phase has roads with two or more lanes each way, both directions get a leading green arrow (7 s, then 3 s yellow arrow) before their through green
+    n.cyc.L=[0,1].map(g=>n.legs.some(l=>l.grp===g&&l.e.n>=2)?7:0);n.cyc.YL=3;
+    const C=n.cyc.g[0]+n.cyc.g[1]+2*(n.cyc.Y+n.cyc.AR)+n.cyc.L.reduce((a,v)=>a+(v?v+n.cyc.YL:0),0);n.cyc.C=C;n.cyc.off=((-(n.x+n.y)/(big?17:12))%C+C)%C}
 }
 analyseNet();
 // extra pavement beside the freeway where a ramp leaves or joins (the gore and the speed-change lane), so the ramp meets the shoulder
@@ -2410,8 +2414,11 @@ for(const n of NODES){if(n.ctrl!=="merge")continue;for(const l of n.legs){if(l.m
 if(W2)for(const n of NODES){if(n.legs.length!==2||n.kind!=="cont")continue;const [A,B]=n.legs,wa=A.e.m/2+A.e.n*LANE+A.e.side,wb=B.e.m/2+B.e.n*LANE+B.e.side;if(Math.abs(wa-wb)<1)continue;
   const nr=wa<wb?A:B,d=Math.abs(wa-wb),e=nr.e,L=Math.min(110,e.L*0.6),S=[];for(let k=0;k<=10;k++){const q=k/10,w=d*(1-q*q*(3-2*q));S.push(nr.end===0?[q*L,w]:[e.L-q*L,w])}if(nr.end===1)S.reverse();
   for(const sg of [1,-1])(e.aux=e.aux||[]).push({u0:S[0][0],u1:S[S.length-1][0],sg,S:S.map(p=>p.slice()),drop:true});n.drop=true}
-function sigState(n,grp,t){const c=n.cyc,x=((t+c.off)%c.C+c.C)%c.C,a=c.g[0],b=a+c.Y,d=b+c.AR,e=d+c.g[1],f=e+c.Y;
-  if(grp===0)return x<a?"green":x<b?"yellow":"red";return x>=d&&x<e?"green":x>=e&&x<f?"yellow":"red"}
+// a phase: [leading left arrow][yellow arrow][through green (lefts flash yellow: turn when clear)][yellow][all red], then the other phase
+function sigPh(n,grp,t){const c=n.cyc,x=((t+c.off)%c.C+c.C)%c.C,L=c.L||[0,0],ph=g=>(L[g]?L[g]+c.YL:0)+c.g[g]+c.Y+c.AR,S=grp===0?0:ph(0),lg=L[grp]?L[grp]:0,yl=lg?c.YL:0,ts=S+lg+yl,te=ts+c.g[grp];return {x,S,lg,yl,ts,te,ye:te+c.Y}}
+function sigState(n,grp,t){const P=sigPh(n,grp,t);return P.x>=P.ts&&P.x<P.te?"green":P.x>=P.te&&P.x<P.ye?"yellow":"red"}
+function sigLeft(n,grp,t){const P=sigPh(n,grp,t);if(!P.lg){const s_=sigState(n,grp,t);return s_==="green"?"fya":s_}
+  return P.x>=P.S&&P.x<P.S+P.lg?"green":P.x>=P.S+P.lg&&P.x<P.ts?"yellow":P.x>=P.ts&&P.x<P.te?"fya":P.x>=P.te&&P.x<P.ye?"yellow":"red"}
 const legOf=(n,e,end)=>n.legs.find(l=>l.e===e&&l.end===end);
 const arrLeg=(e,dir)=>legOf(endNode(e,dir),e,dir>0?1:0);      // the leg you arrive on, driving along (e, dir)
 // allowed movements from an arriving leg: S straight, R right, L left, U U-turn
@@ -4888,6 +4895,9 @@ function ctrlGap(c,dStop,dt){const n=c.mvNode,mv=c.mv,L=c.mvLeg;if(!mv)return dS
   if(c.waitT>25)return Infinity;           // nobody waits forever
   switch(n.ctrl){
     case "signal":{const S=sigState(n,L.grp,st.clock);
+      if(mv.t==="L"&&n.cyc.L&&n.cyc.L[L.grp]){const SL=sigLeft(n,L.grp,st.clock);   // protected left: go on the green arrow (no need to yield), stop on red; on the flashing yellow arrow yield as usual
+        if(SL==="red")return at;if(SL==="yellow"&&!c.goYellow){if(dStop>c.v*c.v/(2*3.2)+1.5)return at;c.goYellow=true}
+        if(SL==="green"||SL==="yellow")return exitClear(c)?Infinity:at}
       if(S==="red"&&c.pers&&c.pers.reck&&c.v>7&&dStop<c.v*1.3&&sigState(n,L.grp,st.clock-2.2)!=="red"&&!c.noRun){if(c.runRed===undefined)c.runRed=rnd()<0.55;if(c.runRed)return Infinity}
       if(S==="red"){if(mv.t==="R"){fullStop();if(c.stopDone){c.waitT+=dt;if(gapClear(c,n,L,mv)&&!boxBusy(n,c)&&exitClear(c))return Infinity}}return at}
       if(S==="yellow"&&!c.goYellow){if(!(c.pers&&c.pers.reck&&dStop<c.v*3.2)&&dStop>c.v*c.v/(2*3.2)+1.5)return at;c.goYellow=true}
@@ -8441,6 +8451,14 @@ function sensors(){
     out.push({o,ds:f.ds+CARLEN/2-0.4,lat:f.off-M.off,off:f.off,v:vp,vRel:vp-car.vx,vLat:(o.v||0)*Math.sin(o.wh-f.h),vru:true})}
   return {M,list:out};
 }
+function predHit(sp,T){const r=car.r||0,c0=Math.cos(car.psi),s0=Math.sin(car.psi);let best=null;
+  for(const o of cars){if(o.wx===undefined||o.kind==="cone"||o.kind==="ped"||o.kind==="test"&&!o.v)continue;const dx=o.wx-car.px,dy=o.wy-car.py;if(dx*dx+dy*dy>75*75||Math.abs((o.wz||0)-(car.zb||0))>2.5)continue;
+    const dh=Math.abs(wrapPi((o.wh||0)-car.psi));if(dh<0.45||dh>2.7)continue;   // following and oncoming traffic are the normal AEB's job; this is for paths that cross
+    const ov=o.v||0,ox=ov*Math.cos(o.wh),oy=ov*Math.sin(o.wh),hl=(o.len||CARLEN)/2,hw=(o.wid||1.9)/2;
+    for(let t=0.1;t<=T;t+=0.1){const ps=car.psi+r*t,mx=Math.abs(r)>1e-3?(Math.sin(ps)-Math.sin(car.psi))/r*sp:c0*sp*t,my=Math.abs(r)>1e-3?(Math.cos(car.psi)-Math.cos(ps))/r*sp:s0*sp*t;
+      const ax=car.px+mx,ay=car.py+my,bx=o.wx+ox*t,by=o.wy+oy*t;if((ax-bx)**2+(ay-by)**2>64)continue;
+      if(obbSAT(ax,ay,ps,BODY_HL+0.25,BODY_HW+0.2,bx,by,o.wh,hl,hw)){if(!best||t<best.t)best={t,o,vAlong:ov*Math.cos(o.wh-car.psi)};break}}}
+  return best}
 function assist(dt){
   if(!st.walk){const w=inTC(car.px,car.py)?tcWhere(car.px,car.py):null,nm=w?w[3]:null;if(nm!==sys.tcSec)sys.tcSec=nm}   // no pop-up: each section has its own sign board
   {const v=Math.abs(car.vx);
@@ -8458,6 +8476,9 @@ function assist(dt){
     if(!inPath&&t.vru&&Math.abs(t.vLat||0)>0.25&&t.ds<70&&sp>1){const tA=t.ds/Math.max(sp-Math.max(t.v,0),0.5);for(const k of [0.6,0.8,1.0]){const lp=lat+t.vLat*tA*k;if(Math.abs(lp)<1.3){inPath=true;break}}}
     if(inPath){const g=t.ds-CARLEN;if(g<gap){gap=g;lead=t}}}
   if(lead&&st.gear==="D"){const close=sp-lead.v;if(close>0.4)ttc=gap/close}
+  // ---- junction / turn-across AEB: play every nearby car forward 2.5 s on its own heading and ours on our heading and turn rate; if the bodies meet,
+  // that's the target (a car running the red across us, one turning left in front of us, one pulling out of a side street)
+  if(st.gear==="D"&&sp>2){const PH=predHit(sp,2.5);if(PH&&PH.t<ttc&&!(lead&&lead.o===PH.o)){const gp=Math.max(0.2,sp*PH.t-1);ttc=PH.t;gap=gp;lead={o:PH.o,ds:gp+CARLEN,lat:0,v:Math.max(0,PH.vAlong),vRel:PH.vAlong-sp,cross:true}}}
   // the same target for a moment, and the braking it would really take, before AEB acts
   sys.leadT=lead&&sys.leadO===lead.o?(sys.leadT||0)+dt:0;sys.leadO=lead?lead.o:null;const reqDec=lead&&sp>lead.v?(sp-lead.v)*(sp-lead.v)/(2*Math.max(gap,0.3)):0;
   sys.ttc=ttc; sys.lead=lead; sys.gap=gap;
@@ -8476,7 +8497,7 @@ function assist(dt){
     const sure=sys.leadT>(lead&&lead.vru?0.12:0.25);
     if(ttc<aebT(0)&&inp.brk<0.6&&sure&&reqDec>2)sys.fcw=true;
     if(st.aebAuto===false){if(ttc<aebT(1)&&sure&&reqDec>2)sys.fcw=true}
-    else if((ttc<aebT(2)&&sure&&(reqDec>4||(lead&&lead.vru&&reqDec>1.5)))||(sys.aebBrake>0.45&&ttc<4&&sp-(lead?lead.v:0)>0.3)){sys.aebBrake=1;if(sys.aebState!=="braking"){sys.aebState="braking";sys.aebStart={v:sp};sys.aebWho=lead?(lead.o.kind==="ped"?"a pedestrian":lead.o.kind==="deer"?"a deer":lead.o.kind==="bike"?"a cyclist":"the car ahead"):"an obstacle";beep(1900,.12,"square",.25)}}
+    else if((ttc<aebT(2)&&sure&&(reqDec>4||(lead&&lead.vru&&reqDec>1.5)))||(sys.aebBrake>0.45&&ttc<4&&sp-(lead?lead.v:0)>0.3)){sys.aebBrake=1;if(sys.aebState!=="braking"){sys.aebState="braking";sys.aebStart={v:sp};sys.aebWho=lead?(lead.cross?"a car crossing your path":lead.o.kind==="ped"?"a pedestrian":lead.o.kind==="deer"?"a deer":lead.o.kind==="bike"?"a cyclist":"the car ahead"):"an obstacle";beep(1900,.12,"square",.25)}}
     else if(st.aebAuto!==false&&ttc<aebT(1)&&sure&&reqDec>2.5&&inp.brk<0.5&&sys.aebBrake<0.5)sys.aebBrake=0.5;
   }
   // once braking, modulate like the real systems: just enough to stop about 2 m short (never less than half braking)
@@ -9154,7 +9175,7 @@ const SEG7=[[0,1,2,4,5,6],[2,5],[0,2,3,4,6],[0,2,3,5,6],[1,2,3,5],[0,1,3,5,6],[0
 function digitPolys(d,ox,oz){const w=0.05,h=0.06,t=0.012,S=[rectP(-w/2,h-t/2,w/2,h+t/2),rectP(-w/2-t/2,0,-w/2+t/2,h),rectP(w/2-t/2,0,w/2+t/2,h),rectP(-w/2,-t/2,w/2,t/2),rectP(-w/2-t/2,-h,-w/2+t/2,0),rectP(w/2-t/2,-h,w/2+t/2,0),rectP(-w/2,-h-t/2,w/2,-h+t/2)];
   return SEG7[d].map(i=>S[i].map(([x,z])=>[x+ox,z+oz]))}
 // pedestrian signal for the crossing parallel to a signal group: WALK, then a flashing hand with a countdown that ends with the yellow
-function pedState(n,grp,t){const c=n.cyc,x=((t+c.off)%c.C+c.C)%c.C,a=c.g[0],b=a+c.Y,d=b+c.AR,e=d+c.g[1],f=e+c.Y;const gs=grp===0?0:d,ye=grp===0?b:f;
+function pedState(n,grp,t){const P=sigPh(n,grp,t),x=P.x,gs=P.ts,ye=P.ye;
   if(x<gs||x>=ye)return {s:"dw"};const fdw=Math.min(14,ye-gs-7);return x<ye-fdw?{s:"walk"}:{s:"flash",rem:Math.ceil(ye-x)}}
 const hwOf=e=>e.m/2+e.n*LANE+e.side;
 {const bx={P:[],N:[],I:[]};boxInto(bx,0,0,0,1,1,1,0);SCN.box=meshFrom(bx.P,bx.N,bx.I);SCN.boxSrc=bx;
@@ -9576,7 +9597,7 @@ function w2Fill(r){const P=[],Nn=[],I=[],C=[];const gz=(x,y)=>groundAt(x,y).h;
 // Every placed copy is baked into a few big world meshes coloured per vertex (matte, semi-gloss, glass), split into map cells and culled by distance,
 // so hundreds of houses cost a handful of draw calls. Collision boxes come from props/colliders.json.
 // footprints (local x min/max, z min/max; the front faces +z)
-const W2_FP={sig_v:[-0.2,0.2,-0.2,0.2],sig_vb:[-0.2,0.2,-0.2,0.2],sig_fya:[-0.2,0.2,-0.2,0.2],g_rail4:[-0.2,0.2,-0.2,0.2],g_rail8:[-0.2,0.2,-0.2,0.2],g_railend:[-0.2,0.2,-0.2,0.2],b_auto_parts_shop:[-7.8,7.8,-6.2,7.3],b_auto_service_4_bay:[-12.3,12.3,-9.3,9.4],b_bakery:[-4.8,4.8,-4.2,5.3],b_bmw_dealership:[-13.3,13.3,-12.3,15.2],
+const W2_FP={sig_dog:[-0.2,0.2,-0.2,0.2],sig_v:[-0.2,0.2,-0.2,0.2],sig_vb:[-0.2,0.2,-0.2,0.2],sig_fya:[-0.2,0.2,-0.2,0.2],g_rail4:[-0.2,0.2,-0.2,0.2],g_rail8:[-0.2,0.2,-0.2,0.2],g_railend:[-0.2,0.2,-0.2,0.2],b_auto_parts_shop:[-7.8,7.8,-6.2,7.3],b_auto_service_4_bay:[-12.3,12.3,-9.3,9.4],b_bakery:[-4.8,4.8,-4.2,5.3],b_bmw_dealership:[-13.3,13.3,-12.3,15.2],
   b_bungalow:[-5.4,5.4,-4.9,6.1],b_chevrolet_dealership:[-16.3,16.3,-12.8,15.7],b_clothing_boutique:[-5.8,5.8,-4.7,5.8],b_corner_cafe:[-5.2,5.2,-4.7,5.8],b_duplex:[-8.9,8.9,-5.9,6.8],
   b_electronics_store:[-7.2,7.2,-5.7,6.8],b_farmhouse:[-6.4,6.4,-5.9,7.9],b_ford_dealership:[-15.3,15.3,-12.3,15.2],b_luxury_house:[-10.3,10.3,-7.3,8.2],b_mercedes_dealership:[-15.3,15.3,-13.3,16.2],
   b_modern_house:[-6.3,6.3,-6.3,7.2],b_neighborhood_market:[-8.2,8.2,-6.7,7.8],b_pharmacy:[-6.8,6.8,-5.2,6.3],b_quick_service_2_bay:[-6.3,6.3,-7.3,7.5],b_ranch_house:[-8.4,8.4,-5.4,6.6],
@@ -9763,15 +9784,22 @@ function worldScenery(){W2P.length=0;
     for(const l of n.legs){if(l.e.n<1)continue;const e=l.e,dir=l.end===1?1:-1,lo=loOf(e.n),hi=lo+e.n-1,sideO=lo*LANE-LANE/2-e.side;
       if(n.ctrl==="signal"){const sF=e.L+rX+1.5,p=offRoad(fpt(e,dir,sF,sideO-1.2),fpt(e,dir,sF,sideO-1.2)[2]),ph=p[2],fx=Math.cos(ph),fy=Math.sin(ph),gz=Math.max(SZ(p[0],p[1]),n.z||0);
         // galvanised steel pole on a base plate, a tapered mast arm reaching out over the lanes
-        tubeInto(sigPole,[p[0],p[1],gz],[p[0],p[1],gz+7.4],0.17,0.12,12);B(sigPole,p[0],p[1],gz,0.06,0.55,0.55,ph);B(sigPole,p[0],p[1],gz+7.4,0.05,0.27,0.27,ph);collAdd({t:"c",x:p[0],y:p[1],r:0.2});
+        const span=W2&&!inCity(p[0],p[1])&&Math.max(...n.legs.map(l2=>l2.rank))<5;   // country crossroads: the heads hang from a steel cable strung between two wooden-look poles
+        let wire=null;
+        if(span){const o2=-(sideO-1.2)+(e.m>0.8?0:0),p2=offRoad(fpt(e,dir,sF,o2),fpt(e,dir,sF,o2)[2]+Math.PI),gz2=Math.max(SZ(p2[0],p2[1]),n.z||0),zt=gz+7.3,zt2=gz2+7.3;
+          for(const [P_,Z_] of [[p,gz],[p2,gz2]]){tubeInto(sigPole,[P_[0],P_[1],Z_],[P_[0],P_[1],Z_+7.6],0.16,0.12,10);B(sigPole,P_[0],P_[1],Z_,0.06,0.5,0.5,ph);collAdd({t:"c",x:P_[0],y:P_[1],r:0.2})}
+          const W_=u=>{const x=p[0]+(p2[0]-p[0])*u,y=p[1]+(p2[1]-p[1])*u;return [x,y,zt+(zt2-zt)*u-0.7*4*u*(1-u)]};let prv=W_(0);for(let i=1;i<=10;i++){const c_=W_(i/10);tubeInto(sigPole,prv,c_,0.018,0.018,5);prv=c_}   // the messenger cable, sagging in the middle
+          const D_=Math.hypot(p2[0]-p[0],p2[1]-p[1])||1;wire=q=>{const u=clamp(((q[0]-p[0])*(p2[0]-p[0])+(q[1]-p[1])*(p2[1]-p[1]))/(D_*D_),0,1);return W_(u)[2]}}
+        else{tubeInto(sigPole,[p[0],p[1],gz],[p[0],p[1],gz+7.4],0.17,0.12,12);B(sigPole,p[0],p[1],gz,0.06,0.55,0.55,ph);B(sigPole,p[0],p[1],gz+7.4,0.05,0.27,0.27,ph);collAdd({t:"c",x:p[0],y:p[1],r:0.2});
         const tip=fpt(e,dir,sF,hi*LANE+0.9);tubeInto(sigPole,[p[0],p[1],gz+6.45],[tip[0],tip[1],gz+6.75],0.12,0.065,10);
-        {const g1=fpt(e,dir,sF,sideO-1.2+(hi*LANE+0.9-(sideO-1.2))*0.3);tubeInto(sigPole,[p[0],p[1],gz+7.25],[g1[0],g1[1],gz+6.55],0.035,0.035,6)}   // tie rod
+        {const g1=fpt(e,dir,sF,sideO-1.2+(hi*LANE+0.9-(sideO-1.2))*0.3);tubeInto(sigPole,[p[0],p[1],gz+7.25],[g1[0],g1[1],gz+6.55],0.035,0.035,6)}}   // tie rod
         const L_=e.n>=2;
-        for(let k=lo;k<=hi;k++){const at=(sideO-1.2)+(hi*LANE+0.9-(sideO-1.2))*0,q=fpt(e,dir,sF-0.05,k*LANE),zc=gz+5.62,armZ=gz+6.45+0.3*((k*LANE-(sideO-1.2))/(hi*LANE+0.9-(sideO-1.2)));
+        for(let k=lo;k<=hi;k++){const at=(sideO-1.2)+(hi*LANE+0.9-(sideO-1.2))*0,q=fpt(e,dir,sF-0.05,k*LANE),armZ=wire?wire(q):gz+6.45+0.3*((k*LANE-(sideO-1.2))/(hi*LANE+0.9-(sideO-1.2))),zc=wire?armZ-0.75:gz+5.62;
           const fy4=L_&&k===hi;
           if(W2){   // the owner's signal heads: real cast housings, doors, tunnel visors and reflective backplates (yellow downtown, black elsewhere; a 4-lamp flashing-yellow-arrow head over the left lane)
-            const zh=fy4?zc-0.18:zc,top=zh+(fy4?0.8:0.62);w2Put(fy4?"sig_fya":inCity(q[0],q[1])?"sig_v":"sig_vb",q[0]-fx*0.05,q[1]-fy*0.05,q[2]+Math.PI,zh);boxInto(sigPole,q[0],(top+armZ)/2,-q[1],0.07,Math.max(0.05,armZ-top),0.07,q[2]);
-            SIGH.push({t:fy4?"fya4":"ball",x:q[0]-fx*0.19,y:q[1]-fy*0.19,h:q[2],z:zh,n,g:l.grp,sp:0.355});continue}
+            const city=inCity(q[0],q[1]),dog=fy4&&city&&n.cyc.L&&n.cyc.L[l.grp]>0,kind=dog?"dog":fy4?"fya4":"ball",zh=fy4&&!dog?zc-0.18:zc,top=zh+(kind==="fya4"?0.8:0.62);
+            w2Put(dog?"sig_dog":fy4?"sig_fya":city?"sig_v":"sig_vb",q[0]-fx*0.05,q[1]-fy*0.05,q[2]+Math.PI,zh);boxInto(sigPole,q[0],(top+armZ)/2,-q[1],0.07,Math.max(0.05,armZ-top),0.07,q[2]);
+            SIGH.push({t:kind,x:q[0]-fx*0.19,y:q[1]-fy*0.19,h:q[2],z:zh,n,g:l.grp,sp:0.355});continue}
           boxInto(sigH,q[0],zc,-q[1],0.26,1.08,0.36,q[2]);boxInto(sigH,q[0],(zc+0.54+armZ)/2,-q[1],0.07,armZ-zc-0.54,0.07,q[2]);   // housing and hanger
           {const bx=q[0]+fx*0.14,by=q[1]+fy*0.14,sx=-Math.sin(q[2]),sy=Math.cos(q[2]);boxInto(sigBP,bx,zc,-by,0.02,1.3,0.6,q[2]);
             boxInto(sigY,bx,zc+0.68,-by,0.02,0.06,0.72,q[2]);boxInto(sigY,bx,zc-0.68,-by,0.02,0.06,0.72,q[2]);for(const sd of [1,-1])boxInto(sigY,bx+sx*0.33*sd,zc,-(by+sy*0.33*sd),0.02,1.3,0.06,q[2])}   // backplate with its yellow reflective border
@@ -13166,7 +13194,10 @@ function render(dt){
         else if(P_.s==="dw"||blink)flatInto(BK[3],H.x,H.y,H.z,H.h,PED_HAND.map(p=>p.map(([x,z])=>[x*1.5-0.1,z*1.5+0.02])));
         if(P_.s==="flash"){const r=Math.min(99,P_.rem);flatInto(BK[3],H.x,H.y,H.z,H.h,[...(r>=10?digitPolys(Math.floor(r/10),0.07,0):[]),...digitPolys(r%10,0.15,0)])}continue}
       const ls=sigState(H.n,H.g,T);
-      if(H.t==="fya4"){const z=H.z+(ls==="red"?0.5325:ls==="yellow"?0.1775:-0.1775);if(ls==="green"&&!blink)continue;flatInto(BK[ls==="red"?0:1],H.x,H.y,z,H.h,SIG_ARROW);continue}   // red arrow, steady yellow arrow, flashing yellow arrow (turn left, yielding)
+      if(H.t==="fya4"){const lt=sigLeft(H.n,H.g,T),z=H.z+(lt==="red"?0.5325:lt==="yellow"?0.1775:lt==="fya"?-0.1775:-0.5325);if(lt==="fya"&&!blink)continue;flatInto(BK[lt==="red"?0:lt==="green"?2:1],H.x,H.y,z,H.h,SIG_ARROW);continue}   // red arrow, steady yellow arrow, flashing yellow arrow, green arrow
+      if(H.t==="dog"){const lt=sigLeft(H.n,H.g,T),rx=Math.sin(H.h),ry=-Math.cos(H.h),at=(dx_,dz_,B_,arrow)=>{const X=H.x+rx*dx_,Y=H.y+ry*dx_;if(arrow)flatInto(B_,X,Y,H.z+dz_,H.h,SIG_ARROW);else octInto(B_,X,Y,H.z+dz_,H.h,0.152,0.008,16,0)};
+        if(ls==="red")at(0,0.355,BK[0]);else if(ls==="yellow")at(0.177,0,BK[1]);else at(0.177,-0.355,BK[2]);   // the balls follow the through phase
+        if(lt==="green")at(-0.177,-0.355,BK[2],1);else if(lt==="yellow"&&ls!=="yellow")at(-0.177,0,BK[1],1);continue}   // the arrows: green while turning left is protected, yellow as it ends   // red arrow, steady yellow arrow, flashing yellow arrow (turn left, yielding)
       if(H.t==="fya"){const z=ls==="red"?H.z+0.35:ls==="yellow"?H.z:H.z-0.35;if(ls==="green"&&!blink)continue;flatInto(BK[ls==="red"?0:1],H.x,H.y,z,H.h,SIG_ARROW);continue}
       const sp_=H.sp||0.35,z=ls==="red"?H.z+sp_:ls==="yellow"?H.z:H.z-sp_;octInto(BK[ls==="red"?0:ls==="yellow"?1:2],H.x,H.y,z,H.h,0.152,0.008,16,0)}
     if(!SCN.lit||SCN.lit.length<5){SCN.lit=[0,1,2,3,4].map(()=>({p:gl.createBuffer(),n:gl.createBuffer(),i:gl.createBuffer(),count:0,type:gl.UNSIGNED_SHORT}))}
@@ -13464,7 +13495,8 @@ function updatePark(dt){
   const sp=Math.abs(car.vx); const P=parkSensors(); sys.pdc=P;
   const sd=sideOK()?Math.min(...P.sl,...P.sr):9,near=Math.min(...P.f,...P.r,sd);let relevant=st.gear==="R"?Math.min(...P.r):sp<0.3?near:car.vx>0?Math.min(...P.f):Math.min(...P.r);if(sp>0.1&&sd<0.3)relevant=Math.min(relevant,sd);
   {const on=st.parkAssist&&st.gear!=="P"&&!st.walk&&sp<4.5&&(st.gear==="R"||near<(sys.parkOn?3.2:2.5));if(on)sys.parkOnT=2.5;else sys.parkOnT=(sys.parkOnT||0)-dt;sys.parkOn=on||(sys.parkOnT>0&&st.gear!=="P"&&sp<4.5)}
-  if(!sys.parkOn||relevant>1.6){parkBeepT=0;return}
+  sys.stillT=sp<0.08?(sys.stillT||0)+dt:0;   /* stopped: the beeping goes quiet (the bars on the screen stay), like the real systems */
+  if(!sys.parkOn||relevant>1.6||sys.stillT>0.6){parkBeepT=0;return}
   parkBeepT-=dt; if(relevant<0.3){if(parkBeepT<=0){beep(1050,.11,"sine",.18);parkBeepT=0.1}}
   else if(parkBeepT<=0){beep(1050,.06,"sine",.18);parkBeepT=clamp(relevant*0.55,0.12,0.9)}
 }
@@ -13881,7 +13913,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=259;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="173",BUILD_VER=260;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}try{const P=JSON.parse(localStorage.getItem("strata.ped")||"null");if(P){st.pedHold=+P.pedHold||0;st.thrRate=+P.thrRate||2;st.brkRate=+P.brkRate||2}}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){const k=GFX.q==="auto"?GFX.eff:GFX.q;if(G.k!==k||G.v!==GFX.ovV||!G.m){G.k=k;G.v=GFX.ovV;const m={...GQ[k]};for(const o of GOPT)if(GFX.ov[o[0]]!==undefined)Object.assign(m,o[4](GFX.ov[o[0]]));if(Object.keys(GFX.ov).length)m.label=GQ[k].label+" (custom)";G.m=m;COLL.nt=!m.trees}return G.m}
