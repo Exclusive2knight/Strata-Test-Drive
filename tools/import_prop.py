@@ -4,10 +4,12 @@ Positions int16 mm, normals int8, uint16 indices; one group per material; all no
 import json,struct,sys,base64
 import numpy as np
 src,key=sys.argv[1],sys.argv[2]
-ONLY=SKIP=None   # optional: --only a,b  /  --skip a,b  (node names) to split animated pieces into their own props
+ONLY=SKIP=SKIPRE=None;FULL=False   # optional: --only a,b  /  --skip a,b  (node names) to split animated pieces into their own props
 for i,a in enumerate(sys.argv):
     if a=='--only':ONLY=set(sys.argv[i+1].split(','))
     if a=='--skip':SKIP=set(sys.argv[i+1].split(','))
+    if a=='--skipre':SKIPRE=__import__('re').compile(sys.argv[i+1])
+    if a=='--full':FULL=True
 b=open(src,'rb').read();l=struct.unpack('<I',b[12:16])[0];J=json.loads(b[20:20+l]);o=20+l;bl=struct.unpack('<I',b[o:o+4])[0];BIN=b[o+8:o+8+bl]
 CT={5126:np.float32,5123:np.uint16,5125:np.uint32,5121:np.uint8};NC={'SCALAR':1,'VEC3':3,'VEC2':2,'VEC4':4}
 def acc(i):
@@ -20,6 +22,15 @@ def acc(i):
 par={}
 for i,n in enumerate(J['nodes']):
     for c in n.get('children',[]):par[c]=i
+def lm(n):
+    if 'matrix' in n:return np.array(n['matrix'],float).reshape(4,4).T
+    t=n.get('translation',[0,0,0]);q=n.get('rotation',[0,0,0,1]);sc=n.get('scale',[1,1,1]);x,y,z,w=q
+    R=np.array([[1-2*(y*y+z*z),2*(x*y-z*w),2*(x*z+y*w)],[2*(x*y+z*w),1-2*(x*x+z*z),2*(y*z-x*w)],[2*(x*z-y*w),2*(y*z+x*w),1-2*(x*x+y*y)]])
+    M=np.eye(4);M[:3,:3]=R*np.array(sc);M[:3,3]=t;return M
+def wm(i):
+    M=lm(J['nodes'][i])
+    while i in par:i=par[i];M=lm(J['nodes'][i])@M
+    return M
 def wt(i):
     t=np.array(J['nodes'][i].get('translation',[0,0,0]),float)
     while i in par:i=par[i];t+=np.array(J['nodes'][i].get('translation',[0,0,0]),float)
@@ -31,9 +42,11 @@ for i,n in enumerate(J['nodes']):
     if 'mesh' not in n:continue
     if ONLY is not None and n.get('name') not in ONLY:continue
     if SKIP is not None and n.get('name') in SKIP:continue
-    T=wt(i)
+    if SKIPRE is not None and SKIPRE.search(n.get('name','')):continue
+    T=wt(i);WM=wm(i)
     for pr in J['meshes'][n['mesh']]['primitives']:
         P=acc(pr['attributes']['POSITION']).astype(float)+T;N=acc(pr['attributes']['NORMAL']).astype(float)
+        if FULL:P0=acc(pr['attributes']['POSITION']).astype(float);P=P0@WM[:3,:3].T+WM[:3,3];N=N@np.linalg.inv(WM[:3,:3])
         I=acc(pr['indices']).reshape(-1).astype(np.int64) if 'indices' in pr else np.arange(len(P))
         m=pr.get('material',0);bymat.setdefault(m,[]).append((P,N,I))
 # per-node bounds of named parts (for couplers, bogies, wheels)
