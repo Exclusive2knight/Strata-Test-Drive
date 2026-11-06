@@ -1267,8 +1267,9 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
 <script data-boot>(function(){var p=0;window.__bootP=0;var t=setInterval(function(){if(window.__bootReal){clearInterval(t);return}p+=(0.7-p)*0.025;window.__bootP=p;var a=document.getElementById("bootArc"),n=document.getElementById("bootNeedle"),c=document.getElementById("bootPct");if(a)a.setAttribute("stroke-dasharray",(p*100).toFixed(1)+" 100");if(n)n.style.setProperty("--a",(-135+p*270)+"deg");if(c)c.textContent=String(Math.round(p*100))},120)})()</script>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 267 · Rest area at the service plaza</h2></div>
+    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 268 · Halden Pkwy and real turn bays</h2></div>
     <div class="nb">
+<h4>🛣️ Halden Pkwy and real turn bays</h4><ul><li>New road where the proving ground was: Halden Pkwy, a 3-lane-each-way divided boulevard between County Rd 1 and County Rd 3, with Signal St and Arrow St running down to County Rd 30. It has four traffic lights.</li><li>At every light on Halden Pkwy, a left-turn bay opens up in the median: the median narrows, a new lane appears beside your lane with a solid white line and turn arrows, and it gets its own flashing-yellow-arrow signal head. You (and AI drivers) move into it to turn left, so turning traffic waits out of the way and the through lanes keep moving.</li></ul>
 <h4>🛑 Rest area at the service plaza</h4><ul><li>The I-38 service plaza is bigger: behind the shop there's now a rest area with a restroom building, vending machines, a covered picnic shelter with tables, and nine truck parking stalls along the back.</li></ul>
 <h4>🏫 School zones and night road work</h4><ul><li>School zone around School St: SCHOOL SPEED LIMIT 20 WHEN FLASHING signs with two yellow beacons that flash on school days from 7:00 to 8:30 AM and 2:30 to 4:00 PM. The speed limit on your dash drops to 20 and traffic slows down (reckless drivers a bit less).</li><li>Night freeway work: from 9 PM to 5 AM the right lane of the freeway closes for about half a mile, with a ROAD WORK sign, a LANE CLOSED sign, a message board, a drum and cone taper, and a work truck with a flashing arrow board. The limit drops to 45 mph through it and traffic merges left. It's gone in the morning.</li></ul>
 <h4>🏎️ Porsche at the dealer</h4><ul><li>14 new Porsches: 911 Carrera ($132,300), 911 Carrera Cabriolet ($145,400), 911 Targa 4 ($151,300), 718 Cayman ($70,400), 718 Boxster ($72,500), Panamera ($104,000), Taycan ($103,000), Taycan 4 Cross Turismo ($114,000), Macan ($65,000), Macan 4 Electric ($81,700), Cayenne ($88,400), Cayenne Coupe ($94,100), Cayenne Electric ($108,000) and Cayenne Coupe Electric ($113,800).</li><li>Real powertrains: twin-turbo flat-6 with an 8-speed PDK in the 911s, turbo flat-4 in the 718s, twin-turbo V6 in the Panamera and Cayenne, and electric motors in the Taycan, Macan Electric and Cayenne Electric. The 911s and 718s come on summer tires with Normal, Sport, Sport Plus and Wet modes.</li></ul>
@@ -2275,13 +2276,17 @@ function buildNet2(){
   mkR("road","Maple Rd",[[1000,0],[1000,-650],[1000,-1090]],{lim:45});
   mkR("art","Maple Rd",[[1000,-1090],[1000,-1350],[1000,-1650],[1000,-1910]],{lim:45});
   mkR("road","Maple Rd",[[1000,-1910],[1000,-2400],[1000,-3300]],{lim:55});
-  mkR("road","County Rd 3",[[-3600,-3300],[-3600,-2400],[-3600,-1910]],{lim:55});
+  mkR("road","County Rd 3",[[-3600,-3300],[-3600,-2400],[-3600,-2100],[-3600,-1910]],{lim:55});
   mkR("art","County Rd 3",[[-3600,-1910],[-3600,-1650],[-3600,-1350],[-3600,-1090]],{lim:45});
   mkR("road","County Rd 3",[[-3600,-1090],[-3600,0],[-3600,1000],[-4100,1800,300],[-4252,3050]],{lim:50});
-  mkR("road","County Rd 1",[[-4400,-3300],[-4400,-2400],[-4400,0]],{lim:55});
+  // Halden Pkwy: a divided boulevard with real left-turn bays cut into the median at its four lights (the signal test road)
+  for(const x of [-4400,-4130,-3870,-3600])N(x,-2100,{ctrl:"signal"});
+  mkR("road","County Rd 1",[[-4400,-3300],[-4400,-2400],[-4400,-2100],[-4400,0]],{lim:55});
+  mkR("blvd","Halden Pkwy",[[-4400,-2100],[-4130,-2100],[-3870,-2100],[-3600,-2100]],{lim:45});
+  mkR("col","Signal St",[[-4130,-2400],[-4130,-2100]],{lim:35});mkR("col","Arrow St",[[-3870,-2400],[-3870,-2100]],{lim:35});
   mkR("road","County Rd 11",[[4500,-3300],[4500,-2400],[4500,0]],{lim:55});
   mkR("road","County Rd 9",[[4000,-3300],[4000,-2400],[4000,0],[4000,1500,300],[3300,2300,300],[2750,2700]],{lim:55});
-  mkR("road","County Rd 30",[ILW.P(0,ILW.T(1)),ILW.P(0,ILW.T(-1)),[-4400,-2400],[-3600,-2400],[-1000,-2400],[1000,-2400],[2600,-2400],[3300,-2400],[4000,-2400],[4500,-2400]],{lim:55});
+  mkR("road","County Rd 30",[ILW.P(0,ILW.T(1)),ILW.P(0,ILW.T(-1)),[-4400,-2400],[-4130,-2400],[-3870,-2400],[-3600,-2400],[-1000,-2400],[1000,-2400],[2600,-2400],[3300,-2400],[4000,-2400],[4500,-2400]],{lim:55});
   mkR("road","County Rd 40",[[-4400,-3300],[-3600,-3300],[-1000,-3300],[-300,-3300],[1000,-3300],[2600,-3300],[3300,-3300],[4000,-3300],[4500,-3300]],{lim:55});
   mkR("dirt","Quarry Rd",[[-1000,-3300],[-1000,-3480,60],[-300,-3480,60],[-300,-3300]]);
   mkR("dirt","Gravel Pit Rd",[[3300,-2400],[3380,-2850,120],[3300,-3300]]);
@@ -2408,7 +2413,9 @@ function analyseNet(){
     if(r0===r1)n.cyc.g=[20,20];
     // protected left turns: where a phase has roads with two or more lanes each way, both directions get a leading green arrow (7 s, then 3 s yellow arrow) before their through green
     n.cyc.L=[0,1].map(g=>n.legs.some(l=>l.grp===g&&l.e.n>=2)?7:0);n.cyc.YL=3;
-    for(const l of n.legs)if(n.cyc.L[l.grp]&&l.e.n>=2&&!(l.e.ow&&l.end!==1))l.ltl=true;   // the left lane on these approaches is a left-turn-only lane
+    for(const l of n.legs){const e=l.e;if(e.ow&&l.end!==1)continue;const dir=l.end===1?1:-1;
+      if(e.type==="blvd"&&e.m>=8&&!e.tp&&e.L>220){const len=70,tap=30;e.bay=e.bay||{};e.bay[dir]=dir>0?{t0:e.L-l.r-len-tap,f0:e.L-l.r-len,len,tap}:{t0:l.r+len+tap,f0:l.r+len,len,tap};l.bay=true;continue}   // a left-turn bay cut into the median
+      if(n.cyc.L[l.grp]&&e.n>=2)l.ltl=true}   // no bay: the left lane on these approaches is a left-turn-only lane
     const C=n.cyc.g[0]+n.cyc.g[1]+2*(n.cyc.Y+n.cyc.AR)+n.cyc.L.reduce((a,v)=>a+(v?v+n.cyc.YL:0),0);n.cyc.C=C;n.cyc.off=((-(n.x+n.y)/(big?17:12))%C+C)%C}
 }
 analyseNet();
@@ -2807,7 +2814,7 @@ function groundAt0(x,y){
   const pick=g=>{if(!hits)hits=[];hits.push(g)};
   for(const e of gAt(GRID.e,x,y)){const p=eProj(e,x,y);if(p.u<e.p0-0.5||p.u>e.L-e.p1+0.5)continue;
     if(e.gap&&p.u>e.gap[0]&&p.u<e.gap[1]){if(Math.abs(p.t)>hwOf(e)+(e.T.walk||0)+0.5)continue;const hh=dbLeafH(e,p.u);if(hh!==null)pick({h:hh,mu:0.95,kind:"road"});continue}
-    const mm=mAt(e,p.u),a=Math.abs(p.t),m2=mm/2,outer=m2+e.n*LANE+e.side+auxW(e,p.u,p.t),inner=mm>0.8?m2-e.shL:-1;
+    const mm=mAt(e,p.u),a=Math.abs(p.t),m2=mm/2,outer=m2+e.n*LANE+e.side+auxW(e,p.u,p.t),inner=mm>0.8?m2-e.shL-(e.bay?bayW(e,p.u,p.t<0?1:-1):0):-1;
     if(a<=outer&&a>=inner){const rum=e.T.rumble&&(Math.abs(a-(m2+e.n*LANE+0.5))<0.2||Math.abs(a-(m2-0.6))<0.2)&&(p.u%0.6)<0.3;
       {const hb=roadBumps(e,p.u,p.t)+(e.br&&e.br.style?brJank(e,p.u,p.t):0);if(e.T.dirt){const fd=e.ford&&Math.abs(p.u-e.ford.uc)<e.ford.half;pick({h:(e.hz||e.ford?ez(e,p.u):0)+hb+dirtH(e,p.u,p.t),mu:fd?0.5:0.74,kind:fd?"ford":"dirt",hole:RB_HOLE});continue}
         pick({h:(e.hz?ez(e,p.u):0)+hb+(rum?0.006:0),mu:1.15,kind:"road",rum,hole:RB_HOLE,deck:overDeck(e,p.u)});continue}}
@@ -4744,11 +4751,11 @@ function checkCollision(){
 let seedR=12345,CAR_ID=0; const rnd=()=>(seedR=(seedR*16807)%2147483647)/2147483647;
 const spW=e=>e.L*e.n*(e.type==="xway"?2.2:e.type==="ramp"?3:1);   // freeways and ramps get more of the traffic
 const EW=[];{let a=0;for(const e of EDGES){a+=spW(e);EW.push(a)}}
-function laneIdx(c){return clamp(Math.round(c.offT/LANE)-loOf(c.e.n),0,c.e.n-1)}
+function laneIdx(c){return clamp(Math.round(c.offT/LANE)-loOf(c.e.n),0,c.e.n-1+(c.inBay?1:0))}
 function carPose(c){if(c.fixed||c.dyn)return;if(c.jn){const P=c.jn.P,q=pathAt(P,c.jn.d),f=c.jn.ex!==undefined?Math.max(0,1-c.jn.d/10):0;c.wx=q[0]+(f?c.jn.ex*f:0);c.wy=q[1]+(f?c.jn.ey*f:0);c.wh=q[2]+(f?c.jn.eh*f:0);   // into a junction: ease from where the car really is onto the turning path over the first 10 m
 c.wz=P.z0+(P.z1-P.z0)*clamp(c.jn.d/Math.max(P.L,0.1),0,1);c.wp=0}
   else{const q=fpt(c.e,c.dir,c.s,c.off+(c.wob||0));c.wx=q[0];c.wy=q[1];c.wh=q[2]+(c.head||0);if(c.e.hz){const u=c.dir>0?c.s:c.e.L-c.s;c.wz=ez(c.e,u);c.wp=Math.atan((ez(c.e,u+c.dir)-ez(c.e,u-c.dir))/2)}else{c.wz=0;c.wp=0}}}
-function planMove(c,prefer){const n=endNode(c.e,c.dir),inL=arrLeg(c.e,c.dir);c.mv=null;c.stopDone=false;c.stopT=0;c.waitT=0;c.goC=0;c.goYellow=false;c.runRed=undefined;c.needLane=null;if(!inL)return;
+function planMove(c,prefer){const n=endNode(c.e,c.dir),inL=arrLeg(c.e,c.dir);c.mv=null;c.inBay=false;c.stopDone=false;c.stopT=0;c.waitT=0;c.goC=0;c.goYellow=false;c.runRed=undefined;c.needLane=null;if(!inL)return;
   let ms=movesFrom(n,inL);if(RW.closed.size){const ok=ms.filter(m=>!RW.closed.has(m.e));if(ok.length)ms=ok}if(c.kind==="bike"){const all=ms;ms=ms.filter(m=>m.t!=="U"&&(BIKE_T.has(m.e.type)||m.e.type==="rbt")||m.e.type==="blvd"&&m.t==="S");if(!ms.length)ms=all.filter(m=>!/xway|ramp/.test(m.e.type))}/* cyclists ride round roundabouts and turning circles too, and turn back at a dead end */if(!ms.length)return;let pick=prefer?ms.find(m=>m.t===prefer):null;if(!pick&&c.route){const Q=c.route,nk=c.e===Q.dest.e&&c.dir===Q.dest.dir&&c.s>Q.dest.s+3?Q.loop:Q.next.get(skey(c.e,c.dir));if(nk!=null)pick=ms.find(m=>skey(m.e,m.dir)===nk)||null}
   // a roundabout: go round at most a couple of exits, then take one (nobody does laps)
   if(n.rbt){if(!inL.major)c.rbN=0;else{c.rbN=(c.rbN||0)+1;if(!pick&&!c.route&&c.rbN>=3)pick=ms.find(m=>m.t==="R")||null}}
@@ -5109,7 +5116,8 @@ function updateTraffic(dt){try{sfTick(dt)}catch(e){console.error(e)}try{aiCollid
     if(!c.jn){const er=c.offT-c.off,lv=Math.min(c.passT>0?1.7:1.1,0.5+c.v*0.12),want=clamp(er*1.4,-lv,lv);c.offV=(c.offV||0)+clamp(want-(c.offV||0),-1.6*dt,1.6*dt);if(Math.abs(er)<0.02&&Math.abs(c.offV)<0.05){c.off=c.offT;c.offV=0}else c.off+=c.offV*dt;c.head=Math.atan2(c.offV,Math.max(c.v,1))*Math.min(1,c.v/3)}else c.offV=0
     // indicators for the turn ahead, lane changes on multi-lane roads
     if(!c.jn&&c.mv&&!c.lcPending&&Math.abs(c.offT-c.off)<0.05)c.sig=dStop<70?(c.mv.t==="R"?1:c.mv.t==="L"||c.mv.t==="U"?-1:0):0;
-    if(c.kind==="ai"&&!c.jn&&c.e.n>1){const li=laneIdx(c);
+    if(c.kind==="ai"&&!c.jn&&!c.inBay&&c.mv&&(c.mv.t==="L"||c.mv.t==="U")&&c.e.bay&&c.e.bay[c.dir]&&laneIdx(c)===c.e.n-1&&!c.lcPending){const B=c.e.bay[c.dir];if(dStop<B.len+B.tap*0.35&&dStop>8){c.inBay=true;c.offT=laneOff(c.e,c.e.n);c.sig=-1}}   // into the left-turn bay
+    if(c.kind==="ai"&&!c.jn&&c.e.n>1&&!c.inBay){const li=laneIdx(c);
       if(c.lcPending){c.lcPending-=dt;if(c.lcPending<=0&&c.v<2.5&&dStop<40)c.lcPending=0.3;if(c.lcPending<=0){c.lcPending=0;if(laneSafe(c,c.lcTarget))c.offT=laneOff(c.e,c.lcTarget);else c.sig=0}}
       else if(Math.abs(c.offT-c.off)<0.05){c.lcT-=dt;
         if(c.needLane!==null&&li!==c.needLane&&dStop<35&&!c.lanePinned){const was=c.mv&&c.mv.t;planMove(c,"S");if(!c.mv)planMove(c,was);c.lanePinned=true}       // missed the lane: go straight on instead
@@ -9205,6 +9213,8 @@ function digitPolys(d,ox,oz){const w=0.05,h=0.06,t=0.012,S=[rectP(-w/2,h-t/2,w/2
 function pedState(n,grp,t){const P=sigPh(n,grp,t),x=P.x,gs=P.ts,ye=P.ye;
   if(x<gs||x>=ye)return {s:"dw"};const fdw=Math.min(14,ye-gs-7);return x<ye-fdw?{s:"walk"}:{s:"flash",rem:Math.ceil(ye-x)}}
 const hwOf=e=>e.m/2+e.n*LANE+e.side;
+// width of a left-turn bay beside the median for traffic going this way at u (0 outside it, LANE where it is fully open, a taper in between)
+function bayW(e,u,dir){const B=e.bay&&e.bay[dir];if(!B)return 0;return dir>0?(u>=B.f0?LANE:u>B.t0?LANE*smooth01(B.t0,B.f0,u):0):(u<=B.f0?LANE:u<B.t0?LANE*smooth01(B.t0,B.f0,u):0)}
 {const bx={P:[],N:[],I:[]};boxInto(bx,0,0,0,1,1,1,0);SCN.box=meshFrom(bx.P,bx.N,bx.I);SCN.boxSrc=bx;
   SCN.shadow=meshFrom([-1.6,0.015,-3.2,1.6,0.015,-3.2,1.6,0.015,3.2,-1.6,0.015,3.2],[0,1,0,0,1,0,0,1,0,0,1,0],[0,2,1,0,3,2]);}
 const TERR={};
@@ -9333,9 +9343,13 @@ function buildWorld(){retailSites();placeExtras();
       if(e.T.bike){stripInto(bikeL,e,tt(u=>out(u)-0.03),tt(u=>out(u)-sd+0.12),0.009,l0,l1);   // painted bike lane with a bike symbol every 60 m
         for(let u=l0+20;u<l1-10;u+=60){const uu=dir>0?u:e.L-u,c=-(e.m/2+nL+sd/2);for(const k of [-0.5,0.5]){const q=ePt(e,uu+k*dir,dir*c);discInto(white,q[0],q[1],0.26,(e.hz?ez(e,uu):0)+0.014,10)}
           stripInto(white,e,dir*(c-0.05),dir*(c+0.05),0.014,uu-0.45,uu+0.45)}}
-      if(e.m>0)stripInto(yellow,e,tt(u=>-M2(u)-0.15),tt(u=>-M2(u)-0.3),0.012,Math.max(l0,tp?e.tp[0]:0),l1);
+      const BW=u=>e.bay?bayW(e,u,dir):0;
+      if(e.bay&&e.bay[dir]){const B=e.bay[dir],ua=Math.max(l0,Math.min(B.t0,B.f0)-1),ub=dir>0?e.L-e.r1:Math.max(B.t0,B.f0)+1,ua2=dir>0?ua:e.r0;
+        stripInto(R,e,tt(u=>-(M2(u)-e.shL)-0.02),tt(u=>-(M2(u)-e.shL-BW(u))),0,dir>0?ua:ua2,dir>0?ub:Math.max(B.t0,B.f0)+1);
+        const fa=dir>0?B.f0:l0,fb=dir>0?l1:B.f0;stripInto(white,e,tt(u=>-M2(u)-0.08),tt(u=>-M2(u)+0.08),0.013,fa,fb)}   // solid white between the bay and the through lanes
+      if(e.m>0)stripInto(yellow,e,tt(u=>-M2(u)+BW(u)-0.15),tt(u=>-M2(u)+BW(u)-0.3),0.012,Math.max(l0,tp?e.tp[0]:0),l1);
       if(e.T.rumble){for(const [a,b] of minus(l0,l1,auxI))stripInto(rumble,e,tt(u=>out(u)-0.3),tt(u=>out(u)-0.7),0.003,a,b);stripInto(rumble,e,tt(u=>-M2(u)+0.4),tt(u=>-M2(u)+0.8),0.003,l0,l1)}
-      if(e.T.kerb){stripInto(kerb,e,tt(u=>-W(u)),tt(u=>-W(u)-0.35),0.006,k0,k1);if(e.m>0)stripInto(kerb,e,tt(u=>-(M2(u)-e.shL)),tt(u=>-(M2(u)-e.shL)+0.35),0.006,Math.max(k0,mu0),k1)}
+      if(e.T.kerb){stripInto(kerb,e,tt(u=>-W(u)),tt(u=>-W(u)-0.35),0.006,k0,k1);if(e.m>0)stripInto(kerb,e,tt(u=>-(M2(u)-e.shL-BW(u))),tt(u=>-(M2(u)-e.shL-BW(u))+0.35),0.006,Math.max(k0,mu0),k1)}
       if(e.T.walk)stripInto(walk,e,tt(u=>-W(u)-0.35),tt(u=>-W(u)-0.35-e.T.walk),0.004,k0,k1)}
     if(e.m===0&&e.T.cl==="dy"){stripInto(yellow,e,0.08,0.2,0.012,l0,l1);stripInto(yellow,e,-0.08,-0.2,0.012,l0,l1)}
     if(e.m===0&&e.T.cl==="yd")dashInto(yellow,e,0,0.13,0.012,l0,l1,12,3)
@@ -9348,7 +9362,8 @@ function buildWorld(){retailSites();placeExtras();
     for(const l of n.legs){if(l.r<=0)continue;const e=l.e,dir=l.end===1?1:-1,L=e.L,m2=mAt(e,l.end===0?0:e.L)/2,W=m2+e.n*LANE;
       const uAt=d=>dir>0?L-d:d;   // distance d from the node along this leg
       stripInto(stopL,e,dir*(-m2-0.2),dir*(-W+0.2),0.012,Math.min(uAt(l.r+0.2),uAt(l.r+0.75)),Math.max(uAt(l.r+0.2),uAt(l.r+0.75)));
-      if(l.ltl){const hi=loOf(e.n)+e.n-1;for(const d of [7,24]){const p=fpt(e,dir,e.L-l.r-d,hi*LANE),z=(e.hz?ez(e,uAt(l.r+d)):0)+0.014,c_=Math.cos(p[2]),s_=Math.sin(p[2]),G=(f,lt)=>[p[0]+c_*f-s_*lt,p[1]+s_*f+c_*lt];   // white turn arrow, curving left
+      if(l.bay)stripInto(stopL,e,dir*(-m2+LANE+0.1),dir*(-m2-0.2),0.012,Math.min(uAt(l.r+0.2),uAt(l.r+0.75)),Math.max(uAt(l.r+0.2),uAt(l.r+0.75)));
+      if(l.ltl||l.bay){const hi=loOf(e.n)+e.n-(l.bay?0:1);for(const d of [7,24]){const p=fpt(e,dir,e.L-l.r-d,hi*LANE),z=(e.hz?ez(e,uAt(l.r+d)):0)+0.014,c_=Math.cos(p[2]),s_=Math.sin(p[2]),G=(f,lt)=>[p[0]+c_*f-s_*lt,p[1]+s_*f+c_*lt];   // white turn arrow, curving left
           for(const P of [[[0,-0.15],[2.9,-0.15],[2.9,0.15],[0,0.15]],[[2.55,0.15],[2.9,0.15],[2.9,0.85],[2.55,0.85]],[[2.25,0.85],[3.2,0.85],[2.72,1.55]]]){const k=stopL.P.length/3;for(const [f,lt] of P){const w=G(f,lt);stopL.P.push(w[0],z,-w[1]);stopL.N.push(0,1,0)}for(let i=1;i<P.length-1;i++)stopL.I.push(k,k+i+1,k+i,k,k+i,k+i+1)}}}
       if(n.ctrl!=="minor"&&e.T.z==="c"&&!e.T.rumble)for(let t=-W+0.5;t<W-0.3;t+=1.2){if(e.m>0&&Math.abs(t)<m2)continue;stripInto(zebra,e,t,t+0.6,0.011,Math.min(uAt(l.r-0.4),uAt(l.r-3.4)),Math.max(uAt(l.r-0.4),uAt(l.r-3.4)))}}}
   SCN.roadZ=[["c",mf(road.c)],["h",mf(road.h)],["d",mf(road.d)]];SCN.wear=[["c",mf(wear.c)],["h",mf(wear.h)],["d",mf(wear.d)]];SCN.lines=[mf(white)];SCN.ylines=mf(yellow);SCN.kerbs=[mf(kerb)];SCN.walk=mf(walk);
@@ -9826,13 +9841,13 @@ function worldScenery(){W2P.length=0;
           const W_=u=>{const x=p[0]+(p2[0]-p[0])*u,y=p[1]+(p2[1]-p[1])*u;return [x,y,zt+(zt2-zt)*u-0.7*4*u*(1-u)]};let prv=W_(0);for(let i=1;i<=10;i++){const c_=W_(i/10);tubeInto(sigPole,prv,c_,0.018,0.018,5);prv=c_}   // the messenger cable, sagging in the middle
           const D_=Math.hypot(p2[0]-p[0],p2[1]-p[1])||1;wire=q=>{const u=clamp(((q[0]-p[0])*(p2[0]-p[0])+(q[1]-p[1])*(p2[1]-p[1]))/(D_*D_),0,1);return W_(u)[2]}}
         else{tubeInto(sigPole,[p[0],p[1],gz],[p[0],p[1],gz+7.4],0.17,0.12,12);B(sigPole,p[0],p[1],gz,0.06,0.55,0.55,ph);B(sigPole,p[0],p[1],gz+7.4,0.05,0.27,0.27,ph);collAdd({t:"c",x:p[0],y:p[1],r:0.2});
-        const tip=fpt(e,dir,sF,hi*LANE+0.9);tubeInto(sigPole,[p[0],p[1],gz+6.45],[tip[0],tip[1],gz+6.75],0.12,0.065,10);
+        const tip=fpt(e,dir,sF,(hi+(e.bay&&e.bay[dir]?1:0))*LANE+0.9);tubeInto(sigPole,[p[0],p[1],gz+6.45],[tip[0],tip[1],gz+6.75],0.12,0.065,10);
         {const g1=fpt(e,dir,sF,sideO-1.2+(hi*LANE+0.9-(sideO-1.2))*0.3);tubeInto(sigPole,[p[0],p[1],gz+7.25],[g1[0],g1[1],gz+6.55],0.035,0.035,6)}}   // tie rod
-        const L_=e.n>=2;
-        for(let k=lo;k<=hi;k++){const at=(sideO-1.2)+(hi*LANE+0.9-(sideO-1.2))*0,q=fpt(e,dir,sF-0.05,k*LANE),armZ=wire?wire(q):gz+6.45+0.3*((k*LANE-(sideO-1.2))/(hi*LANE+0.9-(sideO-1.2))),zc=wire?armZ-0.75:gz+5.62;
-          const fy4=L_&&k===hi;
+        const L_=e.n>=2,bayH=!!(e.bay&&e.bay[dir]),hiB=hi+(bayH?1:0);
+        for(let k=lo;k<=hiB;k++){const at=(sideO-1.2)+(hi*LANE+0.9-(sideO-1.2))*0,q=fpt(e,dir,sF-0.05,k*LANE),armZ=wire?wire(q):gz+6.45+0.3*((k*LANE-(sideO-1.2))/(hiB*LANE+0.9-(sideO-1.2))),zc=wire?armZ-0.75:gz+5.62;
+          const fy4=bayH?k===hiB:L_&&k===hi;
           if(W2){   // the owner's signal heads: real cast housings, doors, tunnel visors and reflective backplates (yellow downtown, black elsewhere; a 4-lamp flashing-yellow-arrow head over the left lane)
-            const city=inCity(q[0],q[1]),dog=fy4&&city&&n.cyc.L&&n.cyc.L[l.grp]>0,kind=dog?"dog":fy4?"fya4":"ball",zh=fy4&&!dog?zc-0.18:zc,top=zh+(kind==="fya4"?0.8:0.62);
+            const city=inCity(q[0],q[1]),dog=fy4&&!bayH&&city&&n.cyc.L&&n.cyc.L[l.grp]>0,kind=dog?"dog":fy4?"fya4":"ball",zh=fy4&&!dog?zc-0.18:zc,top=zh+(kind==="fya4"?0.8:0.62);
             w2Put(dog?"sig_dog":fy4?"sig_fya":city?"sig_v":"sig_vb",q[0]-fx*0.05,q[1]-fy*0.05,q[2]+Math.PI,zh);boxInto(sigPole,q[0],(top+armZ)/2,-q[1],0.07,Math.max(0.05,armZ-top),0.07,q[2]);
             SIGH.push({t:kind,x:q[0]-fx*0.19,y:q[1]-fy*0.19,h:q[2],z:zh,n,g:l.grp,sp:0.355});continue}
           boxInto(sigH,q[0],zc,-q[1],0.26,1.08,0.36,q[2]);boxInto(sigH,q[0],(zc+0.54+armZ)/2,-q[1],0.07,armZ-zc-0.54,0.07,q[2]);   // housing and hanger
@@ -13960,7 +13975,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=267;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="173",BUILD_VER=268;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}try{const P=JSON.parse(localStorage.getItem("strata.ped")||"null");if(P){st.pedHold=+P.pedHold||0;st.thrRate=+P.thrRate||2;st.brkRate=+P.brkRate||2}}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){const k=GFX.q==="auto"?GFX.eff:GFX.q;if(G.k!==k||G.v!==GFX.ovV||!G.m){G.k=k;G.v=GFX.ovV;const m={...GQ[k]};for(const o of GOPT)if(GFX.ov[o[0]]!==undefined)Object.assign(m,o[4](GFX.ov[o[0]]));if(Object.keys(GFX.ov).length)m.label=GQ[k].label+" (custom)";G.m=m;COLL.nt=!m.trees}return G.m}
