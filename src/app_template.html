@@ -1267,8 +1267,9 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
 <script data-boot>(function(){var p=0;window.__bootP=0;var t=setInterval(function(){if(window.__bootReal){clearInterval(t);return}p+=(0.7-p)*0.025;window.__bootP=p;var a=document.getElementById("bootArc"),n=document.getElementById("bootNeedle"),c=document.getElementById("bootPct");if(a)a.setAttribute("stroke-dasharray",(p*100).toFixed(1)+" 100");if(n)n.style.setProperty("--a",(-135+p*270)+"deg");if(c)c.textContent=String(Math.round(p*100))},120)})()</script>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 283 · Tyres that really climb rocks and logs</h2></div>
+    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 284 · Smarter park assist, solid traffic</h2></div>
     <div class="nb">
+      <h4>🅿️ Park assist that stays off the kerb · traffic that can't drive through itself</h4><ul><li>Parallel parking now finishes about 20–30 cm from the kerb, straight and inside the parking lane. It used to end touching the kerb, or over it in long cars like the Regent. The message tells you the real gap to the kerb.</li><li>Perpendicular parking now finishes with a straight centring move, so the car sits in the middle of the space with its back bumper about 30 cm from the end. It no longer stops with the nose hanging into the aisle. Very long trucks that can't fit go as deep as is safe, and the message tells you how much is sticking out.</li><li>AI cars are now solid to each other. When two would overlap (merging, at junctions, creeping in a queue), the one behind backs off and waits, so they no longer drive through each other. Real crashes between AI cars still happen as before.</li><li>Fixed: some cars parked along the street and in lots spawned inside each other. Overlapping ones are now removed when the world loads.</li></ul>
       <h4>🪨 Off-road park: tyres no longer sink into rocks and logs</h4><ul><li>Fixed: in the off-road park, wheels used to sink into boulders, ledges and logs (up to 30 cm in) and then slowly float up on top. Now the tyre is treated as round: the rubber touches the face first and the wheel rides up it straight away, so nothing clips through.</li><li>Climbing still takes effort. The steeper the face, the harder it pushes back on the tyre, so you need throttle, low range or momentum.</li><li>A face much taller than your tyre (about 1.25× its radius) is now a wall: the wheel stops against it with a jolt instead of passing through. Back up and pick a better line, or bring a truck with bigger tyres.</li><li>The Steps are now climbable the way they're meant to be, one wheel at a time. In testing, a Bronco Sport and a Fusion Current Summit both made it over all three ledges, where before they got stuck partway up.</li></ul>
       <h4>🚙 More realistic car on the Fusion Current cluster</h4><ul><li>The car in the Current's chase view now has shaded paint in your colour, a tinted rear window with a reflection, a roof spoiler, a full-width light bar that glows brighter when you brake, turn signals that blink, a FUSION badge, a licence plate, a bumper with a diffuser, tyres and a ground shadow.</li></ul>
       <h4>🖥️ Current and Trailline screens · parking assist · fit fixes</h4><ul><li>Fusion Current centre screen: Drive Modes, Vehicle and Settings tabs on top. The Drive page has the mode list, a picture of your car that rises with the ride height, ride height arrows (air-suspension trims), Soft / Normal / Firm suspension, Auto Level and Terrain Assist. The bottom bar has Drive, Nav, Music, Social, Challenges and Energy.</li><li>Fusion Current cluster: Driftwood and the street modes show a chase view of your car, plus a mini map and the next turn when you're navigating. Trailhead, Rockstep, Sidewinder and Whiteout switch to terrain telemetry: pitch and roll gauges, compass, tyre pressure and temperature, altitude, heading and grade.</li><li>Fusion Trailline centre screen: Navigation, Media, Phone, Vehicle, Charge and Settings tiles, with drive-mode buttons along the bottom.</li><li>Fusion Trailline cluster: Sunday shows twin analog dials (speed and power/regen) with trip distance, time and mi/kWh. Switchback, Apex and Gravel Dance show a power meter with a G-meter. Longway shows a full-width map with your speed and the next turn.</li><li>Energy page: charge level, live charging power, time to target, a charge target slider (the car stops charging there) and the charging curve. The Energy Monitor tab shows trip distance, energy used and efficiency.</li><li>Challenges: 0–60 under 4 seconds, climb a 15° slope, 10 miles off-road and 2 kWh of regen. They track your progress.</li><li>Parking assist (the car parks itself) is now standard on the Current Summit and Storm, Regent Grand, Sovereign and Black Label, and Trailline GT and Apex. The Porsche Panamera, Cayenne, Taycan and Macan Electric now have Remote ParkAssist.</li><li>Fixed: Fusion wheels stuck out past the fenders, and they now sit flush. The Fusion door-mirror views now line up with the real mirrors.</li></ul>
@@ -5067,13 +5068,22 @@ function nwzTick(){const m=GT.min,want=W2&&st.started&&(m>=1260||m<300);if(want=
 const nwzIn=(e,dir,s)=>NWZ.zone&&e===NWZ.zone.e&&dir===NWZ.zone.dir&&s>NWZ.zone.s0-320&&s<NWZ.zone.s1;
 // traffic can hit traffic: two cars whose bodies overlap with a real closing speed crash for real (hazards, spun, police and tow trucks come)
 const AIC={cool:0};try{if(localStorage.getItem("strata.aiw")==="0")st.aiWreck=false}catch(e){}
+// AI bodies are solid to each other: two cars that overlap without a real crash (merging, junctions, a slow nudge) are pushed apart,
+// and the one behind stops until there's room, so nobody drives through anybody
+function aiSeparate(dt){const A=[];for(const c of cars){if((c.kind!=="ai"&&c.kind!=="parked")||c.wx===undefined)continue;if(Math.abs(c.wx-car.px)>300||Math.abs(c.wy-car.py)>300)continue;A.push(c)}
+  const G=new Map(),key=(x,y)=>Math.floor(x/7)*100003+Math.floor(y/7);for(const c of A){const k=key(c.wx,c.wy);let L=G.get(k);if(!L)G.set(k,L=[]);L.push(c)}
+  for(const a of A){if(a.kind!=="ai"||a.crashed||a.wreck)continue;const k0=key(a.wx,a.wy);for(let i=-1;i<=1;i++)for(let j=-1;j<=1;j++){const L=G.get(k0+i*100003+j);if(!L)continue;for(const b of L){if(b===a||Math.abs((a.wz||0)-(b.wz||0))>1.5)continue;
+    const H=obbSAT(a.wx,a.wy,a.wh,(a.len||CARLEN)/2-0.1,(a.wid||1.9)/2-0.08,b.wx,b.wy,b.wh,(b.len||CARLEN)/2-0.1,(b.wid||1.9)/2-0.08);if(!H||!H.n)continue;
+    const ca=Math.cos(a.wh),sa=Math.sin(a.wh),ahead=(b.wx-a.wx)*ca+(b.wy-a.wy)*sa;if(ahead<0&&b.kind==="ai")continue;   // the pair is handled once, by the car behind
+    a.v=Math.min(a.v,Math.max(0,(b.v||0)*Math.max(0,Math.cos((b.wh||0)-a.wh))-0.5));a.sepT=1.2;
+    if(a.s!==undefined&&!a.jn){a.s=Math.max(0,a.s-Math.min(0.6,H.d+0.05));try{carPose(a)}catch(e){}}else{a.wx-=ca*Math.min(0.4,H.d+0.05);a.wy-=sa*Math.min(0.4,H.d+0.05)}}}}}
 function aiCollide(dt){AIC.cool-=dt;if(AIC.cool>0||st.aiWreck===false)return;const A=[];for(const c of cars){if(c.kind!=="ai"||c.emv||c.wx===undefined)continue;if(Math.abs(c.wx-car.px)>450||Math.abs(c.wy-car.py)>450)continue;A.push(c)}
   if(EV.list.filter(v=>v.pair&&v.phase>0).length>=2)return;
   for(let i=0;i<A.length;i++){const a=A[i];for(let j=i+1;j<A.length;j++){const b=A[j];const dx=b.wx-a.wx,dy=b.wy-a.wy;if(dx*dx+dy*dy>36||Math.abs((a.wz||0)-(b.wz||0))>1.5)continue;
     const H=obbSAT(a.wx,a.wy,a.wh,(a.len||CARLEN)/2-0.15,(a.wid||1.9)/2-0.1,b.wx,b.wy,b.wh,(b.len||CARLEN)/2-0.15,(b.wid||1.9)/2-0.1);if(!H||H.d<0.3)continue;
     const rv=Math.hypot(a.v*Math.cos(a.wh)-b.v*Math.cos(b.wh),a.v*Math.sin(a.wh)-b.v*Math.sin(b.wh));if(rv<3.5)continue;
     const L_=a.s!==undefined&&b.e===a.e&&b.s<a.s?a:b,F=L_===a?b:a;EV.list.push({type:"aicrash",label:"Crash",x:a.wx,y:a.wy,t:240,items:[],pair:[L_,F],phase:0,pt:0,quiet:false,real:true});AIC.cool=25;return}}}
-function updateTraffic(dt){try{sfTick(dt)}catch(e){console.error(e)}try{aiCollide(dt)}catch(e){}try{nwzTick()}catch(e){console.error(e)}
+function updateTraffic(dt){try{sfTick(dt)}catch(e){console.error(e)}try{aiCollide(dt)}catch(e){}try{aiSeparate(dt)}catch(e){}try{nwzTick()}catch(e){console.error(e)}
   st.clock=(st.clock||0)+dt;
   const OB=[];for(const o of cars)if(o.wx!==undefined)OB.push({x:o.wx,y:o.wy,z:o.wz||0,h:o.wh,v:o.v||0,o,t2:o.kind==="cone"?1.56:o.kind==="bike"?2.25:4.84});for(const o of parked)if(!o.fixed){const b=o._ob||(o._ob={o,v:0});b.x=o.wx;b.y=o.wy;b.z=o.wz||0;b.h=o.wh;OB.push(b)}
   for(const p of peds)OB.push({x:p.wx,y:p.wy,z:p.wz||0,h:p.wh,v:p.v||0,o:p,t2:4.4});for(const d of EV.crit)OB.push({x:d.wx,y:d.wy,z:d.wz||0,h:d.wh,v:d.v,o:d,t2:4.4});
@@ -10481,7 +10491,13 @@ function spawnParked(){parked=[];const K=PARK;let i=0;
   {let sd=5;const r=()=>(sd=(sd*16807)%2147483647)/2147483647;let n=0;
    for(const t of garStalls()){const x=t.x,y=t.y,h=(t.uy>0?Math.PI/2:-Math.PI/2)+(r()<0.5?Math.PI:0);if(r()>0.22||n>=30)continue;n++;
      const P={fixed:true,kind:"parked",wx:x+t.uy*0,wy:y,wh:h,wz:t.z,v:0,spin:0,sig:0,head:0,paint:TRAFFIC_PAINTS[Math.floor(r()*TRAFFIC_PAINTS.length)]};
-     {const ro=Math.atan(t.sl),M=carMatrix(0,0,h,0,0,ro),q=M4.p(M,[1,0,0]);P.wr=Math.abs(q[1]-t.sl*q[0])<Math.abs(-q[1]-t.sl*q[0])?ro:-ro}parked.push(P)}}}
+     {const ro=Math.atan(t.sl),M=carMatrix(0,0,h,0,0,ro),q=M4.p(M,[1,0,0]);P.wr=Math.abs(q[1]-t.sl*q[0])<Math.abs(-q[1]-t.sl*q[0])?ro:-ro}parked.push(P)}}
+  // no two parked cars inside each other: where meter spaces, lot stalls or street spots overlap (corners, two edges sharing a kerb), keep the first
+  {const G=new Map(),keep=[];let drop=0;const key=(x,y)=>Math.floor(x/8)*100003+Math.floor(y/8);
+   for(const p of parked){if(p.wx===undefined){keep.push(p);continue}const hl=(p.len||CARLEN)/2-0.12,hw=(p.wid||1.9)/2-0.08;let hitP=false;
+     for(let i=-1;i<=1&&!hitP;i++)for(let j=-1;j<=1&&!hitP;j++){const L=G.get(key(p.wx,p.wy)+i*100003+j);if(L)for(const q of L){if(Math.abs((q.wz||0)-(p.wz||0))>1.2||Math.hypot(q.wx-p.wx,q.wy-p.wy)>6)continue;const H=obbSAT(p.wx,p.wy,p.wh,hl,hw,q.wx,q.wy,q.wh,(q.len||CARLEN)/2-0.12,(q.wid||1.9)/2-0.08);if(H&&H.n){hitP=true;break}}}
+     if(hitP){drop++;continue}keep.push(p);const k=key(p.wx,p.wy);let L=G.get(k);if(!L)G.set(k,L=[]);L.push(p)}
+   parked=keep;if(drop)console.log("parked overlaps removed:",drop)}}
 buildWorld();spawnParked();
 // load the 3D accessories ahead of time, one at a time while nothing else is happening, so fitting a roof rack (or a
 // box, kayak or bikes) never stalls a frame while you drive
@@ -14363,7 +14379,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=283;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="173",BUILD_VER=284;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}try{const P=JSON.parse(localStorage.getItem("strata.ped")||"null");if(P){st.pedHold=+P.pedHold||0;st.thrRate=+P.thrRate||2;st.brkRate=+P.brkRate||2}}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){const k=GFX.q==="auto"?GFX.eff:GFX.q;if(G.k!==k||G.v!==GFX.ovV||!G.m){G.k=k;G.v=GFX.ovV;const m={...GQ[k]};for(const o of GOPT)if(GFX.ov[o[0]]!==undefined)Object.assign(m,o[4](GFX.ov[o[0]]));if(Object.keys(GFX.ov).length)m.label=GQ[k].label+" (custom)";G.m=m;COLL.nt=!m.trees}return G.m}
@@ -14539,7 +14555,9 @@ function paOpenMenu(){if(!st.started||st.walk)return;if(!has("autopark")){toast(
 function paChoose(k){$("paMenu").hidden=true;SCR.paMenu=false;SCR.focus=false;if(!k){PA.mode=null;return}st.acc=false;st.pilot=false;
   if(k==="exit"){paStartExit();return}PA.mode=k;PA.found=false;PA.side=st.signal||1;tick(1)}
 // a parallel-parking stretch: Westport's Main St block, or (new world) whichever parking street you're driving along
-function paK(M){if(W2&&M.e.T.park&&M.e.mtr){const lo=loOf(M.e.n)*LANE;return {e:M.e,dir:M.dir,s0:rStart(M.e,M.dir)+9,s1:M.L-rEnd(M.e,M.dir)-9,oP:lo-LANE/2-M.e.T.park/2,oA:lo-0.1}}return PARK}
+function paK(M){if(W2&&M.e.T.park&&M.e.mtr){const lo=loOf(M.e.n)*LANE;return {e:M.e,dir:M.dir,s0:rStart(M.e,M.dir)+9,s1:M.L-rEnd(M.e,M.dir)-9,oP:lo-LANE/2-M.e.T.park/2,oA:lo-0.1,pw:M.e.T.park}}return PARK}
+const paKerb=K=>K.oP-(K.pw||2.4)/2,paParT=K=>paKerb(K)+BODY_HW+0.28;   // the kerb line, and where the car's centre should end up: about 28 cm off the kerb whatever its width
+const paInner=(M,he)=>M.off-(BODY_HW*Math.cos(he)+BODY_HL*Math.abs(Math.sin(he)));
 function paScan(){sys.paSpot=null;if(!PA.mode||sys.pa)return;if(st.signal)PA.side=st.signal;const sp=Math.abs(car.vx),M=me();PA.fast=sp>8.5;if(PA.fast||st.gear==="R")return;
   if(PA.mode==="par"){const K=paK(M);if(PA.side>0&&M.e===K.e&&M.dir===K.dir&&M.off<1.2+(K.oA+0.1)){const xs=parked.filter(p=>p.e===K.e&&(p.dir===K.dir||p.dir===undefined)).map(p=>p.s).sort((a,b)=>a-b),edges=[K.s0-2.4,...xs,K.s1+2.4];
       for(let i=0;i<edges.length-1;i++){const g0=edges[i]+2.4,g1=edges[i+1]-2.4,len=g1-g0,c=(g0+g1)/2,d=relS(M.s,c);if(len>VEH.len+1.6&&d>-6&&d<14){sys.paSpot={type:"par",s:c,len,K};break}}}}
@@ -14548,7 +14566,7 @@ function paScan(){sys.paSpot=null;if(!PA.mode||sys.pa)return;if(st.signal)PA.sid
       if(sp_&&sp_.type==="perp")sys.paSpot=sp_;else if(sp_&&sp_.type==="perpTight")PA.tight=true}}
   if(sys.paSpot&&!PA.found){PA.found=true;beep(880,.08,"sine",.18);setTimeout(()=>beep(1175,.12,"sine",.18),110)}if(!sys.paSpot)PA.found=false}
 function paStart(){const sp=sys.paSpot;if(!sp)return;const M=me();
-  if(sp.type==="par"){const K=sp.K||PARK;sys.pa={type:"par",ph:"pos",K,sT:sp.s,o0:K.oA,oT:K.oP,posD:TRIMS[st.trim].ws4&&st.ws4?5.9:6.5,msg:"Positioning"}}
+  if(sp.type==="par"){const K=sp.K||PARK;sys.pa={type:"par",ph:"pos",K,sT:sp.s,o0:K.oA,oT:paParT(K),posD:TRIMS[st.trim].ws4&&st.ws4?5.9:6.5,msg:"Positioning"}}
   else if(sp.type==="perp"&&sp.hplan){const L=planPerpH(sp.t,150000);if(!L){toast("Not enough room to park there: creep on to the next stall");return}sys.pa={type:"perpH",segs:L.segs,si:0,idx:0,t:sp.t,u:L.u,moves:L.moves,stuck:0,replans:0,msg:"Positioning"}}
   else if(sp.type==="perp"&&sp.plan){const L=sp.plan;sys.pa={type:"perp",ph:"pos",...L,idx:0,tries:0,msg:"Positioning"};{const r0=rearAx();let bi=0,bd=1e9;L.fp.forEach((p,i)=>{const d=Math.hypot(p[0]-r0[0],p[1]-r0[1]);if(d<bd){bd=d;bi=i}});sys.pa.idx=bi}}
   else if(sp.type==="perp"){const t=sp.t,u=[t.ux,t.uy],c=Math.cos(car.psi),s=Math.sin(car.psi);let a=[c,s];const dd=a[0]*u[0]+a[1]*u[1];a=[a[0]-dd*u[0],a[1]-dd*u[1]];const n=Math.hypot(a[0],a[1]);a=[a[0]/n,a[1]/n];
@@ -14587,13 +14605,13 @@ function paUpdate(dt){const A=sys.pa;if(!A)return null;
       if(togo<0.08&&Math.abs(v)<0.05){A.ph="rev1";A.offStart=M.off}}
     else if(A.ph==="rev1"){st.gear="R";steer=1;A.msg="Reversing in";vt=steerReady(1)?0.8:0;
       if(Math.abs(car.r)>0.02)A.xp=lerp(A.xp??-1.4,clamp(-car.vy/car.r,-3,1),0.1);const offP=M.off+(A.xp??-1.4)*Math.sin(he);
-      if(offP<=(A.offStart+A.oT)/2||rr<0.35){A.ph="rev2"}}
+      if(offP<=(A.offStart+A.oT)/2+0.14||rr<0.35||paInner(M,he)<paKerb(A.K)-0.05){A.ph="rev2"}}   // switch a little early so the car finishes ~25 cm off the kerb, not on it   // never let the rear corner swing over the kerb
     else if(A.ph==="rev2"){st.gear="R";steer=-1;A.msg="Straightening";vt=steerReady(-1)?0.8:0;
-      if(he<=0.015||rr<0.3){A.ph="adj"}}
+      if(he<=0.015||rr<0.3||paInner(M,he)<paKerb(A.K)-0.05){A.ph="adj"}}
     else if(A.ph==="adj"){const d=relS(M.s,A.sT);st.gear=d>0.15?"D":d<-0.15?"R":st.gear;const fwd=st.gear==="D";
       steer=clamp((fwd?1:-1)*(2.5*he+0.6*(M.off-A.oT)),-0.6,0.6);vt=Math.abs(d)>0.15?clamp(Math.abs(d)*0.6,0.25,0.7):0;A.msg="Centring";
       if((fwd&&fr<0.45)||(!fwd&&rr<0.45))vt=0;
-      if((vt===0)&&Math.abs(v)<0.03){paStop(`Parked: ${ftS(Math.min(fr,rr))} clearance, ${Math.abs(M.off-A.oT).toFixed(2)} m from the kerb line`,true);return null}}}
+      if((vt===0)&&Math.abs(v)<0.03){paStop(`Parked: ${ftS(Math.min(fr,rr))} clearance, ${ftS(Math.max(0,paInner(M,he)-paKerb(A.K)))} from the kerb`,true);return null}}}
   else if(A.type==="perp"){
     if(A.ph==="pos"){st.gear="D";const o=ppSteer(A,A.fp,A.fc,3.2);steer=o.steer;vt=clamp(o.left*0.45,0,2.0);A.msg="Positioning";if(fr<0.5)vt=0;
       if(o.left<0.12&&Math.abs(v)<0.05){A.ph="rev";A.idx=0}}
@@ -14604,7 +14622,7 @@ function paUpdate(dt){const A=sys.pa;if(!A)return null;
         const axis=Math.atan2(-A.u[1],-A.u[0]),he_=wrapPi(car.psi-axis),cx=car.px,cy=car.py,lat=(cx-A.t.x)*(-A.u[1])+(cy-A.t.y)*A.u[0];
         if((Math.abs(he_)>0.06||Math.abs(lat)>0.28)&&A.tries<3&&fr>1.2){A.tries++;A.ph="fix";const r0=rearAx(),F=[A.E[0]-A.u[0]*1.6,A.E[1]-A.u[1]*1.6];const fpts=[];for(let q=0;q<=1.0001;q+=0.05){const e=q*q*(3-2*q);fpts.push([r0[0]+(F[0]-r0[0])*q+(-A.u[0])*0*e,r0[1]+(F[1]-r0[1])*q])}
           A.xp=fpts;A.xc=cumOf(fpts);A.idx=0;A.msg=`Adjusting (${A.tries})`}
-        else{paStop(`Parked in the stall${rr<3?`: ${ftS(rr)} behind you`:""}${A.tries?`, after ${A.tries} adjustment${A.tries>1?"s":""}`:""}`,true);return null}}}}
+        else{A.type="settle";A.done=`Parked in the stall${A.tries?`, after ${A.tries} adjustment${A.tries>1?"s":""}`:""}`}}}}
     else if(A.ph==="fix"){st.gear="D";const o=ppSteer(A,A.xp,A.xc,1.6);steer=o.steer;vt=clamp(o.left*0.45,0,0.7);if(fr<0.5)vt=0;A.msg=`Adjusting (${A.tries})`;
       if((o.left<0.15||fr<0.5)&&Math.abs(v)<0.04){const r0=rearAx(),depth=(A.t.x+A.u[0]*(2.9-0.25+B-2.9)-r0[0])*A.u[0]+(A.t.y+A.u[1]*(2.9-0.25+B-2.9)-r0[1])*A.u[1];
         const rp=[];const end=[A.t.x+A.u[0]*(B-0.25),A.t.y+A.u[1]*(B-0.25)];for(let q=0;q<=1.0001;q+=0.04)rp.push([r0[0]+(end[0]-r0[0])*q,r0[1]+(end[1]-r0[1])*q]);A.rp=rp;A.rc=cumOf(rp);A.idx=0;A.ph="rev"}}}
@@ -14612,9 +14630,14 @@ function paUpdate(dt){const A=sys.pa;if(!A)return null;
     const last=A.si===A.segs.length-1;A.msg=last?(left>2?"Reversing in":"Straightening"):`${rev?"Reversing":"Pulling forward"} (move ${A.si+1} of ${A.segs.length})`;
     const lag=Math.abs(car.dF-(-(0.35*Math.abs(steer)+0.65*steer*steer)*Math.sign(steer)*0.576));vt=Math.abs(v)<0.1&&lag>0.08?0:clamp(left*0.45,0.2,lag>0.12?0.2:0.55);
     if((!rev&&fr<0.1)||(rev&&rr<0.1))vt=0;if(!rev&&fr<0.6||rev&&rr<0.6)vt=Math.min(vt,0.3);
-    if(left<0.1){vt=0;if(Math.abs(v)<0.04){if(last){paStop(`Parked in the stall${A.segs.length>1?` (${A.segs.length}-point turn)`:""}${rr<3?`: ${ftS(rr)} behind you`:""}`,true);return null}A.si++;A.idx=0}}
+    if(left<0.1){vt=0;if(Math.abs(v)<0.04){if(last){A.type="settle";A.done=`Parked in the stall${A.segs.length>1?` (${A.segs.length}-point turn)`:""}`}else{A.si++;A.idx=0}}}
     A.stuck=vt===0&&Math.abs(v)<0.03&&left>=0.1?A.stuck+dt:0;
     if(A.stuck>1.5){A.stuck=0;const L=A.replans<3?planPerpH(A.t,150000,true):null;if(L){A.replans++;A.segs=L.segs;A.si=0;A.idx=0}else{paStop("Park assist stopped: not enough room",false);return null}}}
+  else if(A.type==="settle"){// straight in or out until the car sits where it should in the stall: centred, but never closer than 30 cm to the stall end
+    const T=A.t,u=[T.ux,T.uy],c=Math.cos(car.psi),sn=Math.sin(car.psi),hu=c*u[0]+sn*u[1],d=(car.px-T.x)*u[0]+(car.py-T.y)*u[1],hl=(T.hl||2.9),dT=Math.min(Math.max(0,hl-0.3-BODY_HL)*0.5,hl-0.3-BODY_HL),err=dT-d;
+    const deeper=hu>0?"D":"R";st.gear=err>0?deeper:(deeper==="D"?"R":"D");const fw=st.gear==="D";steer=0;A.msg="Centring in the stall";A.st=(A.st||0)+dt;
+    vt=Math.abs(err)>0.06?clamp(Math.abs(err)*0.7,0.15,0.4):0;if((fw&&fr<0.35)||(!fw&&rr<0.3))vt=0;
+    if((vt===0||A.st>12)&&Math.abs(v)<0.03){const back=hl-(d+BODY_HL*Math.abs(hu)),front=hl+(d-BODY_HL*Math.abs(hu));paStop(`${A.done}: ${ftS(Math.max(0,back))} to the end of the space${front<0?`, ${ftS(-front)} sticking out`:""}`,true);return null}}
   else if(A.type==="exit"){
     if(A.ph==="back"){st.gear="R";steer=0;vt=0.5;A.msg="Making room";if(rr<0.6||relS(M.s,A.s0)<-1.2){vt=0;if(Math.abs(v)<0.03)A.ph="out"}}
     else if(A.ph==="out"){st.gear="D";steer=-1;A.msg="Steering out";vt=steerReady(-1)?0.8:0;if(fr<0.45){vt=0;if(Math.abs(v)<0.03)A.ph="back2"}
