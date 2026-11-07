@@ -1267,8 +1267,9 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
 <script data-boot>(function(){var p=0;window.__bootP=0;var t=setInterval(function(){if(window.__bootReal){clearInterval(t);return}p+=(0.7-p)*0.025;window.__bootP=p;var a=document.getElementById("bootArc"),n=document.getElementById("bootNeedle"),c=document.getElementById("bootPct");if(a)a.setAttribute("stroke-dasharray",(p*100).toFixed(1)+" 100");if(n)n.style.setProperty("--a",(-135+p*270)+"deg");if(c)c.textContent=String(Math.round(p*100))},120)})()</script>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 284 · Smarter park assist, solid traffic</h2></div>
+    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 285 · No more dead ends</h2></div>
     <div class="nb">
+      <h4>🛣️ Every street connects · park assist lag fixed</h4><ul><li>All 12 cul-de-sacs are now through streets, so every road leads somewhere.</li><li>Rosedale: Linwood St and Spruce St cross the whole neighbourhood, and Walnut Rd runs out to Commerce Pkwy at Maple Rd.</li><li>Birch Park: Aspen Way runs down to Maple Rd.</li><li>Oakridge: Hickory St and Chestnut St cross the middle, Fox Run and Deer Path run out to North St, and Quail Ln loops round the north side.</li><li>Kestrel Estates: Summit Ridge Dr is a new ring behind the gate that links the north, west and south sides.</li><li>The houses moved to line the new streets. The only road that still ends is the gravel track into the off-road park lot.</li><li>Fixed: searching for a perpendicular space made the game lag badly, especially in the garage. It was re-planning the whole manoeuvre on every frame. Now it plans once when you tap Park, so searching runs as smoothly as normal driving.</li></ul>
       <h4>🅿️ Park assist that stays off the kerb · traffic that can't drive through itself</h4><ul><li>Parallel parking now finishes about 20–30 cm from the kerb, straight and inside the parking lane. It used to end touching the kerb, or over it in long cars like the Regent. The message tells you the real gap to the kerb.</li><li>Perpendicular parking now finishes with a straight centring move, so the car sits in the middle of the space with its back bumper about 30 cm from the end. It no longer stops with the nose hanging into the aisle. Very long trucks that can't fit go as deep as is safe, and the message tells you how much is sticking out.</li><li>AI cars are now solid to each other. When two would overlap (merging, at junctions, creeping in a queue), the one behind backs off and waits, so they no longer drive through each other. Real crashes between AI cars still happen as before.</li><li>Fixed: some cars parked along the street and in lots spawned inside each other. Overlapping ones are now removed when the world loads.</li></ul>
       <h4>🪨 Off-road park: tyres no longer sink into rocks and logs</h4><ul><li>Fixed: in the off-road park, wheels used to sink into boulders, ledges and logs (up to 30 cm in) and then slowly float up on top. Now the tyre is treated as round: the rubber touches the face first and the wheel rides up it straight away, so nothing clips through.</li><li>Climbing still takes effort. The steeper the face, the harder it pushes back on the tyre, so you need throttle, low range or momentum.</li><li>A face much taller than your tyre (about 1.25× its radius) is now a wall: the wheel stops against it with a jolt instead of passing through. Back up and pick a better line, or bring a truck with bigger tyres.</li><li>The Steps are now climbable the way they're meant to be, one wheel at a time. In testing, a Bronco Sport and a Fusion Current Summit both made it over all three ledges, where before they got stuck partway up.</li></ul>
       <h4>🚙 More realistic car on the Fusion Current cluster</h4><ul><li>The car in the Current's chase view now has shaded paint in your colour, a tinted rear window with a reflection, a roof spoiler, a full-width light bar that glows brighter when you brake, turn signals that blink, a FUSION badge, a licence plate, a bumper with a diffuser, tyres and a ground shadow.</li></ul>
@@ -2281,13 +2282,13 @@ function buildNet2(){
   mkR("col","Riverside Dr",[[100,-650],[100,-300],[100,0],[100,300],[100,650]]);
   // Rosedale: a loop street round an oval, a winding spine through the middle, cul-de-sacs off it
   {const R=ovalLoop("Rosedale Dr",560,740,320,280);rd("res","Kendall St",[R.S,[520,620,0],[560,740],[600,880,0],R.N]);
-    cul("Linwood Ct",[560,740],-1,0,150);cul("Spruce Ct",[560,740],1,0,150);cul("Walnut Ct",R.E,1,0,90);
+    rd("res","Linwood St",[[560,740],R.W]);rd("res","Spruce St",[[560,740],R.E]);rd("res","Walnut Rd",[R.E,[960,700,0],[1000,560,0],[1000,0]]);   // no dead ends: what were cul-de-sacs now run through
     rd("res","Ardmore St",[[100,650],[170,700,0],R.W]);rd("col","Poplar Ln",[[500,0],[530,240,0],R.S])}
   // Birch Park: an oval loop with a cross street, a cul-de-sac off the south end
-  {const B=ovalLoop("Birch Park Dr",560,-670,330,200);rd("res","Willow St",[B.W,[400,-610,0],[720,-730,0],B.E]);cul("Aspen Ct",B.S,0,-1,85);
+  {const B=ovalLoop("Birch Park Dr",560,-670,330,200);rd("res","Willow St",[B.W,[400,-610,0],[720,-730,0],B.E]);rd("res","Aspen Way",[B.S,[600,-960,0],[1000,-960]]);
     rd("res","Birch St",[[100,-650],B.W]);rd("res","Cedar St",[B.E,[1000,-650]]);rd("col","Poplar Ln",[[500,0],[530,-240,0],B.N])}
   // ---- Maple Rd and the county roads: a mile-ish grid of 55 mph roads through the farmland
-  mkR("road","Maple Rd",[[1000,0],[1000,-650],[1000,-1090]],{lim:45});
+  mkR("road","Maple Rd",[[1000,0],[1000,-650],[1000,-960],[1000,-1090]],{lim:45});
   mkR("art","Maple Rd",[[1000,-1090],[1000,-1350],[1000,-1650],[1000,-1910]],{lim:45});
   mkR("road","Maple Rd",[[1000,-1910],[1000,-2400],[1000,-3300]],{lim:55});
   mkR("road","County Rd 3",[[-3600,-3300],[-3600,-2400],[-3600,-2100],[-3600,-1910]],{lim:55});
@@ -2314,7 +2315,7 @@ function buildNet2(){
   mkR("road","County Rd 22",[[2600,-1910],[2600,-2400],[2600,-3300]],{lim:55});
   // Oakridge: an oval loop, a winding spine, cul-de-sacs off three sides
   {const O=ovalLoop("Oakridge Dr",2800,900,430,270);rd("res","Laurel St",[O.S,[2740,780,0],[2800,900],[2860,1040,0],O.N]);
-    cul("Fox Run",O.W,-1,0,95);cul("Deer Path",O.E,1,0,95);cul("Quail Ct",O.N,0,1,85);cul("Hickory Ct",[2800,900],-1,0.15,170);cul("Chestnut Ct",[2800,900],1,-0.15,170);
+    rd("res","Fox Run",[O.W,[2310,820,0],[2300,300]]);rd("res","Deer Path",[O.E,[3270,760,0],[2900,300]]);rd("res","Quail Ln",[O.N,[2920,1270,0],[3170,1170,0],O.E]);rd("res","Hickory St",[[2800,900],O.W]);rd("res","Chestnut St",[[2800,900],O.E]);
     rd("col","Fairhaven Blvd",[[2600,300],[2680,480,0],O.S])}
   // ---- Millbrook: Mill St, a few side streets, Lakeshore Dr round the lake, Old Mill Rd south over the creek, Route 9 west to Westport
   mkR("st","Mill St",[[1450,2450],[1600,2450],[1750,2450],[1900,2450],[2100,2450]],{lim:25});
@@ -2330,7 +2331,7 @@ function buildNet2(){
   mkR("road","Route 9",[[-1000,1500],[-760,1640,180],[-520,1960,200],[-80,2080,220],[300,2350,250],[760,2260,220],[1150,2480,200],[1450,2450]],{lim:45});
   // ---- Kestrel Estates: a gated community off Woodward Ave (the gatehouse is on Estates Dr)
   {const G=ovalLoop("Estates Loop",-1450,1140,210,125,{lim:20});rd("res","Estates Dr",[[-1000,1000],[-1120,1060,0],G.E],{lim:20});
-    cul("Summit Ct",G.N,0,1,75);cul("Ridgeview Ct",G.W,-1,0,85);cul("Aspen Ridge",G.S,0,-1,75)}
+    rd("res","Summit Ridge Dr",[G.N,[-1600,1300,0],[-1745,1140],[-1600,980,0],G.S],{lim:20});rd("res","Ridgeview Ct",[G.W,[-1745,1140]],{lim:20})}
   // ---- Kestrel Rd: from Woodward Ave west over I-61 to the foot of Mount Kestrel and on to County Rd 3
   mkR("road","Kestrel Rd",[[-1000,1500],[-1890,1500]],{lim:45});
   mkR("art","Kestrel Rd",[[-1890,1500],[-2150,1500],[-2450,1500],[-2710,1500]],{lim:40});
@@ -14379,7 +14380,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=284;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="173",BUILD_VER=285;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}try{const P=JSON.parse(localStorage.getItem("strata.ped")||"null");if(P){st.pedHold=+P.pedHold||0;st.thrRate=+P.thrRate||2;st.brkRate=+P.brkRate||2}}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){const k=GFX.q==="auto"?GFX.eff:GFX.q;if(G.k!==k||G.v!==GFX.ovV||!G.m){G.k=k;G.v=GFX.ovV;const m={...GQ[k]};for(const o of GOPT)if(GFX.ov[o[0]]!==undefined)Object.assign(m,o[4](GFX.ov[o[0]]));if(Object.keys(GFX.ov).length)m.label=GQ[k].label+" (custom)";G.m=m;COLL.nt=!m.trees}return G.m}
@@ -14541,13 +14542,16 @@ function planPerpH(t,budget,tight){const u=[t.ux,t.uy],z=t.z||0,Rm=WB/Math.tan(0
   if(!cur||!cur.rev){cur={rev:true,pts:[[x,y]],ks:[0]};segs.push(cur)}const dep=(G[0]-x)*u[0]+(G[1]-y)*u[1];for(let k=0.1;k<=dep+1e-6;k+=0.1){cur.pts.push([x+u[0]*k,y+u[1]*k]);cur.ks.push(0)}
   for(const sg of segs){sg.pts.push([sg.pts[sg.pts.length-1][0]+(sg.pts.length>1?(sg.pts[sg.pts.length-1][0]-sg.pts[sg.pts.length-2][0]):0)*3,sg.pts[sg.pts.length-1][1]+(sg.pts.length>1?(sg.pts[sg.pts.length-1][1]-sg.pts[sg.pts.length-2][1]):0)*3]);sg.end=sg.pts.length-2;sg.cum=cumOf(sg.pts);sg.ks.push(0)}
   return {segs,t,u,z,moves:segs.length}}
+// the stall list is cached while you creep along (it only changes when you move a fair way), so searching for a space doesn't stutter
+function perpSpotsC(){const C=PA.spC,now=performance.now();if(C&&now-C.at<2000&&Math.hypot(car.px-C.x,car.py-C.y)<12&&Math.abs((car.zb||0)-C.z)<1)return C.L;const L=perpSpots();PA.spC={L,x:car.px,y:car.py,z:car.zb||0,at:now};return L}
 function scanPerp(){const c=Math.cos(car.psi),s=Math.sin(car.psi),r=rearAx();let best=null,bs=1e9;
-  for(const t of perpSpots()){if(Math.abs(t.ux*c+t.uy*s)>0.4)continue;const ex=t.x-t.ux*2.9,ey=t.y-t.uy*2.9,dx=ex-r[0],dy=ey-r[1],lx=dx*c+dy*s,ly=-dx*s+dy*c;
+  for(const t of perpSpotsC()){if(Math.abs(t.ux*c+t.uy*s)>0.4)continue;const ex=t.x-t.ux*2.9,ey=t.y-t.uy*2.9,dx=ex-r[0],dy=ey-r[1],lx=dx*c+dy*s,ly=-dx*s+dy*c;
     if(lx<-4||lx>9)continue;const side=ly<0?1:-1;if(st.signal&&side!==st.signal)continue;if(Math.abs(ly)<0.6||Math.abs(ly)>10)continue;
     // the stall must open toward us (we back in from the aisle side)
     if((t.ux*(-s)+t.uy*c)*(ly<0?1:-1)>0)continue;if(!spotFree(t))continue;const sc=Math.abs(lx-1.5)+Math.abs(ly)*0.2;if(sc<bs){bs=sc;best=t}}
-  if(!best)return null;const plan=inGarage(car.px,car.py)?null:planPerp(best);if(plan)return {type:"perp",t:best,plan};
-  if(inGarage(car.px,car.py)){const now=performance.now(),C=PA.hc;let ok;if(C&&C.t===best&&now-C.at<1500)ok=C.ok;else{ok=!!planPerpH(best,40000);PA.hc={t:best,ok,at:now}}if(ok)return {type:"perp",t:best,hplan:true}}
+  if(!best)return null;const same=q=>q&&Math.abs(q.tx-best.x)<0.01&&Math.abs(q.ty-best.y)<0.01&&Math.hypot(car.px-q.x,car.py-q.y)<3&&Math.abs(wrapPi(car.psi-q.h))<0.12;
+  if(!inGarage(car.px,car.py)){let plan;const P=PA.pc;if(same(P))plan=P.plan;else{plan=planPerp(best);PA.pc={tx:best.x,ty:best.y,x:car.px,y:car.py,h:car.psi,plan}}if(plan)return {type:"perp",t:best,plan}}   // the path is only re-planned when you've moved
+  if(inGarage(car.px,car.py))return {type:"perp",t:best,hplan:true};   // in the garage the full manoeuvre is planned once, when you tap Park (planning it on every scan froze the game for a third of a second)
   return {type:"perpTight",t:best}}
 
 function paOpenMenu(){if(!st.started||st.walk)return;if(!has("autopark")){toast(`The real ${TRIMS[st.trim].short||"car"} doesn't have park assist`);return}if(sys.pa){paStop("Park assist cancelled");return}
