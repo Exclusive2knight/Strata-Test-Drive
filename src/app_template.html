@@ -1267,8 +1267,9 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
 <script data-boot>(function(){var p=0;window.__bootP=0;var t=setInterval(function(){if(window.__bootReal){clearInterval(t);return}p+=(0.7-p)*0.025;window.__bootP=p;var a=document.getElementById("bootArc"),n=document.getElementById("bootNeedle"),c=document.getElementById("bootPct");if(a)a.setAttribute("stroke-dasharray",(p*100).toFixed(1)+" 100");if(n)n.style.setProperty("--a",(-135+p*270)+"deg");if(c)c.textContent=String(Math.round(p*100))},120)})()</script>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 296 · Park to park, for real</h2></div>
+    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 297 · Real Tesla sounds</h2></div>
     <div class="nb">
+      <h4>🔊 Real Tesla sounds on every Tesla</h4><ul><li>Every Tesla now uses the real sounds from Tesla's owner's manual instead of generic beeps:<ul><li>Driver assistance: Autosteer on and off, Navigate on Self-Driving on and off, Traffic-Aware Cruise Control on and off.</li><li>Alerts: the hands-on-wheel warning (repeating when it escalates), Self-Driving alerts, and the sound when Autosteer or Self-Driving is unavailable.</li><li>Warnings: forward collision warning, lane departure warning, and the speed limit chime when you go more than 10% over.</li><li>Park assist: a chime when it comes on, a warning when you're very close, and a fast tone when you're too close.</li><li>Around the car: the lock chime, the faint footwell sound when Hold engages, the seat belt chime, and the Dashcam save sound.</li><li>Driving: the real pedestrian warning sound in Drive and in Reverse, the motor's high-pitched whine when you launch hard, and the occasional click from the brakes at low speed.</li></ul></li></ul>
       <h4>🅿️ FSD park to park: street parking, store lots, chargers, downtown</h4><ul><li><b>Fixed: FSD kept driving past the destination instead of parking.</b> The navigation was ending the trip about 18 m early, which took the destination away from FSD. Now FSD handles the arrival and parks.</li><li><b>Street parking:</b> heading to a place on a metered street (downtown), FSD slows down in the kerb lane about 100 m out, takes the first gap that fits and parallel parks. If it passes the destination without finding one, it keeps looking for another 60 m.</li><li><b>Store lots</b> (Bean &amp; Brew, Fresh Market, HomeWorks, Burger Barn, Tread Center): FSD turns in through the driveway, drives along the aisle to a free space near the door and backs in. Leaving, it backs out, drives the aisle to the nearest driveway and turns out onto the road. No more cutting across the lot.</li><li><b>Chargers:</b> in an EV or plug-in below 90%, FSD picks a free charging bay first (Bean &amp; Brew has eight), parks and plugs in. If you start FSD while plugged in, it unplugs first.</li><li><b>Downtown in the navigation:</b> the shops in downtown Westport and Fairhaven (Corner Café, Boutique, Electronics, Corner market, Pharmacy, Bakery, Restaurant, Auto parts) are now places you can pick, each with its street.</li><li>FSD no longer switches off by itself in the first two seconds after it takes over from park assist.</li></ul>
       <h4>🅿️ FSD park to park: the Fort St garage</h4><ul><li>Start FSD in any stall of the Fort St parking garage, on any level. The car backs out, drives down the ramps, pays at the exit gate and heads out onto Park Ave, then drives to your destination.</li><li>If your destination is near the garage, FSD drives in from Cass Ave, takes a ticket, climbs to the lowest level with a free stall (crossing between the two ramps when it needs to), backs into the stall and shifts to Park.</li><li>Fixed: when FSD took over after leaving a parking lot, a leftover steering input could switch it straight off.</li></ul>
       <h4>🅿️ FSD: park to park</h4><ul><li>With a destination set, turn on FSD while you're parked in a space (a parking-lot stall or a parallel space). The Tesla pulls out by itself, drives through the parking lot to the road and carries on to your destination.</li><li>When it gets there, it no longer stops in the lane. It finds a free parallel space right there, or the nearest free stall in a parking lot near the destination, drives in and backs into the space, then shifts to Park. If a space gets taken or it can't get in, it tries the next one (up to four), and otherwise asks you to park.</li><li>Press the pedals or steer at any time to take over.</li><li>Smart Summon also leaves more room around the ends of parked cars, and backs up and tries another way when its nose is against something.</li></ul>
@@ -6042,8 +6043,26 @@ function w2NavPlaces(add){
 st.power=true;
 
 // ---- seatbelt reminder: a chime that gets more insistent while you drive unbuckled
+// ---- Tesla sounds (from the official Model Y owner's manual), on every Tesla: Autosteer / FSD / TACC chimes, hands-on and alerts,
+// park assist, forward collision and lane departure warnings, lock, Hold, seat belt, speed limit, dashcam, motor whine and the brake clicks
+const TS_ALL=["lock","whine","hold","brkclick","dashcam","belt","belt_rear","fcw","ldw","park","close","tooclose","speed","alert","unavail","hands","noa_on","noa_off","as_on","as_off","tacc_on","tacc_off"];
+const tsS=(k,v)=>isTesla()&&playS("ts_"+k,v??0.5);
+const TSQ={};
+function tslSndTick(dt){if(!isTesla()||!au.ctx)return;const q=TSQ,sp=Math.abs(car.vx);
+  if(q.trim!==st.trim){q.trim=st.trim;TS_ALL.forEach(k=>sfxLoad("ts_"+k));for(const k of Object.keys(q))if(k!=="trim")delete q[k]}
+  const ch=(k,v)=>{const was=q[k];q[k]=v;return was!==undefined&&was!==v};
+  if(ch("lock",!!st.locked)&&st.locked)tsS("lock",0.45);
+  if(st.walk)return;
+  if(ch("hold",!!sys.hold)&&sys.hold&&st.started)tsS("hold",0.3);
+  const pil=!!st.pilot,acc=!!st.acc,fsd=fsdOwned()&&!!NAV.dest;
+  const pc=ch("pilot",pil);if(pc){if(pil)tsS(fsd?"noa_on":"as_on",0.55);else tsS(q.fsdWas?"noa_off":"as_off",0.55)}if(pil)q.fsdWas=fsd;
+  if(ch("acc",acc)&&!pil&&!pc)tsS(acc?"tacc_on":"tacc_off",0.5);
+  if(ch("park",!!sys.parkOn)&&sys.parkOn)tsS("park",0.45);
+  {const M=me(),lim=M&&M.limit;if(lim&&st.started){const over=car.vx>lim*1.1+0.9;if(ch("over",over)&&over)tsS("speed",0.4)}}
+  q.wT=(q.wT||0)-dt;if(inp.thr>0.6&&car.vx>0.3&&car.vx<3&&q.wT<=0&&st.gear==="D"){q.wT=8;tsS("whine",0.22)}
+  q.cT=(q.cT||0)-dt;if(inp.brk>0.15&&sp>0.6&&sp<3.5&&q.cT<=0){q.cT=3+Math.random()*4;if(Math.random()<0.5)tsS("brkclick",0.18)}}
 function beltTick(dt){if(st.walk||!st.started||st.belt||st.power!==true){sys.beltT=0;return}const v=Math.abs(car.vx);if(v<2.5){return}sys.beltT=(sys.beltT||0)+dt;sys.beltC=(sys.beltC||0)-dt;
-  if(sys.beltC<=0){sys.beltC=sys.beltT>20?0.5:1.1;const b=(TRIMS[st.trim].group||"").split(" ")[0];if(isRav19()){const fast=sys.beltT>20;sys.beltC=fast?5.95:3.38;if(!playS(fast?"rav19_belt_fast":"rav19_belt_slow",0.45))beep(800,.14,"sine",.16)}else if(b==="Ford"){sys.beltC=1.6;if(!playS("ch_ford",0.4))beep(880,.14,"sine",.16)}else if(b==="BMW"){sys.beltC=1.3;if(!playS("ch_bmw",0.4))beep(880,.14,"sine",.16)}else if(!(GMB.has(b)&&playS("gm_chime",0.35)))beep(sys.beltT>20?1180:880,.14,"sine",.16)}
+  if(sys.beltC<=0){sys.beltC=sys.beltT>20?0.5:1.1;const b=(TRIMS[st.trim].group||"").split(" ")[0];if(isTesla()&&playS("ts_belt",0.5)){sys.beltC=sys.beltT>20?0.9:1.3}else if(isRav19()){const fast=sys.beltT>20;sys.beltC=fast?5.95:3.38;if(!playS(fast?"rav19_belt_fast":"rav19_belt_slow",0.45))beep(800,.14,"sine",.16)}else if(b==="Ford"){sys.beltC=1.6;if(!playS("ch_ford",0.4))beep(880,.14,"sine",.16)}else if(b==="BMW"){sys.beltC=1.3;if(!playS("ch_bmw",0.4))beep(880,.14,"sine",.16)}else if(!(GMB.has(b)&&playS("gm_chime",0.35)))beep(sys.beltT>20?1180:880,.14,"sine",.16)}
   if(!sys.beltToast||performance.now()-sys.beltToast>9000){sys.beltToast=performance.now();toast(PC.on?"Fasten your seatbelt: press B":"Fasten your seatbelt")}}
 // ---- G: radial menu of the driver assists
 const RADIAL={open:false};
@@ -8629,7 +8648,7 @@ function tControls(g,top,bot,W){const cx=W*0.5,cy=top+(bot-top)*0.3,cl=Math.min(
   lbl(cx-cl*0.62,cy-18,"Frunk",SCR.frunk,()=>{SCR.frunk=!SCR.frunk;tick(1)});lbl(cx+cl*0.62,cy-18,"Trunk",SCR.trunk,()=>{SCR.trunk=!SCR.trunk;tick(1)});
   g.fillStyle="#e6eef0";g.font=FONT(16);g.fillText(st.locked?"🔒":"🔓",cx,cy-44);hit(cx-16,cy-60,32,30,()=>{st.locked=!st.locked;tick(1)});
   const tiles=[["Mirrors","⇔",TOPT.fold,()=>TOPT.fold=!TOPT.fold],["Steering","◎",false,()=>{SCR.ts="pedals"}],["Wiper","⌒",!!st.wipers,()=>{st.wipers=!st.wipers}],["Window Lock","▤",TOPT.wlock,()=>TOPT.wlock=!TOPT.wlock],
-    ["Child Lock","⚿",TOPT.childLock,()=>TOPT.childLock=!TOPT.childLock],["Display","▭",false,()=>{SCR.ts="display"}],["Sentry","◉",TSL.sentry,()=>{TSL.sentry=!TSL.sentry;toast(TSL.sentry?"Sentry Mode on":"Sentry Mode off")}],["Dashcam","●",hasDash&&hasDash(),()=>toast(hasDash()?"Dashcam saved a clip":"Dashcam: add it in the builder")]];
+    ["Child Lock","⚿",TOPT.childLock,()=>TOPT.childLock=!TOPT.childLock],["Display","▭",false,()=>{SCR.ts="display"}],["Sentry","◉",TSL.sentry,()=>{TSL.sentry=!TSL.sentry;toast(TSL.sentry?"Sentry Mode on":"Sentry Mode off")}],["Dashcam","●",hasDash&&hasDash(),()=>{if(hasDash())tsS("dashcam",0.5);toast(hasDash()?"Dashcam saved a clip":"Dashcam: add it in the builder")}]];
   const cols=4,tw=(W-28)/cols,th=Math.min(52,(bot-cy-50)/2-6);tiles.forEach(([n,ic,on,fn],i)=>{const x=14+(i%cols)*tw,y=cy+44+Math.floor(i/cols)*(th+6);g.fillStyle=on?"#1d2c4f":"#15191d";rr2(g,x,y,tw-6,th,8);g.fill();
     g.fillStyle=on?"#9db4ff":"#cfd6da";g.textAlign="center";g.font=FONT(15);g.fillText(ic,x+(tw-6)/2,y+th/2-7);g.font=FONT(10.5);g.fillText(n,x+(tw-6)/2,y+th/2+12);hit(x,y,tw-6,th,()=>{fn();tick(1)})})}
 function tPedals(g,top,bot,W){const T=TRIMS[st.trim],mn=T.modeNames||["Chill","Standard"];let y=top+14;
@@ -9442,7 +9461,7 @@ function assist(dt){
   if(sys.aebState==="held"){sys.aebHold-=dt;sys.aebBrake=1;if(sys.aebHold<=0){sys.aebBrake=0;sys.aebState="ready"}}
   if(sys.aebState==="ready"&&sys.aebBrake>0&&!(ttc<aebT(1)))sys.aebBrake=Math.max(0,sys.aebBrake-dt*2);
   if(!st.aeb||!has("aeb")){sys.aebBrake=0;sys.aebState="off"}else if(st.aebAuto===false){sys.aebBrake=0;sys.aebState="ready"}else if(sys.aebState==="off")sys.aebState="ready";
-  {const b=brandS(),lin=b==="Lincoln",gm=GMB.has(b),kia=b==="Kia",bmw=b==="BMW",ford=b==="Ford",toy=b==="Toyota"||b==="Lexus",kSolid=kia&&(sys.aebState==="braking"||sys.aebBrake>0.3);if(sys.fcw&&(lin||gm||kia||bmw||ford||toy)){const now=performance.now();if(!sys.fcwSndT||now-sys.fcwSndT>(lin?2300:kia?(kSolid?1850:1300):bmw?600:ford?1000:toy?1690:950)){sys.fcwSndT=now;if(!playS(lin?"lin_hard":kia?(kSolid?"kia_aeb_solid":"kia_aeb"):bmw?"bmw_aeb":ford?"ford_aeb":toy?"toy_aeb":"gm_aeb",0.7))beep(2300,.08,"square",.18)}}else{if(!sys.fcw)sys.fcwSndT=0;if(sys.fcw&&(performance.now()%220)<dt*1000*1.2)beep(2400,.07,"square",.2)}}
+  {if(isTesla()&&sys.fcw){const now=performance.now();if(!sys.fcwSndT||now-sys.fcwSndT>700){sys.fcwSndT=now;playS("ts_fcw",0.7)}}else{const b=brandS(),lin=b==="Lincoln",gm=GMB.has(b),kia=b==="Kia",bmw=b==="BMW",ford=b==="Ford",toy=b==="Toyota"||b==="Lexus",kSolid=kia&&(sys.aebState==="braking"||sys.aebBrake>0.3);if(sys.fcw&&(lin||gm||kia||bmw||ford||toy)){const now=performance.now();if(!sys.fcwSndT||now-sys.fcwSndT>(lin?2300:kia?(kSolid?1850:1300):bmw?600:ford?1000:toy?1690:950)){sys.fcwSndT=now;if(!playS(lin?"lin_hard":kia?(kSolid?"kia_aeb_solid":"kia_aeb"):bmw?"bmw_aeb":ford?"ford_aeb":toy?"toy_aeb":"gm_aeb",0.7))beep(2300,.08,"square",.18)}}else{if(!sys.fcw)sys.fcwSndT=0;if(sys.fcw&&(performance.now()%220)<dt*1000*1.2)beep(2400,.07,"square",.2)}}}
   // ---- traffic lights ahead: ACC / Pilot stop for them quietly; running a red is logged
   sys.red=null;sys.redWarn=false;
   {const n=M.node;if(n&&n.ctrl==="signal"&&M.s<M.L){const leg=arrLeg(M.e,M.dir),d=M.sStop-M.s,ls=sigState(n,leg.grp,st.clock||0);
@@ -9517,7 +9536,7 @@ function assist(dt){
   sys.pilotDelta=0;
   sys.fsdActive=false;if(!st.pilot&&FSD.a)fsdReset();
   if(!st.pilot)sys.pilotState="off";
-  else if(isTesla()&&fsdOwned()){if(st.gear!=="D"||car.offroad){sys.pilotState="standby";fsdReset()}else if(Math.abs(inp.steer)>0.3&&!(sys.p2pGrace>0)){st.pilot=false;fsdReset();sys.pilotState="off";beep(500,.2,"sine",.25);toast("FSD disengaged: you steered");logResult("FSD disengaged by steering")}else{sys.pilotState="active";sys.fsdActive=true;if(!st.acc)st.acc=true;fsdDrive(dt,M,S)}}
+  else if(isTesla()&&fsdOwned()){if(st.gear!=="D"||car.offroad){sys.pilotState="standby";fsdReset()}else if(Math.abs(inp.steer)>0.3&&!(sys.p2pGrace>0)){st.pilot=false;fsdReset();sys.pilotState="off";toast("FSD disengaged: you steered");logResult("FSD disengaged by steering")}else{sys.pilotState="active";sys.fsdActive=true;if(!st.acc)st.acc=true;fsdDrive(dt,M,S)}}
   else if(sp<(TRIMS[st.trim].tjaMax?0.5:8)||st.gear!=="D"||car.offroad||sys.esa||(TRIMS[st.trim].pilotHwy&&zoneAt(M.s)==="c"))sys.pilotState="standby";
   else if(override){sys.pilotState="override";sys.pilotLC=null}
   else{
@@ -9539,9 +9558,9 @@ function assist(dt){
   // hands-on systems (Lane Tracing Assist): warn if your hands have been off the wheel, then switch off
   {const T=TRIMS[st.trim],handsOn=T.handsOn||(T.tjaMax&&sp>T.tjaMax);
    sys.nag=0;if(st.attn!==false&&T.tesla&&st.pilot&&(sys.pilotState==="active"||sys.pilotState==="changing"||sys.pilotState==="waiting")){const fsd=fsdOwned();sys.handsT=(fsd?(SCR.focus&&st.cam===1):!(Math.abs(inp.steer)>0.02||inp.padActive))?(sys.handsT||0)+dt:0;
-     const w1=fsd?5:30,w2=fsd?12:42,off=fsd?18:55;if(sys.handsT>w1){sys.nag=1;if(!sys.handsW){sys.handsW=true;beep(980,.1,"sine",.2);toast(fsd?"Pay attention to the road":"Apply slight turning force to steering wheel")}}
-     if(sys.handsT>w2){sys.nag=2;if((performance.now()%600)<dt*1000*1.2)beep(1200,.12,"square",.25)}
-     if(sys.handsT>off){st.pilot=false;st.acc=false;sys.handsT=0;sys.handsW=false;sys.apStrike=true;beep(400,.5,"square",.3);toast("Autosteer unavailable for the rest of this drive");logResult("Autopilot strike: ignored the reminders")}
+     const w1=fsd?5:30,w2=fsd?12:42,off=fsd?18:55;if(sys.handsT>w1){sys.nag=1;if(!sys.handsW){sys.handsW=true;if(!playS(fsd?"ts_alert":"ts_hands",0.55))beep(980,.1,"sine",.2);toast(fsd?"Pay attention to the road":"Apply slight turning force to steering wheel")}}
+     if(sys.handsT>w2){sys.nag=2;if((performance.now()%600)<dt*1000*1.2&&!playS("ts_hands",0.65))beep(1200,.12,"square",.25)}
+     if(sys.handsT>off){st.pilot=false;st.acc=false;sys.handsT=0;sys.handsW=false;sys.apStrike=true;beep(400,.5,"square",.3);tsS("unavail",0.6);toast("Autosteer unavailable for the rest of this drive");logResult("Autopilot strike: ignored the reminders")}
      if(sys.handsT<1)sys.handsW=false}
    else if(st.attn!==false&&st.pilot&&handsOn&&(sys.pilotState==="active"||sys.pilotState==="changing")){sys.handsT=Math.abs(inp.steer)>0.02||inp.padActive?0:(sys.handsT||0)+dt;
      if(sys.handsT>12&&!sys.handsW){sys.handsW=true;beep(980,.12,"square",.2);toast("Keep your hands on the wheel")}
@@ -9562,7 +9581,7 @@ function assist(dt){
     sys.lkaDelta=clamp(sys.lkaDelta,-0.03,0.03)}
   if(sys.lkaHold>0)sys.lkaHold-=dt;
   if(st.lka&&!pilotOn&&Math.abs(e)>0.8&&sp>17.9&&!st.signal&&!M.inJ){sys.ldw=true;sys.ldwSide=-Math.sign(e);sys.ldwT=performance.now()}
-  if(sys.ldw&&!sys.ldwWas&&!(brandS()==="Kia"&&playS("kia_ldw",0.6))){beep(880,.09,"sine",.2);setTimeout(()=>beep(660,.12,"sine",.2),110)}
+  if(sys.ldw&&!sys.ldwWas&&!(brandS()==="Kia"&&playS("kia_ldw",0.6))&&!tsS("ldw",0.6)){beep(880,.09,"sine",.2);setTimeout(()=>beep(660,.12,"sine",.2),110)}
   sys.ldwWas=sys.ldw;
   if(sys.driftT>0){sys.driftT-=dt;sys.drift=-0.012*(1-Math.exp(-(6-sys.driftT)));sys.lkaLog.maxE=Math.max(sys.lkaLog.maxE,Math.abs(e));
     if(sys.driftT<=0){sys.drift=0;logResult(`Lane keep test: max drift ${ftS(sys.lkaLog.maxE)} from lane centre${st.lka?"":" (LKA off)"}`)}}
@@ -9643,10 +9662,10 @@ function initAudio(){
 }
 // ---- real AVAS recordings (forward, and reverse where we have it); every other electric / hybrid keeps the synthesized sound
 const AVAS_REC={camry_le:"camry",camry_se:"camry",camry_xle:"camry",camry25:"camry",rav4h_le:"rav4",rav4h_xle:"rav4",rav4_19:"rav4",rav4h_lim:"rav4",rx350h:"lexus",rx450h:"lexus",rx500h:"lexus",acc_hyb:"accord",ms_awd:"tesla",ms_plaid:"tesla",mx_awd:"tesla",mx_plaid:"tesla",m3_std:"tesla",m3_lrrwd:"tesla",m3_lrawd:"tesla",m3_perf:"tesla",ty_std:"tesla",ty_lrrwd:"tesla",ty_lrawd:"tesla",ty_perf:"tesla"};   // Tesla plays the same sound in reverse
-const AVAS_REV={camry:"camry_rev",lexus:"lexus_rev",rav4:"rav4_rev",accord:"accord_rev"};
+const AVAS_REV={tesla:"tesla_rev",camry:"camry_rev",lexus:"lexus_rev",rav4:"rav4_rev",accord:"accord_rev"};
 const SND={};
 function sndLoad(k){if(k in SND)return SND[k];SND[k]=null;fetch("sounds/avas_"+k+".wav").then(r=>{if(!r.ok)throw 0;return r.arrayBuffer()}).then(b=>au.ctx.decodeAudioData(b)).then(buf=>{SND[k]=buf}).catch(()=>{});return null}
-function avasRec(t,kmh){const key=AVAS_REC[st.trim],want=key?(st.gear==="R"&&AVAS_REV[key]?AVAS_REV[key]:key==="camry"?null:key):null,c=au.ctx;
+function avasRec(t,kmh){const key=AVAS_REC[st.trim]||(TRIMS[st.trim]&&TRIMS[st.trim].tesla?"tesla":null),want=key?(st.gear==="R"&&AVAS_REV[key]?AVAS_REV[key]:key==="camry"?null:key):null,c=au.ctx;
   if(au.rec&&au.rec.k!==want){const old=au.rec;old.g.gain.setTargetAtTime(0,t,0.04);setTimeout(()=>{try{old.s.stop()}catch(e){}},400);au.rec=null}
   if(!want)return false;const buf=sndLoad(want);if(!buf)return false;
   if(!au.rec){const s_=c.createBufferSource();s_.buffer=buf;s_.loop=true;const g=c.createGain();g.gain.value=0;s_.connect(g);g.connect(au.master);s_.start();au.rec={k:want,s:s_,g}}
@@ -14474,7 +14493,8 @@ function updatePark(dt){
   {const on=st.parkAssist&&st.gear!=="P"&&!st.walk&&sp<4.5&&(st.gear==="R"||near<(sys.parkOn?3.2:2.5));if(on)sys.parkOnT=2.5;else sys.parkOnT=(sys.parkOnT||0)-dt;sys.parkOn=on||(sys.parkOnT>0&&st.gear!=="P"&&sp<4.5)}
   sys.stillT=sp<0.08?(sys.stillT||0)+dt:0;   /* stopped: the beeping goes quiet (the bars on the screen stay), like the real systems */
   if(!sys.parkOn||relevant>1.6||sys.stillT>0.6){parkBeepT=0;return}
-  parkBeepT-=dt; if(relevant<0.3){if(parkBeepT<=0){beep(1050,.16,"sine",.18);parkBeepT=0.1}}   /* inside 30 cm: one solid tone */
+  parkBeepT-=dt; if(isTesla()){if(parkBeepT<=0){if(relevant<0.3){playS("ts_tooclose",0.5)||beep(1050,.16,"sine",.18);parkBeepT=0.3}else if(relevant<0.6){playS("ts_close",0.5)||beep(1050,.06,"sine",.18);parkBeepT=0.8}else{beep(1050,.06,"sine",.16);parkBeepT=clamp(relevant*0.55,0.2,0.9)}}return}
+  if(relevant<0.3){if(parkBeepT<=0){beep(1050,.16,"sine",.18);parkBeepT=0.1}}   /* inside 30 cm: one solid tone */
   else if(parkBeepT<=0){beep(1050,.06,"sine",.18);parkBeepT=clamp(relevant*0.55,0.12,0.9)}
 }
 function drawPark(){
@@ -14623,10 +14643,10 @@ function act(a){ if(a==="codes"){closeDrawer();codeOpen();return} if(typeof a===
     case "accUp":st.accSet=Math.min(st.accSet+(st.units==="mph"?2.2352:1.3889),55);break;
     case "accDown":st.accSet=Math.max(st.accSet-(st.units==="mph"?2.2352:1.3889),8);break;
     case "gap":st.accGap=st.accGap%3+1;break;
-    case "pilot":if(st.pilot){st.pilot=false;sys.pilotLC=null;fsdReset();toast(`${T.pilotName||"Westport Pilot"} off: you are steering`);beep(500,.15,"sine",.2)}
-      else if(T.tesla&&sys.apStrike)toast("Autosteer unavailable for the rest of this drive (shift to P to reset)");
+    case "pilot":if(st.pilot){st.pilot=false;sys.pilotLC=null;fsdReset();toast(`${T.pilotName||"Westport Pilot"} off: you are steering`);if(!T.tesla)beep(500,.15,"sine",.2)}
+      else if(T.tesla&&sys.apStrike){tsS("unavail",0.6);toast("Autosteer unavailable for the rest of this drive (shift to P to reset)")}
       else if(T.tesla&&fsdOwned()&&(st.gear==="D"||(st.gear==="P"&&Math.abs(car.vx)<0.2))&&p2pStart()){}
-      else if(T.tesla&&fsdOwned()&&(st.gear==="D"||(st.gear==="P"&&Math.abs(car.vx)<0.2))){if(st.gear==="P"){st.gear="D";sys.epb=false;sys.hold=false;tick(1)}st.pilot=true;st.acc=true;st.accSet=Math.max(st.accSet,13.4);fsdReset();beep(880,.08,"sine",.2);setTimeout(()=>beep(1320,.1,"sine",.2),100);toast(NAV.dest?`FSD (Supervised) on: driving to ${NAV.dest.name}`:"FSD (Supervised) on: pick a destination on the map, or it keeps following the road")}
+      else if(T.tesla&&fsdOwned()&&(st.gear==="D"||(st.gear==="P"&&Math.abs(car.vx)<0.2))){if(st.gear==="P"){st.gear="D";sys.epb=false;sys.hold=false;tick(1)}st.pilot=true;st.acc=true;st.accSet=Math.max(st.accSet,13.4);fsdReset();toast(NAV.dest?`FSD (Supervised) on: driving to ${NAV.dest.name}`:"FSD (Supervised) on: pick a destination on the map, or it keeps following the road")}
       else if(st.gear!=="D"||car.vx<(T.tesla?0.5:8))toast(T.tesla?"Shift to D first":"Westport Pilot works above 18 mph in D");
       else{st.pilot=true;if(!st.acc){st.acc=true;st.accSet=Math.max(car.vx,13.4)}toast(T.pilotName?(T.pilotHwy?`${T.pilotName} on: hands-free on Hwy 7 (it waits on town streets). Signal to change lanes`:T.handsOn?`${T.pilotName} on: centres you in the lane, keep your hands on the wheel`:`${T.pilotName} on: hands-free below 25 mph, hands on above`):"Westport Pilot on: hands-free. Tap a signal to change lanes; steer or brake to take over");beep(880,.1,"sine",.2);setTimeout(()=>beep(1320,.12,"sine",.2),120)}break;
     case "autoLC":st.autoLC=!st.autoLC;toast(st.autoLC?"Pilot may change lanes by itself to pass":"Pilot changes lanes only when you signal");break;
@@ -14898,7 +14918,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=296;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="173",BUILD_VER=297;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}try{const P=JSON.parse(localStorage.getItem("strata.ped")||"null");if(P){st.pedHold=+P.pedHold||0;st.thrRate=+P.thrRate||2;st.brkRate=+P.brkRate||2}}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){const k=GFX.q==="auto"?GFX.eff:GFX.q;if(G.k!==k||G.v!==GFX.ovV||!G.m){G.k=k;G.v=GFX.ovV;const m={...GQ[k]};for(const o of GOPT)if(GFX.ov[o[0]]!==undefined)Object.assign(m,o[4](GFX.ov[o[0]]));if(Object.keys(GFX.ov).length)m.label=GQ[k].label+" (custom)";G.m=m;COLL.nt=!m.trees}return G.m}
@@ -15330,7 +15350,7 @@ function whlDraw(soft){const el=$("whl");if(!el||el.hidden)return;if(soft){const
 function whlVals(){const c=WHL.cfg||whlDef("");return `<label>Rotation <b>${c.range}°</b><input id="whR" type="range" min="270" max="1080" step="90" value="${c.range}"></label>
   <label>Force feedback strength <b>${Math.round((c.ffb??0.7)*100)}%</b><input id="whF" type="range" min="0" max="150" step="5" value="${Math.round((c.ffb??0.7)*100)}"></label>
   <label>Steering ratio <b>${c.ratio}:1</b> <small>(${Math.round(0.576*180/Math.PI*c.ratio*2)}° lock to lock)</small><input id="whQ" type="range" min="10" max="20" step="0.5" value="${c.ratio}"></label>`}
-function controls(dt){try{sigCancel()}catch(e){}sys.wheelRad=null;let whlOn=false;try{whlOn=whlPoll(dt);whlOut(dt)}catch(e){}
+function controls(dt){try{sigCancel()}catch(e){}try{tslSndTick(dt)}catch(e){}sys.wheelRad=null;let whlOn=false;try{whlOn=whlPoll(dt);whlOut(dt)}catch(e){}
   const K=inp.keys; let s=inp.steerT, thr=inp.thrT, brk=inp.brkT;
   try{fusTick(dt);if(fusOn("chauf")){thr=Math.pow(thr,1.7)*0.8;brk=Math.pow(brk,1.3)*0.8}}catch(e){}   // Fusion Regent Chauffeur Smooth
   try{if(isMon()){const r_=monTick(dt,thr,brk);thr=r_[0];brk=r_[1]}}catch(e){}
