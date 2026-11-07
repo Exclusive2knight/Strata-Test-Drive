@@ -1267,8 +1267,9 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
 <script data-boot>(function(){var p=0;window.__bootP=0;var t=setInterval(function(){if(window.__bootReal){clearInterval(t);return}p+=(0.7-p)*0.025;window.__bootP=p;var a=document.getElementById("bootArc"),n=document.getElementById("bootNeedle"),c=document.getElementById("bootPct");if(a)a.setAttribute("stroke-dasharray",(p*100).toFixed(1)+" 100");if(n)n.style.setProperty("--a",(-135+p*270)+"deg");if(c)c.textContent=String(Math.round(p*100))},120)})()</script>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 295 · Park to park in the garage</h2></div>
+    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 296 · Park to park, for real</h2></div>
     <div class="nb">
+      <h4>🅿️ FSD park to park: street parking, store lots, chargers, downtown</h4><ul><li><b>Fixed: FSD kept driving past the destination instead of parking.</b> The navigation was ending the trip about 18 m early, which took the destination away from FSD. Now FSD handles the arrival and parks.</li><li><b>Street parking:</b> heading to a place on a metered street (downtown), FSD slows down in the kerb lane about 100 m out, takes the first gap that fits and parallel parks. If it passes the destination without finding one, it keeps looking for another 60 m.</li><li><b>Store lots</b> (Bean &amp; Brew, Fresh Market, HomeWorks, Burger Barn, Tread Center): FSD turns in through the driveway, drives along the aisle to a free space near the door and backs in. Leaving, it backs out, drives the aisle to the nearest driveway and turns out onto the road. No more cutting across the lot.</li><li><b>Chargers:</b> in an EV or plug-in below 90%, FSD picks a free charging bay first (Bean &amp; Brew has eight), parks and plugs in. If you start FSD while plugged in, it unplugs first.</li><li><b>Downtown in the navigation:</b> the shops in downtown Westport and Fairhaven (Corner Café, Boutique, Electronics, Corner market, Pharmacy, Bakery, Restaurant, Auto parts) are now places you can pick, each with its street.</li><li>FSD no longer switches off by itself in the first two seconds after it takes over from park assist.</li></ul>
       <h4>🅿️ FSD park to park: the Fort St garage</h4><ul><li>Start FSD in any stall of the Fort St parking garage, on any level. The car backs out, drives down the ramps, pays at the exit gate and heads out onto Park Ave, then drives to your destination.</li><li>If your destination is near the garage, FSD drives in from Cass Ave, takes a ticket, climbs to the lowest level with a free stall (crossing between the two ramps when it needs to), backs into the stall and shifts to Park.</li><li>Fixed: when FSD took over after leaving a parking lot, a leftover steering input could switch it straight off.</li></ul>
       <h4>🅿️ FSD: park to park</h4><ul><li>With a destination set, turn on FSD while you're parked in a space (a parking-lot stall or a parallel space). The Tesla pulls out by itself, drives through the parking lot to the road and carries on to your destination.</li><li>When it gets there, it no longer stops in the lane. It finds a free parallel space right there, or the nearest free stall in a parking lot near the destination, drives in and backs into the space, then shifts to Park. If a space gets taken or it can't get in, it tries the next one (up to four), and otherwise asks you to park.</li><li>Press the pedals or steer at any time to take over.</li><li>Smart Summon also leaves more room around the ends of parked cars, and backs up and tries another way when its nose is against something.</li></ul>
       <h4>💡 Tesla ambient lighting removed</h4><ul><li>The coloured ambient light strips across the dashboard and doors are gone from every Tesla, and so is the ambient lighting setting on their screens.</li></ul>
@@ -6318,6 +6319,8 @@ function navPlaces(){const L=[],add=(name,sub,x,y,h,ic)=>{if(x==null||!isFinite(
   add("Rosedale","Neighborhood",STARTS.suburb.x,STARTS.suburb.y,STARTS.suburb.h,"🏘️");
   if(W2){for(const k of ["mountain","millbrook","fairhaven","oakridge"])if(STARTS[k])add(STARTS[k].name,STARTS[k].nav||"",STARTS[k].x,STARTS[k].y,STARTS[k].h,STARTS[k].ic||"📍")}
   if(W2)try{w2NavPlaces(add)}catch(e){}
+  if(W2)try{const NM={b_corner_cafe:["Corner Café","Café","☕"],b_clothing_boutique:["Boutique","Clothing","👗"],b_electronics_store:["Electronics store","Electronics","📱"],b_neighborhood_market:["Corner market","Groceries","🛒"],b_pharmacy:["Pharmacy","Pharmacy","💊"],b_bakery:["Bakery","Bakery","🥐"],b_restaurant:["Restaurant","Restaurant","🍽️"],b_auto_parts_shop:["Auto parts","Auto parts","🔩"]};
+    const seen=new Set();for(const o of W2P){const n=NM[o.k];if(!n||!inCity(o.x,o.y))continue;const f=navSnap({x:o.x,y:o.y,h:0}),nm=`${n[0]} · ${f?f.e.name:"downtown"}`;if(seen.has(nm))continue;seen.add(nm);add(nm,`${o.x>1000?"Fairhaven":"Westport"} downtown · street parking`,o.x,o.y,0,n[2])}}catch(e){}
   return L.sort((a,b)=>a.d-b.d)}
 // fastest route to frame f from every (road, direction): Dijkstra over the reversed graph. Used by the navigation and by the tow truck
 function navBuild(f){let loop;
@@ -6391,7 +6394,7 @@ function navTick(dt){if(!NAV.dest||st.walk||!st.started){const b=$("u2nav");if(b
   if(NAV.cur!==k&&NAV.candT>0.9){if(NAV.expect!==undefined&&k!==NAV.expect&&NAV.cur!==undefined){const ok=navNextKey(M.e,M.dir,M.s)!==undefined||(M.e===NAV.dest.e&&M.dir===NAV.dest.dir);toast(ok?"Rerouting…":"No route from here: turn around when you can");navSay(ok?"Rerouting":"Make a U-turn when possible");NAV.said={}}NAV.cur=k;NAV.expect=navNextKey(M.e,M.dir,M.s)}
   else if(M.e===NAV.dest.e&&M.dir===NAV.dest.dir)NAV.expect=navNextKey(M.e,M.dir,M.s);
   const G=navGuide(M);NAV.g=G;if(!G)return;const v=Math.abs(car.vx),id=(G.key??"A")+":"+G.t;
-  if(G.t==="A"&&G.d<18+v*0.6){toast(`You have arrived: ${NAV.dest.name}`);navSay(`You have arrived at ${NAV.dest.name}`);logResult(`Arrived at ${NAV.dest.name}`);navTo(null);return}
+  if(G.t==="A"&&G.d<18+v*0.6&&!(st.pilot&&isTesla()&&fsdOwned()&&G.d>1.5)&&!sys.p2p){toast(`You have arrived: ${NAV.dest.name}`);navSay(`You have arrived at ${NAV.dest.name}`);logResult(`Arrived at ${NAV.dest.name}`);navTo(null);return}
   const far=v>20?1600:v>12?800:400,near=Math.max(70,v*7),now=Math.max(25,v*2.6),S=NAV.said[id]||(NAV.said[id]={});
   if(!S.far&&G.d<far&&G.d>near*1.6){S.far=true;navSay(`In ${distSay(G.d)}, ${navText(G).replace(/^Your destination, (.*), is (ahead|on the (left|right))$/,(m,a,b)=>"your destination is "+b)}`)}
   else if(!S.near&&G.d<near&&G.d>now){S.near=S.far=true;navSay(G.t==="A"?navText(G):`In ${distSay(G.d)}, ${navText(G)}`)}
@@ -6424,7 +6427,7 @@ function fsdPedGap(pts){const vv=Math.max(car.vx,2.5);let gap=Infinity;
       const al=pts[bi][2];if(al<0.5||al>70)continue;const tA=al/vv;if(k>0&&Math.abs(tA-tau)>1.8)continue;
       gap=Math.min(gap,Math.max(0,al-CARLEN/2-1.8));break}}
   return gap}
-function fsdReset(){FSD.over=null;FSD.slowT=0;FSD.a=null;FSD.lcT=0;FSD.arrived=false;FSD.around=null;FSD.waitAround=0;FSD.lcDoing=false;sys.fsdThr=0;sys.fsdBrk=0;sys.fsdPts=null}
+function fsdReset(){FSD.hunt=undefined;FSD.huntV=0;FSD.over=null;FSD.slowT=0;FSD.a=null;FSD.lcT=0;FSD.arrived=false;FSD.around=null;FSD.waitAround=0;FSD.lcDoing=false;sys.fsdThr=0;sys.fsdBrk=0;sys.fsdPts=null}
 function fsdDrive(dt,M,S){const prof={sloth:[0.96,1.7,1.9],chill:[1.0,2.0,1.6],standard:[1.04,2.4,1.3],hurry:[1.09,2.8,1.05],madmax:[1.22,3.7,1.05]}[TSL.profile]||[1.04,2.4,1.3];
   const MAD=TSL.profile==="madmax",HUR=TSL.profile==="hurry";let A=FSD.a;if(!A){A=FSD.a={kind:"fsd",e:M.e,dir:M.dir,s:M.s,off:M.off,offT:laneOf(M.off)*LANE,v:0,vf:1,jn:null,sig:0,arrT:0};fsdPlan(A)}
   A.v=Math.max(0,car.vx);A.wx=car.px;A.wy=car.py;A.wh=car.psi;
@@ -6489,10 +6492,11 @@ function fsdDrive(dt,M,S){const prof={sloth:[0.96,1.7,1.9],chill:[1.0,2.0,1.6],s
      if(O.ret&&Math.abs(A.off-O.off0)<0.35){FSD.over=null;st.signal=0;if(done)logResult("FSD finished passing")}}}
   if(!A.jn){const dStop=P?P.s0-A.s:(A.e.L-A.s);const g=ctrlGap(A,dStop,dt);if(g<gap){gap=g;vL=0;sys.fsdWhy=A.mvNode&&A.mvNode.ctrl==="signal"?"traffic light":"stop sign"}}
   // destination
-  if(NAV.dest&&A.e===NAV.dest.e&&A.dir===NAV.dest.dir){const dd=NAV.dest.s-A.s;if(dd<gap+CARLEN){gap=Math.max(0,dd);vL=0;sys.fsdWhy="destination"}
-    if(dd<4&&car.vx<0.3&&!FSD.arrived){const nm=NAV.dest.name,dp=fpt(NAV.dest.e,NAV.dest.dir,NAV.dest.s,0);FSD.arrived=true;if(p2pPark(nm,dp[0],dp[1])){logResult(`FSD arrived at ${nm}`);navTo(null);st.pilot=false;fsdReset();return}toast(`You have arrived: ${NAV.dest.name}`);logResult(`FSD arrived at ${NAV.dest.name}`);navTo(null);st.pilot=false;st.acc=false;sys.hold=true;sys.holdGear="D";fsdReset();return}}
+  if(NAV.dest&&A.e===NAV.dest.e&&A.dir===NAV.dest.dir){const dd=NAV.dest.s-A.s;if(A.e.T.park&&A.e.mtr&&has("autopark")&&!st.p2pOff&&dd<110&&dd>-70&&!(NAV.place&&(Math.hypot(NAV.place.x-GAR.cx,NAV.place.y-GAR.cy)<90||retailOf(NAV.place.x,NAV.place.y,25)))){if(p2pStreetHunt(A,dd))return;if(!FSD.lcT&&!FSD.lcDoing&&!A.jn)A.offT=laneOff(A.e,0);FSD.huntV=4.5;if(dd<-60){FSD.hunt=false;FSD.huntV=0}}else FSD.huntV=0;
+    if(dd<gap+CARLEN&&!(FSD.huntV&&dd>-60)){gap=Math.max(0,dd);vL=0;sys.fsdWhy="destination"}
+    if((dd<4&&car.vx<0.3||FSD.hunt===false&&dd<-60)&&!FSD.arrived){const nm=NAV.dest.name,dp=fpt(NAV.dest.e,NAV.dest.dir,NAV.dest.s,0);FSD.arrived=true;if(p2pPark(nm,dp[0],dp[1])){logResult(`FSD arrived at ${nm}`);navTo(null);st.pilot=false;fsdReset();return}toast(`You have arrived: ${NAV.dest.name}`);logResult(`FSD arrived at ${NAV.dest.name}`);navTo(null);st.pilot=false;st.acc=false;sys.hold=true;sys.holdGear="D";fsdReset();return}}
   // speed: the limit plus the profile, slower for bends and turns, IDM following
-  let vc=M.limit*prof[0]*wxSpeed();if(FSD.over&&!FSD.over.ret)vc=Math.max(vc,FSD.over.vP);if(FSD.around||sys.fsdWhy==="going around")vc=Math.min(vc,9);for(const p of pts)if(p[3]>1e-3){const vk=Math.sqrt(prof[1]/p[3]);vc=Math.min(vc,Math.sqrt(vk*vk+3.2*p[2]))}
+  let vc=M.limit*prof[0]*wxSpeed();if(FSD.huntV)vc=Math.min(vc,FSD.huntV);if(FSD.over&&!FSD.over.ret)vc=Math.max(vc,FSD.over.vP);if(FSD.around||sys.fsdWhy==="going around")vc=Math.min(vc,9);for(const p of pts)if(p[3]>1e-3){const vk=Math.sqrt(prof[1]/p[3]);vc=Math.min(vc,Math.sqrt(vk*vk+3.2*p[2]))}
   const v=Math.max(car.vx,0),s0=2.6,Tg=prof[2],ss=s0+Math.max(0,v*Tg+v*(v-vL)/(2*Math.sqrt(1.8*3))),aDes=clamp((MAD?2.4:1.8)*(1-Math.pow(v/Math.max(vc,0.1),4)-Math.pow(ss/Math.max(gap,0.1),2)),-7,MAD?3.4:2);
   sys.fsdThr=aDes>=0?clamp(0.06+aDes*0.22+(vc-v)*0.02,0,MAD?1:0.85):0;sys.fsdBrk=aDes<0?clamp(-aDes/9,0,0.85):0;if(v<0.2&&(gap<6||vc<0.5))sys.fsdBrk=Math.max(sys.fsdBrk,0.35);
   // steering: pure pursuit on the planned path
@@ -6503,24 +6507,24 @@ function fsdDrive(dt,M,S){const prof={sloth:[0.96,1.7,1.9],chill:[1.0,2.0,1.6],s
 // ---- Smart Summon: from outside the car, it drives itself to you at walking pace, stopping for anything in the way
 // ---- park-to-park FSD: starting in a space, it pulls out (park exit), drives through the lot to the road and on to the destination,
 // then parks itself in a free space near it (a lot stall, or a parallel space on a parking street)
-function p2pInSpot(){if(Math.abs(car.vx)>0.3)return false;const M=me(),K=paK(M);if(M.e===K.e&&M.dir===K.dir&&Math.abs(M.off-K.oP)<0.8)return true;return perpSpots().some(t=>Math.hypot(t.x-car.px,t.y-car.py)<2.6&&Math.abs((t.z||0)-(car.zb||0))<1.5)}
+function p2pInSpot(){if(Math.abs(car.vx)>0.3)return false;{const R=retailOf(car.px,car.py);if(R&&Math.abs(car.py)>RB0+1)return true}const M=me(),K=paK(M);if(M.e===K.e&&M.dir===K.dir&&Math.abs(M.off-K.oP)<0.8)return true;return perpSpots().some(t=>Math.hypot(t.x-car.px,t.y-car.py)<2.6&&Math.abs((t.z||0)-(car.zb||0))<1.5)}
 function p2pOnRoad(){const g=groundAt(car.px,car.py);if(g.kind!=="road")return false;const M=me();return Math.abs(M.off)<(M.e.n||1)*LANE+1}
-function p2pEngage(){inp.brk=0;inp.thr=0;inp.brkT=0;inp.steer=0;inp.steerT=0;sys.steerOv=null;st.pilot=true;st.acc=true;st.accSet=Math.max(st.accSet||0,13.4);sys.epb=false;sys.hold=false;st.gear="D";fsdReset();if(sys.p2p)sys.p2p.ph="drive";toast(NAV.dest?`FSD (Supervised): driving to ${NAV.dest.name}`:"FSD (Supervised) on")}
+function p2pEngage(){sys.p2pGrace=2;inp.brk=0;inp.thr=0;inp.brkT=0;inp.steer=0;inp.steerT=0;sys.steerOv=null;st.pilot=true;st.acc=true;st.accSet=Math.max(st.accSet||0,13.4);sys.epb=false;sys.hold=false;st.gear="D";fsdReset();if(sys.p2p)sys.p2p.ph="drive";toast(NAV.dest?`FSD (Supervised): driving to ${NAV.dest.name}`:"FSD (Supervised) on")}
 function p2pLot(x,y,msg,done,fail){st.pilot=false;sys.summon={t:0,idx:0,ph:"plan",block:[],msg,drive:true,target:{x,y},tol:1.6,done,fail};st.power=true;sys.epb=false;sys.hold=false;st.gear="D"}
 function p2pSnap(x,y){for(const S of XSITES){if(S.kind!=="lot"||!S.e||Math.hypot(S.x-x,S.y-y)>Math.max(S.L,S.D))continue;const e=S.e,p=eProj(e,x,y);let dir=p.t<0?1:-1;if(e.ow&&dir<0)dir=1;const u=clamp(p.u,(e.r0||0)+3,e.L-(e.r1||0)-3);return {e,dir,s:dir>0?u:e.L-u}}return navSnap({x,y,h:0})}   // a lot's own road (even a freeway rest stop)
 function p2pToRoad(){const f=p2pSnap(car.px,car.py);if(!f){toast("No road nearby to drive out to");sys.p2p=null;return}const p=fpt(f.e,f.dir,clamp(f.s+6,2,f.e.L-2),laneOff(f.e,0));if(Math.hypot(p[0]-car.px,p[1]-car.py)>150){toast("Too far from a road to drive out on its own");sys.p2p=null;return}
   sys.p2p.ph="lot";p2pLot(p[0],p[1],"Driving out to the road",()=>{if(sys.p2p)p2pEngage()})}
-function p2pStart(){if(!has("autopark")||!NAV.dest||!p2pInSpot())return false;sys.p2p={ph:"exit"};if(inGarage(car.px,car.py)){p2pGarageOut();toast("FSD: backing out and heading for the exit");return true}const sig0=st.signal;if(inGarage(car.px,car.py)){const t=perpSpots().sort((a,b)=>Math.hypot(a.x-car.px,a.y-car.py)-Math.hypot(b.x-car.px,b.y-car.py))[0];if(t){const h0=Math.atan2(-t.uy,-t.ux),down=t.bay>0?Math.PI:0;st.signal=Math.cos(h0+Math.PI/2-down)>Math.cos(h0-Math.PI/2-down)?-1:1}}paStartExit();st.signal=sig0;if(!sys.pa){sys.p2p=null;return false}toast("FSD: pulling out of the space first");return true}
-function p2pAfterPa(ok){const P=sys.p2p;if(!P)return;if(!ok){sys.p2p=null;return}
+function p2pStart(){if(!has("autopark")||!NAV.dest||!p2pInSpot())return false;if(sys.fuel==="plug"){sys.fuel=null;if(sys.hose)sys.hose=null;toast("Unplugged")}sys.p2p={ph:"exit"};if(inGarage(car.px,car.py)){p2pGarageOut();toast("FSD: backing out and heading for the exit");return true}{const R=retailOf(car.px,car.py);if(R){p2pRetailOut(R);toast("FSD: backing out and heading for the driveway");return true}}const sig0=st.signal;if(inGarage(car.px,car.py)){const t=perpSpots().sort((a,b)=>Math.hypot(a.x-car.px,a.y-car.py)-Math.hypot(b.x-car.px,b.y-car.py))[0];if(t){const h0=Math.atan2(-t.uy,-t.ux),down=t.bay>0?Math.PI:0;st.signal=Math.cos(h0+Math.PI/2-down)>Math.cos(h0-Math.PI/2-down)?-1:1}}paStartExit();st.signal=sig0;if(!sys.pa){sys.p2p=null;return false}toast("FSD: pulling out of the space first");return true}
+function p2pAfterPa(ok){const P=sys.p2p;if(!P)return;if(!ok){if(P.retry){const f=P.retry;P.retry=null;f();return}sys.p2p=null;return}
   if(P.ph==="exit"){P.wait=0.4;P.ph="exited";return}
-  if(P.ph==="park"){sys.p2p=null;st.gear="P";sys.epb=true;toast(`Parked near ${P.name||"your destination"}`);logResult(`FSD parked near ${P.name||"the destination"}`)}}
+  if(P.ph==="park"){sys.p2p=null;st.gear="P";sys.epb=true;if(P.t&&P.t.chg){sys.fuel="plug";toast("Parked at the charger and plugged in")}else toast(`Parked near ${P.name||"your destination"}`);logResult(`FSD parked near ${P.name||"the destination"}`)}}
 // free lot stalls near a point (anywhere in the world, not just around the car)
 function stallsNear(x,y,R){const out=[];for(const S of XSITES){if(S.kind!=="lot"||Math.hypot(S.x-x,S.y-y)>R+Math.max(S.L,S.D))continue;
     if(S.custom){for(const t of S.stalls||[])out.push({x:t.p[0],y:t.p[1],ux:Math.cos(t.h),uy:Math.sin(t.h),k:0,z:0});continue}
     const b1=-S.D/2+8,b2=S.D/2-2.9;for(let a=-S.L/2+2.75;a<S.L/2-1.4;a+=2.7){const p1=xLocal(S,a,b1),p2=xLocal(S,a,b2);out.push({x:p1[0],y:p1[1],ux:-S.N[0],uy:-S.N[1],k:0,z:0});out.push({x:p2[0],y:p2[1],ux:S.N[0],uy:S.N[1],k:0,z:0})}}
   return out.filter(t=>Math.hypot(t.x-x,t.y-y)<R&&spotFree(t)).sort((a,b)=>Math.hypot(a.x-x,a.y-y)-Math.hypot(b.x-x,b.y-y))}
 // at the destination: park instead of stopping in the lane. Returns true when it has taken over.
-function p2pPark(name,dx,dy){if(!has("autopark")||st.p2pOff)return false;{const dG=Math.hypot(dx-GAR.cx,dy-GAR.cy),lot=stallsNear(dx,dy,90)[0],dL=lot?Math.hypot(lot.x-dx,lot.y-dy):1e9;if(dG<160&&dG<dL+20&&p2pGarageIn(name))return true}
+function p2pPark(name,dx,dy){if(!has("autopark")||st.p2pOff)return false;{const R=retailOf(dx,dy,25);if(R&&p2pRetailIn(R,name))return true}{const dG=Math.hypot(dx-GAR.cx,dy-GAR.cy),lot=stallsNear(dx,dy,90)[0],dL=lot?Math.hypot(lot.x-dx,lot.y-dy):1e9;if(dG<160&&dG<dL+20&&p2pGarageIn(name))return true}
   // a parallel space right here on a parking street
   PA.mode="par";PA.side=1;paScan();if(sys.paSpot){sys.p2p={ph:"park",name};st.pilot=false;st.acc=false;paStart();if(sys.pa){toast("FSD: parallel parking near "+name);return true}}PA.mode=null;sys.paSpot=null;
   const L=stallsNear(dx,dy,90).filter(t=>Math.hypot(t.x-car.px,t.y-car.py)<110);if(!L.length)return false;sys.p2p={ph:"lotIn",name,L,tries:0};st.acc=false;p2pTryStall();return true}
@@ -6544,13 +6548,40 @@ function garUp(t){const sdT=t.bay,nT=t.k,Xt=t.x-GAR.cx,P=[[-62,12]];garLine(P,-2
       else{const dir=sd>0?1:-1;garLine(P,Xt+4*dir,12*sd)}break}
     if(sd>0){garLine(P,24,12);garArc(P,24,Math.PI/2,-Math.PI/2);sd=-1;n++}else{garLine(P,-24,-12);garArc(P,-24,-Math.PI/2,-Math.PI*1.5);sd=1;n++}}
   return P.map(p=>GW(p[0],p[1]))}
-function p2pFixed(pts,msg,done,fail){st.pilot=false;const L=pts[pts.length-1];sys.summon={t:0,idx:0,ph:"fwd",block:[],msg,drive:true,fixed:true,fast:true,pts,cum:cumOf(pts),target:{x:L[0],y:L[1]},tol:1.8,done,fail};st.power=true;sys.epb=false;sys.hold=false;st.gear="D"}
+function p2pFixed(pts,msg,done,fail,vmax){st.pilot=false;const L=pts[pts.length-1];sys.summon={t:0,idx:0,ph:"fwd",block:[],msg,drive:true,fixed:true,fast:true,vmax:vmax||4.2,pts,cum:cumOf(pts),target:{x:L[0],y:L[1]},tol:1.8,done,fail};st.power=true;sys.epb=false;sys.hold=false;st.gear="D"}
 function p2pGarageOut(){sys.p2p.ph="garage";p2pFixed(garDown(),"Driving down to the exit",()=>{if(!sys.p2p)return;if(p2pOnRoad())p2pEngage();else p2pToRoad()},()=>{sys.p2p=null;toast("FSD: couldn't get out of the garage: please take over")})}
 function p2pGarageIn(name){const S=garStalls().filter(t=>stallFree(t)&&spotFree(t)).sort((a,b)=>a.k-b.k||(a.bay===b.bay?0:a.bay>0?-1:1)||Math.abs(a.x-GAR.cx)-Math.abs(b.x-GAR.cx));if(!S.length)return false;
   const t=S[0];sys.p2p={ph:"toGarage",name,t};st.acc=false;toast(`FSD: parking in the Fort St garage, level ${t.k+1}`);
   const E=GW(-62,12);p2pLot(E[0],E[1],"Heading to the garage entrance",()=>{const P=sys.p2p;if(!P)return;P.ph="garage";
     p2pFixed(garUp(P.t),"Finding the space",()=>{const P=sys.p2p;if(!P)return;if(!stallFree(P.t)){sys.p2p=null;st.gear="P";toast("That space was taken: please park it yourself");return}const Lp=planPerpH(P.t,150000);
       if(!Lp){sys.p2p=null;st.gear="P";toast("Not enough room to back in: please park it yourself");return}P.ph="park";sys.pa={type:"perpH",segs:Lp.segs,si:0,idx:0,t:P.t,u:Lp.u,moves:Lp.moves,stuck:0,replans:0,msg:"Parking"};tick(1)},()=>{sys.p2p=null;toast("FSD: couldn't reach the space: please take over")})},()=>{sys.p2p=null;toast("FSD: couldn't reach the garage: please take over")});return true}
+// ---- park to park at the stores (Bean & Brew and the rest): in and out through the driveways and along the aisle, like a person would,
+// and a charging bay first when the car can plug in
+function p2pLine(P,x,y){const a=P[P.length-1],n=Math.max(1,Math.ceil(Math.hypot(x-a[0],y-a[1])/0.5));for(let i=1;i<=n;i++)P.push([a[0]+(x-a[0])*i/n,a[1]+(y-a[1])*i/n])}
+function retailOf(x,y,pad){pad=pad||0;return RETAIL.find(R=>R.S&&x>R.a0-6-pad&&x<R.a1+6+pad&&Math.sign(y)===R.s&&Math.abs(y)<(R.bb||RB0+R.lotD+20)+3+pad)}
+const p2pWantsCharge=()=>{const T=TRIMS[st.trim],H=car.hyb||{};if(!(T.kWh>0))return false;const b=T.plug?(H.pb??1):socShow(H);return b<0.9};
+function retailTargets(R,wantChg){const S=R.S,s=R.s,ay=s*(RB0+3.5);
+  const st0=S.stalls.map(q=>({x:q.p[0],y:q.p[1],ux:Math.cos(q.h),uy:Math.sin(q.h),z:0,k:0})).filter(t=>Math.abs((t.y-t.uy*6.25)-ay)<1.2).sort((a,b)=>Math.abs(a.x-R.ac)-Math.abs(b.x-R.ac));
+  const ch=(S.chargers||[]).map(c=>({x:c[0],y:c[1]-s*0.65,ux:0,uy:s,z:0,k:0,chg:true}));return (wantChg?ch.concat(st0):st0).filter(t=>spotFree(t))}
+function retailLane(R,x){const f=navSnap({x,y:R.s*5,h:0});return f}
+function p2pRetailIn(R,name){const wantChg=p2pWantsCharge(),L=retailTargets(R,wantChg);if(!L.length)return false;const t=L[0],s=R.s,ay=s*(RB0+3.5);
+  const fx=Math.cos(car.psi)>=0?1:-1,ahead=R.ent.filter(a=>(a-car.px)*fx>7).sort((a,b)=>Math.abs(a-car.px)-Math.abs(b-car.px)),e=ahead[0]??R.ent.slice().sort((a,b)=>Math.abs(a-car.px)-Math.abs(b-car.px))[0],ef=Math.sign(e-car.px)||fx,dd=Math.sign(t.x-e)||1;
+  const P=[[car.px,car.py]];p2pLine(P,e-6*ef,car.py);p2pLine(P,e-1.5*ef,s*7);p2pLine(P,e,s*10.5);p2pLine(P,e+1.5*dd,ay);p2pLine(P,t.x+3.8*dd,ay);
+  sys.p2p={ph:"lotIn",name,t};st.acc=false;toast(t.chg?`FSD: pulling into a free charging bay at ${R.name}`:`FSD: pulling into ${R.name}'s lot`);
+  p2pFixed(P,t.chg?"Heading to a charger":"Heading to a free space",()=>{const Q=sys.p2p;if(!Q)return;if(!spotFree(Q.t)){const M=retailTargets(R,wantChg).filter(q=>q!==Q.t);if(!M.length){sys.p2p=null;st.gear="P";toast("The spaces filled up: please park it yourself");return}Q.t=M[0]}
+    const tryT=(t,left)=>{const Lp=planPerpH(t,150000);if(!Lp){if(left.length)return tryT(left[0],left.slice(1));sys.p2p=null;st.gear="P";toast("Not enough room to back in: please park it yourself");return}Q.t=t;Q.ph="park";Q.retry=left.length?()=>{sys.p2p=Q;Q.ph="lotIn";toast("Trying another space");tryT(left[0],left.slice(1))}:null;sys.pa={type:"perpH",segs:Lp.segs,si:0,idx:0,t,u:Lp.u,moves:Lp.moves,stuck:0,replans:0,msg:"Parking"};tick(1)};
+    tryT(Q.t,retailTargets(R,false).filter(q=>q!==Q.t).sort((a,b)=>Math.hypot(a.x-car.px,a.y-car.py)-Math.hypot(b.x-car.px,b.y-car.py)).slice(0,3))},
+    ()=>{sys.p2p=null;toast("FSD: couldn't get into the lot: please take over")},3.2);return true}
+function p2pRetailOut(R){const s=R.s,ay=s*(RB0+3.5),e=R.ent.slice().sort((a,b)=>Math.abs(a-car.px)-Math.abs(b-car.px))[0],P=[[car.px,car.py]];const ex=Math.abs(car.py-ay)>1.5?car.px:car.px;
+  p2pLine(P,ex,ay);p2pLine(P,e+1.5*Math.sign(ex-e||1),ay);p2pLine(P,e,s*10.5);const f=retailLane(R,e);
+  if(f){const dirX=Math.sign(fpt(f.e,f.dir,f.s+1,0)[0]-fpt(f.e,f.dir,f.s,0)[0])||1,q=fpt(f.e,f.dir,clamp(f.s+9,2,f.e.L-2),laneOff(f.e,0));p2pLine(P,e+1.5*dirX,s*6.5);p2pLine(P,q[0],q[1])}
+  sys.p2p.ph="lot";p2pFixed(P,"Driving out of the lot",()=>{if(sys.p2p)p2pEngage()},()=>{sys.p2p=null;toast("FSD: couldn't get out of the lot: please take over")},3.2)}
+// street parking: on a metered street near the destination, slow down in the kerb lane and take the first gap that fits
+function p2pStreetHunt(A,dd){if(!has("autopark")||st.p2pOff||!A.e.T.park||!A.e.mtr||sys.pa||sys.p2p)return false;if(dd>110||dd<-70)return false;const pl=NAV.place;if(pl&&(Math.hypot(pl.x-GAR.cx,pl.y-GAR.cy)<90||retailOf(pl.x,pl.y,25)||stallsNear(pl.x,pl.y,50).length))return false;
+  if(!FSD.hunt){FSD.hunt=true;toast("FSD: looking for a parking space on the street");}
+  PA.mode="par";PA.side=1;paScan();const sp=sys.paSpot;PA.mode=null;
+  if(sp&&sp.type==="par"){sys.p2p={ph:"park",name:NAV.dest?NAV.dest.name:""};st.pilot=false;st.acc=false;PA.mode="par";sys.paSpot=sp;paStart();if(sys.pa){FSD.hunt=false;toast("FSD: parallel parking");return true}sys.p2p=null;PA.mode=null}
+  return false}
 function summonOK(){return isTesla()&&fsdOwned()&&st.walk&&!sys.fuel}
 // ---- Smart Summon: plans a route on a 1 m grid around buildings, posts, parked cars, kerbs and grass, follows it at walking pace,
 // backs out first when the way is behind it, waits for people and cars, and finds a new route when something blocks it
@@ -6628,7 +6659,7 @@ function summonStep(dt){const S_=sys.summon,W=S_.target||st.walk;S_.t+=dt;S_.pla
   const left=S_.cum[S_.cum.length-1]-S_.cum[best],turn=Math.abs(dF);const blocked=front<0.9||pedNear||carNear;
   S_.waitT=blocked?(S_.waitT||0)+dt:0;if(front<0.9&&S_.waitT>2.5&&!pedNear&&!carNear&&!(S_.noRev>0)){S_.block.push([car.px+c*3.4,car.py+s*3.4]);S_.nBack=(S_.nBack||0)+1;if(S_.drive&&S_.nBack>4){const f=S_.fail;sys.summon=null;stop(0.6);if(f)f();else{sys.p2p=null;toast("FSD: can't find a way through: please take over")}return}S_.ph="rev";S_.rev0=[car.px,car.py];S_.wdir=farDir();S_.straightTo=1.4;S_.tries=1;S_.revD=0;S_.waitT=0;S_.replan=true;S_.msg="Backing up to get round";return}   // nose against a kerb or a post: back off and turn
   if(S_.waitT>4&&!pedNear){const ob=[car.px+c*4,car.py+s*4];S_.block.push(ob);S_.waitT=0;S_.replan=true;S_.msg="Finding another way"}
-  const vt=blocked?0:Math.min(S_.fast?4.2:2.2,left*0.45,turn>0.3?(S_.fast?2.2:1.1):S_.fast?4.2:2.2,Math.max(0,((S_.fixed?left:d)-(S_.drive?1.0:4.4))*0.6+0.25)),err=vt-Math.abs(car.vx);if(vt<0.05)stop(0.5);else if(err>-0.15){inp.thr=clamp(0.06+err*0.35,0,0.3);inp.brk=0}else{inp.thr=0;inp.brk=clamp(-err,0.1,0.6)}
+  const vt=blocked?0:Math.min(S_.fast?S_.vmax||4.2:2.2,left*0.45,turn>0.3?(S_.fast?2.2:1.1):S_.fast?S_.vmax||4.2:2.2,Math.max(0,((S_.fixed?left:d)-(S_.drive?1.0:4.4))*0.6+0.25)),err=vt-Math.abs(car.vx);if(vt<0.05)stop(0.5);else if(err>-0.15){inp.thr=clamp(0.06+err*0.35,0,0.3);inp.brk=0}else{inp.thr=0;inp.brk=clamp(-err,0.1,0.6)}
   S_.msg=front<0.9?"Waiting: something in front":pedNear?"Waiting for a pedestrian":carNear?"Waiting for a car":(S_.drive?S_.msg0||(S_.msg0=S_.msg):"Coming to you")+" · "+Math.round(S_.fixed?left:d)+" m"}
 
 // ---- the driving visualization: what the car sees, drawn the way Tesla does it (also replaces the sensor panel on a Tesla)
@@ -9486,7 +9517,7 @@ function assist(dt){
   sys.pilotDelta=0;
   sys.fsdActive=false;if(!st.pilot&&FSD.a)fsdReset();
   if(!st.pilot)sys.pilotState="off";
-  else if(isTesla()&&fsdOwned()){if(st.gear!=="D"||car.offroad){sys.pilotState="standby";fsdReset()}else if(Math.abs(inp.steer)>0.3){st.pilot=false;fsdReset();sys.pilotState="off";beep(500,.2,"sine",.25);toast("FSD disengaged: you steered");logResult("FSD disengaged by steering")}else{sys.pilotState="active";sys.fsdActive=true;if(!st.acc)st.acc=true;fsdDrive(dt,M,S)}}
+  else if(isTesla()&&fsdOwned()){if(st.gear!=="D"||car.offroad){sys.pilotState="standby";fsdReset()}else if(Math.abs(inp.steer)>0.3&&!(sys.p2pGrace>0)){st.pilot=false;fsdReset();sys.pilotState="off";beep(500,.2,"sine",.25);toast("FSD disengaged: you steered");logResult("FSD disengaged by steering")}else{sys.pilotState="active";sys.fsdActive=true;if(!st.acc)st.acc=true;fsdDrive(dt,M,S)}}
   else if(sp<(TRIMS[st.trim].tjaMax?0.5:8)||st.gear!=="D"||car.offroad||sys.esa||(TRIMS[st.trim].pilotHwy&&zoneAt(M.s)==="c"))sys.pilotState="standby";
   else if(override){sys.pilotState="override";sys.pilotLC=null}
   else{
@@ -9546,7 +9577,7 @@ function assist(dt){
   if(!sys.stopSign)sys.ssGo=false;else if(sys.ssStopped&&inp.thr>0.1)sys.ssGo=true;
   if(st.acc){
     if(!sys.fsdActive&&sys.stopSign&&sys.ssStopped&&!sys.ssGo&&Math.abs(car.vx)<0.3){sys.accState="stop sign";sys.accBrk=0.35;sys.ssHold=true}
-    else if(inp.brk>0.1||st.gear!=="D"){st.acc=false;sys.accState="off";if(st.pilot){st.pilot=false;sys.pilotLC=null;toast("Pilot and cruise off (brake)")}else toast("Adaptive cruise off");tick(0)}
+    else if((inp.brk>0.1&&!(sys.p2pGrace>0))||st.gear!=="D"){st.acc=false;sys.accState="off";if(st.pilot){st.pilot=false;sys.pilotLC=null;toast("Pilot and cruise off (brake)")}else toast("Adaptive cruise off");tick(0)}
     else if(sys.fsdActive){sys.accThr=sys.fsdThr||0;sys.accBrk=sys.fsdBrk||0;sys.accState="FSD"}
     else{const Tg=[1.0,1.5,2.1][st.accGap-1];
       let g2=lead?gap:Infinity, vL=lead?lead.v:st.accSet;
@@ -14867,7 +14898,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=295;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="173",BUILD_VER=296;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}try{const P=JSON.parse(localStorage.getItem("strata.ped")||"null");if(P){st.pedHold=+P.pedHold||0;st.thrRate=+P.thrRate||2;st.brkRate=+P.brkRate||2}}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){const k=GFX.q==="auto"?GFX.eff:GFX.q;if(G.k!==k||G.v!==GFX.ovV||!G.m){G.k=k;G.v=GFX.ovV;const m={...GQ[k]};for(const o of GOPT)if(GFX.ov[o[0]]!==undefined)Object.assign(m,o[4](GFX.ov[o[0]]));if(Object.keys(GFX.ov).length)m.label=GQ[k].label+" (custom)";G.m=m;COLL.nt=!m.trees}return G.m}
@@ -15309,6 +15340,7 @@ function controls(dt){try{sigCancel()}catch(e){}sys.wheelRad=null;let whlOn=fals
     if(inp.padActive||inp.thrT>0.05||inp.brkT>0.05||keyed||whlGrab())paStop("Park assist cancelled: you have control");
     else{const o=paUpdate(dt);if(o){[s,thr,brk]=o;inp.steer+=clamp(s-inp.steer,-2.2*dt,2.2*dt);inp.thr+=clamp(thr-inp.thr,-4*dt,2*dt);inp.brk+=clamp(brk-inp.brk,-6*dt,6*dt);
       knob.style.transform=st.wheelUI?`rotate(${inp.steer*135}deg)`:`translateX(${inp.steer*(pad.clientWidth/2-30)}px) rotate(${inp.steer*90}deg)`;$("accel").fill.style.height=(inp.thr*100)+"%";$("brake").fill.style.height=(inp.brk*100)+"%";return}}}
+  if(sys.p2pGrace>0){sys.p2pGrace-=dt;if(inp.steerT===0)inp.steer*=0.5}
   if(sys.p2p&&sys.p2p.ph==="exited"&&!st.walk){sys.p2p.wait-=dt;if(sys.p2p.wait<=0){if(inGarage(car.px,car.py))p2pGarageOut();else if(p2pOnRoad())p2pEngage();else p2pToRoad()}}
   if(sys.summon&&sys.summon.drive&&!st.walk){const keyed=K.arrowleft||K.arrowright||K.arrowup||K.arrowdown||K.a||K.d||K.w||K.s||K[" "];
     if(inp.padActive||inp.thrT>0.05||inp.brkT>0.05||keyed||whlGrab()){sys.summon=null;sys.p2p=null;inp.brk=0.5;toast("FSD cancelled: you have control")}else{summonUpdate(dt);sys.fsdState=sys.summon?sys.summon.msg:"";return}}
