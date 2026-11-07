@@ -17,7 +17,7 @@ WHEEL = {"wheel_front_left": "FL", "wheel_front_right": "FR", "wheel_rear_left":
 # work equipment that moves (plows, salt spreader, rollback deck, wheel-lift): each its own object, centred on its box
 EQUIP = re.compile(r"^(plow_A_frame|blade_left|blade_right|hopper|spinner_chute|rollback_deck|underlift|boom|warning_bar|tipping_body|gutter_brush_-?1|stop_arm|crossing_arm|(red|amber)_(left|right)_(front|rear))$")
 CABIN = re.compile(r"^(interior|headliner|driver_cab|passenger_seats|cabin_.*|driver_cluster|cluster_information_display|panoramic_display|center_touchscreen|flush_center_screen|period_dashboard|dash|dashboard|dashboard_trim|center_display|steering_wheel|steering_yoke)$")
-SCREEN_M = re.compile(r"blank display surface|blank custom ui surface|blank center display|display glass|display graphics|navigation", re.I)
+SCREEN_M = re.compile(r"cluster_blank|infotainment_blank|blank screen|blank display surface|blank custom ui surface|blank center display|display glass|display graphics|navigation", re.I)
 
 
 def srgb(c):
@@ -180,6 +180,7 @@ def main(src, key, budget=60000, cab_budget=42000, wheels_only=False):
         m["pano"] = quad("panoramic_display"); m["clu"] = quad("panoramic_display", 0, 0.2304)
         m["xs"] = {"nav": quad("panoramic_display", 0.3074, 0.5996), "pas": quad("panoramic_display", 0.6826, 1.0)}
     elif quad("driver_cluster"): m["clu"] = quad("driver_cluster")
+    elif quad("cabin_cluster_blank"): m["clu"] = quad("cabin_cluster_blank")   # Fusion set 2: blank screen nodes for our own UI
     elif quad("cluster_information_display"): m["clu"] = quad("cluster_information_display")
     elif steer_c is not None and any(p["node"] == "period_dashboard" for p in parts):
         # older dashboards: the gauge bezels (bright trim) sit in the dash right behind the steering wheel; the cluster screen covers them
@@ -191,7 +192,7 @@ def main(src, key, budget=60000, cab_budget=42000, wheels_only=False):
             r = lambda q: [round(float(t), 4) for t in q]
             bl = P([hi_[0], yf, lo_[2]]); br = P([lo_[0], yf, lo_[2]]); tl = P([hi_[0], yf, hi_[2]]); cc = P([(lo_[0] + hi_[0]) / 2, yf, (lo_[2] + hi_[2]) / 2])
             m["clu"] = {"bl": r(bl), "br": r(br), "tl": r(tl), "c": r(cc), "n": [0.0, 0.0, 1.0], "w": round(float(hi_[0] - lo_[0]), 4), "h": round(float(hi_[2] - lo_[2]), 4)}
-    s = quad("center_touchscreen") or quad("flush_center_screen") or quad("center_display")
+    s = quad("center_touchscreen") or quad("flush_center_screen") or quad("center_display") or quad("cabin_infotainment_blank")
     if s: m["scr"] = s
     if ("clu" not in m or "scr" not in m) and cam is not None:
         # no named screen nodes (a refreshed cabin): the display glass in the dashboard, split into separate panels side by side;
