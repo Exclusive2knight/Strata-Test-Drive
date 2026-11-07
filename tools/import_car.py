@@ -15,7 +15,7 @@ from web_export import pack
 WHEEL = {"wheel_front_left": "FL", "wheel_front_right": "FR", "wheel_rear_left": "RL", "wheel_rear_right": "RR",
          "wheel_0_1": "FL", "wheel_0_-1": "FR", "wheel_1_1": "RL", "wheel_1_-1": "RR"}   # the heavy work-truck chassis names them by axle
 # work equipment that moves (plows, salt spreader, rollback deck, wheel-lift): each its own object, centred on its box
-EQUIP = re.compile(r"^(plow_A_frame|blade_left|blade_right|hopper|spinner_chute|rollback_deck|underlift|boom|warning_bar|tipping_body|gutter_brush_-?1|stop_arm|crossing_arm|(red|amber)_(left|right)_(front|rear))$")
+EQUIP = re.compile(r"^(plow_A_frame|blade_left|blade_right|hopper|spinner_chute|rollback_deck|underlift|boom|warning_bar|tipping_body|gutter_brush_-?1|stop_arm|crossing_arm|(red|amber)_(left|right)_(front|rear)|mq_door_(FL|FR|RL|RR)|mq_tailgate|mq_mirror_[LR])$")
 CABIN = re.compile(r"^(interior|headliner|driver_cab|passenger_seats|cabin_.*|driver_cluster|cluster_information_display|panoramic_display|center_touchscreen|flush_center_screen|period_dashboard|dash|dashboard|dashboard_trim|center_display|steering_wheel|steering_yoke)$")
 SCREEN_M = re.compile(r"cluster_blank|infotainment_blank|blank screen|blank display surface|blank custom ui surface|blank custom display|blank center display|display glass|display graphics|navigation", re.I)
 
@@ -217,6 +217,9 @@ def main(src, key, budget=60000, cab_budget=42000, wheels_only=False):
         def box(lo_, hi_):
             a, b = np.array(P(lo_)), np.array(P(hi_)); return [round(float(v), 4) for v in np.minimum(a, b)], [round(float(v), 4) for v in np.maximum(a, b)]
         m["equip"] = {k: {"c": P(c_), "lo": box(lo_, hi_)[0], "hi": box(lo_, hi_)[1]} for k, (c_, lo_, hi_) in eq.items()}
+        mv = {k: v for k, v in m["equip"].items() if k.startswith("mq_")}   # opening doors / tailgate / folding mirrors: not work equipment
+        if mv: m["parts"] = mv; m["equip"] = {k: v for k, v in m["equip"].items() if k not in mv} or None
+        if not m["equip"]: del m["equip"]
     dst = f"models/{key}.json"
     if KEEP_SCREENS:   # a refreshed body on the same cabin with its screen graphics taken out: keep the screen spots from the model it replaces
         import os
