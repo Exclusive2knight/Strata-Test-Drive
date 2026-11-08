@@ -17,7 +17,7 @@ WHEEL = {"wheel_front_left": "FL", "wheel_front_right": "FR", "wheel_rear_left":
 # work equipment that moves (plows, salt spreader, rollback deck, wheel-lift): each its own object, centred on its box
 EQUIP = re.compile(r"^(plow_A_frame|blade_left|blade_right|hopper|spinner_chute|rollback_deck|underlift|boom|warning_bar|tipping_body|gutter_brush_-?1|stop_arm|crossing_arm|(red|amber)_(left|right)_(front|rear)|mq_door_(FL|FR|RL|RR)|mq_tailgate|mq_mirror_[LR])$")
 CABIN = re.compile(r"^(interior|headliner|driver_cab|passenger_seats|cabin_.*|driver_cluster|cluster_information_display|panoramic_display|center_touchscreen|flush_center_screen|period_dashboard|dash|dashboard|dashboard_trim|center_display|steering_wheel|steering_yoke)$")
-SCREEN_M = re.compile(r"cluster_blank|infotainment_blank|blank screen|blank display surface|blank custom ui surface|blank custom display|blank center display|display glass|display graphics|navigation", re.I)
+SCREEN_M = re.compile(r"cluster_blank|infotainment_blank|display_blank|blank screen|blank display surface|blank custom ui surface|blank custom display|blank center display|display glass|display graphics|navigation", re.I)
 
 
 def srgb(c):
