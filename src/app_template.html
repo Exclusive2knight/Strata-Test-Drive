@@ -1267,8 +1267,15 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
 <script data-boot>(function(){var p=0;window.__bootP=0;var t=setInterval(function(){if(window.__bootReal){clearInterval(t);return}p+=(0.7-p)*0.025;window.__bootP=p;var a=document.getElementById("bootArc"),n=document.getElementById("bootNeedle"),c=document.getElementById("bootPct");if(a)a.setAttribute("stroke-dasharray",(p*100).toFixed(1)+" 100");if(n)n.style.setProperty("--a",(-135+p*270)+"deg");if(c)c.textContent=String(Math.round(p*100))},120)})()</script>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 301 · Classic Model S and X screen</h2></div>
+    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 302 · New Tesla climate and charging screens</h2></div>
     <div class="nb">
+      <h4>New Tesla climate and charging screens</h4><ul>
+      <li>Current Teslas (Model 3, Model Y, Model S, Model X and Cybertruck) have a new Climate screen laid out like the real one: a view of the dashboard with air streaming from the vents. Drag the air streams left or right to aim them. They turn orange when heating and blue when cooling.</li>
+      <li>Along the top: power, Auto, A/C and three airflow choices (face, face and feet, feet), an Off / Keep / Dog / Camp selector, Front and Rear tabs, and Schedule. Along the bottom: heated and ventilated seats with level bars, steering wheel heater, wiper defrost, front and rear defrost, the fan with LO to 10, recirculation and, on Model S, X and Y, Bioweapon Defense Mode. The Rear tab has heaters for the three rear seats.</li>
+      <li>The Charging settings page now matches the current software: your range, a View Energy Consumption link, a charge slider with Daily and Trip marks, Charge Current with minus and plus, Start/Stop Charging, Open Charge Port, Schedule Charge, Charge on Solar and your last Supercharging session. The page scrolls.</li>
+      <li>Charge on Solar works: with it on, the car charges to the sun mark (default 60%) from any charger and keeps going to your limit during sunny daytime hours. The charge limit now really decides where Supercharging stops on all Teslas.</li>
+      <li>The dock now has a passenger temperature next to the volume, and the settings menu says Pedals & Steering and Upgrade, as in the current software.</li>
+      </ul>
       <h4>Classic Model S and X screen</h4><ul>
       <li>The 2020 Model S and Model X now have their own tall portrait touchscreen in the classic Tesla layout: a status bar with lock, home and driver profile, a full-height map, and the black climate dock along the bottom.</li>
       <li>The map has been redrawn in the classic light style: white streets, yellow main roads, orange freeways, red, orange and green traffic lines, street names, red place pins and a red car arrow. Tap a pin for a card with a Navigate button. North-up, traffic, charger, zoom and recenter buttons sit on the right.</li>
@@ -4444,7 +4451,7 @@ function energy(dt,Pw){
   // plugged in at the charging station (charging is sped up 10x so you don't wait)
   H.charging=false; H.refuel=false;
   if(T.hybrid&&sys.fuel==="pump"&&nearStn("pumps",6.5)&&sp<0.3&&H.fuel<H.tank){H.refuel=true;H.fuel=Math.min(H.tank,H.fuel+4*dt);if(SAFE.trip)SAFE.trip.f0=H.fuel;if(H.fuel>=H.tank){sys.fuel=null;setTimeout(()=>toast("Tank full"),0)}}
-  if(sys.fuel==="plug"&&nearStn("chargers",8)&&sp<0.3&&(T.phev||!T.hybrid)){const tg_=fusLine()?(st.cTgt||0.8):0.9;if(H.soc<tg_){H.charging=true;H.Pb-=(T.phev?50e3:250e3)*10}else{sys.fuel=null;setTimeout(()=>toast(`Charged to ${Math.round(tg_*100)} %`),0)}}
+  if(sys.fuel==="plug"&&nearStn("chargers",8)&&sp<0.3&&(T.phev||!T.hybrid)){const tg_=fusLine()?(st.cTgt||0.8):isTesla()?tslChgTarget():0.9;if(H.soc<tg_){H.charging=true;H.Pb-=(T.phev?50e3:250e3)*10}else{sys.fuel=null;setTimeout(()=>toast(`Charged to ${Math.round(tg_*100)} %`),0);if(isTesla())SCR.lastSC=`Last session: charged to ${Math.round(tg_*100)}% at ${hourNow()%12||12}:00 ${hourNow()<12?"AM":"PM"}`}}
   H.soc=clamp(H.soc-H.Pb*dt/(cap*3.6e6),T.hybrid?0.12:0,T.hybrid?0.95:1);   // EVs run right down to empty; hybrids keep a hidden reserve
   if(!T.ice||T.hybrid){let amb=20;try{amb=(ambF()-32)/1.8}catch(e){}if(H.bt==null)H.bt=amb;const kwh=Math.max(1,cap);H.bt+=Math.abs(H.Pb)/1e3*0.045/kwh*dt*(T.hybrid&&!T.phev?0.12:1)-(H.bt-amb)*dt/900-(H.bt>34?(H.bt-32)*dt/120:0)+(H.charging&&H.bt<25?0.05*dt:0);
     H.btK=clamp((H.bt+15)/25,0.3,1)*(H.bt>48?0.6:1);if(H.btK<0.7&&!SAFE.btSaid&&!T.ice&&st.started){SAFE.btSaid=1;carMsg(H.bt<10?`❄️ The battery is cold (${degF(H.bt)}°F): regenerative braking and power are limited until it warms up`:`🌡️ The battery is hot: power is limited to protect it`)}}
@@ -8666,7 +8673,7 @@ function scrTeslaEnergy(g,top,bot,W){const T=TRIMS[st.trim],Hy=car.hyb,P=car.tq.
   const pf=(car.tq[0]*car.w[0]+car.tq[1]*car.w[1])/1000,pr=(car.tq[2]*car.w[2]+car.tq[3]*car.w[3])/1000,n=teslaMotors();
   const mot=(x,y,p,l)=>{g.fillStyle=Math.abs(p)<1?"#2c3e44":p<0?"#55d68c":"#3e6ae1";g.beginPath();g.arc(x,y,9,0,7);g.fill();g.fillStyle="#cfd6da";g.font=FONT(11);g.textAlign="right";g.fillText(`${l} ${hpN(p)} hp`,cx-cw/2-8,y+4)};
   if(n>=2)mot(cx,cy-ch*0.36,pf,"Front");if(n===3){mot(cx-cw*0.2,cy+ch*0.36,pr/2,"Rear (×2)");mot(cx+cw*0.2,cy+ch*0.36,pr/2,"")}else mot(cx,cy+ch*0.36,pr,"Rear");g.textAlign="left"}
-function teslaMenu(){const sx=["models_","modelx"].includes(TRIMS[st.trim].model);return [["controls","Controls","⚙"],["pedals",sx?"Pedals & Steering":"Dynamics","◎"],...(sx?[["susp","Suspension","⇕"]]:[]),["charging","Charging","⚡"],["autopilot","Autopilot","◈"],["locks","Locks","🔒"],["lights","Lights","☀"],["display","Display","▭"],["trips","Trips","↯"],["nav","Navigation","➤"],["safety","Safety","⚠"],["service","Service","✎"],["software","Software","⤓"],["upgrades","Upgrades","⬆"]]}
+function teslaMenu(){const sx=["models_","modelx"].includes(TRIMS[st.trim].model);return [["controls","Controls","⚙"],["pedals","Pedals & Steering","◎"],...(sx?[["susp","Suspension","⇕"]]:[]),["charging","Charging","⚡"],["autopilot","Autopilot","◈"],["locks","Locks","🔒"],["lights","Lights","☀"],["display","Display","▭"],["trips","Trips","↯"],["nav","Navigation","➤"],["safety","Safety","⚠"],["service","Service","✎"],["software","Software","⤓"],["upgrades","Upgrade","⬆"]]}
 function tRow(g,y,W,label,opts,cur,fn){g.fillStyle="#9fb4b7";g.font=FONT(12);g.textAlign="left";g.textBaseline="middle";g.fillText(label,14,y+6);const x0=14,bw=(W-x0-10)/opts.length,yy=y+16;
   opts.forEach(([k,n],i)=>{const x=x0+i*bw,on=cur===k;g.fillStyle=on?"#3e6ae1":"#1a1f24";rr2(g,x,yy,bw-5,26,7);g.fill();g.fillStyle=on?"#fff":"#cfd6da";g.textAlign="center";g.font=FONT(bw<70?11:12.5);g.fillText(n,x+(bw-5)/2,yy+13);hit(x,yy,bw-5,26,()=>{fn(k);tick(1)})})}
 function tTog(g,y,W,label,on,fn,sub){g.fillStyle="#e6eef0";g.font=FONT(13.5);g.textAlign="left";g.textBaseline="middle";g.fillText(label,14,y+12);if(sub){g.fillStyle="#7f8d92";g.font=FONT(11);g.fillText(sub,14,y+28)}
@@ -8700,7 +8707,7 @@ function tSusp(g,top,bot,W){let y=top+14;const H=[["vl","V. Low",-0.03],["lo","L
   tRow(g,y,W,"Ride Height",H.map(h=>[h[0],h[1]]),SCR.rh||"md",k=>{SCR.rh=k;st.rideH=H.find(h=>h[0]===k)[2];toast(`Ride height: ${H.find(h=>h[0]===k)[1]}`)});y+=52;
   tRow(g,y,W,"Adaptive Suspension Damping",[[0,"Comfort"],[1,"Auto"],[2,"Sport"]],st.damp??1,k=>{st.damp=k});y+=52;
   tTog(g,y,W,"Auto-Lower at speed",TOPT.autoLow!==false,v=>TOPT.autoLow=v,"Lowers the car on the highway for less drag")}
-function tCharging(g,top,bot,W){const Hy=car.hyb;let y=top+16;g.fillStyle="#e6eef0";g.font=FONT(22);g.textAlign="left";g.textBaseline="middle";g.fillText(`${Math.round(socShow(Hy)*100)} %  ·  ${Math.round(evRange()/1.609)} mi`,14,y+8);y+=36;
+function tCharging(g,top,bot,W){if(isTesla()&&!tslLeg()){tChargingNew(g,top,bot,W);return}const Hy=car.hyb;let y=top+16;g.fillStyle="#e6eef0";g.font=FONT(22);g.textAlign="left";g.textBaseline="middle";g.fillText(`${Math.round(socShow(Hy)*100)} %  ·  ${Math.round(evRange()/1.609)} mi`,14,y+8);y+=36;
   g.fillStyle="#1a1f24";rr2(g,14,y,W-28,16,8);g.fill();g.fillStyle="#55d68c";rr2(g,14,y,(W-28)*socShow(Hy),16,8);g.fill();g.fillStyle="#fff";g.fillRect(14+(W-28)*TOPT.chgLim/100-1,y-4,3,24);hit(14,y-6,W-28,28,()=>{});y+=34;
   tRow(g,y,W,"Charge Limit",[[50,"50%"],[70,"70%"],[80,"80%"],[90,"90%"],[100,"100%"]],TOPT.chgLim,k=>{TOPT.chgLim=k});y+=54;
   const chg=sys.fuel==="plug";g.fillStyle="#1d2c4f";rr2(g,14,y,170,34,8);g.fill();g.fillStyle="#fff";g.font=FONT(13);g.fillText(chg?"Stop Charging":"Open Charge Port",26,y+17);hit(14,y,170,34,()=>{if(chg){sys.fuel=null;toast("Charging stopped")}else if(Math.abs(car.vx)<0.3&&st.gear==="P"){sys.fuel="plug";toast("Charge port open: plugged in")}else toast("Shift to Park to charge")})}
@@ -8718,7 +8725,7 @@ function tService(g,top,bot,W){let y=top+22;g.textAlign="left";g.textBaseline="m
 function tSoftware(g,top,bot,W){let y=top+26;g.textAlign="left";g.textBaseline="middle";g.fillStyle="#e6eef0";g.font=FONT(18);g.fillText("Software Version: 2026.38.4",14,y);y+=28;g.fillStyle="#9fb4b7";g.font=FONT(13);
   g.fillText(fsdOwned()?"Full Self-Driving (Supervised) v14.1":"Autopilot",14,y);y+=22;g.fillText("Your car is up to date",14,y);y+=32;g.fillStyle="#e6eef0";g.font=FONT(14);g.fillText("Release Notes",14,y);y+=22;g.fillStyle="#9fb4b7";g.font=FONT(12);
   for(const l of ["FSD goes around stopped cars and crashes","Toybox: Light Show, Emissions Testing, Romance Mode","Real door and rear-view mirrors","Smart Summon backs out of tight stalls"]){g.fillText("• "+l,14,y);y+=18}}
-function scrClimate(g,top,bot,W){const p=14;g.fillStyle="#0d1013";g.fillRect(0,top,W,bot-top);sys.tL=sys.tL||70;sys.fan=sys.fan||5;let y=top+14;
+function scrClimate(g,top,bot,W){if(isTesla()){tslClimate(g,top,bot,W);return}const p=14;g.fillStyle="#0d1013";g.fillRect(0,top,W,bot-top);sys.tL=sys.tL||70;sys.fan=sys.fan||5;let y=top+14;
   const btn=(x,y,w,t,on,fn)=>{g.fillStyle=on?"#3e6ae1":"#1a1f24";rr2(g,x,y,w,30,8);g.fill();g.fillStyle="#fff";g.font=FONT(12.5);g.textAlign="center";g.textBaseline="middle";g.fillText(t,x+w/2,y+15);hit(x,y,w,30,()=>{fn();tick(1)})};
   btn(p,y,70,"⏻ Auto",!!sys.climate,()=>sys.climate=!sys.climate);btn(p+80,y,50,"A/C",!!sys.climate&&!sys.heat,()=>sys.heat=false);btn(p+140,y,90,`✣ ${sys.fan}`,true,()=>sys.fan=sys.fan%10+1);btn(p+240,y,50,"⟲",!!sys.recirc,()=>sys.recirc=!sys.recirc);
   if(bioOK())btn(p+300,y,60,"☣",TSL.bio,()=>{TSL.bio=!TSL.bio;toast(TSL.bio?"Bioweapon Defense Mode on":"Bioweapon Defense Mode off")});y+=48;
@@ -8731,7 +8738,9 @@ function teslaDock(g,bot,W,H){const dk=tslDark();g.fillStyle=dk?"#0b0d0f":"#f4f5
   g.fillStyle=ink;g.font=FONT(20);g.textAlign="center";g.fillText("‹",72,cy);g.font=FONT(17);g.fillText(String(sys.tL),100,cy+1);g.font=FONT(20);g.fillText("›",128,cy);hit(58,bot,26,H-bot,()=>sys.tL--);hit(116,bot,26,H-bot,()=>sys.tL++);hit(86,bot,30,H-bot,()=>{SCR.page="climate"});
   const w_=(c)=>(x,y)=>rivIco(g,c,x,y,20,"#fff");
   const apps=[["map","#3e6ae1",w_("nav")],["media","#e2334a",w_("music")],["camera","#4b5259",w_("cam")],["energy","#2fb35f",w_("bolt")],["autopilot","#5b6cff",(x,y)=>{g.strokeStyle="#fff";g.lineWidth=2;g.beginPath();g.arc(x,y,8,0,7);g.moveTo(x-8,y);g.lineTo(x+8,y);g.moveTo(x,y);g.lineTo(x,y+8);g.stroke()}],["toybox","#ff9f0a",(x,y)=>{g.fillStyle="#fff";g.font=FONT(17);g.textAlign="center";g.fillText("🧸",x,y+1)}],["upgrades","#6e7378",(x,y)=>{g.fillStyle="#fff";g.beginPath();g.moveTo(x,y-9);g.lineTo(x+8,y);g.lineTo(x+3,y);g.lineTo(x+3,y+8);g.lineTo(x-3,y+8);g.lineTo(x-3,y);g.lineTo(x-8,y);g.closePath();g.fill()}]];
-  const sp=Math.min(46,(W-220)/apps.length),x0=150+(W-210-sp*apps.length)/2+sp/2;apps.forEach(([k,c,d],i)=>tile(x0+i*sp,k,c,d));rivIco(g,"vol",W-28,cy,22,ink);hit(W-50,bot,50,H-bot,()=>{SCR.page="media";SCR.autoCam=false})}
+  const sp=Math.min(46,(W-320)/apps.length),x0=150+(W-310-sp*apps.length)/2+sp/2;apps.forEach(([k,c,d],i)=>tile(x0+i*sp,k,c,d));
+  {sys.tR=sys.tR||sys.tL;const px=W-112;g.fillStyle=ink;g.font=FONT(20);g.textAlign="center";g.fillText("‹",px-28,cy);g.font=FONT(17);g.fillText(String(sys.tR),px,cy+1);g.font=FONT(20);g.fillText("›",px+28,cy);hit(px-42,bot,26,H-bot,()=>sys.tR--);hit(px+16,bot,26,H-bot,()=>sys.tR++);hit(px-14,bot,28,H-bot,()=>{SCR.page="climate"})}
+  rivIco(g,"vol",W-28,cy,22,ink);hit(W-50,bot,50,H-bot,()=>{SCR.page="media";SCR.autoCam=false})}
 
 // ---- launch control: hold the brake, floor it, wait for "ready", let go of the brake
 const LC={st:"off",t:0,go:0,t60:0};
@@ -12414,6 +12423,108 @@ function legScreen(g,W,H,M){const P=legPal(),top=31,bot=H-52;if(SCR.page==="park
   for(let i=LY.length-1;i>=0;i--)SCR.hits.push(...LY[i]);
   {const b=TOPT.brAuto?(st.night?60:100):TOPT.bright;if(b<100){g.fillStyle=`rgba(0,0,0,${((100-b)/100*0.65).toFixed(3)})`;g.fillRect(0,0,W,H)}}
   g.textBaseline="alphabetic"}
+/* ---- v302 current Tesla climate page (interior view, Off/Keep/Dog/Camp, vents you drag) and the current Charging settings page */
+function tcIco(g,k,x,y,c,s){s=s||1;g.save();g.translate(x,y);g.scale(s,s);g.strokeStyle=c;g.fillStyle=c;g.lineWidth=1.6;g.lineCap="round";g.lineJoin="round";g.beginPath();
+  if(k==="power"){g.arc(0,1,7,-1.1,Math.PI+1.1+0.0);g.moveTo(0,-8);g.lineTo(0,0);g.stroke()}
+  else if(k==="face"||k==="both"||k==="feet"){g.arc(-3,-7,2.2,0,7);g.stroke();g.beginPath();g.moveTo(-3,-4);g.lineTo(-3,2);g.lineTo(2,2);g.lineTo(3,8);g.stroke();
+    if(k!=="feet"){g.beginPath();g.moveTo(9,-7);g.lineTo(3,-5);g.moveTo(5,-8);g.lineTo(3,-5);g.lineTo(5.5,-3);g.stroke()}
+    if(k!=="face"){g.beginPath();g.moveTo(9,4);g.lineTo(5,7);g.moveTo(5,4.5);g.lineTo(5,7);g.lineTo(7.5,7.5);g.stroke()}}
+  else if(k==="seatH"||k==="seatV"){g.moveTo(-5,-8);g.lineTo(-3,3);g.lineTo(5,3);g.moveTo(-3,3);g.lineTo(-2,8);g.stroke();g.beginPath();
+    if(k==="seatH"){for(const o of [1,4.5,8]){g.moveTo(o,-9);g.quadraticCurveTo(o+2,-6,o,-3);g.quadraticCurveTo(o-2,0,o,1)}}else{for(const o of [2,6]){g.moveTo(o,-8);g.lineTo(o,-1)}g.moveTo(0,-5);g.lineTo(8,-5)}g.stroke()}
+  else if(k==="wheel"){g.arc(0,0,7.5,0,7);g.moveTo(-7.5,0);g.lineTo(7.5,0);g.moveTo(0,0);g.lineTo(0,7.5);g.stroke();g.beginPath();for(const o of [-4,0,4]){g.moveTo(o,-10);g.quadraticCurveTo(o+1.5,-12,o,-14)}g.stroke()}
+  else if(k==="wiper"){g.moveTo(-9,4);g.quadraticCurveTo(0,-9,9,4);g.closePath();g.stroke();g.beginPath();g.moveTo(0,4);g.lineTo(-5,-2);g.stroke()}
+  else if(k==="defF"){g.moveTo(-9,5);g.quadraticCurveTo(0,-9,9,5);g.closePath();g.stroke();g.beginPath();for(const o of [-4,0,4]){g.moveTo(o,3);g.quadraticCurveTo(o+2,0,o,-3)}g.stroke()}
+  else if(k==="defR"){g.rect(-9,-6,18,12);g.stroke();g.beginPath();for(const o of [-4,0,4]){g.moveTo(o,3);g.quadraticCurveTo(o+2,0,o,-3)}g.stroke()}
+  else if(k==="recirc"){g.moveTo(-9,4);g.lineTo(-7,-1);g.lineTo(7,-1);g.lineTo(9,4);g.closePath();g.stroke();g.beginPath();g.arc(0,-5,4,Math.PI*0.9,Math.PI*2.3);g.stroke();g.beginPath();g.moveTo(-4,-8);g.lineTo(-4,-4.5);g.lineTo(-1,-5.5);g.stroke()}
+  else if(k==="bio"){g.font="15px system-ui";g.textAlign="center";g.textBaseline="middle";g.fillText("☣",0,1)}
+  else if(k==="fan"){for(let i=0;i<4;i++){g.save();g.rotate(i*Math.PI/2);g.beginPath();g.moveTo(0,0);g.quadraticCurveTo(-5,-4,-1,-8);g.quadraticCurveTo(3,-6,0,0);g.fill();g.restore()}}
+  else if(k==="clock"){g.arc(0,0,7,0,7);g.moveTo(0,-4);g.lineTo(0,0);g.lineTo(3,2);g.stroke()}
+  else if(k==="keep"){for(let i=0;i<4;i++){g.save();g.rotate(i*Math.PI/2+0.4);g.beginPath();g.moveTo(0,0);g.quadraticCurveTo(-4,-3,-1,-6.5);g.quadraticCurveTo(2.5,-5,0,0);g.fill();g.restore()}}
+  else if(k==="dog"){g.arc(0,2.5,3.2,0,7);g.fill();for(const [a,b] of [[-5,-2],[-2,-5.5],[2,-5.5],[5,-2]]){g.beginPath();g.arc(a,b,1.6,0,7);g.fill()}}
+  else if(k==="camp"){g.moveTo(-8,6);g.lineTo(0,-7);g.lineTo(8,6);g.closePath();g.stroke();g.beginPath();g.moveTo(0,-7);g.lineTo(-2,6);g.moveTo(0,-7);g.lineTo(2,6);g.stroke()}
+  g.restore()}
+function tcBars(g,x,y,lv,col){for(let j=0;j<3;j++){g.fillStyle=j<lv?col:"rgba(128,128,128,.35)";g.fillRect(x-8+j*6,y,4.5,2.5)}}
+function tslClimate(g,top,bot,W){const dk=tslDark(),h=bot-top,u=Math.min(1,h/322,W/680);sys.tL=sys.tL||70;sys.tR=sys.tR||sys.tL;sys.fan=sys.fan||5;
+  const P=dk?{bg0:"#17191b",bg1:"#0c0d0e",ink:"#e9ebec",sub:"#8a9094",line:"#2a2d30",card:"#232628",sel:"#3e6ae1",il:"#2a2d30",il2:"#1f2224",ilS:"#3a3e42"}:{bg0:"#f6f6f7",bg1:"#e7e8ea",ink:"#1d1f21",sub:"#8b9095",line:"#d9dbdd",card:"#ffffff",sel:"#3e6ae1",il:"#ffffff",il2:"#eceef0",ilS:"#cfd2d5"};
+  const gr=g.createLinearGradient(0,top,0,bot);gr.addColorStop(0,P.bg0);gr.addColorStop(1,P.bg1);g.fillStyle=gr;g.fillRect(0,top,W,h);
+  const on=sys.climate!==false,mode=TSL.camp?"camp":TSL.dog?"dog":TSL.keep?"keep":"off",rear=SCR.climRear,hot=on&&(sys.heat||(sys.climAuto&&sys.tL>ambF())),col=!on?P.sub:hot?"#ff7a3a":"#3e8bff";
+  const T=(t,x,y,f,c,al)=>{g.fillStyle=c||P.ink;g.font=FONT(f*u);g.textAlign=al||"center";g.textBaseline="middle";g.fillText(t,x,y)};
+  const yTop=top+8*u,ilTop=top+70*u,ilBot=bot-46*u;
+  {const cx=W/2,cy=ilTop-4*u,cw=W*0.62,ch=ilBot-ilTop;g.save();g.beginPath();g.rect(0,ilTop-10*u,W,ilBot-ilTop+10*u);g.clip();
+    g.fillStyle=P.il2;g.beginPath();g.moveTo(cx-cw*0.75,ilBot);g.lineTo(cx-cw*0.62,cy+ch*0.18);g.quadraticCurveTo(cx,cy-ch*0.02,cx+cw*0.62,cy+ch*0.18);g.lineTo(cx+cw*0.75,ilBot);g.closePath();g.fill();
+    g.fillStyle=P.il;g.strokeStyle=P.ilS;g.lineWidth=1;g.beginPath();g.moveTo(cx-cw*0.66,cy+ch*0.36);g.quadraticCurveTo(cx,cy+ch*0.28,cx+cw*0.66,cy+ch*0.36);g.lineTo(cx+cw*0.7,cy+ch*0.55);g.quadraticCurveTo(cx,cy+ch*0.47,cx-cw*0.7,cy+ch*0.55);g.closePath();g.fill();g.stroke();
+    g.fillStyle=P.ilS;g.fillRect(cx-cw*0.5,cy+ch*0.39,cw*0.25,2*u);g.fillRect(cx+cw*0.25,cy+ch*0.39,cw*0.25,2*u);
+    if(!rear){const sw=cw*0.28,sh=ch*0.5;g.fillStyle=P.il;g.strokeStyle=P.ilS;rr2(g,cx-sw/2,cy+ch*0.22,sw,sh,4*u);g.fill();g.stroke()}
+    if(!rear){const wx=cx-cw*0.36,wy=cy+ch*0.62,r=ch*0.3;g.strokeStyle=P.ilS;g.lineWidth=7*u;g.beginPath();g.arc(wx,wy,r,0,7);g.stroke();g.strokeStyle=P.il;g.lineWidth=5*u;g.stroke();
+      g.fillStyle=P.il;g.strokeStyle=P.ilS;g.lineWidth=1;g.beginPath();g.ellipse(wx,wy+r*0.12,r*0.36,r*0.26,0,0,7);g.fill();g.stroke();g.lineWidth=5*u;g.strokeStyle=P.il;g.beginPath();g.moveTo(wx-r,wy);g.lineTo(wx-r*0.36,wy+r*0.05);g.moveTo(wx+r,wy);g.lineTo(wx+r*0.36,wy+r*0.05);g.stroke()}
+    g.fillStyle=P.il2;g.strokeStyle=P.ilS;g.lineWidth=1;g.beginPath();g.moveTo(cx-cw*0.18,ilBot);g.lineTo(cx-cw*0.12,cy+ch*0.75);g.lineTo(cx+cw*0.12,cy+ch*0.75);g.lineTo(cx+cw*0.18,ilBot);g.closePath();g.fill();g.stroke();
+    if(!rear&&on){sys.vL=sys.vL??0;sys.vR=sys.vR??0;for(const [vx,key] of [[cx-cw*0.2,"vL"],[cx+cw*0.36,"vR"]]){const ax=vx+sys[key]*cw*0.22,vy=cy+ch*0.42;const sp=0.6+sys.fan*0.05;
+        const gg=g.createRadialGradient(vx,vy,2,vx,vy,ch*0.55*sp);gg.addColorStop(0,hot?"rgba(255,140,80,.55)":"rgba(140,190,255,.55)");gg.addColorStop(1,"rgba(255,255,255,0)");g.fillStyle=gg;
+        g.beginPath();g.moveTo(vx-cw*0.04,vy);g.quadraticCurveTo(ax-cw*0.08,vy+ch*0.12,ax-cw*0.13,vy+ch*0.5*sp);g.lineTo(ax+cw*0.13,vy+ch*0.5*sp);g.quadraticCurveTo(ax+cw*0.08,vy+ch*0.12,vx+cw*0.04,vy);g.closePath();g.fill();
+        g.fillStyle=P.ilS;rr2(g,vx-cw*0.05,vy-2*u,cw*0.1,4*u,2*u);g.fill();g.fillStyle=dk?"#e9ebec":"#fff";g.strokeStyle=P.ilS;g.beginPath();g.arc(ax,vy+ch*0.26*sp,5*u,0,7);g.fill();g.stroke();
+        dragArea(vx-cw*0.24,vy,cw*0.48,ch*0.58,(dx,dy,wheel)=>{if(wheel)return;sys[key]=clamp(sys[key]+dx/(cw*0.18),-1,1)})}}
+    if(rear){const seats=[["seatRL","Left"],["seatRC","Center"],["seatRR","Right"]];seats.forEach(([k,n],i)=>{const x=W*(0.3+i*0.2),y=cy+ch*0.62,lv=sys[k]||0;g.fillStyle=P.card;g.strokeStyle=P.line;rr2(g,x-40*u,y-34*u,80*u,68*u,10*u);g.fill();g.stroke();
+      tcIco(g,"seatH",x,y-8*u,lv?"#ff7a3a":P.ink,1.3*u);tcBars(g,x,y+12*u,lv,"#ff7a3a");T(n,x,y+24*u,10.5,P.sub);hit(x-40*u,y-34*u,80*u,68*u,()=>{sys[k]=(lv+1)%4;tick(1)})});
+      T(TSL.rearLock?"Rear screen climate locked":"Rear screen climate unlocked",W/2,cy+ch*0.18,11.5,P.sub);hit(W/2-110,cy+ch*0.18-12,220,24,()=>{TSL.rearLock=!TSL.rearLock;toast(TSL.rearLock?"Rear climate controls locked":"Rear climate controls unlocked");tick(1)})}
+    g.restore()}
+  {const tw=Math.min(300*u,W*0.46),th=30*u,tx=W/2-tw/2,ty=yTop,M=[["off","Off",null],["keep","Keep","keep"],["dog","Dog","dog"],["camp","Camp","camp"]],bw=tw/4;
+    g.shadowColor="rgba(0,0,0,.12)";g.shadowBlur=6;g.fillStyle=P.card;rr2(g,tx,ty,tw,th,6*u);g.fill();g.shadowBlur=0;g.shadowColor="transparent";
+    M.forEach(([k,n,ic],i)=>{const x=tx+i*bw,sel=mode===k;if(sel){g.fillStyle=dk?"#33373a":"#eef0f2";rr2(g,x+3,ty+3,bw-6,th-6,4*u);g.fill()}if(ic)tcIco(g,ic,x+bw/2-18*u,ty+th/2,sel?P.ink:P.sub,0.8*u);T(n,x+bw/2+(ic?6*u:0),ty+th/2+0.5,11.5,sel?P.ink:P.sub);
+      hit(x,ty,bw,th,()=>{TSL.keep=k==="keep";TSL.dog=k==="dog";TSL.camp=k==="camp";if(k!=="off")sys.climate=true;toast(k==="off"?"Climate turns off when you leave":k==="keep"?"Keep Climate On: stays on after you park":k==="dog"?"Dog Mode on: the screen tells passers-by your dog is fine":"Camp Mode on: climate, lights and media stay on");tick(1)})})}
+  {const y=top+52*u;let x=18*u;const it=(w,draw,fn)=>{draw(x+w/2);hit(x,y-14*u,w,28*u,()=>{fn();tick(1)});x+=w};
+    it(30*u,cx=>tcIco(g,"power",cx,y,on?P.sel:P.sub,u),()=>{sys.climate=!on;toast(on?"Climate off":"Climate on")});g.fillStyle=P.line;g.fillRect(x+4*u,y-9*u,1,18*u);x+=10*u;
+    it(44*u,cx=>T("Auto",cx,y,12,sys.climAuto&&on?P.sel:P.sub),()=>{sys.climAuto=!sys.climAuto;if(sys.climAuto)sys.climate=true});
+    it(40*u,cx=>T("A/C",cx,y,12,on&&!sys.acOff?P.sel:P.sub),()=>{sys.acOff=!sys.acOff;if(!sys.acOff){sys.heat=false;sys.climate=true}});g.fillStyle=P.line;g.fillRect(x+4*u,y-9*u,1,18*u);x+=10*u;
+    for(const f of ["face","both","feet"])it(34*u,cx=>tcIco(g,f,cx,y,(sys.flow||"face")===f&&on?P.sel:P.sub,u),()=>{sys.flow=f;sys.climate=true});
+    {const fx=W/2-46*u;for(const [k,n] of [[false,"Front"],[true,"Rear"]]){const sel=!!rear===k;T(n,fx+(k?60:0)*u+22*u,y,12,sel?P.ink:P.sub);if(sel){g.fillStyle=P.ink;g.fillRect(fx+(k?60:0)*u+8*u,y+11*u,28*u,2)}hit(fx+(k?60:0)*u,y-14*u,48*u,28*u,()=>{SCR.climRear=k;tick(1)})}}
+    T("Schedule",W-44*u,y,12,TOPT.sched?P.sel:P.sub,"right");tcIco(g,"clock",W-26*u,y,TOPT.sched?P.sel:P.sub,u);hit(W-110*u,y-14*u,110*u,28*u,()=>{TOPT.sched=!TOPT.sched;toast(TOPT.sched?"Scheduled: cabin ready at 7:00 AM on weekdays":"Climate schedule off");tick(1)})}
+  {const y=bot-22*u,items=[["seatHL","seatH",sys.seatHL,"#ff7a3a","Auto",()=>{sys.seatHL=((sys.seatHL||0)+1)%4;if(sys.seatHL)sys.seatVL=0}],["seatVL","seatV",sys.seatVL,"#3e8bff",null,()=>{sys.seatVL=((sys.seatVL||0)+1)%4;if(sys.seatVL)sys.seatHL=0}],
+      ["wiperH","wiper",sys.wiperH?1:0,"#ff7a3a",null,()=>{sys.wiperH=!sys.wiperH;toast(sys.wiperH?"Wiper defrost on":"Wiper defrost off")}],["wheelH","wheel",sys.wheelH?1:0,"#ff7a3a","Auto",()=>{sys.wheelH=!sys.wheelH;toast(sys.wheelH?"Steering wheel heater on":"Steering wheel heater off")}],
+      ["defF","defF",sys.defF?1:0,"#ff7a3a",null,()=>{sys.defF=!sys.defF;if(sys.defF){sys.climate=true;sys.fan=Math.max(sys.fan,8)}toast(sys.defF?"Front defrost on: fan up, air to the windshield":"Front defrost off")}],["defR","defR",sys.defR?1:0,"#ff7a3a",null,()=>{sys.defR=!sys.defR;toast(sys.defR?"Rear defrost on":"Rear defrost off")}],
+      ["fan"],["recirc","recirc",sys.recirc?1:0,P.sel,"Auto",()=>{sys.recirc=!sys.recirc}],...(bioOK()?[["bio","bio",TSL.bio?1:0,P.sel,null,()=>{TSL.bio=!TSL.bio;if(TSL.bio){sys.climate=true;sys.recirc=true;sys.fan=10}toast(TSL.bio?"Bioweapon Defense Mode on: HEPA filter, fan at max":"Bioweapon Defense Mode off")}]]:[]),
+      ["seatVR","seatV",sys.seatVR,"#3e8bff",null,()=>{sys.seatVR=((sys.seatVR||0)+1)%4;if(sys.seatVR)sys.seatHR=0}],["seatHR","seatH",sys.seatHR,"#ff7a3a","Auto",()=>{sys.seatHR=((sys.seatHR||0)+1)%4;if(sys.seatHR)sys.seatVR=0}]];
+    const n=items.length+1,sw=(W-24*u)/n;let i=0;for(const it of items){const w=it[0]==="fan"?sw*2:sw,x=12*u+i*sw,cx=x+w/2;i+=it[0]==="fan"?2:1;
+      if(it[0]==="fan"){T("‹",cx-w*0.36,y,18,P.sub);T("›",cx+w*0.36,y,18,P.sub);tcIco(g,"fan",cx-14*u,y,on?P.ink:P.sub,u);T(on?(sys.fan<=1?"LO":String(sys.fan)):"OFF",cx+10*u,y+0.5,12.5,on?P.ink:P.sub);
+        hit(x,y-18*u,w*0.3,36*u,()=>{sys.fan=Math.max(1,sys.fan-1);sys.climate=true;tick(1)});hit(x+w*0.7,y-18*u,w*0.3,36*u,()=>{sys.fan=Math.min(10,sys.fan+1);sys.climate=true;tick(1)});hit(x+w*0.3,y-18*u,w*0.4,36*u,()=>{sys.climate=!on;tick(1)});continue}
+      const [,ic,lv,c,lab,fn]=it;tcIco(g,ic,cx,y,lv?c:P.sub,u);if(lab)T(lab,cx,y-20*u,8.5,P.sub);if(ic==="seatH"||ic==="seatV")tcBars(g,cx,y+12*u,lv||0,c);hit(x,y-20*u,sw,40*u,()=>{fn();tick(1)})}}
+  g.textBaseline="alphabetic"}
+function solarNow(){const h=hourNow();return h>=9&&h<17&&WX.cur!=="rain"&&WX.cur!=="snow"}
+function tslChgTarget(){if(TOPT.solar)return (solarNow()?TOPT.chgLim:Math.min(TOPT.chgLim,TOPT.chgBase||60))/100;return TOPT.chgLim/100}
+function tChargingNew(g,top,bot,W){const Hy=car.hyb,plug=sys.fuel==="plug",ink="#e9ebec",sub="#8e9499",card="#1e2022",line="#2c2f32",blue="#3e6ae1";TOPT.chgBase=TOPT.chgBase||60;TOPT.amps=TOPT.amps||32;
+  const sc=SCR.chgSc=clamp(SCR.chgSc||0,0,SCR.chgMax||0);dragArea(0,top,W,bot-top,(dx,dy,wheel)=>{SCR.chgSc=clamp((SCR.chgSc||0)+(wheel?dy*0.5:-dy),0,SCR.chgMax||0)});
+  const H=(x,y,w,h,fn)=>{const a=Math.max(y,top),b=Math.min(y+h,bot);if(b-a>4)hit(x,a,w,b-a,()=>{fn();tick(1)})};
+  const T=(t,x,y,f,c,al,wt)=>{g.fillStyle=c||ink;g.font=wt?`${wt} ${f}px system-ui`:FONT(f);g.textAlign=al||"left";g.textBaseline="middle";g.fillText(t,x,y)};
+  const x0=16,w=W-32;let y=top+14-sc;
+  {g.fillStyle="#3a3e42";g.beginPath();g.arc(x0+11,y+10,11,0,7);g.fill();rivIco(g,"user",x0+11,y+10,13,"#cfd3d6");T(TOPT.prof&&TOPT.prof!=="Profile"?TOPT.prof:"Driver",x0+30,y+10,13.5);
+    let ix=W-16;for(const k of ["wifi","bt","bell","garage"]){rivIco(g,k,ix-8,y+10,16,"#cfd3d6");ix-=34}y+=34}
+  T(`${Math.round(evRange()/1.609)} miles`,x0,y+12,24,ink,"left","500");T("View Energy Consumption",x0+w,y+14,11.5,"#6f8cff","right");H(x0+w-150,y,150,26,()=>{SCR.page="energy";SCR.autoCam=false});y+=38;
+  {const ch=192;g.fillStyle=card;rr2(g,x0,y,w,ch,8);g.fill();const sx=x0+20,sw=w-40;
+    const txt=TOPT.solar?[["Charge to ",0],[`${TOPT.chgBase}%`,1],[" from any source and",0]]:[["Charge to ",0],[`${TOPT.chgLim}%`,1],[plug?(socShow(Hy)<TOPT.chgLim/100?` · charging at ${Math.round(TOPT.amps*0.24*10)/10} kW`:" · charge complete"):" when plugged in",0]];
+    let tx=sx;for(const [t,b] of txt){T(t,tx,y+20,11.5,b?ink:"#b9bec2","left",b?"600":"400");tx+=g.measureText(t).width}
+    if(TOPT.solar){tx=sx;for(const [t,b] of [["continue to ",0],[`${TOPT.chgLim}%`,1],[" when solar is available",0]]){T(t,tx,y+36,11.5,b?ink:"#b9bec2","left",b?"600":"400");tx+=g.measureText(t).width}}
+    const ty=y+70,X=v=>sx+sw*v/100;g.fillStyle="#5a5f63";for(let v=10;v<=90;v+=10){g.fillRect(X(v),ty-14,1,6)}for(const v of [30,60,90])T(String(v),X(v),ty-22,9.5,sub,"center");
+    g.fillStyle="#0d0e0f";rr2(g,sx,ty-3,sw,6,3);g.fill();g.fillStyle="#3c4044";rr2(g,sx,ty-3,X(TOPT.chgLim)-sx,6,3);g.fill();g.fillStyle="#57b25c";rr2(g,sx,ty-3,Math.max(6,sw*socShow(Hy)),6,3);g.fill();
+    if(TOPT.solar){const bx=X(TOPT.chgBase);g.fillStyle="#f5a623";g.beginPath();g.arc(bx,ty,9,0,7);g.fill();g.strokeStyle="#fff";g.lineWidth=1.2;g.beginPath();g.arc(bx,ty,3,0,7);g.stroke();for(let i=0;i<8;i++){const a=i*Math.PI/4;g.beginPath();g.moveTo(bx+Math.cos(a)*4.6,ty+Math.sin(a)*4.6);g.lineTo(bx+Math.cos(a)*6.4,ty+Math.sin(a)*6.4);g.stroke()}}
+    {const lx=X(TOPT.chgLim);g.fillStyle="#e8e8e8";g.beginPath();g.arc(lx,ty,10,0,7);g.fill()}
+    g.strokeStyle="#5a5f63";g.lineWidth=1;g.beginPath();g.moveTo(X(40),ty+14);g.lineTo(X(40),ty+20);g.lineTo(X(100),ty+20);g.lineTo(X(100),ty+14);g.moveTo(X(90),ty+14);g.lineTo(X(90),ty+20);g.stroke();T("Daily",X(65),ty+30,9.5,sub,"center");T("Trip",X(95),ty+30,9.5,sub,"center");
+    if(ty-14>top&&ty+14<bot)dragArea(sx-10,ty-14,sw+20,28,(dx,dy,wheel)=>{if(wheel)return;const v=TOPT.chgLim+dx/sw*100;TOPT.chgLim=clamp(Math.round(v),50,100);if(TOPT.chgBase>TOPT.chgLim)TOPT.chgBase=TOPT.chgLim});
+    for(let v=50;v<=100;v+=5)H(X(v)-sw*0.025,ty-14,sw*0.05,28,()=>{TOPT.chgLim=v;if(TOPT.chgBase>v)TOPT.chgBase=v});
+    if(TOPT.solar)for(let v=20;v<=80;v+=10)H(X(v)-sw*0.03,ty+8,sw*0.06,16,()=>{TOPT.chgBase=Math.min(v,TOPT.chgLim)});
+    const ry=y+126;T("🔌",sx+4,ry+4,13,"#cfd3d6","center");T("Charge Current at",sx+24,ry-4,12.5);T("this location",sx+24,ry+12,12.5);
+    {const bw=Math.min(200,w*0.4),bx=x0+w-20-bw;g.fillStyle="#2b2e31";rr2(g,bx,ry-14,bw,34,6);g.fill();T("−",bx+20,ry+3,18,ink,"center");T(`${TOPT.amps} A`,bx+bw/2,ry+3,13.5,ink,"center");T("+",bx+bw-20,ry+3,18,ink,"center");
+      H(bx,ry-14,44,34,()=>{TOPT.amps=Math.max(5,TOPT.amps-1)});H(bx+bw-44,ry-14,44,34,()=>{TOPT.amps=Math.min(48,TOPT.amps+1)})}
+    const by=y+ch-38;g.fillStyle=line;g.fillRect(x0,by-2,w,1);g.fillRect(x0+w/2,by-2,1,40);
+    T(plug?"Stop Charging":"Start Charging",x0+w/4,by+18,13,plug?"#c9ced2":sub,"center");T(plug?"Unlock Charge Port":(SCR.cport?"Close Charge Port":"Open Charge Port"),x0+w*3/4,by+18,13,"#c9ced2","center");
+    H(x0,by,w/2,38,()=>{if(plug){sys.fuel=null;toast("Charging stopped")}else if(SCR.cport||Math.abs(car.vx)<0.3&&st.gear==="P"){if(nearStn("chargers",8)){sys.fuel="plug";SCR.cport=true;toast("Charging started")}else toast("Plug in at a charger first")}else toast("Shift to Park to charge")});
+    H(x0+w/2,by,w/2,38,()=>{if(plug){sys.fuel=null;SCR.cport=false;toast("Charge port unlocked: unplug the cable")}else{SCR.cport=!SCR.cport;toast(SCR.cport?"Charge port open":"Charge port closed")}});y+=ch+18}
+  g.fillStyle=line;g.fillRect(x0,y,w,1);y+=18;
+  tcIco(g,"clock",x0+8,y+8,"#cfd3d6",1);T("Schedule Charge at this location",x0+26,y+8,13.5);y+=24;
+  {g.strokeStyle="#3a3e42";g.lineWidth=1;rr2(g,x0,y,Math.min(190,w*0.45),34,6);g.stroke();T(TOPT.schedC?"Starts 11:00 PM":"Schedule",x0+Math.min(190,w*0.45)/2,y+17,13,TOPT.schedC?"#6f8cff":"#c9ced2","center");H(x0,y,Math.min(190,w*0.45),34,()=>{TOPT.schedC=!TOPT.schedC;toast(TOPT.schedC?"Charging here starts at 11:00 PM (off-peak)":"Charge schedule off")});y+=50}
+  {const on=!!TOPT.solar;g.fillStyle=on?blue:"#3a3e42";rr2(g,x0,y,44,24,12);g.fill();g.fillStyle="#fff";g.beginPath();g.arc(on?x0+32:x0+12,y+12,9,0,7);g.fill();T("Charge on Solar at this location",x0+56,y+12,13.5);H(x0,y-4,260,32,()=>{TOPT.solar=!on;toast(!on?`Solar charging: ${TOPT.chgBase}% from any source, up to ${TOPT.chgLim}% when the sun is out`:"Solar charging off")});y+=40}
+  g.fillStyle=line;g.fillRect(x0,y,w,1);y+=16;T("Supercharging",x0,y+8,14);T(SCR.lastSC?SCR.lastSC:"No recent supercharging",x0,y+28,12,sub);y+=48;
+  SCR.chgMax=Math.max(0,y+sc-bot+8);
+  if(SCR.chgMax>0){const vh=bot-top,th=Math.max(24,vh*vh/(vh+SCR.chgMax));g.fillStyle="rgba(255,255,255,.18)";rr2(g,W-5,top+(vh-th)*sc/SCR.chgMax,3,th,1.5);g.fill()}
+  g.textBaseline="alphabetic"}
 function drawScreen0(dt){
   const g=SCR.g,W=SCR.W,H=SCR.H,M=me();SCR.hits=[];SCR.drags=[];SCR.t+=dt;g.setTransform(SS,0,0,SS,0,0);g.imageSmoothingQuality="high";
   if(dogShow()){dogScreen(g,W,H);gl.bindTexture(gl.TEXTURE_2D,SCR.tex);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,SCR.cv);return}
@@ -15165,7 +15276,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=301;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="173",BUILD_VER=302;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}try{const P=JSON.parse(localStorage.getItem("strata.ped")||"null");if(P){st.pedHold=+P.pedHold||0;st.thrRate=+P.thrRate||2;st.brkRate=+P.brkRate||2}}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){const k=GFX.q==="auto"?GFX.eff:GFX.q;if(G.k!==k||G.v!==GFX.ovV||!G.m){G.k=k;G.v=GFX.ovV;const m={...GQ[k]};for(const o of GOPT)if(GFX.ov[o[0]]!==undefined)Object.assign(m,o[4](GFX.ov[o[0]]));if(Object.keys(GFX.ov).length)m.label=GQ[k].label+" (custom)";G.m=m;COLL.nt=!m.trees}return G.m}
