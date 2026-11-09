@@ -1273,8 +1273,16 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
 <script data-boot>(function(){var p=0;window.__bootP=0;var t=setInterval(function(){if(window.__bootReal){clearInterval(t);return}p+=(0.7-p)*0.025;window.__bootP=p;var a=document.getElementById("bootArc"),n=document.getElementById("bootNeedle"),c=document.getElementById("bootPct");if(a)a.setAttribute("stroke-dasharray",(p*100).toFixed(1)+" 100");if(n)n.style.setProperty("--a",(-135+p*270)+"deg");if(c)c.textContent=String(Math.round(p*100))},120)})()</script>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 305 · 2020 Explorer, remote screen, Autopark</h2></div>
+    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 306 · Real chargers and parking fixes</h2></div>
     <div class="nb">
+      <h4>Real chargers and parking fixes</h4><ul>
+      <li><b>Real chargers everywhere:</b> Tesla V3 Superchargers (for Teslas only) at Bean &amp; Brew and at every other gas station, Electrify America 350 kW towers at the service plaza, the other stores and the remaining gas stations, Level 2 chargers on the street and in the parking garage, and Tesla Wall Connectors at some houses. Each one tells you what it is when you walk up.</li>
+      <li>When you plug in, the cable and handle come off the charger and run to your car's charge port. They go back on the charger when you unplug.</li>
+      <li><b>EV-only spaces:</b> the street and garage chargers have their own green EV spaces with no parked cars in them. Level 2 chargers charge more slowly than the fast chargers.</li>
+      <li><b>Parallel park assist</b> now works on every downtown street with parking, not only the streets with meters. It never picks a space in a red-kerb no-parking zone or across a driveway. When it straightens up at the end, it only moves a short way each time.</li>
+      <li>2020 Model S and Model X: the driver's view now tilts down so you can see and tap the whole tall screen.</li>
+      <li>The interior and side mirrors now line up with the mirrors on the Forge H8, Velora Vale and 2020 Explorer, and the Forge H8 and Velora Vale get a real rear-view mirror on a stem.</li>
+      </ul>
       <h4>2020 Explorer, remote screen, Autopark and fixes</h4><ul>
       <li><b>New: 2020 Ford Explorer</b> in six trims: Base, XLT and Limited (2.3 L EcoBoost, 300 hp), Limited Hybrid (3.3 L V6 hybrid, 318 hp), ST (3.0 L twin-turbo V6, 400 hp, 4WD) and Platinum (365 hp, 4WD), with the 2020 equipment and prices. ST and Platinum get the 12.3-inch digital cluster; the others have real gauges with a 4.2-inch or 6.5-inch center screen. Turning the drive mode dial brings up the big mode wheel (Normal, Eco, Sport, Slippery, Tow/Haul, Trail and, on 4WD, Deep Snow/Sand). The center screen is SYNC 3.</li>
       <li><b>Remote screen:</b> when you're outside the car (walking or in an outside camera), tap Remote in the left dock to bring up the car's center screen in a panel. It's live and you can tap and swipe it like the real one.</li>
@@ -4482,7 +4490,7 @@ function energy(dt,Pw){
   // plugged in at the charging station (charging is sped up 10x so you don't wait)
   H.charging=false; H.refuel=false;
   if(T.hybrid&&sys.fuel==="pump"&&nearStn("pumps",6.5)&&sp<0.3&&H.fuel<H.tank){H.refuel=true;H.fuel=Math.min(H.tank,H.fuel+4*dt);if(SAFE.trip)SAFE.trip.f0=H.fuel;if(H.fuel>=H.tank){sys.fuel=null;setTimeout(()=>toast("Tank full"),0)}}
-  if(sys.fuel==="plug"&&nearStn("chargers",8)&&sp<0.3&&(T.phev||!T.hybrid)){const tg_=fusLine()?(st.cTgt||0.8):isTesla()?tslChgTarget():0.9;if(H.soc<tg_){H.charging=true;H.Pb-=(T.phev?50e3:250e3)*10}else{sys.fuel=null;setTimeout(()=>toast(`Charged to ${Math.round(tg_*100)} %`),0);if(isTesla())SCR.lastSC=`Last session: charged to ${Math.round(tg_*100)}% at ${hourNow()%12||12}:00 ${hourNow()<12?"AM":"PM"}`}}
+  if(sys.fuel==="plug"&&nearStn("chargers",8)&&sp<0.3&&(T.phev||!T.hybrid)){const tg_=fusLine()?(st.cTgt||0.8):isTesla()?tslChgTarget():0.9;if(H.soc<tg_){H.charging=true;H.Pb-=(sys.hose&&sys.hose.c&&sys.hose.c.slow?(T.phev?7.2e3:11.5e3):T.phev?50e3:250e3)*10}else{sys.fuel=null;setTimeout(()=>toast(`Charged to ${Math.round(tg_*100)} %`),0);if(isTesla())SCR.lastSC=`Last session: charged to ${Math.round(tg_*100)}% at ${hourNow()%12||12}:00 ${hourNow()<12?"AM":"PM"}`}}
   H.soc=clamp(H.soc-H.Pb*dt/(cap*3.6e6),T.hybrid?0.12:0,T.hybrid?0.95:1);   // EVs run right down to empty; hybrids keep a hidden reserve
   if(!T.ice||T.hybrid){let amb=20;try{amb=(ambF()-32)/1.8}catch(e){}if(H.bt==null)H.bt=amb;const kwh=Math.max(1,cap);H.bt+=Math.abs(H.Pb)/1e3*0.045/kwh*dt*(T.hybrid&&!T.phev?0.12:1)-(H.bt-amb)*dt/900-(H.bt>34?(H.bt-32)*dt/120:0)+(H.charging&&H.bt<25?0.05*dt:0);
     H.btK=clamp((H.bt+15)/25,0.3,1)*(H.bt>48?0.6:1);if(H.btK<0.7&&!SAFE.btSaid&&!T.ice&&st.started){SAFE.btSaid=1;carMsg(H.bt<10?`❄️ The battery is cold (${degF(H.bt)}°F): regenerative braking and power are limited until it warms up`:`🌡️ The battery is hot: power is limited to protect it`)}}
@@ -4510,7 +4518,23 @@ function socShow(H){const T=TRIMS[st.trim];if(!T.hybrid)return clamp(H.soc,0,1);
 function evRange(){const T=TRIMS[st.trim],H=car.hyb;if(T.ice)return 0;const rk=T.hybrid?0.36:0.33,R=RNG.k===st.trim&&!T.hybrid?RNG:null,w=R?Math.min(0.85,R.km/14):0,lk=R&&R.kpk>0?R.kpk*1.609:rk,k=rk*(1-w)+clamp(lk,rk*0.6,rk*2.5)*w;return Math.max(0,(H.soc-(T.phev?0.16:0.05))*battCap()/k)}
 // ---- the service plaza
 const STN={chargers:[0,1,2,3,4,5].map(k=>[51.8+k*3.6,-40.6]),pumps:[[18,-18],[30,-18],[18,-24],[30,-24]]};
-const STNW={};function stnWorld(list){if(STNW[list])return STNW[list];const L=STN[list].map(([u,o])=>padPt(u,o));for(const S of XSITES)if(S[list])L.push(...S[list]);if(SCN.sm)STNW[list]=L;return L}
+const STNW={};
+/* ---- v306 real chargers: Tesla V3 Superchargers (Teslas only) and Electrify America 350 kW towers, plus street chargers; the cable comes off the tower when you plug in */
+const CHGS=[];let CHGS_PTS=null,CHG_STN_N=0;
+function chgAdd(x,y,face,kind,o){if(CHGS.some(c=>Math.abs(c.x-x)<0.3&&Math.abs(c.y-y)<0.3))return null;const c={x,y,face,kind,tesla:kind==="sc"||kind==="td",slow:kind==="l2"||kind==="td",name:(o&&o.name)||"",z:o&&o.z,spot:o&&o.spot};CHGS.push(c);CHGS_PTS=null;return c}
+const CHG_PROP={sc:"chg_sc",ea:"chg_ea",l2:"chg_l2",td:"chg_td"},CHG_ANC={sc:[0.2,1.05,0.12],ea:[-0.24,1.9,-0.05],l2:[0.12,0.98,0.06],td:[0,0.86,0.08]},CHG_NAME={sc:"Tesla Supercharger",ea:"Electrify America 350 kW",l2:"Level 2 charger",td:"Tesla Wall Connector"};
+function chgAt(x,y,r){let b=null,bd=r||3;for(const c of CHGS){const d=Math.hypot(c.x-x,c.y-y);if(d<bd){bd=d;b=c}}return b}
+function chgM(c){const z=c.z!=null?c.z:((groundAt(c.x,c.y).h)||0);return carMatrix(c.x,c.y,c.face+Math.PI,z,0,0)}
+function chgAnchor(c){const o=M4.p(chgM(c),CHG_ANC[c.kind]||CHG_ANC.ea);return [o[0],-o[2],o[1]]}
+/* street (green EV-only spaces), the parking garage and some houses */
+function chgFree(x,y,z,r){for(let i=parked.length-1;i>=0;i--){const p=parked[i];if(p.wx!==undefined&&Math.hypot(p.wx-x,p.wy-y)<r&&Math.abs((p.wz||0)-(z||0))<1.5)parked.splice(i,1)}}
+function chgStreet(){try{const K=PARK;if(K&&K.e){for(const s_ of [K.s0+20,K.s0+52]){const o=K.oP-(K.pw||2.4)/2-0.45,p=fpt(K.e,K.dir,s_,o),q=fpt(K.e,K.dir,s_,o+1),c=fpt(K.e,K.dir,s_,K.oP);chgFree(c[0],c[1],0,3.2);chgAdd(p[0],p[1],Math.atan2(q[1]-p[1],q[0]-p[0]),"l2",{name:"Street charger",spot:{x:c[0],y:c[1],h:c[2],l:6,w:K.pw||2.4}})}}
+  if(W2){let n=0;for(const e of EDGES){if(n>=12)break;if(!(e.T&&e.T.park&&e.mtr&&e.mtr.length>3))continue;const S=e.mtr[Math.floor(e.mtr.length/2)];if(!S||S.ev)continue;n++;S.ev=true;const k=ePt(e,(S.u0+S.u1)/2,S.sd*(e.m/2+e.n*LANE+e.T.park+0.45)),fh=Math.atan2(S.y-k[1],S.x-k[0]);chgFree(S.x,S.y,0,3.2);chgAdd(k[0],k[1],fh,"l2",{name:"Street charger",spot:{x:S.x,y:S.y,h:S.h,l:6.2,w:e.T.park}})}}
+  {const GS=garStalls().filter(t=>t.k===0&&t.bay===1).slice(0,4);for(const t of GS){chgFree(t.x,t.y,t.z,2);chgAdd(t.x+t.ux*2.85,t.y+t.uy*2.85,Math.atan2(-t.uy,-t.ux),"l2",{name:"Garage charger",z:t.z,spot:{x:t.x,y:t.y,h:Math.atan2(t.uy,t.ux),l:5.2,w:2.5,z:t.z}})}}
+  for(const H of OPEN_HOUSES){if(H.i%3!==1||!H.gdoor||!H.gar)continue;const u=H.gar.u+(H.gs||1)*2.05,n=H.gar.n1+0.18,x=H.x+H.U[0]*u+H.N[0]*n,y=H.y+H.U[1]*u+H.N[1]*n;chgAdd(x,y,Math.atan2(H.N[1],H.N[0]),"td",{name:"Home charger"})}}catch(e){console.warn("chg",e)}}
+function chgDraw(ex,ey,night){if(!chgDraw.sc&&CHGS.length&&(OPEN_HOUSES.length||performance.now()-(chgDraw.t0||(chgDraw.t0=performance.now()))>8000)){chgDraw.sc=1;chgStreet()}if(!CHGS.length)return;if(!chgDraw.ld){chgDraw.ld=1;for(const k of Object.values(CHG_PROP)){propLoad(k);propLoad(k+"_cable")}}const inUse=sys.hose&&sys.hose.kind==="plug"?sys.hose.c:null,R=G().label==="Lowest"?70:130;
+  for(const c of CHGS){const dx=c.x-ex,dy=c.y-ey;if(dx*dx+dy*dy>R*R)continue;if(c.spot){const S=c.spot,z=S.z!=null?S.z:((groundAt(S.x,S.y).h)||0);bind(SCN.box);gl.uniformMatrix4fv(U.uM,false,chain(carMatrix(S.x,S.y,S.h,z+0.012,0,0),M4.S(S.w-0.2,0.01,S.l-0.3)));mat([0.12,0.62,0.3],[0.02,0.16+night*0.25,0.06],0.2,10);gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_SHORT,0)}
+    if(!sphVis(c.x,1,-c.y,2.5,R))continue;const k=CHG_PROP[c.kind]||"chg_ea";if(!PROPS[k])continue;const M=chgM(c);propDraw(k,M,{head:night*0.6});if(c!==inUse&&PROPS[k+"_cable"])propDraw(k+"_cable",M,{head:0})}}function stnWorld(list){if(list==="chargers"&&CHGS.length){if(!CHGS_PTS)CHGS_PTS=CHGS.map(c=>[c.x,c.y]);return CHGS_PTS}if(STNW[list])return STNW[list];const L=STN[list].map(([u,o])=>padPt(u,o));for(const S of XSITES)if(S[list])L.push(...S[list]);if(SCN.sm)STNW[list]=L;return L}
 function nearStn(list,r){return stnWorld(list).some(p=>Math.hypot(p[0]-car.px,p[1]-car.py)<r)}
 function onPad(){return Math.hypot(car.px-PAD.cx,car.py-PAD.cy)<PAD.rad&&padHit(car.px,car.py)}
 let xcars=[], onc=[];       // everything drives in "cars" now; these stay empty
@@ -5453,13 +5477,15 @@ function hosePortLocal(side){const T=TRIMS[st.trim],hw=(VEH.width||1.9)/2,hy=VEH
   return [sd*(hw+0.005),hy+0.3,tz*0.62]}
 function hoseCm(){let cm=carMatrix(car.px,car.py,car.psi,car.height+(car.zb||0),car.pitch||0,car.roll||0);if(VEH.cgOff)cm=chain(cm,M4.T(0,0,VEH.cgOff));return cm}
 function hosePort(){if(!sys.hose)return null;const q=M4.p(hoseCm(),hosePortLocal(sys.hose.side));return [q[0],-q[2],q[1]]}
-function hoseStart(kind){const L=stnWorld(kind==="pump"?"pumps":"chargers");let best=null,bd=1e9;for(const p of L){const d=Math.hypot(p[0]-car.px,p[1]-car.py);if(d<bd){bd=d;best=p}}if(!best)return;
+function hoseStart(kind){const L=stnWorld(kind==="pump"?"pumps":"chargers");let best=null,bd=1e9;const W_=st.walk;for(const p of L){const d=Math.hypot(p[0]-car.px,p[1]-car.py)+(W_?Math.hypot(p[0]-W_.x,p[1]-W_.y)*0.5:0);if(d<bd){bd=d;best=p}}if(!best)return;
+  const C_=kind==="plug"?chgAt(best[0],best[1],0.5):null;if(C_&&C_.tesla&&!isTesla()){toast(`⚡ ${CHG_NAME[C_.kind]}: this one is for Teslas only. Use an Electrify America or Level 2 charger`);return}
   sys.hose={kind,p:[best[0],best[1]],side:1};const a=hosePort();sys.hose.side=-1;const b=hosePort();sys.hose.side=Math.hypot(a[0]-best[0],a[1]-best[1])<Math.hypot(b[0]-best[0],b[1]-best[1])?1:-1;
-  {const PS=portSide(st.trim,kind);if(PS&&PS.s&&PS.s!==sys.hose.side){const q=PS.s>0?a:b;if(Math.hypot(q[0]-best[0],q[1]-best[1])>4.4){sys.hose=null;toast(`${kind==="pump"?"⛽ Your fuel door":"⚡ Your charge port"} is on the ${PS.s<0?"driver":"passenger"} side: pull up with the ${kind==="pump"?"pump":"charger"} on that side (the arrow by the ${kind==="pump"?"fuel":"battery"} icon shows which)`);return}sys.hose.side=PS.s}}
+  {const PS=portSide(st.trim,kind);if(PS&&PS.s&&PS.s!==sys.hose.side){const q=PS.s>0?a:b;if(Math.hypot(q[0]-best[0],q[1]-best[1])>(kind==="plug"?5.8:4.4)){sys.hose=null;toast(`${kind==="pump"?"⛽ Your fuel door":"⚡ Your charge port"} is on the ${PS.s<0?"driver":"passenger"} side: pull up with the ${kind==="pump"?"pump":"charger"} on that side (the arrow by the ${kind==="pump"?"fuel":"battery"} icon shows which)`);return}sys.hose.side=PS.s}}
+  sys.hose.c=C_;if(C_)sys.hose.a=chgAnchor(C_);
   sys.hose.len=Math.max(kind==="pump"?3.6:4.2,Math.hypot((sys.hose.side>0?a:b)[0]-best[0],(sys.hose.side>0?a:b)[1]-best[1])+0.9)}
 function hoseTick(){const H_=sys.hose;if(!H_)return;if(H_.kind==="plug"&&st.gear!=="P"&&!st.walk){st.gear="P";const n=performance.now();if(n-(H_.warn||0)>3000){H_.warn=n;toast("Unplug the charge cable first: the car stays in Park while it's plugged in");tick(1)}}const pt=hosePort(),d=Math.hypot(pt[0]-H_.p[0],pt[1]-H_.p[1]);
   if(d>H_.len+0.4){if(H_.kind==="pump"){sys.fuel=null;sys.hose=null;crashFx(2,"the fuel hose");toast("Drive-off! The hose's breakaway coupling snapped: no fuel spilled, but that's a $300 repair")}else{sys.fuel=null;sys.hose=null;toast("The charge cable pulled out")}}}
-function hoseDraw(){const H_=sys.hose;if(!H_)return;const pt=hosePort(),A=[H_.p[0],H_.p[1],H_.kind==="pump"?1.15:1.05],B=pt,dist=Math.hypot(B[0]-A[0],B[1]-A[1],B[2]-A[2]),sag=Math.max(0.12,Math.sqrt(Math.max(0,H_.len*H_.len-dist*dist))*0.5),N=16;
+function hoseDraw(){const H_=sys.hose;if(!H_)return;const pt=hosePort(),A=H_.a||[H_.p[0],H_.p[1],H_.kind==="pump"?1.15:1.05],B=pt,dist=Math.hypot(B[0]-A[0],B[1]-A[1],B[2]-A[2]),sag=Math.max(0.12,Math.sqrt(Math.max(0,H_.len*H_.len-dist*dist))*0.5),N=16;
   const P=[];for(let i=0;i<=N;i++){const t=i/N;P.push([A[0]+(B[0]-A[0])*t,A[1]+(B[1]-A[1])*t,Math.max(0.03,A[2]+(B[2]-A[2])*t-sag*4*t*(1-t))])}
   const th=H_.kind==="pump"?0.042:0.038;for(let i=0;i<N;i++){const a=P[i],b=P[i+1],dx=b[0]-a[0],dy=b[1]-a[1],dz=b[2]-a[2],h=Math.hypot(dx,dy);oBox("hose",(a[0]+b[0])/2,(a[1]+b[1])/2,(a[2]+b[2])/2,Math.hypot(h,dz)+0.01,th,th,Math.atan2(dy,dx),-Math.atan2(dz,h))}
   // the nozzle or plug, pushed into the car's fuel door / charge port
@@ -5628,7 +5654,7 @@ function rwPropsDraw(){if(!RW.pl){RW.pl=1;let i=0;const nx=()=>{if(i<RW_PROPS.le
   for(const z of RW.zones){if((z.x-ex)**2+(z.y-ey)**2>380*380)continue;for(const q of z.props||[])if(PROPS[q.k])propDraw(q.k,carMatrix(q.x,q.y,q.h,gz(q.x,q.y),0,0),{head:0});
     const m=z.mb;if(m&&PROPS[m.k]){const M=carMatrix(m.x,m.y,m.h,gz(m.x,m.y),0,0);propDraw(m.k,M,{head:0});const pi=Math.floor(performance.now()/2000)%2;
       if(st.mbMsg&&st.mbMsg.length)mbLed(m,M,st.mbMsg[pi%st.mbMsg.length],night);else{const pg=m.k+"_"+(1+pi);if(PROPS[pg])propDraw(pg,M,{glow:1.6+night})}}}
-  bbDraw(ex,ey,night);slDraw(ex,ey,night);try{emoDraw()}catch(e){}}
+  bbDraw(ex,ey,night);slDraw(ex,ey,night);try{chgDraw(ex,ey,night)}catch(e){}try{emoDraw()}catch(e){}}
 // billboards: big ones along the freeway, smaller ones on the main streets, set back on open ground
 const BB={list:null};
 function bbBuild(){const L=[];let h=12345;const rr=()=>{h=(h*1103515245+12345)>>>0;return h/4294967296};
@@ -5861,7 +5887,7 @@ function walkCtx(){const W=st.walk,T=TRIMS[st.trim];if(!W)return null;
   if(METER.cur&&Math.hypot(W.x-METER.cur.mx,W.y-METER.cur.my)<1.6){const l=meterLeft();return {a:"meter",label:`🅿️ Pay the meter · +15 min for $1 · ${l>0?Math.ceil(l/60)+" min left":METER.paid>METER.arrive?"expired":"not paid yet"}`}}
   {const an=airNear();if(an)return tiresLow()?{a:"air",label:"🛞 Air for your tires · $2.00"}:{a:null,label:"🛞 Air machine · your tires are fine"}}
   if(fuelOK&&near("pumps",2.2))return {a:"pump",label:"⛽ Fill up"};
-  if(plugOK&&near("chargers",2.2))return {a:"plug",label:"⚡ Plug in"};
+  if(plugOK&&near("chargers",2.2)){const C_=CHGS.find(c=>Math.hypot(c.x-W.x,c.y-W.y)<2.2);if(C_&&C_.tesla&&!isTesla())return {a:null,label:`${CHG_NAME[C_.kind]} · Teslas only`};return {a:"plug",label:C_?`⚡ Plug in · ${CHG_NAME[C_.kind]}`:"⚡ Plug in"}}
   if(dd<2.4)return {a:"in",label:"Get in"};
   return {a:null,label:fuelOK||plugOK?"Walk to the pump or charger":""}}
 // ---- metered street parking (the new world): spaces on the shopping streets, a meter at each. $1 buys 15 minutes, 2 hours at most.
@@ -10120,7 +10146,7 @@ function applyVehicle(T){const M=T&&T.model&&MODELS[T.model];
     screen:sc,scr:m.scr,clu:m.pano?null:m.clu,xs:m.pano?null:m.xs,pano:m.pano,len:m.length,width:m.width,wb:m.wb,track:m.track,R:M.wheelR}}
   REAR_MAX=((T&&T.rearMax)||9.8)*Math.PI/180;WB=VEH.wb;{const f=(T&&T.fwd)||0.5;A=WB*(1-f);B=WB*f;VEH.cgOff=VEH===VEH_STRATA?0:(B-A)/2}TRACK=VEH.track;WR=VEH.R;BODY_HL=VEH.len/2-(VEH===VEH_STRATA?0:0.05);BODY_HW=VEH.width/2-0.02;
   WPOS[0][0]=WPOS[1][0]=A;WPOS[2][0]=WPOS[3][0]=-B;WPOS[0][1]=WPOS[2][1]=TRACK/2;WPOS[1][1]=WPOS[3][1]=-TRACK/2;
-  {const E=VEH.eye,q=VEH.clu||VEH.scr;VEH.tilt=0;if(E&&q){const a=Math.atan2(E[1]-q.c[1],Math.max(0.2,E[2]-q.c[2]));VEH.tilt=clamp(a-0.3,0,0.32)}}   // look down enough to see the gauges and screen
+  {const E=VEH.eye,leg=T&&/^tsl_model[sx]20$/.test(T.model),q=leg&&VEH.scr?VEH.scr:VEH.clu||VEH.scr;VEH.tilt=0;if(E&&q){const a=Math.atan2(E[1]-q.c[1],Math.max(0.2,E[2]-q.c[2]));VEH.tilt=leg?clamp(a-0.22,0,0.5):clamp(a-0.3,0,0.32)}}   // look down enough to see the gauges and screen
   if(typeof SCR!=="undefined")setScreenFrame();
   if(typeof XS!=="undefined")xsSetup();
   if(typeof PANO!=="undefined")panoSetup();
@@ -10532,7 +10558,7 @@ function retailInto(SM,lamp,treeAt){let sd=91;const r=()=>(sd=(sd*16807)%2147483
         for(let a=a0+5.4;a<a1-4;a+=2.7){if(inIsl(a))continue;BX("paint",a-1.35,b0+2.75,0.006,0.004,0.11,5.3);
           const near=k===rows-1&&half===1&&Math.abs(a-ac)<6&&acc>0,ev=!near&&k===0&&half===0&&chg>0&&a>a1-30;
           if(near){acc--;BX("blue",a,b0+2.75,0.004,0.004,2.4,5.2);continue}   // accessible bays stay free
-          if(ev){chg--;BX("ev",a,b0+2.75,0.004,0.004,2.4,5.2);const pb=half?b0+0.4:b0+5.2;BX("chg",a,pb,0,1.6,0.5,0.4,"a charger");BX("glow",a,pb-(half?-0.21:0.21),1.1,0.35,0.3,0.02);S.chargers.push([a,s*(pb+(half?2.2:-2.2))]);continue}
+          if(ev){chg--;BX("ev",a,b0+2.75,0.004,0.004,2.4,5.2);const pb=half?b0+0.4:b0+5.2;collAdd({t:"b",x:a,y:s*pb,h:0,hl:0.3,hw:0.22,z0:-0.3,z1:2,what:"a charger"});chgAdd(a,s*pb,Math.atan2(half?s:-s,0),R.type==="cafe"?"sc":"ea",{name:R.name});S.chargers.push([a,s*(pb+(half?2.2:-2.2))]);continue}
           S.stalls.push({p:[a,s*(b0+2.75)],h:Math.atan2(s*(half?-1:1),0)})}}
       if(R.type==="grocery"||R.type==="hardware"){const ca=a0+18+k*20;BX("metal",ca,bR+5.5,0,1.1,2.2,0.08,"a cart corral");BX("metal",ca-1.1,bR+5.5,0,1.1,0.08,5,"a cart corral");BX("metal",ca+1.1,bR+5.5,0,1.1,0.08,5,"a cart corral")}}
     // arrows down the aisles
@@ -11058,7 +11084,7 @@ function worldScenery(){W2P.length=0;
    for(const S of XSITES){if(S.custom&&S.kind!=="stn")continue;if(S.kind==="stn"){Bx(pad,S,0,0,0.002,0.02,S.L,S.D);
        Bx(XM.canopy,S,0,-4,5.1,0.6,24,12);Bx(XM.glow,S,0,-4,5.08,0.03,22,10);for(const a of [-9,9])for(const b of [-7,-1])Bx(XM.pillar,S,a,b,0,5.1,0.45,0.45,"a canopy pillar");
        for(const a of [-6,6])for(const b of [-7,-1]){Bx(XM.pump,S,a,b,0,1.9,0.85,0.7,"a fuel pump");Bx(XM.glow,S,a,b,1.92,0.1,0.9,0.75)}
-       for(let k=0;k<4;k++){Bx(chg,S,-17+k*3.4,10,0,1.9,0.55,0.45,"a charger")}for(let k=0;k<=4;k++)Bx(stall,S,-18.7+k*3.4,7.0,0.012,0.012,0.12,5.2);
+       {const kind=(CHG_STN_N++)%2===0?"sc":"ea";for(let k=0;k<4;k++){const [x,y]=xLocal(S,-17+k*3.4,10);collAdd({t:"b",x,y,h:Math.atan2(S.U[1],S.U[0]),hl:0.3,hw:0.25,what:"a charger"});chgAdd(x,y,Math.atan2(-S.N[1],-S.N[0]),kind,{name:kind==="sc"?"Tesla Supercharger":"Electrify America"})}}for(let k=0;k<=4;k++)Bx(stall,S,-18.7+k*3.4,7.0,0.012,0.012,0.12,5.2);
        Bx(XM.shop,S,8,9,0,4.2,16,9,"the shop");Bx(XM.win,S,8,4.48,0.4,2.4,12,0.04);Bx(XM.sign,S,-17,-12.5,0,6,1.6,0.5,"a sign");
        S.pumps=[[-6,-7],[6,-7],[-6,-1],[6,-1]].map(([a,b])=>xLocal(S,a,b));S.chargers=[0,1,2,3].map(k=>xLocal(S,-17+k*3.4,8.6))}
      else{Bx(lot,S,0,0,0.003,0.02,S.L,S.D);S.stalls=[];for(let a=-S.L/2+1.4;a<=S.L/2-1.4;a+=2.7){Bx(stall,S,a,-S.D/2+8,0.012,0.012,0.12,5.4);Bx(stall,S,a,S.D/2-2.9,0.012,0.012,0.12,5.4)}
@@ -11076,7 +11102,7 @@ function stationInto(pad,chg,stall){
   const L=PAD.s1-PAD.s0, M_=()=>({P:[],N:[],I:[]}), canopy=M_(),pillar=M_(),pump=M_(),shop=M_(),glow=M_(),warm=M_(),teal=M_(),island=M_();
   B(pad,L/2,(PAD.o0+PAD.o1)/2,0.002,L,0.02,PAD.o1-PAD.o0);
   // EV bays along the back: chargers with screens, bay lines
-  STN.chargers.forEach(([u,o])=>{BC(chg,u,o,0.95,0.55,1.9,0.45);B(island,u,o+0.1,0.07,1.6,0.14,1.1)});
+  STN.chargers.forEach(([u,o])=>{{const p=padPt(u,o),q=padPt(u,o+1);collAdd({t:"b",x:p[0],y:p[1],h:p[2],hl:0.3,hw:0.25});chgAdd(p[0],p[1],Math.atan2(q[1]-p[1],q[0]-p[0]),"ea",{name:"Service plaza"})}B(island,u,o+0.1,0.07,1.6,0.14,1.1)});
   for(let k=0;k<7;k++)B(stall,50+k*3.6,-37.2,0.008,0.12,0.012,5.6);
   B(stall,60.8,-34.4,0.008,21.6,0.012,0.12);
   // fuel canopy on four pillars with light panels underneath and a lit fascia
@@ -14857,8 +14883,7 @@ function render(dt){
     mat([0.12,0.13,0.14],null,0.6,50);draw(S_.pump);mat([0.55,0.53,0.5],null,0.2,20);draw(S_.shop);
     mat([0.9,0.9,0.85],night?[2.2,2.1,1.9]:[0.5,0.5,0.45]);draw(S_.glow);mat([0.4,0.35,0.25],night?[1.5,1.15,0.6]:[0.25,0.2,0.12]);draw(S_.warm);
     mat([0.03,0.3,0.32],night?[0.1,1.3,1.25]:[0.03,0.25,0.25],0.5,40);draw(S_.teal)}
-  for(const [u,o] of STN.chargers){const b=padPt(u,o+0.25);gl.uniformMatrix4fv(U.uM,false,chain(M4.T(b[0],1.45,-b[1]),M4.rY(b[2]-Math.PI/2),M4.S(0.02,0.4,0.36)));bind(SCN.box);
-    mat([0.02,0.1,0.05],car.hyb.charging?[0.2,1.6,0.6]:[0.05,0.5,0.25],0.6,40);gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_SHORT,0)} gl.uniformMatrix4fv(U.uM,false,M4.id());mat([0.9,0.85,0.7],night?[1.6,1.4,1.0]:[0.1,0.1,0.08]);draw(SCN.head);if(SCN.fwHead){mat([0.95,0.7,0.35],night?[3.2,1.5,0.35]:[0.12,0.08,0.03]);draw(SCN.fwHead);if(night&&SCN.fwPool){gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE);gl.depthMask(false);mat([0,0,0],[0.5,0.24,0.05],0,1,0.28);draw(SCN.fwPool);gl.depthMask(true);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.disable(gl.BLEND)}}
+  gl.uniformMatrix4fv(U.uM,false,M4.id());mat([0.9,0.85,0.7],night?[1.6,1.4,1.0]:[0.1,0.1,0.08]);draw(SCN.head);if(SCN.fwHead){mat([0.95,0.7,0.35],night?[3.2,1.5,0.35]:[0.12,0.08,0.03]);draw(SCN.fwHead);if(night&&SCN.fwPool){gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE);gl.depthMask(false);mat([0,0,0],[0.5,0.24,0.05],0,1,0.28);draw(SCN.fwPool);gl.depthMask(true);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.disable(gl.BLEND)}}
   gl.enable(gl.CULL_FACE);
   const flash=sys.flashT>0&&((sys.flashT*6|0)%2===0),sigOn=((st.signal||st.hazard)&&st.blink)||flash, AMB=[2.2,1.0,0.08], OFF=[0,0,0];
   const LS=lightShow(),fogOn=st.fog&&st.power!==false,hk=car.dmg&&car.dmg.lamp?(car.dmg.lamp[0]+car.dmg.lamp[1])/2:1;const lit=LS||{head:lampsOn?[1.6*hk,1.6*hk,1.5*hk]:fogOn?[1.1*hk,1.1*hk,1.0*hk]:[0.35,0.36,0.38],tail:braking?[1.4,0.04,0.02]:(lampsOn?[0.45,0.01,0.01]:OFF),
@@ -15570,7 +15595,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=305;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="173",BUILD_VER=306;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}try{const P=JSON.parse(localStorage.getItem("strata.ped")||"null");if(P){st.pedHold=+P.pedHold||0;st.thrRate=+P.thrRate||2;st.brkRate=+P.brkRate||2}}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){const k=GFX.q==="auto"?GFX.eff:GFX.q;if(G.k!==k||G.v!==GFX.ovV||!G.m){G.k=k;G.v=GFX.ovV;const m={...GQ[k]};for(const o of GOPT)if(GFX.ov[o[0]]!==undefined)Object.assign(m,o[4](GFX.ov[o[0]]));if(Object.keys(GFX.ov).length)m.label=GQ[k].label+" (custom)";G.m=m;COLL.nt=!m.trees}return G.m}
@@ -15749,12 +15774,14 @@ function paOpenMenu(){if(!st.started||st.walk)return;if(!has("autopark")){toast(
 function paChoose(k){$("paMenu").hidden=true;SCR.paMenu=false;SCR.focus=false;if(!k){PA.mode=null;return}st.acc=false;st.pilot=false;
   if(k==="exit"){paStartExit();return}PA.mode=k;PA.found=false;PA.side=st.signal||1;tick(1)}
 // a parallel-parking stretch: Westport's Main St block, or (new world) whichever parking street you're driving along
-function paK(M){if(W2&&M.e.T.park&&M.e.mtr){const lo=loOf(M.e.n)*LANE;return {e:M.e,dir:M.dir,s0:rStart(M.e,M.dir)+9,s1:M.L-rEnd(M.e,M.dir)-9,oP:lo-LANE/2-M.e.T.park/2,oA:lo-0.1,pw:M.e.T.park}}return PARK}
+function paK(M){if(W2&&M.e.T&&M.e.T.park){const lo=loOf(M.e.n)*LANE;return {e:M.e,dir:M.dir,s0:rStart(M.e,M.dir)+9,s1:M.L-rEnd(M.e,M.dir)-9,oP:lo-LANE/2-M.e.T.park/2,oA:lo-0.1,pw:M.e.T.park}}return PARK}
 const paKerb=K=>K.oP-(K.pw||2.4)/2,paParT=K=>paKerb(K)+BODY_HW+0.28;   // the kerb line, and where the car's centre should end up: about 28 cm off the kerb whatever its width
 const paInner=(M,he)=>M.off-(BODY_HW*Math.cos(he)+BODY_HL*Math.abs(Math.sin(he)));
 function paScan(){sys.paSpot=null;if(!PA.mode||sys.pa)return;if(st.signal)PA.side=st.signal;const sp=Math.abs(car.vx),M=me();PA.fast=sp>8.5;if(PA.fast||st.gear==="R")return;
   if(PA.mode==="par"){const K=paK(M);if(PA.side>0&&M.e===K.e&&M.dir===K.dir&&M.off<1.2+(K.oA+0.1)){const xs=parked.filter(p=>p.e===K.e&&(p.dir===K.dir||p.dir===undefined)).map(p=>p.s).sort((a,b)=>a-b),edges=[K.s0-2.4,...xs,K.s1+2.4];
-      for(let i=0;i<edges.length-1;i++){const g0=edges[i]+2.4,g1=edges[i+1]-2.4,len=g1-g0,c=(g0+g1)/2,d=relS(M.s,c);if(len>VEH.len+1.6&&d>-6&&d<14){sys.paSpot={type:"par",s:c,len,K};break}}}}
+      const blk=xs.map(v=>[v-2.4,v+2.4]);for(const S of (K.e.nop||[])){if(Math.sign(S.off)!==Math.sign((K.dir||1)*K.oP))continue;const a=K.dir>0?S.u0:K.e.L-S.u1,b=K.dir>0?S.u1:K.e.L-S.u0;blk.push([a,b])}
+      blk.push([-1e9,K.s0]);blk.push([K.s1,1e9]);blk.sort((a,b)=>a[0]-b[0]);const mg=[];for(const r of blk){if(mg.length&&r[0]<=mg[mg.length-1][1])mg[mg.length-1][1]=Math.max(mg[mg.length-1][1],r[1]);else mg.push([r[0],r[1]])}
+      for(let i=0;i<mg.length-1;i++){const g0=mg[i][1],g1=mg[i+1][0],len=g1-g0,c=(g0+g1)/2,d=relS(M.s,c);if(len>VEH.len+1.6&&d>-6&&d<14){sys.paSpot={type:"par",s:c,len,K};break}}}}
   else{if(M.e===PAD.e&&M.dir===PAD.dir){const db=PAD.s0-M.s;if(db>4&&db<160&&M.off<1&&M.off>-8&&PA.side>0){sys.paSpot={type:"bay"}}}
     if(!sys.paSpot){const now=performance.now();if(now-(PA.scanT||0)>250||!PA.last){PA.scanT=now;PA.last=scanPerp()}const sp_=PA.last;
       if(sp_&&sp_.type==="perp")sys.paSpot=sp_;else if(sp_&&sp_.type==="perpTight")PA.tight=true}}
@@ -15802,9 +15829,9 @@ function paUpdate(dt){const A=sys.pa;if(!A)return null;
       if(offP<=(A.offStart+A.oT)/2+0.14||rr<0.35||paInner(M,he)<paKerb(A.K)-0.05){A.ph="rev2"}}   // switch a little early so the car finishes ~25 cm off the kerb, not on it   // never let the rear corner swing over the kerb
     else if(A.ph==="rev2"){st.gear="R";steer=-1;A.msg="Straightening";vt=steerReady(-1)?0.8:0;
       if(he<=0.015||rr<0.3||paInner(M,he)<paKerb(A.K)-0.05){A.ph="adj"}}
-    else if(A.ph==="adj"&&Math.abs(he)>0.012&&(A.sh||0)<8){A.sh=A.sh||0;if(!A.sd)A.sd=fr>rr?1:-1;const fwd=A.sd>0;st.gear=fwd?"D":"R";A.msg="Straightening";
-      steer=clamp((fwd?1:-1)*(7*he+0.8*(M.off-A.oT)),-1,1);const room=fwd?fr:rr;vt=room>0.42?clamp((room-0.35)*0.7,0.2,0.55):0;if(Math.abs(v)<0.1&&!steerReady(steer))vt=0;
-      if(room<=0.42&&Math.abs(v)<0.03){A.sd=-A.sd;A.sh++}}
+    else if(A.ph==="adj"&&Math.abs(he)>0.016&&(A.sh||0)<8){A.sh=A.sh||0;if(!A.sd){A.sd=fr>rr?1:-1;A.s0=M.s}const fwd=A.sd>0;st.gear=fwd?"D":"R";A.msg="Straightening";
+      steer=clamp((fwd?1:-1)*(7*he+0.8*(M.off-A.oT)),-1,1);const room=fwd?fr:rr,moved=Math.abs(relS(M.s,A.s0)),lim=room<=0.42||moved>1.6;vt=lim?0:clamp((room-0.35)*0.7,0.2,0.55);if(Math.abs(v)<0.1&&!steerReady(steer))vt=0;
+      if(lim&&Math.abs(v)<0.03){A.sd=-A.sd;A.s0=M.s;A.sh++}}
     else if(A.ph==="adj"){const d=relS(M.s,A.sT);st.gear=d>0.15?"D":d<-0.15?"R":st.gear;const fwd=st.gear==="D";
       steer=clamp((fwd?1:-1)*(2.5*he+0.6*(M.off-A.oT)),-0.6,0.6);vt=Math.abs(d)>0.15?clamp(Math.abs(d)*0.6,0.25,0.7):0;A.msg="Centring";
       if((fwd&&fr<0.45)||(!fwd&&rr<0.45))vt=0;
