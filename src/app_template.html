@@ -1273,8 +1273,15 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
 <script data-boot>(function(){var p=0;window.__bootP=0;var t=setInterval(function(){if(window.__bootReal){clearInterval(t);return}p+=(0.7-p)*0.025;window.__bootP=p;var a=document.getElementById("bootArc"),n=document.getElementById("bootNeedle"),c=document.getElementById("bootPct");if(a)a.setAttribute("stroke-dasharray",(p*100).toFixed(1)+" 100");if(n)n.style.setProperty("--a",(-135+p*270)+"deg");if(c)c.textContent=String(Math.round(p*100))},120)})()</script>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 306 · Real chargers and parking fixes</h2></div>
+    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 307 · Tesla S and X clusters, new people, preconditioning</h2></div>
     <div class="nb">
+      <h4>Tesla S and X clusters, new people, preconditioning</h4><ul>
+      <li><b>2020 Model S and Model X cluster:</b> the real grey layout. Warning lights in the top corners, speed with the Autosteer and set-speed icons above the lane view, a dark map (or what's playing) on the left, and the power meter arc with its energy graph and average Wh/mi on the right. Battery, range, gear, clock and outside temperature run along the bottom. In Park it shows the MODEL S / MODEL X badge and the car.</li>
+      <li><b>2026 Model S and Model X cluster:</b> the black layout from the newer cars. The driving view sits in the middle with the map and next turn on the left. Big speed and the cruise set speed are on the right, with the thin power bar at the bottom (green when regenerating).</li>
+      <li><b>Battery preconditioning:</b> navigate to a Supercharger or Electrify America charger in an EV and the car warms the battery on the way. A message tells you it started, and the cluster shows the battery temperature. A cold battery now fast-charges slower (about 40% speed near freezing, full speed from about 77°F), so warming it first really does charge faster. Superchargers and Electrify America chargers are now in the navigation list.</li>
+      <li><b>Two new people:</b> Person A and Person B are more detailed and have their own poses. They walk, stand, sit down, hold the steering wheel when driving and wave back when you honk at them while they're standing still. You'll see them around town and in other cars, and you can play as either one (menu → Car → Your character).</li>
+      <li><b>2020 Explorer cluster fixed:</b> every 2020 Explorer, including the Limited Hybrid, now gets its own cluster instead of the generic Ford one.</li>
+      <li><b>Model Y and Model 3 bottom bar:</b> the app icons no longer pile on top of each other. The ones that don't fit go in a ••• tray that pops up above the bar.</li></ul>
       <h4>Real chargers and parking fixes</h4><ul>
       <li><b>Real chargers everywhere:</b> Tesla V3 Superchargers (for Teslas only) at Bean &amp; Brew and at every other gas station, Electrify America 350 kW towers at the service plaza, the other stores and the remaining gas stations, Level 2 chargers on the street and in the parking garage, and Tesla Wall Connectors at some houses. Each one tells you what it is when you walk up.</li>
       <li>When you plug in, the cable and handle come off the charger and run to your car's charge port. They go back on the charger when you unplug.</li>
@@ -4490,9 +4497,10 @@ function energy(dt,Pw){
   // plugged in at the charging station (charging is sped up 10x so you don't wait)
   H.charging=false; H.refuel=false;
   if(T.hybrid&&sys.fuel==="pump"&&nearStn("pumps",6.5)&&sp<0.3&&H.fuel<H.tank){H.refuel=true;H.fuel=Math.min(H.tank,H.fuel+4*dt);if(SAFE.trip)SAFE.trip.f0=H.fuel;if(H.fuel>=H.tank){sys.fuel=null;setTimeout(()=>toast("Tank full"),0)}}
-  if(sys.fuel==="plug"&&nearStn("chargers",8)&&sp<0.3&&(T.phev||!T.hybrid)){const tg_=fusLine()?(st.cTgt||0.8):isTesla()?tslChgTarget():0.9;if(H.soc<tg_){H.charging=true;H.Pb-=(sys.hose&&sys.hose.c&&sys.hose.c.slow?(T.phev?7.2e3:11.5e3):T.phev?50e3:250e3)*10}else{sys.fuel=null;setTimeout(()=>toast(`Charged to ${Math.round(tg_*100)} %`),0);if(isTesla())SCR.lastSC=`Last session: charged to ${Math.round(tg_*100)}% at ${hourNow()%12||12}:00 ${hourNow()<12?"AM":"PM"}`}}
+  precTick(T,H,dt);
+  if(sys.fuel==="plug"&&nearStn("chargers",8)&&sp<0.3&&(T.phev||!T.hybrid)){const tg_=fusLine()?(st.cTgt||0.8):isTesla()?tslChgTarget():0.9;if(H.soc<tg_){H.charging=true;H.Pb-=(sys.hose&&sys.hose.c&&sys.hose.c.slow?(T.phev?7.2e3:11.5e3):(T.phev?50e3:250e3)*dcBattK(H))*10}else{sys.fuel=null;setTimeout(()=>toast(`Charged to ${Math.round(tg_*100)} %`),0);if(isTesla())SCR.lastSC=`Last session: charged to ${Math.round(tg_*100)}% at ${hourNow()%12||12}:00 ${hourNow()<12?"AM":"PM"}`}}
   H.soc=clamp(H.soc-H.Pb*dt/(cap*3.6e6),T.hybrid?0.12:0,T.hybrid?0.95:1);   // EVs run right down to empty; hybrids keep a hidden reserve
-  if(!T.ice||T.hybrid){let amb=20;try{amb=(ambF()-32)/1.8}catch(e){}if(H.bt==null)H.bt=amb;const kwh=Math.max(1,cap);H.bt+=Math.abs(H.Pb)/1e3*0.045/kwh*dt*(T.hybrid&&!T.phev?0.12:1)-(H.bt-amb)*dt/900-(H.bt>34?(H.bt-32)*dt/120:0)+(H.charging&&H.bt<25?0.05*dt:0);
+  if(!T.ice||T.hybrid){let amb=20;try{amb=(ambF()-32)/1.8}catch(e){}if(H.bt==null)H.bt=amb;const kwh=Math.max(1,cap);H.bt+=Math.abs(H.Pb)/1e3*0.045/kwh*dt*(T.hybrid&&!T.phev?0.12:1)-(H.bt-amb)*dt/900-(H.bt>34?(H.bt-32)*dt/120:0)+(H.charging&&H.bt<25?0.05*dt:0)+(PREC.on?0.022*dt:0);
     H.btK=clamp((H.bt+15)/25,0.3,1)*(H.bt>48?0.6:1);if(H.btK<0.7&&!SAFE.btSaid&&!T.ice&&st.started){SAFE.btSaid=1;carMsg(H.bt<10?`❄️ The battery is cold (${degF(H.bt)}°F): regenerative braking and power are limited until it warms up`:`🌡️ The battery is hot: power is limited to protect it`)}}
   H.pAvail=(H.eng?eMax:20e3)+(H.soc>(T.phev?0.16:0.2)?bMax*clamp((H.btK??1)*1.4,0.5,1):0);
   const k=Math.min(1,dt*6), F=H.f;
@@ -4521,6 +4529,16 @@ const STN={chargers:[0,1,2,3,4,5].map(k=>[51.8+k*3.6,-40.6]),pumps:[[18,-18],[30
 const STNW={};
 /* ---- v306 real chargers: Tesla V3 Superchargers (Teslas only) and Electrify America 350 kW towers, plus street chargers; the cable comes off the tower when you plug in */
 const CHGS=[];let CHGS_PTS=null,CHG_STN_N=0;
+// battery preconditioning: navigating to a fast charger warms the battery on the way so it charges at full speed on arrival
+// (a cold pack takes far less power: about 40% near freezing, full rate from about 25 °C)
+const PREC={on:false,c:null,key:null,said:null};
+function dcBattK(H){return clamp(((H.bt??20)+10)/35,0.4,1)}
+function precTick(T,H,dt){const ev=!T.ice&&(!T.hybrid||T.phev),pl=typeof NAV==="object"&&NAV.dest&&NAV.place;
+  if(pl&&PREC.key!==pl){PREC.key=pl;PREC.c=null;let bd=45;for(const c of CHGS){if(c.kind!=="sc"&&c.kind!=="ea")continue;const d=Math.hypot(c.x-pl.x,c.y-pl.y);if(d<bd){bd=d;PREC.c=c}}if(PREC.c&&PREC.c.kind==="sc"&&!T.tesla)PREC.c=null}
+  if(!pl){PREC.key=null;PREC.c=null}
+  const want=ev&&!!PREC.c&&st.started&&st.power!==false&&st.precond!==false&&!H.charging&&(H.bt??20)<37;
+  if(want&&!PREC.on&&PREC.said!==PREC.key){PREC.said=PREC.key;carMsg(`🔋 Preconditioning the battery for fast charging at ${PREC.c.name||NAV.name||"the charger"}`)}
+  PREC.on=want;if(want)H.Pb+=6e3}
 function chgAdd(x,y,face,kind,o){if(CHGS.some(c=>Math.abs(c.x-x)<0.3&&Math.abs(c.y-y)<0.3))return null;const c={x,y,face,kind,tesla:kind==="sc"||kind==="td",slow:kind==="l2"||kind==="td",name:(o&&o.name)||"",z:o&&o.z,spot:o&&o.spot};CHGS.push(c);CHGS_PTS=null;return c}
 const CHG_PROP={sc:"chg_sc",ea:"chg_ea",l2:"chg_l2",td:"chg_td"},CHG_ANC={sc:[0.2,1.05,0.12],ea:[-0.24,1.9,-0.05],l2:[0.12,0.98,0.06],td:[0,0.86,0.08]},CHG_NAME={sc:"Tesla Supercharger",ea:"Electrify America 350 kW",l2:"Level 2 charger",td:"Tesla Wall Connector"};
 function chgAt(x,y,r){let b=null,bd=r||3;for(const c of CHGS){const d=Math.hypot(c.x-x,c.y-y);if(d<bd){bd=d;b=c}}return b}
@@ -5498,7 +5516,7 @@ function oBox(k,X,Y,Hc,sx,sy,sz,yaw,pitch){const B=dB(k),c=Math.cos(yaw),s=Math.
     for(const [p,q] of [[-1,-1],[1,-1],[1,1],[-1,1]]){const w=[0,1,2].map(i=>ax[a][i]*sg*hs[a]+ax[b][i]*p*hs[b]+ax[d][i]*q*hs[d]*sg);B.P.push(X+w[0],Hc+w[2],-(Y+w[1]));B.N.push(n[0],n[2],-n[1])}
     B.I.push(base,base+1,base+2,base,base+2,base+3)}}
 function limb(k,X,Y,Hj,yaw,ang,len,th,wd){const d=[Math.cos(yaw)*Math.sin(ang),Math.sin(yaw)*Math.sin(ang),-Math.cos(ang)];oBox(k,X+d[0]*len/2,Y+d[1]*len/2,Hj+d[2]*len/2,th,len,wd,yaw,-ang);return [X+d[0]*len,Y+d[1]*len,Hj+d[2]*len]}
-function personInto(x,y,z,h,ph,P,st_){if(st_!=="down"&&typeof charQueue==="function"){const k=P.mk||(P.mk=P.skirt||P.long?"Adult_Woman":(P.sc||1)<0.93?"Child":Math.random()<0.5?"Adult_Man":"Adult_Woman");if(charQueue(k,x,y,z,h,P.v||0,(P.ph||0)*0.1))return}const s=P.sc||1,wd=P.wd||1,c=Math.cos(h),sn=Math.sin(h),L=(f,l)=>[x+c*f-sn*l,y+sn*f+c*l];
+function personInto(x,y,z,h,ph,P,st_){if(st_!=="down"&&typeof charQueue==="function"){const k=P.mk||(P.mk=P.skirt||P.long?"Adult_Woman":(P.sc||1)<0.93?"Child":pplPick());if(charQueue(k,x,y,z,h,P.v||0,(P.ph||0)*0.1))return}const s=P.sc||1,wd=P.wd||1,c=Math.cos(h),sn=Math.sin(h),L=(f,l)=>[x+c*f-sn*l,y+sn*f+c*l];
   const sk="skin"+P.skin,sh="shirt"+P.shirt,pa="pants"+(P.pants||0),hr="hair"+(P.hair||0),shoe="shoe"+(P.shoe||0);
   if(st_==="down"){oBox(sh,x,y,z+0.16,0.62*s,0.42*wd,0.26,h,Math.PI/2);const b=L(-0.62*s,0);oBox(pa,b[0],b[1],z+0.1,0.8*s,0.3*wd,0.18,h,Math.PI/2);const hd=L(0.45*s,0);oBox(sk,hd[0],hd[1],z+0.11,0.24,0.2,0.2,h,Math.PI/2);oBox(hr,hd[0]+c*0.02,hd[1]+sn*0.02,z+0.13,0.2,0.22,0.22,h,Math.PI/2);return}
   const amp=Math.min(1,(P.v||0)/1.3),hip=0.93*s,bob=Math.abs(Math.sin(ph))*0.025*amp,zz=z+bob;
@@ -5546,7 +5564,7 @@ function newPed(e,u,side){const long=rnd()<0.4,jog=rnd()<0.07;return {kind:"ped"
 function pedPos(p){const q=ePt(p.e,p.u,p.side*(walkT(p.e)+(p.lat||0)));return [q[0],q[1],p.e.hz?ez(p.e,p.u):0]}
 // people look out for each other and for cars: keep right when meeting someone, pass slower walkers, pause or hurry on a crosswalk
 // your horn: people nearby jump, look, and hurry on (faster still if they're crossing in front of you)
-function pedHorn(p,dt){if(st.hornAt&&st.clock-st.hornAt<0.3&&p.hornSeen!==st.hornAt&&!st.walk&&Math.hypot(p.wx-car.px,p.wy-car.py)<16){p.hornSeen=st.hornAt;p.startT=0.5;p.hurryT=3;brainLearn("pedScare")}
+function pedHorn(p,dt){if(st.hornAt&&st.clock-st.hornAt<0.3&&p.hornSeen!==st.hornAt&&!st.walk&&Math.hypot(p.wx-car.px,p.wy-car.py)<16){p.hornSeen=st.hornAt;if(Math.abs(p.v||0)<0.2&&Math.random()<0.55){p.waveT=st.clock+2.6;return}p.startT=0.5;p.hurryT=3;brainLearn("pedScare")}
   if(p.startT>0){p.startT-=dt;p.vMul=0}else if(p.hurryT>0){p.hurryT-=dt;p.vMul=Math.max(p.vMul??1,1.7)}}
 function pedSmart(p,dt){if(p.mode==="walk"){let want=0,slow=1;const hw=(p.e.T.walk||2)/2-0.35;
     for(const o of peds){if(o===p||o.mode!=="walk"||o.e!==p.e||o.side!==p.side)continue;const d=(o.u-p.u)*p.du;if(d<0||d>4.5)continue;
@@ -6404,6 +6422,7 @@ function navPlaces(){const L=[],add=(name,sub,x,y,h,ic)=>{if(x==null||!isFinite(
   for(const R of RETAIL){const t=TY[R.type]||["Store","🏪"],x=R.ac!=null?R.ac:(R.a0+R.a1)/2;add(R.name,t[0],x,R.s*(RB0+(R.bf||30)-1.5),R.s>0?-Math.PI/2:Math.PI/2,t[1])}
   for(const T of RETAIL_STN){const nb=RETAIL.slice().sort((a,b)=>Math.abs((a.a0+a.a1)/2-T.x)-Math.abs((b.a0+b.a1)/2-T.x))[0];add(T.name,"Gas station"+(nb?" · by "+nb.name:""),T.x,T.s*(RB0+15.5),0,"⛽")}
   add("Service plaza","Gas and fast chargers on Hwy 7",PAD.cx,PAD.cy,0,"⚡");
+  {const seen=new Set();for(const c of CHGS){if(c.kind!=="sc"&&c.kind!=="ea")continue;const k=c.kind+(c.name||"")+Math.round(c.x/60)+","+Math.round(c.y/60);if(seen.has(k))continue;seen.add(k);const nb=L.filter(q=>q.ic!=="⚡"&&Math.hypot(q.x-c.x,q.y-c.y)<90).sort((q,r)=>Math.hypot(q.x-c.x,q.y-c.y)-Math.hypot(r.x-c.x,r.y-c.y))[0];add(c.kind==="sc"?"Tesla Supercharger":"Electrify America",(nb?"At "+nb.name:"Fast charger")+(c.kind==="sc"?" · V3, Tesla vehicles":" · 350 kW, all EVs"),c.x,c.y,c.face||0,"⚡")}}
   try{const P=fpt(PARK.e,PARK.dir,(PARK.s0+PARK.s1)/2,PARK.oP);add("Park & charge lot","Parking with chargers",P[0],P[1],0,"🅿️")}catch(e){}
   add("Fort St parking garage","Two-level parking garage",GAR.cx,GAR.cy+14,0,"🅿️");
   try{const o=cwSite();if(o){const [x,y]=o.W(4,-28);add("Strata Car Wash","Conveyor wash · $12 · free vacuums",x,y,Math.atan2(o.N[1],o.N[0]),"🫧")}}catch(e){}
@@ -6833,10 +6852,10 @@ function vzModel(L,W,H,k){const key=k+"|"+L.toFixed(1)+"|"+W.toFixed(1)+"|"+H.to
     q("side",oc,[A[0],A[1],A[2]],[B[0],B[1],B[2]],[B[0],B[1]*1.0,zb],[A[0],A[1],zb]);q("side",oc,[A[0],-A[1],A[2]],[B[0],-B[1],B[2]],[B[0],-B[1],zb],[A[0],-A[1],zb])}
   if(k==="truck"){const r=-L/2+0.12,yy=hw*0.86,zz=P.z[3]*H+0.01;q("bed",[0,0,0],[c[3]*L-0.06,yy,zz],[c[3]*L-0.06,-yy,zz],[r,-yy,zz],[r,yy,zz])}
   m={F,cz:H/2,L,W,H};VZ.mdl[key]=m;return m}
-function vizTesla(g,x,y,w,h,big){w=Math.round(w);h=Math.round(h);if(w<8||h<8)return;const key=w+"x"+h+(big?"b":"");VZ.c=VZ.c||{};let C=VZ.c[key];const now=performance.now();
+function vizTesla(g,x,y,w,h,big){w=Math.round(w);h=Math.round(h);if(w<8||h<8)return;const key=w+"x"+h+(big?"b":"")+(VZ.dk?"d":"")+(VZ.bare?"n":"");VZ.c=VZ.c||{};let C=VZ.c[key];const now=performance.now();
   if(!C){const cv=document.createElement("canvas");cv.width=w;cv.height=h;C=VZ.c[key]={cv,g:cv.getContext("2d"),t:-1e9}}
   if(now-C.t>45){C.t=now;vizDraw(C.g,0,0,w,h,big)}g.drawImage(C.cv,x,y,w,h)}
-function vizDraw(g,x,y,w,h,big){const M=me(),T=TRIMS[st.trim],dark=isTesla()?tslDark():st.night,sp=Math.abs(car.vx),F_=FONT,hudF=getComputedStyle(document.body).getPropertyValue("--f-hud");
+function vizDraw(g,x,y,w,h,big){const M=me(),T=TRIMS[st.trim],dark=VZ.dk?true:isTesla()?tslDark():st.night,sp=Math.abs(car.vx),F_=FONT,hudF=getComputedStyle(document.body).getPropertyValue("--f-hud");
   // Park (Teslas): the view swings round from behind the car to its front three-quarter in a studio, like the real screen does
   const nowV=performance.now();MINI.use=nowV;{const want=isTesla()&&st.gear==="P"&&sp<0.3&&!st.walk&&st.power!==false,dtv=Math.min(0.2,(nowV-(VZ.lt||nowV))/1000);VZ.lt=nowV;VZ.pk=clamp((VZ.pk||0)+(want?1:-1)*dtv/1.3,0,1)}
   const pk=VZ.pk||0,pe=pk*pk*(3-2*pk);MINI.ang=pe*2.6;MINI.el=0.38-0.1*pe;MINI.fov=0.3-0.13*pe;
@@ -6929,7 +6948,7 @@ function vizDraw(g,x,y,w,h,big){const M=me(),T=TRIMS[st.trim],dark=isTesla()?tsl
       const pc=Pj(0,0,0.7);if(pe<0.01&&!(pc&&miniDraw(g,pc[0],pc[1],Fc/pc[2])))drawModel(m,0,0,0,0,(()=>{const c=myPaint();return [0,1,2].map(i=>Math.pow(clamp(c[i],0,1),1/2.2)*255)})(),{roof:[22,24,27],glass:[30,33,37],tail:brk?"rgba(255,45,45,1)":"rgba(150,20,25,.95)"})}}
   // top: gear, speed, set speed, limit, hold, lights, Autopilot / FSD status
   const ink=dark?"#e8ecef":"#1c1f23",soft=dark?"#5b636b":"#9aa1a8",u=big?1:0.78;
-  if(tes||big){
+  if((tes||big)&&!VZ.bare){
   g.textAlign="left";g.textBaseline="alphabetic";g.font=`600 ${15*u}px ${hudF}`;["P","R","N","D"].forEach((k,i)=>{g.fillStyle=st.gear===k?ink:soft;g.fillText(k,x+14+i*17*u,y+24*u)});if(tes){const bx=x+14+4*17*u+6*u,by=y+13*u,soc=clamp(Math.round(car.hyb?socShow(car.hyb)*100:80),0,100);g.strokeStyle=soft;g.lineWidth=1.2;rr2(g,bx,by,22*u,11*u,2.5*u);g.stroke();g.fillStyle=soft;g.fillRect(bx+22*u,by+3.5*u,2*u,4*u);g.fillStyle=soc<20?"#ff453a":ink;g.fillRect(bx+2*u,by+2*u,18*u*soc/100,7*u);g.font=`600 ${12*u}px ${hudF}`;g.fillStyle=ink;g.fillText(soc+"%",bx+28*u,y+23*u)}
   g.font=`500 ${44*u}px ${hudF}`;g.fillStyle=ink;g.fillText(Math.round(spdUnit(sp)),x+14,y+70*u);g.font=F_(11*u);g.fillStyle=soft;g.fillText(st.units==="mph"?"MPH":"KM/H",x+16,y+86*u);
   let iy=y+112*u;const icon=(on,col,txt,draw)=>{g.save();g.translate(x+30*u,iy);g.strokeStyle=on?col:soft;g.fillStyle=on?col:soft;g.lineWidth=2*u;draw(u);g.restore();if(txt){g.font=`600 ${11*u}px ${hudF}`;g.textAlign="center";g.fillStyle=on?col:soft;g.fillText(txt,x+30*u,iy+28*u);g.textAlign="left"}iy+=txt?50*u:36*u};
@@ -6947,6 +6966,7 @@ function vizDraw(g,x,y,w,h,big){const M=me(),T=TRIMS[st.trim],dark=isTesla()?tsl
   else if(sys.nag===2){msg="Take control immediately";col="#ff453a"}else if(sys.nag===1){msg=fsdA?"Pay attention to the road":"Apply slight turning force to steering wheel";blue=true}
   else if(sys.apStrike){msg=(tes?"Autosteer":pn)+" unavailable for the rest of this drive";col="#ff453a"}
   else if(fsdA){msg=`Self-Driving · ${sys.fsdState||""}`;col="#6f93ff"}else if(ap){msg=tes?"Autosteer":pn;col="#6f93ff"}else if(lkaOn){msg="Lane Keeping Assist";col="#34c759"}else if(st.acc){msg=tes?"Traffic-Aware Cruise Control":"Adaptive Cruise Control";col="#6f93ff"}else if(!tes&&sys.bsmL&&st.signal<0||!tes&&sys.bsmR&&st.signal>0){msg="Vehicle in blind spot";col="#ff9f0a"}
+  if(VZ.bare&&col!=="#ff453a"&&!blue)msg="";
   if(msg){const bh=big?26:19;g.fillStyle=blue?(performance.now()%700<350?"#3e6ae1":"#2b4fb8"):dark?"rgba(24,27,31,.88)":"rgba(255,255,255,.9)";rr2(g,x+10,y+h-bh-8,w-20,bh,bh/2);g.fill();g.fillStyle=blue?"#fff":col;g.font=F_(big?12:10);g.textAlign="center";g.fillText(msg,cx,y+h-8-bh/2+4)}
   if(pe>0.001)vizPark(g,x,y,w,h,pe,dark,Pj,Fc);
   g.restore()}
@@ -6955,7 +6975,7 @@ function vizPark(g,x,y,w,h,pe,dark,Pj,Fc){g.save();g.globalAlpha=Math.min(1,pe*1
   if(dark){bg.addColorStop(0,"#16181c");bg.addColorStop(0.6,"#1f2226");bg.addColorStop(1,"#0d0e10")}else{bg.addColorStop(0,"#f3f4f6");bg.addColorStop(0.6,"#e3e5e8");bg.addColorStop(1,"#cdd0d4")}g.fillStyle=bg;g.fillRect(x,y,w,h);
   const cx=x+w*0.52,cy=y+h*0.6,sh=g.createRadialGradient(cx,cy+h*0.13,4,cx,cy+h*0.13,w*0.4);sh.addColorStop(0,dark?"rgba(0,0,0,.6)":"rgba(0,0,0,.28)");sh.addColorStop(1,"rgba(0,0,0,0)");g.fillStyle=sh;g.beginPath();g.ellipse(cx,cy+h*0.13,w*0.4,h*0.1,0,0,7);g.fill();
   g.globalAlpha=1;const p0=Pj(0,0,0.7),ppm0=p0?Fc/p0[2]:1,ppm1=h*1.35/(2*MINI.dist*Math.tan(0.15)),ppm=ppm0+(ppm1-ppm0)*pe,px=p0?p0[0]+(cx-p0[0])*pe:cx,py=p0?p0[1]+(cy-p0[1])*pe:cy;miniDraw(g,px,py,ppm);
-  if(pe>0.8){const a=(pe-0.8)/0.2,ink=dark?"#f2f4f6":"#1c1f23",sub=dark?"#9aa1a8":"#5b636b";g.globalAlpha=a;g.textAlign="center";g.textBaseline="middle";const fs=Math.max(10,h*0.045);
+  if(pe>0.8&&!VZ.bare){const a=(pe-0.8)/0.2,ink=dark?"#f2f4f6":"#1c1f23",sub=dark?"#9aa1a8":"#5b636b";g.globalAlpha=a;g.textAlign="center";g.textBaseline="middle";const fs=Math.max(10,h*0.045);
     g.fillStyle=ink;g.font=`600 ${fs}px system-ui,sans-serif`;g.fillText("Open",x+w*0.27,y+h*0.24);g.fillText("Frunk",x+w*0.27,y+h*0.24+fs*1.15);g.fillText("Open",x+w*0.76,y+h*0.25);g.fillText("Trunk",x+w*0.76,y+h*0.25+fs*1.15);
     const lx=x+w*0.5,ly=y+h*0.14,r=fs*0.55;g.strokeStyle=ink;g.lineWidth=Math.max(1.5,fs*0.13);g.beginPath();g.arc(lx,ly-r*0.35,r*0.55,Math.PI,0);g.stroke();g.fillStyle=ink;g.fillRect(lx-r*0.8,ly-r*0.3,r*1.6,r*1.25);
     g.fillStyle=sub;g.font=`500 ${fs*0.8}px system-ui,sans-serif`;g.fillText(st.locked?"Locked":"Unlocked",lx,ly+r*1.7);{const bx=x+w*0.85,by=y+h*0.47,k=fs*0.06;g.fillStyle="#3e6ae1";g.beginPath();[[2,-9],[-5,1],[-0.5,1],[-2,9],[5,-1],[0.5,-1]].forEach(([u,v],i)=>i?g.lineTo(bx+u*k,by+v*k):g.moveTo(bx+u*k,by+v*k));g.closePath();g.fill()}}
@@ -7086,7 +7106,7 @@ function cluCommon(){const T=TRIMS[st.trim],H=car.hyb,P=car.tq.reduce((a,q,i)=>a
   return {T,H,P,pf,clock:`${hh}:${mm}`,ev,hyb,ready,unit,rng,ru,fuelF:T.ice||hyb||T.plug?clamp(H.fuel/H.tank,0,1):0,soc:socShow(H),evMode:(ev||(hyb&&!H.eng)),sig:s=>(st.signal===s||st.hazard)&&st.blink}}
 function cluArrows(g,C,xl,xr,y){g.fillStyle="#3ee06a";g.font=FONT(22);g.textAlign="center";g.textBaseline="middle";if(C.sig(-1))g.fillText("◀",xl,y);if(C.sig(1))g.fillText("▶",xr,y)}
 // navigation on the cluster: a turn arrow, distance and road at the top centre when a turn is coming up (like real clusters)
-function cluNav(g,W,H){const G=NAV.dest&&NAV.g;if(!G||G.d>2400||st.power===false)return;const t=`${distTxt(G.d)}  ${G.t==="A"?"Destination":G.name||navText(G)}`;g.save();g.font=FONT(13);let tx=t;while(g.measureText(tx).width>200&&tx.length>4)tx=tx.slice(0,-2)+"…";
+function cluNav(g,W,H){if(PREC.on&&st.power!==false){g.save();g.font=FONT(11);g.textAlign="center";g.textBaseline="middle";const t=`❄ Preconditioning battery · ${degF(car.hyb.bt??20)}°F`,w=g.measureText(t).width+20;g.fillStyle="rgba(20,40,70,.9)";rr2(g,W/2-w/2,H-24,w,18,9);g.fill();g.fillStyle="#9fd0ff";g.fillText(t,W/2,H-15);g.restore()}const G=NAV.dest&&NAV.g;if(!G||G.d>2400||st.power===false||CLU.noNav)return;const t=`${distTxt(G.d)}  ${G.t==="A"?"Destination":G.name||navText(G)}`;g.save();g.font=FONT(13);let tx=t;while(g.measureText(tx).width>200&&tx.length>4)tx=tx.slice(0,-2)+"…";
   const w=Math.min(250,g.measureText(tx).width+48),x=W/2-w/2,y=6;g.fillStyle="rgba(10,70,44,.95)";rr2(g,x,y,w,28,8);g.fill();g.fillStyle="#fff";g.textBaseline="middle";g.textAlign="left";g.font="800 18px system-ui";g.fillText(NAV_ARROW[G.t]||"↑",x+9,y+15);g.font=FONT(13);g.fillText(tx,x+34,y+15);g.restore()}
 // Mazda-style forward collision warning: a red BRAKE! panel with a car icon over the cluster, and fast beeping
 // ---- Blind-Spot View Monitor: signal and the gauge on that side turns into a live camera view down that side of the car (Hyundai / Kia),
@@ -8803,7 +8823,13 @@ function teslaDock(g,bot,W,H){const dk=tslDark();g.fillStyle=dk?"#0b0d0f":"#f4f5
   g.fillStyle=ink;g.font=FONT(20);g.textAlign="center";g.fillText("‹",72,cy);g.font=FONT(17);g.fillText(String(sys.tL),100,cy+1);g.font=FONT(20);g.fillText("›",128,cy);hit(58,bot,26,H-bot,()=>sys.tL--);hit(116,bot,26,H-bot,()=>sys.tL++);hit(86,bot,30,H-bot,()=>{SCR.page="climate"});
   const w_=(c)=>(x,y)=>rivIco(g,c,x,y,20,"#fff");
   const apps=[["map","#3e6ae1",w_("nav")],["media","#e2334a",w_("music")],["camera","#4b5259",w_("cam")],["energy","#2fb35f",w_("bolt")],["autopilot","#5b6cff",(x,y)=>{g.strokeStyle="#fff";g.lineWidth=2;g.beginPath();g.arc(x,y,8,0,7);g.moveTo(x-8,y);g.lineTo(x+8,y);g.moveTo(x,y);g.lineTo(x,y+8);g.stroke()}],["toybox","#ff9f0a",(x,y)=>{g.fillStyle="#fff";g.font=FONT(17);g.textAlign="center";g.fillText("🧸",x,y+1)}],["upgrades","#6e7378",(x,y)=>{g.fillStyle="#fff";g.beginPath();g.moveTo(x,y-9);g.lineTo(x+8,y);g.lineTo(x+3,y);g.lineTo(x+3,y+8);g.lineTo(x-3,y+8);g.lineTo(x-3,y);g.lineTo(x-8,y);g.closePath();g.fill()}]];
-  const sp=Math.min(46,(W-320)/apps.length),x0=150+(W-310-sp*apps.length)/2+sp/2;apps.forEach(([k,c,d],i)=>tile(x0+i*sp,k,c,d));
+  // only as many app tiles as fit between the two temperatures (about 44 px each); the rest go in a "•••" tray that pops up above the bar
+  const room=W-296,nFit=Math.max(2,Math.floor(room/40)),over=apps.length>nFit,shown=over?apps.slice(0,nFit-1):apps,rest=over?apps.slice(nFit-1):[],nT=shown.length+(over?1:0),sp=Math.min(46,room/nT),x0=144+(room-sp*nT)/2+sp/2;
+  shown.forEach(([k,c,d],i)=>tile(x0+i*sp,k,c,d,()=>{SCR.page=k;SCR.autoCam=false;SCR.tslMore=false}));
+  if(over){const xm=x0+shown.length*sp,on=SCR.tslMore||rest.some(r=>r[0]===SCR.page);g.fillStyle=dk?"#2a2f34":"#dfe2e6";rr2(g,xm-16,cy-16,32,32,9);g.fill();g.fillStyle=ink;g.font=FONT(16);g.textAlign="center";g.fillText("•••",xm,cy-1);if(on&&!SCR.tslMore){rr2(g,xm-8,cy+19,16,3,1.5);g.fill()}hit(xm-22,bot,44,H-bot,()=>{SCR.tslMore=!SCR.tslMore});
+    if(SCR.tslMore){const tw=rest.length*48+16,tx=clamp(xm-tw/2,8,W-tw-8),ty=bot-60;g.fillStyle=dk?"rgba(28,32,36,.97)":"rgba(255,255,255,.97)";g.shadowColor="rgba(0,0,0,.3)";g.shadowBlur=14;rr2(g,tx,ty,tw,52,14);g.fill();g.shadowBlur=0;
+      const nh=SCR.hits.length;rest.forEach(([k,c,d],i)=>{const x=tx+32+i*48,y=ty+26,on2=SCR.page===k;g.fillStyle=c;rr2(g,x-16,y-16,32,32,9);g.fill();d(x,y);if(on2){g.fillStyle=ink;rr2(g,x-8,y+19,16,2,1);g.fill()}hit(x-22,ty,44,52,()=>{SCR.page=k;SCR.autoCam=false;SCR.tslMore=false})});
+      const th=SCR.hits.splice(nh);th.push({x:tx+(SCR.ox||0),y:ty,w:tw,h:52,fn:()=>{}});SCR.hits.unshift(...th)}}
   {sys.tR=sys.tR||sys.tL;const px=W-112;g.fillStyle=ink;g.font=FONT(20);g.textAlign="center";g.fillText("‹",px-28,cy);g.font=FONT(17);g.fillText(String(sys.tR),px,cy+1);g.font=FONT(20);g.fillText("›",px+28,cy);hit(px-42,bot,26,H-bot,()=>sys.tR--);hit(px+16,bot,26,H-bot,()=>sys.tR++);hit(px-14,bot,28,H-bot,()=>{SCR.page="climate"})}
   rivIco(g,"vol",W-28,cy,22,ink);hit(W-50,bot,50,H-bot,()=>{SCR.page="media";SCR.autoCam=false})}
 
@@ -14071,16 +14097,18 @@ function accModelsDraw(cm,alpha){if(st.walk&&!st.started)return;const T=TRIMS[st
   if(need.has("hood")){const A=ACCM.Hood_Deflector;if(A)D("Hood_Deflector",accFitM(A,[0,F.hy+0.03,F.hz-0.06],[F.hw*1.9,0.1,0.2]));else accGet("Hood_Deflector")}}
 const ACC_MODEL_KEYS=new Set(["crossbars","roofBox","kayakRack","bikeRackRoof","hitch","bikeRackHitch","windowVisors","hoodDeflector"]);
 // animated people and animals: queued while building the scene, drawn in every pass
-function charQueue(k,x,y,z,h,v,seed){if(!accGet(k))return false;CHARS.push([k,x,y,z,h,v,seed||0]);return true}
+function charQueue(k,x,y,z,h,v,seed,an){if(!accGet(k))return false;CHARS.push([k,x,y,z,h,v,seed||0,an||null]);return true}
+// who you meet: the original people plus the two newer, more detailed ones (Person A and Person B)
+function pplPick(){const r=Math.random();return r<0.27?"Adult_Man":r<0.54?"Adult_Woman":r<0.77?"Person_A":"Person_B"}
 function charSitPose(A){if(A.sit)return A.sit;const n=A.nodes,F0=A.fr.subarray(0,n*16),out=new Float32Array(F0),idx={};A.parts.forEach(p=>idx[p.name]=p.node);
   const get=i=>F0.subarray(i*16,i*16+16),pos=i=>{const m=get(i);return [m[12],m[13],m[14]]},rotAt=(p,Rm)=>chain(M4.T(p[0],p[1],p[2]),Rm,M4.T(-p[0],-p[1],-p[2]));
   for(const sd of ["left","right"]){const th=idx[sd+"_thigh"],sh=idx[sd+"_shin"],ua=idx[sd+"_upper_arm"],fa=idx[sd+"_forearm"];
     if(th!=null){const H=rotAt(pos(th),M4.rX(-Math.PI/2-0.2));out.set(M4.mul(H,get(th)),th*16);if(sh!=null){const kn=M4.p(H,pos(sh)),K=M4.mul(rotAt(kn,M4.rX(0.8)),H);out.set(M4.mul(K,get(sh)),sh*16)}}
     if(ua!=null){const S=rotAt(pos(ua),M4.rX(-0.9));out.set(M4.mul(S,get(ua)),ua*16);if(fa!=null){const el=M4.p(S,pos(fa)),E=M4.mul(rotAt(el,M4.rX(-0.75)),S);out.set(M4.mul(E,get(fa)),fa*16)}}}
   return A.sit=out}
-function charsDraw(){const t=performance.now()/1000,cr=CULL.sec?70:220;for(const it of CHARS){if(!Array.isArray(it)){const A=ACCM[it.k];if(!A)continue;if(it.M&&!sphVis(it.M[12],it.M[13],it.M[14],2.5,cr))continue;if(A.kind==="acc"){accDrawMs(A.ms,it.M,false);continue}let fr;if(it.pose==="sit"){const an=A.anims&&A.anims.seat;if(an){const f=an[0]+Math.floor(((t+(it.sd||0))/an[2]%1)*an[1]);fr=A.fr.subarray(f*A.nodes*16,(f+1)*A.nodes*16)}else fr=charSitPose(A)}else fr=A.fr.subarray(0,A.nodes*16);
+function charsDraw(){const t=performance.now()/1000,cr=CULL.sec?70:220;for(const it of CHARS){if(!Array.isArray(it)){const A=ACCM[it.k];if(!A)continue;if(it.M&&!sphVis(it.M[12],it.M[13],it.M[14],2.5,cr))continue;if(A.kind==="acc"){accDrawMs(A.ms,it.M,false);continue}let fr;if(it.pose==="sit"){const an=A.anims&&(it.drv&&A.anims.grip||A.anims.seat);if(an){const f=an[0]+Math.floor(((t+(it.sd||0))/an[2]%1)*an[1]);fr=A.fr.subarray(f*A.nodes*16,(f+1)*A.nodes*16)}else fr=charSitPose(A)}else fr=A.fr.subarray(0,A.nodes*16);
       for(const P of A.parts){if(it.skip&&it.skip.includes(P.name))continue;const o=P.node*16;accDrawMs(P.ms,M4.mul(it.M,fr.subarray(o,o+16)),false)}continue}
-    const [k,x,y,z,h,v,sd]=it;const A=ACCM[k];if(!A)continue;if(!sphVis(x,(z||0)+0.9,-y,1.3,cr))continue;const sp=v>0.05?Math.min(1.8,v/1.3):0,ai=A.anims&&A.anims.idle,f=sp?Math.floor(((t*sp+sd)/A.dur%1)*A.F):ai?ai[0]+Math.floor(((t+sd*7)/ai[2]%1)*ai[1]):0,M=chain(M4.T(x,z,-y),M4.rY(h+Math.PI/2));
+    const [k,x,y,z,h,v,sd,an_]=it;const A=ACCM[k];if(!A)continue;if(!sphVis(x,(z||0)+0.9,-y,1.3,cr))continue;const ox_=an_&&A.anims&&A.anims[an_],sp=v>0.05&&!ox_?Math.min(1.8,v/1.3):0,ai=ox_||A.anims&&A.anims.idle,f=sp?Math.floor(((t*sp+sd)/A.dur%1)*A.F):ai?ai[0]+Math.floor(((t+sd*7)/ai[2]%1)*ai[1]):0,M=chain(M4.T(x,z,-y),M4.rY(h+Math.PI/2));
   for(const P of A.parts){const o=(f*A.nodes+P.node)*16;accDrawMs(P.ms,M4.mul(M,A.fr.subarray(o,o+16)),false)}}}
 
 // ======================================================================= Vehicle Settings: a list of categories on the left, the chosen list (or the driver-assistance car) on the right
@@ -14491,12 +14519,98 @@ function chvTruckCluster(g,W,H,v){const C=cluCommon(),F=CF2;chvBg(g,W,H);g.textB
     g.fillStyle="#9fd08a";g.font=F(10,600);g.fillText(String(DRIVES[st.trim]&&DRIVES[st.trim].bias&&DRIVES[st.trim].bias[0]>0?"4WD":"2WD"),W/2,ct+ch-12)}
   chvCommon(g,W,H,C,v)}
 
+// ---- Tesla Model S / X instrument clusters, drawn from the owner's manual layouts
+// legacy (2012-2020): grey panel, telltales in the top corners, speed and Autopilot icons top centre over the lane view,
+// a map or media card on the left, the power meter arc with its energy graph on the right, battery/PRND and clock/temp along the bottom
+// refreshed (2021+): black panel, big car in Park; driving view in the middle, map with the next turn on the left, big speed on the right, power bar at the bottom
+const TCLU={h:[],t:0,pw:0,pwOn:false};
+function tclTick(){const now=performance.now(),P=car.tq.reduce((a,q,i)=>a+q*car.w[i],0)/1000;if(now-TCLU.t>200){TCLU.t=now;TCLU.h.push(P);if(TCLU.h.length>90)TCLU.h.shift()}
+  const on=st.power!==false&&st.started;if(on&&!TCLU.pwOn)TCLU.pw=now;TCLU.pwOn=on;return P}
+function tclWhMi(){const k=RNG.kpk>0?RNG.kpk:0.19;return Math.round(k*1000*1.609)}
+function tclTime(){const d=gDate(),h=d.getHours(),m=String(d.getMinutes()).padStart(2,"0");return [`${h%12||12}:${m}`,h<12?"AM":"PM"]}
+function tclTemp(){let f=70;try{f=ambF()}catch(e){}return st.units==="mph"?`${Math.round(f)}°F`:`${Math.round((f-32)/1.8)}°C`}
+// one telltale symbol, about 16 px
+function tclIcon(g,k,x,y,c){g.save();g.strokeStyle=c;g.fillStyle=c;g.lineWidth=1.6;g.lineCap="round";g.textBaseline="middle";g.textAlign="left";
+  const D=(ox)=>{g.beginPath();g.moveTo(x+ox,y-6);g.quadraticCurveTo(x+ox+11,y-6,x+ox+11,y);g.quadraticCurveTo(x+ox+11,y+6,x+ox,y+6);g.closePath();g.stroke()};
+  if(k==="low"){D(6);for(let i=0;i<3;i++){g.beginPath();g.moveTo(x,y-3+i*4);g.lineTo(x+4.5,y-4.5+i*4);g.stroke()}}
+  else if(k==="high"){D(6);for(let i=0;i<3;i++){g.beginPath();g.moveTo(x,y-4+i*4);g.lineTo(x+4.5,y-4+i*4);g.stroke()}g.fillRect(x+7,y-5,3,10)}
+  else if(k==="park"){D(4);g.beginPath();g.moveTo(x+19,y-5);g.quadraticCurveTo(x+13,y,x+19,y+5);g.stroke();for(let i=0;i<3;i++){g.beginPath();g.moveTo(x-1,y-4+i*4);g.lineTo(x+2.5,y-4+i*4);g.stroke()}}
+  else if(k==="fog"){D(7);for(let i=0;i<3;i++){g.beginPath();g.moveTo(x,y-4+i*4);g.lineTo(x+5,y-4+i*4);g.stroke()}g.beginPath();g.moveTo(x+3,y-7);g.bezierCurveTo(x+6,y-3,x,y+3,x+3,y+7);g.stroke()}
+  else if(k==="tcs"){g.beginPath();g.moveTo(x+2,y-1);g.lineTo(x+5,y-6);g.lineTo(x+13,y-6);g.lineTo(x+16,y-1);g.lineTo(x+16,y+2);g.lineTo(x+2,y+2);g.closePath();g.stroke();for(const o of [4,12]){g.beginPath();g.moveTo(x+o,y+4);g.bezierCurveTo(x+o-3,y+6,x+o+3,y+7,x+o,y+9);g.stroke()}}
+  else if(k==="tpms"){g.beginPath();g.arc(x+8,y,7,Math.PI*0.75,Math.PI*2.25);g.stroke();g.beginPath();g.moveTo(x+2,y+5);g.lineTo(x+14,y+5);g.stroke();g.font="800 10px system-ui";g.textAlign="center";g.fillText("!",x+8,y)}
+  else if(k==="belt"){g.beginPath();g.arc(x+8,y-5,2.4,0,7);g.fill();g.beginPath();g.moveTo(x+8,y-2);g.lineTo(x+8,y+5);g.moveTo(x+4,y+1);g.lineTo(x+12,y+1);g.moveTo(x+8,y+5);g.lineTo(x+5,y+8);g.moveTo(x+8,y+5);g.lineTo(x+11,y+8);g.stroke();g.beginPath();g.moveTo(x+4,y-3);g.lineTo(x+13,y+5);g.stroke()}
+  else if(k==="airbag"){g.beginPath();g.arc(x+5,y-5,2.4,0,7);g.fill();g.beginPath();g.moveTo(x+5,y-2);g.lineTo(x+6,y+6);g.lineTo(x+11,y+6);g.stroke();g.beginPath();g.arc(x+14,y-1,4,0,7);g.stroke()}
+  else{g.font="800 11px 'Arial Narrow',system-ui";g.fillText(k,x,y+0.5)}
+  const w=k.length>3&&/^[A-Z]+$/.test(k)?g.measureText(k).width:18;g.restore();return w}
+// which telltales are lit (all of them for a moment at power-on, like the bulb check)
+function tclTells(){const chk=performance.now()-TCLU.pw<2200,lt=st.lights||st.night,G="#2fd35b",B="#3a7bff",A="#f5b21b",Rd="#ee3535";
+  const L=[["park",G,chk||lt],["low",G,chk||lt],["high",B,chk||(st.high&&lt)],["fog",G,chk||!!st.fog],["tcs",A,chk||(car.tcsOn&&performance.now()%300<150)],["tpms",A,chk]],
+    R=[["BRAKE",Rd,chk],["airbag",Rd,chk],["ABS",A,chk||car.abs],["PARK",Rd,chk||sys.epb],["belt",Rd,chk]];return [L.filter(t=>t[2]),R.filter(t=>t[2])]}
+function tclTellRow(g,list,x,y,right){let cx=x;if(right){let w=0;for(const t of list)w+=(t[0].length>3&&/^[A-Z]+$/.test(t[0])?t[0].length*6.4:18)+6;cx=x-w}for(const t of list)cx+=tclIcon(g,t[0],cx,y,t[1])+6}
+function tclBatt(g,x,y,f){g.strokeStyle="#9aa0a6";g.lineWidth=1;g.strokeRect(x,y-5,24,10);g.fillStyle="#9aa0a6";g.fillRect(x+24,y-2,2,4);g.fillStyle=f<0.15?"#e53935":"#22c55e";g.fillRect(x+1.5,y-3.5,21*clamp(f,0,1),7)}
+function tclPRND(g,x,y,sz,blue){g.font=FONT(sz);g.textAlign="left";g.textBaseline="middle";let cx=x;for(const c of ["P","R","N","D"]){const on=st.gear===c;g.fillStyle=on?(c==="P"||!blue?"#f2f2f2":"#3d7bff"):"#4a4d52";g.fillText(c,cx,y);cx+=g.measureText(c).width+5}}
+function tclMap(g,x,y,w,h,dark){const nh=SCR.hits?SCR.hits.length:0,ox=SCR.ox;g.save();g.beginPath();g.rect(x,y,w,h);g.clip();g.translate(x,0);SCR.mapCompact=true;SCR.mapBare=true;SCR.mapLight=!dark;try{scrMap(g,y,y+h,w,me())}catch(e){}finally{SCR.mapCompact=false;SCR.mapBare=false;SCR.mapLight=false;g.restore();SCR.ox=ox;if(SCR.hits)SCR.hits.length=nh}
+  if(dark){g.save();g.globalCompositeOperation="saturation";g.fillStyle="rgba(128,128,128,.85)";g.fillRect(x,y,w,h);g.restore()}}
+function tclViz(g,x,y,w,h){VZ.dk=true;VZ.bare=true;const nh=SCR.hits?SCR.hits.length:0;try{vizTesla(g,x,y,w,h,false)}finally{VZ.dk=null;VZ.bare=false;if(SCR.hits)SCR.hits.length=nh}}
+function tclMedia(g,x,y,s){g.fillStyle="#3a3b3e";g.fillRect(x,y,s,s);const on=SCR.radioOn&&RADIO[au.station];g.fillStyle="#8c8f94";g.font=`300 ${s*0.4}px system-ui`;g.textAlign="center";g.textBaseline="middle";g.fillText("♫",x+s/2,y+s/2);
+  if(on){g.fillStyle="#d9dadc";g.font=FONT(10);g.fillText(String(RADIO[au.station].name).slice(0,18),x+s/2,y+s+12);g.fillStyle="#8c8f94";g.font=FONT(9);g.fillText(String(RADIO[au.station].genre||"").slice(0,22),x+s/2,y+s+25)}}
+function tclTurnCard(g,x,y,w){const G=NAV.dest&&NAV.g;if(!G||G.d>3200)return;g.fillStyle="rgba(42,42,44,.94)";rr2(g,x,y,w,42,6);g.fill();g.fillStyle="#fff";g.font="700 20px system-ui";g.textAlign="left";g.textBaseline="middle";g.fillText(NAV_ARROW[G.t]||"↑",x+8,y+17);
+  g.font=FONT(9);g.fillText(distTxt(G.d),x+6,y+34);g.font=FONT(11);let t=G.t==="A"?"Destination":G.name||navText(G);while(t.length>3&&g.measureText(t).width>w-48)t=t.slice(0,-2);g.textAlign="center";g.fillText(t,x+w/2+12,y+19)}
+// the legacy power meter: an arc from -50 kW (regen, dashed yellow) through 0 at three o'clock up to 300 kW, with the recent power traced inside
+function tclPowerArc(g,cx,cy,R,P){const KS=[[-50,0.8],[0,0],[75,-0.6],[150,-1.6],[300,-2.45]],ang=p=>{p=clamp(p,-50,300);for(let i=0;i<KS.length-1;i++){const [a,aa]=KS[i],[b,bb]=KS[i+1];if(p<=b)return aa+(bb-aa)*(p-a)/(b-a)}return -2.45};
+  g.lineWidth=1.2;g.strokeStyle="#7d8085";g.beginPath();g.arc(cx,cy,R,-2.45,0);g.stroke();g.setLineDash([3,3]);g.strokeStyle="#d8b62c";g.beginPath();g.arc(cx,cy,R,0,0.8);g.stroke();g.setLineDash([]);
+  g.fillStyle="#9a9da2";g.font=FONT(9);g.textAlign="center";g.textBaseline="middle";for(const [p,l] of [[300,"300"],[150,"150"],[75,"75"],[-50,"-50"]]){const a=ang(p);g.fillText(l,cx+Math.cos(a)*(R+12),cy+Math.sin(a)*(R+10))}
+  g.strokeStyle="#7d8085";g.beginPath();g.moveTo(cx+R-4,cy);g.lineTo(cx+R+4,cy);g.stroke();g.textAlign="left";g.fillText("kW",cx+R+9,cy);
+  const a1=ang(P);g.lineWidth=5;g.strokeStyle=P<0?"#d8b62c":"#f08a24";g.beginPath();if(P>=0)g.arc(cx,cy,R-4,a1,0);else g.arc(cx,cy,R-4,0,a1);g.stroke();
+  const H_=TCLU.h,n=H_.length;if(n>2){const x0=cx-R*0.82,x1=cx+R*0.28,yb=cy-R*0.08,yk=R*0.5/150;g.beginPath();for(let i=0;i<n;i++){const xx=x0+(x1-x0)*i/(n-1),yy=yb-clamp(H_[i],-50,150)*yk;i?g.lineTo(xx,yy):g.moveTo(xx,yy)}
+    g.lineWidth=1.3;g.strokeStyle="#f08a24";g.stroke();g.lineTo(x1,yb);g.lineTo(x0,yb);g.closePath();const gr=g.createLinearGradient(0,yb-R*0.5,0,yb);gr.addColorStop(0,"rgba(240,138,36,.35)");gr.addColorStop(1,"rgba(240,138,36,0)");g.fillStyle=gr;g.fill();
+    g.setLineDash([2,2]);g.strokeStyle="rgba(220,220,220,.35)";g.lineWidth=1;g.beginPath();g.moveTo(x0,yb-tclWhMi()/4*yk*0.5);g.lineTo(x1,yb-tclWhMi()/4*yk*0.5);g.stroke();g.setLineDash([]);g.fillStyle="#fff";g.beginPath();g.arc(x1,yb-clamp(H_[n-1],-50,150)*yk,2.5,0,7);g.fill()}
+  g.textAlign="center";g.fillStyle="#d9dadc";g.font=FONT(12);g.fillText(`Avg. ${st.power===false||!st.started?0:tclWhMi()} Wh/mi`,cx-8,cy+R*0.42);g.fillStyle="#8c8f94";g.font=FONT(8);g.fillText("Past 30 mi",cx-8,cy+R*0.42+13)}
+function tclLegClu(g,W,H,v){const P=tclTick(),T=TRIMS[st.trim],Hy=car.hyb,park=st.gear==="P"&&v<0.3,off=st.power===false||!st.started,mph=st.units==="mph";
+  let gr=g.createRadialGradient(W/2,H*0.62,10,W/2,H*0.55,W*0.55);gr.addColorStop(0,"#3a3b3e");gr.addColorStop(1,"#232427");g.fillStyle=gr;g.fillRect(0,0,W,H);
+  const [tl,trr]=tclTells();tclTellRow(g,tl,18,20,false);tclTellRow(g,trr,W-16,20,true);
+  const [tm,ap]=tclTime(),rng=Math.round(mph?evRange()/1.609:evRange());
+  if(park){g.save();g.fillStyle="#6d7075";g.font="300 22px Georgia,'Times New Roman',serif";g.textAlign="center";g.textBaseline="middle";const nm=modelOf()==="tsl_modelx20"?"X":"S";
+      g.fillText("M",W/2-52,42);g.font="300 16px Georgia,'Times New Roman',serif";g.fillText("O D E L",W/2-8,44);g.font="300 22px Georgia,'Times New Roman',serif";g.fillText(nm,W/2+40,42);g.restore();
+    tclViz(g,W/2-112,58,224,150);gr=g.createRadialGradient(W/2,133,60,W/2,133,125);gr.addColorStop(0,"rgba(46,47,50,0)");gr.addColorStop(1,"rgba(46,47,50,1)");g.fillStyle=gr;g.fillRect(W/2-112,58,224,150);
+    tclMedia(g,56,70,96)}
+  else{if(NAV.dest){tclMap(g,0,0,232,H-30,true);tclTurnCard(g,16,H-84,140)}else tclMedia(g,62,58,96);if(NAV.dest){gr=g.createLinearGradient(150,0,232,0);gr.addColorStop(0,"rgba(42,43,46,0)");gr.addColorStop(1,"rgba(42,43,46,1)");g.fillStyle=gr;g.fillRect(150,0,83,H)}
+    tclViz(g,W/2-95,84,190,H-96);gr=g.createLinearGradient(0,84,0,124);gr.addColorStop(0,"rgba(48,49,52,1)");gr.addColorStop(1,"rgba(48,49,52,0)");g.fillStyle=gr;g.fillRect(W/2-95,84,190,40);
+    for(const [a,b] of [[W/2-95,W/2-65],[W/2+95,W/2+65]]){gr=g.createLinearGradient(a,0,b,0);gr.addColorStop(0,"rgba(45,46,49,1)");gr.addColorStop(1,"rgba(45,46,49,0)");g.fillStyle=gr;g.fillRect(Math.min(a,b),84,30,H-96)}
+    g.textAlign="center";g.textBaseline="middle";g.fillStyle="#f4f4f4";g.font="300 38px system-ui";g.fillText(Math.round(spdUnit(v)),W/2,40);g.font=FONT(9);g.fillStyle="#9a9da2";g.fillText(mph?"mph":"km/h",W/2,64);
+    if(st.pilot||has("pilot")){g.fillStyle=st.pilot?"#2f7bff":"#55585d";g.beginPath();g.arc(W/2-80,38,10,0,7);g.fill();g.strokeStyle="#fff";g.lineWidth=1.6;g.beginPath();g.arc(W/2-80,38,5.5,0,7);g.stroke();g.beginPath();g.moveTo(W/2-85.5,38);g.lineTo(W/2-74.5,38);g.moveTo(W/2-80,38);g.lineTo(W/2-80,43.5);g.stroke()}
+    if(st.acc){g.strokeStyle="#2f7bff";g.lineWidth=1.5;g.beginPath();g.arc(W/2-52,38,10,0,7);g.stroke();g.fillStyle="#fff";g.font="700 6px system-ui";g.fillText("MAX",W/2-52,34);g.font="700 9px system-ui";g.fillText(Math.round(spdUnit(st.accSet)),W/2-52,42)}
+    if(sys.limit){const x=W/2+46,y=24;g.fillStyle="#e9e9e9";rr2(g,x,y,20,26,3);g.fill();g.fillStyle="#111";g.font="700 4.5px system-ui";g.fillText("SPEED",x+10,y+5);g.fillText("LIMIT",x+10,y+9.5);g.font="700 11px system-ui";g.fillText(sys.limit,x+10,y+18)}
+    if((st.signal===-1||st.hazard)&&st.blink){g.fillStyle="#2fd35b";g.font="700 18px system-ui";g.fillText("◀",W/2-118,40)}if((st.signal===1||st.hazard)&&st.blink){g.fillStyle="#2fd35b";g.font="700 18px system-ui";g.fillText("▶",W/2+82,40)}}
+  tclPowerArc(g,W-148,118,72,off?0:P);
+  g.textBaseline="middle";tclBatt(g,76,H-14,socShow(Hy));g.fillStyle="#e6e6e6";g.font=FONT(12);g.textAlign="left";g.fillText(`${rng} ${mph?"mi":"km"}`,108,H-14);
+  if(off){g.fillText("Car Off",160,H-14)}else tclPRND(g,160,H-14,11,true);
+  g.textAlign="left";g.fillStyle="#e6e6e6";g.font=FONT(12);g.fillText(tm,W-152,H-14);g.fillStyle="#9a9da2";g.font=FONT(9);g.fillText(ap,W-152+g.measureText(tm).width*1.35+3,H-13);g.fillStyle="#e6e6e6";g.font=FONT(12);g.fillText(tclTemp(),W-96,H-14)}
+function tclRefClu(g,W,H,v){const P=tclTick(),T=TRIMS[st.trim],Hy=car.hyb,park=st.gear==="P"&&v<0.3,off=st.power===false||!st.started,mph=st.units==="mph";
+  g.fillStyle="#1c1c1d";g.fillRect(0,0,W,H);const [tl,trr]=tclTells();tclTellRow(g,tl,72,26,false);tclTellRow(g,trr,W-74,26,true);const [tm,ap]=tclTime();
+  if(park){tclViz(g,W/2-150,30,300,190);let gr=g.createRadialGradient(W/2,125,70,W/2,125,165);gr.addColorStop(0,"rgba(28,28,29,0)");gr.addColorStop(1,"rgba(28,28,29,1)");g.fillStyle=gr;g.fillRect(W/2-150,30,300,190);
+    tclBatt(g,74,H-26,socShow(Hy));g.fillStyle="#e6e6e6";g.font=FONT(12);g.textAlign="left";g.textBaseline="middle";g.fillText(`${Math.round(socShow(Hy)*100)}%`,104,H-26);g.fillText(tclTemp(),150,H-26)}
+  else{if(NAV.dest){tclMap(g,0,0,232,H-34,true);let gr=g.createLinearGradient(150,0,232,0);gr.addColorStop(0,"rgba(28,28,29,0)");gr.addColorStop(1,"rgba(28,28,29,1)");g.fillStyle=gr;g.fillRect(150,0,83,H);tclTurnCard(g,52,H-82,150)}
+    tclViz(g,W/2-118,34,236,H-48);for(const [a,b] of [[W/2-118,W/2-80],[W/2+118,W/2+80]]){const gr=g.createLinearGradient(a,0,b,0);gr.addColorStop(0,"rgba(28,28,29,1)");gr.addColorStop(1,"rgba(28,28,29,0)");g.fillStyle=gr;g.fillRect(Math.min(a,b),34,38,H-48)}
+    {const gr=g.createLinearGradient(0,34,0,74);gr.addColorStop(0,"rgba(28,28,29,1)");gr.addColorStop(1,"rgba(28,28,29,0)");g.fillStyle=gr;g.fillRect(W/2-118,34,236,40)}
+    if(sys.limit){const x=W/2+86,y=26;g.fillStyle="#e2e2e2";rr2(g,x,y,22,28,3);g.fill();g.fillStyle="#111";g.font="700 4.5px system-ui";g.textAlign="center";g.fillText("SPEED",x+11,y+6);g.fillText("LIMIT",x+11,y+10.5);g.font="700 11px system-ui";g.fillText(sys.limit,x+11,y+20)}
+    g.textAlign="center";g.textBaseline="middle";g.fillStyle="#fafafa";g.font="600 50px system-ui";g.fillText(Math.round(spdUnit(v)),W-118,120);g.fillStyle="#6c6f74";g.font=FONT(8);g.fillText(mph?"MPH":"KM/H",W-118,150);
+    if(st.acc){g.fillStyle="#f0f0f0";g.font=FONT(15);g.fillText(Math.round(spdUnit(st.accSet)),W-60,108);g.fillStyle=st.pilot?"#2f7bff":"#3e6fc4";g.font="700 7px system-ui";g.fillText("MAX",W-60,121)}
+    if(st.pilot){g.fillStyle="#2f7bff";g.beginPath();g.arc(W-60,78,8,0,7);g.fill();g.strokeStyle="#fff";g.lineWidth=1.4;g.beginPath();g.arc(W-60,78,4.5,0,7);g.stroke()}
+    if((st.signal===-1||st.hazard)&&st.blink){g.fillStyle="#2fd35b";g.font="700 18px system-ui";g.fillText("◀",W/2-140,60)}if((st.signal===1||st.hazard)&&st.blink){g.fillStyle="#2fd35b";g.font="700 18px system-ui";g.fillText("▶",W/2+140,60)}
+    const rng=Math.round(mph?evRange()/1.609:evRange());tclBatt(g,74,H-26,socShow(Hy));g.fillStyle="#e6e6e6";g.font=FONT(12);g.textAlign="left";g.fillText(`${rng} ${mph?"mi":"km"}`,104,H-26);g.fillText(tclTemp(),104+g.measureText(`${rng} ${mph?"mi":"km"}`).width+12,H-26)}
+  // power bar: white to the right of zero when driving, green to the left under regen; the dotted end is power held back (cold battery or full charge)
+  {const x0=W/2-115,x1=W/2+115,z=x0+(x1-x0)*0.62,y=H-11,lim=(Hy.btK??1)<0.95||socShow(Hy)>0.95;g.fillStyle="#3a3b3e";g.fillRect(x0,y,(lim?(x1-x0)*0.8:(x1-x0)),3);if(lim){g.fillStyle="#3a3b3e";for(let xx=x0+(x1-x0)*0.82;xx<x1;xx+=5)g.fillRect(xx,y,2,3)}
+    const f=off?0:clamp(P/Math.max(100,T.kW||300),-0.4,1);g.fillStyle=f<0?"#22c55e":"#d6d6d6";if(f>=0)g.fillRect(z,y,(x1-z)*f,3);else g.fillRect(z+(z-x0)*f/0.4,y,-(z-x0)*f/0.4,3)}
+  g.textAlign="left";g.textBaseline="middle";if(off){g.fillStyle="#e6e6e6";g.font=FONT(12);g.fillText("P",W-162,H-26)}else tclPRND(g,W-176,H-26,12,true);g.fillStyle="#e6e6e6";g.font=FONT(12);g.fillText(tm,W-118,H-26);g.fillStyle="#8c8f94";g.fillText(ap,W-118+g.measureText(tm).width+4,H-26)}
 function drawCluster(){
   scrRes();const g=CLU.g,W=CLU.W,H=CLU.H,T=TRIMS[st.trim],Hy=car.hyb,D=DRIVES[st.trim],v=Math.abs(car.vx),F=FONT;g.setTransform(CLU.k,0,0,CLU.k,0,0);
   g.fillStyle="#020405";g.fillRect(0,0,W,H);
   if(st.power===false&&sys.roaT>0){RAV19.pw=false;roaCluster(g,W,H);gl.bindTexture(gl.TEXTURE_2D,CLU.tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);(cluFcw(),gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,CLU.cv));gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);return}
   if(st.power===false){RAV19.pw=false;gl.bindTexture(gl.TEXTURE_2D,CLU.tex);(cluFcw(),gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,CLU.cv));return}
+  if(isTesla()&&(tslLeg()||/^(models_|modelx)$/.test(modelOf()))){CLU.noNav=true;try{(tslLeg()?tclLegClu:tclRefClu)(g,W,H,v)}finally{cluUpload();CLU.noNav=false}return}
   if(isTesla()){vizTesla(g,0,0,W,H,false);cluNav(g,W,H);gl.bindTexture(gl.TEXTURE_2D,CLU.tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);(cluFcw(),gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,CLU.cv));gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);return}
+  if(isEx20()){drawEx20Cluster(g,W,H,v);cluUpload();return}
   const CLASSIC=/^(bmw_535i11|bmw_ah7_11|lin_towncar03)$/.test(modelOf());if(ANALOG.has(st.trim)||CLASSIC||isVolvo()){if(ANALOG.has(st.trim)||CLASSIC)drawAnalogCluster(g,W,H,T,Hy,D,v);else drawVolvoCluster(g,W,H,T,Hy,v);cluNav(g,W,H);gl.bindTexture(gl.TEXTURE_2D,CLU.tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);(cluFcw(),gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,CLU.cv));gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);return}
   if(isJLR()&&!cluAnalog()){jlrCluster(g,W,H,v);cluUpload();return}
   if(fullMapOK()&&!cluAnalog()){drawFullMapCluster(g,W,H,v);cluUpload();return}
@@ -14682,8 +14796,8 @@ function slLights(){SLU.fill(0);const nt=clamp(1-(GT.D??1)*1.4,0,1);if(nt>0.02&&
 let dynFrame=-1;
 function dynBuild(eye,cm){if(dynFrame===GFX.frame)return;dynFrame=GFX.frame;CHARS=[];const ex=eye[0],ey=-eye[2],near=(x,y,r)=>(x-ex)*(x-ex)+(y-ey)*(y-ey)<r*r;if(W2)try{w2Dyn(near)}catch(e){console.error(e)}
   for(const H of OPEN_HOUSES){const g=H.gdoor;if(!g||!near(g.x,g.y,160))continue;dBox("gdoor",g.x,g.y,g.open*2.15,5.3,2.28,0.08,g.h);if(H.i!==HOME.i&&near(H.door0[0],H.door0[1],90)){const q=H.P(H.ox-1.6,H.D2+3.2);dBox("post",q[0],q[1],0,0.06,1.1,0.06,H.a);dBox("forsale",q[0],q[1],0.75,0.7,0.45,0.04,H.a)}}
-  for(const p of peds)if(near(p.wx,p.wy,170)){if(p.mode!=="down"&&near(p.wx,p.wy,90)){if(p.mk===undefined){const r=Math.random();p.mk=r<0.42?"Adult_Man":r<0.84?"Adult_Woman":"Child";p.dog=Math.random()<0.18?(Math.random()<0.5?"Dog_Golden":"Dog_Brown"):null;p.sd=Math.random()}
-    if(charQueue(p.mk,p.wx,p.wy,p.wz||0,p.wh,Math.abs(p.v??1.2),p.sd)){if(p.dog){const c=Math.cos(p.wh),s_=Math.sin(p.wh);charQueue(p.dog,p.wx+c*0.9-s_*0.5,p.wy+s_*0.9+c*0.5,p.wz||0,p.wh,Math.abs(p.v??1.2),p.sd+0.3)}continue}}personInto(p.wx,p.wy,p.wz,p.wh,p.ph,p,p.mode==="down"?"down":"walk")}
+  for(const p of peds)if(near(p.wx,p.wy,170)){if(p.mode!=="down"&&near(p.wx,p.wy,90)){if(p.mk===undefined){const r=Math.random();p.mk=r<0.16?"Child":pplPick();p.dog=Math.random()<0.18?(Math.random()<0.5?"Dog_Golden":"Dog_Brown"):null;p.sd=Math.random()}
+    if(charQueue(p.mk,p.wx,p.wy,p.wz||0,p.wh,Math.abs(p.v??1.2),p.sd,p.waveT>st.clock&&Math.abs(p.v||0)<0.3?"wave":null)){if(p.dog){const c=Math.cos(p.wh),s_=Math.sin(p.wh);charQueue(p.dog,p.wx+c*0.9-s_*0.5,p.wy+s_*0.9+c*0.5,p.wz||0,p.wh,Math.abs(p.v??1.2),p.sd+0.3)}continue}}personInto(p.wx,p.wy,p.wz,p.wh,p.ph,p,p.mode==="down"?"down":"walk")}
   for(const c of cars){if(!near(c.wx,c.wy,220))continue;if(c.kind==="bike")riderInto(c);else if(c.kind==="cone")coneInto(c)}
   for(const d of EV.crit)if(near(d.wx,d.wy,250))deerInto(d);
   for(let k=EXH_PUFF.length-1;k>=0;k--){const q=EXH_PUFF[k];q.t+=1/60;if(q.t>2.6){EXH_PUFF.splice(k,1);continue}q.x+=q.vx/60;q.y+=q.vy/60;q.z+=0.25/60;const sz=(0.12+q.t*0.45)*q.s;dBox("exh",q.x,q.y,q.z,sz,sz,sz,q.t)}
@@ -14720,11 +14834,11 @@ function dynBuild(eye,cm){if(dynFrame===GFX.frame)return;dynFrame=GFX.frame;CHAR
   accessoriesInto(cm);trainInto(eye);if(DALE.p.length||DALE.pools.length)daleInto();if(COP.chase.length||COP.spikes.length)copInto();if(EV.list.some(v=>v.beacons))evBeaconInto();try{trlParkedInto()}catch(e){}if(TRL.on)trlInto();if(GIG.online&&GIG.svc==="taxi"&&!st.walk){if(!DMAT.taxiS)DMAT.taxiS=[[1,0.85,0.1],[0.9,0.7,0.05],0.6,40];const h_=(VEH.height||(MODELS[TRIMS[st.trim].model]&&MODELS[TRIMS[st.trim].model].meta.height)||1.5)+0.12,p=M4.p(cm,[0,h_,0.2]);oBox("taxiS",p[0],-p[2],p[1],0.3,0.18,0.75,car.psi,0)}try{dmgInto(cm)}catch(e){}if(RW.zones.length)rwInto(ex,ey);dynUpload()}
 function segBox(k,A,B,th,wd){const d=[B[0]-A[0],B[1]-A[1],B[2]-A[2]],len=Math.hypot(...d)||1e-3,hz=Math.hypot(d[0],d[1]);oBox(k,(A[0]+B[0])/2,(A[1]+B[1])/2,(A[2]+B[2])/2,th,len,wd,Math.atan2(d[1],d[0]),Math.atan2(hz,d[2]))}
 // hip point of the seat under an eye point: the car's own seat cushion when the model has seats, else a set drop below the eye
-let PLAYER_MK="Adult_Man";try{const c=localStorage.getItem("mstrata.char");if(c==="Adult_Woman"||c==="Adult_Man")PLAYER_MK=c}catch(e){}   // the player is the same person on foot and at the wheel
+let PLAYER_MK="Adult_Man";try{const c=localStorage.getItem("mstrata.char");if(/^(Adult_Woman|Adult_Man|Person_A|Person_B)$/.test(c))PLAYER_MK=c}catch(e){}   // the player is the same person on foot and at the wheel
 function seatHip(seats,E){let b=null,bd=0.45;if(seats)for(const q of seats){const d=Math.abs(q[0]-E[0])+Math.abs(q[2]-E[2])*0.5;if(d<bd){bd=d;b=q}}
   return b?[clamp(b[1]-0.05,E[1]-0.74,E[1]-0.5),clamp(b[2],E[2]-0.05,E[2]+0.25)]:[E[1]-0.66,E[2]+0.08]}
-function seatedInto(M,h,E,W_,o,drive){if(o&&o.skin!==4){const k=o.mk||(o.skin===2||(o.shirt||0)%2?"Adult_Woman":"Adult_Man");if(accGet(k)){const hp=o.hip||[E[1]-0.66,E[2]+0.08];   // the model's hip joint sits 0.97 m above its feet
-    const A_=ACCM[k],sh_=A_&&A_.seatHip&&A_.anims&&A_.anims.seat?A_.seatHip:null;CHARS.push({k,sd:(E[0]+E[2])*3.1,M:sh_?chain(M,M4.T(E[0],hp[0]-sh_[1],hp[1]+sh_[2]),M4.rY(Math.PI)):chain(M,M4.T(E[0],hp[0]-0.97,hp[1]),M4.rY(Math.PI)),pose:"sit",skip:o.noHead?["head"]:null});return}}const wp=l=>{const q=M4.p(M,l);return [q[0],-q[2],q[1]]};   // car-local point -> world [x, y, height]
+function seatedInto(M,h,E,W_,o,drive){if(o&&o.skin!==4){const k=o.mk||(o.shirt===0?"Person_A":o.shirt===3?"Person_B":o.skin===2||(o.shirt||0)%2?"Adult_Woman":"Adult_Man");if(accGet(k)){const hp=o.hip||[E[1]-0.66,E[2]+0.08];   // the model's hip joint sits 0.97 m above its feet
+    const A_=ACCM[k],sh_=A_&&A_.seatHip&&A_.anims&&A_.anims.seat?A_.seatHip:null;CHARS.push({k,sd:(E[0]+E[2])*3.1,M:sh_?chain(M,M4.T(E[0],hp[0]-sh_[1],hp[1]+sh_[2]),M4.rY(Math.PI)):chain(M,M4.T(E[0],hp[0]-0.97,hp[1]),M4.rY(Math.PI)),pose:"sit",drv:!!(drive&&W_),skip:o.noHead?["head"]:null});return}}const wp=l=>{const q=M4.p(M,l);return [q[0],-q[2],q[1]]};   // car-local point -> world [x, y, height]
   const sk="skin"+o.skin,sh="shirt"+o.shirt,pa="pants"+(o.pants||0),x=E[0];
   const hip=wp([x,E[1]-0.6,E[2]+0.08]),sho=wp([x,E[1]-(o.noHead?0.24:0.14),E[2]+0.17]);
   segBox(sh,hip,sho,0.24,0.42);for(const sd of [1,-1]){const H=wp([x+0.1*sd,E[1]-0.6,E[2]+0.08]),K=wp([x+0.1*sd,E[1]-0.5,E[2]-0.36]),F=wp([x+0.1*sd,E[1]-0.98,E[2]-0.46]);
@@ -15260,7 +15374,7 @@ function act(a){ if(a==="codes"){closeDrawer();codeOpen();return} if(typeof a===
     case "rcta":st.rcta=st.rcta===false;toast(st.rcta!==false?"Rear cross traffic alert on":"Rear cross traffic alert off");break;
     case "esa":st.esa=!st.esa;st.esaOff=!st.esa;if(!st.esa){sys.esa=null;sys.esaDelta=0}toast(st.esa?"Evasive steering assist on":"Evasive steering assist off");break;
     case "kThr:1":case "kThr:2":case "kThr:3":case "kThr:4":{const v=[0.3,0.5,0.75,1][+a.slice(-1)-1];st.kThr=v;try{localStorage.setItem("strata.kThr",v)}catch(e){}toast(`Gas strength: ${GAS_N[v]} (${Math.round(v*100)}% max). W / the gas pedal now ${v<1?"never goes full throttle":"goes full throttle"}`);break}
-    case "char:Adult_Man":case "char:Adult_Woman":PLAYER_MK=a.slice(5);try{localStorage.setItem("mstrata.char",PLAYER_MK)}catch(e){}toast(`Character: ${PLAYER_MK==="Adult_Man"?"man":"woman"}`);break;
+    case "char:Adult_Man":case "char:Adult_Woman":case "char:Person_A":case "char:Person_B":PLAYER_MK=a.slice(5);try{localStorage.setItem("mstrata.char",PLAYER_MK)}catch(e){}toast(`Character: ${{Adult_Man:"man",Adult_Woman:"woman",Person_A:"Person A",Person_B:"Person B"}[PLAYER_MK]}`);break;
     case "uihide":hudHide();break;
     case "trl:utility":case "trl:camper":case "trl:boat":closeDrawer();trlSet(a.slice(4));return;
     case "trl:off":trlSet(null);return;
@@ -15415,7 +15529,7 @@ const TABS={
     <h3>Drive mode</h3><div class="grid2">${Array.from({length:dmList()?T.modes:MODES.length},(_,i)=>opt(`data-mode="${i}"`,i===st.mode,modeName(i),dmList()?MD(i).d:["Soft throttle, normal height","Direct throttle"+(T.height?", −0.8 in":""),"Loosest TCS/ESC"+(T.height?", −1.2 in":"")][i],i>=T.modes)).join("")}</div>${(()=>{const S=mmSpec();if(!S)return "";const o=mmGet(),on=MD().type==="custom";return `<h3>My Mode settings${on?" · active now":""}</h3><div class="std">Set each one like the car's Drive Mode app (pencil icon). Pick <b>My Mode</b> above to drive with them.</div>`+S.map(([id,n,opts])=>`<div class="rcRow"><span>${n}</span><div class="seg5">${opts.map((x,i)=>`<button class="${o[id]===x?"on":""}" data-mym="${id}:${i}">${x}</button>`).join("")}</div></div>`).join("")})()}
     <h3>HUD size</h3><div class="grid2">${[[0.7,"Small"],[0.82,"Medium"],[0.92,"Large"],[1,"Extra large"]].map(([v,n])=>opt(`data-a="uiz:${v}"`,Math.abs((st.uiz||(PC.on?0.82:0.85))-v)<0.04,n,v===0.82?"Default":"")).join("")}${opt(`data-a="uihide"`,document.body.classList.contains("uihide"),"Hide the HUD","Eye button top left, or F2")}</div>
     <h3>HUD colors</h3><div class="grid2">${opt(`data-a="hudTheme:dark"`,st.hudTheme!=="ivory","Graphite","Dark warm panels with champagne gold")}${opt(`data-a="hudTheme:ivory"`,st.hudTheme==="ivory","Ivory","Light cream panels with champagne gold")}</div>
-    <h3>Your character</h3><div class="grid2">${[["Adult_Man","Man","On foot and at the wheel"],["Adult_Woman","Woman","On foot and at the wheel"]].map(([k,n,d])=>opt(`data-a="char:${k}"`,PLAYER_MK===k,n,d)).join("")}</div>
+    <h3>Your character</h3><div class="grid2">${[["Adult_Man","Man","On foot and at the wheel"],["Adult_Woman","Woman","On foot and at the wheel"],["Person_A","Person A","More detailed · holds the wheel"],["Person_B","Person B","More detailed · holds the wheel"]].map(([k,n,d])=>opt(`data-a="char:${k}"`,PLAYER_MK===k,n,d)).join("")}</div>
     <h3>Controls</h3><div class="grid2">${opt(`data-a="tutorial"`,false,"Show the tutorial","The short first-drive guide")}${manOK()?opt(`data-a="manual"`,!!st.manual,"Manual gearbox with clutch","Shift = clutch, Q = up a gear, E = down. On phones: the buttons on the right. Let the clutch out at too few revs and it stalls"):""}${opt(`data-a="whlSetup"`,!!(WHL.cfg&&WHL.cfg.gas!=null),"Steering wheel","Set up a USB wheel and pedals, paddles and force feedback")}${opt(`data-a="susSetup"`,!!tuneCur().co,"Suspension setup","Coilovers: ride height, springs, dampers, anti-roll bars and camber, on a live diagram")}${opt(`data-a="mouseSteer"`,!!st.mouseSteer,"Mouse steering","Move the mouse left / right to steer · left button gas · right button brake")}${opt(`data-a="roa"`,st.roa!==false,"Rear Seat Reminder","Chimes and a cluster warning when you switch off")}${opt(`data-a="police"`,st.police!==false,"Police","Speeding past a cruiser gets you pulled over; run and you get wanted stars")}${XR.ok?opt(`data-a="vr"`,XR.on,XR.on?"Exit VR":"Enter VR (Quest)","Right trigger gas, left trigger brake, left stick steers. A Drive/Reverse, B Park, right stick signals/high beams/wipers, right grip view, X horn, Y lights, left grip parking brake or clutch, left stick click engine"):""}</div>
     ${brandS()==="Lucid"?`<h3>Cluster screen (J)</h3><div class="grid2">${cluViews().map(([k,n],i)=>opt(`data-a="cluv:${i}"`,cluView()[0]===k,n,"")).join("")}</div>`:""}
     ${brandS()==="BMW"&&!cluAnalog()?`<h3>BMW display style</h3><div class="grid2">${BMW_STY.map((n,i)=>opt(`data-a="bmwc:${i}"`,(st.bmwClu??1)===i,n,["Round gauges, car in the middle","Live Cockpit chevrons","Hexagons with an economy bar","Speed and gear in the middle, slim arcs","Bold red arcs, speed and gear","One sweeping speed bar","Round needle dials like the F-series X5"][i])).join("")}${opt('data-a="bmwf"',st.bmwFollow!==false,"Follow drive mode",st.bmwFollow!==false?"On: Sport shows the red Track layout, Eco Pro the blue Ergonomic one":"Off: always your style")}</div>`:""}
@@ -15595,7 +15709,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=306;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="173",BUILD_VER=307;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}try{const P=JSON.parse(localStorage.getItem("strata.ped")||"null");if(P){st.pedHold=+P.pedHold||0;st.thrRate=+P.thrRate||2;st.brkRate=+P.brkRate||2}}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){const k=GFX.q==="auto"?GFX.eff:GFX.q;if(G.k!==k||G.v!==GFX.ovV||!G.m){G.k=k;G.v=GFX.ovV;const m={...GQ[k]};for(const o of GOPT)if(GFX.ov[o[0]]!==undefined)Object.assign(m,o[4](GFX.ov[o[0]]));if(Object.keys(GFX.ov).length)m.label=GQ[k].label+" (custom)";G.m=m;COLL.nt=!m.trees}return G.m}
