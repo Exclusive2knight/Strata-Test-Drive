@@ -1273,8 +1273,21 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
 <script data-boot>(function(){var p=0;window.__bootP=0;var t=setInterval(function(){if(window.__bootReal){clearInterval(t);return}p+=(0.7-p)*0.025;window.__bootP=p;var a=document.getElementById("bootArc"),n=document.getElementById("bootNeedle"),c=document.getElementById("bootPct");if(a)a.setAttribute("stroke-dasharray",(p*100).toFixed(1)+" 100");if(n)n.style.setProperty("--a",(-135+p*270)+"deg");if(c)c.textContent=String(Math.round(p*100))},120)})()</script>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 309 · New people everywhere, hands on the wheel, busy chargers</h2></div>
+    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 310 · Realistic emergency braking, lane keeping settings, invisible people fix</h2></div>
     <div class="nb">
+      <h4>Realistic emergency braking, lane keeping settings, invisible people fix</h4><ul>
+      <li><b>Emergency braking works in stages, like real cars:</b>
+        <ul><li>First the warning.</li>
+        <li>If you don't react, a short brake jolt to get your attention.</li>
+        <li>Then partial braking (about 0.4 g) that keeps going and steps up as needed.</li>
+        <li>Then full emergency braking, stopping a few feet short.</li></ul>
+        It also stops you if you creep toward something at low speed.</li>
+      <li><b>Brake assist:</b> if you brake for a hazard but not hard enough, AEB adds the rest.</li>
+      <li><b>You can override it:</b> floor the accelerator or steer hard around the obstacle and AEB lets go, as in real cars.</li>
+      <li><b>After an AEB stop:</b> the car holds you for about 2 seconds, then reminds you to press the brake.</li>
+      <li><b>Warning timing settings:</b> Early, Normal and Late now change when the warning, partial braking and full braking start. Early: 3, 2 and 1.4 seconds before impact. Normal: 2.5, 1.6 and 1.1. Late: 2, 1.3 and 0.9.</li>
+      <li><b>Lane keeping settings:</b> choose what it does (Alert + Aid, Aid only, or Alert only) and how sensitive it is. High steps in as soon as you start to drift, Standard as you reach the line, and Low only right at the line. They're on the Assists page and in the car's driver assistance settings.</li>
+      <li><b>Invisible pedestrians fixed:</b> if one person or passenger failed to draw, everyone after them in the list stopped being drawn too, but you could still hit them. Each person is now drawn on their own, so one problem can't make the rest invisible.</li></ul>
       <h4>New people everywhere, hands on the wheel, busy chargers</h4><ul>
       <li><b>Only the new people:</b> the old man, woman and child models are gone. Everyone you see walking, riding bikes, waiting at crossings or sitting in cars is now Person A or Person B. If you played as the old man you're now Person A, and the old woman becomes Person B.</li>
       <li><b>Really holding the wheel:</b> drivers (you and the AI) now sit in the seat with both hands on the actual rim of the steering wheel at about 9 and 3, in every car. The hands turn with the wheel as you steer.</li>
@@ -5637,6 +5650,9 @@ function pedTick(dt){if(st.people===false){peds=[];return}
   const want=Math.round(G().traffic*0.9);
   if(peds.length<want){const s=pedSpot(60,330);if(s){const p=newPed(s.e,s.u,s.side);const q=pedPos(p);p.wx=q[0];p.wy=q[1];p.wz=q[2];peds.push(p)}}
   for(const p of peds){if(p.mode==="scr")continue;p.ph+=p.v*dt*4.2;
+    // keep people off the road graph (shoppers, crossers, people getting off the bus, the knocked down) standing on the real ground: a shopper at a store
+    // on a hill used to stay at height 0, under the ground, where you couldn't see them but could still hit them
+    if(p.mode!=="walk"&&(p.gzT=(p.gzT||0)-dt)<=0&&p.wx!==undefined){p.gzT=0.35;const g0=GREF;GREF=p.wz||0;const g=groundAt(p.wx,p.wy);GREF=g0;if(g&&isFinite(g.h))p.wz=g.h}
     if(p.mode==="down"){p.v=0;p.downT-=dt;if(p.downT<=0){if(p.site){p.mode="shop";continue}p.mode="walk";const q=pedPos(p);p.wx=q[0];p.wy=q[1]}continue}
     pedSmart(p,dt);pedHorn(p,dt);
     if(p.mode==="board"){if(pedTarget(p,p.tx,p.ty,p.v0*1.2,dt)||!(p.bus&&cars.includes(p.bus)&&p.bus.tStop>0))p.gone=true;continue}
@@ -9308,7 +9324,9 @@ const HUD_STD=["acc_touring20","escalade_pl","escalade","escaladeV","q5_prest","
 const hudStd=()=>HUD_STD.includes(st.trim)||pkgHud()||(typeof bdSel==="function"&&bdSel(st.trim).op.some(o=>o[5].includes("hud"))),hudOffered=()=>hudStd()||HUD_OPT.includes(st.trim)||!TRIMS[st.trim].real;
 const hasHUD=()=>hudStd()||(st.extras.hud&&hudOffered());
 const hasDash=()=>st.extras.dashcam||!!TRIMS[st.trim].tesla;   // Tesla records from its own cameras
-const AEBS={early:[2.8,1.9,1.4],normal:[2.3,1.5,1.1],late:[1.8,1.2,0.9]},aebT=i=>(AEBS[st.aebSens]||AEBS.normal)[i];
+// lane keeping sensitivity: [start nudging at this offset (m), or when heading for this offset, within this many seconds, nudge strength, warn past this offset]
+const LKS={high:[0.25,0.6,1.2,1.25,0.6],standard:[0.4,0.75,0.9,1,0.8],low:[0.55,0.9,0.6,0.8,0.95]};
+const AEBS={early:[3.0,2.0,1.4],normal:[2.5,1.6,1.1],late:[2.0,1.3,0.9]},aebT=i=>(AEBS[st.aebSens]||AEBS.normal)[i];
 const DASH={clips:[]};
 // fit the accessories to the actual body: roof rails on the roof, the deflector on the hood's front edge, flaps behind the wheels
 const ACCFIT={};
@@ -9636,19 +9654,31 @@ function assist(dt){
   const evading=sys.esa&&lead&&Math.abs(lead.lat-latPred(lead.ds))>1.2;
   if(st.aeb&&has("aeb")&&st.gear==="D"&&sp>2&&!evading&&!(lead&&lead.o&&lead.o.kind==="cone")){   // cones never set off FCW / AEB (only cars that really have forward collision warning / AEB
     const sure=sys.leadT>(lead&&lead.vru?0.12:0.25);
-    if(ttc<aebT(0)&&inp.brk<0.6&&sure&&reqDec>2&&!(TOPT.fcwOff&&isTesla()))sys.fcw=true;
+    if(ttc<aebT(0)&&inp.brk<0.6&&sure&&reqDec>2&&!(TOPT.fcwOff&&isTesla())&&st.fcwOff!==true)sys.fcw=true;
+    // like the real systems, in stages: the warning, then a short brake jolt if you haven't reacted, then partial braking, then full braking
+    if(ttc<aebT(0)&&sure&&reqDec>2){sys.fcwT=(sys.fcwT||0)+dt;if(st.aebAuto!==false&&sys.fcwT>0.55&&inp.brk<0.05&&inp.thr<0.8&&sys.aebJerkO!==lead.o&&sys.aebState!=="braking"){sys.aebJerkO=lead.o;sys.aebJerk=0.28}}else sys.fcwT=0;
+    // brake assist: you're braking for it, but not hard enough to stop in time, so it adds the rest
+    if(ttc<aebT(0)&&sure&&inp.brk>0.08&&lead&&sp>lead.v){const need=reqDec*1.15/9;if(need>inp.brk+0.05){sys.aebBA=Math.min(1,need);if(!sys.aebBAon){sys.aebBAon=true;carMsg("🛑 Brake assist: adding braking")}}}else{sys.aebBA=0;sys.aebBAon=false}
     if(st.aebAuto===false){if(ttc<aebT(1)&&sure&&reqDec>2)sys.fcw=true}
+    else if(sys.aebCancel>0){}   // you took over: it stays out of the way for a moment
+    else if(sp<6&&lead&&sure&&sp-lead.v>0.5&&gap<1.6+sp*0.75&&inp.brk<0.3){sys.aebBrake=1;if(sys.aebState!=="braking"){sys.aebState="braking";sys.aebStart={v:sp};sys.aebWho=lead.o&&lead.o.kind==="ped"?"a pedestrian":"the car ahead";beep(1900,.12,"square",.25)}}   // low speed: creeping into something close
     else if((ttc<aebT(2)&&sure&&(reqDec>4||(lead&&lead.vru&&reqDec>1.5)))||(sys.aebBrake>0.45&&ttc<4&&sp-(lead?lead.v:0)>0.3)){sys.aebBrake=1;if(sys.aebState!=="braking"){sys.aebState="braking";sys.aebStart={v:sp};sys.aebWho=lead?(lead.cross?"a car crossing your path":lead.o.kind==="ped"?"a pedestrian":lead.o.kind==="deer"?"a deer":lead.o.kind==="bike"?"a cyclist":"the car ahead"):"an obstacle";beep(1900,.12,"square",.25)}}
-    else if(st.aebAuto!==false&&ttc<aebT(1)&&sure&&reqDec>2.5&&inp.brk<0.5&&sys.aebBrake<0.5)sys.aebBrake=0.5;
+    else if(st.aebAuto!==false&&((ttc<aebT(1)&&sure&&reqDec>2.5&&inp.brk<0.5)||(sys.aebPart&&lead&&sp-lead.v>0.3&&(ttc<aebT(0)+1||gap<4+sp*1.5||(lead.v<0.5&&gap<25))))){sys.aebPart=true;sys.aebBrake=clamp(reqDec*1.25/9,0.42,1)}   // partial braking (about 0.4 g), held and stepped up until the danger is over: past half braking it becomes full emergency braking
+    // you override it by flooring the accelerator or steering hard round the obstacle, as in the real cars
+    if((sys.aebBrake>0.3||sys.aebState==="braking")&&(inp.thr>0.8||Math.abs(inp.steer)>0.32)){sys.aebBrake=0;sys.aebPart=false;if(sys.aebState==="braking")sys.aebState="ready";sys.aebCancel=1.8;carMsg("Emergency braking cancelled: you took over")}
   }
+  if(sys.aebPart&&(!lead||sp-lead.v<0.3||(ttc>aebT(0)+1&&gap>4+sp*1.5&&!(lead.v<0.5&&gap<25))||sys.aebState==="braking"||!st.aeb))sys.aebPart=false;
+  if(sys.aebCancel>0)sys.aebCancel-=dt;
+  if(sys.aebJerk>0){sys.aebJerk-=dt;if(sys.aebState!=="braking")sys.aebBrake=Math.max(sys.aebBrake,0.35)}
+  if(sys.aebBA>0)sys.aebBrake=Math.max(sys.aebBrake,sys.aebBA);
   // once braking, modulate like the real systems: just enough to stop about 2 m short (never less than half braking)
   if(sys.aebState==="braking"&&lead&&!evading){const cl=Math.max(0,sp-Math.max(lead.v,0)),need=cl*cl/(2*Math.max(gap-2.0,0.25))*1.12,aM=sys.aebPV!=null?(sys.aebPV-sp)/Math.max(dt,1e-3):need;sys.aebB2=clamp((sys.aebB2??0.8)+(need-aM)*(need>aM?0.9:0.35)*dt,0.12,1);if(need>9)sys.aebB2=1;sys.aebBrake=sys.aebB2}else sys.aebB2=null;sys.aebPV=sp;
   if(evading&&sys.aebState!=="held"){sys.aebBrake=0;if(sys.aebState==="braking")sys.aebState="ready"}
   if(sys.aebBrake>0&&sys.aebState==="braking"&&(sp<0.2||!lead||sp-lead.v<0.2)){
     sys.aebState="held";const who=sys.aebWho||"the car ahead";const msg=lead&&lead.v<0.5&&sp<0.3?`AEB stopped the car ${ftS(Math.max(gap,0))} short of ${who} (from ${fmtSpeed(sys.aebStart.v)})`:lead?`AEB slowed you from ${fmtSpeed(sys.aebStart.v)} to ${fmtSpeed(sp)}, ${ftS(Math.max(gap,0))} behind ${who}`:`AEB braked for ${who} (from ${fmtSpeed(sys.aebStart.v)} to ${fmtSpeed(sp)})`;
-    logResult(msg);toast(msg);sys.aebHold=lead&&lead.v<0.5?1.5:0.3}
-  if(sys.aebState==="held"){sys.aebHold-=dt;sys.aebBrake=1;if(sys.aebHold<=0){sys.aebBrake=0;sys.aebState="ready"}}
-  if(sys.aebState==="ready"&&sys.aebBrake>0&&!(ttc<aebT(1)))sys.aebBrake=Math.max(0,sys.aebBrake-dt*2);
+    logResult(msg);toast(msg);sys.aebHold=lead&&lead.v<0.5?2.0:0.3}
+  if(sys.aebState==="held"){sys.aebHold-=dt;sys.aebBrake=1;if(sys.aebHold<=0||inp.thr>0.3){sys.aebBrake=0;sys.aebState="ready";if(inp.brk<0.1&&sp<0.2)carMsg("AEB released the brakes: press the brake pedal to stay stopped")}}   /* holds you for about 2 s after a stop, then hands back */
+  if(sys.aebState==="ready"&&sys.aebBrake>0&&!(ttc<aebT(1))&&!(sys.aebJerk>0)&&!(sys.aebBA>0)&&!sys.aebPart)sys.aebBrake=Math.max(0,sys.aebBrake-dt*2);
   if(!st.aeb||!has("aeb")){sys.aebBrake=0;sys.aebState="off"}else if(st.aebAuto===false){sys.aebBrake=0;sys.aebState="ready"}else if(sys.aebState==="off")sys.aebState="ready";
   {if(isTesla()&&sys.fcw){const now=performance.now();if(!sys.fcwSndT||now-sys.fcwSndT>700){sys.fcwSndT=now;playS("ts_fcw",0.6)}}else{const b=brandS(),lin=b==="Lincoln",gm=GMB.has(b),kia=b==="Kia",bmw=b==="BMW",ford=b==="Ford",toy=b==="Toyota"||b==="Lexus",kSolid=kia&&(sys.aebState==="braking"||sys.aebBrake>0.3);if(sys.fcw&&(lin||gm||kia||bmw||ford||toy)){const now=performance.now();if(!sys.fcwSndT||now-sys.fcwSndT>(lin?2300:kia?(kSolid?1850:1300):bmw?600:ford?1000:toy?1690:950)){sys.fcwSndT=now;if(!playS(lin?"lin_hard":kia?(kSolid?"kia_aeb_solid":"kia_aeb"):bmw?"bmw_aeb":ford?"ford_aeb":toy?"toy_aeb":"gm_aeb",0.7))beep(2300,.08,"square",.18)}}else{if(!sys.fcw)sys.fcwSndT=0;if(sys.fcw&&(performance.now()%220)<dt*1000*1.2)beep(2400,.07,"square",.2)}}}
   // ---- traffic lights ahead: ACC / Pilot stop for them quietly; running a red is logged
@@ -9763,14 +9793,16 @@ function assist(dt){
   else if(sp<17.9||st.gear!=="D"||car.offroad||M.inJ)sys.lkaState="standby";
   else if(st.signal||st.hazard||sys.esa||sys.elkT>0||sys.pa||(sys.lkaHold>0))sys.lkaState="paused";
   else{const latV=sp*Math.sin(he)+car.vy;sys.lkaState="ready";
-    // time to line crossing: act when the car will reach about 0.75 m off centre within ~0.9 s, or is already 0.4 m off
-    if((e>0.4||e+latV*0.9>0.75)&&latV>-0.15){sys.lkaDelta=-clamp(0.016+0.06*Math.max(0,e-0.35)+0.85*Math.max(he,0),0,0.05);sys.lkaState="nudge"}
-    if((e<-0.4||e+latV*0.9<-0.75)&&latV<0.15){sys.lkaDelta=clamp(0.016+0.06*Math.max(0,-e-0.35)-0.85*Math.min(he,0),0,0.05);sys.lkaState="nudge"}
+    // time to line crossing: act when the car will reach the trigger distance within the look-ahead time, or is already past the inner limit.
+    // Sensitivity (High / Standard / Low) moves those points, like the real settings: High steps in early, Low only right at the line
+    const LK=LKS[st.lkaSens]||LKS.standard,[e0,eT,tT,gain]=LK;
+    if((e>e0||e+latV*tT>eT)&&latV>-0.15){sys.lkaDelta=-clamp(0.016*gain+0.06*Math.max(0,e-e0+0.05)+0.85*Math.max(he,0),0,0.05);sys.lkaState="nudge"}
+    if((e<-e0||e+latV*tT<-eT)&&latV<0.15){sys.lkaDelta=clamp(0.016*gain+0.06*Math.max(0,-e-e0+0.05)-0.85*Math.min(he,0),0,0.05);sys.lkaState="nudge"}
     if(Math.abs(inp.steer)>0.06){sys.lkaDelta=0;sys.lkaHold=1.5;sys.lkaState="paused"}
     sys.lkaDelta=clamp(sys.lkaDelta,-0.03,0.03)}
-  if(isTesla()&&TOPT.ldaM==="warn")sys.lkaDelta=0;
+  if((isTesla()&&TOPT.ldaM==="warn")||st.lkaMode==="alert")sys.lkaDelta=0;
   if(sys.lkaHold>0)sys.lkaHold-=dt;
-  if(st.lka&&!pilotOn&&Math.abs(e)>0.8&&sp>17.9&&!st.signal&&!M.inJ){sys.ldw=true;sys.ldwSide=-Math.sign(e);sys.ldwT=performance.now()}
+  if(st.lka&&!pilotOn&&st.lkaMode!=="aid"&&Math.abs(e)>(LKS[st.lkaSens]||LKS.standard)[4]&&sp>17.9&&!st.signal&&!M.inJ){sys.ldw=true;sys.ldwSide=-Math.sign(e);sys.ldwT=performance.now()}
   if(sys.ldw&&!sys.ldwWas&&!(brandS()==="Kia"&&playS("kia_ldw",0.6))&&!tsS("ldw",0.6)){beep(880,.09,"sine",.2);setTimeout(()=>beep(660,.12,"sine",.2),110)}
   sys.ldwWas=sys.ldw;
   if(sys.driftT>0){sys.driftT-=dt;sys.drift=-0.012*(1-Math.exp(-(6-sys.driftT)));sys.lkaLog.maxE=Math.max(sys.lkaLog.maxE,Math.abs(e));
@@ -14184,9 +14216,12 @@ function charGrip(A,fr,ik){const nd=n=>{const P=A.parts.find(p=>p.name===n);retu
     let pv=N_([sd*0.55,-1,-0.25]);const pu=D_(pv,u);pv=N_([pv[0]-pu*u[0],pv[1]-pu*u[1],pv[2]-pu*u[2]]);const E2=[S_[0]+u[0]*x+pv[0]*h,S_[1]+u[1]*x+pv[1]*h,S_[2]+u[2]*x+pv[2]*h];
     about(rotBetween(V(E,S_),V(E2,S_)),S_,ids);const H1=tr(ids[2]),Tt=[S_[0]+u[0]*d,S_[1]+u[1]*d,S_[2]+u[2]*d];about(rotBetween(V(H1,E2),V(Tt,E2)),E2,ids.slice(1))}
   return out}
-function charsDraw(){const t=performance.now()/1000,cr=CULL.sec?70:220;for(const it of CHARS){if(!Array.isArray(it)){const A=ACCM[it.k];if(!A)continue;if(it.M&&!sphVis(it.M[12],it.M[13],it.M[14],2.5,cr))continue;if(A.kind==="acc"){accDrawMs(A.ms,it.M,false);continue}let fr;if(it.pose==="sit"){const an=A.anims&&(it.drv&&A.anims.grip||A.anims.seat);if(an){const f=an[0]+Math.floor(((t+(it.sd||0))/an[2]%1)*an[1]);fr=A.fr.subarray(f*A.nodes*16,(f+1)*A.nodes*16)}else fr=charSitPose(A);if(it.ik&&A.anims&&A.anims.grip)fr=charGrip(A,fr,it.ik)}else fr=A.fr.subarray(0,A.nodes*16);
-      for(const P of A.parts){if(it.skip&&it.skip.includes(P.name))continue;const o=P.node*16;accDrawMs(P.ms,M4.mul(it.M,fr.subarray(o,o+16)),false)}continue}
-    const [k,x,y,z,h,v,sd,an_]=it;const A=ACCM[k];if(!A)continue;if(!sphVis(x,(z||0)+0.9,-y,1.3,cr))continue;const ox_=an_&&A.anims&&A.anims[an_],sp=v>0.05&&!ox_?Math.min(1.8,v/1.3):0,ai=ox_||A.anims&&A.anims.idle,f=sp?Math.floor(((t*sp+sd)/A.dur%1)*A.F):ai?ai[0]+Math.floor(((t+sd*7)/ai[2]%1)*ai[1]):0,M=chain(M4.T(x,z,-y),M4.rY(h+Math.PI/2));
+// each person is drawn on their own: before, one bad entry (an error part-way through the list) left everyone after it invisible
+// for the rest of that frame, every frame, while you could still hit them
+function charsDraw(){for(const it of CHARS){try{charDraw1(it)}catch(e){if(!charsDraw.w){charsDraw.w=1;console.warn("person draw",e)}}}}
+function charDraw1(it){const t=performance.now()/1000,cr=CULL.sec?70:220;{if(!Array.isArray(it)){const A=ACCM[it.k];if(!A)return;if(it.M&&!sphVis(it.M[12],it.M[13],it.M[14],2.5,cr))return;if(A.kind==="acc"){accDrawMs(A.ms,it.M,false);return}let fr;if(it.pose==="sit"){const an=A.anims&&(it.drv&&A.anims.grip||A.anims.seat);if(an){const f=an[0]+Math.floor(((t+(it.sd||0))/an[2]%1)*an[1]);fr=A.fr.subarray(f*A.nodes*16,(f+1)*A.nodes*16)}else fr=charSitPose(A);if(it.ik&&A.anims&&A.anims.grip)fr=charGrip(A,fr,it.ik)}else fr=A.fr.subarray(0,A.nodes*16);
+      for(const P of A.parts){if(it.skip&&it.skip.includes(P.name))continue;const o=P.node*16;accDrawMs(P.ms,M4.mul(it.M,fr.subarray(o,o+16)),false)}return}
+    const [k,x,y,z,h,v,sd,an_]=it;const A=ACCM[k];if(!A)return;if(!sphVis(x,(z||0)+0.9,-y,1.3,cr))return;const ox_=an_&&A.anims&&A.anims[an_],sp=v>0.05&&!ox_?Math.min(1.8,v/1.3):0,ai=ox_||A.anims&&A.anims.idle,f=sp?Math.floor(((t*sp+sd)/A.dur%1)*A.F):ai?ai[0]+Math.floor(((t+sd*7)/ai[2]%1)*ai[1]):0,M=chain(M4.T(x,z,-y),M4.rY(h+Math.PI/2));
   for(const P of A.parts){const o=(f*A.nodes+P.node)*16;accDrawMs(P.ms,M4.mul(M,A.fr.subarray(o,o+16)),false)}}}
 
 // ======================================================================= Vehicle Settings: a list of categories on the left, the chosen list (or the driver-assistance car) on the right
@@ -14206,7 +14241,7 @@ function vsRows(cat){const T=TRIMS[st.trim],R=[],t=(k,n,d,on,fn,dis)=>R.push({n,
     if(s==="fwd"){t("aeb","Forward Collision-Avoidance Assist","Brakes for cars, people and cyclists",st.aeb,null,false);R.push({n:"Warning timing",d:{early:"Early",normal:"Normal",late:"Late"}[st.aebSens||"normal"],on:true,fn:()=>{const L=["early","normal","late"];st.aebSens=L[(L.indexOf(st.aebSens||"normal")+1)%3];tick(1)}})}
     if(s==="daw"){t(null,"Driver Attention Warning","Suggests a break when you seem tired",st.daw!==false,()=>{st.daw=st.daw===false;tick(1)},false);t(null,"Leading Vehicle Departure Alert","Tells you when the car ahead pulls away",st.lvda!==false,()=>{st.lvda=st.lvda===false;tick(1)},false)}
     if(s==="spd"){t("isa","Intelligent Speed Limit Assist","Reads speed signs and limits your speed",st.isa);t(null,"Speed Limit Warning","Flashes the sign when you're over",st.speedWarn!==false,()=>{st.speedWarn=st.speedWarn===false;tick(1)},false)}
-    if(s==="lane"){t("lka","Lane Keeping Assist","Nudges you back if you drift",st.lka,null,false);t("elk","Emergency Lane Keeping","Steers back from oncoming cars and road edges",st.elk)}
+    if(s==="lane"){t("lka","Lane Keeping Assist","Nudges you back if you drift",st.lka,null,false);R.push({n:"Lane keeping mode",d:{both:"Alert + Aid",aid:"Aid",alert:"Alert"}[st.lkaMode||"both"],on:true,fn:()=>{const L=["both","aid","alert"];st.lkaMode=L[(L.indexOf(st.lkaMode||"both")+1)%3];tick(1)}});R.push({n:"Lane keeping sensitivity",d:{high:"High",standard:"Standard",low:"Low"}[st.lkaSens||"standard"],on:true,fn:()=>{const L=["high","standard","low"];st.lkaSens=L[(L.indexOf(st.lkaSens||"standard")+1)%3];tick(1)}});t("elk","Emergency Lane Keeping","Steers back from oncoming cars and road edges",st.elk)}
     if(s==="park"){t("rAeb","Reverse Parking Collision-Avoidance","Brakes for things behind you",st.rAeb);t("rcta","Rear Cross-Traffic Alert","Warns of cars crossing behind",st.rcta!==false);t(null,"Parking Distance Warning","Beeps as you get close",st.pdc!==false,()=>{st.pdc=st.pdc===false;tick(1)},false);t(null,"Camera guidance lines","Shown below 15 mph",!st.noGuides,()=>{st.noGuides=!st.noGuides;tick(1)},false);t("autoHold","Auto Hold","Holds the car at a stop",st.autoHold)}
     if(s==="bsm"){t("bsm","Blind-Spot Collision Warning","Lights the mirror and warns when you signal",st.bsm);t(null,bvmName(),"Shows the camera down that side in the instrument cluster when you signal",st.bsView!==false,()=>{st.bsView=st.bsView===false;tick(1)},!bvmHas())}
     return R}
@@ -14915,7 +14950,8 @@ function segBox(k,A,B,th,wd){const d=[B[0]-A[0],B[1]-A[1],B[2]-A[2]],len=Math.hy
 let PLAYER_MK="Person_A";try{const c=localStorage.getItem("mstrata.char");if(c==="Person_A"||c==="Person_B")PLAYER_MK=c;else if(c==="Adult_Woman")PLAYER_MK="Person_B"}catch(e){}   // the player is the same person on foot and at the wheel
 function seatHip(seats,E){let b=null,bd=0.45;if(seats)for(const q of seats){const d=Math.abs(q[0]-E[0])+Math.abs(q[2]-E[2])*0.5;if(d<bd){bd=d;b=q}}
   return b?[clamp(b[1]-0.05,E[1]-0.74,E[1]-0.5),clamp(b[2],E[2]-0.05,E[2]+0.25)]:[E[1]-0.66,E[2]+0.08]}
-function seatedInto(M,h,E,W_,o,drive){if(o&&o.skin!==4){const k=o.mk||((o.shirt||0)%2?"Person_B":"Person_A");if(accGet(k)){const hp=o.hip||[E[1]-0.66,E[2]+0.08];   // the model's hip joint sits 0.97 m above its feet
+function seatedInto(...a){try{seatedInto0(...a)}catch(e){if(!seatedInto.w){seatedInto.w=1;console.warn("seated person",e)}}}   /* a failure here must not stop the people after it being queued */
+function seatedInto0(M,h,E,W_,o,drive){if(o&&o.skin!==4){const k=o.mk||((o.shirt||0)%2?"Person_B":"Person_A");if(accGet(k)){const hp=o.hip||[E[1]-0.66,E[2]+0.08];   // the model's hip joint sits 0.97 m above its feet
     const A_=ACCM[k],sh_=A_&&A_.seatHip&&A_.anims&&A_.anims.seat?A_.seatHip:null;CHARS.push({k,sd:(E[0]+E[2])*3.1,M:sh_?chain(M,M4.T(E[0],hp[0]-sh_[1],hp[1]+sh_[2]),M4.rY(Math.PI)):chain(M,M4.T(E[0],hp[0]-0.97,hp[1]),M4.rY(Math.PI)),pose:"sit",drv:!!(drive&&W_),ik:drive&&W_&&sh_?{C:[-(W_[0]-E[0]),W_[1]-(hp[0]-sh_[1]),-(W_[2]-(hp[1]+sh_[2]))],a:o.whA||0}:null,skip:o.noHead?["head"]:null});return}}const wp=l=>{const q=M4.p(M,l);return [q[0],-q[2],q[1]]};   // car-local point -> world [x, y, height]
   const sk="skin"+o.skin,sh="shirt"+o.shirt,pa="pants"+(o.pants||0),x=E[0];
   const hip=wp([x,E[1]-0.6,E[2]+0.08]),sho=wp([x,E[1]-(o.noHead?0.24:0.14),E[2]+0.17]);
@@ -15127,7 +15163,7 @@ function render(dt){
   for(const [om,c] of drawn){kitNext=kitOf(trafficModel(c));drawCar(om,paintRGB(c.paint),{},[0,0,0,0],0,0,true,0,true)}
   if(cam2!=="rear"&&cam2!=="dash"){dentOn(true);WHL_ME=true;drawCar(cm,myPaint(),lit,car.spin,car.dF,car.dR,true,car.height-tuneLow(),false);WHL_ME=false;dentOn(false)}
   gl.depthMask(true);gl.disable(gl.BLEND);
-  if(cam2!=="dash"||true){try{accModelsDraw(cm,false);charsDraw()}catch(e){}}
+  if(cam2!=="dash"||true){try{accModelsDraw(cm,false)}catch(e){}charsDraw()}   /* separate: one failing accessory used to stop every person from being drawn */
   dynDraw(false);gl.enable(gl.BLEND);gl.depthMask(false);dynDraw(true);try{accModelsDraw(cm,true)}catch(e){}gl.depthMask(true);gl.disable(gl.BLEND);
   };
   // the car's own cameras render into a small off-screen image for the centre screen
@@ -15633,7 +15669,9 @@ const TABS={
     <h3>Chassis</h3><p class="note">Suspension: <b>${suspName()}</b>${suspOf().adapt?" · adjusts with the drive mode":""}${suspOf().cam?" · the camera reads potholes ahead":""}</p><div class="grid2">${tog("ws4","Four-wheel steering","Rear wheels steer up to 10°",st.ws4&&T.ws4,!T.ws4)}${tog("crab","Crab walk","Diagonal driving below 18 mph",st.crab,!T.crab)}</div>
     <h3>Lights, sound, display</h3><div class="grid2">${tog("lights","Headlights","Low beam",st.lights)}${tog("high","High beam","Key B",st.high)}${tog("matrix","Matrix high beam","Shades cars ahead out of the beam",st.matrix)}${tog("cornering","Cornering lights","Beams swivel; side lamp when turning",st.cornering)}${tog("autoHigh","Auto high beam","At night above 25 mph when the road is clear",st.autoHigh)}${tog("leveling","Active levelling","Beam follows hills and stays level under load",st.leveling)}${["allseason","sport","winter","offroad"].map(k=>opt(`data-a="tyre_${k}"`,(st.tyre||"allseason")===k,TYRES[k].name,"Tyres")).join("")}${opt('data-a="uiFull"',!!st.uiFull,"Display: "+(st.uiFull?"Full info":"Clean"),"Tap to switch. Full shows the energy / sensor panel and the assist strip")}${tog("hud","Head-up display",hasHUD()?"Speed, limit, cruise and warnings on the windshield (inside view)":hudOffered()?"Add it in Build":"Not offered on this car",st.hudOn&&hasHUD(),!hasHUD())}${tog("night","Night","",st.night)}${tog("avas","AVAS","Pedestrian sound below 20 mph",st.avas)}${tog("units",st.units==="mph"?"Units: mph":"Units: km/h","Tap to switch",false)}</div>`},
   safety(){return `<h3>Collision avoidance</h3><div class="grid2">${tog("aeb","Emergency braking",`Warns at ${aebT(0)} s, brakes at ${aebT(2)} s to impact`,st.aeb)}${tog("aebAuto","Front auto braking",st.aebAuto!==false?"Brakes for you if you don't react to the warning":"Off: warning only, you brake",st.aeb&&st.aebAuto!==false)}${tog("esa","Evasive steering","Adds steering when you swerve round an obstacle",st.esa)}${smartRegenOn()||(/^(Hyundai|Kia|Genesis) /.test(TRIMS[st.trim].group||"")&&!TRIMS[st.trim].ice&&!TRIMS[st.trim].hybrid)?tog("smartRegen","Smart Regen",st.smartRegen===false?"Off: regen stays at the level you picked":"Lifting off, regen slows you for the car ahead",st.smartRegen!==false):""}${tog("sigAuto","Self-cancelling turn signals",st.sigAutoOff?"Off: the signal stays on until you switch it off":"Cancels when the wheel comes back after a turn",!st.sigAutoOff)}${(()=>{const P=tcsProf(),v=st.tcsLv|0;return tog("tcs",P.b,v?P.s[v-1].n:"On"+(P.s.length>1?` · tap again for the next stage (${P.s.length} stages, like a long press in the real car)`:""),!v)})()}${tog("rAeb","Rear auto brake (U)","Stops you backing into a car",st.rAeb)}${tog("parkAssist","Parking sensors","Bird's-eye distance display and beeps below 10 mph or in reverse",st.parkAssist)}</div>
-    <h3>Forward collision warning & braking</h3><div class="grid2">${[["early","Early","Warns 3.4 s out, brakes at 2.0 s. Most cautious"],["normal","Normal","2.8 s / 1.6 s, the factory setting"],["late","Late","2.2 s / 1.2 s. Fewer false alarms in traffic"]].map(([k,n,d])=>opt(`data-aebs="${k}"`,st.aebSens===k,n,d)).join("")}</div>
+    <h3>Forward collision warning & braking</h3><div class="grid2">${[["early","Early","Warns 3 s before impact, partial braking at 2 s, full at 1.4 s. Most cautious"],["normal","Normal","2.5 s / 1.6 s / 1.1 s, the factory setting"],["late","Late","2 s / 1.3 s / 0.9 s. Fewer false alarms in traffic"]].map(([k,n,d])=>opt(`data-aebs="${k}"`,st.aebSens===k,n,d)).join("")}</div>
+    <h3>Lane keeping: what it does</h3><div class="grid2">${[["both","Alert + Aid","Warns and steers you back"],["aid","Aid","Steers you back, no warning"],["alert","Alert","Warns only, never steers"]].map(([k,n,d])=>opt(`data-lkam="${k}"`,(st.lkaMode||"both")===k,n,d)).join("")}</div>
+    <h3>Lane keeping: sensitivity</h3><div class="grid2">${[["high","High","Steps in early, as you start to drift"],["standard","Standard","Steps in as you reach the line"],["low","Low","Only right at the line. Fewest interruptions"]].map(([k,n,d])=>opt(`data-lkas="${k}"`,(st.lkaSens||"standard")===k,n,d)).join("")}</div>
     <h3>Lanes</h3><div class="grid2">${tog("lka","Lane keep assist","Nudges you back if you drift onto a line above 40 mph. You still steer",st.lka)}${tog("bsm","Blind spot monitoring","Mirror lights, warning when you signal",st.bsm)}${tog("elk","Blind spot assist","Steers you back into your lane if you signal or drift toward a car in your blind spot",st.elk)}</div>
     <h3>Hands-free driving</h3><div class="grid2">${tog("pilot","Westport Pilot","Steers, keeps distance and changes lanes when you signal. Above 18 mph",st.pilot)}${tog("autoLC","Automatic passing","Pilot overtakes slower cars and moves back right",st.autoLC)}</div>
     <h3>Driver attention</h3><div class="grid2"><button class="opt${st.attn!==false?" on":""}" data-attn="1"><b>Attention reminders: ${st.attn!==false?"on":"off"}</b><small>${st.attn!==false?"Hands-on-wheel and eyes-on-road reminders, like the real car":"Off: Autopilot, FSD and lane centering never nag you"}</small></button></div>
@@ -15662,7 +15700,7 @@ function test(k,b,s){return `<button class="opt" data-test="${k}"><b>${b}</b><sm
 // settings sections: Graphics (look and world), Cars (your car and its assists), Spawn (where you are and the traffic), Tests, Log
 const SECS=h=>h.split(/(?=<h3>)/).filter(p=>/^<h3>/.test(p)),ALLS=()=>SECS(TABS.car()+TABS.safety());
 // where each settings section lives (anything not listed stays on the Car tab: drive mode, driving, shifting, regen, chassis, work gear)
-const SEC_RX={graphics:/^<h3>Graphics/,display:/^<h3>(HUD size|HUD colors|Cluster screen|BMW display style|Gauge cluster)/,world:/^<h3>(Weather|Temperature|Road condition|Random events|Traffic crashes|People)/,assists:/^<h3>(Collision|Forward collision|Lanes|Hands-free|Driver attention|Adaptive cruise)/,sound:/^<h3>(Sound|Lights, sound)/,spawn:/^<h3>Go to/,controls:/^<h3>(Controls|Your character)/};
+const SEC_RX={graphics:/^<h3>Graphics/,display:/^<h3>(HUD size|HUD colors|Cluster screen|BMW display style|Gauge cluster)/,world:/^<h3>(Weather|Temperature|Road condition|Random events|Traffic crashes|People)/,assists:/^<h3>(Collision|Forward collision|Lane keeping|Lanes|Hands-free|Driver attention|Adaptive cruise)/,sound:/^<h3>(Sound|Lights, sound)/,spawn:/^<h3>Go to/,controls:/^<h3>(Controls|Your character)/};
 const secOf=p=>Object.keys(SEC_RX).find(k=>SEC_RX[k].test(p))||"cars";
 TABS.graphics=()=>`<div class="grid2">${opt(`data-a="lowend"`,!!st.lowEnd,"📱 Low-end phone mode","One tap: Lowest graphics, 30 fps, simple mirrors, a solid HUD and fewer random events. Tap again to go back")}</div>`+ALLS().filter(p=>secOf(p)==="graphics").join("")+`<h3>Frame rate</h3><div class="grid2">${[[0,"Auto","30 fps on the Lowest graphics, otherwise as fast as it can"],[30,"30 fps","Steady and cooler: best on a Surface Go or while charging"],[60,"60 fps","Smooth on most laptops and phones"],[-1,"Unlimited","As fast as your screen allows"]].map(([k,n,d])=>opt(`data-set="fpsCap:${k}"`,(st.fpsCap??0)===k,n,d)).join("")}</div><h3>Mirrors</h3><div class="grid2">${opt('data-mir="1"',st.mirrors!==false,"Realistic mirrors","Door and rear-view mirrors show the road behind you (inside view)")}${opt('data-mir="0"',st.mirrors===false,"Simple mirrors","Faster on older devices")}</div>`;
 TABS.features=()=>{const T=TRIMS[st.trim];const sec=(t,h)=>h.trim()?`<h3>${t}</h3><div class="grid2">${h}</div>`:"";
@@ -15745,7 +15783,7 @@ $("tabBody").addEventListener("click",e=>{const b=e.target.closest("button");if(
   else if(d.brain!==undefined){for(const k of Object.keys(BRAIN))delete BRAIN[k];Object.assign(BRAIN,{gen:1,ev:0,stops:0,cross:0,wait:3,stopWait:6,gapK:1,pedPat:45,pedGapK:1,scares:0,crashes:0});brainSave();toast("Traffic brain reset: drivers and people start learning again");renderTab&&renderTab()}
   else if(d.emo!==undefined){st.emo=st.emo===false;toast(st.emo?"Driver reaction faces on":"Driver reaction faces off");renderTab&&renderTab()}
   else if(d.spawn!==undefined){const n=+d.spawn;if(n===0){cars=cars.filter(c=>c.kind!=="ai");TOD.add=0;toast("Traffic cleared")}else{spawnTraffic(n);TOD.add=Math.min(200,(TOD.add||0)+n);toast(`${n} AI cars added`)}}
-  else if(d.aebs){st.aebSens=d.aebs;toast(`Collision warning: ${d.aebs}`)}
+  else if(d.aebs){st.aebSens=d.aebs;toast(`Collision warning: ${d.aebs}`)}else if(d.lkam){st.lkaMode=d.lkam;toast(`Lane keeping: ${{both:"Alert + Aid",aid:"Aid",alert:"Alert"}[d.lkam]}`)}else if(d.lkas){st.lkaSens=d.lkas;toast(`Lane keeping sensitivity: ${d.lkas}`)}
   else if(d.set){const [k,v]=d.set.split(":"),n=+v,H=car.hyb,T=TRIMS[st.trim];if(k==="fuel"){H.fuel=H.tank*n;toast(`Fuel set to ${n*100}%`)}else if(k==="chg"){if(T.plug)H.pb=n;else H.soc=socRaw(n);toast(`Charge set to ${n*100}%`)}else{st[k]=n;if(k==="wheelUI")document.body.classList.toggle("wheelMode",!!n);if(k==="pedHold"||k==="thrRate"||k==="brkRate"){try{localStorage.setItem("strata.ped",JSON.stringify({pedHold:st.pedHold||0,thrRate:st.thrRate||2,brkRate:st.brkRate||2}))}catch(e){}renderTab()}}
     if(k==="cargoKg"||k==="dummies"||k==="dummyKg"){car.cargo=loadKg();toast(`Load: ${Math.round(loadKg()*2.205)} lb`)}}
   else if(d.rch!==undefined||d.rcb!==undefined){if(d.rch!==undefined)ROADC.holes=+d.rch;if(d.rcb!==undefined)ROADC.bumps=+d.rcb;try{localStorage.setItem("strata.roadc",JSON.stringify(ROADC))}catch(e){}genBumps();SCN.bumps=bumpMesh();toast(`Road condition: potholes ${ROADC_N[ROADC.holes].toLowerCase()}, bumps ${ROADC_N[ROADC.bumps].toLowerCase()}`);renderTab()}
@@ -15787,7 +15825,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=309;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="173",BUILD_VER=310;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}try{const P=JSON.parse(localStorage.getItem("strata.ped")||"null");if(P){st.pedHold=+P.pedHold||0;st.thrRate=+P.thrRate||2;st.brkRate=+P.brkRate||2}}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){const k=GFX.q==="auto"?GFX.eff:GFX.q;if(G.k!==k||G.v!==GFX.ovV||!G.m){G.k=k;G.v=GFX.ovV;const m={...GQ[k]};for(const o of GOPT)if(GFX.ov[o[0]]!==undefined)Object.assign(m,o[4](GFX.ov[o[0]]));if(Object.keys(GFX.ov).length)m.label=GQ[k].label+" (custom)";G.m=m;COLL.nt=!m.trees}return G.m}
