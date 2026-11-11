@@ -2739,7 +2739,7 @@ function ez0(e,u){let z;if(e.zp){const f=clamp(u,0,e.L)/4,i=Math.min(e.zp.length
   if(e.a.z!==undefined&&!(W2&&(e.a.ctrl==="merge"||e.a.kind==="cont"))&&u<(e.r0||0)+JA){const w=1-smooth01(e.r0||0,(e.r0||0)+JA,u);z+=(e.a.z-hillZ(e.a.x,e.a.y))*0+(e.a.z-z)*w}
   if(e.b.z!==undefined&&!(W2&&(e.b.ctrl==="merge"||e.b.kind==="cont"))&&u>e.L-(e.r1||0)-JB){const w=1-smooth01(e.r1||0,(e.r1||0)+JB,e.L-u);z+=(e.b.z-z)*w}if(e.br)z+=e.br.H*(1-smooth01(e.br.half,e.br.half+e.br.rp,Math.abs(u-e.br.uc)));if(e.ford)z+=(RIVER.water-0.3-z)*(1-smooth01(e.ford.half,e.ford.half+24,Math.abs(u-e.ford.uc)));
   if(e.ov){const o=e.ov,d=u-o.uc;z+=o.H*(1-smooth01(o.half,o.half+(d<0?o.rA:o.rB),Math.abs(d)))}
-  if(e.dip)for(const o of e.dip){const d=u-o.uc;z-=o.H*(1-smooth01(o.half,o.half+(d<0?o.rA:o.rB),Math.abs(d)))}return z}
+  if(e.dip){const uu=clamp(u,0,e.L);for(const o of e.dip){const d=uu-o.uc;z-=o.H*(1-smooth01(o.half,o.half+(d<0?o.rA:o.rB),Math.abs(d)))}}return z}   /* u is clamped: just past the end of a road that is sunk right up to its end node (the freeway cut runs through the ramp nodes) it must stay sunk, not jump up to street level in a thin invisible ridge */
 // old bridges in the new world: a deck that gives a little under you (more under something heavy), and on the covered bridge
 // loose planks and one missing
 function brJank(e,u,t){const b=e.br,d=u-(b.uc-b.half);if(d<0||d>2*b.half)return 0;const heavy=(TRIMS[st.trim].mass||1800)>2400,f=Math.sin(Math.PI*d/(2*b.half));
