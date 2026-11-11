@@ -1277,8 +1277,13 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
 <script data-boot>(function(){var p=0;window.__bootP=0;var t=setInterval(function(){if(window.__bootReal){clearInterval(t);return}p+=(0.7-p)*0.025;window.__bootP=p;var a=document.getElementById("bootArc"),n=document.getElementById("bootNeedle"),c=document.getElementById("bootPct");if(a)a.setAttribute("stroke-dasharray",(p*100).toFixed(1)+" 100");if(n)n.style.setProperty("--a",(-135+p*270)+"deg");if(c)c.textContent=String(Math.round(p*100))},120)})()</script>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 319 · Michigan service drives on I-38</h2></div>
+    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 320 · Service drives at every I-38 interchange</h2></div>
     <div class="nb">
+      <h4>Service drives at every I-38 interchange</h4><ul>
+      <li><b>County Rd 3 and Fairhaven Blvd:</b> both interchanges are now Michigan-style too. I-38 dips into a cut under the cross street, and a one-way service drive on each side takes you from the exit, through the light at the cross street, to the entrance. The old raised diamonds are gone.</li>
+      <li><b>Merging onto the service drive:</b> cars coming off an exit now check both lanes of the service drive before they merge, not just the right lane.</li>
+      <li><b>Exit signs:</b> fixed a freeze. With all the new exits there were more overhead sign faces than the sign texture had room for, and the game could lock up while loading. Signs are now drawn at a slightly lower resolution so every exit sign fits, and a full sign texture can no longer freeze the game.</li>
+      </ul>
       <h4>Michigan service drives on I-38</h4><ul>
       <li><b>Sunken freeway:</b> I-38 now runs down in a cut through the Woodward Ave and Maple Rd interchanges, the way Detroit's freeways do. It comes back up to street level to cross the river between them.</li>
       <li><b>Service drives:</b> a one-way, two-lane I-38 Service Dr runs along each side at street level, with kerbs and a sidewalk, going the same way as the freeway beside it (eastbound on the south side, westbound on the north side). Speed limit 40 mph.</li>
@@ -2374,7 +2379,7 @@ function w2WaterD(x,y,m=200){let d=1e9;for(const B of W2_WATER){const b=B.bb;if(
 // Westport (downtown, the river, the parking garage), Fairhaven (the second city, shops, suburbs), Millbrook (an old small town by a lake),
 // Mount Kestrel (switchbacks and a pass road), farmland, and two interstates: I-38 east-west and I-61 north-south, crossing at a cloverleaf.
 // Cross streets ride over the freeways on raised bridges, so the ramps really climb up to them.
-const W2C={MT:[-3300,2500],FH:[2600,0],MB:[1750,2450],CL:[-2300,-1500],CLH:8,SD:{cuts:[[-1300,-410],[410,1300]],y:-1500,H:7,full:150}};
+const W2C={MT:[-3300,2500],FH:[2600,0],MB:[1750,2450],CL:[-2300,-1500],CLH:8,SD:{cuts:[[-3900,-3300],[-1300,-410],[410,1300],[2300,2900]],y:-1500,H:7,full:150}};
 const W2_MTN=[];   // the mountain roads: their heights are smoothed along the road (see w2Profiles)
 const W2_RB=[];
 function buildNet2(){
@@ -2405,7 +2410,7 @@ function buildNet2(){
     E("ramp",I.name+" exit",[I.P(-d*L,0),I.P(-d*(L-80),sg*20.6),I.P(-d*(L-150),sg*23.75),I.P(-d*uP,sg*24.1,90),I.P(-d*uS,sg*Ta*0.5,90),I.P(-d*30,Tt,40),I.P(0,Tt)]);
     E("ramp",I.name+" entrance",[I.P(0,Tt),I.P(d*30,Tt,40),I.P(d*uS,sg*Ta*0.5,90),I.P(d*uP,sg*24.1,90),I.P(d*(L-150),sg*23.75),I.P(d*(L-80),sg*20.6),I.P(d*L,0)])}};
   const icN=(I,u)=>I.P(u*I.Ld,0);
-  const I38=[mkIC([-3600,-1500],[1,0],420,150,"County Rd 3"),mkIC([-1000,-1500],[1,0],420,90,"Woodward Ave",1),mkIC([1000,-1500],[1,0],420,90,"Maple Rd",1),mkIC([2600,-1500],[1,0],420,150,"Fairhaven Blvd")];
+  const I38=[mkIC([-3600,-1500],[1,0],420,90,"County Rd 3",1),mkIC([-1000,-1500],[1,0],420,90,"Woodward Ave",1),mkIC([1000,-1500],[1,0],420,90,"Maple Rd",1),mkIC([2600,-1500],[1,0],420,90,"Fairhaven Blvd",1)];
   const I61=[mkIC([-2300,0],[0,1],420,150,"Main St"),mkIC([-2300,1500],[0,1],420,150,"Kestrel Rd")];
   // ---- the cloverleaf: I-61 rides over I-38 on a bridge. In each quarter a loop ramp (left turns) and an outer ramp (right turns).
   // Loops leave 50 m past the bridge and join 85 m before it; the outer ramps leave 700 m out and join 730 m out
@@ -2438,6 +2443,11 @@ function buildNet2(){
       const cx=d>0?580:-580;
       E("ramp",A+" entrance",[P(xs[3],t),P(xs[3]+d*55,sg*62,60),P(xs[3]+d*175,sg*60,120),P(d>0?-650:650,sg*24,90),P(-cx,0)],{zo:u=>-cut*smooth01(60,200,u)});
       E("ramp",B+" exit",[P(cx,0),P(d>0?650:-650,sg*24,90),P(xs[4]-d*175,sg*60,120),P(xs[4]-d*55,sg*62,60),P(xs[4],t)],{zo:function(u){return -cut*(1-smooth01(this.L-200,this.L-60,u))}})}}
+  // the outlying interchanges (County Rd 3, Fairhaven Blvd): the same thing for one cross street on its own, the freeway sunk only under it
+  for(const I of [I38[0],I38[3]])for(const d of [1,-1]){const sg=-d,t=sg*90,cx=I.c[0],Y=I.c[1],P=(x,tt,r)=>{const q=[x,Math.round((Y+tt)*100)/100];if(r)q.push(r);return q},a=cx-d*420,b=cx+d*420;
+    mkR("ramp",I.name+" exit",[P(a,0),P(a+d*70,sg*21),P(a+d*120,t,60),P(a+d*160,t)]);
+    mkR("sd","I-38 Service Dr",[P(a+d*160,t),P(cx,t),P(b-d*160,t)]);
+    mkR("ramp",I.name+" entrance",[P(b-d*160,t),P(b-d*120,t,60),P(b-d*70,sg*21),P(b,0)])}
   mkR("road","Harbor Rd",[[1900,2900],ILN.P(0,ILN.T(1)),ILN.P(0,ILN.T(-1))],{lim:40});
   // the ramps of the cloverleaf: quarter (sx, sy); P is the freeway coming in towards the crossing there, Q the one leaving
   const NM={A:["I-38","I-38"],B:["I-61","I-61"]},dirName=v=>v[0]>0.5?"E":v[0]<-0.5?"W":v[1]>0.5?"N":"S";
@@ -2484,7 +2494,7 @@ function buildNet2(){
   mkR("art","Maple Rd",[[1000,-1090],[1000,-1410],[1000,-1590],[1000,-1910]],{lim:45});
   mkR("road","Maple Rd",[[1000,-1910],[1000,-2400],[1000,-3300]],{lim:55});
   mkR("road","County Rd 3",[[-3600,-3300],[-3600,-2400],[-3600,-2100],[-3600,-1910]],{lim:55});
-  mkR("art","County Rd 3",[[-3600,-1910],[-3600,-1650],[-3600,-1350],[-3600,-1090]],{lim:45});
+  mkR("art","County Rd 3",[[-3600,-1910],[-3600,-1590],[-3600,-1410],[-3600,-1090]],{lim:45});
   mkR("road","County Rd 3",[[-3600,-1090],[-3600,0],[-3600,1000],[-4100,1800,300],[-4252,3050]],{lim:50});
   // Halden Pkwy: a divided boulevard with real left-turn bays cut into the median at its four lights (the signal test road)
   for(const x of [-4400,-4130,-3870,-3600])N(x,-2100,{ctrl:"signal"});
@@ -2503,7 +2513,7 @@ function buildNet2(){
   FY.forEach((y,j)=>mkR(y===0?"ave":"st",FYN[j],FX.map(x=>[x,y]),{lim:25}));
   FX.forEach((x,i)=>mkR(x===2600?"ave":"st",FXN[i],FY.map(y=>[x,y]),{lim:25}));
   mkR("road","Route 20",[[2900,0],[4000,0],[4500,0]],{lim:50});
-  mkR("art","Fairhaven Blvd",[[2600,-300],[2600,-1090],[2600,-1350],[2600,-1650],[2600,-1910]],{lim:40});
+  mkR("art","Fairhaven Blvd",[[2600,-300],[2600,-1090],[2600,-1410],[2600,-1590],[2600,-1910]],{lim:40});
   mkR("road","County Rd 22",[[2600,-1910],[2600,-2400],[2600,-3300]],{lim:55});
   // Oakridge: an oval loop, a winding spine, cul-de-sacs off three sides
   {const O=ovalLoop("Oakridge Dr",2800,900,430,270);rd("res","Laurel St",[O.S,[2740,780,0],[2800,900],[2860,1040,0],O.N]);
@@ -2811,13 +2821,13 @@ const SIGN_KIT={"gantry":{"parts":{"metal":{"p":"kOjIAEz/kOjIAEz/kOjIAEz/kOj0Gkz
 // ======================================================================= road signs (US Road and Freeway Sign Pack)
 // Every face is painted into one shared atlas (one texture, a draw call or two for all of them); plates, posts and the
 // gantry steel are merged into the world meshes, so a few hundred signs cost about what one car does.
-const SGN={A:2048,faces:new Map(),sh:[],full:false,tex:null,dirty:true,pxM:150};
+const SGN={A:2048,faces:new Map(),sh:[],full:false,tex:null,dirty:true,pxM:118};   /* 118 px per metre still reads at gantry distance and leaves room in the atlas for every exit */
 const SG_FONT='"Roboto Condensed","Arial Narrow","Helvetica Neue",Arial,sans-serif';
 function sgAlloc(w,h){w+=8;h+=8;const A=SGN.A;for(const r of SGN.sh){if(r.h>=h&&r.h<=h*1.35&&r.x+w<=A){const o={x:r.x+4,y:r.y+4};r.x+=w;return o}}
   const y=SGN.sh.length?SGN.sh[SGN.sh.length-1].y+SGN.sh[SGN.sh.length-1].h:0;if(y+h>A||w>A){SGN.full=true;return null}SGN.sh.push({y,h,x:w});return {x:4,y:y+4}}
 // a face: key (same key = same pixels, shared by every sign that shows it), size in metres, painter(g,W,H)
 function sgFace(key,wm,hm,paint,pxM){let f=SGN.faces.get(key);if(f)return f;const k=pxM||SGN.pxM,W=Math.max(16,Math.round(wm*k)),H=Math.max(16,Math.round(hm*k));let a=sgAlloc(W,H);
-  if(!a){f=SGN.faces.get("__blank")||sgFace("__blank",0.5,0.5,(g,W,H)=>{g.fillStyle="#bbb";g.fillRect(0,0,W,H)});SGN.faces.set(key,f);return f}
+  if(!a){f=SGN.faces.get("__blank")||{key:"__blank",x:0,y:0,W:16,H:16,paint:()=>{}};SGN.faces.set(key,f);if(!SGN.warned){SGN.warned=1;console.warn("sign atlas full")}return f}   /* full: plain grey (never recurse) */
   f={key,x:a.x,y:a.y,W,H,paint};SGN.faces.set(key,f);SGN.dirty=true;return f}
 function sgAtlas(){if(!SGN.dirty&&SGN.tex)return SGN.tex;const A=SGN.A,c=document.createElement("canvas");c.width=A;c.height=A;const g=c.getContext("2d");g.fillStyle="#888";g.fillRect(0,0,A,A);
   for(const f of SGN.faces.values()){if(!f.paint)continue;g.save();g.translate(f.x,f.y);g.beginPath();g.rect(-3,-3,f.W+6,f.H+6);g.clip();try{f.paint(g,f.W,f.H)}catch(e){console.warn("sign face",f.key,e)}g.restore()}
@@ -5318,8 +5328,8 @@ function mergeClear(c,n,mv){const e=mv.e,dir=mv.dir,inc=n.legs.find(l=>l.major&&
   const up=new Map();if(inc){let L=inc,acc=0;for(let k=0;k<4&&L;k++){const ld=L.end===1?1:-1;up.set(L.e,{acc,dir:ld});acc+=L.e.L;if(acc>160)break;const n0=startNode(L.e,ld);L=n0.legs.find(l=>l.major&&l.e!==L.e&&l.e.type===e.type&&(l.end===1?1:-1)===ld)||null}}
   for(const o of cars){if(o===c||o.jn&&o.jn.n!==n)continue;let d=null;
     if(o.jn&&o.jn.n===n&&o.jn.mv.e===e&&o.jn.mv.dir===dir)d=0;
-    else if(!o.jn&&o.e===e&&o.dir===dir&&laneIdx(o)===0)d=-o.s;            // already past the merge point: d < 0
-    else if(!o.jn&&up.has(o.e)&&o.dir===up.get(o.e).dir&&laneIdx(o)===0)d=up.get(o.e).acc+o.e.L-o.s;   // still coming: d > 0
+    else if(!o.jn&&o.e===e&&o.dir===dir&&(laneIdx(o)===0||e.type==="sd"))d=-o.s;            // already past the merge point: d < 0
+    else if(!o.jn&&up.has(o.e)&&o.dir===up.get(o.e).dir&&(laneIdx(o)===0||e.type==="sd"))d=up.get(o.e).acc+o.e.L-o.s;   /* a ramp onto a service drive joins across both its lanes */   // still coming: d > 0
     else if(o.jn&&o.jn.n!==n)continue
     if(d===null)continue;const tA=d/Math.max(o.v,1),tMe=(c.mv&&c.mvNode===n?Math.max(0,(mvP(c).s0-c.s)/v):0)+40/v;
     if(d>-14&&d<20+o.v*1.2&&Math.abs(tA-tMe)<2.4)return false}
@@ -16380,7 +16390,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=319;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="173",BUILD_VER=320;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}try{const P=JSON.parse(localStorage.getItem("strata.ped")||"null");if(P){st.pedHold=+P.pedHold||0;st.thrRate=+P.thrRate||2;st.brkRate=+P.brkRate||2}}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){const k=GFX.q==="auto"?GFX.eff:GFX.q;if(G.k!==k||G.v!==GFX.ovV||!G.m){G.k=k;G.v=GFX.ovV;const m={...GQ[k]};for(const o of GOPT)if(GFX.ov[o[0]]!==undefined)Object.assign(m,o[4](GFX.ov[o[0]]));if(Object.keys(GFX.ov).length)m.label=GQ[k].label+" (custom)";G.m=m;COLL.nt=!m.trees}return G.m}
