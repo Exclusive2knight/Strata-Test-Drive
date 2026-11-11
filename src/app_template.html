@@ -1277,8 +1277,15 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
 <script data-boot>(function(){var p=0;window.__bootP=0;var t=setInterval(function(){if(window.__bootReal){clearInterval(t);return}p+=(0.7-p)*0.025;window.__bootP=p;var a=document.getElementById("bootArc"),n=document.getElementById("bootNeedle"),c=document.getElementById("bootPct");if(a)a.setAttribute("stroke-dasharray",(p*100).toFixed(1)+" 100");if(n)n.style.setProperty("--a",(-135+p*270)+"deg");if(c)c.textContent=String(Math.round(p*100))},120)})()</script>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 318 · Each car's own parking assist</h2></div>
+    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 319 · Michigan service drives on I-38</h2></div>
     <div class="nb">
+      <h4>Michigan service drives on I-38</h4><ul>
+      <li><b>Sunken freeway:</b> I-38 now runs down in a cut through the Woodward Ave and Maple Rd interchanges, the way Detroit's freeways do. It comes back up to street level to cross the river between them.</li>
+      <li><b>Service drives:</b> a one-way, two-lane I-38 Service Dr runs along each side at street level, with kerbs and a sidewalk, going the same way as the freeway beside it (eastbound on the south side, westbound on the north side). Speed limit 40 mph.</li>
+      <li><b>Real Michigan-style ramps:</b> exits climb out of the cut onto the service drive before the cross street. You meet Woodward or Maple at a traffic light, and the entrance after the light drops back down to the freeway. You can also stay on the service drive between the two interchanges, crossing the river on its own bridge.</li>
+      <li><b>Cross streets at street level:</b> Woodward Ave and Maple Rd now cross the freeway on flat bridges between the two service drives, instead of climbing up over it.</li>
+      <li>Traffic uses the new exits, service drives and entrances.</li>
+      </ul>
       <h4>Each car's own parking assist</h4><ul>
       <li><b>No more one park assist for every car:</b> the Park screen now shows the system the real car has, by its real name and in that maker's style: Ford and Lincoln Active Park Assist 2.0 / Enhanced Active Park Assist, Chevrolet and GMC Automatic Parking Assist, Cadillac and Hummer Enhanced Automatic Parking Assist, Jeep / Ram / Chrysler ParkSense Active Park Assist, Audi Park Assist (Plus), Volkswagen Park Assist (Plus), Porsche Active Parking Support, Hyundai / Kia / Genesis Remote Smart Parking Assist 2, Toyota Teammate Advanced Park and Lexus Advanced Park, Volvo Park Assist Pilot and Park Pilot Assist, Lucid Auto Park, Land Rover Park Assist and Tesla Autopark.</li>
       <li><b>Only the moves the real system does:</b> each car only offers the manoeuvres its system really has (for example, no park-out on Tesla Autopark or Chevrolet Automatic Parking Assist, parallel only on the 2011 BMW 5 Series).</li>
@@ -2297,7 +2304,9 @@ const RT={
   // narrow paved country lane, no lines, cars pass close
   lane:{n:1,m:-1.2,shR:0,lim:30,z:"r",rank:1,col:"h",label:"Country lane"},
   // one-way, one-lane ring of a roundabout (traffic goes round anticlockwise; it has priority, everyone entering yields)
-  rbt:{n:1,m:-LANE,shR:1.2,lim:20,z:"c",rank:7,col:"h",kerb:true,edgeL:true,label:"Roundabout",ow:true}};
+  rbt:{n:1,m:-LANE,shR:1.2,lim:20,z:"c",rank:7,col:"h",kerb:true,edgeL:true,label:"Roundabout",ow:true},
+  // a Michigan service drive: a one-way, two-lane frontage road beside a sunken freeway, kerbs and a sidewalk, running the same way as the freeway beside it
+  sd:{n:2,m:-2*LANE,shR:0.6,lim:40,z:"c",rank:4,col:"c",kerb:true,walk:2.0,edgeL:true,label:"Service drive",ow:true}};
 // the new world (Westport, Fairhaven, Millbrook, Mount Kestrel) takes over from Westport at 3 pm Eastern on Oct 23 2026 (19:00 UTC).
 // Before then it can be tried with ?world=2; after it, ?world=1 still opens Westport
 const W2_AT=Date.UTC(2026,9,23,19,0,0);
@@ -2365,7 +2374,7 @@ function w2WaterD(x,y,m=200){let d=1e9;for(const B of W2_WATER){const b=B.bb;if(
 // Westport (downtown, the river, the parking garage), Fairhaven (the second city, shops, suburbs), Millbrook (an old small town by a lake),
 // Mount Kestrel (switchbacks and a pass road), farmland, and two interstates: I-38 east-west and I-61 north-south, crossing at a cloverleaf.
 // Cross streets ride over the freeways on raised bridges, so the ramps really climb up to them.
-const W2C={MT:[-3300,2500],FH:[2600,0],MB:[1750,2450],CL:[-2300,-1500],CLH:8};
+const W2C={MT:[-3300,2500],FH:[2600,0],MB:[1750,2450],CL:[-2300,-1500],CLH:8,SD:{cuts:[[-1300,-410],[410,1300]],y:-1500,H:7,full:150}};
 const W2_MTN=[];   // the mountain roads: their heights are smoothed along the road (see w2Profiles)
 const W2_RB=[];
 function buildNet2(){
@@ -2389,14 +2398,14 @@ function buildNet2(){
   const cul=(name,from,dx,dy,len=80)=>{const L_=Math.hypot(dx,dy),c=[Math.round(from[0]+dx/L_*len),Math.round(from[1]+dy/L_*len)];W2_RB.push({x:c[0],y:c[1],R:13,legs:[],cul:true});rd("res",name,[from,c])};
   const ZX=7.2;     // how high a cross street climbs to bridge a freeway at a diamond interchange
   // ---- a diamond interchange on a straight freeway: c centre, F freeway direction. Signals where the ramps meet the raised cross street
-  const mkIC=(c,F,Ld,Dt,name)=>{const I={c,F,Ld,Dt:[Dt,Dt],name};const [cx,cy]=c,[fx,fy]=F,nx=-fy,ny=fx;
+  const mkIC=(c,F,Ld,Dt,name,sd)=>{const I={c,F,Ld,Dt:[Dt,Dt],name,sd};const [cx,cy]=c,[fx,fy]=F,nx=-fy,ny=fx;
     I.P=(u,t,r)=>{const p=[Math.round((cx+fx*u+nx*t)*100)/100,Math.round((cy+fy*u+ny*t)*100)/100];if(r)p.push(r);return p};
-    for(const u of [-Ld,Ld])N(...I.P(u,0),{ctrl:"merge"});I.T=sg=>sg<0?-I.Dt[0]:I.Dt[1];for(const sg of [-1,1])N(...I.P(0,I.T(sg)),{ctrl:"signal",zo:ZX});return I};
+    for(const u of [-Ld,Ld])N(...I.P(u,0),{ctrl:"merge"});I.T=sg=>sg<0?-I.Dt[0]:I.Dt[1];for(const sg of [-1,1])N(...I.P(0,I.T(sg)),{ctrl:"signal",zo:sd?0:ZX});return I};
   const icRamps=I=>{for(const d of [1,-1]){const sg=-d,L=I.Ld,Tt=I.T(sg),Ta=Math.abs(Tt),uS=Math.min(110,L-310),uP=Math.max(uS+90,L-205);
     E("ramp",I.name+" exit",[I.P(-d*L,0),I.P(-d*(L-80),sg*20.6),I.P(-d*(L-150),sg*23.75),I.P(-d*uP,sg*24.1,90),I.P(-d*uS,sg*Ta*0.5,90),I.P(-d*30,Tt,40),I.P(0,Tt)]);
     E("ramp",I.name+" entrance",[I.P(0,Tt),I.P(d*30,Tt,40),I.P(d*uS,sg*Ta*0.5,90),I.P(d*uP,sg*24.1,90),I.P(d*(L-150),sg*23.75),I.P(d*(L-80),sg*20.6),I.P(d*L,0)])}};
   const icN=(I,u)=>I.P(u*I.Ld,0);
-  const I38=[mkIC([-3600,-1500],[1,0],420,150,"County Rd 3"),mkIC([-1000,-1500],[1,0],420,150,"Woodward Ave"),mkIC([1000,-1500],[1,0],420,150,"Maple Rd"),mkIC([2600,-1500],[1,0],420,150,"Fairhaven Blvd")];
+  const I38=[mkIC([-3600,-1500],[1,0],420,150,"County Rd 3"),mkIC([-1000,-1500],[1,0],420,90,"Woodward Ave",1),mkIC([1000,-1500],[1,0],420,90,"Maple Rd",1),mkIC([2600,-1500],[1,0],420,150,"Fairhaven Blvd")];
   const I61=[mkIC([-2300,0],[0,1],420,150,"Main St"),mkIC([-2300,1500],[0,1],420,150,"Kestrel Rd")];
   // ---- the cloverleaf: I-61 rides over I-38 on a bridge. In each quarter a loop ramp (left turns) and an outer ramp (right turns).
   // Loops leave 50 m past the bridge and join 85 m before it; the outer ramps leave 700 m out and join 730 m out
@@ -2413,7 +2422,22 @@ function buildNet2(){
   mkR("xway","I-61",[[4100,-1500],[4700,-1500,300],[4650,3450,450],icN(ILN,-1),icN(ILN,1),[-2300,3450,380],[-2300,2600]]);
   mkR("xway","I-61",[[-2300,-2850],nB(-CLD.dOM),nB(-CLD.dOX),nB(-CLD.dM),nB(-CLD.dX),nB(CLD.dX),nB(CLD.dM),nB(CLD.dOX),nB(CLD.dOM),
     icN(I61[0],-1),icN(I61[0],1),icN(I61[1],-1),icN(I61[1],1),[-2300,2600]]);
-  for(const I of [...I38,...I61,ILW,ILN])icRamps(I);
+  for(const I of [...I38,...I61,ILW,ILN])if(!I.sd)icRamps(I);
+  // ---- Michigan-style: between Woodward Ave and Maple Rd I-38 runs sunk in a cut (W2C.SD), with a one-way service drive on each side at street level.
+  // Exits climb out of the cut onto the service drive before each cross street; entrances leave the service drive after it and drop back down.
+  // The cross streets meet the service drives at signals and bridge the cut between them.
+  {const W=I38[1],SDT=90,cut=W2C.SD.H,Y=W.c[1];
+    const P=(x,t,r)=>{const q=[x,Math.round((Y+t)*100)/100];if(r)q.push(r);return q};
+    for(const d of [1,-1]){const sg=-d,t=sg*SDT,xs=[-1420,-1300,-1000,-850,850,1000,1300,1420].map(v=>v*d),A=d>0?"Woodward Ave":"Maple Rd",B=d>0?"Maple Rd":"Woodward Ave";
+      for(const x of [xs[3],xs[4]])N(x,Y+t,{ctrl:"merge"});
+      // off the freeway (still at street level here, before the cut) onto the drive, along past both cross streets, and back on at the far end
+      mkR("ramp",A+" exit",[P(xs[0],0),P(xs[0]+d*70,sg*21),P(xs[1],t,60),P(xs[1]+d*40,t)]);
+      mkR("sd","I-38 Service Dr",[P(xs[1]+d*40,t),P(xs[2],t),P(xs[3],t),P(xs[4],t),P(xs[5],t),P(xs[6]-d*40,t)]);
+      mkR("ramp",B+" entrance",[P(xs[6]-d*40,t),P(xs[6],t,60),P(xs[7]-d*70,sg*21),P(xs[7],0)]);
+      // the middle pair, through the cut: the entrance drops down beside the drive first, then swings in to the freeway; the exit does the same the other way round
+      const cx=d>0?580:-580;
+      E("ramp",A+" entrance",[P(xs[3],t),P(xs[3]+d*55,sg*62,60),P(xs[3]+d*175,sg*60,120),P(d>0?-650:650,sg*24,90),P(-cx,0)],{zo:u=>-cut*smooth01(60,200,u)});
+      E("ramp",B+" exit",[P(cx,0),P(d>0?650:-650,sg*24,90),P(xs[4]-d*175,sg*60,120),P(xs[4]-d*55,sg*62,60),P(xs[4],t)],{zo:function(u){return -cut*(1-smooth01(this.L-200,this.L-60,u))}})}}
   mkR("road","Harbor Rd",[[1900,2900],ILN.P(0,ILN.T(1)),ILN.P(0,ILN.T(-1))],{lim:40});
   // the ramps of the cloverleaf: quarter (sx, sy); P is the freeway coming in towards the crossing there, Q the one leaving
   const NM={A:["I-38","I-38"],B:["I-61","I-61"]},dirName=v=>v[0]>0.5?"E":v[0]<-0.5?"W":v[1]>0.5?"N":"S";
@@ -2442,7 +2466,7 @@ function buildNet2(){
   mkR("art","Commerce Pkwy",[[100,0],[500,0],[1000,0],[1700,0],[2300,0]],{lim:45});
   for(const x of [500,1000,1700])N(x,0,{ctrl:"signal"});
   // Woodward Ave: south to I-38 and on into the farmland as County Rd 15; north to Kestrel Rd
-  mkR("art","Woodward Ave",[[-1000,-450],[-1000,-1090],[-1000,-1350],[-1000,-1650],[-1000,-1910]],{lim:45});
+  mkR("art","Woodward Ave",[[-1000,-450],[-1000,-1090],[-1000,-1410],[-1000,-1590],[-1000,-1910]],{lim:45});
   mkR("road","County Rd 15",[[-1000,-1910],[-1000,-2400],[-1000,-3300]],{lim:55});
   mkR("ave","Woodward Ave",[[-1000,450],[-1000,800]],{lim:35});
   mkR("road","Woodward Ave",[[-1000,800],[-1000,1000],[-1000,1500]],{lim:45});
@@ -2457,7 +2481,7 @@ function buildNet2(){
     rd("res","Birch St",[[100,-650],B.W]);rd("res","Cedar St",[B.E,[1000,-650]]);rd("col","Poplar Ln",[[500,0],[530,-240,0],B.N])}
   // ---- Maple Rd and the county roads: a mile-ish grid of 55 mph roads through the farmland
   mkR("road","Maple Rd",[[1000,0],[1000,-650],[1000,-960],[1000,-1090]],{lim:45});
-  mkR("art","Maple Rd",[[1000,-1090],[1000,-1350],[1000,-1650],[1000,-1910]],{lim:45});
+  mkR("art","Maple Rd",[[1000,-1090],[1000,-1410],[1000,-1590],[1000,-1910]],{lim:45});
   mkR("road","Maple Rd",[[1000,-1910],[1000,-2400],[1000,-3300]],{lim:55});
   mkR("road","County Rd 3",[[-3600,-3300],[-3600,-2400],[-3600,-2100],[-3600,-1910]],{lim:55});
   mkR("art","County Rd 3",[[-3600,-1910],[-3600,-1650],[-3600,-1350],[-3600,-1090]],{lim:45});
@@ -2673,11 +2697,15 @@ function w2Profiles(){const ok=e=>e.mtn||/^(road|lane|dirt)$/.test(e.type),done=
     for(const c of chain){const e=c.e,n=Math.ceil(e.L/4)+1,zp=new Float32Array(n);for(let i=0;i<n;i++){const u=Math.min(i*4,e.L);zp[i]=at(c.off+(c.rev?e.L-u:u))}e.zp=zp}
     for(let k=1;k<chain.length;k++){const c=chain[k],n=c.rev?c.e.b:c.e.a;n.zs=at(c.off)}}}
 if(W2)w2Profiles();
+if(W2){const C=W2C.SD;for(const e of EDGES){if(e.type!=="xway"||Math.abs(e.a.y-C.y)>1||Math.abs(e.b.y-C.y)>1)continue;const xa=e.a.x,xb=e.b.x,ux=x=>(x-xa)/(xb-xa)*e.L;   /* I-38's sunken stretches either side of the river */
+  for(const [x0,x1] of C.cuts){const lo=Math.min(ux(x0+C.full),ux(x1-C.full)),hi=Math.max(ux(x0+C.full),ux(x1-C.full)),u0=clamp(lo,0,e.L),u1=clamp(hi,0,e.L);if(u1<=u0)continue;
+    const g0=Math.min(ux(x0),ux(x1)),g1=Math.max(ux(x0),ux(x1));(e.dip=e.dip||[]).push({uc:(u0+u1)/2,half:(u1-u0)/2,H:C.H,rA:u0>0.5?Math.max(1,u0-Math.max(0,g0)):1,rB:u1<e.L-0.5?Math.max(1,Math.min(e.L,g1)-u1):1,sd:1})}}}
 for(const e of EDGES){if(e.type==="xway"||e.ow)continue;for(const x of EDGES){if(x.type!=="xway"||x.a===e.a||x.a===e.b||x.b===e.a||x.b===e.b)continue;let pt=null;
   for(let u=0;u<=e.L;u+=1){const p=eAt(e,u),q=eProj(x,p.x,p.y);if(q.u<1||q.u>x.L-1){pt=null;continue}if(pt!==null&&Math.sign(q.t)!==Math.sign(pt)){const uc=u-0.5;
       if(W2){const dz=ez(e,uc)-ez(x,q.u);if(dz>4){e.ov={uc,half:OV_HALF+2,H:0,rA:22,rB:22};break}if(dz<-4)break}
       e.ov={uc,half:OV_HALF,H:OV_H,rA:clamp(uc-OV_HALF-Math.max(e.r0,e.a.pr||0)-3,30,105),rB:clamp(e.L-uc-OV_HALF-Math.max(e.r1,e.b.pr||0)-3,30,105)};
       (x.dip=x.dip||[]).push({uc:q.u,half:DIP_HALF,H:DIP_H,rA:Math.min(DIP_RAMP,q.u-DIP_HALF-5),rB:Math.min(DIP_RAMP,x.L-q.u-DIP_HALF-5)});break}pt=q.t}if(e.ov)break}}
+if(W2)for(const e of EDGES)if(e.ov&&e.type==="art"&&Math.abs(e.a.y-W2C.SD.y)<95&&Math.abs(e.b.y-W2C.SD.y)<95)e.ov.half=Math.max(e.ov.half,60);   /* the cross streets span the whole sunken cut between the service drives */
 if(W2){const e=EDGES.find(e=>e.name==="I-61"&&Math.abs(e.a.y-(W2C.CL[1]-50))<1&&Math.abs(e.b.y-(W2C.CL[1]+50))<1);if(e)e.ov={uc:50,half:31,H:0,rA:18,rB:18}}   // I-61 over I-38
 for(const e of EDGES){if(W2){let a=null;for(let u=0;u<=e.L+2;u+=2){const p=eAt(e,Math.min(u,e.L));let B=null;for(const b of W2_WATER)if(w2BodyD(b,p.x,p.y)<2){B=b;break}
     if(B&&!a)a={u,B};if(a&&(!B||u>=e.L)){const uc=(a.u+u)/2,half=(u-a.u)/2+8;
@@ -16352,7 +16380,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=318;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="173",BUILD_VER=319;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}try{const P=JSON.parse(localStorage.getItem("strata.ped")||"null");if(P){st.pedHold=+P.pedHold||0;st.thrRate=+P.thrRate||2;st.brkRate=+P.brkRate||2}}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){const k=GFX.q==="auto"?GFX.eff:GFX.q;if(G.k!==k||G.v!==GFX.ovV||!G.m){G.k=k;G.v=GFX.ovV;const m={...GQ[k]};for(const o of GOPT)if(GFX.ov[o[0]]!==undefined)Object.assign(m,o[4](GFX.ov[o[0]]));if(Object.keys(GFX.ov).length)m.label=GQ[k].label+" (custom)";G.m=m;COLL.nt=!m.trees}return G.m}
