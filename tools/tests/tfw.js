@@ -10,7 +10,7 @@ const drive=(label,x,y,h,v,T,thr)=>{   /* holds its lane like a driver would */r
 // 2. Woodward Ave northbound across the cut at street level
 {const e=EDGES.find(e=>e.name==="Woodward Ave"&&e.ov&&e.a.y<-1400&&e.b.y>-1600||e.name==="Woodward Ave"&&e.ov),p=fpt(e,e.a.y<e.b.y?1:-1,2,laneOff(e,0));drive("Woodward Ave over the cut",p[0],p[1]-60,Math.PI/2,13,16,0.3)}
 // 3. the eastbound service drive from Woodward past the river to Maple
-{const e=EDGES.find(e=>e.type==="sd"&&e.a.x===-850&&e.b.x===850),p=fpt(e,1,5,laneOff(e,0));drive("Service Dr EB over the river",p[0],p[1],0,17,60,0.3)}
+{const e=EDGES.find(e=>e.type==="sd"&&e.a.x===-900&&e.b.x===900),p=fpt(e,1,5,laneOff(e,0));drive("Service Dr EB over the river",p[0],p[1],0,17,60,0.3)}
 // 4. traffic: ramps, service drives and the freeway, 120 s
 cars=[];resetCar({free:true,x:-1000,y:-1300,h:0});car.vx=0;st.gear="P";spawnTraffic(70);const seen=new Map(),stop=new Map();let ov=0;const ovS=new Set();
 SIM(120,t=>{for(const c of cars){if(c.kind!=="ai"||!c.e)continue;if(c.e.type==="sd"||c.e.type==="ramp")seen.set(c.e.type+" "+c.e.name,(seen.get(c.e.type+" "+c.e.name)||0)+1);
