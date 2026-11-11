@@ -1277,8 +1277,13 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
 <script data-boot>(function(){var p=0;window.__bootP=0;var t=setInterval(function(){if(window.__bootReal){clearInterval(t);return}p+=(0.7-p)*0.025;window.__bootP=p;var a=document.getElementById("bootArc"),n=document.getElementById("bootNeedle"),c=document.getElementById("bootPct");if(a)a.setAttribute("stroke-dasharray",(p*100).toFixed(1)+" 100");if(n)n.style.setProperty("--a",(-135+p*270)+"deg");if(c)c.textContent=String(Math.round(p*100))},120)})()</script>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 316 · AEB, headlights and Firestone fixes</h2></div>
+    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 317 · Parking lots, part 1: driving the aisles</h2></div>
     <div class="nb">
+      <h4>Parking lots, part 1: driving the aisles</h4><ul>
+      <li><b>No more cutting across spaces:</b> drivers and FSD now treat painted parking spaces as off-limits for driving through. Routes follow the aisles and only turn into the space they're going to (or out of the one they're leaving). In testing, the share of route points crossing other spaces fell from about 3% to about 1%.</li>
+      <li><b>Drivers no longer pick taken spaces:</b> a bug made every lot space look free to the AI, so drivers would head for spaces that already had a car in them and then give up. They now pick genuinely empty spaces, and two drivers no longer aim for the same space.</li>
+      <li><b>Turning in tight aisles:</b> drivers judge clearance from where their car will be as it turns, not just straight ahead, so they stop doing three-point turns for parked cars they would have cleared.</li>
+      </ul>
       <h4>AEB, headlights and Firestone fixes</h4><ul>
       <li><b>AEB lets go:</b> after automatic emergency braking stops the car, pressing the accelerator counts as you taking over. It no longer grabs the brakes again straight away, so you can pull around what it stopped for.</li>
       <li><b>Other drivers' headlights:</b> traffic switches its own headlights on after dark, at dusk and dawn, and in rain, snow or fog. Turning your lights on with L no longer changes theirs, and parked cars stay dark.</li>
@@ -6073,7 +6078,8 @@ function evCrashTick(v,dt){v.pt+=dt;const [L_,F]=v.pair;
 // and drives off. Cars already parked in the lots near you leave the same way, so the lots fill up and empty out
 const ERR={t:12,out:8};
 function lotEntry(S){if(S._ent!==undefined)return S._ent;let best=null;for(const e of edgesNear(S.x,S.y,110)){if(/xway|ramp|rbt|dirt/.test(e.type)||e.ow||e.n<1)continue;const p=eProj(e,S.x,S.y);if(p.u<18||p.u>e.L-18)continue;const d=Math.abs(p.t);if(!best||d<best.d)best={e,u:p.u,d,side:Math.sign(p.t)||1}}S._ent=best;return best}
-function stallFree(q){for(const o of parked)if(Math.abs(o.wx-q.p[0])<2.3&&Math.abs(o.wy-q.p[1])<2.3)return false;for(const c of cars)if(Math.abs(c.wx-q.p[0])<2.6&&Math.abs(c.wy-q.p[1])<2.6)return false;return true}
+function stallFree(q,self){for(const c of cars)if(c!==self&&c.errand&&c.errand.q===q&&(c.errand.ph==="go"||c.errand.ph==="in"))return false;   /* someone is already heading for it */
+  for(const o of parked)if(Math.abs(o.wx-q.p[0])<2.3&&Math.abs(o.wy-q.p[1])<2.3)return false;for(const c of cars)if(Math.abs(c.wx-q.p[0])<2.6&&Math.abs(c.wy-q.p[1])<2.6)return false;return true}
 // in and out through the lot's driveway when it has one (the cut through the kerb), not straight across the pavement
 function lotDrive(S,x,y){if(S._dw===undefined){S._dw=XSITES.filter(D=>D.drive&&Math.hypot(D.x-S.x,D.y-S.y)<Math.max(S.L,S.D)/2+25)}let b=null,bd=1e9;for(const D of S._dw){const d=Math.hypot(D.x-x,D.y-y);if(d<bd){bd=d;b=D}}return b}
 // ---- AI in parking lots: a real path through the aisles (A* on a 1 m grid of the lot), driven like a car (pure pursuit on a
@@ -6086,6 +6092,8 @@ function lotGrid(S){let G=LOTG.get(S);if(G)return G;const pts=[[S.x,S.y],...(S.s
   for(let j=0;j<ny;j++)for(let i=0;i<nx;i++){const x=x0+i+0.5,y=y0+j+0.5,g=groundAt(x,y);let c=KC[g.kind]??25;if(g.kind==="water")c=Infinity;
     if(c<Infinity)for(const o of collNear(x,y)){if(o.z1!==undefined&&(z<o.z0-0.6||z>o.z1))continue;if(o.t==="c"){if(Math.hypot(x-o.x,y-o.y)<o.r+inf){c=Infinity;break}}else{const cc=Math.cos(o.h||0),sn=Math.sin(o.h||0),dx=x-o.x,dy=y-o.y;if(Math.abs(dx*cc+dy*sn)<o.hl+inf&&Math.abs(-dx*sn+dy*cc)<o.hw+inf){c=Infinity;break}}}
     cost[j*nx+i]=c}
+  /* the painted spaces are not road: driving across empty ones costs a lot more than the aisle, so routes keep to the aisles and only turn into the space they're going to (or out of the one they're in) */
+  for(const q of (S.stalls||[])){const c=Math.cos(q.h),sn=Math.sin(q.h);for(let a=-2.5;a<=2.5;a+=0.5)for(let b=-1.15;b<=1.15;b+=0.5){const x=q.p[0]+c*a-sn*b,y=q.p[1]+sn*a+c*b,i=Math.floor(x-x0),j=Math.floor(y-y0);if(i<0||j<0||i>=nx||j>=ny)continue;const k=j*nx+i;if(cost[k]<=2)cost[k]=4}}
   G={x0,y0,nx,ny,cost,z};LOTG.set(S,G);return G}
 function lotPlan(S,from,to,skip){const G=lotGrid(S),{x0,y0,nx,ny}=G,N=nx*ny,cost=G.cost.slice(),id=(x,y)=>clamp(Math.floor(y-y0),0,ny-1)*nx+clamp(Math.floor(x-x0),0,nx-1);
   // the other parked cars, as long boxes; never the one we are, or the stall we're going into
@@ -6094,7 +6102,8 @@ function lotPlan(S,from,to,skip){const G=lotGrid(S),{x0,y0,nx,ny}=G,N=nx*ny,cost
     const c=Math.cos(p.wh||0),sn=Math.sin(p.wh||0);for(let a=-2.3;a<=2.3;a+=0.5)for(let b=-0.9;b<=0.9;b+=0.45){const k2=id(p.wx+c*a-sn*b,p.wy+sn*a+c*b);cost[k2]=Infinity}}
   const fits=(x,y,h)=>{const gx=Math.floor(x/6),gy=Math.floor(y/6);for(let i=-1;i<=1;i++)for(let j=-1;j<=1;j++){const L=PB.get((gx+i)*7919+gy+j);if(!L)continue;for(const p of L)if(obbSAT(x,y,h,2.3,0.95,p.wx,p.wy,p.wh||0,2.3,0.92))return false}return true};
   const near0=(x,y)=>Math.hypot(x-from[0],y-from[1])<3.5||Math.hypot(x-to[0],y-to[1])<2.5;
-  for(const P of [from,to]){const c=P[2]!=null?Math.cos(P[2]):0,sn=P[2]!=null?Math.sin(P[2]):0;for(let d=-3;d<=3;d+=0.5)for(const l of [-0.5,0,0.5]){const k=id(P[0]+c*d-sn*l,P[1]+sn*d+c*l);if(cost[k]===Infinity)cost[k]=2}}
+  for(const P of [from,to]){const c=P[2]!=null?Math.cos(P[2]):0,sn=P[2]!=null?Math.sin(P[2]):0;for(let d=-3;d<=3;d+=0.5)for(const l of [-0.5,0,0.5]){const k=id(P[0]+c*d-sn*l,P[1]+sn*d+c*l);if(cost[k]===Infinity||cost[k]===4)cost[k]=2}}
+  for(const P of [from,to])for(const q of (S.stalls||[]))if(Math.hypot(q.p[0]-P[0],q.p[1]-P[1])<(P===to?6:2.6)){const c=Math.cos(q.h),sn=Math.sin(q.h);for(let a=-2.5;a<=2.5;a+=0.5)for(let b=-1.15;b<=1.15;b+=0.5){const k=id(q.p[0]+c*a-sn*b,q.p[1]+sn*a+c*b);if(cost[k]===4)cost[k]=2}}   /* the space we're in or going to is open to us */
   const s0=id(from[0],from[1]),g0=id(to[0],to[1]);if(cost[g0]===Infinity)cost[g0]=2;
   const g=new Float32Array(N).fill(Infinity),fr=new Int32Array(N).fill(-1),heap=[],gx=g0%nx,gy=(g0/nx)|0,H=k=>{const dx=Math.abs(k%nx-gx),dy=Math.abs(((k/nx)|0)-gy);return (dx+dy)+(1.414-2)*Math.min(dx,dy)};
   const push=(k,f)=>{heap.push([f,k]);let i=heap.length-1;while(i>0){const q=(i-1)>>1;if(heap[q][0]<=heap[i][0])break;[heap[q],heap[i]]=[heap[i],heap[q]];i=q}};
@@ -6143,6 +6152,7 @@ function errAnim(c,dt){const E=c.errand;
   if(E.ph==="in"&&sg.tight){const q=E.q,dx=q.p[0]-c.wx,dy=q.p[1]-c.wy,d=Math.hypot(dx,dy);if(d<3.4&&Math.abs(wrapPi(c.wh-q.h))<0.6&&(dx*Math.cos(q.h)+dy*Math.sin(q.h))>-0.3){const v=Math.min(1.2,0.3+d*0.5),st_=Math.min(d,v*dt);
       c.wx+=dx/(d||1)*st_;c.wy+=dy/(d||1)*st_;c.wh+=wrapPi(q.h-c.wh)*Math.min(1,dt*2.5);c.v=v;c.yr=0;c.spin+=v/0.36*dt;if(d<0.12){c.wx=q.p[0];c.wy=q.p[1];c.wh=q.h;errDone(c)}return}}
   // can't get into this one after a few tries: give up on the space and drive back out to the street, like anyone would
+  if(E.ph==="in"&&!E.gaveUp&&E.q&&parked.some(p=>Math.abs(p.wx-E.q.p[0])<1.3&&Math.abs(p.wy-E.q.p[1])<1.3))E.kN=4;   /* someone took the space first: give up on it right away */
   if(E.ph==="in"&&(E.kN||0)>=4&&!E.gaveUp&&E.S){E.gaveUp=1;try{const en=lotEntry(E.S),X=errPath(E.S,E.q,en,E.dir),path=lotPlan(E.S,[c.wx,c.wy,c.wh],X.G,null);E.ph="leave";E.segs=[{path:(path||[[c.wx,c.wy],X.G]).concat([[X.R[0],X.R[1]]]),rev:false}];
       {const P0=E.segs[0].path,k=Math.min(P0.length-1,4),dx=P0[k][0]-c.wx,dy=P0[k][1]-c.wy;if(dx*Math.cos(c.wh)+dy*Math.sin(c.wh)<0){const B=[[c.wx,c.wy]];for(let d=0.5;d<=4;d+=0.5)B.push([c.wx-Math.cos(c.wh)*d,c.wy-Math.sin(c.wh)*d]);E.segs[0].needRe=1;E.segs.unshift({path:B,rev:true})}}   /* the way out is behind us: back up first */
 E.si=0;E.kN=0;E.s=X.s;return}catch(e){}}
@@ -6175,7 +6185,8 @@ function errClear(c,ax,ay,ux,uy){const hit=(x,y,r)=>{const dx=x-ax,dy=y-ay;if(dx
   for(const p of peds){if(p.wx===undefined||p.mode==="down")continue;const dx=p.wx-ax,dy=p.wy-ay;if(dx*dx+dy*dy>100)continue;if(hit(p.wx,p.wy,1.8))return false}
   // parked cars: the body moved a little further along must not touch one
   if(c.errand&&c.errand.hardBlk>0){c.errand.blockP=1;return false}
-  if(c.errand){c.errand.blockP=0;for(const p of parked){if(p.wx===undefined||Math.abs(p.wx-c.wx)>9||Math.abs(p.wy-c.wy)>9)continue;const E_=c.errand,fin=E_.ph==="in"&&E_.si===E_.segs?.length-1&&E_.q&&Math.hypot(E_.q.p[0]-c.wx,E_.q.p[1]-c.wy)<4.5&&Math.abs(wrapPi(c.wh-E_.q.h))<0.5;if(obbSAT(c.wx+ux*(fin?0.35:0.7),c.wy+uy*(fin?0.35:0.7),c.wh,fin?2.2:2.35,fin?0.8:0.95,p.wx,p.wy,p.wh||0,2.3,0.92)){c.errand.blockP=1;return false}}}
+  if(c.errand){c.errand.blockP=0;for(const p of parked){if(p.wx===undefined||Math.abs(p.wx-c.wx)>9||Math.abs(p.wy-c.wy)>9)continue;const E_=c.errand,fin=E_.ph==="in"&&E_.si===E_.segs?.length-1&&E_.q&&Math.hypot(E_.q.p[0]-c.wx,E_.q.p[1]-c.wy)<4.5&&Math.abs(wrapPi(c.wh-E_.q.h))<0.5;const hh_=c.wh+clamp(c.yr||0,-0.6,0.6)*0.3,ux2=Math.cos(hh_)*Math.sign(ux*Math.cos(c.wh)+uy*Math.sin(c.wh)||1),uy2=Math.sin(hh_)*Math.sign(ux*Math.cos(c.wh)+uy*Math.sin(c.wh)||1);   /* where the body will be a moment from now, turning as it is */
+    if(obbSAT(c.wx+ux2*(fin?0.35:0.7),c.wy+uy2*(fin?0.35:0.7),hh_,fin?2.2:2.35,fin?0.8:0.95,p.wx,p.wy,p.wh||0,2.3,0.92)){c.errand.blockP=1;return false}}}
   return true}
 function errDone(c){const E=c.errand;if(E.ph==="in"){const k=cars.indexOf(c);if(k>=0)cars.splice(k,1);parked.push({fixed:true,kind:"parked",wx:E.q.p[0],wy:E.q.p[1],wh:E.q.h,wz:(groundAt(E.q.p[0],E.q.p[1]).h)||0,v:0,spin:0,sig:0,head:0,paint:c.paint,mdl:c.mdl,errAt:st.clock+35+Math.random()*90,errS:E.S,errQ:E.q})}
   else{Object.assign(c,{kind:"ai",fixed:false,errand:null,jn:null,e:E.e,dir:E.dir,s:E.s,off:laneOff(E.e,0),offT:laneOff(E.e,0),v:3,head:0,idle:0});c.wp=0;try{planMove(c)}catch(e){}carPose(c)}}
@@ -6187,7 +6198,7 @@ function errOut(o,S,q){const en=lotEntry(S);if(!en)return false;const dir=en.e.o
   errStart(c,[[o.wx,o.wy],[X.A[0],X.A[1],1],[X.G[0],X.G[1]],[X.R[0],X.R[1]]],0,segs);return true}
 function errTick(dt){if(!W2||!st.started)return;
   for(const c of cars){const E=c.errand;if(!E)continue;
-    if(E.ph==="go"){E.t+=dt;if(!c.jn&&c.e===E.e&&c.dir===E.dir&&Math.abs(c.s-E.s)<14){const X=errPath(E.S,E.q,lotEntry(E.S),E.dir);if(!stallFree(E.q)){c.errand=null;c.route=null;continue}c.route=null;let segs=null;try{const q=E.q,ch=Math.cos(q.h),sh=Math.sin(q.h),A=[q.p[0]-ch*7.4,q.p[1]-sh*7.4],path=lotPlan(E.S,[X.G[0],X.G[1]],A,null);if(path){
+    if(E.ph==="go"){E.t+=dt;if(!c.jn&&c.e===E.e&&c.dir===E.dir&&Math.abs(c.s-E.s)<14){const X=errPath(E.S,E.q,lotEntry(E.S),E.dir);if(!stallFree(E.q,c)){c.errand=null;c.route=null;continue}c.route=null;let segs=null;try{const q=E.q,ch=Math.cos(q.h),sh=Math.sin(q.h),A=[q.p[0]-ch*7.4,q.p[1]-sh*7.4],path=lotPlan(E.S,[X.G[0],X.G[1]],A,null);if(path){
           // the turn in: a curve that leaves the aisle the way we were going and ends straight in the space (swinging wide like a driver does)
           const n=path.length,a1=path[Math.max(0,n-4)],ix=A[0]-a1[0],iy=A[1]-a1[1],il=Math.hypot(ix,iy)||1,P1=[A[0]+ix/il*3.2,A[1]+iy/il*3.2],P2=[q.p[0]-ch*4.2,q.p[1]-sh*4.2],fin=[];
           for(let t=0;t<=1.0001;t+=0.05){const u=1-t;fin.push([u*u*u*A[0]+3*u*u*t*P1[0]+3*u*t*t*P2[0]+t*t*t*q.p[0],u*u*u*A[1]+3*u*u*t*P1[1]+3*u*t*t*P2[1]+t*t*t*q.p[1]])}segs=[{path:[[c.wx,c.wy],[X.G[0],X.G[1]]].concat(path.slice(1)),rev:false},{path:fin,rev:false,tight:true}]}}catch(e){}
@@ -6202,7 +6213,7 @@ function errTick(dt){if(!W2||!st.started)return;
   if(ERR.t>0)return;ERR.t=14+Math.random()*16;if(cars.filter(c=>c.errand).length>=3)return;
   // a driver near you decides to stop at a store
   const L=XSITES.filter(S=>S.kind==="lot"&&S.stalls&&S.stalls.length&&Math.hypot(S.x-car.px,S.y-car.py)<500);if(!L.length)return;const S=L[Math.floor(Math.random()*L.length)],en=lotEntry(S);if(!en)return;
-  const fr=S.stalls.filter(stallFree);if(!fr.length)return;const q=fr[Math.floor(Math.random()*fr.length)];
+  const fr=S.stalls.filter(q=>stallFree(q));if(!fr.length)return;const q=fr[Math.floor(Math.random()*fr.length)];
   const C=cars.filter(c=>c.kind==="ai"&&!c.errand&&!poolKeep(c)&&!c.emv&&c.mdl!=="city_police"&&!(c.len>5.6)&&!c.route&&Math.hypot(c.wx-S.x,c.wy-S.y)<480&&Math.hypot(c.wx-S.x,c.wy-S.y)>70);if(!C.length)return;const c=C[Math.floor(Math.random()*C.length)];
   const X0=errPath(S,q,en,1),rp=ePt(en.e,X0.s,0),f=findFrame(rp[0],rp[1],rp[2]+(Math.random()<0.5?0:Math.PI),null);if(!f||f.e!==en.e)return;try{c.route=navBuild(f)}catch(e){return}c.errand={ph:"go",S,q,e:f.e,dir:f.dir,s:f.s,t:0}}
 // police pull over AI drivers too: a patrol car behind a speeder or someone in a road rage lights up, the driver signals and pulls onto
@@ -7049,10 +7060,10 @@ function garUp(t){const sdT=t.bay,nT=t.k,Xt=t.x-GAR.cx,P=[[-62,12]];garLine(P,-2
   return P.map(p=>GW(p[0],p[1]))}
 function p2pFixed(pts,msg,done,fail,vmax){st.pilot=false;const L=pts[pts.length-1];sys.summon={t:0,idx:0,ph:"fwd",block:[],msg,drive:true,fixed:true,fast:true,vmax:vmax||4.2,pts,cum:cumOf(pts),target:{x:L[0],y:L[1]},tol:1.8,done,fail};st.power=true;sys.epb=false;sys.hold=false;st.gear="D"}
 function p2pGarageOut(){sys.p2p.ph="garage";p2pFixed(garDown(),"Driving down to the exit",()=>{if(!sys.p2p)return;if(p2pOnRoad())p2pEngage();else p2pToRoad()},()=>{sys.p2p=null;toast("FSD: couldn't get out of the garage: please take over")})}
-function p2pGarageIn(name){const S=garStalls().filter(t=>stallFree(t)&&spotFree(t)).sort((a,b)=>a.k-b.k||(a.bay===b.bay?0:a.bay>0?-1:1)||Math.abs(a.x-GAR.cx)-Math.abs(b.x-GAR.cx));if(!S.length)return false;
+function p2pGarageIn(name){const S=garStalls().filter(t=>garStallFree(t)&&spotFree(t)).sort((a,b)=>a.k-b.k||(a.bay===b.bay?0:a.bay>0?-1:1)||Math.abs(a.x-GAR.cx)-Math.abs(b.x-GAR.cx));if(!S.length)return false;
   const t=S[0];sys.p2p={ph:"toGarage",name,t};st.acc=false;toast(`FSD: parking in the Fort St garage, level ${t.k+1}`);
   const E=GW(-62,12);p2pLot(E[0],E[1],"Heading to the garage entrance",()=>{const P=sys.p2p;if(!P)return;P.ph="garage";
-    p2pFixed(garUp(P.t),"Finding the space",()=>{const P=sys.p2p;if(!P)return;if(!stallFree(P.t)){sys.p2p=null;st.gear="P";toast("That space was taken: please park it yourself");return}const Lp=planPerpH(P.t,150000);
+    p2pFixed(garUp(P.t),"Finding the space",()=>{const P=sys.p2p;if(!P)return;if(!garStallFree(P.t)){sys.p2p=null;st.gear="P";toast("That space was taken: please park it yourself");return}const Lp=planPerpH(P.t,150000);
       if(!Lp){sys.p2p=null;st.gear="P";toast("Not enough room to back in: please park it yourself");return}P.ph="park";sys.pa={type:"perpH",segs:Lp.segs,si:0,idx:0,t:P.t,u:Lp.u,moves:Lp.moves,stuck:0,replans:0,msg:"Parking"};tick(1)},()=>{sys.p2p=null;toast("FSD: couldn't reach the space: please take over")})},()=>{sys.p2p=null;toast("FSD: couldn't reach the garage: please take over")});return true}
 // ---- park to park at the stores (Bean & Brew and the rest): in and out through the driveways and along the aisle, like a person would,
 // and a charging bay first when the car can plug in
@@ -16309,7 +16320,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=316;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="173",BUILD_VER=317;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}try{const P=JSON.parse(localStorage.getItem("strata.ped")||"null");if(P){st.pedHold=+P.pedHold||0;st.thrRate=+P.thrRate||2;st.brkRate=+P.brkRate||2}}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){const k=GFX.q==="auto"?GFX.eff:GFX.q;if(G.k!==k||G.v!==GFX.ovV||!G.m){G.k=k;G.v=GFX.ovV;const m={...GQ[k]};for(const o of GOPT)if(GFX.ov[o[0]]!==undefined)Object.assign(m,o[4](GFX.ov[o[0]]));if(Object.keys(GFX.ov).length)m.label=GQ[k].label+" (custom)";G.m=m;COLL.nt=!m.trees}return G.m}
@@ -16413,7 +16424,7 @@ var GSTALLS=null;function garStalls(){if(GSTALLS)return GSTALLS;const G=GAR,S=[]
   for(let n=0;n<G.T;n++)for(const sd of [1,-1])for(const [lo,hi] of [[-22,-5],[5,22]])for(let x0=lo;x0<hi-2-1e-6;x0+=2.8){const X=x0+1.35,z=garZ(sd,n,X),sl=garSl(sd,X);
     S.push({x:G.cx+X,y:G.cy+sd*6.95,ux:0,uy:-sd,k:n,z,sl,bay:sd});S.push({x:G.cx+X,y:G.cy+sd*17.05,ux:0,uy:sd,k:n,z,sl,bay:sd})}
   return GSTALLS=S}
-function stallFree(t){return !parked.some(p=>p.fixed&&Math.abs(p.wx-t.x)<1.2&&Math.abs(p.wy-t.y)<2.2&&Math.abs((p.wz||0)-t.z)<1)&&!cars.some(c=>c.wx!==undefined&&Math.hypot(c.wx-t.x,c.wy-t.y)<2.6)}
+function garStallFree(t){return !parked.some(p=>p.fixed&&Math.abs(p.wx-t.x)<1.2&&Math.abs(p.wy-t.y)<2.2&&Math.abs((p.wz||0)-t.z)<1)&&!cars.some(c=>c.wx!==undefined&&Math.hypot(c.wx-t.x,c.wy-t.y)<2.6)}
 const rearAx=()=>[car.px-Math.cos(car.psi)*B,car.py-Math.sin(car.psi)*B];
 function cumOf(p){const c=[0];for(let i=1;i<p.length;i++)c.push(c[i-1]+Math.hypot(p[i][0]-p[i-1][0],p[i][1]-p[i-1][1]));return c}
 // pure pursuit about the rear axle; the same steering law works going forward and in reverse
