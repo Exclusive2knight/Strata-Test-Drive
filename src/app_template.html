@@ -1277,11 +1277,18 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
 <script data-boot>(function(){var p=0;window.__bootP=0;var t=setInterval(function(){if(window.__bootReal){clearInterval(t);return}p+=(0.7-p)*0.025;window.__bootP=p;var a=document.getElementById("bootArc"),n=document.getElementById("bootNeedle"),c=document.getElementById("bootPct");if(a)a.setAttribute("stroke-dasharray",(p*100).toFixed(1)+" 100");if(n)n.style.setProperty("--a",(-135+p*270)+"deg");if(c)c.textContent=String(Math.round(p*100))},120)})()</script>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 315 · New stores and the 2019 BMW X5</h2></div>
+    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 316 · AEB, headlights and Firestone fixes</h2></div>
     <div class="nb">
+      <h4>AEB, headlights and Firestone fixes</h4><ul>
+      <li><b>AEB lets go:</b> after automatic emergency braking stops the car, pressing the accelerator counts as you taking over. It no longer grabs the brakes again straight away, so you can pull around what it stopped for.</li>
+      <li><b>Other drivers' headlights:</b> traffic switches its own headlights on after dark, at dusk and dawn, and in rain, snow or fog. Turning your lights on with L no longer changes theirs, and parked cars stay dark.</li>
+      <li><b>Horn:</b> H no longer honks while you're on foot. Honk &amp; flash is still on the phone key.</li>
+      <li><b>Firestone service bays:</b> you can drive into all three bays again (they now line up with the building's real bay doors), and the front-row spaces in front of the bays have been removed so the way in stays clear.</li>
+      <li><b>Crosswalks at Walmart and Firestone:</b> now line up with the doors.</li>
+      </ul>
       <h4>New stores and the 2019 BMW X5</h4><ul>
       <li><b>New store buildings:</b> the five retail stores along the highway are now detailed models: Kroger, Walmart Supercenter, Firestone Complete Auto Care, Dunkin' and Subway, each sized to its real footprint.</li>
-      <li><b>Stores are outside only:</b> the buildings are exteriors now, so you can't walk or drive inside. At Firestone, pull up in front of a service bay door to get your tires done.</li>
+      
       <li><b>Real lot markings:</b> the store lots keep their real-size stalls and 7 m aisles, and now have proper painted arrows in each half of the aisles, in and out arrows on the driveways, a stop bar with STOP painted on the way out, a crosswalk from the lot to the front door, and a red fire-lane kerb with FIRE LANE along the store front.</li>
       <li><b>Lot drivers follow the rules:</b> parking-lot drivers keep to the right side of the aisle, stay under about 9 mph, stop for people and wait before pulling out. They no longer nose into parked cars while turning around, and a driver that gives up on a tight space now backs out first instead of getting stuck.</li>
       <li><b>FSD in parking lots:</b> when FSD drives into or out of a store lot, it uses the right half of the driveway and the right side of the aisle. In other lots it now plans its route along the aisles and around parked cars, at up to about 8 mph.</li>
@@ -3059,7 +3066,7 @@ function retailSites(){if(XSITES.some(S=>S.custom))return;
   for(const R of RETAIL){const s=R.s,bf=RB0+R.lotD+4,bb=bf+R.bd,D=bb+3-RB0,ac=(R.a0+R.a1)/2;R.bf=bf;R.bb=bb;R.ac=R.type==="tire"?R.a0+R.bw/2+4:ac;
     const S={kind:"lot",custom:true,R,x:ac,y:s*(RB0+D/2),L:R.a1-R.a0,D,U:[1,0],N:[0,s],stalls:[],chargers:[]};XSITES.push(S);R.S=S;
     for(const a of R.ent)XSITES.push({kind:"lot",custom:true,drive:true,x:a,y:s*((8.2+RB0)/2+0.05),L:9,D:RB0-8.2+0.1,U:[1,0],N:[0,s],stalls:[]});
-    if(!R.mdl)STORES.push({x:R.ac,y:s*(bf+R.bd/2),U:[1,0],N:[0,s],w:R.bw-0.4,d:R.bd-0.4,hh:R.h,store:R,door:[R.ac+(R.dx||0),s*(bf-1.5)]})}
+    if(!R.mdl)STORES.push({x:R.ac,y:s*(bf+R.bd/2),U:[1,0],N:[0,s],w:R.bw-0.4,d:R.bd-0.4,hh:R.h,store:R,door:[R.ac+(R.mdl?s:1)*(R.dx||0),s*(bf-1.5)]})}
   // the Fort St garage: a proper concrete driveway from the street, through the kerb, up to the ticket gates
   // the garage driveways: in from Cass Ave (west), out onto Park Ave (east)
   XSITES.push({kind:"lot",custom:true,drive:true,x:(GAR.wEdge+GAR.x0+0.6)/2,y:GAR.cy+12,L:GAR.x0+0.6-GAR.wEdge,D:8,U:[1,0],N:[0,1],stalls:[]});
@@ -10016,7 +10023,7 @@ function assist(dt){
     const sure=sys.leadT>(lead&&lead.vru?0.12:0.25);
     if(ttc<aebT(0)&&inp.brk<0.6&&sure&&reqDec>2&&!(TOPT.fcwOff&&isTesla())&&st.fcwOff!==true)sys.fcw=true;
     // like the real systems, in stages: the warning, then a short brake jolt if you haven't reacted, then partial braking, then full braking
-    if(ttc<aebT(0)&&sure&&reqDec>2){sys.fcwT=(sys.fcwT||0)+dt;if(st.aebAuto!==false&&sys.fcwT>0.55&&inp.brk<0.05&&inp.thr<0.8&&sys.aebJerkO!==lead.o&&sys.aebState!=="braking"){sys.aebJerkO=lead.o;sys.aebJerk=0.28}}else sys.fcwT=0;
+    if(ttc<aebT(0)&&sure&&reqDec>2){sys.fcwT=(sys.fcwT||0)+dt;if(st.aebAuto!==false&&!(sys.aebCancel>0)&&sys.fcwT>0.55&&inp.brk<0.05&&inp.thr<0.8&&sys.aebJerkO!==lead.o&&sys.aebState!=="braking"){sys.aebJerkO=lead.o;sys.aebJerk=0.28}}else sys.fcwT=0;
     // brake assist: you're braking for it, but not hard enough to stop in time, so it adds the rest
     if(ttc<aebT(0)&&sure&&inp.brk>0.08&&lead&&sp>lead.v){const need=reqDec*1.15/9;if(need>inp.brk+0.05){sys.aebBA=Math.min(1,need);if(!sys.aebBAon){sys.aebBAon=true;carMsg("🛑 Brake assist: adding braking")}}}else{sys.aebBA=0;sys.aebBAon=false}
     if(st.aebAuto===false){if(ttc<aebT(1)&&sure&&reqDec>2)sys.fcw=true}
@@ -10037,7 +10044,9 @@ function assist(dt){
   if(sys.aebBrake>0&&sys.aebState==="braking"&&(sp<0.2||!lead||sp-lead.v<0.2)){
     sys.aebState="held";const who=sys.aebWho||"the car ahead";const msg=lead&&lead.v<0.5&&sp<0.3?`AEB stopped the car ${ftS(Math.max(gap,0))} short of ${who} (from ${fmtSpeed(sys.aebStart.v)})`:lead?`AEB slowed you from ${fmtSpeed(sys.aebStart.v)} to ${fmtSpeed(sp)}, ${ftS(Math.max(gap,0))} behind ${who}`:`AEB braked for ${who} (from ${fmtSpeed(sys.aebStart.v)} to ${fmtSpeed(sp)})`;
     logResult(msg);toast(msg);sys.aebHold=lead&&lead.v<0.5?2.0:0.3}
-  if(sys.aebState==="held"){sys.aebHold-=dt;sys.aebBrake=1;if(sys.aebHold<=0||inp.thr>0.3){sys.aebBrake=0;sys.aebState="ready";if(inp.brk<0.1&&sp<0.2)carMsg("AEB released the brakes: press the brake pedal to stay stopped")}}   /* holds you for about 2 s after a stop, then hands back */
+  if(sys.aebState==="held"){sys.aebHold-=dt;sys.aebBrake=1;if(sys.aebHold<=0||inp.thr>0.3){sys.aebBrake=0;sys.aebState="ready";sys.aebAfter=1;if(inp.brk<0.1&&sp<0.2)carMsg("AEB released the brakes: press the brake pedal to stay stopped")}}   /* holds you for about 2 s after a stop, then hands back */
+  /* after it has stopped you, the next press of the accelerator is you taking over (pulling round it, or creeping up): like the real systems it stays out of the way for a few seconds instead of grabbing the brakes again */
+  if(sys.aebAfter){if(inp.thr>0.12){sys.aebCancel=Math.max(sys.aebCancel||0,6);sys.aebAfter=0;sys.aebBrake=0;sys.aebPart=false;sys.aebJerk=0}else if(sp>6)sys.aebAfter=0}
   if(sys.aebState==="ready"&&sys.aebBrake>0&&!(ttc<aebT(1))&&!(sys.aebJerk>0)&&!(sys.aebBA>0)&&!sys.aebPart)sys.aebBrake=Math.max(0,sys.aebBrake-dt*2);
   if(!st.aeb||!has("aeb")){sys.aebBrake=0;sys.aebState="off"}else if(st.aebAuto===false){sys.aebBrake=0;sys.aebState="ready"}else if(sys.aebState==="off")sys.aebState="ready";
   {if(isTesla()&&sys.fcw){const now=performance.now();if(!sys.fcwSndT||now-sys.fcwSndT>700){sys.fcwSndT=now;playS("ts_fcw",0.6)}}else{const b=brandS(),lin=b==="Lincoln",gm=GMB.has(b),kia=b==="Kia",bmw=b==="BMW",ford=b==="Ford",toy=b==="Toyota"||b==="Lexus",kSolid=kia&&(sys.aebState==="braking"||sys.aebBrake>0.3);if(sys.fcw&&(lin||gm||kia||bmw||ford||toy)){const now=performance.now();if(!sys.fcwSndT||now-sys.fcwSndT>(lin?2300:kia?(kSolid?1850:1300):bmw?600:ford?1000:toy?1690:950)){sys.fcwSndT=now;if(!playS(lin?"lin_hard":kia?(kSolid?"kia_aeb_solid":"kia_aeb"):bmw?"bmw_aeb":ford?"ford_aeb":toy?"toy_aeb":"gm_aeb",0.7))beep(2300,.08,"square",.18)}}else{if(!sys.fcw)sys.fcwSndT=0;if(sys.fcw&&(performance.now()%220)<dt*1000*1.2)beep(2400,.07,"square",.2)}}}
@@ -11023,12 +11032,13 @@ function retailInto(SM,lamp,treeAt){let sd=91;const r=()=>(sd=(sd*16807)%2147483
     BX("kerb",a0,(RB0+bb+3)/2,0,0.15,0.3,bb+3-RB0);BX("kerb",a1,(RB0+bb+3)/2,0,0.15,0.3,bb+3-RB0);
     // stall rows: back-to-back pairs with 7 m aisles, islands at the ends (and the middle of wide lots) with trees and lights
     const rows=Math.floor((R.lotD-7)/18),wide=a1-a0>110,isl=wide?[[a0,a0+4],[(a0+a1)/2-1.6,(a0+a1)/2+1.6],[a1-4,a1]]:[[a0,a0+4],[a1-4,a1]];
-    const inIsl=a=>isl.some(([p,q])=>a>p-1.35&&a<q+1.35);let chg=R.chg,acc=4;
+    const bayX=R.type!=="tire"?[]:R.bays0?R.bays0.map(v=>ac+(R.mdl?s:1)*v):[ac-4,ac+5.2,ac+14.4];const inIsl=a=>isl.some(([p,q])=>a>p-1.35&&a<q+1.35);let chg=R.chg,acc=4;
     for(let k=0;k<rows;k++){const bR=RB0+7+k*18;BX("paint",(a0+a1)/2,bR+5.5,0.006,0.004,a1-a0-8,0.12);
       for(const [p,q] of isl){const ic=(p+q)/2;BX("grass",ic,bR+5.5,0,0.14,q-p-0.4,10.6);BX("kerb",ic,bR+5.5,0,0.16,q-p,0.2);if(k%2===0||!wide){const tz=0.14;treeAt(ic,s*(bR+2.5),tz,false);collAdd({tree:1,t:"c",x:ic,y:s*(bR+2.5),r:0.3})}
         lamp(ic,s*(bR+8),s>0?-Math.PI/2:Math.PI/2,0.6)}
       for(const half of [0,1]){const b0=bR+half*5.5,head=s*(half?-1:1)*Math.PI/2;
-        for(let a=a0+5.4;a<a1-4;a+=2.7){if(inIsl(a))continue;BX("paint",a-1.35,b0+2.75,0.006,0.004,0.11,5.3);
+        for(let a=a0+5.4;a<a1-4;a+=2.7){if(inIsl(a))continue;if(bayX.length&&k===rows-1&&half===1&&bayX.some(x=>Math.abs(x-a)<3.2))continue;   /* keep the way into the service bays clear */
+          BX("paint",a-1.35,b0+2.75,0.006,0.004,0.11,5.3);
           const near=k===rows-1&&half===1&&Math.abs(a-ac)<6&&acc>0,ev=!near&&k===0&&half===0&&chg>0&&a>a1-30;
           if(near){acc--;BX("blue",a,b0+2.75,0.004,0.004,2.4,5.2);continue}   // accessible bays stay free
           if(ev){chg--;BX("ev",a,b0+2.75,0.004,0.004,2.4,5.2);const pb=half?b0+0.4:b0+5.2;collAdd({t:"b",x:a,y:s*pb,h:0,hl:0.3,hw:0.22,z0:-0.3,z1:2,what:"a charger"});chgAdd(a,s*pb,Math.atan2(half?s:-s,0),R.type==="cafe"?"sc":"ea",{name:R.name});S.chargers.push([a,s*(pb+(half?2.2:-2.2))]);continue}
@@ -11048,15 +11058,15 @@ function retailInto(SM,lamp,treeAt){let sd=91;const r=()=>(sd=(sd*16807)%2147483
       for(const e of R.ent){/* in on the right half, out on the left (seen from the road) */arrow(e+s*2.2,(8.2+RB0)/2+1.2,"b",1);arrow(e-s*2.2,(8.2+RB0)/2-1.2,"b",-1);
         for(let b=8.6;b<RB0-0.6;b+=2.2)P_(e,b+0.55,0.12,1.1);
         P_(e-s*2.25,RB0-0.6,4.1,0.45);word("STOP",e-s*2.25,RB0-0.6+3.4,-1,0.22,0.5)}
-      if(R.type!=="tire"){const fa=RB0+rows*18,cw_=3.6;for(let b=fa+0.5;b<lotEnd-0.4;b+=1.2)P_(ac+(R.dx||0),b+0.3,cw_,0.6)}   /* crosswalk to the door */
-      BX("red",(a0+a1)/2,lotEnd+0.16,0.002,0.17,a1-a0-0.6,0.33);word("FIRE",ac+(R.dx||0)+(R.type==="tire"?0:9),lotEnd-1.9,1,0.16,0.32);word("LANE",ac+(R.dx||0)+(R.type==="tire"?0:9),lotEnd-4.0,1,0.16,0.32)}
+      if(R.type!=="tire"){const fa=RB0+rows*18,cw_=3.6;for(let b=fa+0.5;b<lotEnd-0.4;b+=1.2)P_(ac+(R.mdl?s:1)*(R.dx||0),b+0.3,cw_,0.6)}   /* crosswalk to the door */
+      BX("red",(a0+a1)/2,lotEnd+0.16,0.002,0.17,a1-a0-0.6,0.33);word("FIRE",ac+(R.mdl?s:1)*(R.dx||0)+(R.type==="tire"?0:9),lotEnd-1.9,1,0.16,0.32);word("LANE",ac+(R.mdl?s:1)*(R.dx||0)+(R.type==="tire"?0:9),lotEnd-4.0,1,0.16,0.32)}
     // pylon sign by the road
     {const pa=R.ent[0]+(R.ent[0]<ac?-8:8);BX("metal",pa,11.6,0,6,0.35,0.35,"a sign");BX("sign"+RETAIL.indexOf(R),pa,11.6,5.2,1.8,3.2,0.45);BX("signT",pa,11.6,5.55,0.5,2.6,0.5);BX("glow",pa,11.6,6.3,0.25,2.8,0.48)}
     // ---- the building
     const T=R.type,tire=T==="tire",wl=(a,b,la,lb,z0=0,hh=h,what="a wall")=>{BX("wallE",a,b,z0,hh,la,lb,what)};
-    const doorW=tire?0:3.2,dc=ac+(R.dx||0),bays=tire?(R.bays0?R.bays0.map(v=>ac+v):[ac-4,ac+5.2,ac+14.4]):[],office=tire?(R.bays0?[ac+2.4,ac+w2]:[ac-w2,ac-8]):null;
+    const doorW=tire?0:3.2,dc=ac+(R.mdl?s:1)*(R.dx||0),bays=tire?(R.bays0?R.bays0.map(v=>ac+(R.mdl?s:1)*v):[ac-4,ac+5.2,ac+14.4]):[],office=tire?(R.bays0?[ac+2.4,ac+w2]:[ac-w2,ac-8]):null;
     // front wall with the door (and garage bays on the tire shop)
-    {const gaps=R.mdl?[]:(tire?bays.map(a=>[a-(R.bays0?2.15:1.9),a+(R.bays0?2.15:1.9)]).concat([R.bays0?[dc-0.75,dc+0.75]:[ac-13.5,ac-12]]):[[dc-doorW/2,dc+doorW/2]]).sort((p,q)=>p[0]-q[0]);let x=ac-w2;
+    {const gaps=R.mdl&&!tire?[]:(tire?bays.map(a=>[a-(R.bays0?2.15:1.9),a+(R.bays0?2.15:1.9)]).concat(R.mdl?[]:[R.bays0?[dc-0.75,dc+0.75]:[ac-13.5,ac-12]]):[[dc-doorW/2,dc+doorW/2]]).sort((p,q)=>p[0]-q[0]);let x=ac-w2;
       for(const [g0,g1] of gaps.concat([[ac+w2,ac+w2]])){if(g0>x+0.05)wl((x+g0)/2,bf,g0-x,0.3);x=g1}
       for(const [g0,g1] of gaps){const top=g1-g0>3?3.9:2.5;wl((g0+g1)/2,bf,g1-g0,0.3,top,h-top);if(g1-g0>3)BX("door",(g0+g1)/2,bf+0.25,top-0.6,0.6,g1-g0,0.4)}}
     wl(ac-w2,(bf+bb)/2,0.3,R.bd);wl(ac+w2,(bf+bb)/2,0.3,R.bd);wl(ac,bb,R.bw,0.3);
@@ -11073,7 +11083,7 @@ function retailInto(SM,lamp,treeAt){let sd=91;const r=()=>(sd=(sd*16807)%2147483
     BLD_LIST.push([ac,s*(bf+R.bd/2),w2,R.bd/2]);
     if(R.mdl&&typeof w2Put==="function"){W2_FP[R.mdl]=W2_FP[R.mdl]||[-w2,w2,-R.bd,R.zf+2];const o=w2Put(R.mdl,ac,s*(bf+R.zf),Math.atan2(-s,0),0);if(o)o.store=1}
     const F=(m,a,b,z0,hh,la,lb,coll)=>BX(m,a,b,z0,hh,la,lb,coll);
-    if(R.mdl){if(tire)R.bays=bays.map(a=>[a,s*(bf-3)]);continue}   /* outside only: service by pulling up to a bay door */
+    if(R.mdl){if(tire)R.bays=bays.map(a=>[a,s*(bf+8)]);continue}   /* the model has open service bays: drive in for tires */
     const prods=["prodR","prodG","prodB","prodY","prodW","prodO"];
     if(T==="grocery"||T==="hardware"){const hw=T==="hardware",tall=hw?4.2:2.1,lv=hw?[0.3,1.3,2.3,3.3]:[0.3,0.75,1.2,1.65],sp=hw?5.2:4.3;
       // aisles of shelving, stocked both sides
@@ -15499,6 +15509,8 @@ function render(dt){
   gl.uniform3fv(U.uSunC,[0.03,0.035,0.05].map((v,i)=>lerp(v,[1.05,1.0,0.92][i]*[1,0.78+0.22*D_,0.55+0.45*D_][i],D_)).map(v=>v*(1-(wsky?ww*0.55:0)))); gl.uniform3fv(U.uAmb,[0.014,0.016,0.024].map((v,i)=>lerp(v,[0.30,0.34,0.40][i],D_)));
   gl.uniform3fv(U.uFog,sky);gl.uniform1f(U.uNt,clamp(1-(GT.D??(night?0:1))*1.4,0,1));gl.uniform1i(U.uTex,0);WXR.u=[WXR.snow,WXR.wet*(1-WXR.snow)];gl.uniform2f(U.uWX,WXR.u[0],WXR.u[1]);snmBind();gl.uniform4f(U.uGr,0,0,0,0);if(WXR.flash>0.02)gl.uniform3fv(U.uAmb,[0.014,0.016,0.024].map((v,i)=>lerp(v,[0.30,0.34,0.40][i],D_)+WXR.flash*[0.9,0.95,1.1][i])); {const fd=(night?0.004:0.0011)+(wsky?ww*{rain:0.0032,snow:0.0055,fog:0.021}[wk]*(1+WXR.storm*(wk==="snow"?2.2:0.8)):0);gl.uniform1f(U.uFD,fd);CULL.fogD=3.6/Math.max(1e-4,fd);CULL.maxD=Math.min(G().cullD||4800,CULL.fogD)}
   const lampsOn=(st.lights||night)&&st.power!==false;
+  /* other drivers switch their own lights on: after dark, at dusk and dawn, and in rain, snow or fog (not when you switch yours on) */
+  const aiL=night||(()=>{const h=(GT.min/60)%24;return h>=19||h<7})()||(WX.cur==="rain"||WX.cur==="snow"||WX.cur==="fog")&&(WX.w||0)>0.25;
   headlights(cm,fwd,lampsOn);
   const braking=car.brake>0.05; gl.uniform3fv(U.uTP,M4.p(cm,VEH.tail)); gl.uniform1f(U.uTail,braking?1:(lampsOn?0.25:0));
   if(GFX.frame%90===0||DD_N<0)try{ddAssign()}catch(e){}
@@ -15595,7 +15607,7 @@ function render(dt){
   vis.sort((a,b)=>a[0]-b[0]);const capFull=cam2?4:(G().fullCars||10),lodD=cam2?G().lod*0.5:G().lod;let nFull=0;
   for(const [dist,c] of vis){
     const om=aiMat(c);const sOn=(c.sig||c.haz)&&st.blink;
-    const fl=c.flashT>0&&(c.flashT%0.55)>0.25,rmt=c.kind==="remote",lc={head:rmt?(c.li===2?[4.2,4.2,3.9]:c.li?[1.2,1.2,1.1]:[0.3,0.3,0.32]):fl?[4.2,4.2,3.9]:lampsOn?[1.2,1.2,1.1]:[0.3,0.3,0.32],tail:c.kind==="parked"?OFF:c.brk||c.v<0.1?[1.3,0.04,0.02]:(lampsOn?[0.4,0.01,0.01]:OFF),sigL:sOn&&(c.haz||c.sig<0)?AMB:OFF,sigR:sOn&&(c.haz||c.sig>0)?AMB:OFF};{const aL=!!(c.haz||c.sig<0),aR=!!(c.haz||c.sig>0);lc.act=[aL,aR];lc.on=[aL&&st.blink,aR&&st.blink];lc.ph=blinkPh()}
+    const fl=c.flashT>0&&(c.flashT%0.55)>0.25,rmt=c.kind==="remote",lc={head:rmt?(c.li===2?[4.2,4.2,3.9]:c.li?[1.2,1.2,1.1]:[0.3,0.3,0.32]):fl?[4.2,4.2,3.9]:aiL&&c.kind!=="parked"?[1.2,1.2,1.1]:c.kind==="parked"?[0.06,0.06,0.07]:[0.3,0.3,0.32],tail:c.kind==="parked"?OFF:c.brk||c.v<0.1?[1.3,0.04,0.02]:(aiL?[0.4,0.01,0.01]:OFF),sigL:sOn&&(c.haz||c.sig<0)?AMB:OFF,sigR:sOn&&(c.haz||c.sig>0)?AMB:OFF};{const aL=!!(c.haz||c.sig<0),aR=!!(c.haz||c.sig>0);lc.act=[aL,aR];lc.on=[aL&&st.blink,aR&&st.blink];lc.ph=blinkPh()}
     if(dist<lodD&&nFull<capFull&&(c.mdl===undefined||KITS[c.mdl]||nFull<2)){nFull++;EQC=c;kitNext=kitOf(trafficModel(c));CAR_FAR=dist>(cam2?10:18);drawCar(om,paintRGB(c.paint),lc,[c.spin,c.spin,c.spin,c.spin],c.kind==="remote"?(c.steer||0):aiSteer(c),0,false,0,true);CAR_FAR=false;drawn.push([om,c])}else drawProxy(om,paintRGB(c.paint),c.brk,dist)}pxFlush();
   TREAD_OK=PM.on||G().trees&&!cam2&&!(st.cam===1&&!st.walk)&&Math.hypot(eye[0]-cm[12],eye[1]-cm[13],eye[2]-cm[14])<16;
   if(cam2!=="rear"&&cam2!=="dash"){dentOn(true);WHL_ME=true;drawCar(cm,myPaint(),lit,car.spin,car.dF,car.dR,false,car.height-tuneLow(),false,car.defl.map(d=>d));WHL_ME=false;dentOn(false);}
@@ -16297,7 +16309,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=315;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="173",BUILD_VER=316;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}try{const P=JSON.parse(localStorage.getItem("strata.ped")||"null");if(P){st.pedHold=+P.pedHold||0;st.thrRate=+P.thrRate||2;st.brkRate=+P.brkRate||2}}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){const k=GFX.q==="auto"?GFX.eff:GFX.q;if(G.k!==k||G.v!==GFX.ovV||!G.m){G.k=k;G.v=GFX.ovV;const m={...GQ[k]};for(const o of GOPT)if(GFX.ov[o[0]]!==undefined)Object.assign(m,o[4](GFX.ov[o[0]]));if(Object.keys(GFX.ov).length)m.label=GQ[k].label+" (custom)";G.m=m;COLL.nt=!m.trees}return G.m}
@@ -16347,7 +16359,8 @@ window.addEventListener("keydown",e=>{const k=(e.key||"").toLowerCase();{const t
   if(e.key==="F9"){e.preventDefault();photoTake();return}
   if(e.key==="F8"){e.preventDefault();if(RPL.on)rplStop();else if(hasReplay())rplStart(99);else toast("This car has no dashcam: add one at the dealer");return}
   if(e.key===";"&&!st.walk&&st.started){sfWiperCycle();return}
-  if(st.walk){if(k==="u"){walkAction();return}if(k===" ")FOOT.jump=true;else if(k==="l")fobPress(st.locked?"unlock":"lock");else if(k==="p"){FOOT.phone=!FOOT.phone;renderPhone()}else if(k==="h")fobPress("honk");if([" ","arrowup","arrowdown","arrowleft","arrowright"].includes(k))e.preventDefault();return}if(k==="h"){if(!e.repeat)hornOn(true);return}if(k==="y"){paOpenMenu();return}
+  if(st.walk){if(k==="u"){walkAction();return}if(k===" ")FOOT.jump=true;else if(k==="l")fobPress(st.locked?"unlock":"lock");else if(k==="p"){FOOT.phone=!FOOT.phone;renderPhone()}   /* H does nothing on foot: the horn is in the car (Honk & flash is still on the phone key) */
+  if([" ","arrowup","arrowdown","arrowleft","arrowright"].includes(k))e.preventDefault();return}if(k==="h"){if(!e.repeat)hornOn(true);return}if(k==="y"){paOpenMenu();return}
   if(k==="t"){fleetSwitch();return}
   if(k==="`"&&!st.walk){FOOT.phone=!FOOT.phone;renderPhone();return}
   if(k==="y"&&!st.walk){FOOT.phone=!FOOT.phone;renderPhone();return}
