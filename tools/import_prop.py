@@ -4,12 +4,13 @@ Positions int16 mm, normals int8, uint16 indices; one group per material; all no
 import json,struct,sys,base64
 import numpy as np
 src,key=sys.argv[1],sys.argv[2]
-ONLY=SKIP=SKIPRE=None;FULL=False   # optional: --only a,b  /  --skip a,b  (node names) to split animated pieces into their own props
+ONLY=SKIP=SKIPRE=None;FULL=False;SCALE=None   # optional: --only a,b  /  --skip a,b  (node names) to split animated pieces into their own props
 for i,a in enumerate(sys.argv):
     if a=='--only':ONLY=set(sys.argv[i+1].split(','))
     if a=='--skip':SKIP=set(sys.argv[i+1].split(','))
     if a=='--skipre':SKIPRE=__import__('re').compile(sys.argv[i+1])
     if a=='--full':FULL=True
+    if a=='--scale':SCALE=[float(v) for v in sys.argv[i+1].split(',')]   # --scale sx,sy,sz (e.g. widen a building in plan only)
 b=open(src,'rb').read();l=struct.unpack('<I',b[12:16])[0];J=json.loads(b[20:20+l]);o=20+l;bl=struct.unpack('<I',b[o:o+4])[0];BIN=b[o+8:o+8+bl]
 CT={5126:np.float32,5123:np.uint16,5125:np.uint32,5121:np.uint8};NC={'SCALAR':1,'VEC3':3,'VEC2':2,'VEC4':4}
 def acc(i):
@@ -48,6 +49,7 @@ for i,n in enumerate(J['nodes']):
         P=acc(pr['attributes']['POSITION']).astype(float)+T;N=acc(pr['attributes']['NORMAL']).astype(float)
         if FULL:P0=acc(pr['attributes']['POSITION']).astype(float);P=P0@WM[:3,:3].T+WM[:3,3];N=N@np.linalg.inv(WM[:3,:3])
         I=acc(pr['indices']).reshape(-1).astype(np.int64) if 'indices' in pr else np.arange(len(P))
+        if SCALE:P=P*np.array(SCALE);N=N/np.array(SCALE)
         m=pr.get('material',0);bymat.setdefault(m,[]).append((P,N,I))
 # per-node bounds of named parts (for couplers, bogies, wheels)
 parts={}
@@ -72,11 +74,13 @@ for m,lst in bymat.items():
         if cur['g'] and cur['g'][-1][0]==mi and cur['g'][-1][1]+cur['g'][-1][2]==st:cur['g'][-1][2]+=len(I)
         else:cur['g'].append([mi,int(sum(len(x) for x in cur['I'][:-1])),len(I)])
 out={'objects':{},'mats':mats,'nodes':nodes,'parts':parts}
+A0=np.concatenate(allP);KK=1000 if np.abs(A0).max()<32 else int(32000//np.abs(A0).max())   # big models: coarser units so int16 still holds them
+if KK!=1000:out['k']=KK
 for k,o in objs.items():
     if not o['P']:continue
     P=np.concatenate(o['P']);N=np.concatenate(o['N']);I=np.concatenate(o['I'])
     nl=np.linalg.norm(N,axis=1,keepdims=True);nl[nl==0]=1;N=N/nl
-    out['objects'][k]={'p':base64.b64encode(np.round(P*1000).astype('<i2').tobytes()).decode(),'n':base64.b64encode(np.clip(np.round(N*127),-127,127).astype('i1').tobytes()).decode(),
+    out['objects'][k]={'p':base64.b64encode(np.round(P*KK).astype('<i2').tobytes()).decode(),'n':base64.b64encode(np.clip(np.round(N*127),-127,127).astype('i1').tobytes()).decode(),
         'i':base64.b64encode(I.astype('<u2').tobytes()).decode(),'g':o['g']}
 A=np.concatenate(allP);out['min']=[round(float(v),3) for v in A.min(0)];out['max']=[round(float(v),3) for v in A.max(0)]
 json.dump(out,open('props/%s.json'%key,'w'),separators=(',',':'))
