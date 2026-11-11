@@ -1277,8 +1277,18 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
 <script data-boot>(function(){var p=0;window.__bootP=0;var t=setInterval(function(){if(window.__bootReal){clearInterval(t);return}p+=(0.7-p)*0.025;window.__bootP=p;var a=document.getElementById("bootArc"),n=document.getElementById("bootNeedle"),c=document.getElementById("bootPct");if(a)a.setAttribute("stroke-dasharray",(p*100).toFixed(1)+" 100");if(n)n.style.setProperty("--a",(-135+p*270)+"deg");if(c)c.textContent=String(Math.round(p*100))},120)})()</script>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 317 · Parking lots, part 1: driving the aisles</h2></div>
+    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 318 · Each car's own parking assist</h2></div>
     <div class="nb">
+      <h4>Each car's own parking assist</h4><ul>
+      <li><b>No more one park assist for every car:</b> the Park screen now shows the system the real car has, by its real name and in that maker's style: Ford and Lincoln Active Park Assist 2.0 / Enhanced Active Park Assist, Chevrolet and GMC Automatic Parking Assist, Cadillac and Hummer Enhanced Automatic Parking Assist, Jeep / Ram / Chrysler ParkSense Active Park Assist, Audi Park Assist (Plus), Volkswagen Park Assist (Plus), Porsche Active Parking Support, Hyundai / Kia / Genesis Remote Smart Parking Assist 2, Toyota Teammate Advanced Park and Lexus Advanced Park, Volvo Park Assist Pilot and Park Pilot Assist, Lucid Auto Park, Land Rover Park Assist and Tesla Autopark.</li>
+      <li><b>Only the moves the real system does:</b> each car only offers the manoeuvres its system really has (for example, no park-out on Tesla Autopark or Chevrolet Automatic Parking Assist, parallel only on the 2011 BMW 5 Series).</li>
+      <li><b>Steer-only systems work like the real ones:</b> on older and simpler systems (Enhanced Active Park Assist, ParkSense, Park Assist Pilot and others) the car only steers. You shift and work the pedals when the screen and cluster tell you ("Shift to R", "Back up slowly", "Stop"). Going over about 6 mph cancels it. GM Automatic Parking Assist steers and brakes at idle speed, but you shift.</li>
+      <li><b>Hold-to-park:</b> Ford / Lincoln Active Park Assist 2.0 and Hyundai / Kia / Genesis Smart Parking only move while you hold the park button (hold Y, or tap Hold on the screen).</li>
+      <li><b>Cars that don't park themselves</b> (Honda, Acura, Subaru, Nissan, Infiniti and others in the US) no longer get a made-up park assist. Opening Park tells you what they really have instead, like Parking Sensors or the Around View Monitor.</li>
+      <li><b>Different chimes</b> for found, start and done on each maker's system.</li>
+      <li><b>Fix:</b> since version 316, automatic emergency braking could stay out of the way while park assist was pulling into a charging bay, letting the car touch the charger. It now only steps aside when you press the accelerator yourself.</li>
+      <li><b>Parking lots:</b> drivers turning into a space now signal, back straight out when their nose is up against a car, and follow corners instead of cutting them into the end of a row.</li>
+      </ul>
       <h4>Parking lots, part 1: driving the aisles</h4><ul>
       <li><b>No more cutting across spaces:</b> drivers and FSD now treat painted parking spaces as off-limits for driving through. Routes follow the aisles and only turn into the space they're going to (or out of the one they're leaving). In testing, the share of route points crossing other spaces fell from about 3% to about 1%.</li>
       <li><b>Drivers no longer pick taken spaces:</b> a bug made every lot space look free to the AI, so drivers would head for spaces that already had a car in them and then give up. They now pick genuinely empty spaces, and two drivers no longer aim for the same space.</li>
@@ -3278,7 +3288,7 @@ function tcsProf(){const T=TRIMS[st.trim],g=T.group||"",b=g.split(" ")[0],S=(n,t
   return {b:"Traction control",s:[S("Traction control off: the wheels can spin. Stability control stays on",2,0)]}}
 function tcsState(){const P=tcsProf(),v=st.tcsLv|0,S=v?P.s[v-1]:null;return {tc:S?S.tc:0,esc:P.noEsc?3:S?S.esc:0}}
 function esaName(){const b=(TRIMS[st.trim].group||"").split(" ")[0];return b==="Toyota"||b==="Lexus"?"Emergency Steering Assist":b==="BMW"?"Evasion aid":b==="Volvo"?"City Safety steering support":b==="Audi"?"Evasive steering assist":"Evasive Steering Assist"}
-function has(f){const T=TRIMS[st.trim];if(T&&T.tesla&&TESLA_FSD.includes(f)&&!fsdOwned())return false;if(T&&T.real)return !(T.no||[]).includes(f)||pkgAdds(f)||f==="esa"&&pkgAdds("autoEmergencySteer");const p=FEAT_PKG[f];return !p||!!st.pkgs[p]}
+function has(f){const T=TRIMS[st.trim];if(T&&T.tesla&&TESLA_FSD.includes(f)&&!fsdOwned())return false;if(f==="autopark"&&T&&T.real&&typeof pkSys==="function"&&!pkSys())return false;if(T&&T.real)return !(T.no||[]).includes(f)||pkgAdds(f)||f==="esa"&&pkgAdds("autoEmergencySteer");const p=FEAT_PKG[f];return !p||!!st.pkgs[p]}
 function enforcePkgs(){if(enforcePkgs.k!==st.trim){enforcePkgs.k=st.trim;try{OWN.ct=Math.max(5,(ambF()-32)/1.8);car.hyb.bt=null;SAFE.btSaid=0}catch(e){}st.tcsLv=0;st.tcsOff=false;if(!st.levOff)st.leveling=true;if(has("esa")&&!st.esaOff)st.esa=true}for(const f of (TRIMS[st.trim].no||[]))if(typeof st[f]==="boolean"&&!pkgAdds(f))st[f]=false;for(const f of ["pilot","autoLC","esa","elk","matrix","autoHigh","cornering","leveling"])if(!has(f))st[f]=false;if(!has("tech")&&st.cam>=2)st.cam=0;if(!has("tech")&&st.panel==="chassis")st.panel="sensors"}
 // put the car somewhere: a STARTS-style {x,y,h,k} place (snapped to lane k of the road there), a distance s along the road you are on (lane), or where it is now
 function resetCar(a,lane){car.sink=null;car.clog=null;sys.aim=null;sys.limitS=null;car.cargo=loadKg();let p;
@@ -6132,7 +6142,8 @@ function lotFollow(c,E,dt){const P=E.path;if(!P||E.i>=P.length-1)return true;con
   let bi=E.i||0,bt=0,bd=1e9;for(let k=E.i||0;k<Math.min(P.length-1,(E.i||0)+12);k++){const a=P[k],b=P[k+1],vx=b[0]-a[0],vy=b[1]-a[1],L2=vx*vx+vy*vy||1e-6,t=clamp(((c.wx-a[0])*vx+(c.wy-a[1])*vy)/L2,0,1),x=a[0]+vx*t,y=a[1]+vy*t,d=Math.hypot(c.wx-x,c.wy-y);if(d<bd-0.01){bd=d;bi=k;bt=t}}
   E.i=bi;const end=P[P.length-1],dEnd=Math.hypot(end[0]-c.wx,end[1]-c.wy);if(dEnd<0.6||(bi>=P.length-2&&bt>0.97))return true;
   // the point a lookahead further along the path
-  const Ld=E.tight?1.6:Math.max(2.4,Math.abs(c.v)*1.1);let T=end,rem=Ld;{let a=P[bi],b=P[bi+1],x=a[0]+(b[0]-a[0])*bt,y=a[1]+(b[1]-a[1])*bt,k=bi;for(;;){const sl=Math.hypot(b[0]-x,b[1]-y);if(sl>=rem){T=[x+(b[0]-x)/sl*rem,y+(b[1]-y)/sl*rem];break}rem-=sl;k++;if(k>=P.length-1){T=end;break}x=b[0];y=b[1];a=P[k];b=P[k+1]}}
+  let bend0=0;for(let k=bi;k<Math.min(P.length-2,bi+5);k++){const a1=Math.atan2(P[k+1][1]-P[k][1],P[k+1][0]-P[k][0]),a2=Math.atan2(P[k+2][1]-P[k+1][1],P[k+2][0]-P[k+1][0]);bend0+=Math.abs(wrapPi(a2-a1))}
+  const Ld=E.tight?1.6:Math.max(bend0>0.5?1.7:2.4,Math.abs(c.v)*(bend0>0.5?0.7:1.1));   /* a shorter look ahead in the bends, so it follows the corner instead of cutting it into the end of a row */let T=end,rem=Ld;{let a=P[bi],b=P[bi+1],x=a[0]+(b[0]-a[0])*bt,y=a[1]+(b[1]-a[1])*bt,k=bi;for(;;){const sl=Math.hypot(b[0]-x,b[1]-y);if(sl>=rem){T=[x+(b[0]-x)/sl*rem,y+(b[1]-y)/sl*rem];break}rem-=sl;k++;if(k>=P.length-1){T=end;break}x=b[0];y=b[1];a=P[k];b=P[k+1]}}
   const i=bi;
   const hd=rev?c.wh+Math.PI:c.wh,al=wrapPi(Math.atan2(T[1]-c.wy,T[0]-c.wx)-hd),steer=clamp(Math.atan2(2*WB*Math.sin(al),Ld),-0.6,0.6);
   // how sharp is the path just ahead: slow for it
@@ -6154,7 +6165,9 @@ function errAnim(c,dt){const E=c.errand;
   // can't get into this one after a few tries: give up on the space and drive back out to the street, like anyone would
   if(E.ph==="in"&&!E.gaveUp&&E.q&&parked.some(p=>Math.abs(p.wx-E.q.p[0])<1.3&&Math.abs(p.wy-E.q.p[1])<1.3))E.kN=4;   /* someone took the space first: give up on it right away */
   if(E.ph==="in"&&(E.kN||0)>=4&&!E.gaveUp&&E.S){E.gaveUp=1;try{const en=lotEntry(E.S),X=errPath(E.S,E.q,en,E.dir),path=lotPlan(E.S,[c.wx,c.wy,c.wh],X.G,null);E.ph="leave";E.segs=[{path:(path||[[c.wx,c.wy],X.G]).concat([[X.R[0],X.R[1]]]),rev:false}];
-      {const P0=E.segs[0].path,k=Math.min(P0.length-1,4),dx=P0[k][0]-c.wx,dy=P0[k][1]-c.wy;if(dx*Math.cos(c.wh)+dy*Math.sin(c.wh)<0){const B=[[c.wx,c.wy]];for(let d=0.5;d<=4;d+=0.5)B.push([c.wx-Math.cos(c.wh)*d,c.wy-Math.sin(c.wh)*d]);E.segs[0].needRe=1;E.segs.unshift({path:B,rev:true})}}   /* the way out is behind us: back up first */
+      {const P0=E.segs[0].path,k=Math.min(P0.length-1,4),dx=P0[k][0]-c.wx,dy=P0[k][1]-c.wy;const ch_=Math.cos(c.wh),sh_=Math.sin(c.wh),noseIn=parked.some(p=>Math.abs(p.wx-c.wx)<8&&Math.abs(p.wy-c.wy)<8&&obbSAT(c.wx+ch_*1.2,c.wy+sh_*1.2,c.wh,2.35,0.95,p.wx,p.wy,p.wh||0,2.3,0.92));
+        if(noseIn||dx*ch_+dy*sh_<0){const B=[[c.wx,c.wy]];const tight_=parked.some(p=>Math.abs(p.wx-c.wx)<7&&Math.abs(p.wy-c.wy)<7&&obbSAT(c.wx,c.wy,c.wh,2.35,0.95,p.wx,p.wy,p.wh||0,2.3,0.92)),bl_=tight_?2.2:2.35,bw_=tight_?0.86:0.95;   /* already right up against one: judge the way back by the body itself, not the margin */
+        for(let d=0.5;d<=4;d+=0.5){const x=c.wx-ch_*d,y=c.wy-sh_*d;if(parked.some(p=>Math.abs(p.wx-x)<7&&Math.abs(p.wy-y)<7&&obbSAT(x,y,c.wh,bl_,bw_,p.wx,p.wy,p.wh||0,2.3,0.92)))break;B.push([x,y])}if(B.length>2){E.segs[0].needRe=1;E.segs.unshift({path:B,rev:true})}}}   /* the way out is behind us, or our nose is up against a car: back straight out first */   /* the way out is behind us: back up first */
 E.si=0;E.kN=0;E.s=X.s;return}catch(e){}}
   if(E.hardBlk>0)E.hardBlk-=dt;
   {const rev=sg.rev,ux=Math.cos(c.wh)*(rev?-1:1),uy=Math.sin(c.wh)*(rev?-1:1),ax=c.wx+ux*(rev?3.4:4.2),ay=c.wy+uy*(rev?3.4:4.2);
@@ -6162,7 +6175,7 @@ E.si=0;E.kN=0;E.s=X.s;return}catch(e){}}
       if(E.blockP&&!sg.rev&&E.waitT>1.0&&(E.kN||0)<5&&E.S){   // nosed up to a parked car: back up a few metres turning the other way (a three-point turn), then go on
         E.kN=(E.kN||0)+1;E.waitT=0;const P=sg.path,i0=Math.min(P.length-1,(sg.i||0)+6),hd=Math.atan2(P[i0][1]-c.wy,P[i0][0]-c.wx);let B=null;
         /* the back-up arc must not swing the nose into the car we stopped for: try the turn we want, then straight back, then the other way */
-        const hitP=(x,y,h)=>parked.some(p=>p.wx!==undefined&&Math.abs(p.wx-x)<7&&Math.abs(p.wy-y)<7&&obbSAT(x,y,h,2.33,0.95,p.wx,p.wy,p.wh||0,2.3,0.92));
+        const tgt_=parked.some(p=>p.wx!==undefined&&Math.abs(p.wx-c.wx)<7&&Math.abs(p.wy-c.wy)<7&&obbSAT(c.wx,c.wy,c.wh,2.33,0.95,p.wx,p.wy,p.wh||0,2.3,0.92)),hl_=tgt_?2.2:2.33,hw_=tgt_?0.86:0.95,hitP=(x,y,h)=>parked.some(p=>p.wx!==undefined&&Math.abs(p.wx-x)<7&&Math.abs(p.wy-y)<7&&obbSAT(x,y,h,hl_,hw_,p.wx,p.wy,p.wh||0,2.3,0.92));
         for(const k of [1,0,-1]){let x=c.wx,y=c.wy,h=c.wh,ok=true;const A=[[x,y]];
           for(let d=0;d<4;d+=0.5){const st_=k*clamp(-wrapPi(hd-h)*2,-0.58,0.58);h-=0.5/2.8*Math.tan(st_);x-=Math.cos(h)*0.5;y-=Math.sin(h)*0.5;A.push([x,y]);if(hitP(x,y,h)){ok=false;break}}
           if(ok){B=A;break}}
@@ -6176,6 +6189,7 @@ E.si=0;E.kN=0;E.s=X.s;return}catch(e){}}
   if(!was&&hitPk()){c.wx=o0[0];c.wy=o0[1];c.wh=o0[2];c.v=0;c.yr=0;E.hardBlk=1.3;return}   /* never drive (or swing the nose) into a parked car */
 c.wz=(groundAt(c.wx,c.wy).h)||0;c.wp=0;c.wr=0;c.spin+=(sg.rev?-1:1)*(c.v||0)/0.36*dt;
   c.sig=E.ph==="out"&&E.si>=E.segs.length-2?-1:0;
+  if(E.ph==="in"&&E.q&&!sg.rev){const dx=E.q.p[0]-c.wx,dy=E.q.p[1]-c.wy;if(Math.hypot(dx,dy)<16){const cr=Math.cos(c.wh)*dy-Math.sin(c.wh)*dx;if(Math.abs(cr)>1.2)c.sig=cr>0?-1:1}}   /* signal the turn into the space */
   if(done){E.si++;c.v=Math.min(c.v,1);if(E.si<E.segs.length&&E.segs[E.si].rev!==sg.rev){c.v=0;E.look=0.6}   // stop, change gear, go
     if(E.si>=E.segs.length){if(E.ph==="in"){const q=E.q;c.wx+= (q.p[0]-c.wx)*0.6;c.wy+=(q.p[1]-c.wy)*0.6;c.wh+=wrapPi(q.h-c.wh)*0.6}errDone(c)}}}
 function errClear(c,ax,ay,ux,uy){const hit=(x,y,r)=>{const dx=x-ax,dy=y-ay;if(dx*dx+dy*dy<r*r)return true;const px=x-c.wx,py=y-c.wy,al=px*ux+py*uy,ac=Math.abs(-px*uy+py*ux);return al>0&&al<6.5&&ac<2.2};
@@ -6186,7 +6200,8 @@ function errClear(c,ax,ay,ux,uy){const hit=(x,y,r)=>{const dx=x-ax,dy=y-ay;if(dx
   // parked cars: the body moved a little further along must not touch one
   if(c.errand&&c.errand.hardBlk>0){c.errand.blockP=1;return false}
   if(c.errand){c.errand.blockP=0;for(const p of parked){if(p.wx===undefined||Math.abs(p.wx-c.wx)>9||Math.abs(p.wy-c.wy)>9)continue;const E_=c.errand,fin=E_.ph==="in"&&E_.si===E_.segs?.length-1&&E_.q&&Math.hypot(E_.q.p[0]-c.wx,E_.q.p[1]-c.wy)<4.5&&Math.abs(wrapPi(c.wh-E_.q.h))<0.5;const hh_=c.wh+clamp(c.yr||0,-0.6,0.6)*0.3,ux2=Math.cos(hh_)*Math.sign(ux*Math.cos(c.wh)+uy*Math.sin(c.wh)||1),uy2=Math.sin(hh_)*Math.sign(ux*Math.cos(c.wh)+uy*Math.sin(c.wh)||1);   /* where the body will be a moment from now, turning as it is */
-    if(obbSAT(c.wx+ux2*(fin?0.35:0.7),c.wy+uy2*(fin?0.35:0.7),hh_,fin?2.2:2.35,fin?0.8:0.95,p.wx,p.wy,p.wh||0,2.3,0.92)){c.errand.blockP=1;return false}}}
+    const L_=fin?2.2:2.35,W_=fin?0.8:0.95,now_=obbSAT(c.wx,c.wy,c.wh,L_,W_,p.wx,p.wy,p.wh||0,2.3,0.92);   /* already inside the margin (nosed up close): only the body itself counts, so it can back away */
+    if(obbSAT(c.wx+ux2*(fin?0.35:0.7),c.wy+uy2*(fin?0.35:0.7),hh_,now_?2.2:L_,now_?0.82:W_,p.wx,p.wy,p.wh||0,2.3,0.92)){c.errand.blockP=1;return false}}}
   return true}
 function errDone(c){const E=c.errand;if(E.ph==="in"){const k=cars.indexOf(c);if(k>=0)cars.splice(k,1);parked.push({fixed:true,kind:"parked",wx:E.q.p[0],wy:E.q.p[1],wh:E.q.h,wz:(groundAt(E.q.p[0],E.q.p[1]).h)||0,v:0,spin:0,sig:0,head:0,paint:c.paint,mdl:c.mdl,errAt:st.clock+35+Math.random()*90,errS:E.S,errQ:E.q})}
   else{Object.assign(c,{kind:"ai",fixed:false,errand:null,jn:null,e:E.e,dir:E.dir,s:E.s,off:laneOff(E.e,0),offT:laneOff(E.e,0),v:3,head:0,idle:0});c.wp=0;try{planMove(c)}catch(e){}carPose(c)}}
@@ -7616,7 +7631,7 @@ function cluFcw(){try{cluSlot()}catch(e){}try{cluBvm()}catch(e){}try{if(!isTesla
 function roaCluster(g,W,H){g.fillStyle="#05070a";g.fillRect(0,0,W,H);g.fillStyle="#ffb020";g.textAlign="center";g.textBaseline="middle";g.font="700 "+Math.round(H*0.11)+"px system-ui,sans-serif";g.fillText("Rear Seat Reminder",W/2,H*0.36);
   g.fillStyle="#e8eef6";g.font="500 "+Math.round(H*0.075)+"px system-ui,sans-serif";g.fillText("Look in rear seat",W/2,H*0.56);g.font=Math.round(H*0.12)+"px system-ui";g.fillText("👤",W/2,H*0.78);g.textBaseline="alphabetic"}
 function cluUpload(){cluNav(CLU.g,CLU.W,CLU.H);gl.bindTexture(gl.TEXTURE_2D,CLU.tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);(cluFcw(),gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,CLU.cv));gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false)}
-function cluMsg(C){if(sys.pa)return "Parking Assist Active";if(st.acc&&st.pilot)return C.T.pilotName||"Lane Tracing Assist";if(st.acc)return "Radar Cruise Ready";if(!st.belt&&Math.abs(car.vx)>2.5)return "Fasten Seatbelt";if(SCR.radioOn)return `FM ${fmOf(au.station||0).toFixed(1)}`;return ""}
+function cluMsg(C){if(sys.pa){const S=pkSys(),dd=pkDriverDo();return dd||(S?S.name+" active":"Parking Assist Active")}if(st.acc&&st.pilot)return C.T.pilotName||"Lane Tracing Assist";if(st.acc)return "Radar Cruise Ready";if(!st.belt&&Math.abs(car.vx)>2.5)return "Fasten Seatbelt";if(SCR.radioOn)return `FM ${fmOf(au.station||0).toFixed(1)}`;return ""}
 // lane lines on a cluster: the one you're drifting over flashes yellow; your own car between them is the mini 3D model of it (your paint, lights, blinkers)
 function cluLane(g,x0,y0,x1,y1,sd,col,lw){const fl=(sys.ldw||performance.now()-(sys.ldwT||0)<900)&&(sys.ldwSide||0)===sd,bl=Math.floor(performance.now()/180)%2===0;g.strokeStyle=fl?(bl?"#ffd21f":"#6b5a10"):col;g.lineWidth=fl?lw+1.5:lw;g.beginPath();g.moveTo(x0,y0);g.lineTo(x1,y1);g.stroke()}
 function cluMe(g,cx,cy,wPx,fb){MINI.use=performance.now();if(!(VZ.pk>0.01)){MINI.ang=0;MINI.el=0.38;MINI.fov=0.3}if(!miniDraw(g,cx,cy,wPx/1.9)&&fb)fb()}
@@ -10057,7 +10072,7 @@ function assist(dt){
     logResult(msg);toast(msg);sys.aebHold=lead&&lead.v<0.5?2.0:0.3}
   if(sys.aebState==="held"){sys.aebHold-=dt;sys.aebBrake=1;if(sys.aebHold<=0||inp.thr>0.3){sys.aebBrake=0;sys.aebState="ready";sys.aebAfter=1;if(inp.brk<0.1&&sp<0.2)carMsg("AEB released the brakes: press the brake pedal to stay stopped")}}   /* holds you for about 2 s after a stop, then hands back */
   /* after it has stopped you, the next press of the accelerator is you taking over (pulling round it, or creeping up): like the real systems it stays out of the way for a few seconds instead of grabbing the brakes again */
-  if(sys.aebAfter){if(inp.thr>0.12){sys.aebCancel=Math.max(sys.aebCancel||0,6);sys.aebAfter=0;sys.aebBrake=0;sys.aebPart=false;sys.aebJerk=0}else if(sp>6)sys.aebAfter=0}
+  if(sys.aebAfter){if(inp.thrT>0.12&&!sys.pa&&!sys.summon){sys.aebCancel=Math.max(sys.aebCancel||0,6);sys.aebAfter=0;sys.aebBrake=0;sys.aebPart=false;sys.aebJerk=0}else if(sp>6)sys.aebAfter=0}
   if(sys.aebState==="ready"&&sys.aebBrake>0&&!(ttc<aebT(1))&&!(sys.aebJerk>0)&&!(sys.aebBA>0)&&!sys.aebPart)sys.aebBrake=Math.max(0,sys.aebBrake-dt*2);
   if(!st.aeb||!has("aeb")){sys.aebBrake=0;sys.aebState="off"}else if(st.aebAuto===false){sys.aebBrake=0;sys.aebState="ready"}else if(sys.aebState==="off")sys.aebState="ready";
   {if(isTesla()&&sys.fcw){const now=performance.now();if(!sys.fcwSndT||now-sys.fcwSndT>700){sys.fcwSndT=now;playS("ts_fcw",0.6)}}else{const b=brandS(),lin=b==="Lincoln",gm=GMB.has(b),kia=b==="Kia",bmw=b==="BMW",ford=b==="Ford",toy=b==="Toyota"||b==="Lexus",kSolid=kia&&(sys.aebState==="braking"||sys.aebBrake>0.3);if(sys.fcw&&(lin||gm||kia||bmw||ford||toy)){const now=performance.now();if(!sys.fcwSndT||now-sys.fcwSndT>(lin?2300:kia?(kSolid?1850:1300):bmw?600:ford?1000:toy?1690:950)){sys.fcwSndT=now;if(!playS(lin?"lin_hard":kia?(kSolid?"kia_aeb_solid":"kia_aeb"):bmw?"bmw_aeb":ford?"ford_aeb":toy?"toy_aeb":"gm_aeb",0.7))beep(2300,.08,"square",.18)}}else{if(!sys.fcw)sys.fcwSndT=0;if(sys.fcw&&(performance.now()%220)<dt*1000*1.2)beep(2400,.07,"square",.2)}}}
@@ -11854,24 +11869,41 @@ function scrDragFind(x,y){const L=SCR.drags||[];for(let i=L.length-1;i>=0;i--){c
 // a map drawn inside a panel: keep its buttons (shifted to where the panel is) instead of throwing them away
 function keepHits(saved,inner,dx,x0,x1){SCR.hits=saved;for(const h of inner){const X=h.x+dx;if(X+h.w>=x0&&X<=x1)SCR.hits.push({...h,x:X})}}
 function pagesFor(){if(fusLine())return [["home","Home"],["map","Maps"],["media","Media"],["fusion","Fusion"],["phone","Phone"],["camera","Camera"],...(has("autopark")?[["park","Park"]]:[]),["energy","Energy"],["controls","Settings"]];{const th=!isTesla()&&!isSync()&&!isVolvo()&&scrTheme();if(th&&th.mz5)return [["home","Home"],["map","Maps"],["media","Music"],["apps","Apps"],["phone","Phone"],["climate","Climate"],["camera","Camera"],...(has("autopark")?[["park","Park"]]:[]),...(isHybT(st.trim)?[["energy","Energy"]]:[]),["controls","Settings"]];if(th&&th.ui==="Mazda Connect")return [["home","Home"],["map","Navigation"],["media","Media"],["phone","Phone"],["camera","Camera"],...(isHybT(st.trim)?[["energy","Energy"]]:[]),["controls","Settings"]];if(th&&th.toy)return [["home","Home"],["map","Navigation"],["media","Audio"],["phone","Phone"],["camera","Camera"],...(has("autopark")?[["park","Park"]]:[]),...(TRIMS[st.trim].ice&&!isHybT(st.trim)?[]:[["energy","Energy"]]),["controls","Vehicle"]]}if(isSync())return [["home","Home"],["media","Audio"],["phone","Phone"],["map","Nav"],["apps","Apps"],["controls","Settings"],["camera","Camera"],["energy","Energy"],...(has("autopark")?[["park","Park"]]:[])];const P=isTesla()?[["map","Map"],["media","Media"],["camera","Camera"],["energy","Energy"],["autopilot","Autopilot"],["toybox","Toybox"],["upgrades","Upgrades"],["controls","Controls"],["climate","Climate"]]:PAGES.filter(p=>!(p[0]==="energy"&&TRIMS[st.trim].ice&&!(DRIVES[st.trim]||{}).par&&!TRIMS[st.trim].plug));if(has("autopark"))P.splice(2,0,["park","Park"]);if(!isTesla()&&!P.some(p=>p[0]==="home"))P.unshift(["home","Home"]);return P}
-// ---- Park: the park assist menu and its progress, on the car's own screen
-function scrPark(g,top,bot,W){const h=bot-top;g.fillStyle="#0a1013";g.fillRect(0,top,W,h);g.textBaseline="alphabetic";
-  if(!PA.mode&&!sys.pa){g.fillStyle="#e6eef0";g.font=FONT(15);g.textAlign="left";g.fillText("PARK ASSIST",16,top+24);
-    const opts=[["par","Parallel park"],["perp","Perpendicular park"],["exit","Park exit"]],tw=(W-48)/3,th=h-96;
-    opts.forEach(([k,n],i)=>{const x=16+i*(tw+8),y=top+36;const grd=g.createLinearGradient(0,y,0,y+th);grd.addColorStop(0,"#16323f");grd.addColorStop(1,"#081014");g.fillStyle=grd;rr2(g,x,y,tw,th,10);g.fill();g.strokeStyle="#2c5566";g.lineWidth=1.5;rr2(g,x,y,tw,th,10);g.stroke();
-      const cx=x+tw/2,cy=y+th/2-12;g.fillStyle="#fff";g.strokeStyle="#fff";g.lineWidth=3;
-      if(k==="par"){g.fillRect(cx+8,cy-44,18,30);g.fillRect(cx+8,cy+18,18,30);g.beginPath();g.moveTo(cx-22,cy-40);g.quadraticCurveTo(cx-20,cy+6,cx+14,cy+2);g.stroke()}
-      else if(k==="perp"){g.beginPath();for(const dx of [-30,-10,10,30]){g.moveTo(cx+dx,cy-44);g.lineTo(cx+dx,cy-14)}g.moveTo(cx-34,cy-44);g.lineTo(cx+34,cy-44);g.stroke();g.beginPath();g.moveTo(cx-28,cy+40);g.quadraticCurveTo(cx-28,cy+4,cx,cy+2);g.lineTo(cx,cy-16);g.stroke()}
-      else{g.fillRect(cx-26,cy-44,18,30);g.fillRect(cx-26,cy+18,18,30);g.strokeRect(cx-25,cy-11,16,26);g.beginPath();g.moveTo(cx-10,cy-4);g.quadraticCurveTo(cx+14,cy-10,cx+24,cy-40);g.stroke()}
-      g.font=FONT(15);g.textAlign="center";g.fillText(n,cx,y+th-14);hit(x,y,tw,th,()=>paChoose(k))});
-    g.fillStyle="#1b252a";rr2(g,16,bot-48,W-32,38,9);g.fill();g.fillStyle="#e6eef0";g.font=FONT(15);g.textAlign="center";g.fillText("Cancel Park Assist",W/2,bot-23);hit(16,bot-48,W-32,38,()=>{SCR.paMenu=false;SCR.focus=false;SCR.page=SCR.prevPage||"map";SCR.autoCam=false;if(PA.prevCam!==undefined)st.cam=PA.prevCam})}
-  else{const vs=Math.min(h-16,W*0.42),nar=W<560;g.save();g.translate(12,top+8);g.beginPath();g.rect(0,0,vs,vs);g.clip();paTopView(g,vs,vs);g.restore();
-    const x=vs+28;g.textAlign="left";g.fillStyle="#e6eef0";g.font=FONT(nar?15:19);
-    const TS_=isTesla(),head=TS_?(sys.pa?"Autopark Active":sys.paSpot?"Space found":"Autopark: Searching…"):sys.pa?"Parking Assist Active, Be Ready to Brake":sys.paSpot?"Space found":"Searching for Parking Space…";g.fillText(head,x,top+(nar?30:36));
-    g.font=FONT(nar?12:14);g.fillStyle="#9fb4b7";const sub=sys.pa?(TS_?sys.pa.msg+". Keep your foot near the brake.":sys.pa.msg):sys.paSpot?(TS_?"Stop, then tap the blue P or Start Autopark. Release the wheel: it steers, shifts and brakes.":"Stop, then tap Park. It steers, shifts and brakes for you."):PA.fast?"Slow down: under 18 mph":`Drive forward slowly, keeping closer to the ${PA.side>0?"right":"left"} side.`;
-    const words=sub.split(" ");let line="",ly=top+(nar?56:64);for(const w_ of words){if(g.measureText(line+w_).width>W-x-16){g.fillText(line,x,ly);ly+=nar?16:20;line=""}line+=w_+" "}g.fillText(line,x,ly);
-    const bw=Math.min(TS_?150:120,W-x-14),by=bot-52-(sys.paSpot&&!sys.pa&&nar?46:0);if(sys.paSpot&&!sys.pa){g.fillStyle=TS_?"#3e6ae1":"#1d5fd1";rr2(g,x,by,bw,40,10);g.fill();g.fillStyle="#fff";g.font=FONT(TS_?14:16);g.textAlign="center";g.fillText(TS_?"Start Autopark":"Park",x+bw/2,by+26);hit(x,by,bw,40,()=>paStart());if(TS_)hit(12,top+8,vs,vs,()=>paStart())}
-    const cx_=sys.paSpot&&!sys.pa?(nar?x:x+bw+10):x,cy_=sys.paSpot&&!sys.pa&&nar?by+46:by;g.fillStyle="#2b3337";rr2(g,cx_,cy_,bw,40,10);g.fill();g.fillStyle="#fff";g.font=FONT(16);g.textAlign="center";g.fillText("Cancel",cx_+bw/2,cy_+26);hit(cx_,cy_,bw,40,()=>{if(sys.pa)paStop("Park assist cancelled");else{PA.mode=null;PA.found=false}})}}
+// ---- Park: the car's own parking system on its screen, in that maker's style (see PKS_SYS / PKS_TH)
+function pkIcon(g,k,cx,cy,c){g.fillStyle=c;g.strokeStyle=c;g.lineWidth=3;
+  if(k==="par"){g.fillRect(cx+8,cy-44,18,30);g.fillRect(cx+8,cy+18,18,30);g.beginPath();g.moveTo(cx-22,cy-40);g.quadraticCurveTo(cx-20,cy+6,cx+14,cy+2);g.stroke()}
+  else if(k==="perp"){g.beginPath();for(const dx of [-30,-10,10,30]){g.moveTo(cx+dx,cy-44);g.lineTo(cx+dx,cy-14)}g.moveTo(cx-34,cy-44);g.lineTo(cx+34,cy-44);g.stroke();g.beginPath();g.moveTo(cx-28,cy+40);g.quadraticCurveTo(cx-28,cy+4,cx,cy+2);g.lineTo(cx,cy-16);g.stroke()}
+  else{g.fillRect(cx-26,cy-44,18,30);g.fillRect(cx-26,cy+18,18,30);g.strokeRect(cx-25,cy-11,16,26);g.beginPath();g.moveTo(cx-10,cy-4);g.quadraticCurveTo(cx+14,cy-10,cx+24,cy-40);g.stroke()}}
+function scrPark(g,top,bot,W){const h=bot-top,S=pkSys()||PKS_SYS.strata,T=pkTh(),light=T.bg[1]>"a",onAc=parseInt(T.ac.slice(1,3),16)*0.3+parseInt(T.ac.slice(3,5),16)*0.59+parseInt(T.ac.slice(5,7),16)*0.11>150?"#111":"#fff";g.fillStyle=T.bg;g.fillRect(0,top,W,h);g.textBaseline="alphabetic";
+  const btn=(x,y,w,hh,label,fill,txt,fn,bold)=>{g.fillStyle=fill;rr2(g,x,y,w,hh,Math.min(T.r,hh/2));g.fill();g.fillStyle=txt;g.font=FONT(bold?16:15);g.textAlign="center";g.fillText(label,x+w/2,y+hh/2+5);hit(x,y,w,hh,fn)};
+  const back=()=>{SCR.paMenu=false;SCR.focus=false;SCR.page=SCR.prevPage||"map";SCR.autoCam=false;if(PA.prevCam!==undefined)st.cam=PA.prevCam};
+  // header: the system's own name, and the maker's accent
+  g.fillStyle=T.ac;g.fillRect(0,top,W,3);g.fillStyle=T.tx;g.font=FONT(15);g.textAlign="left";g.fillText(S.name.toUpperCase()===S.name?S.name:S.name,16,top+24);
+  g.fillStyle=T.sub;g.font=FONT(11);g.textAlign="right";g.fillText(S.fict?"Mission Strata feature (fictional car)":S.auto==="full"?"Steers, shifts, brakes":S.auto==="creep"?"Steers and brakes · you shift":"Steers only · you shift and use the pedals",W-16,top+22);
+  if(!PA.mode&&!sys.pa){const opts=S.types.map(k=>[k,T.o[k]||k]);
+    if(T.lay==="list"){// a plain list, one row per manoeuvre (Cadillac, Audi, older BMW, Volvo, Land Rover)
+      opts.forEach(([k,n],i)=>{const y=top+40+i*48;g.fillStyle=T.pn;rr2(g,16,y,W-32,42,T.r);g.fill();g.fillStyle=T.ac;g.fillRect(16,y,4,42);g.fillStyle=T.tx;g.font=FONT(16);g.textAlign="left";g.fillText(n,32,y+27);g.fillStyle=T.sub;g.textAlign="right";g.fillText("›",W-30,y+27);hit(16,y,W-32,42,()=>paChoose(k))})}
+    else if(T.lay==="viz"){// the car seen from above on the left, the choices beside it (Tesla, BMW, Porsche, Toyota / Lexus, Volvo, Lucid)
+      const vs=Math.min(h-80,W*0.36);g.save();g.translate(16,top+36);g.beginPath();g.rect(0,0,vs,vs);g.clip();try{paTopView(g,vs,vs)}catch(e){}g.restore();
+      const x=vs+32,bw=W-x-16;opts.forEach(([k,n],i)=>{const y=top+40+i*50;g.fillStyle=T.pn;rr2(g,x,y,bw,42,T.r);g.fill();g.save();g.translate(x+26,y+21);g.scale(0.32,0.32);pkIcon(g,k,0,0,T.ac);g.restore();g.fillStyle=T.tx;g.font=FONT(15);g.textAlign="left";g.fillText(n,x+52,y+26);hit(x,y,bw,42,()=>paChoose(k))})}
+    else{// big picture cards (Ford, GM, Hyundai / Kia / Genesis "Select parking type", VW, Uconnect)
+      const n=opts.length,tw=(W-32-(n-1)*8)/n,th=h-100;opts.forEach(([k,nm],i)=>{const x=16+i*(tw+8),y=top+36;const grd=g.createLinearGradient(0,y,0,y+th);grd.addColorStop(0,T.pn);grd.addColorStop(1,T.bg);g.fillStyle=grd;rr2(g,x,y,tw,th,T.r);g.fill();g.strokeStyle=T.ac;g.lineWidth=1.5;rr2(g,x,y,tw,th,T.r);g.stroke();
+        pkIcon(g,k,x+tw/2,y+th/2-12,T.tx);g.fillStyle=T.tx;g.font=FONT(15);g.textAlign="center";g.fillText(nm,x+tw/2,y+th-14);hit(x,y,tw,th,()=>paChoose(k))})}
+    btn(16,bot-48,W-32,38,"Cancel",T.pn,T.tx,back);return}
+  // searching / found / parking
+  const vs=Math.min(h-40,W*0.42),nar=W<560;g.save();g.translate(12,top+32);g.beginPath();g.rect(0,0,vs,vs);g.clip();try{paTopView(g,vs,vs)}catch(e){}g.restore();
+  const x=vs+28;g.textAlign="left";g.fillStyle=T.tx;g.font=FONT(nar?15:19);
+  const head=sys.pa?T.act:sys.paSpot?T.found:PA.fast?"Slow down to under 18 mph":T.search;g.fillText(head,x,top+(nar?52:60));
+  // the instruction: on steer-only / creep systems this is what you have to do, in big type, with the gear it wants
+  const dd=pkDriverDo();let ly=top+(nar?74:86);
+  if(sys.pa&&dd){const want=sys.pa.wantG||st.gear,ok=want===st.gear;g.fillStyle=ok?T.pn:T.ac;rr2(g,x,ly-4,Math.min(W-x-16,260),34,T.r);g.fill();g.fillStyle=ok?T.tx:onAc;g.font=FONT(nar?14:16);g.fillText((ok?"":"⚠ ")+dd,x+10,ly+18);ly+=44}
+  if(sys.pa&&(S.hold||T.hold)&&!sys.pa.held){g.fillStyle=T.ac;g.font=FONT(nar?13:15);g.fillText("Hold the park button (Y) to keep moving",x,ly);ly+=22}
+  g.font=FONT(nar?12:14);g.fillStyle=T.sub;const sub=sys.pa?sys.pa.msg+(S.auto==="full"?". Keep your foot near the brake.":""):sys.paSpot?(S.auto==="full"?`Stop, then ${T.start==="START"?"press START":"tap "+T.start}.`:"Stop, then confirm. You'll shift"+(S.auto==="steer"?" and work the pedals":"")+" when told."):`Drive forward slowly, keeping closer to the ${PA.side>0?"right":"left"} (use the turn signal to search the other side).`;
+  const words=sub.split(" ");let line="";for(const w_ of words){if(g.measureText(line+w_).width>W-x-16){g.fillText(line,x,ly);ly+=nar?16:20;line=""}line+=w_+" "}g.fillText(line,x,ly);
+  const bw=Math.min(150,W-x-14),by=bot-52-(sys.paSpot&&!sys.pa&&nar?46:0);
+  if(sys.paSpot&&!sys.pa){btn(x,by,bw,40,T.start,T.ac,onAc,()=>{paStart();if(sys.pa)pkChime(0)},true);if(T.lay==="viz")hit(12,top+32,vs,vs,()=>paStart())}
+  if(sys.pa&&(S.hold||T.hold)){btn(x,by,bw,40,PA.holdScr?"Holding · tap to let go":"Hold to park",PA.holdScr?T.ac:T.pn,PA.holdScr?onAc:T.tx,()=>{PA.holdScr=!PA.holdScr})}
+  const cx_=(sys.paSpot&&!sys.pa)||(sys.pa&&(S.hold||T.hold))?(nar?x:x+bw+10):x,cy_=sys.paSpot&&!sys.pa&&nar?by+46:by;btn(cx_,cy_,bw,40,"Cancel",light?"#d8d6d0":"#2b3337",T.tx,()=>{if(sys.pa)paStop(`${S.name} cancelled`);else{PA.mode=null;PA.found=false}})}
 function rr2(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
 let _FF=null;const FONT=s=>`600 ${s}px ${_FF||(_FF=getComputedStyle(document.body).getPropertyValue("--f-hud")||"system-ui")}`;
 // the next junction on your road: what crosses there and how far
@@ -16320,7 +16352,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=317;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="173",BUILD_VER=318;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}try{const P=JSON.parse(localStorage.getItem("strata.ped")||"null");if(P){st.pedHold=+P.pedHold||0;st.thrRate=+P.thrRate||2;st.brkRate=+P.brkRate||2}}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){const k=GFX.q==="auto"?GFX.eff:GFX.q;if(G.k!==k||G.v!==GFX.ovV||!G.m){G.k=k;G.v=GFX.ovV;const m={...GQ[k]};for(const o of GOPT)if(GFX.ov[o[0]]!==undefined)Object.assign(m,o[4](GFX.ov[o[0]]));if(Object.keys(GFX.ov).length)m.label=GQ[k].label+" (custom)";G.m=m;COLL.nt=!m.trees}return G.m}
@@ -16499,9 +16531,90 @@ function scanPerp(){const c=Math.cos(car.psi),s=Math.sin(car.psi),r=rearAx();let
   if(inGarage(car.px,car.py))return {type:"perp",t:best,hplan:true};   // in the garage the full manoeuvre is planned once, when you tap Park (planning it on every scan froze the game for a third of a second)
   return {type:"perpTight",t:best}}
 
-function paOpenMenu(){if(!st.started||st.walk)return;if(!has("autopark")){toast(`The real ${TRIMS[st.trim].short||"car"} doesn't have park assist`);return}if(sys.pa){paStop("Park assist cancelled");return}
+// ======================================================================= parking assist by maker: each car gets the system its real model year / trim had
+// (name, what it controls, which manoeuvres), drawn in that maker's style. auto: "full" = steers, shifts, brakes and moves the car;
+// "steer" = steers only, you work the pedals and the gear lever when it tells you; "creep" = steers and brakes at idle speed, you shift when told.
+// Where the real equipment couldn't be confirmed the car gets the lower, documented system (often just sensors and cameras).
+const PKS_SYS={
+  tsl_ap:{name:"Autopark",th:"tesla",auto:"full",types:["par","perp"]},
+  ford_apa2:{name:"Active Park Assist 2.0",th:"ford",auto:"full",hold:true,types:["par","perp","exit"]},
+  lin_apa2:{name:"Active Park Assist 2.0",th:"lincoln",auto:"full",hold:true,types:["par","perp","exit"]},
+  ford_eapa:{name:"Enhanced Active Park Assist",th:"ford",auto:"steer",types:["par","perp","exit"]},
+  lin_eapa:{name:"Enhanced Active Park Assist",th:"lincoln",auto:"steer",types:["par","perp","exit"]},
+  gm_apab:{name:"Automatic Parking Assist",th:"chevy",auto:"creep",types:["par","perp"]},
+  gmc_apab:{name:"Automatic Parking Assist",th:"gmc",auto:"creep",types:["par","perp"]},
+  gmc_eapa:{name:"Enhanced Automatic Parking Assist",th:"gmc",auto:"full",types:["par","perp","exit"]},
+  cad_eapa:{name:"Enhanced Automatic Parking Assist",th:"cadillac",auto:"full",types:["par","perp","exit"]},
+  stl_apa:{name:"ParkSense Active Park Assist",th:"uconnect",auto:"steer",types:["par","perp"]},
+  bmw_pap:{name:"Parking Assistant Plus",th:"bmw",auto:"full",types:["par","perp","exit"]},
+  bmw_pa11:{name:"Parking Assistant",th:"bmw11",auto:"steer",types:["par"]},
+  audi_pap:{name:"Park Assist Plus",th:"audi",auto:"full",types:["par","perp","exit"]},
+  audi_pa:{name:"Park Assist",th:"audi",auto:"steer",types:["par","perp","exit"]},
+  vw_pa:{name:"Park Assist",th:"vw",auto:"steer",types:["par","perp","exit"]},
+  vw_pap:{name:"Park Assist Plus",th:"vw",auto:"full",types:["par","perp","exit"]},
+  por_apa:{name:"Active Parking Support",th:"porsche",auto:"full",types:["par","perp"]},
+  hy_rspa2:{name:"Remote Smart Parking Assist 2",th:"hyundai",auto:"full",types:["perp","par","exit"]},
+  kia_rspa2:{name:"Remote Smart Parking Assist 2",th:"kia",auto:"full",types:["perp","par","exit"]},
+  gen_rspa2:{name:"Remote Smart Parking Assist 2",th:"genesis",auto:"full",types:["perp","par","exit"]},
+  toy_ap:{name:"Toyota Teammate Advanced Park",th:"toyota",auto:"full",types:["perp","par","exit"]},
+  lex_ap:{name:"Advanced Park",th:"lexus",auto:"full",types:["perp","par","exit"]},
+  volvo_pap:{name:"Park Assist Pilot",th:"volvo16",auto:"steer",types:["par","perp"]},
+  volvo_ppa:{name:"Park Pilot Assist",th:"volvo",auto:"full",types:["par","perp","exit"]},
+  lucid_ap:{name:"Auto Park",th:"lucid",auto:"full",types:["par","perp","exit"]},
+  lr_pa:{name:"Park Assist",th:"landrover",auto:"steer",types:["par","perp","exit"]},
+  strata:{name:"Strata Park",th:"strata",auto:"full",types:["par","perp","exit"],fict:true}};
+// model -> system (only for trims that have the hardware: the trim's own "autopark" flag decides that)
+const PKS_MAP={model3:"tsl_ap",modely:"tsl_ap",models_:"tsl_ap",modelx:"tsl_ap",tsl_model3l:"tsl_ap",tsl_modelyl:"tsl_ap",tsl_models20:"tsl_ap",tsl_modelx20:"tsl_ap",tsl_cybertruck:"tsl_ap",tsl_roadster:"tsl_ap",
+  explorer20:"ford_apa2",f150_22:"ford_apa2",f150:"ford_apa2",fusion17:"ford_eapa",mkc19:"lin_eapa",aviator:"lin_apa2",nautilus:"lin_apa2",lin_navigator:"lin_apa2",
+  chv_tahoe:"gm_apab",chv_suburban:"gm_apab",chv_silverado_1500:"gm_apab",chv_silverado_2500_hd:"gm_apab",sierra:"gmc_apab",sierra2500:"gmc_apab",sierra3500:"gmc_apab",yukon:"gmc_apab",yukonxl:"gmc_apab",
+  hummerpu:"gmc_eapa",hummersuv:"gmc_eapa",escalade_reg:"cad_eapa",
+  gcherokee:"stl_apa",jeep_gc_l:"stl_apa",jeep_grand_wagoneer:"stl_apa",jeep_gw_l:"stl_apa",ram_1500:"stl_apa",ram_2500:"stl_apa",ram_3500_dually:"stl_apa",chrysler_pacifica:"stl_apa",
+  bmw_x1:"bmw_pap",bmw_x2:"bmw_pap",bmw_x3:"bmw_pap",bmw_x5:"bmw_pap",bmw_x5_19:"bmw_pap",bmw_x5_50e:"bmw_pap",bmw_x6:"bmw_pap",bmw_x7:"bmw_pap",bmw_ix3:"bmw_pap",bmw_535i11:"bmw_pa11",
+  q5:"audi_pa",q5_25:"audi_pap",audi_a6_allroad:"audi_pap",audi_q3:"audi_pap",audi_q4_etron:"audi_pap",audi_q4_sportback_etron:"audi_pap",audi_q6_etron:"audi_pap",audi_q6_sportback_etron:"audi_pap",audi_q7:"audi_pap",audi_q8:"audi_pap",audi_q9:"audi_pap",
+  vw_atlas:"vw_pa",vw_atlas_cs:"vw_pa",vw_id4:"vw_pap",
+  por_cayenne:"por_apa",por_cayenne_cp:"por_apa",por_cayenne_ev:"por_apa",por_cayenne_evcp:"por_apa",por_macan_ev:"por_apa",por_panamera:"por_apa",por_taycan:"por_apa",por_taycan_ct:"por_apa",
+  hy_santafe:"hy_rspa2",kia_ev9:"kia_rspa2",gen_g80:"gen_rspa2",gen_g90:"gen_rspa2",gen_gv70:"gen_rspa2",gen_egv70:"gen_rspa2",gen_gv80:"gen_rspa2",gen_gv80c:"gen_rspa2",gen_gv60:"gen_rspa2",
+  toy_sequoia:"toy_ap",lex_tx:"lex_ap",
+  xc60_16:"volvo_pap",xc90_14:"volvo_pap",v60cc17:"volvo_pap",ex30:"volvo_ppa",ex30cc:"volvo_ppa",ex90:"volvo_ppa",ex60:"volvo_ppa",
+  lucid_air:"lucid_ap",lucid_gravity:"lucid_ap",rr_sport:"lr_pa",rr_rangerover:"lr_pa"};
+// what a car without automatic parking really has instead (shown when you open Park)
+const PKS_NONE={Honda:"Parking Sensors and the multi-view camera",Acura:"Parking Sensors and the Surround View Camera",Subaru:"front and rear sonar and the 360° camera",Nissan:"Intelligent Around View Monitor and sonar (ProPILOT Park isn't sold in the US)",Infiniti:"Around View Monitor and sonar (ProPILOT Park isn't sold in the US)",
+  Hyundai:"Parking Distance Warning and Surround View Monitor",Kia:"Parking Distance Warning and Surround View Monitor",Genesis:"Parking Distance Warning and Surround View Monitor",Toyota:"Panoramic View Monitor and Parking Assist sonar",Lexus:"Panoramic View Monitor and Parking Support Brake",
+  Chevrolet:"rear park assist and HD Surround Vision",Buick:"rear park assist and HD Surround Vision",GMC:"rear park assist and HD Surround Vision",Ford:"the 360-degree camera and parking sensors",Volvo:"Park Assist sensors and the 360° camera",Mercedes:"PARKTRONIC and the 360° camera",Rivian:"Park Assist sensors and the surround cameras",Dodge:"ParkSense sensors and the surround camera"};
+function pkSys(){const T=TRIMS[st.trim];if(!T)return null;if(!T.real)return PKS_SYS.strata;if((T.no||[]).includes("autopark")&&!pkgAdds("autopark"))return null;const k=PKS_MAP[T.model];if(k)return PKS_SYS[k];
+  return /^(fus_|mon_|aureon|wk_|city_)/.test(T.model||"")||/Concept|Work Trucks/.test(T.group||"")?PKS_SYS.strata:null}
+// each maker's look: background, panel, accent, text, the words it uses, and its chimes
+const PKS_TH={
+  tesla:{bg:"#101112",pn:"#1d1f22",ac:"#3e6ae1",tx:"#f2f2f2",sub:"#9ea3a8",r:12,lay:"viz",o:{par:"Parallel",perp:"Perpendicular",exit:"Pull out"},search:"Autopark: Searching…",found:"Tap the blue P to park",start:"Start Autopark",act:"Autopark Active",snd:[[880,.07],[1320,.1]]},
+  ford:{bg:"#0b1622",pn:"#132a40",ac:"#1d74d6",tx:"#eef4fa",sub:"#9db3c8",r:6,lay:"tiles",o:{par:"Parallel Park",perp:"Perpendicular Park",exit:"Park Out Assist"},search:"Searching for a space…",found:"Space found: stop the vehicle",start:"Hold Park Assist",act:"Active Park Assist",snd:[[1047,.09],[1047,.09]]},
+  lincoln:{bg:"#0c0c0e",pn:"#1d1c1f",ac:"#c9a463",tx:"#f4efe6",sub:"#a49f95",r:4,lay:"tiles",o:{par:"Parallel",perp:"Perpendicular",exit:"Park Out"},search:"Searching for a space",found:"Space found",start:"Hold Park Assist",act:"Active Park Assist",snd:[[784,.12],[1175,.16]]},
+  chevy:{bg:"#0d0f12",pn:"#1b2027",ac:"#d6a01e",tx:"#f0f2f4",sub:"#a3aab2",r:6,lay:"tiles",o:{par:"Parallel",perp:"Perpendicular"},search:"Searching for parking space",found:"Space found: stop to confirm",start:"Confirm Park",act:"Automatic Parking Assist",snd:[[1400,.08],[1400,.08]]},
+  gmc:{bg:"#0c0d0f",pn:"#1c1e22",ac:"#c8202f",tx:"#f0f1f3",sub:"#a2a6ad",r:4,lay:"tiles",o:{par:"Parallel",perp:"Perpendicular",exit:"Exit"},search:"Searching for parking space",found:"Space found: stop to confirm",start:"Confirm Park",act:"Auto Park Assist",snd:[[1400,.08],[1600,.1]]},
+  cadillac:{bg:"#08090b",pn:"#17191d",ac:"#b5bcc6",tx:"#f5f6f8",sub:"#9aa1ab",r:2,lay:"list",o:{par:"Parallel",perp:"Perpendicular",exit:"Exit Parallel"},search:"Searching…",found:"Space found",start:"Park",act:"Enhanced Automatic Parking Assist",snd:[[660,.12],[990,.14]],seat:true},
+  uconnect:{bg:"#0f1114",pn:"#1f2328",ac:"#2c8be0",tx:"#f1f3f6",sub:"#a0a8b1",r:8,lay:"tiles",o:{par:"Parallel",perp:"Perpendicular"},search:"Searching for a space…",found:"Space found: stop the vehicle",start:"Park",act:"ParkSense Active Park Assist",snd:[[1175,.09],[1175,.09]]},
+  bmw:{bg:"#0f1a24",pn:"#1b2a38",ac:"#1c69d4",tx:"#eaf1f8",sub:"#93a7bb",r:14,lay:"viz",o:{par:"Parallel",perp:"Perpendicular",exit:"Exit parking space"},search:"Searching for parking spaces",found:"Select a parking space",start:"Start parking",act:"Parking Assistant",snd:[[988,.08],[1319,.1]]},
+  bmw11:{bg:"#1b1f24",pn:"#2b3138",ac:"#e98a12",tx:"#e9e3d6",sub:"#a59c8b",r:2,lay:"list",o:{par:"Parallel parking"},search:"Searching for parking space",found:"Parking space found",start:"Engage reverse",act:"Parking Assistant",snd:[[1047,.1],[1047,.1]]},
+  audi:{bg:"#0b0b0c",pn:"#1c1c1e",ac:"#e2001a",tx:"#f2f2f2",sub:"#9a9a9a",r:3,lay:"list",o:{par:"Parallel",perp:"Perpendicular",exit:"Exit"},search:"Searching for parking space…",found:"Parking space detected",start:"Start",act:"Park Assist Plus",snd:[[1245,.08],[1661,.1]]},
+  vw:{bg:"#0a1724",pn:"#13283c",ac:"#00b0f0",tx:"#eef6fc",sub:"#93abc0",r:10,lay:"tiles",o:{par:"Parallel",perp:"Bay parking",exit:"Exit space"},search:"Searching for a space",found:"Space found",start:"Start",act:"Park Assist",snd:[[1109,.08],[1480,.1]]},
+  porsche:{bg:"#0e0e0f",pn:"#1f1f21",ac:"#d5001c",tx:"#f4f4f4",sub:"#9b9b9e",r:3,lay:"viz",o:{par:"Parallel",perp:"Perpendicular"},search:"Searching for parking space",found:"Select a parking space",start:"Start",act:"Active Parking Support",snd:[[1319,.07],[1760,.09]]},
+  hyundai:{bg:"#0b1b2a",pn:"#16304a",ac:"#00aad2",tx:"#eef6fb",sub:"#93abc0",r:8,lay:"tiles",o:{perp:"Perpendicular",par:"Parallel",exit:"Smart Exit"},search:"Searching for parking space",found:"Select parking type",start:"Hold P to park",act:"Smart Parking",snd:[[1047,.08],[1568,.1]],hold:true},
+  kia:{bg:"#05141f",pn:"#13283a",ac:"#5d7d2b",tx:"#f1f5f8",sub:"#93a6b6",r:4,lay:"tiles",o:{perp:"Perpendicular",par:"Parallel",exit:"Smart Exit"},search:"Searching for parking space",found:"Select parking type",start:"Hold P to park",act:"Smart Parking",snd:[[988,.08],[1480,.1]],hold:true},
+  genesis:{bg:"#0d0c0b",pn:"#1e1c1a",ac:"#c49a6c",tx:"#f5f0ea",sub:"#a59c91",r:4,lay:"tiles",o:{perp:"Perpendicular",par:"Parallel",exit:"Smart Exit"},search:"Searching for parking space",found:"Select parking type",start:"Hold P to park",act:"Smart Parking",snd:[[784,.1],[1175,.12]],hold:true},
+  toyota:{bg:"#0d1013",pn:"#1d2329",ac:"#eb0a1e",tx:"#f2f4f6",sub:"#a1a9b1",r:6,lay:"viz",o:{perp:"Perpendicular",par:"Parallel",exit:"Parallel exit"},search:"Stop next to the space",found:"Select the target space",start:"START",act:"Advanced Park",snd:[[1175,.08],[1175,.08]]},
+  lexus:{bg:"#0a0a0b",pn:"#1b1c1e",ac:"#c7a77b",tx:"#f4f2ef",sub:"#a3a09a",r:4,lay:"viz",o:{perp:"Perpendicular",par:"Parallel",exit:"Parallel exit"},search:"Stop next to the space",found:"Select the target space",start:"START",act:"Advanced Park",snd:[[880,.1],[1320,.12]]},
+  volvo16:{bg:"#141516",pn:"#232527",ac:"#3a7bd5",tx:"#ececec",sub:"#a2a2a2",r:2,lay:"list",o:{par:"Parallel",perp:"Perpendicular"},search:"Searching for parking space",found:"Space found: stop",start:"Engage reverse",act:"Park Assist Pilot",snd:[[1047,.08],[1047,.08]]},
+  volvo:{bg:"#f3f2ef",pn:"#e4e2dc",ac:"#284e80",tx:"#1b1b1b",sub:"#5b5b5b",r:16,lay:"viz",o:{par:"Parallel",perp:"Perpendicular",exit:"Exit"},search:"Looking for spaces",found:"Select a space",start:"Park",act:"Park Pilot Assist",snd:[[784,.09],[1047,.11]]},
+  lucid:{bg:"#0d0d0d",pn:"#1c1c1c",ac:"#d9c7a3",tx:"#f2f0ec",sub:"#9e9a92",r:20,lay:"viz",o:{par:"Parallel",perp:"Perpendicular",exit:"Auto Park Out"},search:"Searching for spaces",found:"Select a space",start:"Auto Park",act:"Auto Park",snd:[[880,.08],[1320,.1]]},
+  landrover:{bg:"#0c0d0d",pn:"#1d2020",ac:"#5f9a7a",tx:"#eef1ef",sub:"#9ba39e",r:4,lay:"list",o:{par:"Parallel",perp:"Perpendicular",exit:"Park Exit"},search:"Searching for a space",found:"Space found: stop",start:"Engage reverse",act:"Park Assist",snd:[[1047,.08],[1397,.1]]},
+  strata:{bg:"#0a1013",pn:"#16323f",ac:"#1d5fd1",tx:"#e6eef0",sub:"#9fb4b7",r:10,lay:"tiles",o:{par:"Parallel park",perp:"Perpendicular park",exit:"Park exit"},search:"Searching for Parking Space…",found:"Space found",start:"Park",act:"Parking Assist Active",snd:[[880,.08],[1175,.12]]}};
+const pkTh=()=>{const S=pkSys();return PKS_TH[S?S.th:"strata"]||PKS_TH.strata};
+function pkChime(i){try{const s=pkTh().snd||[[880,.08],[1175,.12]];beep(s[i][0],s[i][1],"sine",.2)}catch(e){}}
+// what the driver has to do right now on a steer-only / creep system (the car steers; you shift, and on steer-only you work the pedals)
+function pkDriverDo(){const S=pkSys(),A=sys.pa;if(!S||!A||S.auto==="full")return "";const g=A.wantG||st.gear;if(g!==st.gear)return g==="R"?"Shift to R":g==="D"?"Shift to D":"Shift to P";
+  if(S.auto==="creep")return "Hands off the wheel: it moves at idle speed";return A.wantV>0.05?(st.gear==="R"?"Back up slowly":"Move forward slowly"):Math.abs(car.vx)>0.08?"Stop":"Wait";}
+function paOpenMenu(){if(!st.started||st.walk)return;if(!has("autopark")){const T=TRIMS[st.trim],b=(T.group||"").split(" ")[0],alt=PKS_NONE[b];toast(`The real ${T.short||"car"} doesn't park itself${alt?": it has "+alt:""}`);return}if(sys.pa){const S=pkSys();if(S&&(S.hold||pkTh().hold))return;paStop(`${S?S.name:"Park assist"} cancelled`);return}
   if(PA.mode){PA.mode=null;PA.found=false;SCR.paMenu=false;return}SCR.paMenu=true;PA.prevCam=st.cam;st.cam=1;SCR.focus=true;tick(1)}
-function paChoose(k){$("paMenu").hidden=true;SCR.paMenu=false;SCR.focus=false;if(!k){PA.mode=null;return}st.acc=false;st.pilot=false;
+function paChoose(k){$("paMenu").hidden=true;SCR.paMenu=false;SCR.focus=false;if(!k){PA.mode=null;return}{const S=pkSys();if(S&&!S.types.includes(k)){toast(`${S.name} doesn't do that`);return}}st.acc=false;st.pilot=false;
   if(k==="exit"){paStartExit();return}PA.mode=k;PA.found=false;PA.side=st.signal||1;tick(1)}
 // a parallel-parking stretch: Westport's Main St block, or (new world) whichever parking street you're driving along
 function paK(M){if(W2&&M.e.T&&M.e.T.park){const lo=loOf(M.e.n)*LANE;return {e:M.e,dir:M.dir,s0:rStart(M.e,M.dir)+9,s1:M.L-rEnd(M.e,M.dir)-9,oP:lo-LANE/2-M.e.T.park/2,oA:lo-0.1,pw:M.e.T.park}}return PARK}
@@ -16517,7 +16630,7 @@ function paScan(){sys.paSpot=null;if(!PA.mode||sys.pa)return;if(st.signal)PA.sid
   else{if(M.e===PAD.e&&M.dir===PAD.dir){const db=PAD.s0-M.s;if(db>4&&db<160&&M.off<1&&M.off>-8&&PA.side>0){sys.paSpot={type:"bay"}}}
     if(!sys.paSpot){const now=performance.now();if(now-(PA.scanT||0)>250||!PA.last){PA.scanT=now;PA.last=scanPerp()}const sp_=PA.last;
       if(sp_&&sp_.type==="perp")sys.paSpot=sp_;else if(sp_&&sp_.type==="perpTight")PA.tight=true}}
-  if(sys.paSpot&&!PA.found){PA.found=true;beep(880,.08,"sine",.18);setTimeout(()=>beep(1175,.12,"sine",.18),110)}if(!sys.paSpot)PA.found=false}
+  if(sys.paSpot&&!PA.found){PA.found=true;pkChime(0);setTimeout(()=>pkChime(1),110)}if(!sys.paSpot)PA.found=false}
 function paStart(){const sp=sys.paSpot;if(!sp)return;const M=me();
   if(sp.type==="par"){const K=sp.K||PARK;sys.pa={type:"par",ph:"pos",K,sT:sp.s,o0:K.oA,oT:paParT(K),posD:TRIMS[st.trim].ws4&&st.ws4?5.9:6.5,msg:"Positioning"}}
   else if(sp.type==="perp"&&sp.hplan){const L=planPerpH(sp.t,150000);if(!L){toast("Not enough room to park there: creep on to the next stall");return}sys.pa={type:"perpH",segs:L.segs,si:0,idx:0,t:sp.t,u:L.u,moves:L.moves,stuck:0,replans:0,msg:"Positioning"}}
@@ -16548,7 +16661,7 @@ function paStartExit(){const M=me(),K=paK(M);
     sys.epb=false;sys.hold=false;st.acc=false;
     sys.pa={type:"exitG",u:[t.ux,t.uy],M:[t.x-t.ux*2.75,t.y-t.uy*2.75],fwd:noseOut,ph:"out",hT:wrapPi(h0+side*Math.PI/2),side,stuck:0,msg:"Pulling out"};tick(1);return}}
   toast("Park exit works from a parallel space, a parking-lot bay or a garage stall")}
-function paStop(why,ok,keepD){const p2ok=!!ok;sys.pa=null;PA.mode=null;PA.found=false;inp.paS=inp.paT=inp.paB=0;if(why)toast(why);if(ok){beep(990,.1,"sine",.22);setTimeout(()=>beep(1320,.16,"sine",.22),120);st.gear=keepD?"D":"P";logResult(why)}try{p2pAfterPa(p2ok)}catch(e){}}
+function paStop(why,ok,keepD){const p2ok=!!ok;sys.pa=null;PA.holdScr=false;PA.mode=null;PA.found=false;inp.paS=inp.paT=inp.paB=0;if(why)toast(why);if(ok){pkChime(0);setTimeout(()=>pkChime(1),120);setTimeout(()=>pkChime(1),300);st.gear=keepD?"D":"P";logResult(why)}try{p2pAfterPa(p2ok)}catch(e){}}
 function paUpdate(dt){const A=sys.pa;if(!A)return null;
   const M=me(), he=wrapPi(car.psi-M.h), v=car.vx, P=sys.pdc||parkSensors(), fr=Math.min(...P.f), rr=Math.min(...P.r);
   let steer=0, vt=0;
@@ -16773,9 +16886,14 @@ function controls(dt){try{sigCancel()}catch(e){}try{tslSndTick(dt)}catch(e){}sys
   try{if(isMon()){const r_=monTick(dt,thr,brk);thr=r_[0];brk=r_[1]}}catch(e){}
   if(st.hdc&&thr<0.05&&Math.abs(car.vx)>(st.hdcV||2.2)+0.2&&Math.abs(car.pitch||0)>0.05)brk=Math.max(brk,clamp((Math.abs(car.vx)-(st.hdcV||2.2))*0.25,0,0.6));   // Hill Descent Control (Ridgeway) / Descent Anchor (Monarch, set speed)
   paScan();paPanel();$("paBtn").hidden=true;
-  if(sys.pa){const keyed=K.arrowleft||K.arrowright||K.arrowup||K.arrowdown||K.a||K.d||K.w||K.s||K[" "];
-    if(inp.padActive||inp.thrT>0.05||inp.brkT>0.05||keyed||whlGrab())paStop("Park assist cancelled: you have control");
-    else{const o=paUpdate(dt);if(o){[s,thr,brk]=o;inp.steer+=clamp(s-inp.steer,-2.2*dt,2.2*dt);inp.thr+=clamp(thr-inp.thr,-4*dt,2*dt);inp.brk+=clamp(brk-inp.brk,-6*dt,6*dt);
+  if(sys.pa){const PS=pkSys()||PKS_SYS.strata,man=PS.auto!=="full",steerK=K.arrowleft||K.arrowright||K.a||K.d,keyed=steerK||(!man&&(K.arrowup||K.arrowdown||K.w||K.s||K[" "]));
+    if((!man&&(inp.thrT>0.05||inp.brkT>0.05))||(inp.padActive&&!man)||keyed||whlGrab())paStop(`${PS.name} cancelled: you have control`);
+    else if(man&&Math.abs(car.vx)>2.8)paStop(`${PS.name} cancelled: too fast`);
+    else{const g0=st.gear,o=paUpdate(dt);if(o&&sys.pa){const A=sys.pa;
+      /* steer-only and creep systems: the car steers, but the gear lever is yours (it tells you when to shift), and on steer-only the pedals are too */
+      if(man){A.wantG=st.gear;st.gear=g0;A.wantV=o[1];if(A.wantG!==st.gear){o[1]=0;o[2]=Math.max(o[2],0.4)}if(PS.auto==="steer"){o[1]=inp.thrT;o[2]=inp.brkT}}
+      if(PS.hold||pkTh().hold){const held=!!(K.y||PA.holdScr);A.held=held;if(!held){o[1]=0;o[2]=Math.max(o[2],0.6)}}
+      [s,thr,brk]=o;inp.steer+=clamp(s-inp.steer,-2.2*dt,2.2*dt);inp.thr+=clamp(thr-inp.thr,-4*dt,2*dt);inp.brk+=clamp(brk-inp.brk,-6*dt,6*dt);
       knob.style.transform=st.wheelUI?`rotate(${inp.steer*135}deg)`:`translateX(${inp.steer*(pad.clientWidth/2-30)}px) rotate(${inp.steer*90}deg)`;$("accel").fill.style.height=(inp.thr*100)+"%";$("brake").fill.style.height=(inp.brk*100)+"%";return}}}
   if(sys.p2pGrace>0){sys.p2pGrace-=dt;if(inp.steerT===0)inp.steer*=0.5}
   if(sys.p2p&&sys.p2p.ph==="exited"&&!st.walk){sys.p2p.wait-=dt;if(sys.p2p.wait<=0){if(inGarage(car.px,car.py))p2pGarageOut();else if(p2pOnRoad())p2pEngage();else p2pToRoad()}}
