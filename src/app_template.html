@@ -1277,8 +1277,22 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
 <script data-boot>(function(){var p=0;window.__bootP=0;var t=setInterval(function(){if(window.__bootReal){clearInterval(t);return}p+=(0.7-p)*0.025;window.__bootP=p;var a=document.getElementById("bootArc"),n=document.getElementById("bootNeedle"),c=document.getElementById("bootPct");if(a)a.setAttribute("stroke-dasharray",(p*100).toFixed(1)+" 100");if(n)n.style.setProperty("--a",(-135+p*270)+"deg");if(c)c.textContent=String(Math.round(p*100))},120)})()</script>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 322 · The I-38 / I-61 pretzel interchange</h2></div>
+    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 323 · Strata Metro Airport</h2></div>
     <div class="nb">
+      <h4>Strata Metro Airport, and park assist that knows what it's doing</h4><ul>
+      <li>✈️ <b>Strata Metro Airport</b> is open, south of County Rd 40. It's laid out like Detroit Metro: the long McNamara terminal with Concourse A and the regional B/C concourse, the Evans (north) terminal with Concourse D, two parallel runways, a control tower, hangars, air cargo, a fuel farm and 70 airliners at the gates, taxiing, landing and being pushed back</li>
+      <li>Get there on <b>John D. Dingell Dr</b> (a boulevard south off County Rd 40) to McNamara, or <b>W.G. Rogell Dr</b> to Evans. The inbound and outbound roadways are one-way, three lanes, and they dip through a <b>tunnel under taxiway T</b></li>
+      <li>Both terminals have the real two-level layout: <b>Departures</b> drop-off on an elevated deck at check-in, <b>Arrivals</b> pick-up below at baggage claim, and a "Return to Terminal" loop if you miss your stop. There's also an Air Cargo road to the truck court</li>
+      <li>The airfield is fenced off (you can't drive onto the runways), and the terminals, garages and hangars are solid</li>
+      <li>Pick the terminals in Navigation (✈️) and FSD drives you to the curb</li>
+      <li>Performance: the airport only loads when you're within about 3 miles, and it's drawn in tiles by distance, so the rest of the map runs the same as before. Small things (bag carts, tugs, trees) stop drawing first; the buildings and runway lights stay visible from far away</li>
+      <li>🅿️ <b>Park assist fixed (VW Atlas and the other steer-only systems)</b>: on these the car steers and you work the pedals, but before it let you roll at any speed and didn't stop you at the end of each move, so it overshot and lost track. Now it keeps you to walking pace and brakes at the end of every move and before anything in the way (like the real cars' manoeuvre braking), and W / the down arrow work as your pedals on a keyboard</li>
+      <li>Bay parking in store lots stays on the lot: it plans the turn so the wheels never go over the grass strip or the kerb, and does a 2- or 4-point turn when the front row is tight instead of swinging out</li>
+      <li>Parking sensors now see people walking in the lot, so park assist stops for them</li>
+      <li>🐞 Bug reports fixed: the invisible bump on I-38 in the sunken stretch that could flip you (#119), the grey band across the road at each end of the bridges over the cut (#118), and "you hit a pedestrian" when someone walked into the side of your slow car (#121; they're nudged aside now)</li>
+      <li>⚡ <b>Lower CPU use</b> (#125): the steering-wheel graphic made the browser re-measure the page every single frame, which could eat a big chunk of your CPU. It now measures once a second, and a few other on-screen bits do the same</li>
+      <li>🚗 <b>FSD takes freeway exits again</b>: it now gets into the right lane before an exit, and stays with the exit ramp as it peels away instead of giving up and carrying on down the freeway</li>
+      </ul>
       <h4>The I-38 / I-61 pretzel interchange</h4><ul>
       <li><b>Two new flyovers:</b> at the I-38 / I-61 crossing, the left turns from I-38 east to I-61 north and from I-38 west to I-61 south are now flyover ramps 16 m up. Each leaves I-38 well before the crossing, climbs about 6%, sweeps left over both freeways and the I-61 bridge, then runs down beside I-61, over the loop ramp underneath.</li>
       <li><b>Loops under flyovers:</b> the other two left turns are still 270° loop ramps, so the ramps wind over and under each other like a pretzel. Every ramp passes at least 7 m above anything it crosses.</li>
@@ -2331,7 +2345,10 @@ const RT={
   // one-way, one-lane ring of a roundabout (traffic goes round anticlockwise; it has priority, everyone entering yields)
   rbt:{n:1,m:-LANE,shR:1.2,lim:20,z:"c",rank:7,col:"h",kerb:true,edgeL:true,label:"Roundabout",ow:true},
   // a Michigan service drive: a one-way, two-lane frontage road beside a sunken freeway, kerbs and a sidewalk, running the same way as the freeway beside it
-  sd:{n:2,m:-2*LANE,shR:0.6,lim:40,z:"c",rank:4,col:"c",kerb:true,walk:2.0,edgeL:true,label:"Service drive",ow:true}};
+  sd:{n:2,m:-2*LANE,shR:0.6,lim:40,z:"c",rank:4,col:"c",kerb:true,walk:2.0,edgeL:true,label:"Service drive",ow:true},
+  // airport: one-way three-lane roadways in and out, and the four-lane terminal curb roads (arrivals below, departures on the deck above)
+  aw:{n:3,m:-3*LANE,shR:2.0,shL:1.0,lim:40,z:"r",rank:4,col:"h",edgeL:true,label:"Airport road",ow:true},
+  curb:{n:4,m:-4*LANE,shR:0.4,shL:0.4,lim:15,z:"c",rank:4,col:"c",kerb:true,walk:4.0,edgeL:true,label:"Terminal curb",ow:true}};
 // the new world (Westport, Fairhaven, Millbrook, Mount Kestrel) takes over from Westport at 3 pm Eastern on Oct 23 2026 (19:00 UTC).
 // Before then it can be tried with ?world=2; after it, ?world=1 still opens Westport
 const W2_AT=Date.UTC(2026,9,23,19,0,0);
@@ -2400,6 +2417,18 @@ function w2WaterD(x,y,m=200){let d=1e9;for(const B of W2_WATER){const b=B.bb;if(
 // Mount Kestrel (switchbacks and a pass road), farmland, and two interstates: I-38 east-west and I-61 north-south, crossing at a cloverleaf.
 // Cross streets ride over the freeways on raised bridges, so the ramps really climb up to them.
 const W2C={MT:[-3300,2500],FH:[2600,0],MB:[1750,2450],CL:[-2300,-1500],CLH:8,SD:{cuts:[[-3850,-3350],[-1250,-370],[370,1250],[2350,2850]],y:-1500,H:7,full:190}};
+// ---- Strata Metro Airport, south of County Rd 40: the owner's model (its X runs east, its Z runs south, ground at 0), placed at (cx, cy).
+// TX/TH/TB: the road tunnel under taxiway T (approach ramps to TX+-TH, the taxiway bridge TX+-TB), TZ the inbound / outbound roads through it
+const APT={cx:1000,cy:-5000,X0:-2500,X1:2500,Z0:-1450,Z1:1150,z:0,TX:-840,TH:195,TB:14,TZ:[470,250],TW:9.5,m:null,busy:false,pave:null,coll:false};
+const aptXY=(X,Z)=>[APT.cx+X,APT.cy-Z];
+const inApt=(x,y,m)=>{const X=x-APT.cx,Z=APT.cy-y,mm=m||0;return X>APT.X0-mm&&X<APT.X1+mm&&Z>APT.Z0-mm&&Z<APT.Z1+mm};
+const aptDz=X=>{const d=Math.abs(X-APT.TX);if(d<=22)return -7;if(d>=APT.TH)return 0;const t=(d-22)/(APT.TH-22);return -7*(1-t*t*(3-2*t))};
+function aptTr(x,y){const X=x-APT.cx,Z=APT.cy-y;if(Math.abs(X-APT.TX)>=APT.TH)return null;for(const z of APT.TZ)if(Math.abs(Z-z)<APT.TW)return {X,Z,h:aptDz(X)};return null}
+// how much the land is pulled to the airport's level: all of it inside, easing out over 300 m around it
+function aptW(x,y){const X=x-APT.cx,Z=APT.cy-y,dx=Math.max(APT.X0-X,X-APT.X1,0),dz=Math.max(APT.Z0-Z,Z-APT.Z1,0);if(dx>300||dz>300)return 0;const d=Math.hypot(dx,dz);return d>=300?0:1-smooth01(0,300,d)}
+const APT_PR=[[-1600,1600,-723,-677],[-1600,1600,837,883],[-1600,1600,-572,-548],[-1600,1600,-842,-818],[-1600,1600,708,732],[-852,-828,-842,732],[828,852,-842,732],[-837,837,-470,142],[440,1040,-987,-830]];   /* runways, taxiways, the main apron (X0,X1,Z0,Z1) */
+function aptPaved(x,y){const X=x-APT.cx,Z=APT.cy-y;for(const r of APT_PR)if(X>r[0]&&X<r[1]&&Z>r[2]&&Z<r[3])return true;const T=APT.pave;if(!T)return false;for(const t of T){if(X<t[6]||X>t[7]||Z<t[8]||Z>t[9])continue;const [ax,az,bx,bz,cx_,cz]=t,d1=(X-bx)*(az-bz)-(ax-bx)*(Z-bz),d2=(X-cx_)*(bz-cz)-(bx-cx_)*(Z-cz),d3=(X-ax)*(cz-az)-(cx_-ax)*(Z-az);if(!((d1<0||d2<0||d3<0)&&(d1>0||d2>0||d3>0)))return true}return false}
+function aptGround(x,y){const T=aptTr(x,y);if(T&&!(Math.abs(T.X-APT.TX)<APT.TB&&GREF>APT.z-3))return {h:APT.z+T.h,mu:1.1,kind:"pavement"};const pv=aptPaved(x,y);return {h:APT.z,mu:pv?1.05:MAP.offMu,kind:pv?"pad":"grass"}}
 const W2_MTN=[];   // the mountain roads: their heights are smoothed along the road (see w2Profiles)
 const W2_RB=[];
 function buildNet2(){
@@ -2534,7 +2563,37 @@ function buildNet2(){
   mkR("road","County Rd 11",[[4500,-3300],[4500,-2400],[4500,0]],{lim:55});
   mkR("road","County Rd 9",[[4000,-3300],[4000,-2400],[4000,0],[4000,1500,300],[3300,2300,300],[2750,2700]],{lim:55});
   mkR("road","County Rd 30",[ILW.P(0,ILW.T(1)),ILW.P(0,ILW.T(-1)),[-4400,-2400],[-4130,-2400],[-3870,-2400],[-3600,-2400],[-1000,-2400],[1000,-2400],[2600,-2400],[3300,-2400],[4000,-2400],[4500,-2400]],{lim:55});
-  mkR("road","County Rd 40",[[-4400,-3300],[-3600,-3300],[-1000,-3300],[-300,-3300],[1000,-3300],[2600,-3300],[3300,-3300],[4000,-3300],[4500,-3300]],{lim:55});
+  mkR("road","County Rd 40",[[-4400,-3300],[-3600,-3300],[-1800,-3300],[-1000,-3300],[-300,-3300],[1000,-3300],[2600,-3300],[3300,-3300],[3700,-3300],[4000,-3300],[4500,-3300]],{lim:55});
+  // ---- Strata Metro Airport (laid out like Detroit Metro): John D. Dingell Dr to the McNamara terminal, W.G. Rogell Dr to the Evans terminal, a cargo road
+  {const A=(X,Z,r)=>{const p=aptXY(X,Z).map(v=>Math.round(v*100)/100);if(r!==undefined)p.push(r);return p};
+   N(-1800,-3300,{ctrl:"signal"});N(3700,-3300,{ctrl:"signal"});
+   const D0=A(-2600,360),D1=A(2620,-1357);for(const q of [D0,D1,A(120,470),A(640,-1375),A(-1100,470),A(-1100,250)])N(q[0],q[1],{ctrl:"merge"});
+   rd("blvd","John D. Dingell Dr",[[-1800,-3300],[-1800,-5000,0],[-1800,-5360,0],D0],{lim:45});
+   // McNamara: in along the south roadway (M1), dipping under taxiway T in a tunnel, round the garage to the curbs; out along the north roadway (M4)
+   const tun=X0=>function(u){return aptDz(X0+(this.a.x<this.b.x?u:-u))};
+   rd("aw","McNamara Terminal",[D0,A(-2380,470,0),A(-1100,470)],{lim:45});
+   E("aw","McNamara Terminal",[A(-1100,470),A(-1040,470)],{lim:40});
+   E("aw","McNamara Terminal",[A(-1040,470),A(-640,470)],{lim:40,zo:tun(-1040),tun:1});
+   rd("aw","McNamara Terminal",[A(-640,470),A(120,470)],{lim:35});
+   rd("curb","Arrivals (lower level)",[A(120,470),A(165,462,0),A(262,462,0),A(262,150,0),A(-262,150,0),A(-262,250,0),A(-420,250)],{lim:15});
+   rd("curb","Departures (upper level)",[A(120,470),A(165,484,0),A(285,484,0),A(285,150,0),A(-285,150,0),A(-285,225,0),A(-470,232,0),A(-530,240,0),A(-560,250)],
+     {lim:15,fly:1,stack:1,zo:function(u){const up=(a,b)=>0.5*smooth01(a,b,u)+0.5*clamp((u-a)/(b-a),0,1);return 7.2*up(185,355)*(1-up(this.L-300,this.L-12))}});
+   N(...A(-420,250),{ctrl:"merge"});N(...A(-560,250),{ctrl:"merge"});
+   rd("aw","McNamara Terminal",[A(-420,250),A(-560,250)],{lim:35});rd("aw","McNamara Terminal",[A(-560,250),A(-640,250)],{lim:35});
+   E("aw","McNamara Terminal",[A(-640,250),A(-1040,250)],{lim:40,zo:tun(-640),tun:1});
+   E("aw","McNamara Terminal",[A(-1040,250),A(-1100,250)],{lim:40});
+   rd("aw","McNamara Terminal",[A(-1100,250),A(-2380,250,0),D0],{lim:45});
+   rd("ramp","Return to Terminal",[A(-1100,250),A(-1190,300,0),A(-1190,420,0),A(-1100,470)],{lim:20});
+   // Evans (north) terminal: in along the north roadway (N1), arrivals below and departures above, out to the east (N4)
+   rd("road","W.G. Rogell Dr",[[3700,-3300],[3700,-3480],[3700,-3643,60],D1],{lim:45});
+   rd("aw","Evans Terminal",[D1,A(2480,-1375,0),A(640,-1375)],{lim:35});
+   rd("curb","Arrivals (lower level)",[A(640,-1375),A(520,-1375,0),A(520,-1110,0),A(960,-1110,0),A(960,-1340,0),A(1100,-1340)],{lim:15});
+   rd("curb","Departures (upper level)",[A(640,-1375),A(497,-1375,0),A(497,-1110,0),A(983,-1110,0),A(983,-1318,0),A(1100,-1318,0),A(1160,-1340)],
+     {lim:15,fly:1,stack:1,zo:function(u){const up=(a,b)=>0.5*smooth01(a,b,u)+0.5*clamp((u-a)/(b-a),0,1);return 7.2*up(165,330)*(1-up(this.L-390,this.L-130))}});
+   N(...A(1100,-1340),{ctrl:"merge"});N(...A(1160,-1340),{ctrl:"merge"});
+   rd("aw","Evans Terminal",[A(1100,-1340),A(1160,-1340)],{lim:35});rd("aw","Evans Terminal",[A(1160,-1340),A(2480,-1340,0),D1],{lim:45});
+   // the cargo road off Rogell Dr, down the east side to the freight buildings' truck court
+   rd("road","Air Cargo Rd",[[3700,-3480],[3860,-3540,0],[3860,-5300,0],A(2500,425,0),A(900,425)],{lim:35})}
   mkR("dirt","Quarry Rd",[[-1000,-3300],[-1000,-3480,60],[-300,-3480,60],[-300,-3300]]);
   mkR("dirt","Gravel Pit Rd",[[3300,-2400],[3380,-2850,120],[3300,-3300]]);
   // ---- Fairhaven: a small grid of 150 m blocks, Commerce Pkwy in from the west (the shops), Oakridge subdivision to the north
@@ -2715,7 +2774,7 @@ function pathAt(P,d){const c=P.cum;if(P.L<1e-3)return [P.pts[0][0],P.pts[0][1],P
 // ---- height: steep hills (Lake Rd and Oak St climb over two of them), the Rouge River and its five bridges. Roads stay level across; junctions stay flat
 const HILLS=[[-930,-720,26,140],[-80,640,24,130],[-2050,700,28,200],[2000,-850,22,180],[-400,-1450,18,160],
   [1500,-1560,24,170],[-1550,-1600,26,160],[-700,1380,20,140],[2230,650,20,150],[1700,1430,16,140],[-2280,1150,22,170],[2300,-1250,18,150]];
-function hillZ(x,y){let z=0;for(const h of (W2?HILLS2:HILLS)){const dx=x-h[0],dy=y-h[1],d2=dx*dx+dy*dy,s2=h[3]*h[3];if(d2<12*s2)z+=h[2]*Math.exp(-d2/s2)}return z}
+function hillZ(x,y){let z=0;for(const h of (W2?HILLS2:HILLS)){const dx=x-h[0],dy=y-h[1],d2=dx*dx+dy*dy,s2=h[3]*h[3];if(d2<12*s2)z+=h[2]*Math.exp(-d2/s2)}if(W2){const w=aptW(x,y);if(w>0)z+=(APT.z-z)*w}return z}
 const RIVER={x:150,w:44,water:-1.5};const riverX=y=>RIVER.x+25*Math.sin(y/400),riverD=W2?((x,y)=>w2WaterD(x,y)+RIVER.w/2):((x,y)=>Math.abs(x-riverX(y)));   // in the new world: distance from the nearest water, offset so that < RIVER.w/2 is in the water
 function riverCut(x,y){const d=riverD(x,y);return d<RIVER.w/2+14?-3.4*(1-smooth01(RIVER.w/2-6,RIVER.w/2+14,d)):0}
 const BRIDGE_H=5.2,BRIDGE_RAMP=125,BRIDGE_HALF=RIVER.w/2+8;
@@ -2762,8 +2821,8 @@ function ez0(e,u){let z;if(e.zp){const f=clamp(u,0,e.L)/4,i=Math.min(e.zp.length
   const JA=e.type!=="rbt"&&e.a.rbt?80:JE,JB=e.type!=="rbt"&&e.b.rbt?80:JE;   // roads into a roundabout ease onto its flat ring over 80 m
   if(e.a.z!==undefined&&!(W2&&(e.a.ctrl==="merge"||e.a.kind==="cont"))&&u<(e.r0||0)+JA){const w=1-smooth01(e.r0||0,(e.r0||0)+JA,u);z+=(e.a.z-hillZ(e.a.x,e.a.y))*0+(e.a.z-z)*w}
   if(e.b.z!==undefined&&!(W2&&(e.b.ctrl==="merge"||e.b.kind==="cont"))&&u>e.L-(e.r1||0)-JB){const w=1-smooth01(e.r1||0,(e.r1||0)+JB,e.L-u);z+=(e.b.z-z)*w}if(e.br)z+=e.br.H*(1-smooth01(e.br.half,e.br.half+e.br.rp,Math.abs(u-e.br.uc)));if(e.ford)z+=(RIVER.water-0.3-z)*(1-smooth01(e.ford.half,e.ford.half+24,Math.abs(u-e.ford.uc)));
-  if(e.ov){const o=e.ov,d=u-o.uc;z+=o.H*(1-smooth01(o.half,o.half+(d<0?o.rA:o.rB),Math.abs(d)))}
-  if(e.dip)for(const o of e.dip){const d=u-o.uc;z-=o.H*(1-smooth01(o.half,o.half+(d<0?o.rA:o.rB),Math.abs(d)))}return z}
+  if(e.ov){const o=e.ov,d=clamp(u,0,e.L)-o.uc;z+=o.H*(1-smooth01(o.half,o.half+(d<0?o.rA:o.rB),Math.abs(d)))}
+  if(e.dip){const uu=clamp(u,0,e.L);for(const o of e.dip){const d=uu-o.uc;z-=o.H*(1-smooth01(o.half,o.half+(d<0?o.rA:o.rB),Math.abs(d)))}}return z}   /* u is clamped: just past the end of a road sunk right up to its end node (the cut runs through the ramp nodes) it stays sunk, no thin invisible ridge (issue #119) */
 // old bridges in the new world: a deck that gives a little under you (more under something heavy), and on the covered bridge
 // loose planks and one missing
 function brJank(e,u,t){const b=e.br,d=u-(b.uc-b.half);if(d<0||d>2*b.half)return 0;const heavy=(TRIMS[st.trim].mass||1800)>2400,f=Math.sin(Math.PI*d/(2*b.half));
@@ -2821,7 +2880,7 @@ for(const e of EDGES){if(e.type!=="ramp")continue;const n=Math.ceil(e.L/2)+1,F=n
   if(any)e.zfx=F}
 function edgesNear(x,y,m){const C=GRID.C,out=new Set();for(let i=Math.floor((x-m)/C);i<=Math.floor((x+m)/C);i++)for(let j=Math.floor((y-m)/C);j<=Math.floor((y+m)/C);j++)for(const e of (GRID.e.get(i*100003+j)||[]))out.add(e);return out}
 // distance from a point to the nearest paved road (exact within ~40 m, from a coarse distance field further out)
-const WORLD=W2?{x0:-4800,x1:4800,y0:-3600,y1:3600}:{x0:-2400,x1:2400,y0:-1750,y1:1750};
+const WORLD=W2?{x0:-4800,x1:4800,y0:-6500,y1:3600}:{x0:-2400,x1:2400,y0:-1750,y1:1750};
 const DF={C:20};
 {const nx=Math.ceil((WORLD.x1-WORLD.x0)/DF.C)+1,ny=Math.ceil((WORLD.y1-WORLD.y0)/DF.C)+1,d=new Float32Array(nx*ny).fill(1e9);DF.nx=nx;DF.ny=ny;DF.d=d;
   for(const e of EDGES)for(let u=0;u<=e.L;u+=6){const p=eAt(e,u),i=Math.round((p.x-WORLD.x0)/DF.C),j=Math.round((p.y-WORLD.y0)/DF.C);
@@ -3097,7 +3156,7 @@ function tcWhere(x,y){const S=tcSec(x,y);if(S)return S;if(Math.hypot(x-TC_SKID.x
 // ---- ground under a tyre: road (with bumps, rumble strips), kerbs, sidewalks, and grass with less grip off the road
 function smooth01(a,b,x){const t=clamp((x-a)/(b-a),0,1);return t*t*(3-2*t)}
 function terrainH(x,y,d){const D=Math.max(d,dfAt(x,y)),f=smooth01(45,80,D)*(1+2.6*smooth01(80,230,D)),hills=MAP.hills?(1.4*Math.sin(x*0.021+1)*Math.cos(y*0.017)+0.7*Math.sin(x*0.047+y*0.039)):0;
-  const k=1-cityW(x,y);return hillZ(x,y)+riverCut(x,y)+k*(f*hills+Math.min(1,d/1.5)*MAP.lumps*(Math.sin(x*2.3+Math.cos(y*1.7))+Math.sin(y*2.9+x*0.7)))}
+  const k=1-cityW(x,y),z=hillZ(x,y)+riverCut(x,y)+k*(f*hills+Math.min(1,d/1.5)*MAP.lumps*(Math.sin(x*2.3+Math.cos(y*1.7))+Math.sin(y*2.9+x*0.7)));if(W2){const w=aptW(x,y);if(w>0)return z+(APT.z-z)*w}return z}
 // the new world: ground near a road is cut or filled to meet it (embankments up to raised roads, benches cut into the mountain).
 // Bridge decks and the freeway cut are left to embZ and cutZ
 function w2Blend(x,y,base){let sw=0,sz=0,A=0,under=1e9;
@@ -3183,6 +3242,7 @@ function groundAt0(x,y){
   if(kerb)return kz?{h:kz+0.04,mu:1.0,kind:"kerb"}:G_KERB;
   if(walk)return kz?{h:kz,mu:0.95,kind:"pavement"}:G_WALK;
   if(inCity(x,y))return G_WALK;
+  if(W2&&inApt(x,y))return aptGround(x,y);
   if(!W2&&Math.abs(y)>24&&Math.abs(y)<64&&x>-45&&x<1355){const ax=Math.abs(y);for(const [xa,xb] of LOTS)if(x>xa+15&&x<xb-15)return G_LOT}
   let tz=Math.min(terrainH(x,y,dmin)-0.03,cutZ(x,y));const em=embZ(x,y);if(W2){tz=Math.max(tz,em);if(dmin<40)tz=w2Blend(x,y,tz)}else if(em>tz)return {h:em,mu:MAP.offMu,kind:"grass"};
   if(tz<RIVER.water&&riverD(x,y)<RIVER.w/2)return {h:RIVER.water-0.6,mu:0.3,kind:"water"};
@@ -5207,7 +5267,7 @@ function checkCollision(){
   // pedestrians and deer: knocked down (they get up again)
   for(const p of peds.concat(EV.crit)){if(p.down||p.mode==="down")continue;const dx=p.wx-car.px,dy=p.wy-car.py;if(dx*dx+dy*dy>12||Math.abs((p.wz||0)-(car.zb||0))>1.5)continue;
     const c=Math.cos(car.psi),s=Math.sin(car.psi),lx=dx*c+dy*s,ly=-dx*s+dy*c,r=p.kind==="deer"?0.5:0.3;if(Math.abs(lx)>BODY_HL+r||Math.abs(ly)>BODY_HW+r)continue;
-    const v=Math.abs(car.vx);if(v<0.8&&p.kind!=="deer"){const m=Math.max(0.01,Math.min(BODY_HL+r-Math.abs(lx),BODY_HW+r-Math.abs(ly)));if(BODY_HL+r-Math.abs(lx)<BODY_HW+r-Math.abs(ly)){const k=(Math.sign(lx)||1)*m;p.wx+=c*k;p.wy+=s*k}else{const k=(Math.sign(ly)||1)*m;p.wx+=-s*k;p.wy+=c*k}p.det=null;continue}
+    const v=Math.abs(car.vx),ahead=Math.sign(car.vx||1)*lx>BODY_HL-0.35;if((v<0.8||!ahead&&v<4)&&p.kind!=="deer"){   /* someone walking into the side of a slow car is nudged aside, not counted as hit (issue #121) */const m=Math.max(0.01,Math.min(BODY_HL+r-Math.abs(lx),BODY_HW+r-Math.abs(ly)));if(BODY_HL+r-Math.abs(lx)<BODY_HW+r-Math.abs(ly)){const k=(Math.sign(lx)||1)*m;p.wx+=c*k;p.wy+=s*k}else{const k=(Math.sign(ly)||1)*m;p.wx+=-s*k;p.wy+=c*k}p.det=null;continue}
     if(p.kind==="deer"){p.down=true;p.v=0;car.vx*=0.9}else{p.mode="down";p.downT=7;p.wh=car.psi;p.v=0}crashFx(Math.max(v,1.6),p.kind==="deer"?"a deer":"a pedestrian")}
   // fixed obstacles near the car
   const seen=new Set();
@@ -5449,7 +5509,7 @@ function emoB(c,k,t,next){c.bub={e:EMO[k],t:t||2.2,nx:next?EMO[next]:null}}
 function emoDraw(){let box=$("emoL");if(!box){box=document.createElement("div");box.id="emoL";box.style.cssText="position:fixed;inset:0;pointer-events:none;z-index:6;overflow:hidden";document.body.appendChild(box)}
   box.hidden=false;clearTimeout(emoDraw.to);emoDraw.to=setTimeout(()=>{box.hidden=true},400);
   const M=CULL.vp,cv=$("gl");let n=0;const kids=box.children;
-  if(M&&cv&&st.emo!==false&&!(typeof PM!=="undefined"&&PM.on&&PM.hidePanel)){const r=cv.getBoundingClientRect();
+  if(M&&cv&&st.emo!==false&&!(typeof PM!=="undefined"&&PM.on&&PM.hidePanel)){const now_=performance.now();if(!cv._br||now_-cv._brT>500||cv._brG!==ELSZ_G){cv._br=cv.getBoundingClientRect();cv._brT=now_;cv._brG=ELSZ_G}const r=cv._br;
     for(const c of cars){if(!c.bub||n>=8)continue;const dx=c.wx-car.px,dy=c.wy-car.py;if(dx*dx+dy*dy>60*60)continue;const md=MODELS[c.mdl],x=c.wx,y=(c.wz||0)+((md&&md.meta.height)||1.5)+0.6,z=-c.wy;
       const cw=M[3]*x+M[7]*y+M[11]*z+M[15];if(cw<0.5)continue;const sx=(M[0]*x+M[4]*y+M[8]*z+M[12])/cw,sy=(M[1]*x+M[5]*y+M[9]*z+M[13])/cw;if(Math.abs(sx)>1.05||Math.abs(sy)>1.05)continue;
       let el=kids[n];if(!el){el=document.createElement("span");el.style.cssText="position:absolute;transform:translate(-50%,-100%);line-height:1;filter:drop-shadow(0 2px 3px rgba(0,0,0,.55))";box.appendChild(el)}
@@ -6727,13 +6787,13 @@ function viewDraw(){const c=$("u2vc");if(!c||c.offsetParent===null)return;const 
   document.querySelectorAll("#u2vt button").forEach(b=>b.classList.toggle("on",b.dataset.v===v));
   if(v==="assist"&&isTesla()){vizTesla(g,0,0,W,Hh,false);return}
   g.setTransform(k,0,0,k,0,0);g.lineJoin="round";g.lineCap="round";
-  const bigG=(c.clientWidth||196)<150?1.35:(c.clientWidth||196)<200?1.2:1.1,txt=(s,x,y,col,sz,al,w)=>{g.fillStyle=col;g.font=F((sz||9)*bigG,w);g.textAlign=al||"left";g.fillText(s,x,y)};
+  const bigG=(elSize(c)[0]||196)<150?1.35:(elSize(c)[0]||196)<200?1.2:1.1,txt=(s,x,y,col,sz,al,w)=>{g.fillStyle=col;g.font=F((sz||9)*bigG,w);g.textAlign=al||"left";g.fillText(s,x,y)};
   const carTop=(x,y,w,h,col)=>{g.strokeStyle=col||"#5a5d62";g.lineWidth=1.5;rr2(g,x,y,w,h,w*0.3);g.stroke()};
   const wheel=(x,y,on,col)=>{g.fillStyle=on?(col||amb):TH.track;rr2(g,x,y,7,17,2);g.fill()};
   const D=DRIVES[st.trim]||{},fr=D.bias?D.bias[0]>0.05:D.T?D.T[0]>0:true,rr=D.bias?D.bias[1]>0.05:D.T?D.T[1]>0:false,drv=fr&&rr?(/4x4|4WD|TRD|Wrangler|Bronco|Tacoma|4Runner/i.test((T.name||"")+(T.group||""))?"4WD":"AWD"):rr?"RWD":"FWD";
   if(v==="energy"){const hyb=!!T.hybrid||!!(DRIVES[st.trim]||{}).par,ice=!!T.ice&&!hyb,ev=!T.ice&&!hyb;let pe=0,pm=0,P=car.tq.reduce((a,q,i)=>a+q*car.w[i],0)/1000,regen=false,engChg=false,soc=null;
     if(hyb){try{const S=hybState();pe=S.pe;pm=S.pm;P=S.P;regen=S.regen;engChg=S.engChg;soc=S.soc}catch(e){}}else if(ice)pe=Math.max(0,P);else{pm=P;regen=P<-1;soc=socShow(H)}
-    const fuelF=ice||hyb?clamp(H.fuel/(H.tank||1),0,1):null,go=P>0.5,eOn=pe>0.5&&!engChg,mOn=Math.abs(pm)>0.5,cE=TH.pow,cB=regen?TH.good:TH.ev,cw=c.clientWidth||196,big=cw<150?1.45:cw<200?1.28:1.15;
+    const fuelF=ice||hyb?clamp(H.fuel/(H.tank||1),0,1):null,go=P>0.5,eOn=pe>0.5&&!engChg,mOn=Math.abs(pm)>0.5,cE=TH.pow,cB=regen?TH.good:TH.ev,cw=elSize(c)[0]||196,big=cw<150?1.45:cw<200?1.28:1.15;
     // the car from above, nose to the right: body, glass, mirrors, tyres
     const X0=54,X1=144,YC=56,HW=21,fa=127,ra=72;
     g.fillStyle=TH.cbody;g.strokeStyle=TH.cline;g.lineWidth=1.3;g.beginPath();g.moveTo(X0+8,YC-HW);g.lineTo(fa-6,YC-HW);g.bezierCurveTo(X1-4,YC-HW,X1,YC-HW+6,X1,YC-8);g.lineTo(X1,YC+8);g.bezierCurveTo(X1,YC+HW-6,X1-4,YC+HW,fa-6,YC+HW);g.lineTo(X0+8,YC+HW);g.bezierCurveTo(X0+1,YC+HW,X0,YC+HW-5,X0,YC+10);g.lineTo(X0,YC-10);g.bezierCurveTo(X0,YC-HW+5,X0+1,YC-HW,X0+8,YC-HW);g.closePath();g.fill();g.stroke();
@@ -6898,6 +6958,10 @@ function navPlaces(){const L=[],add=(name,sub,x,y,h,ic)=>{if(x==null||!isFinite(
   const TY={grocery:["Grocery store","🛒"],tire:["Tires and repairs","🛞"],cafe:["Café · fast chargers","☕"],hardware:["Hardware store","🔨"],diner:["Restaurant","🍔"]};
   for(const R of RETAIL){const t=TY[R.type]||["Store","🏪"],x=R.ac!=null?R.ac:(R.a0+R.a1)/2;add(R.name,t[0],x,R.s*(RB0+(R.bf||30)-1.5),R.s>0?-Math.PI/2:Math.PI/2,t[1])}
   for(const T of RETAIL_STN){const nb=RETAIL.slice().sort((a,b)=>Math.abs((a.a0+a.a1)/2-T.x)-Math.abs((b.a0+b.a1)/2-T.x))[0];add(T.name,"Gas station"+(nb?" · by "+nb.name:""),T.x,T.s*(RB0+15.5),0,"⛽")}
+  {const at=(nm,X,Z)=>{const e=EDGES.find(q=>q.name===nm&&Math.abs(eProj(q,...aptXY(X,Z)).t)<2&&eProj(q,...aptXY(X,Z)).u>0&&eProj(q,...aptXY(X,Z)).u<q.L);return e?{e,dir:1,s:eProj(e,...aptXY(X,Z)).u,side:"right"}:null};
+   for(const [nm,sub,X,Z,road] of [["McNamara Terminal · Departures","Strata Metro Airport · drop-off at check-in, upper level",0,150,"Departures (upper level)"],["McNamara Terminal · Arrivals","Strata Metro Airport · pick-up at baggage claim",0,150,"Arrivals (lower level)"],
+     ["Evans Terminal · Departures","Strata Metro Airport · north terminal, upper level",750,-1110,"Departures (upper level)"],["Evans Terminal · Arrivals","Strata Metro Airport · north terminal, baggage claim",750,-1110,"Arrivals (lower level)"],["Strata Metro Air Cargo","Freight buildings and truck court",1200,425,"Air Cargo Rd"]]){
+     const p=aptXY(X,Z);add(nm,sub,p[0],p[1],0,"✈️");const f=at(road,X,Z);if(f)L[L.length-1].fr=f}}
   add("Service plaza","Gas and fast chargers on Hwy 7",PAD.cx,PAD.cy,0,"⚡");if(L.length&&L[L.length-1].name==="Service plaza")L[L.length-1].fr={e:PAD.e,dir:PAD.dir,s:Math.max(5,PAD.s0-25),side:"right"};   // route to the plaza turn-off itself, not the nearest street
   {const seen=new Set();for(const c of CHGS){if(c.kind!=="sc"&&c.kind!=="ea")continue;const k=c.kind+(c.name||"")+Math.round(c.x/60)+","+Math.round(c.y/60);if(seen.has(k))continue;seen.add(k);const nb=L.filter(q=>q.ic!=="⚡"&&Math.hypot(q.x-c.x,q.y-c.y)<90).sort((q,r)=>Math.hypot(q.x-c.x,q.y-c.y)-Math.hypot(r.x-c.x,r.y-c.y))[0];add(c.kind==="sc"?"Tesla Supercharger":"Electrify America",(nb?"At "+nb.name:"Fast charger")+(c.kind==="sc"?" · V3, Tesla vehicles":" · 350 kW, all EVs"),c.x,c.y,c.face||0,"⚡")}
    for(const c of CHGS){if(c.kind!=="l2")continue;const f=navSnap({x:c.x,y:c.y}),nm=f?f.e.name:"street",k="l2"+nm+Math.round(c.x/150)+","+Math.round(c.y/150);if(seen.has(k))continue;seen.add(k);add("Level 2 charging",`${c.name||nm} · EV-only spaces, all EVs`,c.x,c.y,c.face||0,"🔌")}}
@@ -7009,9 +7073,9 @@ function fsdPlan(A){const n=endNode(A.e,A.dir),L=arrLeg(A.e,A.dir);A.mv=null;A.s
   if(!pick)pick=ms.find(m=>m.t==="S")||ms.find(m=>m.t!=="U")||ms[0];
   if(pick.e.type==="rbt"&&A.e.type!=="rbt"){A.rbN=0;A.rbWant=Math.random()<0.6?2:Math.random()<0.5?1:3}
   if(pick.e.type==="rbt"&&A.e.type!=="rbt"&&pick.e.n>1){let k=0,ee=pick.e,dd=pick.dir;if(NAV.dest){for(let g=0;g<12;g++){const nk2=navNextKey(ee,dd,0);if(nk2==null)break;const e2=EDGES[nk2>>1];if(e2.type!=="rbt")break;k++;ee=e2;dd=nk2&1?1:-1}}else k=(A.rbWant||2)-1;A.rbLane=k>=1?1:0}
-  A.mv=pick;A.mvNode=n;A.mvLeg=L;A.needLane=A.e.type==="rbt"?null:pick.t==="R"?0:(pick.t==="L"||pick.t==="U")?A.e.n-1:null}
+  A.mv=pick;A.mvNode=n;A.mvLeg=L;A.needLane=A.e.type==="rbt"?null:pick.t==="R"||pick.e.ow&&n.ctrl==="merge"&&pick.e.type!==A.e.type?0:(pick.t==="L"||pick.t==="U")?A.e.n-1:null}   /* an exit ramp leaves from the right-hand lane: get over in good time */
 // is (x,y) on edge e (direction dir)? -> where along it and how far across, in that direction's lane terms
-function onEdgeAt(e,dir,x,y,strict){const q=eProj(e,x,y);if(q.u<-1||q.u>e.L+1||Math.abs(q.t)>hwOf(e)+1.5)return null;if(strict&&(q.u<(e.p0||0)+2||q.u>e.L-(e.p1||0)-2))return null;const u=clamp(q.u,0,e.L);return {s:dir>0?u:e.L-u,off:dir*q.t-shiftOf(e,u)}}
+function onEdgeAt(e,dir,x,y,strict,extra){const q=eProj(e,x,y);if(q.u<-1||q.u>e.L+1||Math.abs(q.t)>hwOf(e)+1.5+(extra||0))return null;if(strict&&(q.u<(e.p0||0)+2||q.u>e.L-(e.p1||0)-2))return null;const u=clamp(q.u,0,e.L);return {s:dir>0?u:e.L-u,off:dir*q.t-shiftOf(e,u)}}
 function fsdPedGap(pts){const vv=Math.max(car.vx,2.5);let gap=Infinity;
   for(const p of peds){if(p.mode==="down"||p.mode==="shop"||p.mode==="scr"||p.wx===undefined)continue;const dx=p.wx-car.px,dy=p.wy-car.py;if(dx*dx+dy*dy>4900||Math.abs((p.wz||0)-(car.zb||0))>2.5)continue;
     const go=p.mode==="cross"||p.mode==="jay",pv=go?Math.max(p.v||0,1.3):0,ux=Math.cos(p.wh||0),uy=Math.sin(p.wh||0);
@@ -7026,9 +7090,9 @@ function fsdDrive(dt,M,S){const prof={sloth:[0.96,1.7,1.9],chill:[1.0,2.0,1.6],s
   A.v=Math.max(0,car.vx);A.wx=car.px;A.wy=car.py;A.wh=car.psi;
   let P=null;
   if(A.jn){const Pj=A.jn.P;let bi=0,bd=1e9;for(let q=0;q<Pj.pts.length;q++){const d=(Pj.pts[q][0]-car.px)**2+(Pj.pts[q][1]-car.py)**2;if(d<bd){bd=d;bi=q}}A.jn.d=Pj.cum[bi];
-    if(A.jn.d>=Pj.L-0.6||(M.e===A.jn.mv.e&&M.dir===A.jn.mv.dir&&!M.inJ)){const m=A.jn.mv,j=A.jn.j;A.e=m.e;A.dir=m.dir;A.jn=null;A.s=M.e===A.e?M.s:Pj.s1;A.off=M.e===A.e?M.off:laneOff(A.e,j);A.offT=laneOff(A.e,j);A.sig=0;st.signal=0;fsdPlan(A)}}
+    if(A.jn.d>=Pj.L-0.6||(M.e===A.jn.mv.e&&M.dir===A.jn.mv.dir&&!M.inJ)){const m=A.jn.mv,j=A.jn.j;A.e=m.e;A.dir=m.dir;A.jn=null;A.s=M.e===A.e?M.s:Pj.s1;A.off=M.e===A.e?M.off:laneOff(A.e,j);A.offT=laneOff(A.e,j);A.sig=0;st.signal=0;A.jnT=m.e.type==='ramp'||m.e.ow?9:2;fsdPlan(A)}}
   if(!A.jn){// stay on the road we planned while the car is still on it (an exit ramp's first stretch runs alongside the freeway, where the map frame still says freeway)
-    const on=onEdgeAt(A.e,A.dir,car.px,car.py);
+    if(A.jnT>0)A.jnT-=dt;const on=onEdgeAt(A.e,A.dir,car.px,car.py,false,A.jnT>0?30:0);   /* just after a junction (an exit ramp peeling off): stay with the road we chose while the car is still between it and the freeway */
     if((M.e!==A.e||M.dir!==A.dir)&&on){A.s=on.s;A.off=on.off}
     else if(M.e!==A.e||M.dir!==A.dir){Object.assign(A,{e:M.e,dir:M.dir,s:M.s,off:M.off,offT:clamp(Math.round(M.off/LANE),M.lo,M.hi)*LANE});fsdPlan(A)}else{A.s=M.s;A.off=M.off}
     if(A.mv){P=mvP(A);if(A.s>=P.s0-0.4)A.jn={P,d:0,mv:A.mv,j:P.j,n:A.mvNode,inLeg:A.mvLeg}}}
@@ -10845,7 +10909,7 @@ function drawGroundFar(){const G_=SCN.groundFar;if(!G_||!G_.chunks)return;const 
   for(const c of G_.chunks){const d=Math.hypot(c.c[0]-e[0],c.c[1]-e[1],c.c[2]-e[2])-c.r;if(d<near||d>far)continue;let ok=true;if(CULL.pl)for(const p of CULL.pl)if(p[0]*c.c[0]+p[1]*c.c[1]+p[2]*c.c[2]+p[3]<-c.r){ok=false;break}if(ok)draw(c)}}
 function terrainMesh(){const N=W2?800:360,X0=WORLD.x0,X1=WORLD.x1,Y0=WORLD.y0,Y1=WORLD.y1,P=[],Nn=[],I=[];const NY=Math.round(N*(Y1-Y0)/(X1-X0));
   const onPad=(x,y)=>Math.abs(x-PAD.cx)<PAD.rad+8&&Math.abs(y-PAD.cy)<PAD.rad+8&&[[0,0],[7,0],[-7,0],[0,7],[0,-7]].some(([a,b])=>padHit(x+a,y+b));
-  const H2=(x,y)=>{if(inCity(x,y)||inTC(x,y,4)||inExtra(x,y,6)||onPad(x,y))return -0.14;const d=dfAt(x,y);let z=Math.max(d<45?hillZ(x,y)+riverCut(x,y):terrainH(x,y,d),embZ(x,y));z=Math.min(z,cutZ(x,y));if(d<40)z=w2Blend(x,y,z);return z-0.08};
+  const H2=(x,y)=>{if(inApt(x,y,-6)){const X=x-APT.cx,Z=APT.cy-y;if(Math.abs(X-APT.TX)<APT.TH&&APT.TZ.some(z=>Math.abs(Z-z)<APT.TW+14))return APT.z+aptDz(X)-0.6;return APT.z-1.2}   /* the tunnel trench: the land under it is sunk to the road (the airport's own ground hides it outside the walls) */if(inCity(x,y)||inTC(x,y,4)||inExtra(x,y,6)||onPad(x,y))return -0.14;const d=dfAt(x,y);let z=Math.max(d<45?hillZ(x,y)+riverCut(x,y):terrainH(x,y,d),embZ(x,y));z=Math.min(z,cutZ(x,y));if(d<40)z=w2Blend(x,y,z);return z-0.08};
   const H=W2?H2:(x,y)=>{if(inCity(x,y)||inTC(x,y,4)||inExtra(x,y,6)||onPad(x,y))return -0.14;const d=dfAt(x,y);let z=Math.max(d<45?hillZ(x,y)+riverCut(x,y):terrainH(x,y,d),embZ(x,y));
     for(const n of gAt(GRID.n,x,y)){if(n.pr){const dn=Math.hypot(x-n.x,y-n.y)-n.pr;if(dn<14)z=Math.min(z,n.z-0.25+Math.max(0,dn)*0.12)}}
     if(d<70){let best=1e9,rz=null,zc=1e9;for(const e of edgesNear(x,y,34)){const p=eProj(e,x,y);if(p.u<-6||p.u>e.L+6)continue;const dd=Math.abs(p.t)-e.W-auxW(e,p.u,p.t),zz=e.hz?ez(e,clamp(p.u,0,e.L)):0;
@@ -11576,12 +11640,12 @@ function worldScenery(){W2P.length=0;
       boxInto(crack,p[0],0.0025+zz,-p[1],Math.abs(Math.cos(ang))*L_+0.05,0.002,Math.abs(Math.sin(ang))*L_+0.05,p[2]);uu+=Math.cos(ang)*L_;tt+=Math.sin(ang)*L_;ang+=(r()-0.5)*1.1}}}}
   if(W2)try{w2Fill(r)}catch(e){console.error(e)}
   // ---- countryside: trees on the hills, farmhouses
-  let nt=0;const NT=W2?4200:1300;for(let n=0;n<(W2?32000:9000)&&nt<NT;n++){const x=WORLD.x0+r()*(WORLD.x1-WORLD.x0),y=WORLD.y0+r()*(WORLD.y1-WORLD.y0);if(cityW(x,y)>0.05||riverD(x,y)<RIVER.w/2+10||inTC(x,y,25)||orNoTree(x,y)||W2&&inFarm(x,y,12))continue;const d=dfAt(x,y);if(d<16)continue;
+  let nt=0;const NT=W2?5600:1300;for(let n=0;n<(W2?43000:9000)&&nt<NT;n++){const x=WORLD.x0+r()*(WORLD.x1-WORLD.x0),y=WORLD.y0+r()*(WORLD.y1-WORLD.y0);if(cityW(x,y)>0.05||W2&&inApt(x,y,40)||riverD(x,y)<RIVER.w/2+10||inTC(x,y,25)||orNoTree(x,y)||W2&&inFarm(x,y,12))continue;const d=dfAt(x,y);if(d<16)continue;
     if(d<40&&!clear(x,y,12))continue;if(Math.hypot(x-PAD.cx,y-PAD.cy)<90)continue;if(tree.P.length/3>200000)break;
     if(W2&&Math.hypot(x-W2C.MT[0],y-W2C.MT[1])<1150){if(W2P.length<4000&&r()<0.55&&w2Free(x,y,4)){w2Put(r()<0.6?"t_pine_tall":"t_pine_small",x,y,r()*6.28,terrainH(x,y,d)-0.25);nt++}continue}
     if(r()<0.55&&d>30){const cx=x,cy=y;for(let k=0;k<4;k++){const tx=cx+(r()-0.5)*30,ty=cy+(r()-0.5)*30;if(dfAt(tx,ty)<14||riverD(tx,ty)<RIVER.w/2+8||orNoTree(tx,ty)||W2&&inFarm(tx,ty,6))continue;treeAt(tx,ty,terrainH(tx,ty,dfAt(tx,ty))-0.3,true);nt++;if(dfAt(tx,ty)<40||inOR(tx,ty))collAdd({tree:1,t:"c",x:tx,y:ty,r:0.35})}}
     else{treeAt(x,y,terrainH(x,y,d)-0.3,true);nt++;if(d<40||inOR(x,y))collAdd({tree:1,t:"c",x,y,r:0.35})}}
-  for(let n=0;n<(W2?900:400);n++){const x=WORLD.x0+r()*(WORLD.x1-WORLD.x0),y=WORLD.y0+r()*(WORLD.y1-WORLD.y0);if(cityW(x,y)>0.05||riverD(x,y)<RIVER.w/2+20||inTC(x,y,40)||inOR(x,y,40)||W2&&inFarm(x,y,15))continue;const d=dfAt(x,y);if(d<45||d>160)continue;
+  for(let n=0;n<(W2?1210:400);n++){const x=WORLD.x0+r()*(WORLD.x1-WORLD.x0),y=WORLD.y0+r()*(WORLD.y1-WORLD.y0);if(cityW(x,y)>0.05||W2&&inApt(x,y,60)||riverD(x,y)<RIVER.w/2+20||inTC(x,y,40)||inOR(x,y,40)||W2&&inFarm(x,y,15))continue;const d=dfAt(x,y);if(d<45||d>160)continue;
     const hb=terrainH(x,y,d)-0.4,a=r()*Math.PI;B(house,x,y,hb,5.5,9+r()*4,7+r()*3,a);B(roofs,x,y,hb+5.5,1.6,7,5,a);collAdd({t:"b",x,y,h:a,hl:6,hw:4.5,what:"a house"})}
   // ---- the new world's old bridges: a red covered wooden bridge, a rusty steel truss, a stone bridge; gravel fords get marker posts
   const rust=M_(),wood=M_(),stone=M_(),fordW=M_();
@@ -11619,7 +11683,8 @@ function worldScenery(){W2P.length=0;
     for(let u=0;u<=e.L;u+=4){if(!flyUp(e,u)&&!flyUp(e,u+4))continue;const z=ez(e,u+2),p=ePt(e,u+2,0);boxInto(gird,p[0],z-0.95,-p[1],4.1,1.3,2*Wt-1.2,p[2]);boxInto(gSlab,p[0],z-0.26,-p[1],4.1,0.3,2*Wt+0.9,p[2]);
       for(const sd of [1,-1]){const q=ePt(e,u+2,sd*(Wt+0.25));boxInto(para,q[0],z+0.5,-q[1],4.05,1.0,0.4,q[2]);collAdd({t:"b",x:q[0],y:q[1],h:q[2],hl:2.02,hw:0.2,z0:z-0.3,z1:z+1.6,what:"the bridge parapet"})}
       const c=eAt(e,u+2),g=hillZ(c.x,c.y);if(z-g>3.2&&u-lastP>=30){const busy=gAt(GRID.e,c.x,c.y).some(f=>f!==e&&(()=>{const q=eProj(f,c.x,c.y);return q.u>-2&&q.u<f.L+2&&Math.abs(q.t)<f.W+2.5&&(f.hz?ez(f,clamp(q.u,0,f.L)):0)<z-3})());
-        if(!busy){lastP=u;const h=z-1.6-g;boxInto(gird,p[0],g+h/2,-p[1],1.8,h,1.8,p[2]);boxInto(gird,p[0],z-1.75,-p[1],1.8,0.5,2*Wt-2,p[2]);collAdd({t:"c",x:p[0],y:p[1],r:1.0,z0:g-0.3,z1:z-1.7,what:"a bridge pier"})}}}}
+        if(!busy){lastP=u;const h=z-1.6-g;boxInto(gird,p[0],g+h/2,-p[1],1.8,h,1.8,p[2]);boxInto(gird,p[0],z-1.75,-p[1],1.8,0.5,2*Wt-2,p[2]);collAdd({t:"c",x:p[0],y:p[1],r:1.0,z0:g-0.3,z1:z-1.7,what:"a bridge pier"})}
+        else if(e.stack){lastP=u;const h=z-1.6-g;for(const sd of [1,-1]){const q=ePt(e,u+2,sd*(Wt+1.1));boxInto(gird,q[0],g+h/2,-q[1],1.0,h,1.0,q[2]);collAdd({t:"c",x:q[0],y:q[1],r:0.55,z0:g-0.3,z1:z-1.7,what:"a deck column"})}boxInto(gird,p[0],z-1.75,-p[1],1.2,0.5,2*Wt+2.6,p[2])}}}}   /* a departures deck over the arrivals road: a column each side of the road below, a cross beam over it */
   // ---- the sides of the freeway cut under each bridge: sloped grass from the shoulder up to the ground
   for(const e of EDGES){if(!e.dip)continue;for(const o of e.dip){const u0=o.uc-o.half-o.rA,u1=o.uc+o.half+o.rB;for(const sg of [1,-1]){const k0=green.P.length/3;let q=0;
       for(let u=u0;u<=u1+0.01;u+=3,q++){const out=e.m/2+e.n*LANE+e.side+auxW(e,u,sg)+0.2,zr=ez(e,u),dz=Math.max(0,hillZ(...ePt(e,u,0).slice(0,2))-zr),w=dz/0.42+0.3;
@@ -11637,7 +11702,7 @@ function worldScenery(){W2P.length=0;
     const bents=[uc];if(o.xw){const half=o.xw.m/2+o.xw.n*LANE+o.xw.side+2.5;if(hf>half+6){bents.push(uc-half,uc+half)}}
     for(const ub of bents){const z=ez(e,ub),zf=o.xw?Math.min(zb,ez(o.xw,o.xu)):0;if(z-1.4-zf<0.5)continue;for(let t=-Wt+2;t<=Wt-2+1e-6;t+=(2*Wt-4)/3){const p=ePt(e,ub,t);boxInto(gird,p[0],(z-1.4+zf)/2,-p[1],1.3,z-1.4-zf,1.3,p[2]);collAdd({t:"c",x:p[0],y:p[1],r:0.75,z0:zf-0.3,z1:z-1.6,what:"a bridge pier"})}
       const p=ePt(e,ub,0);boxInto(gird,p[0],z-1.75,-p[1],1.6,0.9,2*Wt+0.4,p[2])}
-    for(const sd of [1,-1]){const u=uc+sd*(hf+1),z=ez(e,u),p=ePt(e,u,0),zf=o.H===0?Math.min(zb,z-0.3):-0.5;boxInto(gWall,p[0],(z+0.2+zf)/2,-p[1],1.6,z+0.2-zf,2*Wt+1.2,p[2]);
+    for(const sd of [1,-1]){const u=uc+sd*(hf+1),z=ez(e,u),p=ePt(e,u,0),zf=o.H===0?Math.min(zb,z-0.3):-0.5;boxInto(gWall,p[0],(z-0.12+zf)/2,-p[1],1.6,z-0.12-zf,2*Wt+1.2,p[2]);   /* its top stays just under the road (it used to stick up 20 cm through it as a grey band: issue #118) */
       collAdd({t:"b",x:p[0],y:p[1],h:p[2],hl:0.8,hw:Wt+0.6,z0:zf+0.1,z1:z-1.3,what:"the bridge abutment"})}}
   if(W2)for(const Bw of W2_WATER){if(Bw.k==="lake"){const k0=water.P.length/3,n=64;water.P.push(Bw.x,RIVER.water,-Bw.y);water.N.push(0,1,0);
       for(let i=0;i<n;i++){const a=i/n*Math.PI*2;water.P.push(Bw.x+Math.cos(a)*(Bw.rx-1.5),RIVER.water,-(Bw.y+Math.sin(a)*(Bw.ry-1.5)));water.N.push(0,1,0)}for(let i=0;i<n;i++)water.I.push(k0,k0+1+i,k0+1+(i+1)%n);continue}
@@ -15577,7 +15642,7 @@ function gtTick(dt){if(st.night!==GT.lastN){GT.min=st.night?22*60:10*60;GT.lastN
   const n=GT.D<0.3;if(n!==GT.lastN){st.night=n;GT.lastN=n;if(n&&st.started&&!st.lights&&st.autoLights!==false){st.lights=true}}}
 function gtClock(){const h=Math.floor(GT.min/60),m=Math.floor(GT.min%60);return `${h%12||12}:${String(m).padStart(2,"0")} ${h<12?"am":"pm"}`}
 function render(dt){
-  const dpr=Math.max(0.5,Math.min(window.devicePixelRatio||1,G().res)*GFX.dyn), W=Math.floor(cv.clientWidth*dpr), H=Math.floor(cv.clientHeight*dpr);
+  const dpr=Math.max(0.5,Math.min(window.devicePixelRatio||1,G().res)*GFX.dyn), W=Math.floor(elSize(cv)[0]*dpr), H=Math.floor(elSize(cv)[1]*dpr);
   if(cv.width!==W||cv.height!==H){cv.width=W;cv.height=H}
   gl.viewport(0,0,W,H);
   if((st.cam!==1||st.walk)&&SCR.uiHid){SCR.uiHid=false;SCR.fz=0;document.body.classList.remove("scrview")}
@@ -15668,6 +15733,7 @@ function render(dt){
   gl.disable(gl.POLYGON_OFFSET_FILL);
   if(G().trees){mat([0.16,0.10,0.05]);draw(SCN.trunks); mat([0.04,0.15,0.04],null,0.05,8,1,1);draw(SCN.crowns)}if(SCN.hedge){mat([0.05,0.17,0.05],null,0.05,8,1,1);draw(SCN.hedge)}if(SCN.hedge){mat([0.05,0.17,0.05],null,0.05,8,1,1);draw(SCN.hedge)}
   if(SCN.w2p)w2pDraw(night);
+  if(W2)try{aptDraw(night)}catch(e){console.error(e)}
   SCN.bld.forEach((m,i)=>{mat([[0.46,0.43,0.38],[0.24,0.27,0.31],[0.58,0.55,0.5],[0.34,0.27,0.22],[0.17,0.2,0.23]][i],null,0.35,40,1,4);draw(m)});
   mat([0.25,0.25,0.26],null,0.2,20);draw(SCN.roofs);mat([0.62,0.55,0.45],null,0.1,10);draw(SCN.house);if(SCN.xm){const X_=SCN.xm;mat([0.9,0.9,0.92],null,0.3,20);draw(X_.canopy);mat([0.55,0.57,0.6],null,0.4,30);draw(X_.pillar);mat([0.15,0.17,0.2],null,0.5,30);draw(X_.pump);mat([0.95,0.95,0.9],[1.6,1.6,1.4],0,1);draw(X_.glow);mat([0.75,0.72,0.66],null,0.1,10);draw(X_.shop);mat([0.2,0.3,0.36],night?[0.9,0.8,0.5]:null,1.2,80);draw(X_.win);mat([0.8,0.12,0.1],null,0.3,20);draw(X_.sign)}if(SCN.sm){const px_=st.walk?st.walk.x:car.px,py_=st.walk?st.walk.y:car.py,nearS=STORES.some(S=>Math.hypot(S.x-px_,S.y-py_)<170);
     gl.enable(gl.POLYGON_OFFSET_FILL);const OFF={asph:[6,6],walk:[6,6],drive:[5,5],tile:[3,3],epoxy:[3,3],grass:[4,4],paint:[-1,-1],blue:[0,0],ev:[0,0]};
@@ -15987,6 +16053,8 @@ function parkSensors(){const HL=BODY_HL+0.02;
       const wx=ox+a*ch-b*shh, wy=oy+a*shh+b*ch, dx=wx-car.px, dy=wy-car.py, lx=dx*c+dy*sn, ly=-dx*sn+dy*c;
       zones.forEach(([lo,hi],z)=>{if(ly<lo-0.25||ly>hi+0.25)return;
         if(lx>HL-0.1)out.f[z]=Math.min(out.f[z],lx-HL);if(lx<-HL+0.1)out.r[z]=Math.min(out.r[z],-HL-lx)});pkSide(out,lx,ly)}}
+  for(const p of peds){if(p.wx===undefined||p.mode==="scr"||Math.abs(p.wx-car.px)>8||Math.abs(p.wy-car.py)>8||Math.abs((p.wz||0)-zc)>1.6)continue;const dx=p.wx-car.px,dy=p.wy-car.py,lx=dx*c+dy*sn,ly=-dx*sn+dy*c;   /* people: the sensors see legs too */
+    zones.forEach(([lo,hi],z)=>{if(ly<lo-0.55||ly>hi+0.55)return;if(lx>HL-0.1)out.f[z]=Math.min(out.f[z],lx-HL-0.3);if(lx<-HL+0.1)out.r[z]=Math.min(out.r[z],-HL-lx-0.3)});pkSide(out,lx,ly)}
   // walls, pillars, posts and kerb-side things the ultrasonic sensors would see (only near the car, on this floor)
   if(Math.abs(car.vx)<7){const seen=new Set();for(let i=-1;i<=1;i++)for(let j=-1;j<=1;j++)for(const o of collNear(car.px+i*COLL.C,car.py+j*COLL.C)){if(seen.has(o))continue;seen.add(o);if(o.z0!=null&&(zc<o.z0-0.5||zc>o.z1))continue;
     const pts=[];if(o.t==="c"){pts.push([o.x,o.y])}else{const ch=Math.cos(o.h),shh=Math.sin(o.h),nL=Math.min(12,Math.ceil(o.hl/0.5)),nW=Math.min(6,Math.ceil(o.hw/0.5));for(let a=-nL;a<=nL;a++)for(const b of [-1,1])pts.push([o.x+(a/nL)*o.hl*ch-b*o.hw*shh,o.y+(a/nL)*o.hl*shh+b*o.hw*ch]);for(let b=-nW;b<=nW;b++)for(const a of [-1,1])pts.push([o.x+a*o.hl*ch-(b/nW)*o.hw*shh,o.y+a*o.hl*shh+(b/nW)*o.hw*ch])}
@@ -16433,7 +16501,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=322;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="173",BUILD_VER=323;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}try{const P=JSON.parse(localStorage.getItem("strata.ped")||"null");if(P){st.pedHold=+P.pedHold||0;st.thrRate=+P.thrRate||2;st.brkRate=+P.brkRate||2}}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){const k=GFX.q==="auto"?GFX.eff:GFX.q;if(G.k!==k||G.v!==GFX.ovV||!G.m){G.k=k;G.v=GFX.ovV;const m={...GQ[k]};for(const o of GOPT)if(GFX.ov[o[0]]!==undefined)Object.assign(m,o[4](GFX.ov[o[0]]));if(Object.keys(GFX.ov).length)m.label=GQ[k].label+" (custom)";G.m=m;COLL.nt=!m.trees}return G.m}
@@ -16559,16 +16627,24 @@ function bodyClear(x,y,h,z,m){const cx=x+Math.cos(h)*B,cy=y+Math.sin(h)*B,HL=BOD
   for(const o of seen){if(o.z1!==undefined&&(z<o.z0-0.6||z>o.z1))continue;if(o.t==="c"){const dx=o.x-cx,dy=o.y-cy,lx=Math.abs(dx*c+dy*s)-HL,ly=Math.abs(-dx*s+dy*c)-HW;if(Math.hypot(Math.max(lx,0),Math.max(ly,0))<o.r)return false}
     else if(obbSAT(cx,cy,h,HL,HW,o.x,o.y,o.h,o.hl,o.hw))return false}
   return true}
-function pathClear(pts,rev,z){for(let i=0;i<pts.length-1;i+=2){const p=pts[i],q=pts[i+1],h=rev?Math.atan2(p[1]-q[1],p[0]-q[0]):Math.atan2(q[1]-p[1],q[0]-p[0]);if(!bodyClear(p[0],p[1],h,z,0.12))return false}return true}
+/* where the car may put its wheels around a lot stall: lot, pad or road surface, never the grass strip, kerb or footpath (a 0.5 m mask, made once per stall) */
+const PAVEM=new Map();
+function paveMask(t){if(inGarage(t.x,t.y))return null;const k=Math.round(t.x*2)+","+Math.round(t.y*2);let M=PAVEM.get(k);if(M)return M;if(PAVEM.size>60)PAVEM.clear();
+  const R=26,S=0.5,n=Math.ceil(2*R/S),m=new Uint8Array(n*n),x0=t.x-R,y0=t.y-R,gr=GREF;GREF=t.z||0;
+  for(let j=0;j<n;j++)for(let i=0;i<n;i++){const kd=groundAt(x0+(i+0.5)*S,y0+(j+0.5)*S).kind;m[j*n+i]=kd==="lot"||kd==="pad"||kd==="road"?1:0}
+  GREF=gr;M={x0,y0,S,n,m};PAVEM.set(k,M);return M}
+function paveOK(M,x,y,h,mg){if(!M)return true;const c=Math.cos(h),s=Math.sin(h),cx=x+c*B,cy=y+s*B,HL=BODY_HL+mg,HW=BODY_HW+mg;
+  for(const [a,b] of [[1,1],[1,-1],[-1,1],[-1,-1],[1,0],[-1,0],[0,1],[0,-1],[0.5,1],[0.5,-1],[-0.5,1],[-0.5,-1]]){const px=cx+c*a*HL-s*b*HW,py=cy+s*a*HL+c*b*HW,i=Math.floor((px-M.x0)/M.S),j=Math.floor((py-M.y0)/M.S);if(i<0||j<0||i>=M.n||j>=M.n||!M.m[j*M.n+i])return false}return true}
+function pathClear(pts,rev,z,M){for(let i=0;i<pts.length-1;i+=2){const p=pts[i],q=pts[i+1],h=rev?Math.atan2(p[1]-q[1],p[0]-q[0]):Math.atan2(q[1]-p[1],q[0]-p[0]);if(!bodyClear(p[0],p[1],h,z,0.12)||!paveOK(M,p[0],p[1],h,0.3))return false}return true}
 function planPerp(t){const u=[t.ux,t.uy],c=Math.cos(car.psi),s=Math.sin(car.psi);let a=[c,s];const dd=a[0]*u[0]+a[1]*u[1];a=[a[0]-dd*u[0],a[1]-dd*u[1]];const n=Math.hypot(a[0],a[1]);if(n<0.3)return null;a=[a[0]/n,a[1]/n];
-  const Rmin=Math.max(4.8,WB/Math.tan(0.47)+0.3),E=[t.x-u[0]*2.9,t.y-u[1]*2.9],z=t.z||0,r=rearAx();
+  const Rmin=Math.max(4.8,WB/Math.tan(0.47)+0.3),E=[t.x-u[0]*2.9,t.y-u[1]*2.9],z=t.z||0,r=rearAx(),PM=paveMask(t);
   for(const Rt of [Rmin,Rmin+1,Rmin+2.2])for(const pre of [1,2.2]){const E2=[E[0]-u[0]*pre,E[1]-u[1]*pre],O=[E2[0]+a[0]*Rt,E2[1]+a[1]*Rt],A=[O[0]-u[0]*Rt,O[1]-u[1]*Rt];
     const lat=Math.abs((r[0]-A[0])*u[0]+(r[1]-A[1])*u[1]),ahead=(A[0]-r[0])*a[0]+(A[1]-r[1])*a[1],run=Math.max(2,lat*2.2+2-ahead),P0=[A[0]+a[0]*run,A[1]+a[1]*run];
     const rp=[];for(let q=0;q<=1.0001;q+=0.05)rp.push([P0[0]+(A[0]-P0[0])*q,P0[1]+(A[1]-P0[1])*q]);
     for(let th=Math.PI/2;th>=-1e-6;th-=0.04)rp.push([O[0]+Rt*(-Math.cos(th)*a[0]-Math.sin(th)*u[0]),O[1]+Rt*(-Math.cos(th)*a[1]-Math.sin(th)*u[1])]);
     const depth=pre+2.9+B-0.25;for(let q=0.2;q<=depth+1e-6;q+=0.2)rp.push([E2[0]+u[0]*q,E2[1]+u[1]*q]);
     const fp=[];for(let q=-30;q<=0.0001;q+=0.5)fp.push([P0[0]+a[0]*q,P0[1]+a[1]*q]);
-    if(pathClear(rp,true,z)&&pathClear(fp.slice(-24),false,z))return {P0,a,u,rp,rc:cumOf(rp),fp,fc:cumOf(fp),t,E,z,Rt}}
+    if(pathClear(rp,true,z,PM)&&pathClear(fp.slice(-24),false,z,PM))return {P0,a,u,rp,rc:cumOf(rp),fp,fc:cumOf(fp),t,E,z,Rt}}
   return null}
 // ---- tight stalls (narrow garage aisles): a small hybrid-A* search over forward / reverse arcs finds a multi-point turn into the stall.
 // States are the rear axle (x, y, heading); every move is checked against walls, pillars and parked cars with bodyClear.
@@ -16576,9 +16652,10 @@ function planPerpH(t,budget,tight){const u=[t.ux,t.uy],z=t.z||0,Rm=WB/Math.tan(0
   // obstacles near the stall, gathered once (parked cars on this tier, walls, rails and pillars at this height)
   const OB=[],seenO=new Set();for(const p of parked){if(p.wx===undefined||p.kind==="xing"||Math.abs((p.wz||0)-z)>1.2||Math.hypot(p.wx-t.x,p.wy-t.y)>22)continue;OB.push({t:"b",x:p.wx,y:p.wy,h:p.wh,hl:2.35,hw:0.95})}
   for(let gx=Math.floor((t.x-22)/COLL.C);gx<=Math.floor((t.x+22)/COLL.C);gx++)for(let gy=Math.floor((t.y-22)/COLL.C);gy<=Math.floor((t.y+22)/COLL.C);gy++)for(const o of ((COLL.nt?COLL.gN:COLL.g).get(gx*100003+gy)||[])){if(seenO.has(o))continue;seenO.add(o);if(o.z1!==undefined&&(z<o.z0-0.6||z>o.z1))continue;OB.push(o)}
-  const bodyClear=(x,y,h,z_,m)=>{const cx=x+Math.cos(h)*B,cy=y+Math.sin(h)*B,HL=BODY_HL+m,HW=BODY_HW+m,c=Math.cos(h),s=Math.sin(h);
+  let bodyClear=(x,y,h,z_,m)=>{const cx=x+Math.cos(h)*B,cy=y+Math.sin(h)*B,HL=BODY_HL+m,HW=BODY_HW+m,c=Math.cos(h),s=Math.sin(h);
     for(const o of OB){const dx=o.x-cx,dy=o.y-cy;if(dx*dx+dy*dy>(o.t==="c"?(HL+o.r+1)**2:(HL+Math.hypot(o.hl,o.hw)+0.5)**2))continue;
       if(o.t==="c"){const lx=Math.abs(dx*c+dy*s)-HL,ly=Math.abs(-dx*s+dy*c)-HW;if(Math.hypot(Math.max(lx,0),Math.max(ly,0))<o.r)return false}else if(obbSAT(cx,cy,h,HL,HW,o.x,o.y,o.h,o.hl,o.hw))return false}return true};
+  {const PM=paveMask(t),bc0=bodyClear,sx=rearAx(),s0ok=paveOK(PM,sx[0],sx[1],car.psi,0.3);bodyClear=(x,y,h,z_,m)=>bc0(x,y,h,z_,m)&&(!s0ok&&Math.hypot(x-sx[0],y-sx[1])<1.2||paveOK(PM,x,y,h,0.3))}
   const r0=rearAx(),start={x:r0[0],y:r0[1],h:car.psi,g:0,d:0,p:null,m:null};const CS=0.3,HB=72,key=(x,y,h)=>Math.round(x/CS)*7919+Math.round(y/CS)*104729+((Math.round(wrapPi(h)/(2*Math.PI)*HB)+HB)%HB);
   const prims=[];for(const d of [1,-1])for(const k of [-1,-0.5,0,0.5,1])prims.push([d,k/Rm]);const STEP=0.6,ds=0.15;
   const heur=n=>{const dx=n.x-M[0],dy=n.y-M[1];return Math.hypot(dx,dy)*0.9+Math.abs(wrapPi(n.h-thG))*2.2};
@@ -16609,7 +16686,7 @@ function scanPerp(){const c=Math.cos(car.psi),s=Math.sin(car.psi),r=rearAx();let
     if((t.ux*(-s)+t.uy*c)*(ly<0?1:-1)>0)continue;if(!spotFree(t))continue;const sc=Math.abs(lx-1.5)+Math.abs(ly)*0.2;if(sc<bs){bs=sc;best=t}}
   if(!best)return null;const same=q=>q&&Math.abs(q.tx-best.x)<0.01&&Math.abs(q.ty-best.y)<0.01&&Math.hypot(car.px-q.x,car.py-q.y)<3&&Math.abs(wrapPi(car.psi-q.h))<0.12;
   if(!inGarage(car.px,car.py)){let plan;const P=PA.pc;if(same(P))plan=P.plan;else{plan=planPerp(best);PA.pc={tx:best.x,ty:best.y,x:car.px,y:car.py,h:car.psi,plan}}if(plan)return {type:"perp",t:best,plan}}   // the path is only re-planned when you've moved
-  if(inGarage(car.px,car.py))return {type:"perp",t:best,hplan:true};   // in the garage the full manoeuvre is planned once, when you tap Park (planning it on every scan froze the game for a third of a second)
+  return {type:"perp",t:best,hplan:true};   // in the garage the full manoeuvre is planned once, when you tap Park (planning it on every scan froze the game for a third of a second)
   return {type:"perpTight",t:best}}
 
 // ======================================================================= parking assist by maker: each car gets the system its real model year / trim had
@@ -16692,7 +16769,7 @@ const pkTh=()=>{const S=pkSys();return PKS_TH[S?S.th:"strata"]||PKS_TH.strata};
 function pkChime(i){try{const s=pkTh().snd||[[880,.08],[1175,.12]];beep(s[i][0],s[i][1],"sine",.2)}catch(e){}}
 // what the driver has to do right now on a steer-only / creep system (the car steers; you shift, and on steer-only you work the pedals)
 function pkDriverDo(){const S=pkSys(),A=sys.pa;if(!S||!A||S.auto==="full")return "";const g=A.wantG||st.gear;if(g!==st.gear)return g==="R"?"Shift to R":g==="D"?"Shift to D":"Shift to P";
-  if(S.auto==="creep")return "Hands off the wheel: it moves at idle speed";return A.wantV>0.05?(st.gear==="R"?"Back up slowly":"Move forward slowly"):Math.abs(car.vx)>0.08?"Stop":"Wait";}
+  if(S.auto==="creep")return "Hands off the wheel: it moves at idle speed";return (A.vt||0)>0.01?(st.gear==="R"?"Back up slowly":"Move forward slowly"):Math.abs(car.vx)>0.08?"Stop":"Wait";}
 function paOpenMenu(){if(!st.started||st.walk)return;if(!has("autopark")){const T=TRIMS[st.trim],b=(T.group||"").split(" ")[0],alt=PKS_NONE[b];toast(`The real ${T.short||"car"} doesn't park itself${alt?": it has "+alt:""}`);return}if(sys.pa){const S=pkSys();if(S&&(S.hold||pkTh().hold))return;paStop(`${S?S.name:"Park assist"} cancelled`);return}
   if(PA.mode){PA.mode=null;PA.found=false;SCR.paMenu=false;return}SCR.paMenu=true;PA.prevCam=st.cam;st.cam=1;SCR.focus=true;tick(1)}
 function paChoose(k){$("paMenu").hidden=true;SCR.paMenu=false;SCR.focus=false;if(!k){PA.mode=null;return}{const S=pkSys();if(S&&!S.types.includes(k)){toast(`${S.name} doesn't do that`);return}}st.acc=false;st.pilot=false;
@@ -16807,7 +16884,7 @@ function paUpdate(dt){const A=sys.pa;if(!A)return null;
     if((left<0.3||fr<0.45)&&Math.abs(v)<0.03){paStop(`Parked in bay ${A.bay+1}: ${ftS(fr)} from the charger`,true);return null}}
   // speed control that copes with ramps: speed is measured in the direction of the gear (rolling back counts as negative),
   // an integral term finds the extra throttle a slope needs, and the brake holds the car while it builds
-  const dirS=st.gear==="R"?-1:1,sp=v*dirS,err=vt-sp;
+  A.vt=vt;const dirS=st.gear==="R"?-1:1,sp=v*dirS,err=vt-sp;
   let thr=0, brk=0; if(vt<0.01){A.ki=0;brk=Math.abs(sp)>0.02?0.6:0.35}
   else{A.ki=clamp((A.ki||0)+err*dt*0.25,0,0.45);if(err>-0.15)thr=clamp(0.06+err*0.35+A.ki,0,0.7);else{brk=clamp(-err*0.9,0.1,0.8);A.ki=Math.max(0,A.ki-dt*0.2)}
     if(sp<-0.03)brk=Math.max(brk,clamp(-sp*1.5,0.2,0.7))}
@@ -16960,6 +17037,9 @@ function whlDraw(soft){const el=$("whl");if(!el||el.hidden)return;if(soft){const
 function whlVals(){const c=WHL.cfg||whlDef("");return `<label>Rotation <b>${c.range}°</b><input id="whR" type="range" min="270" max="1080" step="90" value="${c.range}"></label>
   <label>Force feedback strength <b>${Math.round((c.ffb??0.7)*100)}%</b><input id="whF" type="range" min="0" max="150" step="5" value="${Math.round((c.ffb??0.7)*100)}"></label>
   <label>Steering ratio <b>${c.ratio}:1</b> <small>(${Math.round(0.576*180/Math.PI*c.ratio*2)}° lock to lock)</small><input id="whQ" type="range" min="10" max="20" step="0.5" value="${c.ratio}"></label>`}
+/* an element's size, re-read at most twice a second: reading it forces the browser to lay the page out again */
+let ELSZ_G=0;addEventListener("resize",()=>ELSZ_G++);addEventListener("orientationchange",()=>ELSZ_G++);
+function elSize(el){const now=performance.now();if(!el._sz||now-el._szT>500||el._szG!==ELSZ_G){el._sz=[el.clientWidth,el.clientHeight];el._szT=now;el._szG=ELSZ_G}return el._sz}
 function controls(dt){try{sigCancel()}catch(e){}try{tslSndTick(dt)}catch(e){}sys.wheelRad=null;let whlOn=false;try{whlOn=whlPoll(dt);whlOut(dt)}catch(e){}
   const K=inp.keys; let s=inp.steerT, thr=inp.thrT, brk=inp.brkT;
   try{fusTick(dt);if(fusOn("chauf")){thr=Math.pow(thr,1.7)*0.8;brk=Math.pow(brk,1.3)*0.8}}catch(e){}   // Fusion Regent Chauffeur Smooth
@@ -16972,10 +17052,12 @@ function controls(dt){try{sigCancel()}catch(e){}try{tslSndTick(dt)}catch(e){}sys
     else if(man&&Math.abs(car.vx)>2.8)paStop(`${PS.name} cancelled: too fast`);
     else{const g0=st.gear,o=paUpdate(dt);if(o&&sys.pa){const A=sys.pa;
       /* steer-only and creep systems: the car steers, but the gear lever is yours (it tells you when to shift), and on steer-only the pedals are too */
-      if(man){A.wantG=st.gear;st.gear=g0;A.wantV=o[1];if(A.wantG!==st.gear){o[1]=0;o[2]=Math.max(o[2],0.4)}if(PS.auto==="steer"){o[1]=inp.thrT;o[2]=inp.brkT}}
+      if(man){A.wantG=st.gear;st.gear=g0;A.wantV=o[1];if(A.wantG!==st.gear){o[1]=0;o[2]=Math.max(o[2],0.4)}if(PS.auto==="steer"){/* steer-only (VW, Ford Enhanced, Stellantis, Land Rover, Volvo): your pedals move the car, but like the real systems' manoeuvre braking it keeps you to walking pace, stops you at the end of each move and before anything in the way */
+          const dT=Math.max(inp.thrT,(K.arrowup||K.w)?0.32:0,(st.mouseSteer&&MOUSE.in&&MOUSE.l)?0.32:0),dB=Math.max(inp.brkT,(K.arrowdown||K.s)?1:0),av=Math.abs(car.vx),cap=A.wantG===g0&&(A.vt||0)>0.01?Math.min(1.6,(A.vt||0)+0.35):0;
+          o[1]=cap>0?Math.min(dT,0.45):0;o[2]=dB;if(cap===0)o[2]=Math.max(o[2],av>0.05?0.6:0.4);else if(av>cap)o[2]=Math.max(o[2],clamp((av-cap)*0.8,0.15,0.6)),o[1]=0}}
       if(PS.hold||pkTh().hold){const held=!!(K.y||PA.holdScr);A.held=held;if(!held){o[1]=0;o[2]=Math.max(o[2],0.6)}}
       [s,thr,brk]=o;inp.steer+=clamp(s-inp.steer,-2.2*dt,2.2*dt);inp.thr+=clamp(thr-inp.thr,-4*dt,2*dt);inp.brk+=clamp(brk-inp.brk,-6*dt,6*dt);
-      knob.style.transform=st.wheelUI?`rotate(${inp.steer*135}deg)`:`translateX(${inp.steer*(pad.clientWidth/2-30)}px) rotate(${inp.steer*90}deg)`;$("accel").fill.style.height=(inp.thr*100)+"%";$("brake").fill.style.height=(inp.brk*100)+"%";return}}}
+      knob.style.transform=st.wheelUI?`rotate(${inp.steer*135}deg)`:`translateX(${inp.steer*(elSize(pad)[0]/2-30)}px) rotate(${inp.steer*90}deg)`;$("accel").fill.style.height=(inp.thr*100)+"%";$("brake").fill.style.height=(inp.brk*100)+"%";return}}}
   if(sys.p2pGrace>0){sys.p2pGrace-=dt;if(inp.steerT===0)inp.steer*=0.5}
   if(sys.p2p&&sys.p2p.ph==="exited"&&!st.walk){sys.p2p.wait-=dt;if(sys.p2p.wait<=0){if(inGarage(car.px,car.py))p2pGarageOut();else if(p2pOnRoad())p2pEngage();else p2pToRoad()}}
   if(sys.summon&&sys.summon.drive&&!st.walk){const keyed=K.arrowleft||K.arrowright||K.arrowup||K.arrowdown||K.a||K.d||K.w||K.s||K[" "];
@@ -17006,8 +17088,9 @@ function controls(dt){try{sigCancel()}catch(e){}try{tslSndTick(dt)}catch(e){}sys
    inp.thr+=clamp(thr-inp.thr,-(gT?0.65:an?12:PS[1])*dt,(gT?0.33:an?10:PS[0])*dt); inp.brk+=clamp(brk-inp.brk,-(gB?0.85:an?12:PS[3])*dt,(gB?gbOn:an?12:PS[2])*dt)}
   if(st.walk){walkUpdate(dt);inp.thr=0;inp.brk=0;if(sys.summon)summonUpdate(dt)}else if(!(sys.summon&&sys.summon.drive))sys.summon=null
   if(PC.on){$("pcS").style.left=`calc(${(inp.steer*0.5+0.5)*100}% - 4px)`;$("pcT").style.width=(Math.max(inp.thr,sys.accThr)*100)+"%";$("pcB").style.width=(Math.max(inp.brk,sys.aebBrake,sys.accBrk)*100)+"%";
-    $("pcHint").innerHTML=gp?"Gamepad · Start for menu · <kbd>?</kbd> controls":"Keyboard · press <kbd>?</kbd> for controls"}
-  knob.style.transform=st.wheelUI?`rotate(${inp.steer*135}deg)`:`translateX(${inp.steer*(pad.clientWidth/2-30)}px) rotate(${inp.steer*90}deg)`;
+    {const h=gp?"Gamepad · Start for menu · <kbd>?</kbd> controls":"Keyboard · press <kbd>?</kbd> for controls";if(PC.hint!==h){PC.hint=h;$("pcHint").innerHTML=h}}}
+  {const now=performance.now();if(!controls.pw||now-controls.pwT>1000){controls.pw=pad.clientWidth;controls.pwT=now}   /* reading the pad's width forces a layout: once a second, not every frame (it was a big part of the game's CPU use: issue #125) */
+   const tf=st.wheelUI?`rotate(${(inp.steer*135).toFixed(1)}deg)`:`translateX(${(inp.steer*(controls.pw/2-30)).toFixed(1)}px) rotate(${(inp.steer*90).toFixed(1)}deg)`;if(knob._tf!==tf){knob._tf=tf;knob.style.transform=tf}}
   $("accel").fill.style.height=(Math.max(inp.thr,sys.accThr)*100)+"%"; $("brake").fill.style.height=(Math.max(inp.brk,sys.aebBrake,sys.accBrk,sys.rAebBrake)*100)+"%";
   if(st.signal||st.hazard){if(TSL.fart&&st.signal&&!st.hazard&&st.signalT===0&&isTesla()&&!st.walk)fart();st.signalT+=dt;const b=(st.signalT%0.66)<0.36;if(b!==st.blink){st.blink=b;if(!st.walk)tick(b)}
     if(st.signal&&!st.hazard&&!st.pilot&&!sys.userSig&&st.signalT>2.5&&Math.abs(inp.steer)<0.05&&Math.abs(sys.e||0)<0.4&&!sys.lcw){st.signal=0;st.blink=false}}
@@ -17970,6 +18053,47 @@ const PROPS={},PROPL={};
 function propLoad(k){if(PROPS[k])return Promise.resolve(PROPS[k]);if(!PROPL[k])PROPL[k]=fetch("props/"+k+".json?v="+BUILD_VER).then(r=>{if(!r.ok)throw 0;return r.json()}).catch(e=>{if(/github\.io$/.test(location.hostname))throw e;return fetch("https://cdn.jsdelivr.net/gh/Exclusive2knight/Strata-Test-Drive@/*ASSET_REF*/main/props/"+k+".json").then(r=>{if(!r.ok)throw 0;return r.json()})}).then(d=>{const objs=[];
     for(const ob of Object.values(d.objects)){const p16=b64(ob.p,Int16Array),n8=b64(ob.n,Int8Array),idx=b64(ob.i,Uint16Array),P=new Float32Array(p16.length),N=new Float32Array(n8.length);const kk=d.k||1000;for(let i=0;i<p16.length;i++)P[i]=p16[i]/kk;for(let i=0;i<n8.length;i++)N[i]=n8[i]/127;objs.push(Object.assign(upload(P,N,idx),{groups:ob.g}))}
     PROPS[k]={objs,mats:d.mats,nodes:d.nodes,parts:d.parts,min:d.min,max:d.max};return PROPS[k]}).catch(e=>{delete PROPL[k]});return PROPL[k]}
+// ---- the airport model: loaded once you're within 4.5 km of it, baked into vertex-coloured meshes in 400 m tiles (drawn by distance, out of
+// view tiles skipped); the parked and moving airliners are instances of 14 models, baked in at load. Its file is props/apt_world.json
+const APT_DD={base:-4200,bld:-3600,mark:1500,alt:700,mast:1800,jet:900,gse:420,tree:1100,ac:2400,fence:700,fenceN:450};
+const APT_LT={alt3:[0.05,1.0,0.25],alt4:[1.0,0.08,0.05],alt5:[1.0,0.85,0.55],alt6:[1.0,0.55,0.08],alt7:[0.15,0.35,1.0]};
+function aptLoad(){if(APT.m||APT.busy)return;APT.busy=true;
+  fetch("props/apt_world.json?v="+BUILD_VER).then(r=>{if(!r.ok)throw 0;return r.json()}).catch(e=>{if(/github\.io$/.test(location.hostname))throw e;return fetch("https://cdn.jsdelivr.net/gh/Exclusive2knight/Strata-Test-Drive@/*ASSET_REF*/main/props/apt_world.json").then(r=>{if(!r.ok)throw 0;return r.json()})})
+  .then(d=>{const ox=APT.cx,oz=-APT.cy,oy=APT.z,M={},cat={};
+    const add=(c,ch,T)=>{const B=cat[c]||(cat[c]={P:[],N:[],C:[],I:[]}),p=b64(ch.p,Int16Array),n=b64(ch.n,Int8Array),col=b64(ch.c,Uint8Array),idx=b64(ch.i,Uint16Array),k=ch.k,o=ch.o,base=B.P.length/3;
+      for(let v=0;v<p.length/3;v++){let x=p[v*3]/k+o[0],y=p[v*3+1]/k+o[1],z=p[v*3+2]/k+o[2],nx=n[v*3]/127,ny=n[v*3+1]/127,nz=n[v*3+2]/127;
+        if(T){const X=T[0]*x+T[1]*y+T[2]*z+T[3],Y=T[4]*x+T[5]*y+T[6]*z+T[7],Z=T[8]*x+T[9]*y+T[10]*z+T[11],NX=T[0]*nx+T[1]*ny+T[2]*nz,NY=T[4]*nx+T[5]*ny+T[6]*nz,NZ=T[8]*nx+T[9]*ny+T[10]*nz;x=X;y=Y;z=Z;nx=NX;ny=NY;nz=NZ}
+        B.P.push(x+ox,y+oy,z+oz);B.N.push(nx,ny,nz);B.C.push(col[v*3]/255,col[v*3+1]/255,col[v*3+2]/255)}
+      for(let q=0;q<idx.length;q++)B.I.push(idx[q]+base)};
+    for(const c in d.cats)for(const ch of d.cats[c])add(c,ch);
+    for(const it of d.inst)add("ac",d.acm[it.m],it.M);
+    aptFence(cat);
+    for(const c in cat){const B=cat[c];if(!B.I.length)continue;const m=meshFrom(B.P,B.N,B.I,B.C);m.dd=APT_DD[c]||APT_DD[c.replace(/\d+$/,"")]||(c.startsWith("alt")?-2600:1500);M[c]=m}
+    APT.pave=d.pave.map(t=>[...t,Math.min(t[0],t[2],t[4]),Math.max(t[0],t[2],t[4]),Math.min(t[1],t[3],t[5]),Math.max(t[1],t[3],t[5])]);
+    aptColl(d.coll);APT.m=M;APT.busy=false}).catch(e=>{APT.busy=false;APT.fail=(APT.fail||0)+1;console.warn("airport model",e)})}
+// the airside fence: chain-link round the airfield (posts, top rail and a see-through mesh), with its colliders. Lines in airport X/Z
+const APT_FENCE=[[[-2500,215],[-855,215],[-855,505],[-2500,505],[-2500,1150],[2500,1150],[2500,470],[880,470],[880,380],[2500,380],[2500,-1095],[480,-1095],[480,-1450],[-2500,-1450],[-2500,215]],
+  [[-825,505],[320,505],[320,135],[-825,135],[-825,505]]];
+function aptFence(cat){const B=cat.fence={P:[],N:[],C:[],I:[]},net=cat.fenceN={P:[],N:[],C:[],I:[]},g=[0.42,0.44,0.43];
+  for(const L of APT_FENCE)for(let i=0;i<L.length-1;i++){const [X0,Z0]=L[i],[X1,Z1]=L[i+1],len=Math.hypot(X1-X0,Z1-Z0),ux=(X1-X0)/len,uz=(Z1-Z0)/len,n=Math.ceil(len/6);
+    for(let k=0;k<=n;k++){const X=X0+ux*len*k/n,Z=Z0+uz*len*k/n,b0=B.P.length/3;boxInto(B,APT.cx+X,APT.z+1.25,-APT.cy+Z,0.07,2.5,0.07,0);while(B.C.length<B.P.length)B.C.push(...g)}
+    const r0=B.P.length/3;boxInto(B,APT.cx+(X0+X1)/2,APT.z+2.45,-APT.cy+(Z0+Z1)/2,len,0.05,0.05,Math.atan2(-(Z1-Z0),X1-X0));while(B.C.length<B.P.length)B.C.push(...g);
+    const k=net.P.length/3,ax=APT.cx+X0,az=-APT.cy+Z0,bx=APT.cx+X1,bz=-APT.cy+Z1,nx=-uz,nz=ux;net.P.push(ax,APT.z,az,bx,APT.z,bz,bx,APT.z+2.4,bz,ax,APT.z+2.4,az);for(let q=0;q<4;q++){net.N.push(nx,0,nz);net.C.push(0.3,0.33,0.32)}net.I.push(k,k+1,k+2,k,k+2,k+3,k,k+2,k+1,k,k+3,k+2);
+    if(!APT.fenceC){const c=aptXY((X0+X1)/2,(Z0+Z1)/2),o={t:"b",x:c[0],y:c[1],h:Math.atan2(-(Z1-Z0),X1-X0),hl:len/2,hw:0.1,z0:APT.z-1.2,z1:APT.z+3,what:"the airport fence"};collAdd(o);COLL_KEEP.push(o)}}
+  APT.fenceC=true}
+// buildings: the model's footprint rectangles (X, Z centre and half sizes); any that would sit on a road are left out
+function aptColl(R){if(APT.coll)return;APT.coll=true;const gr=GREF;GREF=APT.z;
+  for(const [X,Z,hx,hz] of R){const c=aptXY(X,Z);let road=false;const nx=Math.max(1,Math.ceil(hx/3)),nz=Math.max(1,Math.ceil(hz/3));if(edgesNear(c[0],c[1],Math.hypot(hx,hz)+15).size)for(let i=-nx;i<=nx&&!road;i++)for(let j=-nz;j<=nz;j++){const g=groundAt(c[0]+hx*i/nx*0.97,c[1]-hz*j/nz*0.97);if(g.kind==="road"){road=true;break}}if(road)continue;
+    const o={t:"b",x:c[0],y:c[1],h:0,hl:hx,hw:hz,z0:APT.z-0.5,z1:APT.z+40,what:"the terminal"};collAdd(o);COLL_KEEP.push(o)}
+  for(const z of APT.TZ)for(const sd of [-1,1]){const X=APT.TX,c=aptXY(X,z+sd*APT.TW);const o={t:"b",x:c[0],y:c[1],h:0,hl:APT.TH,hw:0.25,z0:APT.z-8,z1:APT.z+0.9,what:"the tunnel wall"};collAdd(o);COLL_KEEP.push(o)}
+  GREF=gr}
+function aptDraw(night){if(!APT.m){if(!APT.busy&&(APT.fail||0)<3&&Math.hypot(car.px-APT.cx,car.py-(APT.cy+150))<4600)aptLoad();return}const M=APT.m;
+  const po=gl.isEnabled(gl.POLYGON_OFFSET_FILL);
+  for(const c in M){if(c==="fenceN")continue;if(c==="base"||c==="mark"){gl.enable(gl.POLYGON_OFFSET_FILL);gl.polygonOffset(c==="base"?10:9,c==="base"?10:9)}else if(!po)gl.disable(gl.POLYGON_OFFSET_FILL);else gl.polygonOffset(0,0);   /* the airfield's ground sits behind the game's own roads and lots */
+    const lt=APT_LT[c];if(lt){mat([1,1,1],night?lt.map(v=>v*1.8):null,0.1,10)}else if(c==="ac")mat([1,1,1],null,0.45,60);else if(c==="bld")mat([1,1,1],night?[0.06,0.055,0.04]:null,0.2,24);else mat([1,1,1],null,0.06,10);draw(M[c])}
+  if(po)gl.enable(gl.POLYGON_OFFSET_FILL);else gl.disable(gl.POLYGON_OFFSET_FILL);
+  if(M.fenceN){gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.depthMask(false);mat([1,1,1],null,0.05,8,0.16);draw(M.fenceN);gl.depthMask(true);gl.disable(gl.BLEND)}   /* the chain-link: see-through */
+  if(aC>=0){gl.disableVertexAttribArray(aC);gl.vertexAttrib3f(aC,1,1,1);bind.col=false}}
 // draw a prop with model matrix M; lit = {head, brake} light strengths
 function propDraw(k,M,lit){const P=PROPS[k];if(!P)return;const cf_=gl.isEnabled(gl.CULL_FACE);gl.disable(gl.CULL_FACE);gl.uniform1f(U.uBackOn,/^(rw_|bb_|sl_)/.test(k)?0:1);   // road work / billboard props are open shapes: no dark "inside" faces
   for(const o of P.objs){bind(o);gl.uniformMatrix4fv(U.uM,false,M);for(const [mi,start,count] of o.groups){const m=P.mats[mi],c=[m[0],m[1],m[2]],nm=m[7]||"",sp=0.25+m[5]*1.1*(1-m[6]*0.6),sh=12+(1-m[6])*110;
