@@ -140,7 +140,10 @@ body.wheelMode #steerPad{width:150px!important;height:150px;border-radius:50%;tr
 #ui2 .u2left .dk button.on .ic{background:rgba(255,255,255,.14)}
 #ui2 .u2left .dk i{position:absolute;top:5px;right:9px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--bad,#ff5b52);color:#fff;font:700 10px/16px system-ui;font-style:normal;text-align:center;box-shadow:0 0 0 2px rgba(14,17,22,.8)}#ui2 .u2left .dk i[hidden]{display:none}
 #ui2 .u2left .dk button:active .ic{transform:scale(.9)}
-#ui2 #u2dock,body.ui2 #ui2 #u2dock{width:26px!important;height:18px!important;border-radius:9px;padding:0;display:flex;align-items:center;justify-content:center;background:var(--g-bg,rgba(14,17,22,.6))!important;border:1px solid var(--g-brd,rgba(255,255,255,.1))!important;box-shadow:none!important;opacity:.75}
+#ui2 #u2dock,body.ui2 #ui2 #u2mm{width:116px;height:116px;border-radius:22px;border:1px solid var(--g-brd,rgba(255,255,255,.14));box-shadow:var(--g-sh,0 10px 28px rgba(0,0,0,.35));cursor:pointer;transition:width .25s cubic-bezier(.2,.8,.2,1),height .25s cubic-bezier(.2,.8,.2,1),box-shadow .3s;touch-action:manipulation;align-self:flex-start}
+#u2mm.big{width:190px;height:190px}#u2mm[hidden]{display:none}#u2mm.hot{box-shadow:0 0 0 2px rgba(255,70,70,.85),0 0 22px rgba(70,120,255,.6)}
+@media (max-height:480px){#u2mm{width:84px;height:84px;border-radius:17px}#u2mm.big{width:150px;height:150px}}
+#u2dock{width:26px!important;height:18px!important;border-radius:9px;padding:0;display:flex;align-items:center;justify-content:center;background:var(--g-bg,rgba(14,17,22,.6))!important;border:1px solid var(--g-brd,rgba(255,255,255,.1))!important;box-shadow:none!important;opacity:.75}
 #ui2 #u2dock svg{width:14px;height:14px;fill:none;stroke:var(--tx,#fff);stroke-width:2.2;transition:transform .2s}
 body.dkMin #ui2 .u2left .dk small{display:none}body.dkMin #ui2 .u2left .dk button{width:44px!important;height:42px!important}body.dkMin #ui2 #u2dock svg{transform:rotate(180deg)}
 body.ui2 #scrBtn{display:none!important}
@@ -1222,7 +1225,7 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
     <button id="u2bt" aria-label="Bluetooth"><span class="ic"><svg viewBox="0 0 24 24"><path d="M7 7l10 10-5 4V3l5 4L7 17"/></svg></span><small id="u2btL">Pair</small></button>
     <button id="u2rs" aria-label="Remote screen" hidden><span class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M7 21l3-3M17 21l-3-3"/><circle cx="12" cy="11" r="1.6"/></svg></span><small>Remote</small></button>
     <button id="u2scr" aria-label="Screen" hidden><span class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M9 20h6M12 17v3"/></svg></span><small id="u2scrL">Screen</small></button>
-  </div><button id="u2dock" aria-label="Collapse"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button></div>
+  </div><button id="u2dock" aria-label="Collapse"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button><canvas id="u2mm" width="264" height="264" aria-label="Mini map: tap to make it bigger" hidden></canvas></div>
   <div class="u2right">
     <button id="u2rc" aria-label="More controls"><svg viewBox="0 0 24 24"><path d="M6 12h.01M12 12h.01M18 12h.01" stroke-width="3.2"/></svg></button>
     <button id="u2clu" aria-label="Zoom cluster (N)"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M16 16l5 5M11 8v3l2 2"/></svg></button>
@@ -1273,8 +1276,13 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
 <script data-boot>(function(){var p=0;window.__bootP=0;var t=setInterval(function(){if(window.__bootReal){clearInterval(t);return}p+=(0.7-p)*0.025;window.__bootP=p;var a=document.getElementById("bootArc"),n=document.getElementById("bootNeedle"),c=document.getElementById("bootPct");if(a)a.setAttribute("stroke-dasharray",(p*100).toFixed(1)+" 100");if(n)n.style.setProperty("--a",(-135+p*270)+"deg");if(c)c.textContent=String(Math.round(p*100))},120)})()</script>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 311 · Smarter police, people at chargers, more detailed Tesla interiors</h2></div>
+    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 312 · Mini map, park sensor screens for each make</h2></div>
     <div class="nb">
+      <h4>Mini map, park sensor screens for each make</h4><ul>
+      <li><b>Mini map:</b> a map now sits on the left of the screen all the time, under the lock / phone buttons. It turns with you, zooms out as you speed up, and shows your route in blue, your destination, other traffic, chargers (in EVs and plug-ins) and police. During a chase the police dots flash and the map edge glows. Tap it to make it bigger; tap again to shrink it. On foot it shows where your car is.</li>
+      <li><b>Park sensor screens by make:</b> when you get close to something at low speed, the centre screen now shows the park sensor view the way that make draws it: Toyota and Lexus (Intuitive Parking Assist), Honda and Acura, Hyundai / Kia / Genesis (Parking Distance Warning), Chevrolet / GMC / Cadillac / Buick, Ford and Lincoln, BMW (Park Distance Control), Mercedes (PARKTRONIC), Jeep / Dodge / Ram / Chrysler (ParkSense), Nissan / Infiniti / Mazda / Subaru, Volvo and Land Rover. It is bigger than before and shows the distance and a STOP warning.</li>
+      <li><b>2019 RAV4:</b> the park sensor view used to land on top of the buttons beside the screen, so you couldn't really see it. It is now inside the display.</li>
+      </ul>
       <h4>Smarter police, people at chargers, more detailed Tesla interiors</h4><ul>
       <li><b>Police only act on what they can see:</b> a patrol car has to be facing you with a clear view (buildings block it) to catch you speeding. They now also pull you over for running a red light, driving the wrong way on a one-way street, and reckless swerving at speed.</li>
       <li><b>Traffic stops:</b> when you pull over, the officer gets out, walks up to your window, writes the ticket and walks back to the cruiser before it drives off. Drive away while they're walking up and it becomes a pursuit.</li>
@@ -7822,6 +7830,30 @@ function miniMap(g,x,y,w,h,R,col){g.save();g.beginPath();rr2(g,x,y,w,h,10);g.cli
   for(const r of ROADS2D){const e=r.e;if(Math.min(Math.abs(e.a.x-car.px)+Math.abs(e.a.y-car.py),Math.abs(e.b.x-car.px)+Math.abs(e.b.y-car.py))>R*2+e.L)continue;g.strokeStyle=col.road;g.lineWidth=Math.max(1.5,r.w*sc*0.6);g.beginPath();r.pts.forEach((p,i)=>{const q=P(p[0],p[1]);i?g.lineTo(q[0],q[1]):g.moveTo(q[0],q[1])});g.stroke()}
   let NP=null;try{NP=NAV.dest?navPoints(me()):null}catch(e){}if(NP&&NP.length>1){g.strokeStyle=col.route;g.lineWidth=5;g.lineCap="round";g.beginPath();NP.forEach((q,i)=>{const v=P(q[0],q[1]);i?g.lineTo(v[0],v[1]):g.moveTo(v[0],v[1])});g.stroke()}
   g.fillStyle="#fff";g.strokeStyle="#000";g.lineWidth=1.5;g.beginPath();g.moveTo(cx,cy-11);g.lineTo(cx-8,cy+8);g.lineTo(cx,cy+4);g.lineTo(cx+8,cy+8);g.closePath();g.fill();g.stroke();g.restore()}
+// the HUD mini map: always on, heading-up, zooms out as you go faster, shows your route, the destination, chargers (EVs), traffic and police
+const HMM={t:0,R:200,big:false};try{HMM.big=localStorage.getItem("mstrata.mmBig")==="1"}catch(e){}
+function hudMapTick(dt){const el=$("u2mm");if(!el)return;const show=!!st.started&&st.hudMap!==false&&!(typeof PM!=="undefined"&&PM.on);if(el.hidden===show)el.hidden=!show;if(!show)return;
+  if(!HMM.init){HMM.init=1;el.classList.toggle("big",HMM.big);el.addEventListener("click",()=>{HMM.big=!HMM.big;el.classList.toggle("big",HMM.big);HMM.t=0;try{localStorage.setItem("mstrata.mmBig",HMM.big?"1":"0")}catch(e){}})}
+  HMM.t-=dt;if(HMM.t>0)return;HMM.t=0.09;const W_=st.walk,px=W_?W_.x:car.px,py=W_?W_.y:car.py,h=W_?(W_.h??car.psi):car.psi,v=W_?0:Math.abs(car.vx);
+  const tR=(W_?90:clamp(150+v*9,150,430))*(HMM.big?1.35:1);HMM.R+=(tR-HMM.R)*0.18;const R=HMM.R,g=el.getContext("2d"),S=el.width,cx=S/2,cy=S*0.62,sc=S/(2*R),fx=Math.cos(h),fy=Math.sin(h);
+  const P=(x,y)=>{const dx=x-px,dy=y-py;return [cx+(dx*fy-dy*fx)*sc,cy-(dx*fx+dy*fy)*sc]};
+  g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,S,S);g.fillStyle="rgba(13,17,22,.86)";g.fillRect(0,0,S,S);g.lineCap="round";g.lineJoin="round";
+  const far=R*1.9;for(const pass of [0,1])for(const r of ROADS2D){const e=r.e,hw=/xway|ramp/.test(e.type);if(hw!==!!pass)continue;if(Math.min(Math.abs(e.a.x-px)+Math.abs(e.a.y-py),Math.abs(e.b.x-px)+Math.abs(e.b.y-py))>far+e.L)continue;
+    g.strokeStyle=hw?"#e2b45c":e.type==="dirt"?"#6b5f4c":"#687482";g.lineWidth=Math.max(hw?3:2,r.w*sc*0.75);g.beginPath();r.pts.forEach((q,i)=>{const a=P(q[0],q[1]);i?g.lineTo(a[0],a[1]):g.moveTo(a[0],a[1])});g.stroke()}
+  let NP=null;try{NP=NAV.dest&&!W_?navPoints(me()):null}catch(e){}
+  if(NP&&NP.length>1){for(const [col,lw] of [["rgba(40,120,255,.35)",11],["#4aa8ff",5.5]]){g.strokeStyle=col;g.lineWidth=lw;g.beginPath();NP.forEach((q,i)=>{const a=P(q[0],q[1]);i?g.lineTo(a[0],a[1]):g.moveTo(a[0],a[1])});g.stroke()}}
+  const edge=(a,m)=>{const dx=a[0]-cx,dy=a[1]-cy,k=Math.max(Math.abs(dx)/(S/2-m),Math.abs(dy)/(cy-m),dy>0?Math.abs(dy)/(S-cy-m):0,1);return [cx+dx/k,cy+dy/k,k>1]};
+  try{if(!TRIMS[st.trim].ice||TRIMS[st.trim].phev)for(const c of CHGS){if(c.kind==="td"||Math.abs(c.x-px)>R*1.2||Math.abs(c.y-py)>R*1.6)continue;const a=P(c.x,c.y);g.fillStyle=c.occ?"#7a8a80":"#3ddc84";g.beginPath();g.arc(a[0],a[1],4,0,7);g.fill()}}catch(e){}
+  const blink=(performance.now()/260|0)%2;let hot=false;
+  for(const c of cars){if(c.wx===undefined||c.kind==="cone")continue;const dx=c.wx-px,dy=c.wy-py;if(Math.abs(dx)>R*1.7||Math.abs(dy)>R*1.7)continue;const a=P(c.wx,c.wy),cop=isCop(c);
+    if(cop){const ch=c.kind==="cop"&&!c.leaving;if(ch)hot=true;g.fillStyle=ch?(blink?"#ff4a4a":"#4a7dff"):"#8fb4ff";g.beginPath();g.arc(a[0],a[1],ch?7:5,0,7);g.fill();g.strokeStyle="#fff";g.lineWidth=1.5;g.stroke()}
+    else{g.fillStyle="rgba(215,225,235,.75)";g.beginPath();g.arc(a[0],a[1],2.6,0,7);g.fill()}}
+  if(el.classList.contains("hot")!==hot)el.classList.toggle("hot",hot);
+  if(NAV.dest&&NAV.dest.e){try{const q=fpt(NAV.dest.e,NAV.dest.dir,NAV.dest.s,0),a=edge(P(q[0],q[1]),14);g.fillStyle="#ff5b52";g.strokeStyle="#fff";g.lineWidth=2;g.beginPath();g.arc(a[0],a[1],a[2]?6:8,0,7);g.fill();g.stroke()}catch(e){}}
+  if(W_&&!st.walkNoCar){const a=edge(P(car.px,car.py),14);g.fillStyle="#ffd24a";g.strokeStyle="#000";g.lineWidth=1.5;g.beginPath();g.rect(a[0]-6,a[1]-6,12,12);g.fill();g.stroke()}
+  g.fillStyle="#fff";g.strokeStyle="rgba(0,0,0,.8)";g.lineWidth=2;g.beginPath();g.moveTo(cx,cy-14);g.lineTo(cx-10,cy+10);g.lineTo(cx,cy+5);g.lineTo(cx+10,cy+10);g.closePath();g.fill();g.stroke();
+  {const n=edge([cx-fx*1e4,cy-fy*1e4],16);g.fillStyle="rgba(13,17,22,.9)";g.beginPath();g.arc(n[0],n[1],11,0,7);g.fill();g.fillStyle="#ff6b5e";g.font="800 15px system-ui";g.textAlign="center";g.textBaseline="middle";g.fillText("N",n[0],n[1]+1)}
+  {let nm="";try{nm=W_?"":(me().name||"")}catch(e){}const G_=NAV.dest&&NAV.g&&!W_?`${NAV_ARROW[NAV.g.t]||"↑"} ${distTxt(NAV.g.d)}`:"";const t=G_||nm;if(t){g.font="700 "+(HMM.big?19:25)+"px system-ui";let s_=t;while(g.measureText(s_).width>S-28&&s_.length>4)s_=s_.slice(0,-2)+"…";const gr=g.createLinearGradient(0,S-46,0,S);gr.addColorStop(0,"rgba(13,17,22,0)");gr.addColorStop(0.5,"rgba(13,17,22,.85)");g.fillStyle=gr;g.fillRect(0,S-46,S,46);g.fillStyle=G_?"#8fd0ff":"#e8eef3";g.textAlign="center";g.textBaseline="middle";g.fillText(s_,S/2,S-15)}}}
 function fusNavCard(g,x,y,w,col){const G=NAV.dest&&NAV.g;if(!G)return false;g.fillStyle=col||"rgba(20,26,34,.92)";rr2(g,x,y,w,46,8);g.fill();g.fillStyle="#fff";g.textAlign="left";g.textBaseline="middle";g.font="800 22px system-ui";g.fillText(NAV_ARROW[G.t]||"↑",x+10,y+23);g.font=CF2(15,600);g.fillText(distTxt(G.d),x+40,y+16);g.font=CF2(10);let t=G.t==="A"?"Destination":G.name||navText(G);while(g.measureText(t).width>w-48&&t.length>4)t=t.slice(0,-2)+"…";g.fillText(t,x+40,y+33);return true}
 function compassTxt(){const b=((90-car.psi*180/Math.PI)%360+360)%360,D=["N","NE","E","SE","S","SW","W","NW"];return [D[Math.round(b/45)%8],Math.round(b)]}
 function altFt(){try{const gnd=groundAt(car.px,car.py);return Math.round(((gnd&&gnd.h)||0)*3.281+600)}catch(e){return 600}}
@@ -8561,7 +8593,7 @@ function drawRav19Cluster(g,W,H,v){const C=cluCommon(),now=performance.now();if(
   if(bulb){const am="#ffb21f",rd="#ff3b2e",gr="#47e05a";[[LX-R*0.32,CY-R*0.3,"⚙",am,16],[LX+R*0.05,CY-R*0.3,"🛞",am,13],[LX-R*0.42,CY+R*0.05,"VSC",am],[LX-R*0.02,CY+R*0.2,"READY",gr],[LX+R*0.35,CY+R*0.2,"EV",gr],[LX+R*0.3,CY-R*0.05,"TRAC",am],
     [RX+R*0.42,CY-R*0.05,"PARK",rd,11],[RX+R*0.18,CY+R*0.28,"ABS",am,11],[RX+R*0.5,CY+R*0.28,"BRAKE",rd,11],[RX+R*0.35,CY+R*0.48,"P",am,11],[RX+R*0.12,CY+R*0.12,"⚠",rd,14],[RX+R*0.5,CY+R*0.12,"⛐",am,12]].forEach(([x,y,s,c,f])=>{if(s==="EV"&&!hy)return;rav19Lamp(g,x,y,s,c,f)})}
   cluArrows(g,C,W/2-W*0.13,W/2+W*0.13,18)}
-function rav19Screen(g,W,H,M){const F=CF2;g.fillStyle="#1a1b1e";g.fillRect(0,0,W,H);const bz=66,x0=bz,x1=W-bz,top=34,bot=H-24;
+function rav19Screen(g,W,H,M){const F=CF2;g.fillStyle="#1a1b1e";g.fillRect(0,0,W,H);const bz=66,x0=bz,x1=W-bz,top=34,bot=H-24;SCR.dz={x0,x1,y0:top,y1:bot};
   // the hard buttons down both sides
   const L=[["HOME",()=>{SCR.page="home"}],["MENU",()=>{SCR.page="apps"}],["AUDIO",()=>{SCR.page="media"}],["MAP",()=>{SCR.page="map"}]],R=[["SEEK ›",()=>{au.station=((au.station||0)+1)%RADIO.length;radioPlay(au.station)}],["‹ TRACK",()=>{au.station=((au.station||0)+RADIO.length-1)%RADIO.length;radioPlay(au.station)}],["PHONE",()=>{SCR.page="phone"}],["APPS",()=>{SCR.page="apps"}]];
   const btn=(x,y,t,fn)=>{g.fillStyle="#cfd2d6";g.font=F(9,700);g.textAlign="center";g.textBaseline="middle";g.fillText(t,x+bz/2,y);g.fillStyle="#3a3d42";rr2(g,x+12,y+8,bz-24,8,3);g.fill();hit(x,y-14,bz,36,()=>{fn();SCR.autoCam=false})};
@@ -12032,6 +12064,44 @@ function audiNewScreen(g,W,H,M){const F=CF2,C=cluCommon(),red="#f50537";const P=
   IT.forEach(([k,ic],i)=>{const x=x0+i*sp,on=(SCR.page||"home")===k,c=on?"#fff":P.sub;if(on){g.fillStyle=red;g.fillRect(x-14,bot+barH-5,28,3)}if(ic)rivIco(g,ic,x,cy,20,c);else if(k==="home"){g.strokeStyle=c;g.lineWidth=1.8;g.beginPath();g.moveTo(x-8,cy);g.lineTo(x,cy-8);g.lineTo(x+8,cy);g.moveTo(x-6,cy-2);g.lineTo(x-6,cy+7);g.lineTo(x+6,cy+7);g.lineTo(x+6,cy-2);g.stroke()}else{g.strokeStyle=c;g.lineWidth=1.5;for(let a=0;a<3;a++){g.beginPath();g.ellipse(x+Math.cos(a*2.09)*5,cy+Math.sin(a*2.09)*5,6,2.6,a*2.09,0,7);g.stroke()}}hit(x-sp/2,bot,sp,barH,()=>{SCR.page=k;SCR.autoCam=false})})}
 // Audi parking system plus / park assist with 360° display: the car from above with white and red segments all round it,
 // side segments too on cars with park assist (the lateral sensors)
+// ---------------------------------------------------------------- park sensor views, drawn the way each make shows them
+// n bands per sensor; "dist" = every lit band takes the colour of how close it is, "grad" = green/yellow/red from the outside in,
+// "fan" = one field per sensor that shrinks toward the car (BMW), "block" = straight bars instead of arcs
+const PDC_ST={
+  toyota:{name:"Intuitive Parking Assist",bg:"#0a1326",brd:"#27407a",car:"#f4f6f9",glass:"#1a2333",n:4,mode:"dist",col:d=>d<0.45?"#ff2d2d":d<0.9?"#ff9a1f":"#ffd400",dim:"rgba(140,170,230,.14)",lw:5,blink:0.45,tx:"#dfe8ff",warn:"BRAKE!"},
+  honda:{name:"Parking Sensor System",bg:"#0c1422",brd:"#2a3a55",car:"#c9ced6",glass:"#10161f",n:3,mode:"dist",shape:"block",col:d=>d<0.4?"#ff3326":d<0.8?"#ff8a1c":"#ffc400",dim:"rgba(255,255,255,.08)",lw:7,blink:0.4,tx:"#e8eef6",warn:"STOP"},
+  hk:{name:"Parking Distance Warning",bg:"#07090c",brd:"#2b3138",car:"#eef1f4",glass:"#11161b",n:3,mode:"dist",col:d=>d<0.3?"#ff2d2d":d<0.6?"#ff9f1a":"#ffe14a",dim:"rgba(255,255,255,.1)",lw:8,blink:0.3,tx:"#ffffff",warn:"STOP"},
+  gm:{name:"Park Assist",bg:"#101214",brd:"#3a3f45",car:"#b9c0c8",glass:"#0d1114",n:4,mode:"grad",pal:["#f2b01e","#f2b01e","#f2681e","#e8262a"],dim:"rgba(255,255,255,.07)",lw:5,blink:0.3,tx:"#f3f4f5",warn:"⚠ STOP",inch:true},
+  ford:{name:"Parking Aid",bg:"#0b1a2e",brd:"#2b5aa0",car:"#3f8bd6",glass:"#0b1626",n:5,mode:"grad",pal:["#22c55e","#22c55e","#facc15","#facc15","#ef4444"],dim:"rgba(120,170,255,.12)",lw:4,blink:0.3,tx:"#e6f0ff",warn:"STOP"},
+  bmw:{name:"Park Distance Control",bg:"#050607",brd:"#3b2a12",car:"#f2f2f2",glass:"#15181b",n:1,mode:"fan",col:d=>d<0.35?"#ff2a1f":d<0.8?"#ffc21a":"#27c93f",dim:"rgba(255,255,255,.07)",lw:2,blink:0.3,tx:"#f2f2f2",warn:"STOP",accent:"#ff7a1a"},
+  mb:{name:"Active Parking Assist · PARKTRONIC",bg:"#06080c",brd:"#1e2f44",car:"#cfd5db",glass:"#0c1016",n:6,mode:"grad",pal:["#2f7bd6","#2f7bd6","#f5c518","#f5c518","#e5232b","#e5232b"],dim:"rgba(90,140,200,.16)",lw:3.4,blink:0.25,tx:"#e9eef5",warn:"STOP"},
+  stl:{name:"ParkSense",bg:"#0d0d0f",brd:"#3a3a3f",car:"#e9e9ea",glass:"#141416",n:4,mode:"grad",shape:"block",pal:["#ffd21f","#ffd21f","#ff5a1f","#ff2020"],dim:"rgba(255,255,255,.08)",lw:6,blink:0.35,tx:"#f4f4f4",warn:"STOP"},
+  nis:{name:"Sonar",bg:"#0a0f14",brd:"#2a3540",car:"#dfe4ea",glass:"#10161c",n:3,mode:"grad",pal:["#31c452","#f7c61b","#f0312b"],dim:"rgba(255,255,255,.08)",lw:7,blink:0.35,tx:"#eef2f6",warn:"STOP"},
+  volvo:{name:"Park Assist",bg:"#0b0d10",brd:"#2f3540",car:"#eceff2",glass:"#12161b",n:1,mode:"fan",col:d=>d<0.3?"#ff3b30":d<0.7?"#ff9f0a":"#ffd60a",dim:"rgba(255,255,255,.06)",lw:2,blink:0.3,tx:"#f2f4f6",warn:"STOP"}};
+function pdcStyleOf(){const b=brandS();return ({Toyota:"toyota",Lexus:"toyota",Honda:"honda",Acura:"honda",Hyundai:"hk",Kia:"hk",Genesis:"hk",Chevrolet:"gm",GMC:"gm",Cadillac:"gm",Buick:"gm",Ford:"ford",Lincoln:"ford",BMW:"bmw",MINI:"bmw",Mini:"bmw","Rolls-Royce":"bmw",Mercedes:"mb","Mercedes-Benz":"mb","Mercedes-AMG":"mb","Mercedes-Maybach":"mb",Land:"volvo",Suzuki:"nis",INFINITI:"nis",Jeep:"stl",Dodge:"stl",Ram:"stl",Chrysler:"stl",Nissan:"nis",Infiniti:"nis",Mazda:"nis",Subaru:"nis",Mitsubishi:"nis",Volvo:"volvo",Polestar:"volvo",Audi:"audi",Volkswagen:"audi",Porsche:"audi"})[b]||null}
+function pdcView(g,x,y,w,h,key){const S=PDC_ST[key],P=sys.pdc;if(!S||!P){audiPdc(g,x,y,w,h);return}const F=CF2,side=sideOK()&&P.sl,Rm=1.6,now=performance.now(),ft=st.units==="mph";
+  g.save();g.fillStyle=S.bg;rr2(g,x,y,w,h,10);g.fill();g.strokeStyle=S.brd;g.lineWidth=1.5;rr2(g,x,y,w,h,10);g.stroke();g.beginPath();rr2(g,x,y,w,h,10);g.clip();
+  const head=Math.min(26,h*0.14),foot=Math.min(22,h*0.12),ah=h-head-foot,cx=x+w/2,cy=y+head+ah/2,cw=Math.min(w*0.26,ah*0.17),cl=cw*2.25,span=Math.min((w-cw)/2-8,(ah-cl)/2-4);
+  // the car
+  if(S.accent){g.strokeStyle=S.accent;g.lineWidth=2;rr2(g,cx-cw/2-2,cy-cl/2-2,cw+4,cl+4,cw*0.34);g.stroke()}
+  g.fillStyle=S.car;rr2(g,cx-cw/2,cy-cl/2,cw,cl,cw*0.3);g.fill();g.fillStyle=S.glass;g.beginPath();g.moveTo(cx-cw*0.38,cy-cl*0.2);g.quadraticCurveTo(cx,cy-cl*0.29,cx+cw*0.38,cy-cl*0.2);g.lineTo(cx+cw*0.33,cy-cl*0.07);g.lineTo(cx-cw*0.33,cy-cl*0.07);g.closePath();g.fill();rr2(g,cx-cw*0.33,cy+cl*0.2,cw*0.66,cl*0.1,3);g.fill();
+  g.fillStyle=S.car;g.fillRect(cx-cw/2-3,cy-cl*0.17,3,5);g.fillRect(cx+cw/2,cy-cl*0.17,3,5);g.fillStyle="#ff3b2e";g.fillRect(cx-cw*0.4,cy+cl/2-3,cw*0.22,2);g.fillRect(cx+cw*0.18,cy+cl/2-3,cw*0.22,2);
+  const lit=d=>d>=Rm?0:clamp(Math.ceil((1-d/Rm)*S.n),1,S.n),bcol=(k,d)=>S.mode==="grad"?S.pal[k]:S.col(d),hot=d=>d<S.blink&&(now/170|0)%2===0;
+  // front and rear sensors
+  for(const [arr,dir] of [[P.f,-1],[P.r,1]])arr.forEach((d,z)=>{const zi=dir<0?z:3-z,oy=cy+dir*cl*0.3,r0=cw*0.5+cl*0.2+4,a0=dir<0?Math.PI*(1.13+zi*0.19):Math.PI*(0.13+zi*0.19),a1=a0+Math.PI*0.17,L=lit(d);
+    if(S.mode==="fan"){const rmax=r0+span,rd=r0+span*clamp(d/Rm,0.08,1);g.fillStyle=S.dim;g.beginPath();g.arc(cx,oy,rmax,a0,a1);g.arc(cx,oy,r0,a1,a0,true);g.closePath();g.fill();if(d<Rm&&!hot(d)){g.fillStyle=S.col(d);g.globalAlpha=0.85;g.beginPath();g.arc(cx,oy,rd,a0,a1);g.arc(cx,oy,r0,a1,a0,true);g.closePath();g.fill();g.globalAlpha=1}return}
+    for(let k=0;k<S.n;k++){const R=r0+span*(1-(k+0.5)/S.n)*0.96+2,on=k<L&&!(k===L-1&&hot(d)&&L===S.n);g.strokeStyle=on?bcol(k,d):S.dim;g.lineWidth=S.shape==="block"?Math.max(S.lw,span/S.n-3):S.lw;g.lineCap=S.shape==="block"?"butt":"round";
+      if(S.shape==="block"){const am=(a0+a1)/2,hw=R*Math.sin((a1-a0)/2)*0.92,px=cx+Math.cos(am)*R,py=oy+Math.sin(am)*R,tx=-Math.sin(am),ty=Math.cos(am);g.beginPath();g.moveTo(px-tx*hw,py-ty*hw);g.lineTo(px+tx*hw,py+ty*hw);g.stroke()}
+      else{g.beginPath();g.arc(cx,oy,R,a0+0.03,a1-0.03);g.stroke()}}});
+  // side sensors
+  if(side)for(const [arr,sd] of [[P.sl,-1],[P.sr,1]])arr.forEach((d,z)=>{const L=lit(d),zh=(cl-10)/3,yy=cy-cl/2+5+z*zh;
+    if(S.mode==="fan"){const wmax=Math.min(span*0.7,26),wd=wmax*clamp(d/Rm,0.1,1);g.fillStyle=S.dim;g.fillRect(sd<0?cx-cw/2-4-wmax:cx+cw/2+4,yy,wmax,zh-3);if(d<Rm&&!hot(d)){g.fillStyle=S.col(d);g.globalAlpha=0.85;g.fillRect(sd<0?cx-cw/2-4-wd:cx+cw/2+4,yy,wd,zh-3);g.globalAlpha=1}return}
+    const m=Math.min(S.n,3),Ls=Math.ceil(L*m/S.n);for(let k=0;k<m;k++){const on=k<Ls,xx=cx+sd*(cw/2+6+(m-1-k)*6)-(sd<0?4:0);g.fillStyle=on?bcol(Math.round(k*(S.n-1)/Math.max(1,m-1)),d):S.dim;rr2(g,xx,yy,4,zh-4,2);g.fill()}});
+  // title and distance
+  const nf=Math.min(...P.f),nr=Math.min(...P.r),ns=side?Math.min(...P.sl,...P.sr):9,n=Math.min(nf,nr,ns);g.textAlign="center";g.textBaseline="middle";g.fillStyle=S.tx;g.font=F(Math.min(10,w/15),700);let t=S.name;while(g.measureText(t).width>w-12&&t.length>6)t=t.slice(0,-2)+"…";g.fillText(t,cx,y+head/2+1);
+  const stop=n<0.3,dt_=stop?S.warn:n<Rm+0.9?(ft?(S.inch&&n<1?`${Math.round(n*39.37)} in`:`${(n*3.28).toFixed(1)} ft`):`${Math.round(n*100)} cm`):"";
+  if(dt_){if(stop){g.fillStyle=(now/200|0)%2?"#ff2d2d":"#7a1010";rr2(g,x+8,y+h-foot-1,w-16,foot-5,5);g.fill();g.fillStyle="#fff"}else g.fillStyle=S.mode==="grad"?S.pal[Math.max(0,lit(n)-1)]:S.col(n);g.font=F(Math.min(13,foot*0.62),800);g.fillText(dt_,cx,y+h-foot/2-3)}
+  g.restore()}
 function audiPdc(g,x,y,w,h){const P=sys.pdc;if(!P)return;const F=CF2,audi=brandS()==="Audi",side=sideOK()&&P.sl;
   g.save();g.fillStyle="rgba(6,8,11,.94)";rr2(g,x,y,w,h,10);g.fill();g.strokeStyle="rgba(255,255,255,.1)";g.lineWidth=1;rr2(g,x,y,w,h,10);g.stroke();
   const cx=x+w/2,cy=y+h/2+6,cw=Math.min(w*0.3,40),cl=Math.min(h*0.42,cw*2.3);
@@ -12301,7 +12371,8 @@ function lotApp(){const sub=["scratch","mega"].includes(PHONE.sub)?PHONE.sub:"sc
     h+=`<div class="card"><b>Your tickets tonight (${mine.length})</b><small>${mine.slice(-6).map(t=>`${t.n.join(" ")} · ${t.m}`).join("<br>")||"None yet"}</small></div>`;if(LOT.res)h+=`<div class="card"><b>Last draw (day ${LOT.res.day})</b><small>${LOT.res.nums.join(" ")} · Mega ${LOT.res.mb}<br>${LOT.res.total?`You won ${money(LOT.res.total)}`:"No win"}</small></div>`}
   h+=`<p class="fine">Spent ${money(LOT.spent)} · won ${money(LOT.won)}. Play for fun: the odds are like the real thing.</p>`;return h}
 function drawScreen(dt){drawScreen0(dt);try{if(!sys.parkOn||st.power!==true||!sys.pdc||isTesla()||dogShow())return;if(isJLR()&&SCR.page==="camera")return;if(isAudiNew()&&SCR.page!=="camera")return;const g=SCR.g,W=SCR.W,H=SCR.H,cam=SCR.page==="camera",port=H>W;
-  const w=port?Math.min(130,W*0.26):Math.min(118,W*0.14),h=port?Math.min(170,H*0.22):H*0.4,x=cam?10:W-w-10,y=cam?H*0.12:port?H*0.3:H*0.12;g.save();g.setTransform(SS,0,0,SS,0,0);audiPdc(g,x,y,w,h);g.restore();
+  const key=pdcStyleOf(),Z=SCR.dz||{x0:0,x1:W,y0:0,y1:H},zw=Z.x1-Z.x0,zh=Z.y1-Z.y0;SCR.dz=null;
+  const w=key?(port?Math.min(170,zw*0.36):Math.min(cam?150:176,zw*(cam?0.22:0.27))):(port?Math.min(130,W*0.26):Math.min(118,W*0.14)),h=key?(port?Math.min(250,zh*0.34):zh*(cam?0.6:0.72)):(port?Math.min(170,H*0.22):H*0.4),x=cam?Z.x0+10:Z.x1-w-10,y=Z.y0+(cam?zh*0.14:port?zh*0.3:zh*0.13);g.save();g.setTransform(SS,0,0,SS,0,0);pdcView(g,x,y,w,h,key);g.restore();
   gl.bindTexture(gl.TEXTURE_2D,SCR.tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,SCR.cv);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false)}catch(e){}}
 // ======================================================================= Land Rover / Range Rover: Pivi Pro, Interactive Driver Display, Terrain Response, ClearSight
 // (ready for the Range Rover, Range Rover Sport, Velar, Evoque and Defender: any trim whose group starts with "Land Rover" or "Range Rover")
@@ -15923,7 +15994,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=311;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="173",BUILD_VER=312;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}try{const P=JSON.parse(localStorage.getItem("strata.ped")||"null");if(P){st.pedHold=+P.pedHold||0;st.thrRate=+P.thrRate||2;st.brkRate=+P.brkRate||2}}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){const k=GFX.q==="auto"?GFX.eff:GFX.q;if(G.k!==k||G.v!==GFX.ovV||!G.m){G.k=k;G.v=GFX.ovV;const m={...GQ[k]};for(const o of GOPT)if(GFX.ov[o[0]]!==undefined)Object.assign(m,o[4](GFX.ov[o[0]]));if(Object.keys(GFX.ov).length)m.label=GQ[k].label+" (custom)";G.m=m;COLL.nt=!m.trees}return G.m}
@@ -16547,7 +16618,7 @@ function frame(now){if(XR.on&&!XR.inFrame){requestAnimationFrame(frame);return} 
       if(Math.hypot(car.px-sys.aim.x,car.py-sys.aim.y)>40){sys.aim=null;car.cargo=0;st.leveling=true}}acc+=dt;const h=1/G().hz;if(acc>0.05)acc=0.05;   // a slow frame never makes the next one slower catching up (no death spiral)
   while(acc>=h){physics(h);acc-=h}if(car.crashed>0)car.crashed-=dt;try{updateAudio()}catch(e){console.error(e)}}
   shopTick();homeTick(dt);if(st.walk){footTick(dt);openHouseTick()}else if(sys.flashT>0)sys.flashT-=dt;gtTick(dt);phTick();revChime(dt);beltTick(dt);econTick(dt);usedTick(dt);testTick(dt);ui2Tick();trainTick(dt);meterTick(dt);brTick(dt);gateTick(dt);w2LifeTick(dt);mpTick(dt);netTick(dt);teslaTrip(dt);launchTick(dt);
-  try{gigTick(dt)}catch(e){}try{copTick(dt)}catch(e){console.error(e)}if(DALE.p.length||DALE.pools.length||DALE.dead>0||DALE.shake>0||DALE.fire)try{daleTick(dt)}catch(e){}try{if(st.started)stkTick(dt)}catch(e){}if(st.started&&st.power===true&&!st.walk&&Math.abs(car.vx)>1)sys.tripT=(sys.tripT||0)+dt;if(sys.roaT>0)sys.roaT-=dt;
+  try{hudMapTick(dt)}catch(e){}try{gigTick(dt)}catch(e){}try{copTick(dt)}catch(e){console.error(e)}if(DALE.p.length||DALE.pools.length||DALE.dead>0||DALE.shake>0||DALE.fire)try{daleTick(dt)}catch(e){}try{if(st.started)stkTick(dt)}catch(e){}if(st.started&&st.power===true&&!st.walk&&Math.abs(car.vx)>1)sys.tripT=(sys.tripT||0)+dt;if(sys.roaT>0)sys.roaT-=dt;
   try{rplRec(dt)}catch(e){}try{achTick(dt)}catch(e){}render(dt);if(PHOTO.want)photoGrab();hud(dt);
 }
 // ---- on foot: stick, jump, key fob and phone
