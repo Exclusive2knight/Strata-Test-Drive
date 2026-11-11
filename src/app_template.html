@@ -162,7 +162,7 @@ body:not(.pc) #nstack{top:calc(env(safe-area-inset-top,0px) + 54px);width:min(38
 body:not(.pc) #nstack .nr{min-height:36px;font-size:13px;gap:10px;padding-top:4px;padding-bottom:4px}
 body:not(.pc) #nstack .nr i{flex-basis:18px;font-size:20px}body:not(.pc) #nstack .nr i svg{width:18px;height:18px}
 body.uihide #nstack,body.photoMode #nstack,body.pmOn #nstack{display:none!important}
-#towSkip{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 150px);transform:translateX(-50%);z-index:40;background:rgba(8,14,16,.9);color:#e6eef0;border:1px solid rgba(255,255,255,.25);border-radius:12px;padding:10px 18px;font:600 15px system-ui,sans-serif}
+#towSkip,#ubSkip{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 150px);transform:translateX(-50%);z-index:40;background:rgba(8,14,16,.9);color:#e6eef0;border:1px solid rgba(255,255,255,.25);border-radius:12px;padding:10px 18px;font:600 15px system-ui,sans-serif}
 #towFade{position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;transition:opacity .6s;z-index:70}
 #sfCall{position:fixed;left:50%;top:18%;transform:translateX(-50%);z-index:60;width:min(360px,calc(100vw - 32px));background:rgba(14,18,26,.94);border:1px solid #2c3a52;border-radius:16px;padding:14px 16px;color:#fff;font-family:system-ui;display:flex;flex-direction:column;gap:6px;box-shadow:0 12px 40px rgba(0,0,0,.5)}#sfCall[hidden]{display:none}#sfCall small{color:#7fb0ff;font-weight:600;letter-spacing:.04em}#sfCall span{font-size:13px;color:#b8c4da}#sfCall div{display:flex;gap:8px;margin-top:6px}#sfCall button{flex:1;padding:10px;border-radius:10px;border:0;background:#2a3446;color:#fff;font-weight:600}#sfCall button.hp{background:#d93a2f}#sfCall i{position:absolute;right:14px;top:12px;font-style:normal;color:#ffd60a;font-weight:700}
 #tabBody{flex:1;overflow:auto;padding:14px 16px calc(env(safe-area-inset-bottom,0px) + 20px);touch-action:pan-y}
@@ -1277,8 +1277,16 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
 <script data-boot>(function(){var p=0;window.__bootP=0;var t=setInterval(function(){if(window.__bootReal){clearInterval(t);return}p+=(0.7-p)*0.025;window.__bootP=p;var a=document.getElementById("bootArc"),n=document.getElementById("bootNeedle"),c=document.getElementById("bootPct");if(a)a.setAttribute("stroke-dasharray",(p*100).toFixed(1)+" 100");if(n)n.style.setProperty("--a",(-135+p*270)+"deg");if(c)c.textContent=String(Math.round(p*100))},120)})()</script>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 323 · Strata Metro Airport</h2></div>
+    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 324 · Uber and airport rentals</h2></div>
     <div class="nb">
+      <h4>Uber, airport rentals, and natural merges</h4><ul>
+      <li>🚘 <b>Uber app</b> on your phone: on foot, pick where to go (the airport terminals, stores, chargers, or back to your own car) and see the fare first. A driver comes from nearby through traffic, pulls up at the kerb with the hazards on, you walk up and get in, and they drive you there. You can watch the ride or tap ⏩ Skip the ride. Fares work like UberX: a base fare, per mile and per minute, a booking fee and an $8.50 minimum, plus a $4 airport fee to or from the terminals. Cancelling once the driver is close costs $5</li>
+      <li>🔑 <b>Strata Rent-A-Car</b>: a counter at McNamara arrivals (lower level, by baggage claim). Walk up to it, pick a car (Civic, Camry, Rogue, Escape, Grand Cherokee, Model 3, Explorer or Pacifica, $55 to $98 a day) and it's waiting at the curb outside. Your own car stays parked where you left it. Bring the rental back to the counter to return it (extra days are charged), then take an Uber to your car. The counter works without a phone</li>
+      <li>🛣️ <b>Merges fixed</b>: at some on-ramps (like the ones joining I-38 at the I-61 interchange) the ramp's yellow edge line and its lane started far too early and ran right across the freeway to the fast lane. Lane keeping and traffic followed that line. The ramp now only starts once it's clear of the freeway lanes, so it joins the right lane like a real one</li>
+      <li>The Maple Rd and Woodward Ave exit ramps down in the sunken I-38 stretch were buried under the grass bank of the cut. The bank now starts past the ramp</li>
+      <li>Traffic now stays around you when you're on foot or riding in an Uber far from your own car (it used to thin out)</li>
+      <li>Walking under a raised road (like the departures deck) no longer pops you up onto the deck's sidewalk</li>
+      </ul>
       <h4>Strata Metro Airport, and park assist that knows what it's doing</h4><ul>
       <li>✈️ <b>Strata Metro Airport</b> is open, south of County Rd 40. It's laid out like Detroit Metro: the long McNamara terminal with Concourse A and the regional B/C concourse, the Evans (north) terminal with Concourse D, two parallel runways, a control tower, hangars, air cargo, a fuel farm and 70 airliners at the gates, taxiing, landing and being pushed back</li>
       <li>Get there on <b>John D. Dingell Dr</b> (a boulevard south off County Rd 40) to McNamara, or <b>W.G. Rogell Dr</b> to Evans. The inbound and outbound roadways are one-way, three lanes, and they dip through a <b>tunnel under taxiway T</b></li>
@@ -2702,7 +2710,8 @@ function analyseNet(){
     if(n.kind==="corner"){const o=n.legs.find(q=>q!==l);r=Math.min(hw(o.e)/Math.max(0.3,Math.abs(Math.sin(o.h-l.h))),2*hw(o.e))+1}
     else if(n.kind==="x"){
       if((n.ctrl==="minor"||n.ctrl==="merge")&&l.major)r=0;
-      else if(n.ctrl==="merge"){const e=l.e;let u=0;for(;u<e.L*0.6;u+=1){const q=eAt(e,l.end===0?u:e.L-u);let ok=true;for(const o of n.legs){if(!o.major)continue;const pp=eProj(o.e,q.x,q.y);if(pp.u<-1||pp.u>o.e.L+1)continue;if(Math.abs(pp.t)<hw(o.e)-o.e.side+LANE/2+0.2)ok=false}if(ok)break}r=u}   // clear of the driving lanes (a ramp's acceleration lane runs over the shoulder)
+      else if(n.ctrl==="merge"){const e=l.e,MT=new Set(n.legs.filter(o=>o.major).map(o=>o.e.type)),ME=EDGES.filter(f=>f!==e&&MT.has(f.type)&&Math.min(Math.hypot(f.a.x-n.x,f.a.y-n.y),Math.hypot(f.b.x-n.x,f.b.y-n.y),Math.hypot(eAt(f,f.L/2).x-n.x,eAt(f,f.L/2).y-n.y))<f.L/2+700);   /* every stretch of the main road nearby, not just the two meeting here (the freeway is often split into short pieces near a ramp) */
+        let u=0;for(;u<e.L*0.6;u+=1){const q=eAt(e,l.end===0?u:e.L-u);let ok=true;for(const f of ME){const pp=eProj(f,q.x,q.y);if(pp.u<-1||pp.u>f.L+1)continue;if(Math.abs(pp.t)<f.m/2+f.n*LANE+LANE/2+0.2-(f.T.shR?0:0)){ok=false;break}}if(ok)break}r=u}   // clear of the driving lanes (a ramp's acceleration lane runs over the shoulder)
       else for(const o of n.legs){if(o===l)continue;const sn=Math.abs(Math.sin(o.h-l.h));if(sn<0.3)continue;if(n.ctrl==="minor"&&!o.major)continue;
         r=Math.max(r,Math.min(hw(o.e)/sn,2*hw(o.e))+(n.ctrl==="minor"?0.8:2.6))}}
     l.r=r;if(l.end===0)l.e.r0=r;else l.e.r1=r}
@@ -2832,7 +2841,14 @@ function brJank(e,u,t){const b=e.br,d=u-(b.uc-b.half);if(d<0||d>2*b.half)return 
 const flyUp=(e,u)=>{if(!e.fly)return false;const c=clamp(u,0,e.L),p=eAt(e,c);return ez(e,c)-hillZ(p.x,p.y)>1.0};   // the part of a flyover that is up in the air
 const onDip=(e,u)=>e.dip&&e.dip.some(o=>u>o.uc-o.half-o.rA&&u<o.uc+o.half+o.rB);
 // the sides of the freeway cut: grass slopes down to the shoulder
-function cutZ(x,y){let z=1e9;for(const e of gAt(GRID.e,x,y)){if(!e.dip)continue;const p=eProj(e,x,y);if(!onDip(e,p.u))continue;const outer=e.m/2+e.n*LANE+e.side+auxW(e,p.u,p.t),a=Math.abs(p.t),inner=e.m/2-e.shL;
+// where the cut's side slope starts: past the shoulder, and past any ramp or service drive running down in the cut beside the freeway (the slope used to bury them)
+const CUTO=new Map();
+function cutOut(e,u,sg){const ui=Math.round(u/3),k=e.i*100000+ui*2+(sg>0?1:0);let r=CUTO.get(k);if(r!==undefined)return r;const uu=ui*3,base=e.m/2+e.n*LANE+e.side+auxW(e,uu,sg);r=base;
+  const z0=ez(e,clamp(uu,0,e.L)),gz=hillZ(...ePt(e,clamp(uu,0,e.L),0).slice(0,2));
+  for(let d=base+1;d<base+70;d+=2){const q=ePt(e,clamp(uu,0,e.L),sg*d);let hit=false;for(const f of gAt(GRID.e,q[0],q[1])){if(f===e||f.type==="xway"||f.n<1)continue;const pp=eProj(f,q[0],q[1]);if(pp.u<0||pp.u>f.L||Math.abs(pp.t)>f.m/2+f.n*LANE+f.side+0.5)continue;
+      const fz=f.hz||f.zo||f.zp?ez(f,pp.u):0;if(fz<gz-0.8&&fz<z0+(d-base)*0.42+0.3){hit=true;break}}if(hit)r=d+1.5}
+  CUTO.set(k,r);return r}
+function cutZ(x,y){let z=1e9;for(const e of gAt(GRID.e,x,y)){if(!e.dip)continue;const p=eProj(e,x,y);if(!onDip(e,p.u))continue;const outer=cutOut(e,p.u,Math.sign(p.t)||1),a=Math.abs(p.t),inner=e.m/2-e.shL;
   const dd=a>outer?a-outer:a<inner?inner-a:0;z=Math.min(z,ez(e,p.u)+Math.max(0,dd-0.4)*0.42)}return z}
 const onBridge=(e,u)=>e.br&&Math.abs(u-e.br.uc)<e.br.half+e.br.rp;
 const onOver=(e,u)=>e.ov&&Math.abs(u-e.ov.uc)<e.ov.half+(u<e.ov.uc?e.ov.rA:e.ov.rB), overDeck=(e,u)=>e.ov&&Math.abs(u-e.ov.uc)<e.ov.half;
@@ -3233,8 +3249,8 @@ function groundAt0(x,y){
       {const hb=roadBumps(e,p.u,p.t)+(e.br&&e.br.style?brJank(e,p.u,p.t):0);if(e.T.dirt){const fd=e.ford&&Math.abs(p.u-e.ford.uc)<e.ford.half;pick({h:(e.hz||e.ford?ez(e,p.u):0)+hb+dirtH(e,p.u,p.t),mu:fd?0.5:0.74,kind:fd?"ford":"dirt",hole:RB_HOLE});continue}
         pick({h:(e.hz?ez(e,p.u):0)+hb+(rum?0.006:0),mu:1.15,kind:"road",rum,hole:RB_HOLE,deck:overDeck(e,p.u)});continue}}
     if(inner>0&&a<inner&&(e.br&&onBridge(e,p.u)||e.ov&&onOver(e,p.u))){pick({h:ez(e,p.u),mu:1.0,kind:"pavement",deck:overDeck(e,p.u)});continue}     // bridge deck between the carriageways
-    if(e.T.kerb&&((a>outer&&a<outer+0.45)||(inner>0&&a<inner&&a>inner-0.45))){if(e.ov&&onOver(e,p.u))pick({h:ez(e,p.u)+0.04,mu:1.0,kind:"kerb",deck:overDeck(e,p.u)});else{kerb=true;kz=e.hz?ez(e,p.u):0}}
-    else if(e.T.walk&&a>outer&&a<outer+0.45+e.T.walk){if(e.ov&&onOver(e,p.u))pick({h:ez(e,p.u),mu:0.95,kind:"pavement",deck:overDeck(e,p.u)});else{walk=true;kz=e.hz?ez(e,p.u):0}}
+    if(e.T.kerb&&((a>outer&&a<outer+0.45)||(inner>0&&a<inner&&a>inner-0.45))){if(e.ov&&onOver(e,p.u))pick({h:ez(e,p.u)+0.04,mu:1.0,kind:"kerb",deck:overDeck(e,p.u)});else{const zz=e.hz?ez(e,p.u):0;if(!kerb||Math.abs(zz-GREF)<Math.abs(kz-GREF))kz=zz;kerb=true}}
+    else if(e.T.walk&&a>outer&&a<outer+0.45+e.T.walk){if(e.ov&&onOver(e,p.u))pick({h:ez(e,p.u),mu:0.95,kind:"pavement",deck:overDeck(e,p.u)});else{const zz=e.hz?ez(e,p.u):0;if(!(walk||kerb)||Math.abs(zz-GREF)<Math.abs(kz-GREF))kz=zz;walk=true}}   /* two levels of sidewalk (a deck over a street): the one you're on */
     dmin=Math.min(dmin,a>outer?a-outer:inner-a)}
   if(hits){if(hits.length===1&&!kerb&&!walk&&!hits[0].deck)return hits[0];if(kerb)hits.push({h:kz+0.04,mu:1.0,kind:"kerb"});else if(walk)hits.push({h:kz,mu:0.95,kind:"pavement"});
     let best=null,low=null;for(const g of hits){if(!low||g.h<low.h)low=g;if(g.h<=GREF+1.2&&(!best||g.h>best.h))best=g}
@@ -5311,12 +5327,13 @@ function newCar(e,dir,s,i,kind){const vf=0.92+rnd()*0.16,off=laneOff(e,i);
 function freeSpot(e,dir,s,i,gap){for(const o of cars){if(o.jn||o.e!==e||o.dir!==dir)continue;if(laneIdx(o)===i&&Math.abs(o.s-s)<gap)return false}return true}
 // the new world is big: pick from the roads near you (the list is redone when you have moved 150 m)
 const NEAR_E={x:1e9,y:1e9,d:0,E:[],W:[]};
-function nearEdges(maxD){if(Math.hypot(car.px-NEAR_E.x,car.py-NEAR_E.y)<150&&NEAR_E.d===maxD)return NEAR_E;Object.assign(NEAR_E,{x:car.px,y:car.py,d:maxD,E:[],W:[]});let a=0;
-  for(const e of EDGES){const c=eAt(e,e.L/2);if(Math.hypot(c.x-car.px,c.y-car.py)>maxD+e.L/2)continue;a+=spW(e);NEAR_E.E.push(e);NEAR_E.W.push(a)}return NEAR_E}
+function plX(){return st.walk?st.walk.x:car.px}function plY(){return st.walk?st.walk.y:car.py}
+function nearEdges(maxD){if(Math.hypot(plX()-NEAR_E.x,plY()-NEAR_E.y)<150&&NEAR_E.d===maxD)return NEAR_E;Object.assign(NEAR_E,{x:plX(),y:plY(),d:maxD,E:[],W:[]});let a=0;
+  for(const e of EDGES){const c=eAt(e,e.L/2);if(Math.hypot(c.x-plX(),c.y-plY())>maxD+e.L/2)continue;a+=spW(e);NEAR_E.E.push(e);NEAR_E.W.push(a)}return NEAR_E}
 function randomSpot(minD,maxD){const NE=W2?nearEdges(maxD):{E:EDGES,W:EW};if(!NE.E.length)return null;
   for(let k=0;k<80;k++){const x=rnd()*NE.W[NE.W.length-1];let a=0,b=NE.W.length-1;while(a<b){const m=(a+b)>>1;if(NE.W[m]<x)a=m+1;else b=m}const e=NE.E[a];
     if(RW.closed.size&&RW.closed.has(e))continue;const dir=e.ow||rnd()<0.5?1:-1,s0=rStart(e,dir)+4,s1=e.L-rEnd(e,dir)-12;if(s1<=s0)continue;const s=s0+rnd()*(s1-s0),i=Math.floor(rnd()*e.n);
-    const p=fpt(e,dir,s,laneOff(e,i)),d=Math.hypot(p[0]-car.px,p[1]-car.py);if(d<minD||d>maxD)continue;if(!freeSpot(e,dir,s,i,30))continue;return {e,dir,s,i}}
+    const p=fpt(e,dir,s,laneOff(e,i)),d=Math.hypot(p[0]-plX(),p[1]-plY());if(d<minD||d>maxD)continue;if(!freeSpot(e,dir,s,i,30))continue;return {e,dir,s,i}}
   return null}
 function spawnTraffic(n){for(let k=0;k<n;k++){const p=poolSpot(60)||randomSpot(45,900);if(p)cars.push(newCar(p.e,p.dir,p.s,p.i))}st.trafficN=cars.filter(c=>c.kind==="ai").length}
 function spawnOncoming(){}
@@ -5518,10 +5535,10 @@ function emoDraw(){let box=$("emoL");if(!box){box=document.createElement("div");
 // traffic pool (like BeamNG): a fixed number of cars lives around you. They appear where you can't see them, mostly on the roads ahead,
 // and once one is far behind and out of sight it is quietly moved to a new spot instead of driving off into nowhere
 function aiR(){const lb=G().label;return lb==="Ultra"||lb==="High"?650:lb==="Medium"?560:480}
-function aiSeen(x,y,z){if(!CULL.pl)return Math.hypot(x-car.px,y-car.py)<60;return sphVis(x,(z||0)+1,-y,8,1e9)}
-function poolSpot(minD,ok){const R=aiR();for(let k=0;k<16;k++){const p=randomSpot(minD??140,R-40);if(!p)continue;if(ok&&!ok(p))continue;const q=fpt(p.e,p.dir,p.s,laneOff(p.e,p.i)),d=Math.hypot(q[0]-car.px,q[1]-car.py);
-    if(d<R*0.8&&aiSeen(q[0],q[1],p.e.hz?ez(p.e,p.dir>0?p.s:p.e.L-p.s):0))continue;const ah=(q[0]-car.px)*Math.cos(car.psi)+(q[1]-car.py)*Math.sin(car.psi);if(ah<0&&k<10&&rnd()<0.55)continue;return p}return null}
-function poolKeep(c){return c.robo||c.emv||c.bus||c.plow||c.transit||c.towing||c.errand||c.pullH||c.pullCop||c.pullTg||(typeof GIG!=="undefined"&&GIG.job&&GIG.job.towCar===c)}
+function aiSeen(x,y,z){if(!CULL.pl)return Math.hypot(x-plX(),y-plY())<60;return sphVis(x,(z||0)+1,-y,8,1e9)}
+function poolSpot(minD,ok){const R=aiR();for(let k=0;k<16;k++){const p=randomSpot(minD??140,R-40);if(!p)continue;if(ok&&!ok(p))continue;const q=fpt(p.e,p.dir,p.s,laneOff(p.e,p.i)),d=Math.hypot(q[0]-plX(),q[1]-plY());
+    if(d<R*0.8&&aiSeen(q[0],q[1],p.e.hz?ez(p.e,p.dir>0?p.s:p.e.L-p.s):0))continue;const ah=(q[0]-plX())*Math.cos(car.psi)+(q[1]-plY())*Math.sin(car.psi);if(ah<0&&k<10&&rnd()<0.55)continue;return p}return null}
+function poolKeep(c){return c.ub||c.robo||c.emv||c.bus||c.plow||c.transit||c.towing||c.errand||c.pullH||c.pullCop||c.pullTg||(typeof GIG!=="undefined"&&GIG.job&&GIG.job.towCar===c)}
 // AI cars get the same suspension as the cars you drive: the suspension of their own model (passive coils, adaptive, magnetic or air),
 // four corner springs and dampers, anti-roll bars, the real mass, and road bumps and potholes under each wheel
 const AI_TRIM={};function aiTrimOf(mdl){if(AI_TRIM[mdl]===undefined){AI_TRIM[mdl]=Object.keys(TRIMS).find(k=>TRIMS[k].model===mdl)||null}return AI_TRIM[mdl]}
@@ -5695,11 +5712,11 @@ function updateTraffic(dt){try{sigSense(dt)}catch(e){}try{sfTick(dt)}catch(e){co
   if(cars.some(c=>c.dead))cars=cars.filter(c=>!c.dead);   // a car whose numbers went bad is quietly removed
   // keep traffic around you: cars far behind you and out of sight (or stuck for ages) are moved to a new spot you can't see
   respT-=dt;if(respT<=0){respT=1;
-    for(const c of cars){if(c.kind!=="ai"&&c.kind!=="bike")continue;const d=Math.hypot(c.wx-car.px,c.wy-car.py);
+    for(const c of cars){if(c.kind!=="ai"&&c.kind!=="bike")continue;const d=Math.hypot(c.wx-plX(),c.wy-plY());   /* round you: on foot (or riding in an Uber) that's where you are, not where your car is */
       if(poolKeep(c))continue;const R_=aiR(),seen=aiSeen(c.wx,c.wy,c.wz);
       if(d>R_&&!seen||d>R_+450||(c.kind==="bike"?c.idle>25&&d>110:c.idle>50&&d>160)&&!seen){const p=poolSpot(140,q=>c.kind!=="bike"||BIKE_T.has(q.e.type));
         if(p){const bike=c.kind==="bike",n=newCar(p.e,p.dir,p.s,bike?0:p.i,c.kind);if(bike){n.paint=c.paint;n.mdl=c.mdl}else if(c.kind!=="ai"){n.paint=c.paint;n.mdl=c.mdl}if(bike){n.v0=c.v0;n.rider=c.rider;n.off=n.offT=bikeOff(n.e)}Object.keys(c).forEach(k=>delete c[k]);Object.assign(c,n);carPose(c)}}}}
-  try{towedTick(dt)}catch(e){}try{rdsTick(dt)}catch(e){}try{brainTick(dt)}catch(e){}try{errTick(dt)}catch(e){console.warn(e)}try{chgOccTick(dt)}catch(e){console.warn(e)}pedTick(dt);evTick(dt);try{txtTick(dt)}catch(e){}try{trlTick(dt)}catch(e){}try{trafTOD(dt)}catch(e){}
+  try{towedTick(dt)}catch(e){}try{uberTick(dt)}catch(e){console.error(e)}try{rdsTick(dt)}catch(e){}try{brainTick(dt)}catch(e){}try{errTick(dt)}catch(e){console.warn(e)}try{chgOccTick(dt)}catch(e){console.warn(e)}pedTick(dt);evTick(dt);try{txtTick(dt)}catch(e){}try{trlTick(dt)}catch(e){}try{trafTOD(dt)}catch(e){}
 }
 
 // ======================================================================= life: weather, pedestrians, cyclists, people in cars, random events, getting out
@@ -6439,6 +6456,7 @@ function walkCtx(){const W=st.walk,T=TRIMS[st.trim];if(!W)return null;
     return {a:null,label:H_.kind==="pump"?"Nozzle in · walk back to the pump to hang it up":"Plugged in · walk back to the charger to unplug"}}
   const near=(l,r)=>stnWorld(l).some(p=>Math.hypot(p[0]-W.x,p[1]-W.y)<r&&Math.hypot(p[0]-car.px,p[1]-car.py)<8);
   {const vc=valetCtx(W);if(vc)return vc}
+  if(rentNear())return {a:"rent",label:RENT.on?"🔑 Rental counter · return your car":"🔑 Strata Rent-A-Car counter · rent a car"};
   if(METER.cur&&Math.hypot(W.x-METER.cur.mx,W.y-METER.cur.my)<1.6){const l=meterLeft();return {a:"meter",label:`🅿️ Pay the meter · +15 min for $1 · ${l>0?Math.ceil(l/60)+" min left":METER.paid>METER.arrive?"expired":"not paid yet"}`}}
   {const an=airNear();if(an)return tiresLow()?{a:"air",label:"🛞 Air for your tires · $2.00"}:{a:null,label:"🛞 Air machine · your tires are fine"}}
   if(fuelOK&&near("pumps",2.2))return {a:"pump",label:"⛽ Fill up"};
@@ -6917,11 +6935,12 @@ function uiScale(v){if(v)st.uiz=v;document.documentElement.style.setProperty("--
 function uiLook(v){st.uilook=v;document.body.classList.toggle("uisolid",v==="solid");try{localStorage.setItem("mstrata.uilook",v)}catch(e){}}
 try{const lk=localStorage.getItem("mstrata.uilook");if(lk)setTimeout(()=>uiLook(lk),0)}catch(e){}
 try{const z=parseFloat(localStorage.getItem("mstrata.uiz"));if(z>0.5&&z<1.3)st.uiz=z;if(localStorage.getItem("mstrata.uihide"))setTimeout(()=>hudHide(true),0)}catch(e){}setTimeout(()=>uiScale(),0);
-function walkAction(){if(TOWH.ride){toast("Stay in the car until the tow truck drops it off");return}
+function walkAction(){if(TOWH.ride){toast("Stay in the car until the tow truck drops it off");return}if(UBER.ride){toast("You're riding in an Uber: it drops you at the kerb (or tap Skip the ride)");return}
   if(!st.walk){if(!canGetOut()){toast("Stop and shift to P first");return}if(!safeExitCheck())return;
     const lx=-Math.sin(car.psi),ly=Math.cos(car.psi);st.walk={x:car.px+lx*1.45+Math.cos(car.psi)*0.3,y:car.py+ly*1.45+Math.sin(car.psi)*0.3,z:car.zb||0,h:car.psi+Math.PI/2,v:0,ph:0,P:{skin:0,shirt:1,sc:1}};if(VALET.cur&&valetOnExit()){st.acc=false;st.pilot=false;st.signal=0;return}
     st.acc=false;st.pilot=false;st.signal=0;tick(1);toast(PC.on?"On foot: WASD to walk, drag to look, Space to jump, L to lock, P for your phone":"On foot: stick to walk, drag to look, your phone and key are on the right");return}
   const c=walkCtx();if(!c||!c.a)return;if(c.a==="in"){walkGetIn();return}const T=TRIMS[st.trim],H=car.hyb;
+  if(c.a==="rent"){phOpen(true);PHONE.locked=false;PHONE.app="rent";PHONE.kiosk=true;phRender(true);return}   /* the counter works without a phone: it is the counter's own screen */
   if(c.a==="air"){airFill();return}
   if(c.a==="meter"){meterPay();return}
   if(c.a==="valetTake"){valetTake(c.rec);return}
@@ -6960,7 +6979,7 @@ function navPlaces(){const L=[],add=(name,sub,x,y,h,ic)=>{if(x==null||!isFinite(
   for(const T of RETAIL_STN){const nb=RETAIL.slice().sort((a,b)=>Math.abs((a.a0+a.a1)/2-T.x)-Math.abs((b.a0+b.a1)/2-T.x))[0];add(T.name,"Gas station"+(nb?" · by "+nb.name:""),T.x,T.s*(RB0+15.5),0,"⛽")}
   {const at=(nm,X,Z)=>{const e=EDGES.find(q=>q.name===nm&&Math.abs(eProj(q,...aptXY(X,Z)).t)<2&&eProj(q,...aptXY(X,Z)).u>0&&eProj(q,...aptXY(X,Z)).u<q.L);return e?{e,dir:1,s:eProj(e,...aptXY(X,Z)).u,side:"right"}:null};
    for(const [nm,sub,X,Z,road] of [["McNamara Terminal · Departures","Strata Metro Airport · drop-off at check-in, upper level",0,150,"Departures (upper level)"],["McNamara Terminal · Arrivals","Strata Metro Airport · pick-up at baggage claim",0,150,"Arrivals (lower level)"],
-     ["Evans Terminal · Departures","Strata Metro Airport · north terminal, upper level",750,-1110,"Departures (upper level)"],["Evans Terminal · Arrivals","Strata Metro Airport · north terminal, baggage claim",750,-1110,"Arrivals (lower level)"],["Strata Metro Air Cargo","Freight buildings and truck court",1200,425,"Air Cargo Rd"]]){
+     ["Evans Terminal · Departures","Strata Metro Airport · north terminal, upper level",750,-1110,"Departures (upper level)"],["Evans Terminal · Arrivals","Strata Metro Airport · north terminal, baggage claim",750,-1110,"Arrivals (lower level)"],["Strata Metro Air Cargo","Freight buildings and truck court",1200,425,"Air Cargo Rd"],["Strata Rent-A-Car","Rental counter · McNamara arrivals",-60,150,"Arrivals (lower level)"]]){
      const p=aptXY(X,Z);add(nm,sub,p[0],p[1],0,"✈️");const f=at(road,X,Z);if(f)L[L.length-1].fr=f}}
   add("Service plaza","Gas and fast chargers on Hwy 7",PAD.cx,PAD.cy,0,"⚡");if(L.length&&L[L.length-1].name==="Service plaza")L[L.length-1].fr={e:PAD.e,dir:PAD.dir,s:Math.max(5,PAD.s0-25),side:"right"};   // route to the plaza turn-off itself, not the nearest street
   {const seen=new Set();for(const c of CHGS){if(c.kind!=="sc"&&c.kind!=="ea")continue;const k=c.kind+(c.name||"")+Math.round(c.x/60)+","+Math.round(c.y/60);if(seen.has(k))continue;seen.add(k);const nb=L.filter(q=>q.ic!=="⚡"&&Math.hypot(q.x-c.x,q.y-c.y)<90).sort((q,r)=>Math.hypot(q.x-c.x,q.y-c.y)-Math.hypot(r.x-c.x,r.y-c.y))[0];add(c.kind==="sc"?"Tesla Supercharger":"Electrify America",(nb?"At "+nb.name:"Fast charger")+(c.kind==="sc"?" · V3, Tesla vehicles":" · 350 kW, all EVs"),c.x,c.y,c.face||0,"⚡")}
@@ -9765,7 +9784,7 @@ function shopTick(){const R=storeNear(),b=$("shopBtn");if(!b)return;
   const t=R.type==="tire"?(st.walk?`🔧 Service desk · ${R.name}`:`🔧 ${R.name} service`):`🛒 Buy at ${R.name}`;if(b.hidden||b.textContent!==t){b.textContent=t;b.hidden=false;b.onclick=()=>shopOpen(R)}}
 function openHouseTick(){if(!st.walk)return;const W=st.walk;for(const H of OPEN_HOUSES){if(H.seen)continue;if(Math.hypot(W.x-H.door[0],W.y-H.door[1])<6){H.seen=true;toast(H.i===HOME.i?"Home: the front door is open":"For sale: walk in to look around, or claim it with the button")}}
   const h=insideHouse(W.x,W.y,W.z);if(h!==FOOT.inH){FOOT.inH=h;if(h)toast(h.store?STORE_HELLO[h.store.type](h.store):"Inside: living room at the front, kitchen and dining at the back")}}
-function walkUpdate(dt){const W=st.walk;if(W.cyBase===undefined){W.cyBase=W.h;look.yaw=0;look.pitch=0}if(W.vz===undefined)W.vz=0;
+function walkUpdate(dt){const W=st.walk;if(UBER.ride){W.v=0;return}if(W.cyBase===undefined){W.cyBase=W.h;look.yaw=0;look.pitch=0}if(W.vz===undefined)W.vz=0;
   // you can walk around while the pump runs or the car charges (the nozzle latches / the cable locks in), and get back in the car
   const [jx,jy,slow]=footInput(),cy=W.cyBase+look.yaw,fx=Math.cos(cy),fy=Math.sin(cy),rx=Math.sin(cy),ry=-Math.cos(cy);
   const mx=fx*jy+rx*jx,my=fy*jy+ry*jx,mag=Math.hypot(mx,my),spd=(slow?1.7:4.3)*Math.min(1,mag);
@@ -10907,7 +10926,7 @@ function terrainFar(){const K=5,N=TERR.N,NY=TERR.NY,X0=WORLD.x0,X1=WORLD.x1,Y0=W
   return meshFrom(P,Nn,I)}
 function drawGroundFar(){const G_=SCN.groundFar;if(!G_||!G_.chunks)return;const e=CULL.eye,far=CULL.fogD||4800,near=CULL.maxD-80;
   for(const c of G_.chunks){const d=Math.hypot(c.c[0]-e[0],c.c[1]-e[1],c.c[2]-e[2])-c.r;if(d<near||d>far)continue;let ok=true;if(CULL.pl)for(const p of CULL.pl)if(p[0]*c.c[0]+p[1]*c.c[1]+p[2]*c.c[2]+p[3]<-c.r){ok=false;break}if(ok)draw(c)}}
-function terrainMesh(){const N=W2?800:360,X0=WORLD.x0,X1=WORLD.x1,Y0=WORLD.y0,Y1=WORLD.y1,P=[],Nn=[],I=[];const NY=Math.round(N*(Y1-Y0)/(X1-X0));
+function terrainMesh(){CUTO.clear();const N=W2?800:360,X0=WORLD.x0,X1=WORLD.x1,Y0=WORLD.y0,Y1=WORLD.y1,P=[],Nn=[],I=[];const NY=Math.round(N*(Y1-Y0)/(X1-X0));
   const onPad=(x,y)=>Math.abs(x-PAD.cx)<PAD.rad+8&&Math.abs(y-PAD.cy)<PAD.rad+8&&[[0,0],[7,0],[-7,0],[0,7],[0,-7]].some(([a,b])=>padHit(x+a,y+b));
   const H2=(x,y)=>{if(inApt(x,y,-6)){const X=x-APT.cx,Z=APT.cy-y;if(Math.abs(X-APT.TX)<APT.TH&&APT.TZ.some(z=>Math.abs(Z-z)<APT.TW+14))return APT.z+aptDz(X)-0.6;return APT.z-1.2}   /* the tunnel trench: the land under it is sunk to the road (the airport's own ground hides it outside the walls) */if(inCity(x,y)||inTC(x,y,4)||inExtra(x,y,6)||onPad(x,y))return -0.14;const d=dfAt(x,y);let z=Math.max(d<45?hillZ(x,y)+riverCut(x,y):terrainH(x,y,d),embZ(x,y));z=Math.min(z,cutZ(x,y));if(d<40)z=w2Blend(x,y,z);return z-0.08};
   const H=W2?H2:(x,y)=>{if(inCity(x,y)||inTC(x,y,4)||inExtra(x,y,6)||onPad(x,y))return -0.14;const d=dfAt(x,y);let z=Math.max(d<45?hillZ(x,y)+riverCut(x,y):terrainH(x,y,d),embZ(x,y));
@@ -11391,7 +11410,7 @@ function w2pDraw(night){if(SCN.w2farm){mat([1,1,1],null,0.08,10);draw(SCN.w2farm
   if(W.m){mat([1,1,1],null,0.15,20);draw(W.m)}if(W.s){mat([1,1,1],null,0.45,50);draw(W.s)}
   if(W.h){mat([1,1,1],null,0.25,30);draw(W.h)}if(W.q){mat([1,1,1],null,0.35,40);draw(W.q)}if(W.g){mat([1,1,1],night?[0.05,0.045,0.03]:null,1.2,90);draw(W.g)}if(W.t&&G().trees){mat([1,1,1],null,0.06,8);draw(W.t)}
   if(aC>=0){gl.disableVertexAttribArray(aC);gl.vertexAttrib3f(aC,1,1,1);bind.col=false}}
-function worldScenery(){W2P.length=0;
+function worldScenery(){CUTO.clear();W2P.length=0;
   let seed=11;const r=()=>(seed=(seed*16807)%2147483647)/2147483647;
   const M_=()=>({P:[],N:[],I:[]});
   const tree=M_(),trunk=M_(),bld=[M_(),M_(),M_(),M_(),M_()],post=M_(),head=M_(),xl=SCN.stopLB,pole=M_(),pad=M_(),chg=M_(),stall=M_(),zebra=SCN.zebraB,
@@ -11687,7 +11706,7 @@ function worldScenery(){W2P.length=0;
         else if(e.stack){lastP=u;const h=z-1.6-g;for(const sd of [1,-1]){const q=ePt(e,u+2,sd*(Wt+1.1));boxInto(gird,q[0],g+h/2,-q[1],1.0,h,1.0,q[2]);collAdd({t:"c",x:q[0],y:q[1],r:0.55,z0:g-0.3,z1:z-1.7,what:"a deck column"})}boxInto(gird,p[0],z-1.75,-p[1],1.2,0.5,2*Wt+2.6,p[2])}}}}   /* a departures deck over the arrivals road: a column each side of the road below, a cross beam over it */
   // ---- the sides of the freeway cut under each bridge: sloped grass from the shoulder up to the ground
   for(const e of EDGES){if(!e.dip)continue;for(const o of e.dip){const u0=o.uc-o.half-o.rA,u1=o.uc+o.half+o.rB;for(const sg of [1,-1]){const k0=green.P.length/3;let q=0;
-      for(let u=u0;u<=u1+0.01;u+=3,q++){const out=e.m/2+e.n*LANE+e.side+auxW(e,u,sg)+0.2,zr=ez(e,u),dz=Math.max(0,hillZ(...ePt(e,u,0).slice(0,2))-zr),w=dz/0.42+0.3;
+      for(let u=u0;u<=u1+0.01;u+=3,q++){const out=cutOut(e,u,sg)+0.2,zr=ez(e,u),dz=Math.max(0,hillZ(...ePt(e,u,0).slice(0,2))-zr),w=dz/0.42+0.3;
         const a=ePt(e,u,sg*out),b=ePt(e,u,sg*(out+w));green.P.push(a[0],zr-0.01,-a[1],b[0],zr+dz+0.02,-b[1]);green.N.push(0,1,0,0,1,0);if(q>0){const k=k0+q*2;green.I.push(k-2,k-1,k,k-1,k+1,k)}}}
     // the median dips too: grass down the middle stays with the road (drawn with the road)
   }}
@@ -14519,18 +14538,18 @@ const GM_EV=/Blazer EV|Equinox EV|Silverado EV|Sierra EV|Hummer EV|Lyriq|Optiq|V
 function projKind(){const T=TRIMS[st.trim];if(T.tesla)return null;if(GM_EV.test(T.group||""))return null;if(T.model==="sx4")return null;return PHONE.os==="ios"?"cp":"aa"}
 function phoneConnect(on){if(on&&!phModel()){toast("You don't have a phone yet: open the phone (P) to buy one");return}setTimeout(audioSave,0);st.phoneConn=!!on;if(on){const P=projKind();toast(P?`${PHONE.name()} connected · ${P==="cp"?"CarPlay":"Android Auto"} is on the centre screen`:`${PHONE.name()} connected over Bluetooth${TRIMS[st.trim].tesla||GM_EV.test(TRIMS[st.trim].group||"")?" (this car doesn't support CarPlay or Android Auto)":""}`);SCR.proj=!!P;PJ.page=P==="cp"?"dash":"home";beep(1320,.06,"sine",.1)}else{SCR.proj=false;toast("Phone disconnected")}phRender(true)}
 const PH_WALLS=[["linear-gradient(160deg,#4b6cb7,#182848)","linear-gradient(160deg,#89a7ff,#2f5be0)"],["linear-gradient(160deg,#c471ed,#f64f59)","linear-gradient(160deg,#b8a4ff,#7a5cf0 60%,#e9c8ff)"],["linear-gradient(160deg,#1d2b2f,#0f3d3e 60%,#d58b4a)","linear-gradient(160deg,#5ec3ff,#2f7cf6)"]];
-const PH_APPS=[["bank","Northline","#0b6b4e","$"],["wallet","Wallet","#111","▤"],["car","CAR","#1f2a44","🚗"],["maps","Maps","#2e9a5c","➤"],["music","Music","#fa2d48","♫"],["phone","Phone","#2fbf4f","✆"],["msgs","Messages","#30c85a","💬"],["weather","Weather","#2f8cff","⛅"],["clock","Clock","#111","🕘"],["cal","Calendar","#fff","📅"],["settings","Settings","#8e8e93","⚙"],["garage","Garage","#ff9f0a","🏁"],["gig","Gig Jobs","#0f9d58","💼"],["stocks","Stocks","#111","📈"],["photos","Photos","#fff","🌼"],["mail","Mail","#1a73e8","✉"],["auction","Auction","#b3261e","🔨"],["lotto","Lottery","#f4b400","🎟️"]];
+const PH_APPS=[["bank","Northline","#0b6b4e","$"],["wallet","Wallet","#111","▤"],["car","CAR","#1f2a44","🚗"],["maps","Maps","#2e9a5c","➤"],["music","Music","#fa2d48","♫"],["phone","Phone","#2fbf4f","✆"],["msgs","Messages","#30c85a","💬"],["weather","Weather","#2f8cff","⛅"],["clock","Clock","#111","🕘"],["cal","Calendar","#fff","📅"],["settings","Settings","#8e8e93","⚙"],["garage","Garage","#ff9f0a","🏁"],["gig","Gig Jobs","#0f9d58","💼"],["stocks","Stocks","#111","📈"],["photos","Photos","#fff","🌼"],["mail","Mail","#1a73e8","✉"],["auction","Auction","#b3261e","🔨"],["lotto","Lottery","#f4b400","🎟️"],["uber","Uber","#000","🚘"],["rent","Rent-A-Car","#f5c518","🔑"]];
 function phAppName(k){if(k==="car"){const A=appOf();return A?A[0]:"Car"}if(k==="wallet"&&PHONE.os==="android")return "Wallet";if(k==="music"&&PHONE.os==="android")return "Music";if(k==="msgs"&&PHONE.os==="android")return "Messages";return (PH_APPS.find(a=>a[0]===k)||[])[1]}
 function phEl(){let el=$("ph2");if(!el){el=document.createElement("div");el.id="ph2";el.hidden=true;document.body.appendChild(el);
   el.addEventListener("pointerdown",e=>{e.stopPropagation();PHONE.held=1});el.addEventListener("pointerup",e=>{const b=e.target.closest&&e.target.closest('[data-a="phbuy"]');if(b){e.preventDefault();PHONE.buyT=performance.now();phAct("phbuy",b.dataset.v,b)}});addEventListener("pointerup",()=>{if(PHONE.held)setTimeout(()=>{PHONE.held=0},60)},true);addEventListener("pointercancel",()=>{PHONE.held=0},true);el.addEventListener("click",e=>{e.stopPropagation();if(performance.now()-(PHONE.buyT||0)<600)return;const b=e.target.closest("[data-a]");if(b)phAct(b.dataset.a,b.dataset.v,b)});
   el.addEventListener("input",e=>{if(e.target.id==="phAmt"){PHONE.amt=+e.target.value;const o=$("phAmtV");if(o)o.textContent=money(PHONE.amt);const q=$("phLoanQ");if(q)q.innerHTML=phLoanQuote()}})}return el}
-function phOpen(o){PHONE.open=o??!PHONE.open;FOOT.phone=PHONE.open;if(PHONE.open){PHONE.locked=true;PHONE.app=null}phRender(true)}
+function phOpen(o){PHONE.open=o??!PHONE.open;PHONE.kiosk=false;FOOT.phone=PHONE.open;if(PHONE.open){PHONE.locked=true;PHONE.app=null}phRender(true)}
 let phLast=0;function phTick(){if(PHONE.open&&performance.now()-phLast>1000&&!document.activeElement?.closest?.("#ph2"))phRender()}
 function phRender(force){const el=phEl();if(!PHONE.open){el.hidden=true;return}el.hidden=false;phLast=performance.now();const ios=PHONE.os==="ios",M_=phModel(),fold=!!(M_&&M_[4]);el.className=(ios?"ios":"and")+(fold?" fold":"")+(fold&&PHONE.unf?" unf":"");
   const d=gDate(),hh=d.getHours(),mm=String(d.getMinutes()).padStart(2,"0"),tm=`${hh%12||12}:${mm}`,bat=Math.round(100-((GT.day||1)*7+GT.min/60*2)%80);
   const status=ios?`<div class="pSt"><span>${tm}</span><i class="isl"></i><span>▂▄▆ 5G <b class="bt">${bat}</b></span></div>`:`<div class="pSt"><span>${tm}</span><i class="hole"></i><span>5G ▂▄▆ ${bat}%</span></div>`;
   const wall=PH_WALLS[PHONE.wall%PH_WALLS.length][ios?0:1];let body="";
-  if(!M_)body=phStore();else if(PHONE.call)body=phCall();else if(PHONE.locked)body=phLock(d,tm);else if(!PHONE.app)body=phHome(d);else body=`<div class="pAppV${PHONE.app==="maps"?" pMaps":""}">${phApp(PHONE.app)}</div>`;
+  if(!M_&&!(PHONE.kiosk&&PHONE.app==="rent"))body=phStore();else if(PHONE.call)body=phCall();else if(PHONE.locked)body=phLock(d,tm);else if(!PHONE.app)body=phHome(d);else body=`<div class="pAppV${PHONE.app==="maps"?" pMaps":""}">${phApp(PHONE.app)}</div>`;
   const nav=ios?`<div class="pBar" data-a="home"></div>`:`<div class="pNav"><button data-a="recents">|||</button><button data-a="home">○</button><button data-a="back">‹</button></div>`;
   const html_=`<div class="pScr" style="background:${PHONE.app&&!PHONE.locked?"var(--pbg)":wall}">${status}${body}${nav}</div><button class="pX" data-a="close" aria-label="Close phone">✕</button>${fold?`<button class="pFold" data-a="fold" aria-label="Fold or unfold">${PHONE.unf?"Fold":"Unfold"}</button>`:""}`;
   if(!force&&(PHONE.held||el._h===html_))return;el._h=html_;const sc=[...el.querySelectorAll("*")].filter(x=>x.scrollTop>0).map(x=>[x.className,x.scrollTop]);el.innerHTML=html_;for(const [c,t] of sc){const x=c&&el.getElementsByClassName(String(c).split(" ")[0])[0];if(x)x.scrollTop=t}}
@@ -14673,7 +14692,7 @@ function carSearchClose(){const el=$("cmS");if(el)el.hidden=true;try{document.ac
 function phMapsQ(v){PHONE.mq=v;const q=v.trim().toLowerCase();let n=0;for(const b of document.querySelectorAll('#ph2 .plc')){b.hidden=q?!b.textContent.toLowerCase().includes(q):b.dataset.st==="1";if(!b.hidden)n++}const no=$("phNo");if(no)no.hidden=!q||n>0;const h=$("phLH");if(h)h.textContent=q?"Results":"Nearby";const l=document.querySelector("#ph2 .pmL");if(l)l.style.maxHeight="min(260px,42vh)"}
 window.phMapsQ=phMapsQ;   // called from the Maps search box oninput, must survive name mangling
 
-function phApp(k){const T=TRIMS[st.trim],H=car.hyb;if(k==="gig")return gigApp();if(k==="photos")return photosApp();if(k==="mail")return mailApp();if(k==="auction")return aucApp();if(k==="lotto")return lotApp();if(k==="stocks")return stkApp();
+function phApp(k){const T=TRIMS[st.trim],H=car.hyb;if(k==="uber")return uberApp();if(k==="rent")return rentApp();if(k==="gig")return gigApp();if(k==="photos")return photosApp();if(k==="mail")return mailApp();if(k==="auction")return aucApp();if(k==="lotto")return lotApp();if(k==="stocks")return stkApp();
   if(k==="bank"){const C=BANK.card,s=PHONE.sub||"acct";const tabs=`<div class="tabs">${[["acct","Accounts"],["loan","Borrow"],["pay","Pay"],["act","Activity"]].map(([x,n])=>`<button class="${s===x?"on":""}" data-a="sub" data-v="${x}">${n}</button>`).join("")}</div>`;
     let h=phHdr("Northline Bank",`<span class="sc">${BANK.score}</span>`)+tabs;
     if(s==="acct"){const g=(BANK.score-300)/550;h+=`<div class="card bal"><small>Everyday Checking ••4821</small><b>${money2(ECON.cash)}</b><span>Available balance</span></div>
@@ -14708,7 +14727,7 @@ function phApp(k){const T=TRIMS[st.trim],H=car.hyb;if(k==="gig")return gigApp();
     <div class="li"><span>Wallpaper</span></div><div class="chips">${PH_WALLS.map((w,i)=>`<button data-a="wall" data-v="${i}" style="background:${w[PHONE.os==="ios"?0:1]};color:#fff">${i+1}</button>`).join("")}</div></div>`;
   return phHdr(k)}
 function phCall(){const c=PHONE.call,s=Math.floor((performance.now()-PHONE.t0)/1000);return `<div class="callS"><small>${s<3?"calling…":`${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`}</small><b>${c}</b><span>${st.phoneConn?"Audio: car speakers":"Audio: phone"}</span><button class="end" data-a="hang">✆</button></div>`}
-function phAct(a,v,el){const T=TRIMS[st.trim];tick(1);if(a==="mq"){PHONE.mq="";phRender(true);return}if(a==="mc"){PHONE.mc=PHONE.mc===v?null:v;PHONE.mq="";phRender(true);return}if(a==="navplace"){PHONE.mq="";PHONE.mc=null;const p=(PHONE._pl||[])[+v];if(p){navTo(p);toast("Navigating to "+p.name)}phRender(true);return}if(a==="phbuy"){if(phModel())return;phBuy(v);return}if(a==="newph"){const m=phModel();if(m){const back=Math.round(m[3]/2);ECON.cash+=back;try{bankTx(`Sold phone: ${m[1]}`,back);bankSave();econSave()}catch(e){}toast(`Sold your ${m[1]} for ${money(back)}`);PHONE.model=null;PHONE.app=null;phSave();phRender(true)}return}if(a==="fold"){PHONE.unf=!PHONE.unf;phSave();phRender(true);return}if(!phModel()&&a!=="close")return;if(a==="lotTab"){PHONE.sub=v;phRender(true);return}if(a==="lotS"){lotScratch(+v);phRender(true);return}if(a==="lotM"||a==="lotM5"){for(let i=0;i<(a==="lotM5"?5:1);i++)lotBuyMega();phRender(true);return}if(a&&a.startsWith("v_")){valetAct(a);phRender(true);return}if(a==="tpfix"){sfTireFix();phRender(true);return}
+function phAct(a,v,el){const T=TRIMS[st.trim];tick(1);if(a==="ubreq"){ubRequest(+v);return}if(a==="rentgo"){rentGo(+v);return}if(a==="rentret"){rentReturn();return}if(a==="ubcancel"){ubCancel();return}if(a==="ubskip"){ubSkip();return}if(a==="ubrate"){UBER.ph=null;UBER.c=null;toast(`Thanks! You rated ${UBER.driver?UBER.driver.name:"your driver"} ${v} stars`);phRender(true);return}if(a==="mq"){PHONE.mq="";phRender(true);return}if(a==="mc"){PHONE.mc=PHONE.mc===v?null:v;PHONE.mq="";phRender(true);return}if(a==="navplace"){PHONE.mq="";PHONE.mc=null;const p=(PHONE._pl||[])[+v];if(p){navTo(p);toast("Navigating to "+p.name)}phRender(true);return}if(a==="phbuy"){if(phModel())return;phBuy(v);return}if(a==="newph"){const m=phModel();if(m){const back=Math.round(m[3]/2);ECON.cash+=back;try{bankTx(`Sold phone: ${m[1]}`,back);bankSave();econSave()}catch(e){}toast(`Sold your ${m[1]} for ${money(back)}`);PHONE.model=null;PHONE.app=null;phSave();phRender(true)}return}if(a==="fold"){PHONE.unf=!PHONE.unf;phSave();phRender(true);return}if(!phModel()&&a!=="close")return;if(a==="lotTab"){PHONE.sub=v;phRender(true);return}if(a==="lotS"){lotScratch(+v);phRender(true);return}if(a==="lotM"||a==="lotM5"){for(let i=0;i<(a==="lotM5"?5:1);i++)lotBuyMega();phRender(true);return}if(a&&a.startsWith("v_")){valetAct(a);phRender(true);return}if(a==="tpfix"){sfTireFix();phRender(true);return}
   if(a==="stkb"||a==="stks"){const [k,n]=v.split(":");if(+n>0)stkTrade(k,a==="stkb"?+n:-n);phRender(true);return}
   if(a.startsWith("gig")){if(a==="gigsvc"){if(GIG.job)toast("Finish or cancel your job first");else{GIG.svc=v;GIG.offer=null;GIG.nextT=1.5;gigSave()}}else if(a==="gigon"){GIG.online=!GIG.online;GIG.nextT=1.5;if(!GIG.online)GIG.offer=null;toast(GIG.online?`You're online for ${GIG_SVC[GIG.svc].name}`:"You're offline")}else if(a==="gigyes")gigAccept();else if(a==="gigno"){GIG.offer=null;GIG.nextT=3}else if(a==="gignav")gigNav();else if(a==="gigcancel"){GIG.rating=Math.max(1,GIG.rating-0.05);gigEnd("Job cancelled")}phRender(true);return}
   if(a==="phshot"){photoTake();return}if(a==="pmode"){pmOpen();return}if(a==="aucbid"||a==="aucbid5"){aucBid(v,a==="aucbid5"?5:1);return}if(a==="phdel"){PHOTO.list.splice(+v,1);try{localStorage.setItem("mstrata.photos",JSON.stringify(PHOTO.list))}catch(e){}PHONE.sub=null;phRender(true);return}
@@ -15584,7 +15603,7 @@ function dynBuild(eye,cm){if(dynFrame===GFX.frame)return;dynFrame=GFX.frame;CHAR
     for(let k=0;k<7;k++){const a=Math.random(),d=0.15+a*0.9,sd=(Math.random()-0.5)*0.5;dBox("spark",wx-c*d*bk-s_*sd,wy-s_*d*bk+c*sd,g+0.02+Math.random()*0.18,0.035,0.035,0.12+Math.random()*0.15,car.psi)}}}
   try{hoseDraw()}catch(e){}try{for(const c of CHGS){const o=c.occ;if(!o||!o.plug||(c.x-car.px)**2+(c.y-car.py)**2>55*55||!parked.includes(o))continue;aiCableDraw(c,o)}}catch(e){}for(const g of Object.values(GATE)){if(!near(g.gx,(g.ya+g.yb)/2,160))continue;const ca=Math.cos(g.a),sa=Math.sin(g.a),py=g.yb-0.45;oBox("gateP",g.ped[0],g.ped[1],0.65,0.38,0.38,1.3,0,0);oBox("gateP",g.gx,g.yb+0.05,0.55,0.4,0.4,1.1,0,0);
     for(let i=0;i<9;i++){const d=0.35+0.75*i+0.375;oBox(i%2?"gateR":"gateW",g.gx,py-d*ca,1.0+d*sa,0.75,0.07,0.09,-Math.PI/2,-g.a)}}
-  koDraw();dmgSmoke();try{ownInto()}catch(e){}
+  koDraw();dmgSmoke();try{ownInto()}catch(e){}try{rentDraw()}catch(e){}
   // broken-down cars: bonnet up and the driver standing by the kerb side
   for(const c of cars){if(!c.bd||!near(c.wx,c.wy,70))continue;const md=MODELS[trafficModel(c)];if(!md||!md.meta.head)continue;const om=aiMat(c),hd=md.meta.head,wp=l=>{const q=M4.p(om,l);return [q[0],-q[2],q[1]]};
     const hinge=wp([0,hd[1]+0.28,hd[2]+1.15]),L=1.05,pt=-1.0,f=[Math.cos(c.wh)*Math.cos(pt),Math.sin(c.wh)*Math.cos(pt),-Math.sin(pt)];oBox("hoodD",hinge[0]+f[0]*L/2,hinge[1]+f[1]*L/2,hinge[2]+f[2]*L/2,L,0.04,(md.meta.width||1.85)-0.25,c.wh,pt);
@@ -15599,7 +15618,7 @@ function dynBuild(eye,cm){if(dynFrame===GFX.frame)return;dynFrame=GFX.frame;CHAR
   if(!st.walk&&st.started&&VEH.eye){const K=kitOf(TRIMS[st.trim].model),Wl=K.steer?[K.steer[0],K.steer[1]-(K.steerDrop||0)+(st.whlH||0),K.steer[2]+(K.steerBack||0)+(st.whlZ||0)]:null,E=VEH.eye,me_=st.cam===1;const hp=seatHip(VEH.seats,E);seatedInto(cm,car.psi,me_?[E[0],E[1]+(st.seatH||0),E[2]+(st.seatZ||0)]:E,Wl,{mk:PLAYER_MK,skin:1,shirt:7,pants:0,hair:1,noHead:me_,whA:car.dF*14.5,hip:[hp[0]+(st.seatH||0),hp[1]+(st.seatZ||0)]},true)}
   if(st.started&&!st.walk&&VEH.eye){const E=VEH.eye,seats=VEH.seats&&VEH.seats.length>1?VEH.seats.map(q=>[q[0],q[1]+0.6,q[2]-0.08]).filter(q=>Math.hypot(q[0]-E[0],q[2]-E[2])>0.35).sort((a,b)=>a[2]-b[2]||a[0]-b[0]):[[-E[0],E[1],E[2]],[E[0],E[1]+0.03,E[2]+0.95],[-E[0],E[1]+0.03,E[2]+0.95],[0,E[1]+0.03,E[2]+0.95]];for(let i=0;i<(st.dummies||0)&&i<4;i++)seatedInto(cm,car.psi,seats[i],null,{skin:4,shirt:30,pants:4,hair:9},false);
     const nc=(VEH.width||1.9)>1.86?3:2,nb=Math.min(nc*2,Math.round((st.cargoKg||0)/40)),tz=(VEH.tail?VEH.tail[2]:2.3)-0.5,fy=(VEH.eye?VEH.eye[1]-0.55:0.75);for(let i=0;i<nb;i++){const col=i%nc,row=Math.floor(i/nc);dBoxM(i%2?"cargoA":"cargoB",cm,car.psi,[(col-(nc-1)/2)*0.4,fy+0.14,tz-row*0.4],0.36,0.28,0.36)}}
-  if(st.walk&&!FOOT.inH){const W=st.walk;if(!charQueue(PLAYER_MK,W.x,W.y,W.z,W.h,Math.abs(W.v||0),0))personInto(W.x,W.y,W.z,W.h,W.ph,{skin:1,shirt:7,pants:0,hair:1,sc:1,v:Math.abs(W.v)},"walk")}
+  if(st.walk&&!FOOT.inH&&!UBER.ride){const W=st.walk;if(!charQueue(PLAYER_MK,W.x,W.y,W.z,W.h,Math.abs(W.v||0),0))personInto(W.x,W.y,W.z,W.h,W.ph,{skin:1,shirt:7,pants:0,hair:1,sc:1,v:Math.abs(W.v)},"walk")}
   // precipitation around the camera
   // puddles (rain) and ice patches (snow) on the road near you
   if(WX.w>0.3&&(WX.cur==="rain"||WX.cur==="snow")){if(!PUD.grid)pudBuild();const icy=WX.cur==="snow",cx=Math.floor(ex/25),cy=Math.floor(ey/25);for(let i=-5;i<=5;i++)for(let j=-5;j<=5;j++){const L=PUD.grid.get((cx+i)+","+(cy+j));if(!L)continue;
@@ -15662,7 +15681,7 @@ function render(dt){
   const cf=st.cam===0?[Math.cos(car.camYaw),0,-Math.sin(car.camYaw)]:fwd;
   const cy=Math.cos(look.yaw),sy=Math.sin(look.yaw), fl=[cf[0]*cy+cf[2]*sy,0,-cf[0]*sy+cf[2]*cy];   // forward turned by the look yaw
   const inGar=inGarage(car.px,car.py)&&!st.walk;
-  if(st.walk&&st.started){const W=st.walk;const inH=insideHouse(W.x,W.y,W.z),yaw=(W.cyBase===undefined?W.h:W.cyBase)+look.yaw,el=inH?clamp(0.12+look.pitch,0.02,0.5):clamp(0.3+look.pitch,0.05,1.2),dd=inH?0.9:Math.min(look.dist,4.2)*0.8;const wp=[W.x,W.z+1.0,-W.y],f2=[Math.cos(yaw),0,-Math.sin(yaw)];
+  if(st.walk&&st.started){const W=st.walk;const inH=insideHouse(W.x,W.y,W.z),yaw=(W.cyBase===undefined?W.h:W.cyBase)+look.yaw,el=inH?clamp(0.12+look.pitch,0.02,0.5):clamp(0.3+look.pitch,0.05,1.2),dd=UBER.ride?Math.max(6.5,look.dist):inH?0.9:Math.min(look.dist,4.2)*0.8;const wp=[W.x,W.z+1.0,-W.y],f2=[Math.cos(yaw),0,-Math.sin(yaw)];
     let dd2=dd;if(!inH){const hx=W.x,hy=W.y;for(let t=0.4;t<=dd;t+=0.25){const qx=hx-Math.cos(yaw)*t*Math.cos(el),qy=hy-Math.sin(yaw)*t*Math.cos(el),qz=W.z+1.5+t*Math.sin(el);let hitW=false;
       for(const o of collNear(qx,qy)){if(o.z1!==undefined&&(qz<o.z0||qz>o.z1))continue;if(o.t==="c"?Math.hypot(qx-o.x,qy-o.y)<o.r+0.2:(()=>{const c=Math.cos(o.h),s=Math.sin(o.h),dx=qx-o.x,dy=qy-o.y;return Math.abs(dx*c+dy*s)<o.hl+0.2&&Math.abs(-dx*s+dy*c)<o.hw+0.2})()){hitW=true;break}}
       if(hitW){dd2=Math.max(0.5,t-0.3);break}}W.camD=lerp(W.camD??dd2,dd2,dd2<(W.camD??dd2)?0.5:Math.min(1,dt*3));dd2=W.camD}
@@ -16501,7 +16520,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=323;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="173",BUILD_VER=324;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}try{const P=JSON.parse(localStorage.getItem("strata.ped")||"null");if(P){st.pedHold=+P.pedHold||0;st.thrRate=+P.thrRate||2;st.brkRate=+P.brkRate||2}}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
 function G(){const k=GFX.q==="auto"?GFX.eff:GFX.q;if(G.k!==k||G.v!==GFX.ovV||!G.m){G.k=k;G.v=GFX.ovV;const m={...GQ[k]};for(const o of GOPT)if(GFX.ov[o[0]]!==undefined)Object.assign(m,o[4](GFX.ov[o[0]]));if(Object.keys(GFX.ov).length)m.label=GQ[k].label+" (custom)";G.m=m;COLL.nt=!m.trees}return G.m}
@@ -18448,6 +18467,87 @@ function sfCallEnd(help){const el=$("sfCall");if(el)el.hidden=true;SAFE.call=nul
   const sent=emvSend(car.px,car.py,[["city_ambulance",-16,"amb"],[towMdl(false),BODY_HL+3.5,"tow"]]);if(sent.length){EV.list.push({type:"help",label:"Help",x:car.px,y:car.py,t:200,items:sent,beacons:true,quiet:true});const tw=sent.find(c=>c.beacon==="tow");if(tw&&!TOWH.ph)towHelpStart(tw);carMsg((sent.some(c=>c.beacon==="amb")?"🚑 Help is on the way: an ambulance and a tow truck are coming to you":"🚚 Help is on the way: a tow truck is coming to you")+(tw?". The tow truck will take your car to the repair shop":""))}else carMsg("Help is on the way")}
 // ---- the tow truck after "send help": it parks in front of your car, winches it onto the flatbed, drives the roads to Tread Center with you
 // riding on the back, and drops the car in the shop's lot. Phases: wait (driving to you) → load → drive → drop
+// ======================================================================= the airport rental counter (McNamara arrivals, by baggage claim): rent a car by the day.
+// Your own car stays parked wherever you left it; the rental waits at the arrivals curb. Bring it back to the counter to return it (extra days are charged),
+// then take an Uber back to your own car
+const RENT_FLEET=[["honda_civic_sedan_lx","Economy",55],["camry_le","Midsize",62],["nissan_rogue_sv","SUV",68],["esc_active","SUV",66],["gc_laredo","Premium SUV",85],["m3_lrrwd","Electric",89],["expl_active","Large SUV",95],["chrysler_pacifica_sel","Minivan",98]];
+const RENT={on:null,list:null};const RENT_K=[-60,139],RENT_PAINT=["c:#f2f2f0","c:#9aa0a6","c:#1c1d1f","c:#3b4a5c","c:#7a1c1c"];
+function rentAt(){return aptXY(RENT_K[0],RENT_K[1])}
+function rentNear(){const W=st.walk;if(!W)return false;const k=rentAt();return Math.hypot(W.x-k[0],W.y-k[1])<3.2&&Math.abs((W.z||0)-APT.z)<2}
+function rentApp(){let h=phHdr("Strata Rent-A-Car");const R=RENT.on;
+  if(R){const days=Math.max(1,(GT.day||1)-R.day0+1);h+=`<div class="card"><small>Your rental</small><b>${TRIMS[R.trim].name}</b><span>${money2(R.rate)}/day · day ${days} · ${money2(R.rate*days)} so far</span></div>
+      <p style="font-size:12px;opacity:.8;margin:6px 4px">Return it at the counter at McNamara arrivals (baggage claim, lower level). Your ${TRIMS[R.own.trim].short||"car"} is parked where you left it.</p>`;
+    if(rentNear())h+=`<div class="chips"><button data-a="rentret">Return the car here</button></div>`;return h}
+  if(!rentNear())return h+`<p style="font-size:12px;opacity:.8;margin:6px 4px">Pick up at the rental counter at McNamara Terminal arrivals (lower level, by baggage claim). Get there by car or take an Uber to "McNamara Terminal · Arrivals".</p>`;
+  h+=`<p style="font-size:12px;opacity:.75;margin:6px 4px">Choose a car. It's waiting at the curb outside.</p>`;
+  RENT_FLEET.forEach(([k,cls,rate],i)=>{const T=TRIMS[k];if(!T)return;h+=`<button data-a="rentgo" data-v="${i}" style="display:flex;width:100%;gap:8px;align-items:center;justify-content:space-between;text-align:left;background:#fff;border:0;border-bottom:1px solid #eee;padding:8px 4px;color:#111"><span><b>${T.group.split(" · ")[0]}</b> <small style="color:#6b6b70">or similar</small><br><small style="color:#6b6b70">${cls} · ${T.short||T.name}</small></span><span style="text-align:right;white-space:nowrap"><b>${money2(rate)}</b><br><small style="color:#6b6b70">per day</small></span></button>`});return h}
+async function rentGo(i){const F=RENT_FLEET[i];if(!F||RENT.on||!rentNear())return;const [k,cls,rate]=F,T=TRIMS[k];if(!T)return;if(ECON.cash<rate){toast(`Not enough money: ${money2(rate)} a day`);return}
+  try{await loadModel(T.model)}catch(e){toast("Couldn't load that car, try another");return}
+  const OT=TRIMS[st.trim],own={trim:st.trim,paint:st.paint,x:car.px,y:car.py,psi:car.psi,zb:car.zb||0,hyb:{fuel:car.hyb.fuel,soc:car.hyb.soc,pb:car.hyb.pb},dmg:car.dmg?JSON.parse(JSON.stringify(car.dmg)):null};
+  const pk={fixed:true,kind:"parked",own:1,wx:own.x,wy:own.y,wh:own.psi,wz:own.zb,wp:0,wr:0,v:0,spin:0,sig:0,head:0,paint:own.paint,mdl:OT.model};parked.push(pk);
+  ECON.cash-=rate;try{bankTx(`Strata Rent-A-Car · ${T.group.split(" · ")[0]}`,-rate);bankSave();econSave()}catch(e){}
+  setTrim(k,true);st.paint=RENT_PAINT[Math.floor(Math.random()*RENT_PAINT.length)];try{applyPaint&&applyPaint()}catch(e){}
+  const e=EDGES.find(q=>q.name==="Arrivals (lower level)"&&Math.abs(eProj(q,...rentAt()).t)<14&&eProj(q,...rentAt()).u>0&&eProj(q,...rentAt()).u<q.L),pp=e?eProj(e,...rentAt()):null;
+  if(e){const q=fpt(e,1,clamp(pp.u+14,5,e.L-5),laneOff(e,0)-LANE*0.35);GREF=APT.z;resetCar({free:true,x:q[0],y:q[1],h:q[2]})}else{const q=rentAt();resetCar({free:true,x:q[0],y:q[1]-12,h:Math.PI})}
+  st.gear="P";sys.epb=true;st.power=false;RENT.on={trim:k,rate,day0:GT.day||1,own,pk};beep(988,.07,"sine",.15);carMsg(`🔑 Your ${T.group.split(" · ")[0]} is at the curb right outside. Walk up to it to get in`);phRender(true)}
+function rentReturn(){const R=RENT.on;if(!R||!rentNear())return;const k=rentAt();if(Math.hypot(car.px-k[0],car.py-k[1])>90){toast("Bring the rental to the arrivals curb outside first");return}
+  const days=Math.max(1,(GT.day||1)-R.day0+1),extra=(days-1)*R.rate;if(extra>0){ECON.cash-=extra;try{bankTx(`Strata Rent-A-Car · ${days-1} extra day${days>2?"s":""}`,-extra);bankSave();econSave()}catch(e){}}
+  const O=R.own;setTrim(O.trim,true);st.paint=O.paint;try{applyPaint&&applyPaint()}catch(e){}GREF=O.zb;resetCar({free:true,x:O.x,y:O.y,h:O.psi});Object.assign(car.hyb,O.hyb);try{if(O.dmg){car.dmg=O.dmg;faultApply()}}catch(e){}st.gear="P";sys.epb=true;
+  const i=parked.indexOf(R.pk);if(i>=0)parked.splice(i,1);RENT.on=null;carMsg(`🔑 Rental returned${extra?` (${money2(extra)} for ${days-1} extra day${days>2?"s":""})`:""}. Your ${TRIMS[O.trim].short||"car"} is where you left it: the Uber app can take you there`);phRender(true)}
+function rentDraw(){if(!APT.m)return;const k=rentAt();if(Math.hypot(k[0]-car.px,k[1]-car.py)>250&&!(st.walk&&Math.hypot(k[0]-st.walk.x,k[1]-st.walk.y)<250))return;const z=APT.z;
+  dBox("gateP",k[0],k[1],z,0.5,1.15,1.6,0);dBox("gateW",k[0],k[1],z+1.15,0.56,0.08,1.66,0);dBox("cone",k[0],k[1],z+1.9,0.06,0.5,1.6,0)}
+// ======================================================================= Uber: request a ride from your phone when you're on foot; a driver comes to the nearest kerb,
+// you walk up and get in, and they drive you there through traffic (or skip the ride). Fares are worked out like UberX: a base fare, per mile and per
+// minute, a booking fee and a minimum, plus the airport's pickup / drop-off fee
+const UBER={ph:null,c:null,t:0,list:null,rating:4.9,trips:0};
+const UB_NAMES=["Marcus","Aisha","Dmitri","Priya","Carlos","Jen","Tyrone","Mei","Omar","Brooke","Hassan","Lena","DeShawn","Sofia","Raj","Kayla"];
+function ubPlaces(){const W=st.walk||{x:car.px,y:car.py};const L=navPlaces().filter(p=>Math.hypot(p.x-W.x,p.y-W.y)>180);const T=TRIMS[st.trim];if(Math.hypot(car.px-W.x,car.py-W.y)>180)L.unshift({name:`Your ${T.short||"car"}`,sub:"Where you left it",x:car.px,y:car.py,h:car.psi,ic:"🚗",mine:true});
+  L.sort((a,b)=>(b.mine?1:0)-(a.mine?1:0)||(b.ic==="✈️")-(a.ic==="✈️")||Math.hypot(a.x-W.x,a.y-W.y)-Math.hypot(b.x-W.x,b.y-W.y));return L.slice(0,24)}
+function ubQuote(p){const W=st.walk||{x:car.px,y:car.py},mi=Math.hypot(p.x-W.x,p.y-W.y)*1.3/1609.34,min=mi/28*60+2,apt=inApt(p.x,p.y,300)||inApt(W.x,W.y,300);
+  return {mi,min,fare:Math.max(8.5,1.25+1.05*mi+0.25*min+2.95+(apt?4:0)),apt}}
+function ubDest(p){return p.fr||navSnap(p)}
+function ubCarName(c){const T=Object.values(TRIMS).find(t=>t.model===c.mdl);return `${c.paint||""} ${T?T.group.split(" · ")[0]:"sedan"}`.trim()}
+function ubRequest(i){const p=(UBER.list||[])[i];if(!p)return;if(!st.walk){toast("Get out of the car first: Uber picks you up on foot");return}if(UBER.ph){toast("You already have a ride on the way");return}
+  const W=st.walk,pk=navSnap({x:W.x,y:W.y}),D=ubDest(p);if(!pk||!D){toast("Uber: no road near you to pick you up from");return}if(Math.hypot(...fpt(pk.e,pk.dir,pk.s,0).slice(0,2).map((v,k)=>v-(k?W.y:W.x)))>140){toast("Uber: walk closer to a road for a pickup");return}
+  // a driver somewhere nearby, 300-900 m away on an ordinary road
+  let sp=null;for(let k=0;k<40&&!sp;k++){const q=randomSpot(300,900);if(q&&!/xway|ramp|rbt|dirt/.test(q.e.type))sp=q}if(!sp){toast("Uber: no drivers nearby right now, try again in a moment");return}
+  const c=newCar(sp.e,sp.dir,sp.s,0);trafficModel(c);c.ub=1;c.pers={k:"calm",v:1.0,T:1.5,lc:1.2,a:1.4,b:2.6};try{c.route=navBuild({e:pk.e,dir:pk.dir,s:pk.s})}catch(e){}carPose(c);cars.push(c);
+  const off=loOf(pk.e.n)*LANE-LANE/2-Math.max(0.6,(pk.e.side||0)/2);
+  Object.assign(UBER,{ph:"coming",c,t:0,stuck:0,pick:{e:pk.e,dir:pk.dir,s:pk.s,off},dest:p,D,q:ubQuote(p),driver:{name:UB_NAMES[Math.floor(Math.random()*UB_NAMES.length)],rate:(4.7+Math.random()*0.29).toFixed(2),plate:Math.random().toString(36).slice(2,5).toUpperCase()+" "+(1000+Math.floor(Math.random()*9000))}});
+  beep(880,.06,"sine",.15);carMsg(`🚘 ${UBER.driver.name} is on the way in a ${ubCarName(c)} (${UBER.driver.plate})`);phRender(true)}
+function ubStopAt(c,P){Object.assign(c,{kind:"wreck",e:P.e,dir:P.dir,s:P.s,off:P.off,offT:P.off,v:0,haz:true,jn:null,mv:null});carPose(c)}
+function ubGo(c,D){Object.assign(c,{kind:"ai",haz:false,v:0,jn:null,mv:null,offT:laneOff(c.e,0)});try{c.route=navBuild({e:D.e,dir:D.dir,s:D.s})}catch(e){c.route=null}planMove(c)}
+function ubCancel(){const U=UBER;if(!U.ph)return;const fee=U.ph==="wait"||U.t>120?5:0;if(U.c){U.c.ub=0;U.c.route=null;if(U.c.kind==="wreck"){U.c.kind="ai";U.c.haz=false;planMove(U.c)}}
+  if(fee){ECON.cash-=fee;try{bankTx("Uber · cancellation fee",-fee);bankSave();econSave()}catch(e){}}Object.assign(U,{ph:null,c:null,ride:false});ubSkipBtn(false);toast(fee?`Ride cancelled · ${money2(fee)} cancellation fee`:"Ride cancelled");phRender(true)}
+function ubSkipBtn(on){let b=$("ubSkip");if(!b&&on){b=document.createElement("button");b.id="ubSkip";b.textContent="⏩ Skip the ride";b.onclick=()=>{if(UBER.ph==="ride")ubSkip()};document.body.appendChild(b)}if(b)b.hidden=!on}
+// skip ahead: a quick fade and you're there (the driver takes the route; the clock moves on by the ride's time)
+function ubSkip(){const U=UBER,c=U.c;if(!c)return;let f=$("towFade");if(!f){f=document.createElement("div");f.id="towFade";document.body.appendChild(f)}f.style.opacity=1;
+  setTimeout(()=>{const D=U.D,P={e:D.e,dir:D.dir,s:clamp(D.s,4,D.e.L-4),off:loOf(D.e.n)*LANE-LANE/2-Math.max(0.6,(D.e.side||0)/2)};ubStopAt(c,P);U.ph="ride";ubArrive();f.style.opacity=0},700)}
+function ubArrive(){const U=UBER,c=U.c,W=st.walk;if(!c||!W)return;const P={e:c.e,dir:c.dir,s:c.s,off:c.off};if(c.kind!=="wreck")ubStopAt(c,P);
+  const nx=Math.sin(c.wh),ny=-Math.cos(c.wh);W.x=c.wx+nx*2.3;W.y=c.wy+ny*2.3;W.z=groundAt(W.x,W.y).h||c.wz||0;W.h=c.wh;W.v=0;W.cyBase=c.wh;U.ride=false;ubSkipBtn(false);
+  const fare=Math.round(U.q.fare*100)/100;ECON.cash-=fare;try{bankTx(`Uber · ${U.dest.name}`,-fare);bankSave();econSave()}catch(e){}UBER.trips++;
+  Object.assign(U,{ph:"done",fare,t:0});beep(988,.07,"sine",.15);carMsg(`🚘 You've arrived at ${U.dest.name} · ${money2(fare)} charged to your Northline card`);phRender(true);
+  setTimeout(()=>{if(c&&cars.includes(c)){c.ub=0;c.route=null;c.kind="ai";c.haz=false;planMove(c)}},4000)}
+function uberTick(dt){const U=UBER;if(!U.ph||U.ph==="done")return;const c=U.c;if(!c||!cars.includes(c)){if(U.ph==="ride"&&st.walk){U.ride=false;ubSkipBtn(false)}Object.assign(U,{ph:null,c:null});toast("Your Uber driver had to cancel. Request again from the app");phRender(true);return}U.t+=dt;
+  if(U.ph==="coming"){const P=U.pick;if(c.e===P.e&&c.dir===P.dir&&c.s>P.s-16&&c.s<P.s+30||U.t>200){ubStopAt(c,P);U.ph="wait";U.t=0;beep(1175,.08,"sine",.18);carMsg(`🚘 ${U.driver.name} has arrived: ${ubCarName(c)}, ${U.driver.plate}. Walk up to the car to get in`);phRender(true);return}
+    U.stuck=(c.v||0)<0.4?U.stuck+dt:0;if(U.stuck>40){ubStopAt(c,P);U.ph="wait";U.t=0;carMsg(`🚘 ${U.driver.name} has arrived`);phRender(true)}return}
+  if(U.ph==="wait"){const W=st.walk;if(!W)return;if(Math.hypot(W.x-c.wx,W.y-c.wy)<4.2){U.ph="ride";U.ride=true;U.t=0;U.stuck=0;ubGo(c,U.D);ubSkipBtn(true);beep(784,.06,"sine",.15);carMsg(`🚘 Heading to ${U.dest.name}`);phRender(true)}
+    else if(U.t>300){Object.assign(U,{ph:null,c:null});c.ub=0;c.kind="ai";c.haz=false;planMove(c);ECON.cash-=5;try{bankTx("Uber · no-show fee",-5)}catch(e){}toast("Your Uber driver left after waiting 5 minutes ($5 no-show fee)");phRender(true)}return}
+  if(U.ph==="ride"){const W=st.walk;if(W){W.x=c.wx;W.y=c.wy;W.z=c.wz||0;W.h=c.wh;W.v=0}const D=U.D;
+    if(c.e===D.e&&c.dir===D.dir&&c.s>D.s-14&&!c.jn||Math.hypot(c.wx-U.dest.x,c.wy-U.dest.y)<28&&(c.v||0)<3){ubStopAt(c,{e:c.e,dir:c.dir,s:c.s,off:loOf(c.e.n)*LANE-LANE/2-Math.max(0.6,(c.e.side||0)/2)});ubArrive();return}
+    U.stuck=(c.v||0)<0.4?U.stuck+dt:0;if(U.stuck>60||U.t>900){ubSkip()}}}
+function uberApp(){const U=UBER,W=st.walk;let h=phHdr("Uber",`<span class="sc">★ ${U.rating.toFixed(2)}</span>`);
+  if(U.ph==="coming"||U.ph==="wait"){const c=U.c,d=c?Math.hypot(c.wx-(W?W.x:car.px),c.wy-(W?W.y:car.py)):0,eta=Math.max(1,Math.round(d/9/60));
+    h+=`<div class="card"><small>${U.ph==="wait"?"Your driver is here":"Your driver is on the way · "+eta+" min"}</small><b>${U.driver.name} · ★ ${U.driver.rate}</b><span>${c?ubCarName(c):""} · ${U.driver.plate}</span></div>
+      <div class="card"><small>Trip to</small><b>${U.dest.name}</b><span>${money2(U.q.fare)} · about ${Math.round(U.q.min)} min${U.q.apt?" · incl. airport fee":""}</span></div>
+      <p style="opacity:.75;font-size:12px;margin:8px 4px">${U.ph==="wait"?"Walk up to the car (its hazard lights are on) to get in.":"Wait at the kerb: it pulls up with its hazard lights on."}</p>
+      <div class="chips"><button data-a="ubcancel">Cancel ride${U.ph==="wait"||U.t>120?" ($5 fee)":""}</button></div>`;return h}
+  if(U.ph==="ride"){h+=`<div class="card"><small>On your way to</small><b>${U.dest.name}</b><span>${U.driver.name} · ${ubCarName(U.c)} · ${money2(U.q.fare)}</span></div><div class="chips"><button data-a="ubskip">⏩ Skip the ride</button></div>`;return h}
+  if(U.ph==="done"){h+=`<div class="card bal"><small>Trip complete · ${U.dest.name}</small><b>${money2(U.fare)}</b><span>Charged to Northline Rewards</span></div><p style="margin:8px 4px">Rate ${U.driver.name}</p>
+      <div class="tabs">${[1,2,3,4,5].map(n=>`<button data-a="ubrate" data-v="${n}">${"★".repeat(n)}</button>`).join("")}</div>`;return h}
+  if(!W)h+=`<p style="opacity:.8;font-size:12px;margin:8px 4px">Get out of your car to request a ride: drivers pick you up on foot.</p>`;
+  const L=UBER.list=ubPlaces();h+=`<p style="font-size:12px;opacity:.75;margin:6px 4px">Where to?</p>`;
+  L.forEach((p,i)=>{const q=ubQuote(p);h+=`<button class="ubr" data-a="ubreq" data-v="${i}" style="display:flex;width:100%;gap:8px;align-items:center;justify-content:space-between;text-align:left;background:#fff;border:0;border-bottom:1px solid #eee;padding:8px 4px;color:#111"><span>${p.ic||"📍"} <b>${p.name}</b><br><small style="color:#6b6b70">${p.sub||""}</small></span><span style="text-align:right;white-space:nowrap"><b>${money2(q.fare)}</b><br><small style="color:#6b6b70">${Math.round(q.min)} min</small></span></button>`});return h}
 const TOWH={ph:null,ride:false,c:null,t:0};const TOW_DECK=1.05,TOW_BED0=-0.75;
 function towShop(){return RETAIL.find(r=>r.type==="tire")}
 function towHelpStart(c){Object.assign(TOWH,{ph:"wait",ride:false,c,t:0,stuck:0});c.towHelp=true}
