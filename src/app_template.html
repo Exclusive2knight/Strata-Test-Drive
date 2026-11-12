@@ -1330,8 +1330,16 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
 <script data-boot>(function(){var p=0;window.__bootP=0;var t=setInterval(function(){if(window.__bootReal){clearInterval(t);return}p+=(0.7-p)*0.025;window.__bootP=p;var a=document.getElementById("bootArc"),n=document.getElementById("bootNeedle"),c=document.getElementById("bootPct");if(a)a.setAttribute("stroke-dasharray",(p*100).toFixed(1)+" 100");if(n)n.style.setProperty("--a",(-135+p*270)+"deg");if(c)c.textContent=String(Math.round(p*100))},120)})()</script>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 329 · Online play in sync, wheel settings and airport roads</h2></div>
+    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 330 · A real downtown skyline</h2></div>
     <div class="nb">
+      <h4>A real downtown skyline</h4><ul>
+      <li>🏙️ <b>New city buildings</b>: the plain grey blocks downtown are gone. Every street is now lined with detailed, textured buildings: red and tan brick walk-ups, brownstone rows with front stoops, corner markets with awnings, shop rows, apartment blocks, concrete offices and blue glass office towers.</li>
+      <li>🌆 <b>Skyscrapers</b>: the middle of downtown has a skyline of up to ten towers, from a 146 m dark-glass headquarters to a 260 m glass tower with setbacks, an art deco tower, a round green-glass tower and a slim residential tower. They carry red aircraft warning lights, the residential tower's crown glows at night, and you can see the skyline from miles away.</li>
+      <li>🧱 <b>Built like a real city</b>: buildings stand shoulder to shoulder on the back of the sidewalk and face the street, so blocks form a solid street wall instead of scattered boxes with gaps. Taller buildings sit in the middle and get lower toward the edge of town, and the insides of the blocks are filled in too.</li>
+      <li>🛍️ <b>Main streets</b>: Mill St in Millbrook and Main St and Fairhaven Blvd in Fairhaven are now lined with the same brick shop fronts, corner markets and shop rows. They still show up in the phone's search as places to go.</li>
+      <li>🚜 <b>Farms</b>: each farm now has a proper white farmhouse with a porch, a red barn with a metal roof and a silo. A white three-board fence with a farm gate runs along the road by the farmyard, and barbed wire on wooden posts runs along the fields.</li>
+      <li>Houses in the neighbourhoods haven't changed.</li>
+      </ul>
       <h4>Online play in sync, wheel settings and airport roads</h4><ul>
       <li>🌐 <b>Online servers now share one world</b>: the host's traffic is sent to everyone, so every player sees the same AI cars in the same places. Time of day and weather already followed the host. Cars that only exist for you (a bus, an Uber, a tow truck) show up for the others too.</li>
       <li>🚶 <b>See each other on foot, and ride along</b>: when another player gets out and walks, you see them walking. Walk up to another player's car and press O (or Get in) to ride as their passenger; you show in their seat, and press O again once they stop to get out.</li>
@@ -7123,7 +7131,7 @@ function navPlaces(){const L=[],add=(name,sub,x,y,h,ic)=>{if(x==null||!isFinite(
   add("Rosedale","Neighborhood",STARTS.suburb.x,STARTS.suburb.y,STARTS.suburb.h,"🏘️");
   if(W2){for(const k of ["mountain","millbrook","fairhaven","oakridge"])if(STARTS[k])add(STARTS[k].name,STARTS[k].nav||"",STARTS[k].x,STARTS[k].y,STARTS[k].h,STARTS[k].ic||"📍")}
   if(W2)try{w2NavPlaces(add)}catch(e){}
-  if(W2)try{const NM={b_corner_cafe:["Corner Café","Café","☕"],b_clothing_boutique:["Boutique","Clothing","👗"],b_electronics_store:["Electronics store","Electronics","📱"],b_neighborhood_market:["Corner market","Groceries","🛒"],b_pharmacy:["Pharmacy","Pharmacy","💊"],b_bakery:["Bakery","Bakery","🥐"],b_restaurant:["Restaurant","Restaurant","🍽️"],b_auto_parts_shop:["Auto parts","Auto parts","🔩"]};
+  if(W2)try{const NM={b_corner_cafe:["Corner Café","Café","☕"],b_clothing_boutique:["Boutique","Clothing","👗"],b_electronics_store:["Electronics store","Electronics","📱"],b_neighborhood_market:["Corner market","Groceries","🛒"],b_pharmacy:["Pharmacy","Pharmacy","💊"],b_bakery:["Bakery","Bakery","🥐"],b_restaurant:["Restaurant","Restaurant","🍽️"],b_auto_parts_shop:["Auto parts","Auto parts","🔩"],lk_market:["Corner market","Groceries","🛒"],lk_strip:["Shops","Shopping","🛍️"]};
     const seen=new Set();for(const o of W2P){const n=NM[o.k];if(!n||!inCity(o.x,o.y))continue;const f=navSnap({x:o.x,y:o.y,h:0}),nm=`${n[0]} · ${f?f.e.name:"downtown"}`;if(seen.has(nm))continue;seen.add(nm);add(nm,`${o.x>1000?"Fairhaven":"Westport"} downtown · street parking`,o.x,o.y,0,n[2])}}catch(e){}
   return L.sort((a,b)=>a.d-b.d)}
 // fastest route to frame f from every (road, direction): Dijkstra over the reversed graph. Used by the navigation and by the tow truck
@@ -10804,7 +10812,7 @@ void main(){
  if(uKOn>0.5){for(int i=0;i<10;i++){vec4 k=uKO[i];if(k.z>0.0&&length(vW.xz-k.xy)<k.z&&vW.y>k.w+0.3)discard;}}
  vec3 N=normalize(vN),V=normalize(uEye-vW); if(dot(N,V)<0.0)N=-N;
  vec3 base=uC*vC; float alpha=uA;
- if(uPat>5.5)base=texture2D(uTex,vC.xy).rgb*uC;   // road sign faces: one shared atlas, the UV rides in the vertex colour
+ if(uPat>5.5){vec4 tx=texture2D(uTex,vC.xy);if(uPat>6.5&&tx.a<0.5)discard;base=tx.rgb*uC;}   // road sign faces: one shared atlas, the UV rides in the vertex colour
  if(uBackOn>0.5&&!gl_FrontFacing&&alpha>0.99)base=vec3(0.045,0.048,0.052);
  if(vDent>0.02){float sc=step(0.55,fract(vL.x*23.0+vL.y*61.0+vL.z*17.0));base=mix(base,mix(base*0.45,vec3(0.32,0.31,0.3),sc*0.6),vDent*0.75);}   // inside of the body shell: dark trim
  if(uPat>4.5&&uPat<5.5){vec3 dd=vW-uSO;vec2 uv=vec2(dot(dd,uSU)/dot(uSU,uSU),dot(dd,uSV)/dot(uSV,uSV));gl_FragColor=vec4(texture2D(uTex,uv).rgb*uC.x,1.0);return;}
@@ -11527,20 +11535,14 @@ function w2Fill(r){const P=[],Nn=[],I=[],C=[];const gz=(x,y)=>groundAt(x,y).h;
           quad([...p1,gz(...p1)+0.07],[...p2,gz(...p2)+0.07],[...p3,gz(...p3)+0.07],[...p4,gz(...p4)+0.07],col)}}
       if(crop===CROPS[3])for(let n=0;n<10;n++){const p=at(a0+4+r()*(pw-12),b0+6+r()*(b1-b0-12)),z=gz(...p);box(p[0],p[1],z,1.5,1.5,1.4,r()*3,[0.74,0.64,0.36]);collAdd({t:"c",x:p[0],y:p[1],r:0.8,what:"a hay bale"})}}
     // the farmyard by the road at the near corner: house, red barn, silo, a gravel yard
-    const fy=at(-L/2+15,-D/2+12);w2Put("b_farmhouse",...at(-L/2+12,-D/2+10),Math.atan2(-N[1],-N[0]),gz(...at(-L/2+12,-D/2+10))-0.2);
-    {const p=at(-L/2+40,-D/2+16),z=gz(...p)-0.2,a=hh;box(p[0],p[1],z,12,18,6.5,a,[0.58,0.12,0.09]);
-      // gable roof: two sloped quads
-      const c_=Math.cos(a),s_=Math.sin(a),R=(i,j,h)=>[p[0]+c_*9.3*i-s_*j,p[1]+s_*9.3*i+c_*j,z+h];quad(R(-1,-6.6,6.3),R(1,-6.6,6.3),R(1,0,10),R(-1,0,10),[0.25,0.24,0.24]);quad(R(-1,6.6,6.3),R(-1,0,10),R(1,0,10),R(1,6.6,6.3),[0.25,0.24,0.24]);
-      for(const j of [-1,1]){const k=P.length/3;const g=[R(j,-6,6.5),R(j,6,6.5),R(j,0,9.8)];for(const v of g){P.push(v[0],v[2],-v[1]);Nn.push(c_*j,0,-s_*j);C.push(0.58,0.12,0.09)}I.push(k,k+1,k+2,k,k+2,k+1)}
-      box(...at(-L/2+40,-D/2+7.4),z,0.2,5,4,a,[0.92,0.9,0.86]);collAdd({t:"b",x:p[0],y:p[1],h:a,hl:9,hw:6,what:"a barn"})}
-    {const p=at(-L/2+54,-D/2+20),z=gz(...p)-0.2,n=10,R=2.6,H=13;for(let i=0;i<n;i++){const a0=i/n*Math.PI*2,a1=(i+1)/n*Math.PI*2,A=[p[0]+Math.cos(a0)*R,p[1]+Math.sin(a0)*R],B=[p[0]+Math.cos(a1)*R,p[1]+Math.sin(a1)*R],k=P.length/3,am=(a0+a1)/2;
-        for(const q of [[A,z],[B,z],[B,z+H],[A,z+H]]){P.push(q[0][0],q[1],-q[0][1]);Nn.push(Math.cos(am),0,-Math.sin(am));C.push(0.78,0.79,0.8)}I.push(k,k+1,k+2,k,k+2,k+3,k,k+2,k+1,k,k+3,k+2);
-        const t=P.length/3;P.push(A[0],z+H,-A[1],B[0],z+H,-B[1],p[0],z+H+2.2,-p[1]);Nn.push(Math.cos(am)*0.7,0.7,-Math.sin(am)*0.7,Math.cos(am)*0.7,0.7,-Math.sin(am)*0.7,0,1,0);C.push(0.55,0.56,0.58,0.55,0.56,0.58,0.6,0.6,0.62);I.push(t,t+1,t+2,t,t+2,t+1)}
-      collAdd({t:"c",x:p[0],y:p[1],r:R,what:"a silo"})}
+    const fy=at(-L/2+15,-D/2+12);w2Put("lk_farmhouse",...at(-L/2+12,-D/2+12),Math.atan2(-N[1],-N[0]),gz(...at(-L/2+12,-D/2+12))-0.15);
+    /* the Lite Kit's red barn and silo, the barn's doors facing the yard */
+    {const p=at(-L/2+40,-D/2+16);w2Put("lk_barn",p[0],p[1],Math.atan2(-N[1],-N[0]),gz(...p)-0.2)}
+    {const p=at(-L/2+54,-D/2+22);w2Put("lk_silo",p[0],p[1],hh,gz(...p)-0.2)}
     {const a=-L/2+3,b=-D/2+3,p1=at(a,b),p2=at(a+62,b),p3=at(a+62,b+24),p4=at(a,b+24);quad([...p1,gz(...p1)+0.05],[...p2,gz(...p2)+0.05],[...p3,gz(...p3)+0.05],[...p4,gz(...p4)+0.05],[0.55,0.5,0.43])}
-    // a wire-and-post fence along the road side of the fields
-    for(let a=-L/2+64;a<L/2;a+=4){const p=at(a,-D/2+1),z=gz(...p);box(p[0],p[1],z,0.12,0.12,1.2,hh,[0.42,0.32,0.22])}
-    {const z0=gz(...at(-L/2+64,-D/2+1)),z1=gz(...at(L/2,-D/2+1));for(const h of [0.6,1.05]){const A=at(-L/2+64,-D/2+1),B=at(L/2,-D/2+1);box((A[0]+B[0])/2,(A[1]+B[1])/2,(z0+z1)/2+h,0.04,L-64,0.04,hh,[0.35,0.33,0.3])}}
+    // barbed wire on wooden posts along the road side of the fields, a farm gate into the yard, white three-board fence round the yard
+    lkFence("lk_fb","lk_fbp",4,at(-L/2+64,-D/2+1),at(L/2,-D/2+1),gz);
+    {const A=at(-L/2+3,-D/2+1),B=at(-L/2+20,-D/2+1);lkFence("lk_fw","lk_fwp",3,A,B,gz);lkFence("lk_fw","lk_fwp",3,at(-L/2+24,-D/2+1),at(-L/2+64,-D/2+1),gz);const g=at(-L/2+20.2,-D/2+1);LKP.push({k:"lk_fg",x:g[0],y:g[1],a:hh-Math.PI/2,z:gz(...g)})}
     void fy}
   SCN.w2farm=P.length?(()=>{const m=meshFrom(P,Nn,I,C);m.dd=1600;return m})():null}
 // ======================================================================= the new world's buildings and trees (the owner's models in props/b_*.json and t_*.json)
@@ -11556,7 +11558,7 @@ const W2_FP={sig_cam:[-0.1,0.1,-0.1,0.1],sig_dog:[-0.2,0.2,-0.2,0.2],sig_v:[-0.2
   t_ornamental_tree:[-1.5,1.8,-1.8,1.7],f_mcdonalds:[-22.5,22.5,-22.5,24.5],f_burger_king:[-23.5,23.5,-22.5,24.5],f_wendys:[-22,22,-22,24],f_taco_bell:[-21.5,21.5,-22,24],f_chick_fil_a:[-23.5,23.5,-23.5,25.5],f_kfc:[-22,22,-22.5,24.5],t_palm:[-4.6,4.6,-4.6,4.6],t_pine_small:[-1.8,1.8,-1.7,1.7],t_pine_tall:[-3.8,3.8,-3.7,3.7]};
 const W2P=[];       // placed copies: {k, x, y, a (the way the front faces), z}
 // put a model down facing heading a; it also blocks that ground for anything placed later
-function w2Put(k,x,y,a,z){const f=W2_FP[k];if(!f)return null;const o={k,x,y,a,z:z??hillZ(x,y)};W2P.push(o);if(k[0]==="b"||k[0]==="f")BLD_LIST.push([x,y,Math.max(-f[0],f[1],-f[2],f[3]),Math.max(-f[0],f[1],-f[2],f[3])]);return o}
+function w2Put(k,x,y,a,z){const f=W2_FP[k];if(!f)return null;const o={k,x,y,a,z:z??hillZ(x,y)};W2P.push(o);if(k.startsWith("lk_"))lkPut(k,x,y,a,o.z);if(k[0]==="b"||k[0]==="f"||k[0]==="l")BLD_LIST.push([x,y,Math.max(-f[0],f[1],-f[2],f[3]),Math.max(-f[0],f[1],-f[2],f[3])]);return o}
 // is this circle clear of every model already placed?
 function w2Free(x,y,r){for(const o of W2P){const f=W2_FP[o.k],R=Math.max(-f[0],f[1],-f[2],f[3]);if(Math.hypot(o.x-x,o.y-y)<R+r)return false}return true}
 // local model point -> world: front (+z) along heading a, +x to its left, +y up
@@ -11567,7 +11569,7 @@ function propRaw(k){if(!PROPR[k])PROPR[k]=fetch("props/"+k+".json").then(r=>{if(
     for(let i=0;i<p16.length;i++)P[i]=p16[i]/kk;for(let i=0;i<n8.length;i++)N[i]=n8[i]/127;objs.push({P,N,I,g:ob.g})}return {objs,mats:d.mats}}).catch(()=>null);return PROPR[k]}
 let W2P_BUSY=false;
 async function w2PropsBuild(onlyTrees){if(!W2||W2P_BUSY||!W2P.length)return;W2P_BUSY=true;const withTrees=!!G().trees;if(onlyTrees)W2L.treeMesh=true;else W2L.treeMesh=withTrees;
-  const keys=[...new Set(W2P.map(o=>o.k))],R={};await Promise.all(keys.map(async k=>{R[k]=await propRaw(k)}));
+  const keys=[...new Set(W2P.map(o=>o.k))].filter(k=>!k.startsWith("lk_")),R={};await Promise.all(keys.map(async k=>{R[k]=await propRaw(k)}));
   let COLB=null;try{COLB=await fetch("props/colliders.json").then(r=>r.json())}catch(e){}
   // built map cell by map cell straight into typed arrays (the old way held every vertex of every copy in plain arrays at once: over a gigabyte for a moment,
   // enough to crash phones), yielding between cells so the game keeps running while it builds
@@ -11602,7 +11604,66 @@ function w2pDraw(night){if(SCN.w2farm){mat([1,1,1],null,0.08,10);draw(SCN.w2farm
   if(W.m){mat([1,1,1],null,0.15,20);draw(W.m)}if(W.s){mat([1,1,1],null,0.45,50);draw(W.s)}
   if(W.h){mat([1,1,1],null,0.25,30);draw(W.h)}if(W.q){mat([1,1,1],null,0.35,40);draw(W.q)}if(W.g){mat([1,1,1],night?[0.05,0.045,0.03]:null,1.2,90);draw(W.g)}if(W.t&&G().trees){mat([1,1,1],null,0.06,8);draw(W.t)}
   if(aC>=0){gl.disableVertexAttribArray(aC);gl.vertexAttrib3f(aC,1,1,1);bind.col=false}}
-function worldScenery(){CUTO.clear();W2P.length=0;
+/* ---- the Strata Lite Kit (props/lk_kit.json): textured city buildings, skyscrapers, the farm buildings and fences.
+   Placed copies (LKP) are baked into world meshes, one set per material (each with its own tiling texture), in map cells culled by distance. */
+const LK_OBJ={lk_walkup:"City_BrickWalkup_3F",lk_market:"City_CornerMarket_2F",lk_office:"City_OfficeMidrise_9F",lk_glass:"City_GlassOffice_16F",lk_apts:"City_ApartmentBlock_6F",lk_brown:"City_BrownstoneRow_4Units",lk_strip:"City_StripShops_1F",
+  lk_sky_setback:"Sky_GlassSetback_260m",lk_sky_deco:"Sky_ArtDeco_205m",lk_sky_round:"Sky_RoundGlass_215m",lk_sky_slim:"Sky_ResidentialSlim_250m",lk_sky_hq:"Sky_DarkGlassHQ_146m",lk_farmhouse:"Farm_Farmhouse",lk_barn:"Farm_Barn",lk_silo:"Farm_Silo",
+  lk_fb:"Fence_BarbedWire_Segment_4.0m",lk_fbp:"Fence_BarbedWire_EndPost",lk_fg:"Fence_FarmGate_3.6m",lk_fw:"Fence_3BoardWhite_Segment_3.0m",lk_fwp:"Fence_3BoardWhite_EndPost",lk_fp:"Fence_Picket_Segment_2.4m",lk_fpp:"Fence_Picket_EndPost",lk_fc:"Fence_ChainLink_Segment_3.0m",lk_fcp:"Fence_ChainLink_EndPost"};
+/* footprints (local x min/max, z min/max; the front faces +z) and the walls you bump into (the same, less awnings and steps) */
+const LK_FP={lk_walkup:[-7.4,6.2,-9.1,10.4],lk_market:[-10.4,9.1,-9.1,10.4],lk_office:[-12.1,12.1,-12.1,12.1],lk_glass:[-15.1,15.1,-12.1,12.1],lk_apts:[-19.3,19.3,-9.7,9.7],lk_brown:[-12,12,-7,11],lk_strip:[-18.2,18.2,-8.1,10.5],
+  lk_sky_setback:[-21,21,-21,21],lk_sky_deco:[-18.3,18.3,-15.2,15.2],lk_sky_round:[-20.4,20.4,-20.4,20.4],lk_sky_slim:[-14.1,14.1,-14.1,14.1],lk_sky_hq:[-24.9,24.9,-15.9,15.9],lk_farmhouse:[-7.1,8.6,-10.9,8.4],lk_barn:[-6.4,6.4,-9.5,9.5],lk_silo:[-3,3.2,-3,3]};
+const LK_WALL={lk_walkup:[-6,6,-9,9],lk_market:[-9,9,-9,9],lk_office:[-12,12,-12,12],lk_glass:[-15,15,-12,12],lk_apts:[-19.2,19.2,-9.6,9.6],lk_brown:[-12,12,-7,7],lk_strip:[-18,18,-8,8],lk_sky_setback:[-21,21,-21,21],lk_sky_deco:[-18,18,-15,15],
+  lk_sky_round:[-20,20,-20,20],lk_sky_slim:[-14,14,-14,14],lk_sky_hq:[-24,24,-15,15],lk_farmhouse:[-6,6,-10.5,4.5],lk_barn:[-6,6,-9,9]};
+Object.assign(W2_FP,LK_FP);
+const LKP=[],LK={d:null,busy:false,fail:0,tex:[]};
+/* placing buildings tight: oriented footprint rectangles and a separating-axis overlap test against everything already placed */
+function fpRect(k,x,y,a,g){const f=W2_FP[k];if(!f)return null;g=g||0;const o={x,y,a,z:0};return [[f[0]+g,f[2]+g],[f[1]-g,f[2]+g],[f[1]-g,f[3]-g],[f[0]+g,f[3]-g]].map(([lx,lz])=>w2Xf(o,lx,0,lz))}
+function rectHit(A,B){for(const P of [A,B])for(let i=0;i<4;i++){const p=P[i],q=P[(i+1)%4],ax=q[1]-p[1],ay=p[0]-q[0];let a0=1e9,a1=-1e9,b0=1e9,b1=-1e9;
+    for(const v of A){const d=v[0]*ax+v[1]*ay;a0=Math.min(a0,d);a1=Math.max(a1,d)}for(const v of B){const d=v[0]*ax+v[1]*ay;b0=Math.min(b0,d);b1=Math.max(b1,d)}if(a1<=b0||b1<=a0)return false}return true}
+function rectFree(k,x,y,a){const R=fpRect(k,x,y,a,0.05),f=W2_FP[k],r0=Math.hypot(Math.max(-f[0],f[1]),Math.max(-f[2],f[3]));
+  for(const o of W2P){const g=W2_FP[o.k];if(!g)continue;const r1=Math.hypot(Math.max(-g[0],g[1]),Math.max(-g[2],g[3]));if(Math.hypot(o.x-x,o.y-y)>r0+r1)continue;if(rectHit(R,fpRect(o.k,o.x,o.y,o.a,0.05)))return false}
+  for(const b of BLD_LIST){if(b[4])continue;if(Math.abs(b[0]-x)>b[2]+r0||Math.abs(b[1]-y)>b[3]+r0)continue;if(!W2P.some(o=>o.x===b[0]&&o.y===b[1])&&rectHit(R,[[b[0]-b[2],b[1]-b[3]],[b[0]+b[2],b[1]-b[3]],[b[0]+b[2],b[1]+b[3]],[b[0]-b[2],b[1]+b[3]]]))return false}return true}
+/* a continuous street wall: buildings side by side along both sides of a street, fronts on the back of the sidewalk, 0.2 m apart;
+   where the next pick doesn't fit (a cross street, a driveway, the park) a narrower one is tried before stepping on */
+function streetWall(e,pickK,ok){const W=hwOf(e),walk=e.T.walk||0,k0=kerbTrim(e,0)+walk+0.6,k1=e.L-kerbTrim(e,1)-walk-0.6;if(k1-k0<10)return;
+  const NARROW=["lk_walkup","lk_brown","lk_market"];
+  for(const sd of [1,-1]){let u=k0;while(u<k1-10){let put=false;const first=pickK(e,u,sd);
+      for(const k of [first,...NARROW.filter(n=>n!==first)]){const f=W2_FP[k],w=f[1]-f[0];if(u+w>k1)continue;const uc=u+w/2,back=W+walk+0.3+f[3],p=ePt(e,uc,sd*back),rp=ePt(e,uc,0),a=Math.atan2(rp[1]-p[1],rp[0]-p[0]);
+        const cx=p[0]+Math.cos(a)*(-(f[3]+f[2])/2)*0,cs=fpRect(k,p[0],p[1],a,0);if(!cs.every(c=>ok(c[0],c[1],e)))continue;if(!rectFree(k,p[0],p[1],a))continue;void cx;
+        w2Put(k,p[0],p[1],a);u+=w+0.2;put=true;break}
+      if(!put)u+=2}}}
+
+function lkPut(k,x,y,a,z){const o={k,x,y,a,z:z??hillZ(x,y)};LKP.push(o);if(k.startsWith("lk_sky"))LK.sky=(LK.sky||0)+1;const w=LK_WALL[k];
+  if(w){const c=w2Xf(o,(w[0]+w[1])/2,0,(w[2]+w[3])/2);collAdd({t:"b",x:c[0],y:c[1],h:a+Math.PI/2,hl:(w[1]-w[0])/2,hw:(w[3]-w[2])/2,z0:o.z-0.5,z1:o.z+40,what:k==="lk_barn"?"a barn":k==="lk_farmhouse"?"a house":"a building"})}
+  else if(k==="lk_silo")collAdd({t:"c",x:o.x,y:o.y,r:3,what:"a silo"});return o}
+/* a fence from A to B: segments of the kit's length, a post at each end (the segment's local +x runs along the fence) */
+function lkFence(seg,post,len,A,B,gz){const dx=B[0]-A[0],dy=B[1]-A[1],L=Math.hypot(dx,dy);if(L<1)return;const a=Math.atan2(dy,dx)-Math.PI/2,n=Math.max(1,Math.round(L/len)),k=L/n/len;
+  for(let i=0;i<n;i++){const x=A[0]+dx*i/n,y=A[1]+dy*i/n;LKP.push({k:seg,x,y,a,z:gz(x,y),sx:k})}LKP.push({k:post,x:B[0],y:B[1],a,z:gz(B[0],B[1])});
+  collAdd({t:"b",x:(A[0]+B[0])/2,y:(A[1]+B[1])/2,h:Math.atan2(dy,dx),hl:L/2,hw:0.1,z0:gz(A[0],A[1])-0.4,z1:gz(A[0],A[1])+1.3,what:"a fence"})}
+function lkLoad(){if(LK.d){lkBuild();return}if(LK.busy||LK.fail>2)return;LK.busy=true;
+  fetch("props/lk_kit.json?v="+BUILD_VER).then(r=>{if(!r.ok)throw 0;return r.json()}).catch(e=>{if(/github\.io$/.test(location.hostname))throw e;return fetch("https://cdn.jsdelivr.net/gh/Exclusive2knight/Strata-Test-Drive@/*ASSET_REF*/main/props/lk_kit.json").then(r=>{if(!r.ok)throw 0;return r.json()})})
+  .then(d=>{LK.d=d;LK.busy=false;LK.tex=d.tex.map(src=>{const T={t:null},img=new Image();img.onload=()=>{const t=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,img);
+      gl.generateMipmap(gl.TEXTURE_2D);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.REPEAT);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.REPEAT);
+      try{const ext=gl.getExtension("EXT_texture_filter_anisotropic");if(ext)gl.texParameterf(gl.TEXTURE_2D,ext.TEXTURE_MAX_ANISOTROPY_EXT,4)}catch(e){}T.t=t};img.src=src;return T});lkBuild()})
+  .catch(e=>{LK.busy=false;LK.fail++;console.warn("lite kit",e)})}
+function lkBuild(){const d=LK.d;if(!d)return;const CS=400,groups=new Map();   /* material index + cell -> arrays */
+  for(const o of LKP){const ob=d.objs[LK_OBJ[o.k]];if(!ob)continue;const c=Math.cos(o.a),s=Math.sin(o.a),sx=o.sx||1,sky=o.k.startsWith("lk_sky"),key0=Math.floor(o.x/CS)+","+Math.floor(o.y/CS)+(sky?"s":"");
+    for(const p of ob){const key=p.m+"|"+key0;let G_=groups.get(key);if(!G_)groups.set(key,G_={m:p.m,sky,P:[],N:[],C:[],I:[]});const b=G_.P.length/3,nv=p.p.length/3;
+      if(b+nv>65000){continue}
+      for(let v=0;v<nv;v++){const lx=p.p[v*3]*sx,ly=p.p[v*3+1],lz=p.p[v*3+2],nx=p.n[v*3],ny=p.n[v*3+1],nz=p.n[v*3+2],wx=o.x-s*lx+c*lz,wy=o.y+c*lx+s*lz;
+        G_.P.push(wx,o.z+ly,-wy);G_.N.push(-s*nx+c*nz,ny,-(c*nx+s*nz));if(p.t)G_.C.push(p.t[v*2]*(sx!==1&&Math.abs(nx)<0.5?sx:1),p.t[v*2+1],0);else if(p.c)G_.C.push(p.c[v*3],p.c[v*3+1],p.c[v*3+2]);else G_.C.push(1,1,1)}
+      for(const i of p.i)G_.I.push(i+b)}}
+  const out=new Map();for(const G_ of groups.values()){const B=new Float32Array(G_.P),mn=[1e9,1e9,1e9],mx=[-1e9,-1e9,-1e9];for(let i=0;i<B.length;i+=3)for(let a=0;a<3;a++){mn[a]=Math.min(mn[a],B[i+a]);mx[a]=Math.max(mx[a],B[i+a])}
+    const m=upload(B,new Float32Array(G_.N),new Uint16Array(G_.I),new Float32Array(G_.C));m.c=[0,1,2].map(a=>(mn[a]+mx[a])/2);m.r=Math.hypot(mx[0]-m.c[0],mx[1]-m.c[1],mx[2]-m.c[2]);
+    const K=G_.m+(G_.sky?"s":"");let L=out.get(K);if(!L)out.set(K,L={m:G_.m,chunks:[],dd:G_.sky?6000:1100,count:0});L.chunks.push(m);L.count+=m.count}
+  SCN.lk=[...out.values()];LK.n=LKP.length}
+function lkDraw(night){const d=LK.d,L=SCN.lk;if(!d||!L)return;const cf=gl.isEnabled(gl.CULL_FACE);gl.disable(gl.CULL_FACE);gl.uniformMatrix4fv(U.uM,false,M4.id());gl.activeTexture(gl.TEXTURE0);
+  for(const g of L){const M=d.mats[g.m],tx=M.t>=0?LK.tex[M.t]:null;if(M.t>=0&&!(tx&&tx.t))continue;const glass=/glass/.test(M.n),f=M.f;
+    if(tx){gl.bindTexture(gl.TEXTURE_2D,tx.t);mat(f,night&&glass?[0.07,0.06,0.04]:null,glass?0.7:0.12,glass?80:14,1,M.a==="MASK"?7:6)}
+    else if(M.n==="lt_red")mat(f,[1,0.05,0.03].map(v=>v*(night?1.6:0.5)),0.1,10);else if(M.n==="crown_lit")mat(f,night?[0.9,0.75,0.45]:null,0.3,20);else mat([1,1,1],null,0.12,14);
+    draw(g)}
+  if(aC>=0){gl.disableVertexAttribArray(aC);gl.vertexAttrib3f(aC,1,1,1);bind.col=false}if(cf)gl.enable(gl.CULL_FACE)}
+function worldScenery(){CUTO.clear();W2P.length=0;LKP.length=0;LK.sky=0;SCN.lk=null;
   let seed=11;const r=()=>(seed=(seed*16807)%2147483647)/2147483647;
   const M_=()=>({P:[],N:[],I:[]});
   const tree=M_(),trunk=M_(),bld=[M_(),M_(),M_(),M_(),M_()],post=M_(),head=M_(),xl=SCN.stopLB,pole=M_(),pad=M_(),chg=M_(),stall=M_(),zebra=SCN.zebraB,
@@ -11626,12 +11687,11 @@ function worldScenery(){CUTO.clear();W2P.length=0;
     const corners=(k,x,y,a)=>{const f=W2_FP[k],o={x,y,a,z:0};return [[f[0],f[2]],[f[1],f[2]],[f[0],f[3]],[f[1],f[3]],[0,0]].map(([lx,lz])=>w2Xf(o,lx,0,lz))};
     const fits=(k,x,y,a,m=0.4)=>corners(k,x,y,a).every(([cx,cy])=>roadDist(cx,cy,3)>m&&riverD(cx,cy)>RIVER.w/2+4&&!inExtra(cx,cy,1)&&!(cx>GAR.x0-8&&cx<GAR.x1+8&&cy>GAR.y0-8&&cy<GAR.y1+4)&&!nearBr(cx,cy));
     // shops side by side along a street, fronts at the back of the sidewalk
-    const frontage=(e,ks)=>{const W=hwOf(e),T=e.T,k0=kerbTrim(e,0)+9,k1=e.L-kerbTrim(e,1)-9;
-      for(const sd of [1,-1]){let u=k0;while(u<k1){const k=ks[Math.floor(r()*ks.length)],f=W2_FP[k],w=f[1]-f[0];if(u+w>k1)break;const uc=u+w/2,back=W+(T.walk||0)+0.5+f[3],p=ePt(e,uc,sd*back),rp=ePt(e,uc,0),a=Math.atan2(rp[1]-p[1],rp[0]-p[0]);
-        if(fits(k,p[0],p[1],a)&&w2Free(p[0],p[1],Math.min(w/2,f[3])-0.5))w2Put(k,p[0],p[1],a);u+=w+1.0+r()*2.5}}};
-    const SHOPS=["b_corner_cafe","b_bakery","b_clothing_boutique","b_pharmacy","b_neighborhood_market","b_restaurant","b_electronics_store","b_auto_parts_shop"];
+    const okC=(cx,cy)=>roadDist(cx,cy,6)>4.7&&riverD(cx,cy)>RIVER.w/2+4&&!inExtra(cx,cy,1)&&!(cx>GAR.x0-8&&cx<GAR.x1+8&&cy>GAR.y0-8&&cy<GAR.y1+4)&&!nearBr(cx,cy);
+    const frontage=(e,ks)=>streetWall(e,()=>ks[Math.floor(r()*ks.length)],okC);
+    const SHOPS=["lk_market","lk_walkup","lk_strip","lk_brown","lk_market","lk_walkup"];   /* the Lite Kit's street-front buildings */
     for(const e of EDGES){const m=eAt(e,e.L/2);
-      if(e.name==="Mill St")frontage(e,SHOPS.slice(0,5));                                                    // Millbrook's main street
+      if(e.name==="Mill St")frontage(e,["lk_market","lk_walkup","lk_brown","lk_strip"]);                                                    // Millbrook's main street
       else if((e.name==="Main St"||e.name==="Fairhaven Blvd")&&inCity(m.x,m.y)&&m.x>2000)frontage(e,SHOPS);    // Fairhaven
     }
     // the auto mile on Route 20 east of Fairhaven: six dealerships with display lots in front, and service centres
@@ -11692,11 +11752,21 @@ function worldScenery(){CUTO.clear();W2P.length=0;
   const PARKB=[-1140,-1010,160,290];  {const g=M_();B(g,(PARKB[0]+PARKB[1])/2,(PARKB[2]+PARKB[3])/2,-0.03,0.03,PARKB[1]-PARKB[0],PARKB[3]-PARKB[2]);green.P.push(...g.P);const k0=green.P.length/3-g.P.length/3;green.N.push(...g.N);green.I.push(...g.I.map(i=>i+k0))}
   if(main)for(let n=0;n<30;n++){const x=PARKB[0]+6+r()*(PARKB[1]-PARKB[0]-12),y=PARKB[2]+6+r()*(PARKB[3]-PARKB[2]-12);treeAt(x,y,0,true);collAdd({tree:1,t:"c",x,y,r:0.35})}
   const core=main?[-925,0]:[(X0+X1)/2,(Y0+Y1)/2],big=main?1:0.25,coreR=main?330:220;
+  /* the Lite Kit: skyscrapers in the core first, then offices and apartment blocks round them; the grid below fills in brick walk-ups, brownstones, corner markets and shop rows. Each faces its nearest street */
+  const LK_SKY=["lk_sky_setback","lk_sky_deco","lk_sky_round","lk_sky_slim","lk_sky_hq"],LK_MID=["lk_office","lk_glass","lk_apts","lk_office"],LK_LOW=["lk_walkup","lk_brown","lk_market","lk_walkup","lk_strip","lk_apts"],pick=A=>A[Math.floor(r()*A.length)];
+  const lkFace=(x,y)=>{let fa=(r()*4|0)*Math.PI/2,fd=1e9;for(const e of edgesNear(x,y,70)){if(e.n<1)continue;const q=eProj(e,x,y);if(q.u<0||q.u>e.L||Math.abs(q.t)>=fd)continue;fd=Math.abs(q.t);const p=ePt(e,q.u,0),to=Math.atan2(p[1]-y,p[0]-x);fa=[p[2]+Math.PI/2,p[2]-Math.PI/2].sort((A,B)=>Math.abs(wrapPi(A-to))-Math.abs(wrapPi(B-to)))[0]}return fa};
+  const okD=(cx,cy)=>roadDist(cx,cy,6)>4.7&&!nearBr(cx,cy)&&!inExtra(cx,cy,2)&&!(cx>GAR.x0-8&&cx<GAR.x1+8&&cy>GAR.y0-8&&cy<GAR.y1+4)&&!(cx>PARKB[0]-3&&cx<PARKB[1]+3&&cy>PARKB[2]-3&&cy<PARKB[3]+3)&&cx>X0+1&&cx<X1-1&&cy>Y0+1&&cy<Y1-1&&riverD(cx,cy)>RIVER.w/2+8;
+  const lkTry=(k,x,y)=>{if(!W2)return false;const fa=lkFace(x,y);if(!fpRect(k,x,y,fa,0).every(([cx,cy])=>okD(cx,cy)))return false;if(!rectFree(k,x,y,fa))return false;w2Put(k,x,y,fa,0);return true};
+  if(W2){const c0=main?[-925,0]:[(X0+X1)/2,(Y0+Y1)/2],cR=main?330:220;let nS=0;
+    /* street walls first: every street in the block, towers in the core (up to 10), offices and glass round them, walk-ups, brownstones, markets and shop rows further out */
+    const pk=(e,u,sd)=>{const p=ePt(e,u,sd*20),cd=Math.hypot(p[0]-c0[0],p[1]-c0[1])/cR;if(main&&cd<0.8&&LK.sky<10&&r()<0.5)return pick(LK_SKY);if(cd<(main?1.0:0.55))return pick(r()<0.7?LK_MID:LK_LOW);if(cd<1.5&&r()<0.3)return pick(LK_MID);return pick(LK_LOW)};
+    for(const e of EDGES){if(!e.T.walk||e.type==="res")continue;const m=eAt(e,e.L/2);if(m.x<X0||m.x>X1||m.y<Y0||m.y>Y1)continue;streetWall(e,pk,okD)}}
   for(let gx=X0+14;gx<X1-10;gx+=29)for(let gy=Y0+14;gy<Y1-10;gy+=29){
     const w=16+r()*9,d=16+r()*9,x=gx+(r()-0.5)*3,y=gy+(r()-0.5)*3,rad=Math.hypot(w,d)/2;
     if(x>PARKB[0]-6-rad&&x<PARKB[1]+6+rad&&y>PARKB[2]-6-rad&&y<PARKB[3]+6+rad)continue;if(x>GAR.x0-6-rad&&x<GAR.x1+6+rad&&y>GAR.y0-6-rad&&y<GAR.y1+6+rad)continue;if(!clear(x,y,5.5+rad))continue;
     if(W2&&(riverD(x,y)<RIVER.w/2+rad+12||!w2Free(x,y,rad+1)))continue;
     const cd=Math.hypot(x-core[0],y-core[1]),tall=cd<coreR,h=tall?(16*big+r()*26*Math.max(big,0.4)+Math.pow(1-cd/coreR,1.4)*r()*130*big):(8+r()*20*Math.max(big,0.5)),mi=Math.floor(r()*5);
+    if(W2){const cand=h>34?[pick(LK_MID),pick(LK_LOW)]:[pick(LK_LOW),pick(LK_LOW),"lk_walkup"];for(const k of cand)if(lkTry(k,x,y))break;continue}
     if(h>48){B(bld[mi],x,y,0,15,w,d);B(bld[(mi+2)%5],x,y,15,h-15,w*0.72,d*0.72);B(roofs,x,y,h,2.5,w*0.3,d*0.3)}else{B(bld[mi],x,y,0,h,w,d);B(roofs,x,y,h,0.6,w*0.92,d*0.92)}
     collAdd({t:"b",x,y,h:0,hl:w/2,hw:d/2});BLD_LIST.push([x,y,w/2,d/2])}}
   // ---- along every road: lamps, street trees, houses in the subdivisions, trees in the boulevard medians
@@ -16100,7 +16170,7 @@ function render(dt){
   for(const l of SCN.lines){mat([0.75,0.75,0.72],night?[0.012,0.012,0.012]:null,0.1,10);draw(l)}mat([0.78,0.56,0.08],night?[0.012,0.008,0]:null,0.1,10);draw(SCN.ylines);
   gl.disable(gl.POLYGON_OFFSET_FILL);
   if(G().trees){mat([0.16,0.10,0.05]);draw(SCN.trunks); mat([0.04,0.15,0.04],null,0.05,8,1,1);draw(SCN.crowns)}if(SCN.hedge){mat([0.05,0.17,0.05],null,0.05,8,1,1);draw(SCN.hedge)}if(SCN.hedge){mat([0.05,0.17,0.05],null,0.05,8,1,1);draw(SCN.hedge)}
-  if(SCN.w2p)w2pDraw(night);
+  if(SCN.w2p)w2pDraw(night);if(W2&&LKP.length&&(!SCN.lk||LK.n!==LKP.length))lkLoad();if(SCN.lk)try{lkDraw(night)}catch(e){}
   if(W2)try{aptDraw(night)}catch(e){console.error(e)}
   SCN.bld.forEach((m,i)=>{mat([[0.46,0.43,0.38],[0.24,0.27,0.31],[0.58,0.55,0.5],[0.34,0.27,0.22],[0.17,0.2,0.23]][i],null,0.35,40,1,4);draw(m)});
   mat([0.25,0.25,0.26],null,0.2,20);draw(SCN.roofs);mat([0.62,0.55,0.45],null,0.1,10);draw(SCN.house);if(SCN.xm){const X_=SCN.xm;mat([0.9,0.9,0.92],null,0.3,20);draw(X_.canopy);mat([0.55,0.57,0.6],null,0.4,30);draw(X_.pillar);mat([0.15,0.17,0.2],null,0.5,30);draw(X_.pump);mat([0.95,0.95,0.9],[1.6,1.6,1.4],0,1);draw(X_.glow);mat([0.75,0.72,0.66],null,0.1,10);draw(X_.shop);mat([0.2,0.3,0.36],night?[0.9,0.8,0.5]:null,1.2,80);draw(X_.win);mat([0.8,0.12,0.1],null,0.3,20);draw(X_.sign)}if(SCN.sm){const px_=st.walk?st.walk.x:car.px,py_=st.walk?st.walk.y:car.py,nearS=STORES.some(S=>Math.hypot(S.x-px_,S.y-py_)<170);
@@ -16879,7 +16949,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=329;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="173",BUILD_VER=330;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const P=JSON.parse(localStorage.getItem("strata.prefs")||"{}");for(const k in P){if(typeof P[k]==="number"&&isFinite(P[k]))st[k]=P[k]}if(st.wheelUI)document.body.classList.add("wheelMode")}catch(e){}   /* your settings from last time */
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}try{const P=JSON.parse(localStorage.getItem("strata.ped")||"null");if(P){st.pedHold=+P.pedHold||0;st.thrRate=+P.thrRate||2;st.brkRate=+P.brkRate||2}}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
