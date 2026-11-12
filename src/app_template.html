@@ -565,6 +565,10 @@ body.incab #ui2 .u2tr{opacity:.28;transform:scale(.8);transform-origin:top right
 #whl .whH,#whl .whH2{display:flex;align-items:center;justify-content:space-between;gap:8px}#whl .whH b{font-size:20px}#whl .whH2{margin-top:6px;border-top:1px solid rgba(255,255,255,.1);padding-top:10px}#whl p{margin:0}#whl .fine{color:#9fb0b4;font-size:12.5px;line-height:1.4}
 #whl button{background:#1f2c31;color:#fff;border:0;border-radius:10px;padding:10px 14px;font:600 14px var(--f-ui,system-ui);cursor:pointer}#whl .whH button{background:none;font-size:18px;padding:4px 8px}#whl .whGo{background:var(--teal,#2bb3a3);color:#04110f}#whl .whR{display:flex;gap:8px;flex-wrap:wrap}#whl .whR button{flex:1}
 #whl .whStep{color:#8ee6da;font-size:12px;letter-spacing:.06em;text-transform:uppercase}#whl .whOn{background:#24414a;color:#8ee6da;border-radius:6px;padding:2px 8px;font-size:12px}#whl label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:#cfd8db}#whl label small{color:#8a9a9e}#whl input[type=range]{width:100%;accent-color:var(--teal,#2bb3a3)}
+#whl .whBox{width:min(560px,100%)}#whl .whS{border:1px solid rgba(255,255,255,.1);border-radius:12px;overflow:hidden;flex:0 0 auto}#whl .whS.on{border-color:rgba(142,230,218,.35)}
+#whl .whT{width:100%;display:flex;justify-content:space-between;align-items:center;background:#15202a;border-radius:0;padding:12px 14px;font:600 15px var(--f-ui,system-ui);text-align:left}#whl .whS.on .whT{background:#1b2a33}#whl .whT i{font-style:normal;color:#8ee6da}
+#whl .whB{display:flex;flex-direction:column;gap:8px;padding:10px 12px 12px}#whl .whBind{display:flex;justify-content:space-between;align-items:center;background:#111b20;border-radius:8px;padding:9px 12px;font:500 13.5px var(--f-ui,system-ui)}#whl .whBind:hover{background:#18262c}
+#whl .whBind em{font-style:normal;color:#8a9a9e;font-size:12.5px}#whl .whBind.wait{outline:2px solid #ffb547}#whl .whBind.wait em{color:#ffb547}
 #whLive{display:flex;gap:4px;height:34px;align-items:stretch}#whLive i{flex:1;max-width:26px;border-radius:5px;background:linear-gradient(to top,#2bb3a3 var(--v),#18252a var(--v))}#whLive i.on{outline:2px solid #8ee6da}
 #achPop{position:fixed;left:50%;top:14px;transform:translate(-50%,-140%);z-index:99970;display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#2b2108,#0c0f12 70%);border:1px solid #d9a92c;border-radius:16px;padding:10px 18px 10px 12px;color:#fff;font:500 13px var(--f-ui,system-ui);box-shadow:0 8px 30px rgba(0,0,0,.5);transition:transform .45s cubic-bezier(.2,.9,.3,1.3);pointer-events:none;max-width:calc(100vw - 28px);box-sizing:border-box}
 #achPop.on{transform:translate(-50%,0)}#achPop i{font-style:normal;font-size:30px}#achPop small{display:block;color:#f2c94c;font-size:11px;letter-spacing:.08em;text-transform:uppercase}#achPop b{display:block;font-size:16px}#achPop span{color:#c9d1d4;font-size:12px}
@@ -1309,7 +1313,7 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
   <div id="panel">
     <header><strong>Mission Strata <span id="players" hidden></span></strong><input id="setSearch" placeholder="Search…" autocomplete="off"><button id="redo" title="Start your car over in the builder">↺ Redo car</button><button id="close">Done</button></header>
     <div id="tabs">
-      <button class="tab" data-tab="graphics">Graphics</button><button class="tab" data-tab="world">World</button><button class="tab on" data-tab="cars">Car</button><button class="tab" data-tab="features">Features</button><button class="tab" data-tab="display">Display</button><button class="tab" data-tab="controls">Controls</button>
+      <button class="tab" data-tab="graphics">Graphics</button><button class="tab" data-tab="world">World</button><button class="tab on" data-tab="cars">Car</button><button class="tab" data-tab="features">Features</button><button class="tab" data-tab="display">Display</button><button class="tab" data-tab="controls">Controls</button><button class="tab" data-tab="pedals">Pedals</button><button class="tab" data-tab="seat">Driving position</button><button class="tab" data-tab="load">Load</button>
       <button class="tab" data-tab="assists">Assists</button><button class="tab" data-tab="sound">Sound</button>
       <button class="tab" data-tab="online">Online</button><button class="tab" data-tab="spawn">Spawn</button><button class="tab" data-tab="tests">Tests</button><button class="tab" data-tab="log">Log</button>
     </div>
@@ -1326,8 +1330,17 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
 <script data-boot>(function(){var p=0;window.__bootP=0;var t=setInterval(function(){if(window.__bootReal){clearInterval(t);return}p+=(0.7-p)*0.025;window.__bootP=p;var a=document.getElementById("bootArc"),n=document.getElementById("bootNeedle"),c=document.getElementById("bootPct");if(a)a.setAttribute("stroke-dasharray",(p*100).toFixed(1)+" 100");if(n)n.style.setProperty("--a",(-135+p*270)+"deg");if(c)c.textContent=String(Math.round(p*100))},120)})()</script>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 328 · Airport garages and Tesla Park Assist</h2></div>
+    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 329 · Online play in sync, wheel settings and airport roads</h2></div>
     <div class="nb">
+      <h4>Online play in sync, wheel settings and airport roads</h4><ul>
+      <li>🌐 <b>Online servers now share one world</b>: the host's traffic is sent to everyone, so every player sees the same AI cars in the same places. Time of day and weather already followed the host. Cars that only exist for you (a bus, an Uber, a tow truck) show up for the others too.</li>
+      <li>🚶 <b>See each other on foot, and ride along</b>: when another player gets out and walks, you see them walking. Walk up to another player's car and press O (or Get in) to ride as their passenger; you show in their seat, and press O again once they stop to get out.</li>
+      <li>📍 <b>Stay near the host</b>: to keep online play smooth, other players can't go more than 700 m (about 0.4 mi) from the host. The area moves with the host, and you get a message if you reach the edge.</li>
+      <li>🔌 <b>Leaving a charger</b>: cars backing out of a charging spot no longer hesitate and then drive through the charger next to them. They steer round it, and cars in the garage stay plugged in while you're nearby.</li>
+      <li>✈️ <b>Airport roads cleaned up</b>: the Evans terminal roads split in a cleaner place, the leftover lane lines across the curb splits are gone, and cars leaving Departures now give way where they join the exit road instead of stopping in the middle of it.</li>
+      <li>🎮 <b>Steering wheel settings</b>: with a USB wheel plugged in, the wheel setup (Settings › Controls) now has collapsible sections like a sim menu: General Controls, Driving and Steering, Vehicle Functions, Lights, View Modes and Force Feedback. Force feedback has a slider for each effect (overall strength, tyre feel, road bumps, kerbs and gravel, crashes, damping, centring when stopped, minimum force, the lock stop and controller vibration). Steering gets a deadzone and response curve, the pedals get their own curves, and you can bind any wheel button to a function: tap the function, then press the button.</li>
+      <li>⚙️ <b>More settings tabs</b>: Controls is split into Controls, Pedals, Driving position and Load, so things are easier to find. The Display tab opens properly again.</li>
+      </ul>
       <h4>Airport garages and Tesla Park Assist</h4><ul>
       <li>✈️ <b>No more road through the garage</b>: the corners of the Arrivals and Departures loops at McNamara were so wide (about 140 m) that the road cut right through the corner of the parking garage. The loops now turn tight corners round the garage like real terminal roads, and the same goes for Evans</li>
       <li>🚗 <b>Tesla Park Assist, refined</b>: the lines now follow a rounded outline of the car and blend smoothly from white to yellow to orange to red as things get closer. They fade in gently, with a soft glow, instead of jumping from sensor to sensor. The distance is shown right next to the closest point ("29 in") and turns to STOP when you're very close. Camera-only Teslas get a softly shaded High Fidelity outline</li>
@@ -2656,7 +2669,7 @@ function buildNet2(){
   // ---- Strata Metro Airport (laid out like Detroit Metro): John D. Dingell Dr to the McNamara terminal, W.G. Rogell Dr to the Evans terminal, a cargo road
   {const A=(X,Z,r)=>{const p=aptXY(X,Z).map(v=>Math.round(v*100)/100);if(r!==undefined)p.push(r);return p};
    N(-1800,-3300,{ctrl:"signal"});N(3700,-3300,{ctrl:"signal"});
-   const D0=A(-2600,360),D1=A(2620,-1357);for(const q of [D0,D1,A(60,470),A(640,-1375),A(-1100,470),A(-1100,250)])N(q[0],q[1],{ctrl:"merge"});
+   const D0=A(-2600,360),D1=A(2620,-1357);for(const q of [D0,D1,A(60,470),A(700,-1375),A(-1100,470),A(-1100,250)])N(q[0],q[1],{ctrl:"merge"});
    rd("blvd","John D. Dingell Dr",[[-1800,-3300],[-1800,-5000,0],[-1800,-5360,0],D0],{lim:45});
    // McNamara: in along the south roadway (M1), dipping under taxiway T in a tunnel, round the garage to the curbs; out along the north roadway (M4)
    const tun=X0=>function(u){return aptDz(X0+(this.a.x<this.b.x?u:-u))};
@@ -2667,7 +2680,7 @@ function buildNet2(){
    rd("curb","Arrivals (lower level)",[A(60,470),A(110,462,0),A(262,462,30),A(262,150,30),A(-262,150,30),A(-262,250,26),A(-420,250)],{lim:15});   /* tight corners round the garage (an automatic curve was 140 m wide and cut through its corner) */
    rd("curb","Departures (upper level)",[A(60,470),A(110,484,0),A(285,484,32),A(285,150,32),A(-285,150,32),A(-285,225,26),A(-470,232,0),A(-530,240,0),A(-560,250)],
      {lim:15,fly:1,stack:1,zo:function(u){const up=(a,b)=>0.5*smooth01(a,b,u)+0.5*clamp((u-a)/(b-a),0,1);return 7.2*up(240,410)*(1-up(this.L-300,this.L-12))}});
-   N(...A(-560,250),{ctrl:"merge"});
+   N(...A(-560,250),{ctrl:"merge",minT:"curb"});
    rd("aw","McNamara Terminal",[A(-420,250),A(-560,250)],{lim:35});rd("aw","McNamara Terminal",[A(-560,250),A(-640,250)],{lim:35});
    E("aw","McNamara Terminal",[A(-640,250),A(-1040,250)],{lim:40,zo:tun(-640),tun:1});
    E("aw","McNamara Terminal",[A(-1040,250),A(-1100,250)],{lim:40});
@@ -2675,11 +2688,11 @@ function buildNet2(){
    rd("ramp","Return to Terminal",[A(-1100,250),A(-1190,300,0),A(-1190,420,0),A(-1100,470)],{lim:20});
    // Evans (north) terminal: in along the north roadway (N1), arrivals below and departures above, out to the east (N4)
    rd("road","W.G. Rogell Dr",[[3700,-3300],[3700,-3480],[3700,-3643,60],D1],{lim:45});
-   rd("aw","Evans Terminal",[D1,A(2480,-1375,0),A(640,-1375)],{lim:35});
-   rd("curb","Arrivals (lower level)",[A(640,-1375),A(520,-1375,24),A(520,-1110,24),A(960,-1110,24),A(960,-1340,24),A(1100,-1340)],{lim:15});
-   rd("curb","Departures (upper level)",[A(640,-1375),A(497,-1375,32),A(497,-1110,32),A(983,-1110,32),A(983,-1318,26),A(1100,-1318,0),A(1160,-1340)],
-     {lim:15,fly:1,stack:1,zo:function(u){const up=(a,b)=>0.5*smooth01(a,b,u)+0.5*clamp((u-a)/(b-a),0,1);return 7.2*up(165,330)*(1-up(this.L-390,this.L-130))}});
-   N(...A(1160,-1340),{ctrl:"merge"});
+   rd("aw","Evans Terminal",[D1,A(2480,-1375,0),A(700,-1375)],{lim:35});
+   rd("curb","Arrivals (lower level)",[A(700,-1375),A(640,-1364,0),A(520,-1364,24),A(520,-1110,24),A(960,-1110,24),A(960,-1340,24),A(1100,-1340)],{lim:15});
+   rd("curb","Departures (upper level)",[A(700,-1375),A(640,-1387,0),A(497,-1387,32),A(497,-1110,32),A(983,-1110,32),A(983,-1318,26),A(1100,-1318,0),A(1160,-1340)],
+     {lim:15,fly:1,stack:1,zo:function(u){const up=(a,b)=>0.5*smooth01(a,b,u)+0.5*clamp((u-a)/(b-a),0,1);return 7.2*up(225,390)*(1-up(this.L-390,this.L-130))}});
+   N(...A(1160,-1340),{ctrl:"merge",minT:"curb"});
    rd("aw","Evans Terminal",[A(1100,-1340),A(1160,-1340)],{lim:35});rd("aw","Evans Terminal",[A(1160,-1340),A(2480,-1340,0),D1],{lim:45});
    // the cargo road off Rogell Dr, down the east side to the freight buildings' truck court
    rd("road","Air Cargo Rd",[[3700,-3480],[3860,-3540,0],[3860,-5300,0],A(2500,425,0),A(900,425)],{lim:35})}
@@ -2778,7 +2791,7 @@ function analyseNet(){
     const deg=n.legs.length;
     if(n.kind!=="xo"){if(deg===2){const tw=Math.abs(wrapPi(n.legs[0].h-n.legs[1].h-Math.PI));n.kind=tw>0.45?"corner":"cont"}else if(deg>2)n.kind="x";else n.kind="end"}
     if(n.kind!=="x")n.ctrl="free";
-    if(n.ctrl==="merge"){n.kind="x";const mr=Math.max(...n.legs.map(l=>l.rank));n.legs.forEach(l=>l.major=l.rank===mr)}
+    if(n.ctrl==="merge"){n.kind="x";const mr=Math.max(...n.legs.map(l=>l.rank));n.legs.forEach(l=>l.major=l.rank===mr&&l.e.type!==n.minT)}   /* minT: that road type yields (the departures curb joining the exit road) */
     if(n.kind==="x"&&!n.ctrl){const mr=Math.max(...n.legs.map(l=>l.rank)),maj=n.legs.filter(l=>l.rank===mr);
       n.ctrl=maj.length===2&&Math.abs(wrapPi(maj[0].h-maj[1].h-Math.PI))<0.5&&maj.length<deg?"minor":"allstop"}
     if(n.ctrl==="minor"){const mr=Math.max(...n.legs.map(l=>l.rank));n.legs.forEach(l=>l.major=l.rank===mr)}
@@ -5000,7 +5013,7 @@ function chgEVs(tesla){if(!CHGOCC.ev){const T_=new Set(),A_=new Set();for(const 
   if(r.length<3&&!CHGOCC.ld&&L.length){const m=L[Math.floor(Math.random()*L.length)];if(!ok(m)&&typeof loadModel==="function"){CHGOCC.ld=1;Promise.resolve(loadModel(m)).catch(()=>{}).finally(()=>{CHGOCC.ld=0})}}return r}
 function chgOccTick(dt){CHGOCC.t+=dt;if(CHGOCC.t<1.5||!st.started)return;const step=CHGOCC.t;CHGOCC.t=0;
   for(const c of CHGS){if(c.kind==="td")continue;const d2=(c.x-car.px)**2+(c.y-car.py)**2;
-    if(c.occ){if(parked.indexOf(c.occ)<0){c.occ=null;continue}if(st.clock>c.occ.chgUntil&&!(sys.hose&&sys.hose.c===c))chgDepart(c);continue}
+    if(c.occ){if(parked.indexOf(c.occ)<0){c.occ=null;continue}if(st.clock>c.occ.chgUntil&&!(sys.hose&&sys.hose.c===c)){if(!c.occ.leaving&&inGarage(c.x,c.y)&&chgNearMe(c.occ,140)){c.occ.chgUntil=st.clock+45;continue}chgDepart(c)}continue}   /* in the garage there's no straight way out to the street: they stay plugged in until you've gone */
     if(d2>260*260||d2<35*35)continue;                                   // new arrivals only out of sight-ish, never right in front of you
     if(sys.hose&&sys.hose.c===c)continue;const P_=chgStall(c);if(Math.hypot(P_.x-car.px,P_.y-car.py)<4.5)continue;
     let busy=false;for(const o of parked)if(Math.abs(o.wx-P_.x)<2.2&&Math.abs(o.wy-P_.y)<2.2){busy=true;break}if(busy)continue;
@@ -5027,7 +5040,14 @@ function chgLeave(c){const o=c.occ;c.occ=null;const i=parked.indexOf(o);if(i<0)r
   if(!f||(o.wx-car.px)**2+(o.wy-car.py)**2>220*220){parked.splice(i,1);return}
   const e=f.e,dir=e.ow?1:Math.random()<0.5?1:-1,u=clamp(eProj(e,o.wx,o.wy).u,2,e.L-2),s_=dir>0?u:e.L-u,R_=fpt(e,dir,s_,laneOff(e,0)),fx=Math.cos(o.wh),fy=Math.sin(o.wh),nose=(c.x-o.wx)*fx+(c.y-o.wy)*fy>0;
   parked.splice(i,1);const k=newCar(e,dir,s_,0);Object.assign(k,{mdl:o.mdl,paint:o.paint,wx:o.wx,wy:o.wy,wh:o.wh,wz:o.wz});k.errand={ph:"out",e,dir,s:s_,R:R_};cars.push(k);
-  const A_=nose?[o.wx-fx*5.5,o.wy-fy*5.5,1]:[o.wx+fx*5.5,o.wy+fy*5.5];errStart(k,[[o.wx,o.wy],A_,[R_[0],R_[1]]])}
+  const A_=nose?[o.wx-fx*5.5,o.wy-fy*5.5,1]:[o.wx+fx*5.5,o.wy+fy*5.5];errStart(k,[[o.wx,o.wy],A_,...chgDetour(A_,R_),[R_[0],R_[1]]])}
+/* the drive from the charging space to the street must not go through a charger (the street is often on the far side of the chargers):
+   if the straight line passes close to one, go round it, a few metres to the side, as many times as needed */
+function chgDetour(A,R){const out=[];let a=[A[0],A[1]];for(let n=0;n<4;n++){let hit=null,hd=9;const dx=R[0]-a[0],dy=R[1]-a[1],L=Math.hypot(dx,dy)||1;
+    for(const c of CHGS){if(Math.abs(c.x-a[0])>60||Math.abs(c.y-a[1])>60)continue;const t=clamp(((c.x-a[0])*dx+(c.y-a[1])*dy)/(L*L),0,1),px=a[0]+dx*t-c.x,py=a[1]+dy*t-c.y,d=Math.hypot(px,py);if(d<2.8&&t>0.02&&t<0.98&&d<hd){hd=d;hit={c,px,py,t}}}
+    if(!hit)break;let nx=hit.px,ny=hit.py,nl=Math.hypot(nx,ny);if(nl<0.3){nx=-dy/L;ny=dx/L;if((a[0]-hit.c.x)*nx+(a[1]-hit.c.y)*ny<0){nx=-nx;ny=-ny}nl=1}
+    const w=[hit.c.x+nx/nl*4.6,hit.c.y+ny/nl*4.6];out.push(w);a=w}
+  return out}
 function chgAt(x,y,r){let b=null,bd=r||3;for(const c of CHGS){const d=Math.hypot(c.x-x,c.y-y);if(d<bd){bd=d;b=c}}return b}
 function chgM(c){const z=c.z!=null?c.z:((groundAt(c.x,c.y).h)||0);return carMatrix(c.x,c.y,c.face+Math.PI,z,0,0)}
 function chgAnchor(c){const o=M4.p(chgM(c),CHG_ANC[c.kind]||CHG_ANC.ea);return [o[0],-o[2],o[1]]}
@@ -5735,7 +5755,7 @@ function updateTraffic(dt){try{sigSense(dt)}catch(e){}try{sfTick(dt)}catch(e){co
   try{dynTick(dt)}catch(e){console.error(e)}
   for(const c of cars){
     if(c.dyn)continue;
-    if(c.kind==="wreck"||c.kind==="cone"||c.kind==="cop"||c.kind==="towed"||c.kind==="errand")continue;
+    if(c.kind==="wreck"||c.kind==="cone"||c.kind==="cop"||c.kind==="towed"||c.kind==="errand"||c.kind==="net")continue;
     if(c.stunned>0){c.stunned-=dt;c.v=Math.max(0,c.v-6*dt);advance(c,c.v*dt);if(c.stunned<=0){c.haz=false;if(c.slid){c.head=0;c.slid=false}if(!c.jn)c.offT=laneOff(c.e,laneIdx(c))}carPose(c);continue}
     if(c.script)c.script(c,dt);
     if(c.wait){c.v=0;carPose(c);continue}
@@ -6313,7 +6333,7 @@ function jamMul(c){if(c.sbT>0||c.tStop>0||c.sbHold||c.pullH)return 0.002;   // a
   if(EV.crz&&EV.crz.length&&!c.emv){for(const v of EV.crz){const d=Math.hypot(c.wx-v.x,c.wy-v.y);if(d<220){const fw=c.e.type==="xway";return Math.min(1,(fw?0.38:0.62)+(1-(fw?0.38:0.62))*Math.max(0,d-60)/160)*jamMul0(c)}}}
   return jamMul0(c)}
 function jamMul0(c){  if(!JAM.zones.length||c.e.type!=="xway")return 1;for(const z of JAM.zones)if(z.e===c.e&&z.dir===c.dir&&c.s>z.s0-60&&c.s<z.s1){const k=c.s<z.s0?(z.s0-c.s)/60:c.s>z.s1-80?(c.s-(z.s1-80))/80:0;return z.m+(1-z.m)*clamp(k,0,1)}return 1}
-function trafTOD(dt){try{jamTick(TOD.t>0?0:2.5)}catch(e){}TOD.t-=dt;if(TOD.t>0||!st.started)return;TOD.t=2.5;const M_=me(),onFw=M_&&M_.e&&(M_.e.type==="xway"||M_.e.type==="ramp"),want=Math.round(G().traffic*todMul()*(onFw?1.4:1))+(TOD.add||0),ai=cars.filter(c=>c.kind==="ai");   // cars you added stay on top of the normal amount
+function trafTOD(dt){try{jamTick(TOD.t>0?0:2.5)}catch(e){}TOD.t-=dt;if(TOD.t>0||!st.started||mpGuest())return;TOD.t=2.5;const M_=me(),onFw=M_&&M_.e&&(M_.e.type==="xway"||M_.e.type==="ramp"),want=Math.round(G().traffic*todMul()*(onFw?1.4:1))+(TOD.add||0),ai=cars.filter(c=>c.kind==="ai");   // cars you added stay on top of the normal amount
   if(ai.length<want){for(let k=0;k<Math.min(3,want-ai.length);k++){const p=poolSpot(160);if(p)cars.push(newCar(p.e,p.dir,p.s,p.i))}}
   else if(ai.length>want+2){let n=Math.min(3,ai.length-want);for(const c of ai){if(n<=0)break;const d=Math.hypot(c.wx-car.px,c.wy-car.py),ahead=(c.wx-car.px)*Math.cos(car.psi)+(c.wy-car.py)*Math.sin(car.psi);if(!poolKeep(c)&&!aiSeen(c.wx,c.wy,c.wz)&&(d>300||d>140&&ahead<0)){const k=cars.indexOf(c);if(k>=0){cars.splice(k,1);n--}}}}
   st.trafficN=cars.filter(c=>c.kind==="ai").length}
@@ -7043,7 +7063,7 @@ function uiScale(v){if(v)st.uiz=v;document.documentElement.style.setProperty("--
 function uiLook(v){st.uilook=v;document.body.classList.toggle("uisolid",v==="solid");try{localStorage.setItem("mstrata.uilook",v)}catch(e){}}
 try{const lk=localStorage.getItem("mstrata.uilook");if(lk)setTimeout(()=>uiLook(lk),0)}catch(e){}
 try{const z=parseFloat(localStorage.getItem("mstrata.uiz"));if(z>0.5&&z<1.3)st.uiz=z;if(localStorage.getItem("mstrata.uihide"))setTimeout(()=>hudHide(true),0)}catch(e){}setTimeout(()=>uiScale(),0);
-function walkAction(){if(TOWH.ride){toast("Stay in the car until the tow truck drops it off");return}if(UBER.ride){toast("You're riding in an Uber: it drops you at the kerb (or tap Skip the ride)");return}
+function walkAction(){if(MPW.ride){mpRideOut();return}if(TOWH.ride){toast("Stay in the car until the tow truck drops it off");return}if(UBER.ride){toast("You're riding in an Uber: it drops you at the kerb (or tap Skip the ride)");return}
   if(!st.walk){if(!canGetOut()){toast("Stop and shift to P first");return}if(!safeExitCheck())return;
     const lx=-Math.sin(car.psi),ly=Math.cos(car.psi);st.walk={x:car.px+lx*1.45+Math.cos(car.psi)*0.3,y:car.py+ly*1.45+Math.sin(car.psi)*0.3,z:car.zb||0,h:car.psi+Math.PI/2,v:0,ph:0,P:{skin:0,shirt:1,sc:1}};if(VALET.cur&&valetOnExit()){st.acc=false;st.pilot=false;st.signal=0;return}
     st.acc=false;st.pilot=false;st.signal=0;tick(1);toast(PC.on?"On foot: WASD to walk, drag to look, Space to jump, L to lock, P for your phone":"On foot: stick to walk, drag to look, your phone and key are on the right");return}
@@ -7057,7 +7077,7 @@ function walkAction(){if(TOWH.ride){toast("Stay in the car until the tow truck d
   else if(c.a==="stopP"||c.a==="stopC"){sys.fuel=null;sys.hose=null;tick(1);toast(c.a==="stopP"?`Done: ${Math.round(H.fuel/H.tank*100)}% fuel`:`Unplugged at ${Math.round(socShow(H)*100)}%`)}
 }
 function walkNearDoor(){const W=st.walk;if(!W)return false;const door=[car.px-Math.sin(car.psi)*1.25+Math.cos(car.psi)*0.3,car.py+Math.cos(car.psi)*1.25+Math.sin(car.psi)*0.3];return Math.hypot(W.x-door[0],W.y-door[1])<2.4}
-function walkGetIn(){if(!st.walk||!walkNearDoor())return false;if(st.locked){st.locked=false;beep(1500,.06,"square",.14)}st.walk=null;FOOT.phone=false;renderPhone();tick(1);toast(sys.hose?(sys.hose.kind==="pump"?(sys.fuel?"Back in the car · still pumping":"Back in the car · the nozzle is still in"):(sys.fuel?"Back in the car · still charging":"Back in the car · still plugged in")):"Back in the car");return true}
+function walkGetIn(){if(MPW.ride){mpRideOut();return true}if(st.walk&&!walkNearDoor()&&mpRideTry())return true;if(!st.walk||!walkNearDoor())return false;if(st.locked){st.locked=false;beep(1500,.06,"square",.14)}st.walk=null;FOOT.phone=false;renderPhone();tick(1);toast(sys.hose?(sys.hose.kind==="pump"?(sys.fuel?"Back in the car · still pumping":"Back in the car · the nozzle is still in"):(sys.fuel?"Back in the car · still charging":"Back in the car · still plugged in")):"Back in the car");return true}
 
 // ======================================================================= Tesla: Autopilot, Full Self-Driving (Supervised), Smart Summon, navigation, the driving visualization, in-car upgrades
 // Purchases belong to your car (they carry over between Model Y trims, like an account-linked upgrade)
@@ -9944,7 +9964,7 @@ function shopTick(){const R=storeNear(),b=$("shopBtn");if(!b)return;
   const t=R.type==="tire"?(st.walk?`🔧 Service desk · ${R.name}`:`🔧 ${R.name} service`):`🛒 Buy at ${R.name}`;if(b.hidden||b.textContent!==t){b.textContent=t;b.hidden=false;b.onclick=()=>shopOpen(R)}}
 function openHouseTick(){if(!st.walk)return;const W=st.walk;for(const H of OPEN_HOUSES){if(H.seen)continue;if(Math.hypot(W.x-H.door[0],W.y-H.door[1])<6){H.seen=true;toast(H.i===HOME.i?"Home: the front door is open":"For sale: walk in to look around, or claim it with the button")}}
   const h=insideHouse(W.x,W.y,W.z);if(h!==FOOT.inH){FOOT.inH=h;if(h)toast(h.store?STORE_HELLO[h.store.type](h.store):"Inside: living room at the front, kitchen and dining at the back")}}
-function walkUpdate(dt){const W=st.walk;if(UBER.ride){W.v=0;return}if(W.cyBase===undefined){W.cyBase=W.h;look.yaw=0;look.pitch=0}if(W.vz===undefined)W.vz=0;
+function walkUpdate(dt){const W=st.walk;if(UBER.ride||MPW.ride){W.v=0;return}if(W.cyBase===undefined){W.cyBase=W.h;look.yaw=0;look.pitch=0}if(W.vz===undefined)W.vz=0;
   // you can walk around while the pump runs or the car charges (the nozzle latches / the cable locks in), and get back in the car
   const [jx,jy,slow]=footInput(),cy=W.cyBase+look.yaw,fx=Math.cos(cy),fy=Math.sin(cy),rx=Math.sin(cy),ry=-Math.cos(cy);
   const mx=fx*jy+rx*jx,my=fy*jy+ry*jx,mag=Math.hypot(mx,my),spd=(slow?1.7:4.3)*Math.min(1,mag);
@@ -11113,9 +11133,12 @@ function bumpMesh(){const B={P:[],N:[],I:[]},H={P:[],N:[],I:[]};
 // ends of an edge: where its lane lines stop (junction box), and where kerbs / sidewalks stop (side streets cut through them)
 function kerbTrim(e,end){const n=end===0?e.a:e.b,r=end===0?e.r0:e.r1;if(r>0)return r;if(n.kind==="x"&&n.ctrl==="minor"){let t=0;for(const l of n.legs)if(!l.major)t=Math.max(t,hwOf(l.e)+3);return t}
   if(n.ctrl==="merge"&&(e.T.walk||e.T.kerb)){const k=end?"_kt1":"_kt0";if(e[k]===undefined)e[k]=splitTrim(e,end,n);return e[k]}return 0}
+/* where one road splits into two (or two join) at a single point off the freeway (the airport roads), the roads overlap for a while:
+   the lane lines start where they've come apart, over plain pavement before that, instead of crossing each other in an X */
+function lineTrim(e,end){const n=end===0?e.a:e.b;if(!n||n.ctrl!=="merge"||/xway|ramp/.test(e.type)||n.legs.some(l=>/xway/.test(l.e.type)))return 0;const k=end?"_lt1":"_lt0";if(e[k]===undefined)e[k]=Math.min(splitTrim(e,end,n,true),e.L*0.4,70);return e[k]}
 /* where two kerbed roads split (the airport curbs), their kerbs and sidewalks start only once the two roadways are apart, not across the other one's lanes */
-function splitTrim(e,end,n){const we=hwOf(e)+(e.T.walk||0)+0.45;for(let d=0;d<=Math.min(e.L*0.7,220);d+=2){const q=eAt(e,end===0?d:e.L-d);
-    const over=n.legs.some(l=>{if(l.e===e)return false;const pp=eProj(l.e,q.x,q.y);return pp.u>=0&&pp.u<=l.e.L&&Math.abs(pp.t)<hwOf(l.e)+we});if(!over)return d}return Math.min(e.L*0.7,220)}
+function splitTrim(e,end,n,lines){const we=lines?hwOf(e)*0.92:hwOf(e)+(e.T.walk||0)+0.45;for(let d=0;d<=Math.min(e.L*0.7,220);d+=2){const q=eAt(e,end===0?d:e.L-d);
+    const over=n.legs.some(l=>{if(l.e===e)return false;const pp=eProj(l.e,q.x,q.y);return pp.u>=0&&pp.u<=l.e.L&&Math.abs(pp.t)<(lines?hwOf(l.e)*0.92:hwOf(l.e))+we});if(!over)return d}return Math.min(e.L*0.7,220)}
 const SIGH=[];
 // ---- open houses: some single-storey houses in Rosedale and Birch Park have real rooms you can walk into
 const OPEN_HOUSES=[];let HOUSE_N=0;const HM={};["floor","plaster","sofa","wood","white","tv","rug","lamp","tile","ext","glassH","garf","roofG","lampG","shelfG"].forEach(k=>HM[k]={P:[],N:[],I:[]});
@@ -11189,7 +11212,7 @@ function buildWorld(){retailSites();placeExtras();
       else stripInto(green,e,F(u=>-(M2(u)-e.shL-0.3)),F(u=>M2(u)-e.shL-0.3),-0.02,mu0,e.L)}
     else stripInto(R,e,-(e.m/2+nL+sd),e.m/2+nL+sd,0,u0,u1);
     for(const a of e.aux||[]){const o=e.m/2+nL+sd;stripInto(R,e,u=>a.sg*(o-0.05),u=>a.sg*(o+auxW(e,u,a.sg)),0,a.u0,a.u1)}
-    const l0=e.r0+0.4,l1=e.L-e.r1-0.4,k0=kerbTrim(e,0),k1=e.L-kerbTrim(e,1),W=u=>M2(u)+nL+sd;
+    const l0=Math.max(e.r0+0.4,lineTrim(e,0)),l1=Math.min(e.L-e.r1-0.4,e.L-lineTrim(e,1)),k0=kerbTrim(e,0),k1=e.L-kerbTrim(e,1),W=u=>M2(u)+nL+sd;
     // acceleration / deceleration lanes: where a ramp runs alongside the freeway there is one dashed white line between them,
     // not the ramp's yellow edge line next to the freeway's solid edge line and rumble strip
     const minus=(lo,hi,I)=>{let sg=[[lo,hi]];for(const [a,b] of I)sg=sg.flatMap(([x,y])=>b<=x||a>=y?[[x,y]]:[...(a>x?[[x,a]]:[]),...(b<y?[[b,y]]:[])]);return sg.filter(([x,y])=>y-x>0.5)};
@@ -15940,11 +15963,11 @@ function dynBuild(eye,cm){if(dynFrame===GFX.frame)return;dynFrame=GFX.frame;CHAR
   for(const c of cars){if(c.kind==="bike"||c.kind==="cone"||c.kind==="parked"||c.kind==="xing"||c.kind==="remote"&&false||!near(c.wx,c.wy,55))continue;const md=MODELS[trafficModel(c)];if(!md||!md.meta.eye)continue;
     if(c.robo){if(c.rider){const E=normEye(md.meta),E2=[-E[0],E[1],E[2]];if(!c.rider.hip)c.rider.hip=seatHip(md.meta.seats,E2);seatedInto(aiMat(c),c.wh,E2,null,c.rider,false)}continue}   // a robotaxi: nobody at the wheel (there isn't one), sometimes a passenger
     if(c.occ===undefined)c.occ={pax:Math.random()<0.32,a:{skin:Math.floor(Math.random()*3),shirt:Math.floor(Math.random()*6)},b:{skin:Math.floor(Math.random()*3),shirt:Math.floor(Math.random()*6)}};
-    const om=aiMat(c),E=normEye(md.meta),K=kitOf(trafficModel(c)),Wl=K.steer?[K.steer[0],K.steer[1]-(K.steerDrop||0),K.steer[2]+(K.steerBack||0)]:null;c.occ.a.hip=seatHip(md.meta.seats,E);c.occ.a.whA=(c.kind==="remote"?(c.steer||0):aiSteer(c))*14.5;seatedInto(om,c.wh,E,Wl,c.occ.a,true);if(c.occ.pax){const E2=[-E[0],E[1],E[2]];c.occ.b.hip=seatHip(md.meta.seats,E2);seatedInto(om,c.wh,E2,null,c.occ.b,false)}}
+    const om=aiMat(c),E=normEye(md.meta),K=kitOf(trafficModel(c)),Wl=K.steer?[K.steer[0],K.steer[1]-(K.steerDrop||0),K.steer[2]+(K.steerBack||0)]:null;c.occ.a.hip=seatHip(md.meta.seats,E);c.occ.a.whA=(c.kind==="remote"?(c.steer||0):c.kind==="net"?0:aiSteer(c))*14.5;seatedInto(om,c.wh,E,Wl,c.occ.a,true);if(c.occ.pax){const E2=[-E[0],E[1],E[2]];c.occ.b.hip=seatHip(md.meta.seats,E2);seatedInto(om,c.wh,E2,null,c.occ.b,false)}}
   if(!st.walk&&st.started&&VEH.eye){const K=kitOf(TRIMS[st.trim].model),Wl=K.steer?[K.steer[0],K.steer[1]-(K.steerDrop||0)+(st.whlH||0),K.steer[2]+(K.steerBack||0)+(st.whlZ||0)]:null,E=VEH.eye,me_=st.cam===1;const hp=seatHip(VEH.seats,E);seatedInto(cm,car.psi,me_?[E[0],E[1]+(st.seatH||0),E[2]+(st.seatZ||0)]:E,Wl,{mk:PLAYER_MK,skin:1,shirt:7,pants:0,hair:1,noHead:me_,whA:car.dF*14.5,hip:[hp[0]+(st.seatH||0),hp[1]+(st.seatZ||0)]},true)}
-  if(st.started&&!st.walk&&VEH.eye){const E=VEH.eye,seats=VEH.seats&&VEH.seats.length>1?VEH.seats.map(q=>[q[0],q[1]+0.6,q[2]-0.08]).filter(q=>Math.hypot(q[0]-E[0],q[2]-E[2])>0.35).sort((a,b)=>a[2]-b[2]||a[0]-b[0]):[[-E[0],E[1],E[2]],[E[0],E[1]+0.03,E[2]+0.95],[-E[0],E[1]+0.03,E[2]+0.95],[0,E[1]+0.03,E[2]+0.95]];for(let i=0;i<(st.dummies||0)&&i<4;i++)seatedInto(cm,car.psi,seats[i],null,{skin:4,shirt:30,pants:4,hair:9},false);
+  if(st.started&&!st.walk&&VEH.eye){const E=VEH.eye,seats=VEH.seats&&VEH.seats.length>1?VEH.seats.map(q=>[q[0],q[1]+0.6,q[2]-0.08]).filter(q=>Math.hypot(q[0]-E[0],q[2]-E[2])>0.35).sort((a,b)=>a[2]-b[2]||a[0]-b[0]):[[-E[0],E[1],E[2]],[E[0],E[1]+0.03,E[2]+0.95],[-E[0],E[1]+0.03,E[2]+0.95],[0,E[1]+0.03,E[2]+0.95]];for(let i=0;i<(st.dummies||0)&&i<4;i++)seatedInto(cm,car.psi,seats[i],null,{skin:4,shirt:30,pants:4,hair:9},false);for(let i=0;i<(MPW.riders||0)&&(st.dummies||0)+i<4;i++)seatedInto(cm,car.psi,seats[(st.dummies||0)+i],null,{skin:1,shirt:7,pants:0,hair:1},false);
     const nc=(VEH.width||1.9)>1.86?3:2,nb=Math.min(nc*2,Math.round((st.cargoKg||0)/40)),tz=(VEH.tail?VEH.tail[2]:2.3)-0.5,fy=(VEH.eye?VEH.eye[1]-0.55:0.75);for(let i=0;i<nb;i++){const col=i%nc,row=Math.floor(i/nc);dBoxM(i%2?"cargoA":"cargoB",cm,car.psi,[(col-(nc-1)/2)*0.4,fy+0.14,tz-row*0.4],0.36,0.28,0.36)}}
-  if(st.walk&&!FOOT.inH&&!UBER.ride){const W=st.walk;if(!charQueue(PLAYER_MK,W.x,W.y,W.z,W.h,Math.abs(W.v||0),0))personInto(W.x,W.y,W.z,W.h,W.ph,{skin:1,shirt:7,pants:0,hair:1,sc:1,v:Math.abs(W.v)},"walk")}
+  if(st.walk&&!FOOT.inH&&!UBER.ride&&!MPW.ride){const W=st.walk;if(!charQueue(PLAYER_MK,W.x,W.y,W.z,W.h,Math.abs(W.v||0),0))personInto(W.x,W.y,W.z,W.h,W.ph,{skin:1,shirt:7,pants:0,hair:1,sc:1,v:Math.abs(W.v)},"walk")}
   // precipitation around the camera
   // puddles (rain) and ice patches (snow) on the road near you
   if(WX.w>0.3&&(WX.cur==="rain"||WX.cur==="snow")){if(!PUD.grid)pudBuild();const icy=WX.cur==="snow",cx=Math.floor(ex/25),cy=Math.floor(ey/25);for(let i=-5;i<=5;i++)for(let j=-5;j<=5;j++){const L=PUD.grid.get((cx+i)+","+(cy+j));if(!L)continue;
@@ -16007,7 +16030,7 @@ function render(dt){
   const cf=st.cam===0?[Math.cos(car.camYaw),0,-Math.sin(car.camYaw)]:fwd;
   const cy=Math.cos(look.yaw),sy=Math.sin(look.yaw), fl=[cf[0]*cy+cf[2]*sy,0,-cf[0]*sy+cf[2]*cy];   // forward turned by the look yaw
   const inGar=inGarage(car.px,car.py)&&!st.walk;
-  if(st.walk&&st.started){const W=st.walk;const inH=insideHouse(W.x,W.y,W.z),yaw=(W.cyBase===undefined?W.h:W.cyBase)+look.yaw,el=inH?clamp(0.12+look.pitch,0.02,0.5):clamp(0.3+look.pitch,0.05,1.2),dd=UBER.ride?Math.max(6.5,look.dist):inH?0.9:Math.min(look.dist,4.2)*0.8;const wp=[W.x,W.z+1.0,-W.y],f2=[Math.cos(yaw),0,-Math.sin(yaw)];
+  if(st.walk&&st.started){const W=st.walk;const inH=insideHouse(W.x,W.y,W.z),yaw=(W.cyBase===undefined?W.h:W.cyBase)+look.yaw,el=inH?clamp(0.12+look.pitch,0.02,0.5):clamp(0.3+look.pitch,0.05,1.2),dd=UBER.ride||MPW.ride?Math.max(6.5,look.dist):inH?0.9:Math.min(look.dist,4.2)*0.8;const wp=[W.x,W.z+1.0,-W.y],f2=[Math.cos(yaw),0,-Math.sin(yaw)];
     let dd2=dd;if(!inH){const hx=W.x,hy=W.y;for(let t=0.4;t<=dd;t+=0.25){const qx=hx-Math.cos(yaw)*t*Math.cos(el),qy=hy-Math.sin(yaw)*t*Math.cos(el),qz=W.z+1.5+t*Math.sin(el);let hitW=false;
       for(const o of collNear(qx,qy)){if(o.z1!==undefined&&(qz<o.z0||qz>o.z1))continue;if(o.t==="c"?Math.hypot(qx-o.x,qy-o.y)<o.r+0.2:(()=>{const c=Math.cos(o.h),s=Math.sin(o.h),dx=qx-o.x,dy=qy-o.y;return Math.abs(dx*c+dy*s)<o.hl+0.2&&Math.abs(-dx*s+dy*c)<o.hw+0.2})()){hitW=true;break}}
       if(hitW){dd2=Math.max(0.5,t-0.3);break}}W.camD=lerp(W.camD??dd2,dd2,dd2<(W.camD??dd2)?0.5:Math.min(1,dt*3));dd2=W.camD}
@@ -16730,16 +16753,25 @@ TABS.features=()=>{const T=TRIMS[st.trim];const sec=(t,h)=>h.trim()?`<h3>${t}</h
 TABS.controls=()=>{const T=TRIMS[st.trim],H=car.hyb,ev=!T.ice&&!T.hybrid,o=(attr,on,b,sm)=>opt(attr,on,b,sm);
   const lv=T.plug?(H.pb||0):ev||T.hybrid?socShow(H):0,fl=(T.ice||T.hybrid)?H.fuel/H.tank:0;
   return ALLS().filter(p=>secOf(p)==="controls").join("")+`<h3>Steering on a touchscreen</h3><div class="grid2">${o('data-set="wheelUI:0"',!st.wheelUI,"Slider","Slide left and right")}${o('data-set="wheelUI:1"',!!st.wheelUI,"Steering wheel","Turn a wheel on the screen")}</div>
-  <h3>Throttle response</h3><div class="grid2">${[[1.6,"Gentle","More pedal for the same push"],[1,"Normal",""],[0.7,"Sharp","Quick response, little pedal"]].map(([k,n,d])=>o(`data-set="thrK:${k}"`,(st.thrK||1)===k,n,d)).join("")}</div>
+  <h3>Haptics</h3><div class="grid2">${[[0,"Off","No vibration"],[1,"Light","Only the big moments: crashes, potholes, warnings, automatic braking"],[2,"Full","Also bumps, kerbs, rumble strips, ABS pulsing, gear shifts and button taps"]].map(([k,n,d])=>o(`data-set="haptic:${k}"`,hapLvl()===k,n,d)).join("")}</div>
+  <h3>Steering wheel and pedals</h3><div class="grid2">${o('data-a="whlSetup"',!!(WHL.cfg&&WHL.cfg.gas!=null),"🎮 USB steering wheel","Set-up, button bindings, force feedback by effect")}</div>`}
+TABS.pedals=()=>{const T=TRIMS[st.trim],H=car.hyb,ev=!T.ice&&!T.hybrid,o=(attr,on,b,sm)=>opt(attr,on,b,sm);
+  const lv=T.plug?(H.pb||0):ev||T.hybrid?socShow(H):0,fl=(T.ice||T.hybrid)?H.fuel/H.tank:0;
+  return `<h3>Throttle response</h3><div class="grid2">${[[1.6,"Gentle","More pedal for the same push"],[1,"Normal",""],[0.7,"Sharp","Quick response, little pedal"]].map(([k,n,d])=>o(`data-set="thrK:${k}"`,(st.thrK||1)===k,n,d)).join("")}</div>
   <h3>Brake response</h3><div class="grid2">${[[1.5,"Gentle","Progressive, easy to modulate"],[1,"Normal",""],[0.7,"Sharp","Bites early"]].map(([k,n,d])=>o(`data-set="brkK:${k}"`,(st.brkK||1)===k,n,d)).join("")}</div>
   <h3>Touch pedals</h3><div class="grid2">${o('data-set="pedHold:0"',!st.pedHold,"Slide","Slide your finger up the pedal for more: the higher you touch, the harder it presses")}${o('data-set="pedHold:1"',!!st.pedHold,"Hold","Just hold the pedal down and it presses in by itself. Let go and it's off")}</div>
   ${st.pedHold?`<h3>Hold: gas speed</h3><div class="grid2">${[[1,"Slow","About 3 s to full gas"],[2,"Medium","About 1 s to full gas"],[3,"Fast","Almost straight to full gas"]].map(([k,n,d])=>o(`data-set="thrRate:${k}"`,(st.thrRate||2)===k,n,d)).join("")}</div><h3>Hold: brake speed</h3><div class="grid2">${[[1,"Slow","About 3 s to full braking"],[2,"Medium","About 1 s to full braking"],[3,"Fast","Almost straight to full braking"]].map(([k,n,d])=>o(`data-set="brkRate:${k}"`,(st.brkRate||2)===k,n,d)).join("")}</div>`:""}
   <h3>Pedal smoothing</h3><div class="grid2">${[[0,"Instant","Keys and buttons go straight to full"],[1,"Natural","Pedals move like a real foot: about half a second to floor it"],[2,"Smooth","Gentle squeezes on and off, no jerks"]].map(([k,n,d])=>o(`data-set="pedalS:${k}"`,(st.pedalS??1)===k,n,d)).join("")}</div><h3>Gas strength</h3><div class="grid2">${[[1,"Soft","30 % max: gentle, never floors it"],[2,"Medium","50 % max"],[3,"Strong","75 % max"],[4,"Full","100 %: W is full throttle"]].map(([n,nm,d])=>o(`data-a="kThr:${n}"`,(st.kThr??1)===[0.3,0.5,0.75,1][n-1],nm+" ("+n+")",d)).join("")}</div>
-  <h3>Haptics</h3><div class="grid2">${[[0,"Off","No vibration"],[1,"Light","Only the big moments: crashes, potholes, warnings, automatic braking"],[2,"Full","Also bumps, kerbs, rumble strips, ABS pulsing, gear shifts and button taps"]].map(([k,n,d])=>o(`data-set="haptic:${k}"`,hapLvl()===k,n,d)).join("")}</div>
   <h3>Smooth stops</h3><div class="grid2">${o('data-set="softStop:1"',st.softStop!==0,"On","Eases off the brake in the last metre so you stop without a jolt, like a chauffeur (and like Mercedes' Comfort stop)")}${o('data-set="softStop:0"',st.softStop===0,"Off","The brakes stay as hard as you press them")}</div>
-  <h3>Seat</h3><div class="grid2">${[[-0.05,"Low"],[0,"Middle"],[0.06,"High"],[0.12,"Higher"],[0.18,"Highest"]].map(([k,n])=>o(`data-set="seatH:${k}"`,(st.seatH||0)===k,"Height: "+n,k>=0.12?"See over tall dashboards":"")).join("")}${[[-0.08,"Forward"],[0,"Middle"],[0.1,"Back"]].map(([k,n])=>o(`data-set="seatZ:${k}"`,(st.seatZ||0)===k,"Position: "+n,"")).join("")}</div>
+  `}
+TABS.seat=()=>{const T=TRIMS[st.trim],H=car.hyb,ev=!T.ice&&!T.hybrid,o=(attr,on,b,sm)=>opt(attr,on,b,sm);
+  const lv=T.plug?(H.pb||0):ev||T.hybrid?socShow(H):0,fl=(T.ice||T.hybrid)?H.fuel/H.tank:0;
+  return `<h3>Seat</h3><div class="grid2">${[[-0.05,"Low"],[0,"Middle"],[0.06,"High"],[0.12,"Higher"],[0.18,"Highest"]].map(([k,n])=>o(`data-set="seatH:${k}"`,(st.seatH||0)===k,"Height: "+n,k>=0.12?"See over tall dashboards":"")).join("")}${[[-0.08,"Forward"],[0,"Middle"],[0.1,"Back"]].map(([k,n])=>o(`data-set="seatZ:${k}"`,(st.seatZ||0)===k,"Position: "+n,"")).join("")}</div>
   <h3>Steering wheel</h3><div class="grid2">${[[-0.08,"Lowest"],[-0.04,"Low"],[0,"Middle"],[0.04,"High"]].map(([k,n])=>o(`data-set="whlH:${k}"`,(st.whlH||0)===k,"Tilt: "+n,k<0?"Lower it to see the gauges and the road":"")).join("")}${[[-0.06,"Away"],[0,"Middle"],[0.05,"Closer"]].map(([k,n])=>o(`data-set="whlZ:${k}"`,(st.whlZ||0)===k,"Reach: "+n,"")).join("")}</div>
-  <h3>Load · ${Math.round(T.mass+loadKg())} kg total</h3><div class="grid2">
+  `}
+TABS.load=()=>{const T=TRIMS[st.trim],H=car.hyb,ev=!T.ice&&!T.hybrid,o=(attr,on,b,sm)=>opt(attr,on,b,sm);
+  const lv=T.plug?(H.pb||0):ev||T.hybrid?socShow(H):0,fl=(T.ice||T.hybrid)?H.fuel/H.tank:0;
+  return `<h3>Load · ${Math.round(T.mass+loadKg())} kg total</h3><div class="grid2">
    </div>${(T.ice||T.hybrid)?`<label class="slRow"><span>⛽ Fuel</span><input type="range" min="1" max="100" step="1" data-sl="fuel" value="${Math.round(fl*100)}"><b id="sl_fuel">${Math.round(fl*100)}%</b></label>`:""}
    ${(ev||T.plug||T.hybrid&&!T.ice)?`<label class="slRow"><span>⚡ ${T.plug?"Battery":"Charge"}</span><input type="range" min="1" max="100" step="1" data-sl="chg" value="${Math.round(lv*100)}"><b id="sl_chg">${Math.round(lv*100)}%</b></label>`:""}
   <div class="grid2">${[0,80,160,320].map(k=>o(`data-set="cargoKg:${k}"`,(st.cargoKg||0)===k,k?`Cargo ${Math.round(k*2.205)} lb`:"No cargo",k?"Boxes in the back: heavier, slower, softer":"")).join("")}</div>
@@ -16784,7 +16816,7 @@ TABS.spawn=()=>`<div class="grid2"><button class="opt" data-a="codes"><b>🎁 Re
 function slSet(k,n){const H=car.hyb,T=TRIMS[st.trim];if(k==="fuel")H.fuel=H.tank*n;else if(k==="chg"){if(T.plug)H.pb=n;else H.soc=socRaw(n)}}
 document.addEventListener("input",e=>{const el=e.target;if(!el||!el.dataset||!el.dataset.sl)return;const k=el.dataset.sl,n=clamp(+el.value/100,0.01,1);slSet(k,n);const b=document.getElementById("sl_"+k);if(b)b.textContent=Math.round(n*100)+"%"});
 function setSearchApply(){const q=($("setSearch")&&$("setSearch").value||"").trim().toLowerCase();document.querySelectorAll("#tabBody .opt,#tabBody .cRow,#tabBody .slRow").forEach(el=>{el.style.display=!q||el.textContent.toLowerCase().includes(q)?"":"none"})}
-function renderTab(){if(!["graphics","world","cars","features","controls","assists","sound","online","spawn","tests","log"].includes(st.tab))st.tab="cars";$("tabBody").innerHTML=impText(TABS[st.tab]());setSearchApply();document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t.dataset.tab===st.tab))}
+function renderTab(){if(typeof TABS[st.tab]!=="function")st.tab="cars";$("tabBody").innerHTML=impText(TABS[st.tab]());setSearchApply();document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t.dataset.tab===st.tab))}
 function openDrawer(){renderTab();$("drawer").hidden=false}
 function closeDrawer(){$("drawer").hidden=true}
 $("tabs").addEventListener("click",e=>{const t=e.target.closest(".tab");if(t){st.tab=t.dataset.tab;renderTab()}});
@@ -16847,7 +16879,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=328;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="173",BUILD_VER=329;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const P=JSON.parse(localStorage.getItem("strata.prefs")||"{}");for(const k in P){if(typeof P[k]==="number"&&isFinite(P[k]))st[k]=P[k]}if(st.wheelUI)document.body.classList.add("wheelMode")}catch(e){}   /* your settings from last time */
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}try{const P=JSON.parse(localStorage.getItem("strata.ped")||"null");if(P){st.pedHold=+P.pedHold||0;st.thrRate=+P.thrRate||2;st.brkRate=+P.brkRate||2}}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
@@ -17272,31 +17304,36 @@ function whlPoll(dt){const gp=whlFind();WHL.gp=gp;if(!gp){WHL.live=false;WHL.clu
   let c=WHL.cfg;if(!c||c.id!==gp.id){c=WHL.cfg={...whlDef(gp.id),...(c&&!c.id?c:{}),id:gp.id};whlSave()}
   if(!WHL.told&&c.gas==null){WHL.told=true;toast("Steering wheel found: Settings › Controls › Steering wheel to set up the pedals and force feedback")}
   const p=clamp(gp.axes[c.steer]||0,-1,1),k=Math.max(dt,1e-3);WHL.vel+=((p-WHL.pos)/k-WHL.vel)*0.4;WHL.pos=p;WHL.deg=p*c.range/2;if(Math.abs(p)>0.02)WHL.live=true;
-  WHL.gas=whlPed(gp,c.gas);WHL.brk=whlPed(gp,c.brake);WHL.clu=c.clutch?whlPed(gp,c.clutch):null;
-  if(!WHL.setup&&st.started&&!st.walk)gp.buttons.forEach((b,i)=>{const pr=b.pressed;if(pr&&!WHL.prev[i]){if(i===c.up)act("shiftUp");else if(i===c.dn)act("shiftDn");else if(i===c.horn)hornOn(false)}WHL.prev[i]=pr});
+  {const dz=c.sDz||0,a=Math.max(0,Math.abs(p)-dz)/(1-dz),ps=Math.sign(p)*Math.pow(a,c.sLin||1);WHL.degS=ps*c.range/2}   /* steering deadzone and response curve (the force feedback still uses where the wheel really is) */
+  const pc=(x,g)=>x==null?x:Math.pow(clamp(x,0,1),g||1);WHL.gas=pc(whlPed(gp,c.gas),c.gasG);WHL.brk=pc(whlPed(gp,c.brake),c.brkG);WHL.clu=c.clutch?whlPed(gp,c.clutch):null;
+  if(!WHL.setup&&!WHL.bindWait&&st.started)gp.buttons.forEach((b,i)=>{const pr=b.pressed;if(pr&&!WHL.prev[i]){const a=whlBound(c,i);if(a)try{whlDo(a,true)}catch(e){}}else if(!pr&&WHL.prev[i]){const a=whlBound(c,i);if(a==="horn")try{hornOff()}catch(e){}}WHL.prev[i]=pr});
   return true}
 // the assists' own steering (added to the front wheel angle in physics): with force feedback the wheel turns to show it
 const whlAsst=()=>(sys.lkaDelta||0)+(sys.elkDelta||0)+(sys.esaDelta||0)+(sys.pilotDelta||0);
-const whlRoad=()=>WHL.deg/WHL.cfg.ratio*Math.PI/180;
+const whlRoad=()=>(WHL.degS??WHL.deg)/WHL.cfg.ratio*Math.PI/180;
 // park assist, summon: where the wheel should be (degrees), from what the car is steering
 function whlFollowDeg(){const x=sys.steerOv!=null?sys.steerOv:inp.steer,sp=Math.abs(car.vx),sIn=Math.sign(x)*(0.35*Math.abs(x)+0.65*x*x);return sIn*0.576/(1+Math.pow(sp/24,2))*180/Math.PI*WHL.cfg.ratio}
 function whlGrab(){if(!WHL.gp||!WHL.live)return false;return WHL.ffbOK?Math.abs(WHL.deg-whlFollowDeg())>80:Math.abs(WHL.vel)>0.9}
 // force: + turns the wheel right; -1..1
-function whlForce(dt){const c=WHL.cfg,T=TRIMS[st.trim]||{},v=Math.abs(car.vx);let F=0;
+function whlForce(dt){const c=WHL.cfg,T=TRIMS[st.trim]||{},v=Math.abs(car.vx),fx=k=>c[k]??WHL_FX[k];let F=0;
   if(!st.started||st.walk||WHL.setup)return WHL.setup&&WHL.setup.F!=null?WHL.setup.F:0;
   const follow=sys.pa||sys.steerOv!=null,on=st.power===true;
   if(follow){const tg=whlFollowDeg();F=clamp((tg-WHL.deg)/40,-1,1)*0.9-WHL.vel*0.18}
   else{// the tyres pull the wheel back to centre, harder with speed and load, going light when the fronts start to slide
     let al=0;if(car.alpha&&car.fz)for(let i=0;i<2;i++){const a=car.alpha[i]||0;al+=a*(car.fz[i]||0)*Math.max(0,1-Math.abs(a)/0.16)}
-    F+=WHL_ALS*al/((T.mass||1800)*9.81*0.03)*(on?1:1.6);
-    F-=WHL.pos*0.06*Math.min(1,v/4);                                          // caster: a little return when rolling
-    F-=WHL.vel*(on?(v<1?0.1:0.04):0.22);                                       // damping, heavy with the power steering off
+    F+=WHL_ALS*al/((T.mass||1800)*9.81*0.03)*(on?1:1.6)*fx("fAl");
+    F-=WHL.pos*0.06*Math.min(1,v/4)*fx("fAl");                                 // caster: a little return when rolling
+    F-=WHL.pos*0.5*fx("fSpring")*Math.max(0,1-v/4)*(on?1:1.8);                 /* standing still: a gentle centring spring (heavier with the power steering off) */
+    F-=WHL.vel*(on?(v<1?0.1:0.04):0.22)*fx("fDamp");                           // damping, heavy with the power steering off
     const a=whlAsst();if(sys.pilotState==="active"||sys.pilotState==="changing"||Math.abs(a)>0.002){const tg=-a*180/Math.PI*c.ratio;F+=clamp((tg-WHL.deg)/35,-1,1)*0.7-WHL.vel*0.05}}
-  if(car.vzw)F+=clamp(((car.vzw[0]||0)-(car.vzw[1]||0))*0.22,-0.35,0.35);       // bumps and potholes kick through the rack
-  if(car.offroad&&v>1)F+=(Math.random()-0.5)*Math.min(0.3,v/35);
-  const cr=car.crashed>0;if(cr&&!WHL.cr){WHL.jolt=0.3;WHL.joltS=Math.random()<0.5?-1:1}WHL.cr=cr;if(WHL.jolt>0){WHL.jolt-=dt;F+=WHL.joltS*0.9*Math.sign(Math.sin(WHL.jolt*90))}
-  const lk=0.576*180/Math.PI*c.ratio;if(Math.abs(WHL.deg)>lk)F-=Math.sign(WHL.deg)*Math.min(1,(Math.abs(WHL.deg)-lk)/12);   // the steering lock stops the wheel
+  if(car.vzw)F+=clamp(((car.vzw[0]||0)-(car.vzw[1]||0))*0.22,-0.35,0.35)*fx("fRoad");       // bumps and potholes kick through the rack
+  if(car.offroad&&v>1)F+=(Math.random()-0.5)*Math.min(0.3,v/35)*fx("fSurf");
+  {const g_=car.gnd&&car.gnd[0];if(g_&&(g_.rum||g_.kind==="kerb")&&v>2)F+=(Math.random()-0.5)*0.35*fx("fSurf")}   /* rumble strips and kerbs buzz through the wheel */
+  const cr=car.crashed>0;if(cr&&!WHL.cr){WHL.jolt=0.3;WHL.joltS=Math.random()<0.5?-1:1}WHL.cr=cr;if(WHL.jolt>0){WHL.jolt-=dt;F+=WHL.joltS*0.9*Math.sign(Math.sin(WHL.jolt*90))*fx("fHit")}
+  const lk=0.576*180/Math.PI*c.ratio;if(Math.abs(WHL.deg)>lk)F-=Math.sign(WHL.deg)*Math.min(1,(Math.abs(WHL.deg)-lk)/12)*fx("fLock");   // the steering lock stops the wheel
+  {const m=fx("fMin");if(m>0&&Math.abs(F)>0.004)F=Math.sign(F)*(m+Math.abs(F)*(1-m))}   /* minimum force: lifts small forces past the wheel's own dead spot (belt and gear wheels) */
   return clamp(F,-1,1)}
+const WHL_FX={fAl:1,fRoad:1,fSurf:1,fHit:1,fDamp:1,fSpring:0.3,fMin:0,fLock:1,vib:1};
 const WHL_ALS=-1;
 
 // ---- standard USB force feedback (HID PID, the same thing DirectInput games use): Moza, Fanatec, Simagic, Cammus and other direct-drive bases.
@@ -17337,7 +17374,7 @@ function whlOut(dt){if(!WHL.gp||!WHL.cfg)return;const c=WHL.cfg;let F=whlForce(d
   else if(WHL.ffbOK&&!WHL.busy){const lv=clamp(Math.round(0x80+F*127),0,255);let rp=0;const H=car.hyb,D=DRIVES[st.trim]||{};if(st.started&&!st.walk&&H&&H.eng&&D.red){const r=(H.rpm||0)/D.red;rp=r<0.6?0:Math.min(5,Math.floor((r-0.6)/0.07)+1)}
     const job=lv!==WHL.sent?[0x11,0x08,lv,0x80,0,0,0]:rp!==WHL.led?[0xf8,0x12,(1<<rp)-1,0,0,0,0]:null;
     if(job){WHL.busy=true;if(job[0]===0x11)WHL.sent=lv;else WHL.led=rp;whlSend(job).catch(()=>{WHL.ffbOK=false;toast("Force feedback stopped: the wheel disconnected")}).finally(()=>{WHL.busy=false})}}
-  else if(!WHL.ffbOK&&WHL.gp.vibrationActuator&&st.started&&!st.walk){const now=performance.now(),k=Math.min(1,Math.abs(F-WHL.F)*3+(WHL.jolt>0?1:0));WHL.F=F;if(k>0.15&&now>WHL.rum){WHL.rum=now+70;WHL.gp.vibrationActuator.playEffect("dual-rumble",{duration:70,strongMagnitude:k,weakMagnitude:k*0.5}).catch(()=>{})}}}
+  else if(!WHL.ffbOK&&WHL.gp.vibrationActuator&&st.started&&!st.walk){const now=performance.now(),k=Math.min(1,(Math.abs(F-WHL.F)*3+(WHL.jolt>0?1:0))*(c.vib??1));WHL.F=F;if(k>0.15&&now>WHL.rum){WHL.rum=now+70;WHL.gp.vibrationActuator.playEffect("dual-rumble",{duration:70,strongMagnitude:k,weakMagnitude:k*0.5}).catch(()=>{})}}}
 async function whlHid(dev){try{if(!dev.opened)await dev.open();const sw=WHL_LGSW[dev.productId];
     if(sw){for(const b of sw)await dev.sendReport(0,new Uint8Array(b));toast("Switching the wheel to its full mode. It reconnects in a moment: then press Connect force feedback again");return false}
     if(!WHL_LG.has(dev.productId)){WHL.hid=dev;if(await pidInit(dev)){WHL.ffbOK=true;WHL.sent=-9999;if(WHL.cfg){WHL.cfg.ffbOn=true;whlSave()}return true}
@@ -17354,15 +17391,22 @@ addEventListener("pagehide",()=>{if(WHL.ffbOK&&WHL.pid){const P=WHL.pid;try{P.de
 // ---- setup: find the steering axis and the pedals by moving them, the paddles by pulling them
 const WHL_STEPS=[["steer","Turn the wheel all the way left, then all the way right, then back to the middle"],["gas","Press the gas pedal all the way down, then let go"],["brake","Press the brake pedal all the way down, then let go"],["clutch","Press the clutch pedal all the way down, then let go (skip if you don't have one)"],["up","Pull the right paddle (shift up)"],["dn","Pull the left paddle (shift down)"],["horn","Press the button you want for the horn"]];
 function whlOpen(){let el=$("whl");if(!el){el=document.createElement("div");el.id="whl";document.body.appendChild(el);el.addEventListener("click",e=>{if(e.target===el){whlClose();return}const b=e.target.closest("button");if(b)whlAct(b.dataset.w)});
-    el.addEventListener("input",e=>{const t=e.target,c=WHL.cfg;if(!c)return;if(t.id==="whR"){c.range=+t.value;if(WHL.ffbOK)whlSend([0xf8,0x81,c.range&255,c.range>>8,0,0,0]).catch(()=>{})}if(t.id==="whF")c.ffb=+t.value/100;if(t.id==="whQ")c.ratio=+t.value;whlSave();whlDraw(true)})}
+    el.addEventListener("input",e=>{const t=e.target,c=WHL.cfg;if(!c)return;if(t.id==="whR"){c.range=+t.value;if(WHL.ffbOK)whlSend([0xf8,0x81,c.range&255,c.range>>8,0,0,0]).catch(()=>{})}if(t.id==="whF")c.ffb=+t.value/100;if(t.id==="whQ")c.ratio=+t.value;if(t.dataset&&t.dataset.k)c[t.dataset.k]=+t.value/(+t.dataset.sc||100);whlSave();whlDraw(true)})}
   el.hidden=false;whlDraw();if(!WHL.raf){const loop=()=>{if($("whl").hidden){WHL.raf=0;return}whlTick();WHL.raf=requestAnimationFrame(loop)};WHL.raf=requestAnimationFrame(loop)}}
-function whlClose(){const el=$("whl");if(el)el.hidden=true;WHL.setup=null}
+function whlClose(){const el=$("whl");if(el)el.hidden=true;WHL.setup=null;WHL.bindWait=null}
 function whlAct(a){const c=WHL.cfg;if(a==="x")whlClose();else if(a==="go"){const gp=whlFind();if(!gp){toast("Plug in your wheel and turn it a little so the browser sees it");return}if(!c||c.id!==gp.id){WHL.cfg={...whlDef(gp.id),...(c||{}),id:gp.id}}WHL.setup={i:0,base:[...gp.axes],btn:gp.buttons.map(b=>b.pressed),mn:gp.axes.map(v=>v),mx:gp.axes.map(v=>v),hit:-1}}
   else if(a==="skip"&&WHL.setup)whlNext(null);else if(a==="ffb")whlConnect().then(()=>whlDraw());else if(a==="test")whlSignTest();else if(a==="rev"&&c){c.sign=-(c.sign||1);whlSave()}
-  else if(a==="reset"){WHL.cfg=null;try{localStorage.removeItem("msWheel")}catch(e){}WHL.told=false}whlDraw()}
+  else if(a==="reset"){WHL.cfg=null;try{localStorage.removeItem("msWheel")}catch(e){}WHL.told=false}
+  else if(a&&a.startsWith("sec:")){const k=a.slice(4),O=WHL.open||(WHL.open=new Set());if(O.has(k))O.delete(k);else O.add(k)}
+  else if(a&&a.startsWith("bind:")&&c){const k=a.slice(5);if(WHL.bindWait===k){WHL.bindWait=null;c.bind=c.bind||{shiftUp:c.up,shiftDn:c.dn,horn:c.horn};delete c.bind[k];whlSave()}else{WHL.bindWait=k;const gp=whlFind();WHL.bindBase=gp?gp.buttons.map(b=>b.pressed):[]}}
+  else if(a==="unbind"&&c){c.bind={};c.up=c.dn=c.horn=null;whlSave()}
+  else if(a==="ffbdef"&&c){for(const k in WHL_FX)delete c[k];c.ffb=0.7;whlSave()}
+  whlDraw()}
 function whlNext(val){const S=WHL.setup,c=WHL.cfg,[k]=WHL_STEPS[S.i];if(val!==null||k!=="steer")c[k]=val;S.i++;const gp=WHL.gp||whlFind();if(gp){S.base=[...gp.axes];S.btn=gp.buttons.map(b=>b.pressed);S.mn=[...gp.axes];S.mx=[...gp.axes];S.hit=-1;S.r=null}
   if(S.i>=WHL_STEPS.length){WHL.setup=null;whlSave();toast("Wheel set up. Drive!")}whlDraw()}
-function whlTick(){const gp=whlFind();WHL.gp=gp;const S=WHL.setup;if(gp&&WHL.cfg)WHL.pos=clamp(gp.axes[WHL.cfg.steer]||0,-1,1);if(S&&S.F!=null)try{whlOut(0.016)}catch(e){}if(gp&&S&&S.F==null&&S.i!=null){const[k]=WHL_STEPS[S.i],c=WHL.cfg;
+function whlTick(){const gp=whlFind();WHL.gp=gp;const S=WHL.setup;
+  if(gp&&WHL.bindWait&&WHL.cfg){const c=WHL.cfg,B=WHL.bindBase||[];const i=gp.buttons.findIndex((b,j)=>b.pressed&&!B[j]);gp.buttons.forEach((b,j)=>{if(!b.pressed)B[j]=false});WHL.bindBase=B;
+    if(i>=0){c.bind=c.bind||{shiftUp:c.up,shiftDn:c.dn,horn:c.horn};for(const k in c.bind)if(c.bind[k]===i)delete c.bind[k];c.bind[WHL.bindWait]=i;WHL.bindWait=null;WHL.prev[i]=true;whlSave();whlDraw()}}if(gp&&WHL.cfg)WHL.pos=clamp(gp.axes[WHL.cfg.steer]||0,-1,1);if(S&&S.F!=null)try{whlOut(0.016)}catch(e){}if(gp&&S&&S.F==null&&S.i!=null){const[k]=WHL_STEPS[S.i],c=WHL.cfg;
     if(k==="steer"){gp.axes.forEach((v,i)=>{S.mn[i]=Math.min(S.mn[i],v);S.mx[i]=Math.max(S.mx[i],v)});let best=-1,bs=0;gp.axes.forEach((v,i)=>{const s=S.mx[i]-S.mn[i];if(s>bs){bs=s;best=i}});if(bs>1.5&&Math.abs(gp.axes[best]-S.base[best])<0.12){c.steer=best;whlNext(null);return}}
     else if(k==="gas"||k==="brake"||k==="clutch"){S.r=S.r||{};let done=null;   // a pedal: it moves away and comes back to rest (ignore an axis that only jumps from 0 to its rest the first time it's touched)
       gp.axes.forEach((v,i)=>{if(done||i===c.steer||(c.gas&&c.gas.ax===i)||(c.brake&&c.brake.ax===i))return;let r=S.r[i];if(!r){if(Math.abs(v-S.base[i])<0.02)return;r=S.r[i]={first:v,mn:v,mx:v,lv:v,st:0}}
@@ -17371,18 +17415,35 @@ function whlTick(){const gp=whlFind();WHL.gp=gp;const S=WHL.setup;if(gp&&WHL.cfg
       if(done){whlNext(done);return}}
     else{const i=gp.buttons.findIndex((b,j)=>b.pressed&&!S.btn[j]);if(i>=0){whlNext(i);return}gp.buttons.forEach((b,j)=>{if(!b.pressed)S.btn[j]=false})}}
   const m=$("whLive");if(m&&gp){const c=WHL.cfg;m.innerHTML=gp.axes.map((v,i)=>`<i title="axis ${i}" style="--v:${((v+1)/2*100).toFixed(0)}%" class="${c&&(i===c.steer||(c.gas&&c.gas.ax===i)||(c.brake&&c.brake.ax===i)||(c.clutch&&c.clutch.ax===i))?"on":""}"></i>`).join("")}}
-function whlDraw(soft){const el=$("whl");if(!el||el.hidden)return;if(soft){const v=$("whVals");if(v)v.innerHTML=whlVals();return}const gp=whlFind(),c=WHL.cfg,S=WHL.setup;let h=`<div class="whBox"><div class="whH"><b>Steering wheel</b><button data-w="x">✕</button></div>`;
-  if(!gp)h+=`<p>Plug in your wheel and pedals, then turn the wheel a little so the browser sees it.</p><p class="fine">Works with Logitech, Thrustmaster, Fanatec, Moza and other USB wheels in Chrome, Edge and Firefox on a computer.</p>`;
-  else{h+=`<p class="fine">${acctEsc(gp.id)}</p><div id="whLive"></div>`;
-    if(S&&S.i!=null){h+=`<p class="whStep">Step ${S.i+1} of ${WHL_STEPS.length}</p><p><b>${WHL_STEPS[S.i][1]}</b></p><div class="whR">${S.i>=3?`<button data-w="skip">Skip</button>`:""}<button data-w="x">Cancel</button></div>`}
-    else{const ok=c&&c.gas!=null;h+=`<p>${ok?"Set up: the wheel steers, the pedals drive"+(c.up!=null?", the paddles shift":"")+".":"Set up the pedals and paddles once: it takes about 20 seconds."}</p><div class="whR"><button class="whGo" data-w="go">${ok?"Set up again":"Set up the wheel"}</button>${ok?`<button data-w="reset">Reset</button>`:""}</div>
-      <div class="whH2"><b>Force feedback</b>${WHL.ffbOK?`<span class="whOn">On</span>`:""}</div>
-      <p class="fine">Feel the road through the wheel: it gets heavier with speed, goes light when the front tyres slide, kicks over bumps and kerbs, stops at the car's steering lock, and turns by itself when Super Cruise, Lane Keep or Park Assist steer. Moza, Fanatec, Simagic, Cammus and other direct-drive bases with standard force feedback, and Logitech G29, G923 (PlayStation), G27, G25 and Driving Force GT, in Chrome or Edge.</p>
-      <div class="whR">${WHL.ffbOK?`<button data-w="test">Check direction</button><button data-w="rev">Reverse force</button>`:`<button class="whGo" data-w="ffb">Connect force feedback</button>`}</div>
-      <div id="whVals">${whlVals()}</div>`}}
+/* the wheel's settings in sections you open and close (like a sim's controller menu): set-up, every button you can bind, force feedback effect by effect */
+const WHL_CATS=[["drive","Driving and Steering",[["shiftUp","Shift up"],["shiftDn","Shift down"],["gD","Drive (D)"],["gR","Reverse (R)"],["gN","Neutral (N)"],["gP","Park (P)"],["epb","Parking brake"]]],
+  ["veh","Vehicle Functions",[["horn","Horn"],["start","Start / stop engine"],["acc","Cruise control on / off"],["accUp","Cruise speed +"],["accDown","Cruise speed −"],["gap","Following distance"],["pilot","Lane centering / Autopilot"],["lka","Lane keeping"],["mode","Drive mode"],["phone","Phone"],["reset","Reset the car"]]],
+  ["lights","Lights",[["lights","Headlights"],["high","High beams"],["sigL","Left turn signal"],["sigR","Right turn signal"],["hazard","Hazard lights"],["fog","Fog lights"]]],
+  ["view","View Modes",[["cam","Change camera"],["inout","Inside / outside view"],["screen","Zoom to the centre screen"],["cluster","Zoom to the gauges"],["hud","Show / hide the HUD"]]]];
+const WHL_SL={drive:[["sDz","Steering deadzone",0,15,1,100,"%"],["sLin","Steering response curve",100,250,10,100,"x"],["gasG","Gas pedal curve",50,250,10,100,"x"],["brkG","Brake pedal curve",50,250,10,100,"x"]],
+  ffb:[["ffb","Overall strength",0,150,5,100,"%"],["fAl","Tyre feel (self-aligning)",0,200,10,100,"%"],["fRoad","Road bumps and potholes",0,200,10,100,"%"],["fSurf","Kerbs, rumble strips and gravel",0,200,10,100,"%"],["fHit","Crashes and impacts",0,200,10,100,"%"],["fDamp","Damping (weight when turning)",0,200,10,100,"%"],["fSpring","Centring when stopped",0,100,5,100,"%"],["fMin","Minimum force",0,30,1,100,"%"],["fLock","Steering lock stop",0,150,10,100,"%"]],
+  adv:[["vib","Controller vibration intensity",0,150,5,100,"%"]]};
+function whlBound(c,i){if(!c)return null;const B=c.bind||{shiftUp:c.up,shiftDn:c.dn,horn:c.horn};for(const a in B)if(B[a]===i)return a;return null}
+function whlBtnOf(c,a){const B=c.bind||{shiftUp:c.up,shiftDn:c.dn,horn:c.horn};return B[a]}
+function whlDo(a){switch(a){case "horn":hornOn(false);break;case "start":ignition((WHL.brk>0.3||inp.brk>0.3)?"start":"acc");break;case "inout":st.cam=st.cam===1?0:1;tick(1);break;case "screen":SCR.focus=!SCR.focus;SCR.focusClu=false;tick(1);break;
+  case "cluster":SCR.focusClu=!SCR.focusClu;SCR.focus=false;tick(1);break;case "phone":FOOT.phone=!FOOT.phone;try{phOpen(FOOT.phone)}catch(e){}break;case "reset":resetNearest();break;case "fog":st.fog=!st.fog;tick(1);break;
+  default:if(!st.walk||a==="hud")act(a)}}
+function whlDraw(soft){const el=$("whl");if(!el||el.hidden)return;if(soft){for(const k of Object.keys(WHL_SL))for(const r of WHL_SL[k]){const b=$("whv_"+r[0]);if(b)b.textContent=whlFmt(r)}const v=$("whVals");if(v)v.innerHTML=whlVals();return}
+  const gp=whlFind(),c=WHL.cfg,S=WHL.setup,O=WHL.open||(WHL.open=new Set(["gen"]));let h=`<div class="whBox"><div class="whH"><b>Steering wheel</b><button data-w="x">✕</button></div>`;
+  if(!gp){el.innerHTML=h+`<p>Plug in your wheel and pedals, then turn the wheel a little so the browser sees it.</p><p class="fine">Works with Logitech, Thrustmaster, Fanatec, Moza and other USB wheels in Chrome, Edge and Firefox on a computer.</p></div>`;return}
+  if(S&&S.i!=null){el.innerHTML=h+`<p class="fine">${acctEsc(gp.id)}</p><div id="whLive"></div><p class="whStep">Step ${S.i+1} of ${WHL_STEPS.length}</p><p><b>${WHL_STEPS[S.i][1]}</b></p><div class="whR">${S.i>=3?`<button data-w="skip">Skip</button>`:""}<button data-w="x">Cancel</button></div></div>`;return}
+  const sec=(k,t,body)=>`<div class="whS${O.has(k)?" on":""}"><button class="whT" data-w="sec:${k}"><span>${t}</span><i>${O.has(k)?"▾":"◂"}</i></button>${O.has(k)?`<div class="whB">${body}</div>`:""}</div>`;
+  const ok=c&&c.gas!=null,cc=c||whlDef(gp.id);
+  h+=sec("gen","General Controls",`<p class="fine">${acctEsc(gp.id)}</p><div id="whLive"></div><p>${ok?"Set up: the wheel steers, the pedals drive"+(cc.up!=null?", the paddles shift":"")+".":"Set up the pedals and paddles once: it takes about 20 seconds."}</p><div class="whR"><button class="whGo" data-w="go">${ok?"Set up again":"Set up the wheel"}</button>${ok?`<button data-w="reset">Reset</button>`:""}</div><div id="whVals">${whlVals()}</div>`);
+  const rows=L=>L.map(([a,n])=>{const b=whlBtnOf(cc,a),w=WHL.bindWait===a;return `<button class="whBind${w?" wait":""}" data-w="bind:${a}"><span>${n}</span><em>${w?"Press a button…":b==null?"—":"Button "+(b+1)}</em></button>`}).join("");
+  for(const [k,t,L] of WHL_CATS)h+=sec(k,t,(k==="drive"?whlSliders("drive"):"")+rows(L)+(k==="drive"?`<p class="fine">Click an action, then press the button on your wheel. Press the same action again to clear it.</p>`:""));
+  h+=sec("ffb","Force Feedback / Controller Vibration Intensity",`<div class="whH2"><b>Force feedback</b>${WHL.ffbOK?`<span class="whOn">On</span>`:""}</div><p class="fine">Feel the road through the wheel: it gets heavier with speed, goes light when the front tyres slide, kicks over bumps and kerbs, stops at the car's steering lock, and turns by itself when an assist steers. Moza, Fanatec, Simagic, Cammus and other direct-drive bases, and Logitech G29, G923 (PlayStation), G27, G25 and Driving Force GT, in Chrome or Edge.</p>
+    <div class="whR">${WHL.ffbOK?`<button data-w="test">Check direction</button><button data-w="rev">Reverse force</button>`:`<button class="whGo" data-w="ffb">Connect force feedback</button>`}</div>${whlSliders("ffb")}<div class="whR"><button data-w="ffbdef">Default effects</button></div>`);
+  h+=sec("adv","Advanced Settings",whlSliders("adv")+`<div class="whR"><button data-w="unbind">Clear all buttons</button><button data-w="reset">Forget this wheel</button></div>`);
   el.innerHTML=h+`</div>`}
+function whlFmt(r){const c=WHL.cfg||{},[k,,,,,sc,u]=r,def=k==="ffb"?0.7:k==="sDz"?0:["sLin","gasG","brkG"].includes(k)?1:WHL_FX[k]??1,v=c[k]??def;return u==="x"?(v===1?"Linear":`${v.toFixed(1)}×`):`${Math.round(v*sc)}%`}
+function whlSliders(cat){const c=WHL.cfg||{};return (WHL_SL[cat]||[]).map(r=>{const [k,n,mn,mx,stp,sc]=r,def=k==="ffb"?0.7:k==="sDz"?0:["sLin","gasG","brkG"].includes(k)?1:WHL_FX[k]??1,v=c[k]??def;return `<label>${n} <b id="whv_${k}">${whlFmt(r)}</b><input type="range" data-k="${k}" data-sc="${sc}" min="${mn}" max="${mx}" step="${stp}" value="${Math.round(v*sc)}"></label>`}).join("")}
 function whlVals(){const c=WHL.cfg||whlDef("");return `<label>Rotation <b>${c.range}°</b><input id="whR" type="range" min="270" max="1080" step="90" value="${c.range}"></label>
-  <label>Force feedback strength <b>${Math.round((c.ffb??0.7)*100)}%</b><input id="whF" type="range" min="0" max="150" step="5" value="${Math.round((c.ffb??0.7)*100)}"></label>
   <label>Steering ratio <b>${c.ratio}:1</b> <small>(${Math.round(0.576*180/Math.PI*c.ratio*2)}° lock to lock)</small><input id="whQ" type="range" min="10" max="20" step="0.5" value="${c.ratio}"></label>`}
 /* an element's size, re-read at most twice a second: reading it forces the browser to lay the page out again */
 let ELSZ_G=0;addEventListener("resize",()=>ELSZ_G++);addEventListener("orientationchange",()=>ELSZ_G++);
@@ -18255,9 +18316,50 @@ function koDraw(){const now=performance.now(),dt=Math.min(0.1,(now-(KO.t||now))/
   else{let p=at(1.1);oBox("poleD",p[0],p[1],p[2],0.07,2.2,0.07,k.dir,k.ang);p=at(2.2);oBox("signD",p[0],p[1],p[2],0.05,0.75,0.75,k.dir,k.ang)}}}
 // ---- multiplayer: everyone playing shares their car through room presence (about 10 times a second); other players' cars drive in your town
 const MP={room:null,objs:new Map(),sendT:0,last:"",lastT:0,gp:null};
-function mpTick(dt){const R_=MP.room;if(!R_)return;MP.sendT+=dt;
+// ---- v329 one shared world on a server: the host's traffic (and everyone's Uber) is the same car in everyone's game; players on foot are people;
+// you can ride along in another player's car; and guests stay within a radius of the host so the world everyone sees stays the same (and light)
+const MPW={cars:new Map(),sendT:0,lastT:0,R:700,warnT:0,ride:null};
+const mpGuest=()=>NET.on&&MP.room===NETROOM&&!netIsHost()&&NET.peers.size>0;
+/* the host: every car near any player, a few times a second, packed small (models and paints by index) */
+function mpwSend(){if(!NET.on||!netIsHost()||!NET.peers.size)return;const P=[[plX(),plY()]];for(const p of NET.peers.values())if(p.c)P.push([p.c.wx??p.c.x,p.c.wy??p.c.y]);
+  const M=[],Pa=[],mi=m=>{let i=M.indexOf(m);if(i<0){i=M.length;M.push(m)}return i},pi=k=>{let i=Pa.indexOf(k);if(i<0){i=Pa.length;Pa.push(k)}return i};const L=[];
+  for(const c of cars){if(c.wx===undefined||c.gone||c.kind==="net"||c.kind==="test"||c.kind==="cone"||c.kind==="remote")continue;let d=1e9;for(const q of P)d=Math.min(d,Math.hypot(c.wx-q[0],c.wy-q[1]));if(d>MPW.R*0.85)continue;
+    const fl=(c.brk||c.v<0.3?1:0)|(c.sig<0?2:0)|(c.sig>0?4:0)|(c.haz?8:0)|(c.rev?16:0);let m="";try{m=trafficModel(c)||""}catch(e){}
+    L.push([d,[c.id,Math.round(c.wx*10),Math.round(c.wy*10),Math.round((c.wz||0)*10),Math.round(c.wh*100),Math.round((c.v||0)*10),mi(m),pi(String(c.paint||"white")),fl,c.robo?1:c.ub?2:c.bus?3:c.emv?4:0]])}
+  L.sort((a,b)=>a[0]-b[0]);let list=L.map(x=>x[1]);while(list.length&&JSON.stringify(list).length>6200)list=list.slice(0,Math.floor(list.length*0.85));
+  netSend("W",{M,P:Pa,c:list})}
+/* a guest: the host's cars, eased between updates (and predicted forward by their speed so they don't stutter) */
+function mpwRecv(m){if(!mpGuest()||!Array.isArray(m.c))return;const M=Array.isArray(m.M)?m.M:[],Pa=Array.isArray(m.P)?m.P:[],now=performance.now(),seen=new Set();MPW.lastT=now;
+  for(const r of m.c){if(!Array.isArray(r)||r.length<9)continue;const id=+r[0];if(!isFinite(id))continue;seen.add(id);let c=MPW.cars.get(id);
+    const x=r[1]/10,y=r[2]/10,z=r[3]/10,h=r[4]/100,v=r[5]/10,mdl=String(M[r[6]]||""),pt=String(Pa[r[7]]||"white").slice(0,24),fl=+r[8]||0;if(!isFinite(x)||!isFinite(y))continue;
+    if(!c){c={id:-id,kind:"net",nid:id,wx:x,wy:y,wz:z,wh:h,v,spin:0,sig:0,head:0,brk:false,occ:undefined,dyn:false,net:true};const F=findFrame(x,y,h,null,"any");Object.assign(c,{e:F.e,dir:F.dir,s:F.s,off:F.off,offT:F.off});MPW.cars.set(id,c);cars.push(c)}
+    c.tx=x;c.ty=y;c.tz=z;c.th=h;c.v=v;c.rt=now;c.brk=!!(fl&1);c.sig=fl&8?0:fl&2?-1:fl&4?1:0;c.haz=!!(fl&8);c.rev=!!(fl&16);c.robo=r[9]===1;c.ub=r[9]===2;
+    if(/^[a-z0-9_]+$/.test(mdl)){if(MODELS[mdl])c.mdl=mdl;else if(!c.loading){c.loading=true;loadModel(mdl).then(()=>{c.loading=false;c.mdl=mdl}).catch(()=>{c.loading=false})}}
+    if(pt!==c.paint&&(PAINTS[pt]||/^c:#[0-9a-f]{6}$/i.test(pt)))c.paint=pt;
+    {const F=findFrame(x,y,h,c.e?{e:c.e,dir:c.dir}:null,"any");c.e=F.e;c.dir=F.dir;c.s=F.s;c.off=F.off;c.offT=F.off}}
+  for(const [id,c] of MPW.cars)if(!seen.has(id)&&now-c.rt>1500){MPW.cars.delete(id);const i=cars.indexOf(c);if(i>=0)cars.splice(i,1)}}
+function mpwTick(dt){const g=mpGuest();
+  if(!g){if(MPW.cars.size){for(const c of MPW.cars.values()){const i=cars.indexOf(c);if(i>=0)cars.splice(i,1)}MPW.cars.clear()}}
+  else{const now=performance.now();
+    /* the guest's own traffic goes: the host's traffic replaces it (your own Uber, tow truck and the like stay) */
+    for(let i=cars.length-1;i>=0;i--){const c=cars[i];if(c.kind==="ai"&&!poolKeep(c))cars.splice(i,1)}
+    for(const c of MPW.cars.values()){const age=Math.min(0.5,(now-c.rt)/1000),tx=c.tx+Math.cos(c.th)*c.v*age*(c.rev?-1:1),ty=c.ty+Math.sin(c.th)*c.v*age*(c.rev?-1:1),k=Math.min(1,dt*8);
+      if(Math.hypot(tx-c.wx,ty-c.wy)>12){c.wx=tx;c.wy=ty;c.wh=c.th}else{c.wx+=(tx-c.wx)*k;c.wy+=(ty-c.wy)*k;c.wh+=wrapPi(c.th-c.wh)*k}c.wz+=(c.tz-c.wz)*k;c.spin+=c.v/0.36*dt}
+    /* the area round the host: you can't drive (or walk) out of it, it moves when they do */
+    const hp=NET.peers.get(netHostId()),hc=hp&&hp.c;if(hc){const hx=hc.wx??hc.x,hy=hc.wy??hc.y,px=plX(),py=plY(),d=Math.hypot(px-hx,py-hy);
+      if(d>MPW.R){const k=MPW.R/d,nx=hx+(px-hx)*k,ny=hy+(py-hy)*k;if(st.walk&&!MPW.ride){st.walk.x=nx;st.walk.y=ny}else if(!st.walk){car.px=nx;car.py=ny;const ox=(px-hx)/d,oy=(py-hy)/d,vx=Math.cos(car.psi)*car.vx,vy=Math.sin(car.psi)*car.vx,out=vx*ox+vy*oy;if(out>0)car.vx*=0.3}
+        if(now-MPW.warnT>4000){MPW.warnT=now;toast(`You can't go more than ${Math.round(MPW.R*(st.units==="mph"?0.000621:0.001)*10)/10} ${st.units==="mph"?"mi":"km"} from the host (${hp.n}): the area moves with them`)}}}}
+  mpRideTick(dt)}
+/* riding along in another player's car: you sit in it (they see you there), the camera follows it, O gets you out when it's stopped */
+function mpRideTry(){if(!NET.on||!st.walk||MPW.ride)return false;let best=null,bd=4.2;for(const o of MP.objs.values()){if(o.walk)continue;const d=Math.hypot(o.wx-st.walk.x,o.wy-st.walk.y);if(d<bd){bd=d;best=o}}
+  if(!best)return false;MPW.ride={peer:best.peer,o:best};st.walk.v=0;toast(`Riding with ${best.name||"another player"} · press O (or Get out) to get out when they stop`);return true}
+function mpRideOut(){const R=MPW.ride;if(!R)return false;const o=R.o;if(o&&Math.abs(o.v||0)>1){toast("Wait for them to stop");return true}MPW.ride=null;if(st.walk&&o){const lx=-Math.sin(o.wh),ly=Math.cos(o.wh);st.walk.x=o.wx+lx*2.1;st.walk.y=o.wy+ly*2.1;st.walk.h=o.wh}toast("You got out");return true}
+function mpRideTick(dt){const R=MPW.ride;if(!R)return;const o=MP.objs.get(R.peer);if(!o||!NET.on||!st.walk){MPW.ride=null;if(st.walk)toast("The ride ended");return}R.o=o;const W=st.walk;W.x=o.wx;W.y=o.wy;W.z=o.wz||0;W.h=o.wh;W.v=0}
+function mpTick(dt){const R_=MP.room;try{mpwTick(dt)}catch(e){console.warn(e)}if(!R_)return;MP.sendT+=dt;
   if(MP.sendT>0.1&&st.started){MP.sendT=0;const pc=paintRGB(st.paint).map(v=>+v.toFixed(3));
     const p={x:+car.px.toFixed(2),y:+car.py.toFixed(2),z:+(car.zb||0).toFixed(2),h:+car.psi.toFixed(3),v:+car.vx.toFixed(2),m:TRIMS[st.trim].model||"",pc,b:(inp.brk>0.1||st.gear==="P")?1:0,sg:st.hazard?2:(st.signal||0),w:st.walk?1:0,st:Math.round((car.dF||0)*25)/25,li:st.power===false?0:st.high?2:(st.lights||st.night)?1:0,rv:st.gear==="R"?1:0,pt:Math.round((car.pitch||0)*100)/100,rl:Math.round((car.roll||0)*100)/100,hn:st.hornAt&&(st.clock||0)-st.hornAt<0.6?1:0};
+    if(st.walk){p.wx=+st.walk.x.toFixed(2);p.wy=+st.walk.y.toFixed(2);p.wz=+(st.walk.z||0).toFixed(2);p.wh=+(st.walk.h||0).toFixed(2);p.wv=+(Math.abs(st.walk.v||0)).toFixed(1);if(MPW.ride)p.rd=MPW.ride.peer}
+    if(mpGuest()){const X=[];for(const c of cars)if(c.kind!=="net"&&c.wx!==undefined&&poolKeep(c)&&X.length<4){let m="";try{m=trafficModel(c)}catch(e){}X.push([Math.round(c.wx*10),Math.round(c.wy*10),Math.round(c.wh*100),Math.round((c.v||0)*10),m,String(c.paint||"white")])}if(X.length)p.xc=X}
     const key=JSON.stringify(p),now=performance.now();if(key!==MP.last||now-MP.lastT>1000){MP.last=key;MP.lastT=now;R_.presence({car:p,playing:true,ver:BUILD_VER}).catch(()=>{})}}
   const now=performance.now(),seen=new Set();let peers=[];try{peers=R_.peers()}catch(e){}
   for(const pr of peers){if(pr.sameTab||pr.kind!=="viewer")continue;const c=pr.presence&&pr.presence.car;if(!c||typeof c.x!=="number"||!isFinite(c.x)||!isFinite(c.y))continue;seen.add(pr.peer);
@@ -18270,8 +18372,17 @@ function mpTick(dt){const R_=MP.room;if(!R_)return;MP.sendT+=dt;
     if(c.hn&&!o.hn&&Math.hypot(o.wx-car.px,o.wy-car.py)<150)try{mpHorn(o)}catch(e){}o.hn=!!c.hn;
     if(Array.isArray(c.pc)&&c.pc.length===3){const key="rp_"+pr.peer;PAINTS[key]=c.pc.map(x=>clamp(+x||0,0,1));o.paint=key}
     const m=String(c.m||"");if(MODELS[m])o.mdl=m;else if(m&&/^[a-z0-9_]+$/.test(m)&&!o.loading&&!o.failed){o.loading=true;loadModel(m).then(()=>{o.loading=false}).catch(()=>{o.loading=false;o.failed=true})}
+    o.walk=!!c.w;if(c.w&&typeof c.wx==="number"&&isFinite(c.wx)){let pp=o.ped;if(!pp){pp=o.ped=newPed(null,0,1);Object.assign(pp,{mode:"scr",netP:true,skin:1,shirt:7,pants:0,hair:1})}const kk=Math.min(1,dt*10);if(pp.wx===0&&pp.wy===0){pp.wx=c.wx;pp.wy=c.wy}pp.wx+=(c.wx-pp.wx)*kk;pp.wy+=(c.wy-pp.wy)*kk;pp.wz=+c.wz||0;pp.wh=+c.wh||0;pp.v=+c.wv||0;pp.ph+=pp.v*dt*4.2;pp.hidden=!!c.rd;if(!c.rd&&!peds.includes(pp))peds.push(pp);if(c.rd){const i=peds.indexOf(pp);if(i>=0)peds.splice(i,1)}}
+    else if(o.ped){const i=peds.indexOf(o.ped);if(i>=0)peds.splice(i,1);o.ped=null}
+    o.riders=0;
+    if(Array.isArray(c.xc)&&MP.room===NETROOM){o.xc=o.xc||[];c.xc.slice(0,4).forEach((r,j)=>{if(!Array.isArray(r))return;let k=o.xc[j];const x=r[0]/10,y=r[1]/10;if(!isFinite(x)||!isFinite(y))return;if(!k){k=o.xc[j]={id:-(1e6+j),kind:"net",wx:x,wy:y,wz:0,wh:r[2]/100,v:0,spin:0,sig:0,head:0,net:true};const F=findFrame(x,y,r[2]/100,null,"any");Object.assign(k,{e:F.e,dir:F.dir,s:F.s,off:F.off,offT:F.off});cars.push(k)}
+      const kk=Math.min(1,dt*8);k.wx+=(x-k.wx)*kk;k.wy+=(y-k.wy)*kk;k.wh+=wrapPi(r[2]/100-k.wh)*kk;k.v=r[3]/10;k.spin+=k.v/0.36*dt;const m=String(r[4]||"");if(/^[a-z0-9_]+$/.test(m)&&MODELS[m])k.mdl=m;else if(/^[a-z0-9_]+$/.test(m)&&!k.ld){k.ld=1;loadModel(m).catch(()=>{})}k.paint=String(r[5]||"white").slice(0,24)});
+      for(let j=c.xc.length;j<o.xc.length;j++){const k=o.xc[j];const i=cars.indexOf(k);if(i>=0)cars.splice(i,1)}o.xc.length=Math.min(o.xc.length,c.xc.length)}
+    else if(o.xc){for(const k of o.xc){const i=cars.indexOf(k);if(i>=0)cars.splice(i,1)}o.xc=null}
     if(!parked.includes(o))parked.push(o)}
-  for(const [k,o] of MP.objs)if(!seen.has(k)){MP.objs.delete(k);if(MP.room===NETROOM&&o.name&&NET.on)toast(`${o.name} left`);const i=parked.indexOf(o);if(i>=0)parked.splice(i,1)}
+  /* who's riding with whom: a passenger shows in that car's seat */
+  {let mine=0;for(const pr of peers){const c=pr.presence&&pr.presence.car;if(!c||!c.rd)continue;if(c.rd===NET.me)mine++;else{const o=MP.objs.get(c.rd);if(o)o.riders=(o.riders||0)+1}}MPW.riders=mine;for(const o of MP.objs.values())if(o.occ)o.occ.pax=(o.riders||0)>0}
+  for(const [k,o] of MP.objs)if(!seen.has(k)){if(o.ped){const i=peds.indexOf(o.ped);if(i>=0)peds.splice(i,1)}if(o.xc)for(const x of o.xc){const i=cars.indexOf(x);if(i>=0)cars.splice(i,1)}MP.objs.delete(k);if(MP.room===NETROOM&&o.name&&NET.on)toast(`${o.name} left`);const i=parked.indexOf(o);if(i>=0)parked.splice(i,1)}
   MP.ready=true}
 
 (async()=>{try{if(!window.claude||!window.claude.use)return;const user=await window.claude.use("user");const owner=user?await user.isOwner():false;const room=await window.claude.use("room");if(!room)return;
@@ -18309,7 +18420,7 @@ function mqOpen(url,will,onmsg){return new Promise((res,rej)=>{let ws;try{ws=new
       const h=buf[0],P=buf.slice(i,i+L);buf=buf.slice(i+L);const t=h>>4;
       if(t===2){clearTimeout(to);if(P[1]===0){C.open=true;C.ping=setInterval(()=>{if(ws.readyState===1)try{ws.send(Uint8Array.of(0xC0,0))}catch(e){}},30000);res(C)}else{try{ws.close()}catch(e){}rej(new Error("refused"))}}
       else if(t===3){const tl=(P[0]<<8)|P[1],topic=D.decode(P.subarray(2,2+tl));let o=2+tl;if((h>>1)&3)o+=2;const raw=P.subarray(o);let m=null;
-        if(raw.length){if(raw.length>8000)continue;try{m=JSON.parse(D.decode(raw))}catch(_){continue}}try{onmsg(topic,m)}catch(err){console.warn(err)}}}};
+        if(raw.length){if(raw.length>12000)continue;try{m=JSON.parse(D.decode(raw))}catch(_){continue}}try{onmsg(topic,m)}catch(err){console.warn(err)}}}};
   ws.onerror=()=>{};ws.onclose=()=>{clearTimeout(to);clearInterval(C.ping);if(!C.open){rej(new Error("closed"));return}C.open=false;if(C.onclose)C.onclose()}})}
 // the same connection to every broker at once: publish to all, receive from all (duplicates are dropped by sequence number), and survive one broker being down
 async function netGroup(will,onmsg,subs){const G={cs:new Map(),subs:subs.slice(),dead:false,onup:null,
@@ -18332,6 +18443,7 @@ function netOnMsg(topic,m){
   if(m.k==="P"){let p=NET.peers.get(id);if(!p){if(NET.peers.size>=NET.max+2)return;p={j:+m.j||Date.now()};NET.peers.set(id,p);netUI()}
     p.n=netClean(m.n,20)||"Driver";if(+m.j)p.j=+m.j;p.c=m.c&&typeof m.c==="object"&&typeof m.c.x==="number"?m.c:null;p.t=performance.now()}
   else if(m.k==="B"){if(NET.peers.delete(id))netUI()}
+  else if(m.k==="W"&&id===netHostId()){try{mpwRecv(m)}catch(e){console.warn(e)}}
   else if(m.k==="H"&&m.to===NET.me&&Array.isArray(m.dv)&&!st.walk){const dx=clamp(+m.dv[0]||0,-15,15),dy=clamp(+m.dv[1]||0,-15,15),c=Math.cos(car.psi),s_=Math.sin(car.psi);car.vx+=dx*c+dy*s_;car.vy+=-dx*s_+dy*c;car.r+=clamp((Math.random()-0.5)*Math.hypot(dx,dy)*0.15,-0.8,0.8);const p=NET.peers.get(id);crashFx(clamp(+m.v||Math.hypot(dx,dy),0,30),(p&&p.n)||"another player")}
   else if(m.k==="E"&&id===netHostId()){if(typeof m.min==="number"&&isFinite(m.min)&&Math.abs(GT.min-m.min)>3)GT.min=m.min;if(+m.day>0&&+m.day!==GT.day&&Math.abs(+m.day-(GT.day||1))<400)GT.day=+m.day;if(typeof m.sp==="number"&&isFinite(m.sp)&&m.sp>=0&&m.sp<=60)GT.speed=m.sp;
     if(typeof m.wx==="string"&&["clear","rain","snow","fog"].includes(m.wx)&&WX.cur!==m.wx&&WX.next!==m.wx)setWeather(m.wx,false)}}
@@ -18368,7 +18480,7 @@ setInterval(()=>{if(!NET.on)return;const now=performance.now();
   for(const [id,p] of NET.peers)if(now-p.t>10000){NET.peers.delete(id);netUI()}
   if(now-NET.sentT>2000)netSendP();
   const host=netIsHost();if(host!==NET.wasHost){NET.wasHost=host;if(host){toast(`You're hosting ${NET.srvName} now`);netPubListing()}netUI()}
-  if(host){if(now-NET.listT>15000||NET.peers.size+1!==NET.lastN)netPubListing();if(now-NET.envT>2000){NET.envT=now;netSend("E",{min:GT.min,day:GT.day||1,sp:GT.speed??GT_RATE,wx:WX.next||WX.cur})}}},200);
+  if(host){if(now-NET.listT>15000||NET.peers.size+1!==NET.lastN)netPubListing();if(now-MPW.sendT>240){MPW.sendT=now;try{mpwSend()}catch(e){console.warn(e)}}if(now-NET.envT>2000){NET.envT=now;netSend("E",{min:GT.min,day:GT.day||1,sp:GT.speed??GT_RATE,wx:WX.next||WX.cur})}}},200);
 addEventListener("pagehide",()=>{if(NET.on)netLeave(true);try{garageSync()}catch(e){}});
 function netTick(dt){if(!NET.on)return;const el=$("players");if(el&&MP.room===NETROOM){el.hidden=false;el.textContent=`🌐 ${NET.peers.size+1} · ${NET.srvName}`;el.title="Players in your server"}}
 function netUI(){if(st.tab==="online"&&!$("drawer").hidden){const a=document.activeElement;if(a&&a.tagName==="INPUT"&&$("tabBody").contains(a))return;renderTab()}}
