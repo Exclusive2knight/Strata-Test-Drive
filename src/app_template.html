@@ -1326,8 +1326,12 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
 <script data-boot>(function(){var p=0;window.__bootP=0;var t=setInterval(function(){if(window.__bootReal){clearInterval(t);return}p+=(0.7-p)*0.025;window.__bootP=p;var a=document.getElementById("bootArc"),n=document.getElementById("bootNeedle"),c=document.getElementById("bootPct");if(a)a.setAttribute("stroke-dasharray",(p*100).toFixed(1)+" 100");if(n)n.style.setProperty("--a",(-135+p*270)+"deg");if(c)c.textContent=String(Math.round(p*100))},120)})()</script>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 327 · Real merge lanes, a calmer airport and upgraded Teslas</h2></div>
+    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 328 · Airport garages and Tesla Park Assist</h2></div>
     <div class="nb">
+      <h4>Airport garages and Tesla Park Assist</h4><ul>
+      <li>✈️ <b>No more road through the garage</b>: the corners of the Arrivals and Departures loops at McNamara were so wide (about 140 m) that the road cut right through the corner of the parking garage. The loops now turn tight corners round the garage like real terminal roads, and the same goes for Evans</li>
+      <li>🚗 <b>Tesla Park Assist, refined</b>: the lines now follow a rounded outline of the car and blend smoothly from white to yellow to orange to red as things get closer. They fade in gently, with a soft glow, instead of jumping from sensor to sensor. The distance is shown right next to the closest point ("29 in") and turns to STOP when you're very close. Camera-only Teslas get a softly shaded High Fidelity outline</li>
+      </ul>
       <h4>Real merge lanes, a calmer airport and upgraded Teslas</h4><ul>
       <li>🚗 <b>Upgraded Teslas</b>: all 11 (Model 3 and Y old and new, Model S and X old and new, the 2020 S and X, Cybertruck, Roadster and Cybercab) get detailed cabins and real lights. The headlights sit on the nose like the real cars, with white DRLs, amber turn signals, brake-light LEDs and side markers. Inside: seats moved back from the wheel, seat belts, door handles and window switches, pedals, sun visors and the rear-view mirror</li>
       <li>🛣️ <b>Merge lanes look like a real highway</b>: where an on-ramp runs beside the freeway, the solid edge line and rumble strip give way to the dotted line between the merge lane and the right lane, and the merge lane gets its own solid edge line on the outside. No more yellow ramp line squeezed in next to the freeway lanes</li>
@@ -2660,8 +2664,8 @@ function buildNet2(){
    E("aw","McNamara Terminal",[A(-1100,470),A(-1040,470)],{lim:40});
    E("aw","McNamara Terminal",[A(-1040,470),A(-640,470)],{lim:40,zo:tun(-1040),tun:1});
    rd("aw","McNamara Terminal",[A(-640,470),A(60,470)],{lim:35});   /* the curbs split here, clear of the sidewalk island between them */
-   rd("curb","Arrivals (lower level)",[A(60,470),A(110,462,0),A(262,462,0),A(262,150,0),A(-262,150,0),A(-262,250,0),A(-420,250)],{lim:15});
-   rd("curb","Departures (upper level)",[A(60,470),A(110,484,0),A(285,484,0),A(285,150,0),A(-285,150,0),A(-285,225,0),A(-470,232,0),A(-530,240,0),A(-560,250)],
+   rd("curb","Arrivals (lower level)",[A(60,470),A(110,462,0),A(262,462,30),A(262,150,30),A(-262,150,30),A(-262,250,26),A(-420,250)],{lim:15});   /* tight corners round the garage (an automatic curve was 140 m wide and cut through its corner) */
+   rd("curb","Departures (upper level)",[A(60,470),A(110,484,0),A(285,484,32),A(285,150,32),A(-285,150,32),A(-285,225,26),A(-470,232,0),A(-530,240,0),A(-560,250)],
      {lim:15,fly:1,stack:1,zo:function(u){const up=(a,b)=>0.5*smooth01(a,b,u)+0.5*clamp((u-a)/(b-a),0,1);return 7.2*up(240,410)*(1-up(this.L-300,this.L-12))}});
    N(...A(-560,250),{ctrl:"merge"});
    rd("aw","McNamara Terminal",[A(-420,250),A(-560,250)],{lim:35});rd("aw","McNamara Terminal",[A(-560,250),A(-640,250)],{lim:35});
@@ -2672,8 +2676,8 @@ function buildNet2(){
    // Evans (north) terminal: in along the north roadway (N1), arrivals below and departures above, out to the east (N4)
    rd("road","W.G. Rogell Dr",[[3700,-3300],[3700,-3480],[3700,-3643,60],D1],{lim:45});
    rd("aw","Evans Terminal",[D1,A(2480,-1375,0),A(640,-1375)],{lim:35});
-   rd("curb","Arrivals (lower level)",[A(640,-1375),A(520,-1375,0),A(520,-1110,0),A(960,-1110,0),A(960,-1340,0),A(1100,-1340)],{lim:15});
-   rd("curb","Departures (upper level)",[A(640,-1375),A(497,-1375,0),A(497,-1110,0),A(983,-1110,0),A(983,-1318,0),A(1100,-1318,0),A(1160,-1340)],
+   rd("curb","Arrivals (lower level)",[A(640,-1375),A(520,-1375,24),A(520,-1110,24),A(960,-1110,24),A(960,-1340,24),A(1100,-1340)],{lim:15});
+   rd("curb","Departures (upper level)",[A(640,-1375),A(497,-1375,32),A(497,-1110,32),A(983,-1110,32),A(983,-1318,26),A(1100,-1318,0),A(1160,-1340)],
      {lim:15,fly:1,stack:1,zo:function(u){const up=(a,b)=>0.5*smooth01(a,b,u)+0.5*clamp((u-a)/(b-a),0,1);return 7.2*up(165,330)*(1-up(this.L-390,this.L-130))}});
    N(...A(1160,-1340),{ctrl:"merge"});
    rd("aw","Evans Terminal",[A(1100,-1340),A(1160,-1340)],{lim:35});rd("aw","Evans Terminal",[A(1160,-1340),A(2480,-1340,0),D1],{lim:45});
@@ -7647,25 +7651,50 @@ function vizDraw(g,x,y,w,h,big){const M=me(),T=TRIMS[st.trim],dark=VZ.dk?true:is
    when it's very close). Cars with the 12 ultrasonic sensors (6 front, 6 rear) show the classic lines; camera-only cars (Tesla Vision) show the
    High Fidelity outline instead */
 const tslUSS=()=>/^tsl_(model3l|modelyl|models20|modelx20)$/.test(TRIMS[st.trim].model||"");
-function vizUSS(g,x,y,w,h,dark){const P=sys.pdc,HL=BODY_HL,HW=0.95,uss=tslUSS(),Rm=2.0;
-  g.fillStyle=dark?"#0d0e10":"#eceef0";g.fillRect(x,y,w,h);
-  const ppm=Math.min(h/(HL*2+3.4),w/(HW*2+3.6)),cx=x+w/2,cy=y+h*0.5,S=(lx,ly)=>[cx-ly*ppm,cy-lx*ppm];
+function vizUSS(g,x,y,w,h,dark){const P=sys.pdc,HL=BODY_HL,HW=0.95,uss=tslUSS(),Rm=uss?1.9:2.2,RC=0.55;
+  {const bg=g.createRadialGradient(x+w/2,y+h/2,10,x+w/2,y+h/2,Math.max(w,h)*0.7);if(dark){bg.addColorStop(0,"#1a1c20");bg.addColorStop(1,"#0b0c0e")}else{bg.addColorStop(0,"#f4f5f7");bg.addColorStop(1,"#dfe2e6")}g.fillStyle=bg;g.fillRect(x,y,w,h)}
+  const ppm=Math.min(h/(HL*2+3.6),w/(HW*2+3.8)),cx=x+w/2,cy=y+h*0.5,S=(lx,ly)=>[cx-ly*ppm,cy-lx*ppm];
+  /* the car: the real 3D model from above when it's ready, otherwise a clean drawn one */
   MINI.use=performance.now();MINI.ang=0;MINI.el=1.45;MINI.fov=0.3;
-  if(!miniDraw(g,cx,cy,ppm)){g.fillStyle=dark?"#c4c7cb":"#5d6166";rr2(g,cx-HW*ppm,cy-HL*ppm,HW*2*ppm,HL*2*ppm,HW*0.6*ppm);g.fill();g.fillStyle=dark?"#2a2d31":"#25282c";rr2(g,cx-HW*0.75*ppm,cy-HL*0.3*ppm,HW*1.5*ppm,HL*0.75*ppm,HW*0.3*ppm);g.fill()}
-  /* round the car clockwise from the front left: [lx, ly, outward x, outward y, reading] */
-  const pts=[[HL,0.85,1,0,P.f[0]],[HL,0.25,1,0,P.f[1]],[HL,-0.25,1,0,P.f[2]],[HL,-0.85,1,0,P.f[3]],[1.4,-HW,0,-1,P.sr[0]],[0,-HW,0,-1,P.sr[1]],[-1.4,-HW,0,-1,P.sr[2]],
-    [-HL,-0.85,-1,0,P.r[3]],[-HL,-0.25,-1,0,P.r[2]],[-HL,0.25,-1,0,P.r[1]],[-HL,0.85,-1,0,P.r[0]],[-1.4,HW,0,1,P.sl[2]],[0,HW,0,1,P.sl[1]],[1.4,HW,0,1,P.sl[0]]];
-  const col=d=>d<0.3?[255,45,40]:d<0.6?[255,128,30]:d<1.0?[255,206,30]:dark?[235,238,240]:[150,155,160],rgb=c=>`rgb(${c[0]},${c[1]},${c[2]})`;
-  const at=i=>{const [lx,ly,nx,ny,d]=pts[i];const k=Math.max(0.06,Math.min(d,Rm))+0.12;return S(lx+nx*k,ly+ny*k)};
-  g.lineCap="round";g.lineJoin="round";
-  for(const pass of [0,1])for(let i=0;i<pts.length;i++){const j=(i+1)%pts.length,di=pts[i][4],dj=pts[j][4];if(di>=Rm&&dj>=Rm)continue;if(uss&&(di>=Rm||dj>=Rm))continue;
-    const a=at(i),b=at(j),d=Math.min(di,dj),c=col(d);g.strokeStyle=rgb(c);
-    if(pass===0){g.lineCap="butt";g.globalAlpha=uss?0.3:0.24;g.lineWidth=(uss?9:14)*Math.max(0.6,ppm/22)}else g.lineCap="round";if(pass===1){g.globalAlpha=di>=Rm||dj>=Rm?0.45:1;g.lineWidth=(uss?3.5:5)*Math.max(0.6,ppm/22)}
-    g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(b[0],b[1]);g.stroke()}
-  g.globalAlpha=1;
-  /* the distance to the nearest thing in the way you're going (front in Drive, rear in Reverse) */
-  const rev=st.gear==="R",nf=Math.min(...P.f),nr=Math.min(...P.r),ns=Math.min(...P.sl,...P.sr),useR=rev?nr<=Math.min(nf,ns)+0.4||nr<Rm:nr<nf&&nr<ns,n=Math.min(useR?nr:nf,ns);if(n<Rm){const ft=st.units==="mph",t=n<0.3?"STOP":ft?(n<1.2?`${Math.round(n*39.37)} in`:`${(n*3.281).toFixed(1)} ft`):`${Math.round(n*100)} cm`;
-    g.font=`700 ${Math.round(Math.max(14,ppm*0.9))}px system-ui,sans-serif`;g.textAlign="center";g.textBaseline="middle";g.fillStyle=n<0.3?"#ff3b30":dark?"#f2f4f6":"#1c1f22";const ty=useR?Math.min(y+h-16,cy+(HL+Rm*0.8)*ppm):Math.max(y+30,cy-(HL+Rm*0.8)*ppm);g.fillText(t,cx,ty);g.textBaseline="alphabetic"}
+  if(!miniDraw(g,cx,cy,ppm)){const L=HL*ppm,W_=HW*ppm;g.save();g.translate(cx,cy);g.shadowColor="rgba(0,0,0,.35)";g.shadowBlur=12;g.fillStyle=dark?"#d9dce0":"#6b7077";
+    g.beginPath();g.moveTo(-W_*0.78,-L);g.quadraticCurveTo(0,-L*1.05,W_*0.78,-L);g.quadraticCurveTo(W_*1.02,-L*0.9,W_,-L*0.55);g.lineTo(W_*0.98,L*0.8);g.quadraticCurveTo(W_*0.95,L,0,L);g.quadraticCurveTo(-W_*0.95,L,-W_*0.98,L*0.8);g.lineTo(-W_,-L*0.55);g.quadraticCurveTo(-W_*1.02,-L*0.9,-W_*0.78,-L);g.fill();g.shadowBlur=0;
+    g.fillStyle=dark?"#23262b":"#1f2226";g.beginPath();g.moveTo(-W_*0.7,-L*0.42);g.quadraticCurveTo(0,-L*0.52,W_*0.7,-L*0.42);g.lineTo(W_*0.74,L*0.5);g.quadraticCurveTo(0,L*0.58,-W_*0.74,L*0.5);g.closePath();g.fill();
+    g.fillStyle=dark?"#d9dce0":"#6b7077";g.fillRect(-W_*1.14,-L*0.36,W_*0.16,L*0.07);g.fillRect(W_*0.98,-L*0.36,W_*0.16,L*0.07);g.restore()}
+  /* a rounded outline of the car (corner radius RC), sampled finely; each point reads the nearest sensors, blended */
+  const per=[],add=(lx,ly,nx,ny,d)=>per.push({lx,ly,nx,ny,d}),fz=[0.85,0.25,-0.25,-0.85],sz=[1.4,0,-1.4];
+  const lerpZ=(arr,ly)=>{if(ly>=fz[0])return arr[0];if(ly<=fz[3])return arr[3];for(let k=0;k<3;k++)if(ly<=fz[k]&&ly>=fz[k+1]){const f=(fz[k]-ly)/(fz[k]-fz[k+1]);return arr[k]*(1-f)+arr[k+1]*f}return 9};
+  const lerpS=(arr,lx)=>{if(lx>=sz[0])return arr[0];if(lx<=sz[2])return arr[2];const k=lx>=0?0:1,f=(sz[k]-lx)/(sz[k]-sz[k+1]);return arr[k]*(1-f)+arr[k+1]*f};
+  const N=18;for(let i=0;i<=N;i++){const ly=(HW-RC)-(2*(HW-RC))*i/N;add(HL,ly,1,0,lerpZ(P.f,ly))}
+  for(let i=1;i<=6;i++){const a=Math.PI/2*i/6,nx=Math.cos(a),ny=-Math.sin(a);add(HL-RC+RC*nx,-(HW-RC)+RC*ny,nx,ny,Math.min(lerpZ(P.f,-HW),P.sr[0]+(1-nx)*0.1))}
+  for(let i=1;i<N;i++){const lx=(HL-RC)-(2*(HL-RC))*i/N;add(lx,-HW,0,-1,lerpS(P.sr,lx))}
+  for(let i=0;i<=6;i++){const a=Math.PI/2*i/6,nx=-Math.sin(a),ny=-Math.cos(a);add(-(HL-RC)+RC*nx,-(HW-RC)+RC*ny,nx,ny,Math.min(lerpZ(P.r,-HW),P.sr[2]+(1-Math.abs(nx))*0.1))}
+  for(let i=1;i<N;i++){const ly=-(HW-RC)+(2*(HW-RC))*i/N;add(-HL,ly,-1,0,lerpZ(P.r,ly))}
+  for(let i=0;i<=6;i++){const a=Math.PI/2*i/6,nx=-Math.cos(a),ny=Math.sin(a);add(-(HL-RC)+RC*nx,(HW-RC)+RC*ny,nx,ny,Math.min(lerpZ(P.r,HW),P.sl[2]+(1-Math.abs(nx))*0.1))}
+  for(let i=1;i<N;i++){const lx=-(HL-RC)+(2*(HL-RC))*i/N;add(lx,HW,0,1,lerpS(P.sl,lx))}
+  for(let i=0;i<6;i++){const a=Math.PI/2*i/6,nx=Math.sin(a),ny=Math.cos(a);add((HL-RC)+RC*nx,(HW-RC)+RC*ny,nx,ny,Math.min(lerpZ(P.f,HW),P.sl[0]+(1-nx)*0.1))}
+  /* smooth the readings round the outline (the real display never jumps from sensor to sensor) */
+  const M=per.length,ds=per.map((p,i)=>Math.min(p.d,(per[(i+M-1)%M].d+p.d*2+per[(i+1)%M].d)/4+0.04));
+  const C=d=>{const st_=[[0.3,[255,40,38]],[0.6,[255,122,28]],[1.0,[255,204,30]],[1.5,dark?[236,238,240]:[150,154,160]]];if(d<=st_[0][0])return st_[0][1];for(let k=1;k<st_.length;k++)if(d<=st_[k][0]){const f=(d-st_[k-1][0])/(st_[k][0]-st_[k-1][0]);return st_[k-1][1].map((v,j)=>Math.round(v+(st_[k][1][j]-v)*f))}return st_[st_.length-1][1]};
+  const pt=i=>{const p=per[i],k=Math.max(0.05,Math.min(ds[i],Rm))+0.1;return S(p.lx+p.nx*k,p.ly+p.ny*k)},alpha=d=>d>=Rm?0:Math.min(1,(Rm-d)/0.45);
+  g.lineCap="round";g.lineJoin="round";const lw=Math.max(2.4,ppm*(uss?0.11:0.15));
+  const ptF=i=>{const p=per[i],k=ds[i]<Rm?Math.max(0.05,ds[i])+0.1:0.1;return S(p.lx+p.nx*k,p.ly+p.ny*k)};
+  if(!uss){g.beginPath();for(let i=0;i<=M;i++){const q=ptF(i%M);if(i)g.lineTo(q[0],q[1]);else g.moveTo(q[0],q[1])}g.closePath();g.fillStyle=dark?"rgba(255,255,255,.05)":"rgba(0,0,0,.04)";g.fill()}   /* High Fidelity: the clear space round the car, softly filled */
+  /* runs of the outline where something is in range: one soft glow stroke per run, then the bright line with its colour blending along it */
+  const vis=i=>alpha(ds[i])>0.01,runs=[];{let st0=-1;for(let i=0;i<M;i++)if(!vis(i)){st0=i;break}if(st0<0){runs.push([...Array(M+1).keys()].map(k=>k%M))}else{let cur=[];for(let k=1;k<=M;k++){const i=(st0+k)%M;if(vis(i))cur.push(i);else if(cur.length){runs.push(cur);cur=[]}}if(cur.length)runs.push(cur)}}
+  for(const R of runs){if(R.length<2)continue;let dmin=9;for(const i of R)dmin=Math.min(dmin,ds[i]);g.beginPath();R.forEach((i,k)=>{const q=pt(i);if(k)g.lineTo(q[0],q[1]);else g.moveTo(q[0],q[1])});
+    g.strokeStyle=`rgb(${C(dmin)})`;g.globalAlpha=(uss?0.2:0.26)*Math.max(...R.map(i=>alpha(ds[i])));g.lineWidth=lw*(uss?4:5.2);g.stroke()}
+  g.lineCap="butt";for(const R of runs)for(let k=0;k<R.length-1;k++){const i=R[k],j=R[k+1],a=Math.min(alpha(ds[i]),alpha(ds[j])),p0=pt(i),p1=pt(j),c0=C(ds[i]),c1=C(ds[j]);
+    const gr=g.createLinearGradient(p0[0],p0[1],p1[0]+0.01,p1[1]+0.01);gr.addColorStop(0,`rgb(${c0})`);gr.addColorStop(1,`rgb(${c1})`);g.strokeStyle=gr;g.globalAlpha=a;g.lineWidth=lw;g.shadowColor=`rgba(${C(Math.min(ds[i],ds[j]))},.85)`;g.shadowBlur=lw*1.8;
+    g.beginPath();g.moveTo(p0[0],p0[1]);g.lineTo(p1[0],p1[1]);g.stroke()}
+  g.lineCap="round";g.globalAlpha=1;g.shadowBlur=0;
+  /* the distance to the nearest thing, written just outside the line where it's closest (the front in Drive, the rear in Reverse) */
+  const rev=st.gear==="R";let bi=-1,bd=9;for(let i=0;i<M;i++){const p=per[i],ok=rev?p.lx<HL*0.3:p.lx>-HL*0.3;if(ok&&ds[i]<bd){bd=ds[i];bi=i}}
+  if(bi>=0&&bd<Rm){const p=per[bi],k=Math.min(bd,Rm)+0.85,q=S(p.lx+p.nx*k,p.ly+p.ny*k),ft=st.units==="mph",stop=bd<0.3;
+    const big=Math.round(Math.max(15,ppm*0.62)),sm=Math.round(big*0.55),tx=Math.min(x+w-40,Math.max(x+40,q[0])),ty=Math.min(y+h-14,Math.max(y+30,q[1]));g.textBaseline="middle";g.fillStyle=stop?"#ff3b30":dark?"#f2f4f6":"#1c1f22";
+    if(stop){g.font=`800 ${big}px system-ui,sans-serif`;g.textAlign="center";g.fillText("STOP",tx,ty)}
+    else{const n=ft?(bd<1.22?Math.round(bd*39.37):(bd*3.281).toFixed(1)):Math.round(bd*100),u=ft?(bd<1.22?"in":"ft"):"cm";g.font=`600 ${big}px system-ui,sans-serif`;const w1=g.measureText(String(n)).width;g.font=`500 ${sm}px system-ui,sans-serif`;const w2=g.measureText(u).width,x0=tx-(w1+w2+3)/2;
+      g.textAlign="left";g.font=`600 ${big}px system-ui,sans-serif`;g.fillText(String(n),x0,ty);g.font=`500 ${sm}px system-ui,sans-serif`;g.fillText(u,x0+w1+3,ty+big*0.12)}
+    g.textBaseline="alphabetic"}
   g.font="600 11px system-ui,sans-serif";g.textAlign="left";g.fillStyle=dark?"#8a9097":"#6b7076";g.fillText(uss?"Park Assist":"High Fidelity Park Assist",x+10,y+18)}
 // the parked view: a studio with the car in its paint at a front three-quarter angle, Open Frunk / Open Trunk, the lock and the charge port
 function vizPark(g,x,y,w,h,pe,dark,Pj,Fc){g.save();g.globalAlpha=Math.min(1,pe*1.5);const bg=g.createLinearGradient(0,y,0,y+h);
@@ -16818,7 +16847,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=327;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="173",BUILD_VER=328;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const P=JSON.parse(localStorage.getItem("strata.prefs")||"{}");for(const k in P){if(typeof P[k]==="number"&&isFinite(P[k]))st[k]=P[k]}if(st.wheelUI)document.body.classList.add("wheelMode")}catch(e){}   /* your settings from last time */
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}try{const P=JSON.parse(localStorage.getItem("strata.ped")||"null");if(P){st.pedHold=+P.pedHold||0;st.thrRate=+P.thrRate||2;st.brkRate=+P.brkRate||2}}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
