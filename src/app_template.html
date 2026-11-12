@@ -1326,8 +1326,15 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
 <script data-boot>(function(){var p=0;window.__bootP=0;var t=setInterval(function(){if(window.__bootReal){clearInterval(t);return}p+=(0.7-p)*0.025;window.__bootP=p;var a=document.getElementById("bootArc"),n=document.getElementById("bootNeedle"),c=document.getElementById("bootPct");if(a)a.setAttribute("stroke-dasharray",(p*100).toFixed(1)+" 100");if(n)n.style.setProperty("--a",(-135+p*270)+"deg");if(c)c.textContent=String(Math.round(p*100))},120)})()</script>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 326 · New car wash, Google and a livelier phone</h2></div>
+    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 327 · Real merge lanes, a calmer airport and upgraded Teslas</h2></div>
     <div class="nb">
+      <h4>Real merge lanes, a calmer airport and upgraded Teslas</h4><ul>
+      <li>🚗 <b>Upgraded Teslas</b>: all 11 (Model 3 and Y old and new, Model S and X old and new, the 2020 S and X, Cybertruck, Roadster and Cybercab) get detailed cabins and real lights. The headlights sit on the nose like the real cars, with white DRLs, amber turn signals, brake-light LEDs and side markers. Inside: seats moved back from the wheel, seat belts, door handles and window switches, pedals, sun visors and the rear-view mirror</li>
+      <li>🛣️ <b>Merge lanes look like a real highway</b>: where an on-ramp runs beside the freeway, the solid edge line and rumble strip give way to the dotted line between the merge lane and the right lane, and the merge lane gets its own solid edge line on the outside. No more yellow ramp line squeezed in next to the freeway lanes</li>
+      <li>🪧 <b>No more signs standing in the road</b>: stop signs, keep-right signs on boulevards, wrong-way signs on ramps, one-way signs at the airport, and the exit signs and sign poles beside the merge lanes now all stand off the pavement</li>
+      <li>✈️ <b>The airport mess is fixed</b>: the terminal curbs now split from the terminal road before the sidewalk island starts, so cars don't drive over the island. At the split the middle lane can go to either Arrivals or Departures, like a real option lane, so cars don't all try to cross each other and jam. Fewer cars spawn on the curbs, too</li>
+      <li>🅿️ Mercedes PARKTRONIC (like the GLE Coupe) uses the real colours: blue segments mean nothing's there, then yellow (about 3 ft), orange and red as you get closer</li>
+      </ul>
       <h4>New car wash, Google and a livelier phone</h4><ul>
       <li>🫧 <b>Brand-new Strata Express Wash</b> on Fairhaven Blvd: a real express tunnel with a clear arched roof, three pay lanes with kiosks and gate arms that lift, and a conveyor that carries you through. Everything moves: the belt, six wrap brushes, the top brush, the tyre brushes, the cloth curtains, and the foam and wax arches that change colour. A stop/go light at the exit, then a one-way aisle past 11 free vacuums. Pay $12 at a kiosk, line up on the belts, shift to Neutral and ride it out</li>
       <li>🔎 <b>Google on your phone</b>: it suggests as you type, fixes typos ("Showing results for car wash near me", "Did you mean"), and has All, Images, Maps and Shopping tabs. Quick answers for maths, unit conversions, the time, the weather, a coin flip or a dice roll. Places come with the distance and Directions, cars come with their specs, and the results open real pages</li>
@@ -2645,17 +2652,17 @@ function buildNet2(){
   // ---- Strata Metro Airport (laid out like Detroit Metro): John D. Dingell Dr to the McNamara terminal, W.G. Rogell Dr to the Evans terminal, a cargo road
   {const A=(X,Z,r)=>{const p=aptXY(X,Z).map(v=>Math.round(v*100)/100);if(r!==undefined)p.push(r);return p};
    N(-1800,-3300,{ctrl:"signal"});N(3700,-3300,{ctrl:"signal"});
-   const D0=A(-2600,360),D1=A(2620,-1357);for(const q of [D0,D1,A(120,470),A(640,-1375),A(-1100,470),A(-1100,250)])N(q[0],q[1],{ctrl:"merge"});
+   const D0=A(-2600,360),D1=A(2620,-1357);for(const q of [D0,D1,A(60,470),A(640,-1375),A(-1100,470),A(-1100,250)])N(q[0],q[1],{ctrl:"merge"});
    rd("blvd","John D. Dingell Dr",[[-1800,-3300],[-1800,-5000,0],[-1800,-5360,0],D0],{lim:45});
    // McNamara: in along the south roadway (M1), dipping under taxiway T in a tunnel, round the garage to the curbs; out along the north roadway (M4)
    const tun=X0=>function(u){return aptDz(X0+(this.a.x<this.b.x?u:-u))};
    rd("aw","McNamara Terminal",[D0,A(-2380,470,0),A(-1100,470)],{lim:45});
    E("aw","McNamara Terminal",[A(-1100,470),A(-1040,470)],{lim:40});
    E("aw","McNamara Terminal",[A(-1040,470),A(-640,470)],{lim:40,zo:tun(-1040),tun:1});
-   rd("aw","McNamara Terminal",[A(-640,470),A(120,470)],{lim:35});
-   rd("curb","Arrivals (lower level)",[A(120,470),A(165,462,0),A(262,462,0),A(262,150,0),A(-262,150,0),A(-262,250,0),A(-420,250)],{lim:15});
-   rd("curb","Departures (upper level)",[A(120,470),A(165,484,0),A(285,484,0),A(285,150,0),A(-285,150,0),A(-285,225,0),A(-470,232,0),A(-530,240,0),A(-560,250)],
-     {lim:15,fly:1,stack:1,zo:function(u){const up=(a,b)=>0.5*smooth01(a,b,u)+0.5*clamp((u-a)/(b-a),0,1);return 7.2*up(185,355)*(1-up(this.L-300,this.L-12))}});
+   rd("aw","McNamara Terminal",[A(-640,470),A(60,470)],{lim:35});   /* the curbs split here, clear of the sidewalk island between them */
+   rd("curb","Arrivals (lower level)",[A(60,470),A(110,462,0),A(262,462,0),A(262,150,0),A(-262,150,0),A(-262,250,0),A(-420,250)],{lim:15});
+   rd("curb","Departures (upper level)",[A(60,470),A(110,484,0),A(285,484,0),A(285,150,0),A(-285,150,0),A(-285,225,0),A(-470,232,0),A(-530,240,0),A(-560,250)],
+     {lim:15,fly:1,stack:1,zo:function(u){const up=(a,b)=>0.5*smooth01(a,b,u)+0.5*clamp((u-a)/(b-a),0,1);return 7.2*up(240,410)*(1-up(this.L-300,this.L-12))}});
    N(...A(-560,250),{ctrl:"merge"});
    rd("aw","McNamara Terminal",[A(-420,250),A(-560,250)],{lim:35});rd("aw","McNamara Terminal",[A(-560,250),A(-640,250)],{lim:35});
    E("aw","McNamara Terminal",[A(-640,250),A(-1040,250)],{lim:40,zo:tun(-640),tun:1});
@@ -3095,7 +3102,12 @@ function sgBoxL(M,X,N,cx,cy,cz,sx,sy,sz){const b=M.P.length/3;for(const [n,u,v] 
   for(const [a,c] of [[-1,-1],[1,-1],[1,1],[-1,1]]){M.P.push(...X(cx+(n[0]+u[0]*a+v[0]*c)*sx/2,cy+(n[1]+u[1]*a+v[1]*c)*sy/2,cz+(n[2]+u[2]*a+v[2]*c)*sz/2));M.N.push(...N(...n))}M.I.push(q,q+1,q+2,q,q+2,q+3)}}
 // a roadside sign: kind of mount, the plates (shape, size, height of the centre, face), where and which way it faces
 // p: {x,y,z,f, plates:[{shape,w,h,cy,face,cx}], posts:[x offsets], pw}
-function sgPut(p){SGN.list.push({k:p.plates[0].face&&p.plates[0].face.key,x:p.x,y:p.y,z:p.z,f:p.f});const X=sgXf(p.x,p.y,p.z,p.f),N=sgNx(p.f);let top=0;for(const q of p.plates){sgPlate(X,N,q.cx||0,q.cy,0,q.shape,q.w,q.h,q.face);top=Math.max(top,q.cy+q.h/2)}
+/* a sign post never stands on the pavement: slide it sideways (across the way it faces) to the nearest ground that isn't road, or leave it out */
+function sgOnRoad(x,y,z){const g0=GREF;GREF=z||0;let r=false;try{const g=groundAt(x,y);r=g.kind==="road"&&Math.abs((g.h||0)-(z||0))<1.3}catch(e){}GREF=g0;return r}
+function sgFree(p){if(p.over||!sgOnRoad(p.x,p.y,p.z))return true;const cx=Math.cos(p.f+Math.PI/2),cy=Math.sin(p.f+Math.PI/2);
+  for(let d=0.6;d<=9;d+=0.6)for(const sd of [1,-1]){const x=p.x+cx*d*sd,y=p.y+cy*d*sd;if(!sgOnRoad(x,y,p.z)&&!sgOnRoad(x+cx*0.5*sd,y+cy*0.5*sd,p.z)){p.x=x+cx*0.4*sd;p.y=y+cy*0.4*sd;return true}}
+  return false}
+function sgPut(p){if(!sgFree(p))return;SGN.list.push({k:p.plates[0].face&&p.plates[0].face.key,x:p.x,y:p.y,z:p.z,f:p.f});const X=sgXf(p.x,p.y,p.z,p.f),N=sgNx(p.f);let top=0;for(const q of p.plates){sgPlate(X,N,q.cx||0,q.cy,0,q.shape,q.w,q.h,q.face);top=Math.max(top,q.cy+q.h/2)}
   const pw=p.pw||0.065;for(const px of p.posts||[0]){sgBoxL(SGM.post,X,N,px,(top-0.08)/2-0.4,-0.05,pw,top-0.08+0.8,pw);const w_=sgXf(p.x,p.y,p.z,p.f)(px,0,-0.05);collAdd({t:"c",x:w_[0],y:-w_[2],r:Math.max(0.06,pw),z0:p.z-0.3,z1:p.z+top})}}
 // the pack's structures, stretched to the road: class 0/2 vertices move with the left/right column, class 1 stretch
 const SGK={};function sgKit(k){if(SGK[k])return SGK[k];const K=SIGN_KIT[k],d=b=>Uint8Array.from(atob(b),c=>c.charCodeAt(0));const out={};
@@ -3328,8 +3340,9 @@ function groundAt0(x,y){
       {const hb=roadBumps(e,p.u,p.t)+(e.br&&e.br.style?brJank(e,p.u,p.t):0);if(e.T.dirt){const fd=e.ford&&Math.abs(p.u-e.ford.uc)<e.ford.half;pick({h:(e.hz||e.ford?ez(e,p.u):0)+hb+dirtH(e,p.u,p.t),mu:fd?0.5:0.74,kind:fd?"ford":"dirt",hole:RB_HOLE});continue}
         pick({h:(e.hz?ez(e,p.u):0)+hb+(rum?0.006:0),mu:1.15,kind:"road",rum,hole:RB_HOLE,deck:overDeck(e,p.u)});continue}}
     if(inner>0&&a<inner&&(e.br&&onBridge(e,p.u)||e.ov&&onOver(e,p.u))){pick({h:ez(e,p.u),mu:1.0,kind:"pavement",deck:overDeck(e,p.u)});continue}     // bridge deck between the carriageways
-    if(e.T.kerb&&((a>outer&&a<outer+0.45)||(inner>0&&a<inner&&a>inner-0.45))){if(e.ov&&onOver(e,p.u))pick({h:ez(e,p.u)+0.04,mu:1.0,kind:"kerb",deck:overDeck(e,p.u)});else{const zz=e.hz?ez(e,p.u):0;if(!kerb||Math.abs(zz-GREF)<Math.abs(kz-GREF))kz=zz;kerb=true}}
-    else if(e.T.walk&&a>outer&&a<outer+0.45+e.T.walk){if(e.ov&&onOver(e,p.u))pick({h:ez(e,p.u),mu:0.95,kind:"pavement",deck:overDeck(e,p.u)});else{const zz=e.hz?ez(e,p.u):0;if(!(walk||kerb)||Math.abs(zz-GREF)<Math.abs(kz-GREF))kz=zz;walk=true}}   /* two levels of sidewalk (a deck over a street): the one you're on */
+    const kOK=!(e.T.kerb||e.T.walk)||(p.u>=kerbTrim(e,0)&&p.u<=e.L-kerbTrim(e,1));
+    if(kOK&&e.T.kerb&&((a>outer&&a<outer+0.45)||(inner>0&&a<inner&&a>inner-0.45))){if(e.ov&&onOver(e,p.u))pick({h:ez(e,p.u)+0.04,mu:1.0,kind:"kerb",deck:overDeck(e,p.u)});else{const zz=e.hz?ez(e,p.u):0;if(!kerb||Math.abs(zz-GREF)<Math.abs(kz-GREF))kz=zz;kerb=true}}
+    else if(kOK&&e.T.walk&&a>outer&&a<outer+0.45+e.T.walk){if(e.ov&&onOver(e,p.u))pick({h:ez(e,p.u),mu:0.95,kind:"pavement",deck:overDeck(e,p.u)});else{const zz=e.hz?ez(e,p.u):0;if(!(walk||kerb)||Math.abs(zz-GREF)<Math.abs(kz-GREF))kz=zz;walk=true}}   /* two levels of sidewalk (a deck over a street): the one you're on */
     dmin=Math.min(dmin,a>outer?a-outer:inner-a)}
   if(hits){if(hits.length===1&&!kerb&&!walk&&!hits[0].deck)return hits[0];if(kerb)hits.push({h:kz+0.04,mu:1.0,kind:"kerb"});else if(walk)hits.push({h:kz,mu:0.95,kind:"pavement"});
     let best=null,low=null;for(const g of hits){if(!low||g.h<low.h)low=g;if(g.h<=GREF+1.2&&(!best||g.h>best.h))best=g}
@@ -5391,16 +5404,18 @@ c.wz=P.z0+(P.z1-P.z0)*clamp(c.jn.d/Math.max(P.L,0.1),0,1);c.wp=0}
   else{const q=fpt(c.e,c.dir,c.s,c.off+(c.wob||0));c.wx=q[0];c.wy=q[1];c.wh=q[2]+(c.head||0);if(c.e.hz){const u=c.dir>0?c.s:c.e.L-c.s;c.wz=ez(c.e,u);c.wp=Math.atan((ez(c.e,u+c.dir)-ez(c.e,u-c.dir))/2)}else{c.wz=0;c.wp=0}}}
 // at a split (a merge-controlled node), which lane to be in for the road you're taking: right lane for the rightmost branch, left lane for the leftmost, any lane if
 // it's the only way on. (Freeway exit ramps are the rightmost branch; the airport's terminal roads split left and right)
-function splitLane(n,inL,pick,nl){if(n.ctrl!=="merge")return undefined;const hIn=wrapPi(inL.h+Math.PI),ms=movesFrom(n,inL);if(ms.length<2)return null;if(pick.e.type===inL.e.type&&ms.some(m=>m.e.type!==inL.e.type))return null;   /* staying on the freeway past an exit: any lane */
+function splitLane(n,inL,pick,nl,cur){if(n.ctrl!=="merge")return undefined;const hIn=wrapPi(inL.h+Math.PI),ms=movesFrom(n,inL);if(ms.length<2)return null;if(pick.e.type===inL.e.type&&ms.some(m=>m.e.type!==inL.e.type))return null;   /* staying on the freeway past an exit: any lane */
   if(!pick.e.ow&&pick.e.type===inL.e.type)return null;
-  const th=o=>wrapPi(o.o.h-hIn);let mn=Infinity,mx=-Infinity;for(const o of ms){const v=th(o);mn=Math.min(mn,v);mx=Math.max(mx,v)}const v=th(pick);if(mx-mn<0.02)return null;return v>=mx-1e-3?nl-1:v<=mn+1e-3?0:null}
+  const th=o=>wrapPi(o.o.h-hIn);let mn=Infinity,mx=-Infinity;for(const o of ms){const v=th(o);mn=Math.min(mn,v);mx=Math.max(mx,v)}const v=th(pick);if(mx-mn<0.02)return null;const L=v>=mx-1e-3,R=v<=mn+1e-3;if(!L&&!R)return null;
+  /* a wide split (three or more lanes into two roads of two or more): the middle lane(s) can go either way, like a real option lane */
+  const opt=nl>=3&&pick.e.n>=2,lo=L?(opt?1:nl-1):0,hi=L?nl-1:(opt?nl-2:0);if(cur==null||!isFinite(cur))return L?nl-1:0;return clamp(Math.round(cur),lo,hi)}
 function planMove(c,prefer){const n=endNode(c.e,c.dir),inL=arrLeg(c.e,c.dir);c.mv=null;c.inBay=false;c.stopDone=false;c.stopT=0;c.waitT=0;c.goC=0;c.goYellow=false;c.runRed=undefined;c.needLane=null;if(!inL)return;
   let ms=movesFrom(n,inL);if(RW.closed.size){const ok=ms.filter(m=>!RW.closed.has(m.e));if(ok.length)ms=ok}if(c.kind==="bike"){const all=ms;ms=ms.filter(m=>m.t!=="U"&&(BIKE_T.has(m.e.type)||m.e.type==="rbt")||m.e.type==="blvd"&&m.t==="S");if(!ms.length)ms=all.filter(m=>!/xway|ramp/.test(m.e.type))}/* cyclists ride round roundabouts and turning circles too, and turn back at a dead end */if(!ms.length)return;let pick=prefer?ms.find(m=>m.t===prefer):null;if(!pick&&c.route){const Q=c.route,nk=c.e===Q.dest.e&&c.dir===Q.dest.dir&&c.s>Q.dest.s+3?Q.loop:Q.next.get(skey(c.e,c.dir));if(nk!=null)pick=ms.find(m=>skey(m.e,m.dir)===nk)||null}
   // a roundabout: go round at most a couple of exits, then take one (nobody does laps)
   if(n.rbt){if(!inL.major)c.rbN=0;else{c.rbN=(c.rbN||0)+1;if(!pick&&!c.route&&c.rbN>=3)pick=ms.find(m=>m.t==="R")||null}}
   if(!pick){const W=c.kind==="bike"?{S:5,R:2.5,L:0.8,U:0}:n.rbt&&inL.major?{S:1.3,R:1.8,L:0,U:0}:{S:6,R:1.8,L:1.4,U:0.05};let tot=0;for(const m of ms)tot+=W[m.t];let x=rnd()*tot;for(const m of ms){x-=W[m.t];if(x<=0){pick=m;break}}pick=pick||ms[0]}
   if(pick.e.type==="rbt"&&c.e.type!=="rbt"&&pick.e.n>1){let k=0;if(c.route){let ee=pick.e,dd=pick.dir;for(let g=0;g<12;g++){const nk=c.route.next.get(skey(ee,dd));if(nk==null)break;const e2=EDGES[nk>>1];if(e2.type!=="rbt")break;k++;ee=e2;dd=nk&1?1:-1}}c.rbLane=c.route?(k>=1?1:0):(rnd()<0.4?1:0)}
-  c.avoidL=inL.ltl&&pick.t!=="L"&&pick.t!=="U"?c.e.n-1:null;  c.mv=pick;c.mvNode=n;c.mvLeg=inL;c.lanePinned=false;{const sl=splitLane(n,inL,pick,c.e.n);c.needLane=c.e.type==="rbt"&&pick.e.type!=="rbt"?null:sl!==undefined?sl:pick.t==="R"?0:(pick.t==="L"||pick.t==="U")?c.e.n-1:null}
+  c.avoidL=inL.ltl&&pick.t!=="L"&&pick.t!=="U"?c.e.n-1:null;  c.mv=pick;c.mvNode=n;c.mvLeg=inL;c.lanePinned=false;{const sl=splitLane(n,inL,pick,c.e.n,(()=>{try{return laneIdx(c)}catch(e){return null}})());c.needLane=c.e.type==="rbt"&&pick.e.type!=="rbt"?null:sl!==undefined?sl:pick.t==="R"?0:(pick.t==="L"||pick.t==="U")?c.e.n-1:null}
   if(c.needLane===null&&pick.e.n<c.e.n&&pick.t==="S"&&n.drop)c.needLane=c.e.n-1;   // right lane ends: merge left before the join
   if(c.needLane===null&&pick.e.n<c.e.n&&pick.t==="S"&&n.ctrl!=="merge"){const th=wrapPi(pick.o.h-(inL.h+Math.PI));if(Math.abs(th)>0.12)c.needLane=th>0?c.e.n-1:0}}
 function outLane(c,i){const m=c.mv,nO=m.e.n,nI=c.e.n;if(m.e.type==="rbt"&&c.e.type!=="rbt"&&nO>1)return Math.min(nO-1,c.rbLane||0);   // into a two-lane roundabout: outer lane for the first exit, inner lane to go further round
@@ -5622,7 +5637,7 @@ function emoDraw(){let box=$("emoL");if(!box){box=document.createElement("div");
 // and once one is far behind and out of sight it is quietly moved to a new spot instead of driving off into nowhere
 function aiR(){const lb=G().label;return lb==="Ultra"||lb==="High"?650:lb==="Medium"?560:480}
 function aiSeen(x,y,z){if(!CULL.pl)return Math.hypot(x-plX(),y-plY())<60;return sphVis(x,(z||0)+1,-y,8,1e9)}
-function poolSpot(minD,ok){const R=aiR();for(let k=0;k<16;k++){const p=randomSpot(minD??140,R-40);if(!p)continue;if(ok&&!ok(p))continue;const q=fpt(p.e,p.dir,p.s,laneOff(p.e,p.i)),d=Math.hypot(q[0]-plX(),q[1]-plY());
+function poolSpot(minD,ok){const R=aiR();for(let k=0;k<16;k++){const p=randomSpot(minD??140,R-40);if(!p)continue;if(ok&&!ok(p))continue;{const cap=Math.max(2,Math.floor(/curb/.test(p.e.type)?p.e.L/50:p.e.L*Math.max(1,p.e.n)/(p.e.type==="aw"?45:28)));let n=0;for(const c of cars)if(c.e===p.e&&c.kind==="ai")n++;if(n>=cap)continue}   /* no more cars on one road than fit with room between them (the airport curbs fill up fast when it's the only road near you) */const q=fpt(p.e,p.dir,p.s,laneOff(p.e,p.i)),d=Math.hypot(q[0]-plX(),q[1]-plY());
     if(d<R*0.8&&aiSeen(q[0],q[1],p.e.hz?ez(p.e,p.dir>0?p.s:p.e.L-p.s):0))continue;const ah=(q[0]-plX())*Math.cos(car.psi)+(q[1]-plY())*Math.sin(car.psi);if(ah<0&&k<10&&rnd()<0.55)continue;return p}return null}
 function poolKeep(c){return c.ub||c.robo||c.emv||c.bus||c.plow||c.transit||c.towing||c.errand||c.pullH||c.pullCop||c.pullTg||(typeof GIG!=="undefined"&&GIG.job&&GIG.job.towCar===c)}
 // AI cars get the same suspension as the cars you drive: the suspension of their own model (passive coils, adaptive, magnetic or air),
@@ -7181,7 +7196,7 @@ function fsdPlan(A){const n=endNode(A.e,A.dir),L=arrLeg(A.e,A.dir);A.mv=null;A.s
   if(!pick)pick=ms.find(m=>m.t==="S")||ms.find(m=>m.t!=="U")||ms[0];
   if(pick.e.type==="rbt"&&A.e.type!=="rbt"){A.rbN=0;A.rbWant=Math.random()<0.6?2:Math.random()<0.5?1:3}
   if(pick.e.type==="rbt"&&A.e.type!=="rbt"&&pick.e.n>1){let k=0,ee=pick.e,dd=pick.dir;if(NAV.dest){for(let g=0;g<12;g++){const nk2=navNextKey(ee,dd,0);if(nk2==null)break;const e2=EDGES[nk2>>1];if(e2.type!=="rbt")break;k++;ee=e2;dd=nk2&1?1:-1}}else k=(A.rbWant||2)-1;A.rbLane=k>=1?1:0}
-  A.mv=pick;A.mvNode=n;A.mvLeg=L;{const sl=splitLane(n,L,pick,A.e.n);A.needLane=A.e.type==="rbt"?null:sl!==undefined?sl:pick.t==="R"?0:(pick.t==="L"||pick.t==="U")?A.e.n-1:null}}   /* an exit ramp leaves from the right-hand lane: get over in good time */
+  A.mv=pick;A.mvNode=n;A.mvLeg=L;{const sl=splitLane(n,L,pick,A.e.n,Math.round((A.off||0)/LANE)-loOf(A.e.n));A.needLane=A.e.type==="rbt"?null:sl!==undefined?sl:pick.t==="R"?0:(pick.t==="L"||pick.t==="U")?A.e.n-1:null}}   /* an exit ramp leaves from the right-hand lane: get over in good time */
 // is (x,y) on edge e (direction dir)? -> where along it and how far across, in that direction's lane terms
 function onEdgeAt(e,dir,x,y,strict,extra){const q=eProj(e,x,y);if(q.u<-1||q.u>e.L+1||Math.abs(q.t)>hwOf(e)+1.5+(extra||0))return null;if(strict&&(q.u<(e.p0||0)+2||q.u>e.L-(e.p1||0)-2))return null;const u=clamp(q.u,0,e.L);return {s:dir>0?u:e.L-u,off:dir*q.t-shiftOf(e,u)}}
 function fsdPedGap(pts){const vv=Math.max(car.vx,2.5);let gap=Infinity;
@@ -11067,7 +11082,11 @@ function bumpMesh(){const B={P:[],N:[],I:[]},H={P:[],N:[],I:[]};
   for(const b of BUMPS.heave){if(b.len>2)continue;const c=ePt(b.e,b.u,0);boxInto(Hv,c[0],(b.e.hz?ez(b.e,b.u):0)+0.0035,-c[1],b.len,0.003,2*b.w-0.4,c[2])}   // patched trenches show as darker asphalt
   return {speed:meshFrom(B.P,B.N,B.I),holes:meshFrom(H.P,H.N,H.I),rim:meshFrom(Rm.P,Rm.N,Rm.I),man:meshFrom(Mh.P,Mh.N,Mh.I),cut:meshFrom(Hv.P,Hv.N,Hv.I)}}
 // ends of an edge: where its lane lines stop (junction box), and where kerbs / sidewalks stop (side streets cut through them)
-function kerbTrim(e,end){const n=end===0?e.a:e.b,r=end===0?e.r0:e.r1;if(r>0)return r;if(n.kind==="x"&&n.ctrl==="minor"){let t=0;for(const l of n.legs)if(!l.major)t=Math.max(t,hwOf(l.e)+3);return t}return 0}
+function kerbTrim(e,end){const n=end===0?e.a:e.b,r=end===0?e.r0:e.r1;if(r>0)return r;if(n.kind==="x"&&n.ctrl==="minor"){let t=0;for(const l of n.legs)if(!l.major)t=Math.max(t,hwOf(l.e)+3);return t}
+  if(n.ctrl==="merge"&&(e.T.walk||e.T.kerb)){const k=end?"_kt1":"_kt0";if(e[k]===undefined)e[k]=splitTrim(e,end,n);return e[k]}return 0}
+/* where two kerbed roads split (the airport curbs), their kerbs and sidewalks start only once the two roadways are apart, not across the other one's lanes */
+function splitTrim(e,end,n){const we=hwOf(e)+(e.T.walk||0)+0.45;for(let d=0;d<=Math.min(e.L*0.7,220);d+=2){const q=eAt(e,end===0?d:e.L-d);
+    const over=n.legs.some(l=>{if(l.e===e)return false;const pp=eProj(l.e,q.x,q.y);return pp.u>=0&&pp.u<=l.e.L&&Math.abs(pp.t)<hwOf(l.e)+we});if(!over)return d}return Math.min(e.L*0.7,220)}
 const SIGH=[];
 // ---- open houses: some single-storey houses in Rosedale and Birch Park have real rooms you can walk into
 const OPEN_HOUSES=[];let HOUSE_N=0;const HM={};["floor","plaster","sofa","wood","white","tv","rug","lamp","tile","ext","glassH","garf","roofG","lampG","shelfG"].forEach(k=>HM[k]={P:[],N:[],I:[]});
@@ -11122,6 +11141,10 @@ function furnishHouse(H){const HF={};for(const k of HOUSE_MATS)HF[k]={P:[],N:[],
 const HOME_MAT={sofa:[[0.3,0.36,0.45],null,0.05,6],pillow:[[0.85,0.7,0.35],null,0.05,6],rug:[[0.55,0.25,0.2],null,0.02,4],wood:[[0.32,0.2,0.12],null,0.5,30],plant:[[0.15,0.45,0.15],null,0.1,10],pot:[[0.75,0.72,0.68],null,0.4,30],
   tv:[[0.02,0.02,0.025],null,1.2,90],art:[[0.2,0.45,0.65],null,0.3,20],white:[[0.9,0.9,0.9],null,0.6,40],tile:[[0.2,0.2,0.22],null,0.9,60],stove:[[0.05,0.05,0.05],null,1,60],steel:[[0.7,0.72,0.74],null,1,60],
   lamp:[[1,0.95,0.85],[2.2,2.0,1.7],0,1],bin:[[0.15,0.35,0.7],null,0.3,20],bin2:[[0.2,0.5,0.25],null,0.3,20],prodR:[[0.7,0.15,0.12],null,0.3,20],prodB:[[0.15,0.3,0.65],null,0.3,20],prodY:[[0.9,0.75,0.2],null,0.3,20],prodG:[[0.2,0.55,0.25],null,0.3,20]};
+/* where a ramp's lane runs on the freeway's outside shoulder (the acceleration or deceleration lane alongside), as [u0,u1] runs on the side sg */
+function fwAccelI(e,sg,l0,l1){const R=[];let a0=null;for(let u=l0;u<=l1+3;u+=3){const uu=Math.min(u,l1),q=ePt(e,uu,sg*(mAt(e,uu)/2+e.n*LANE+Math.min(1.6,e.side*0.55)));
+    const on=uu<l1&&gAt(GRID.e,q[0],q[1]).some(f=>{if(f.type!=="ramp")return false;const pp=eProj(f,q[0],q[1]);return pp.u>=(f.r0||0)+2&&pp.u<=f.L-(f.r1||0)-2&&Math.abs(pp.t)<LANE*0.5+0.4});
+    if(on&&a0===null)a0=uu;else if(!on&&a0!==null){if(uu-a0>12)R.push([a0-2,uu+2]);a0=null}}return R}
 const HOUSE_MATS=["sofa","pillow","rug","wood","plant","pot","tv","art","white","tile","stove","steel","lamp","bin","bin2","prodR","prodB","prodY","prodG"];
 const SCN_TMP={};      // signal heads: lamp positions for drawing the lit lenses each frame
 function buildWorld(){retailSites();placeExtras();
@@ -11141,18 +11164,18 @@ function buildWorld(){retailSites();placeExtras();
     // acceleration / deceleration lanes: where a ramp runs alongside the freeway there is one dashed white line between them,
     // not the ramp's yellow edge line next to the freeway's solid edge line and rumble strip
     const minus=(lo,hi,I)=>{let sg=[[lo,hi]];for(const [a,b] of I)sg=sg.flatMap(([x,y])=>b<=x||a>=y?[[x,y]]:[...(a>x?[[x,a]]:[]),...(b<y?[[b,y]]:[])]);return sg.filter(([x,y])=>y-x>0.5)};
-    const besideFw=[];if(e.type==="ramp"){const N=[e.a,e.b].find(n=>n&&n.ctrl==="merge"),FW=N?N.legs.filter(l=>l.major).map(l=>l.e):[];let a0=null;
-      for(let u=l0;u<=l1+2;u+=2){const uu=Math.min(u,l1),q=ePt(e,uu,M2(uu)+nL+0.1),near=uu<l1&&FW.some(f=>{const pp=eProj(f,q[0],q[1]);return pp.u>=0&&pp.u<=f.L&&Math.abs(pp.t)<f.m/2+f.n*LANE+f.side+0.9});
+    const besideFw=[];if(e.type==="ramp"){let a0=null;   /* any freeway beside it (a ramp can be built in pieces, and only the last one meets the freeway) */
+      for(let u=l0;u<=l1+2;u+=2){const uu=Math.min(u,l1),q=ePt(e,uu,M2(uu)+nL+0.1),zq=e.hz?ez(e,uu):0,near=uu<l1&&gAt(GRID.e,q[0],q[1]).some(f=>{if(f.type!=="xway")return false;const pp=eProj(f,q[0],q[1]);return pp.u>=0&&pp.u<=f.L&&Math.abs((f.hz?ez(f,pp.u):0)-zq)<1.5&&Math.abs(pp.t)<mAt(f,pp.u)/2+f.n*LANE+f.side+0.9});
         if(near&&a0===null)a0=uu;else if(!near&&a0!==null){besideFw.push([a0-1,uu+1]);a0=null}}}
     for(const dir of [1,-1]){const tt=f=>tp?(u=>dir*f(u)):dir*f(0);   // travel-frame sideways -> raw
-      const auxI=(e.aux||[]).filter(a=>a.sg===-dir).map(a=>[a.u0,a.u1]),skipI=e.type==="ramp"&&dir<0?besideFw:auxI;
+      const auxI=(e.aux||[]).filter(a=>a.sg===-dir).map(a=>[a.u0,a.u1]).concat(e.type==="xway"?fwAccelI(e,-dir,l0,l1):[]),skipI=e.type==="ramp"&&dir<0?besideFw:auxI;
       for(let i=0;i<e.n;i++){const c=u=>-(M2(u)+(e.n-0.5-i)*LANE);for(const d of [-0.62,0.62])stripInto(wear[e.T.col],e,tt(u=>c(u)+d-0.3),tt(u=>c(u)+d+0.3),0.002,l0,l1)}
       const sz=e.type==="ramp"||l1-l0<SOLID_L*2.5?null:dir>0?[l1-SOLID_L,l1]:[l0,l0+SOLID_L];
       for(let i=0;i<e.n-1;i++){const bnd=u=>-(M2(u)+(e.n-1-i)*LANE);for(let u=l0+((-l0%(e.T.z==="c"?9:12))+(e.T.z==="c"?9:12))%(e.T.z==="c"?9:12);u<l1;u+=(e.T.z==="c"?9:12)){if(sz&&u+3>sz[0]&&u<sz[1])continue;stripInto(white,e,tt(v=>bnd(v)-0.065),tt(v=>bnd(v)+0.065),0.012,u,Math.min(u+3,l1))}
         if(sz)stripInto(white,e,tt(v=>bnd(v)-0.065),tt(v=>bnd(v)+0.065),0.012,sz[0],sz[1])}
       const out=u=>-(M2(u)+nL);
       if(e.T.edgeL||e.T.parkLine){for(const [a,b] of minus(l0,l1,skipI))stripInto(e.ow&&dir<0?yellow:white,e,tt(u=>out(u)+0.05),tt(u=>out(u)+0.2),0.012,a,b);
-        for(const [a,b] of auxI)for(let u=a;u<b;u+=12)stripInto(white,e,tt(v=>out(v)-0.065),tt(v=>out(v)+0.065),0.012,u,Math.min(u+3,b))}
+        for(const [a,b] of auxI)for(let u=a;u<b;u+=3.66)stripInto(white,e,tt(v=>out(v)-0.1),tt(v=>out(v)+0.1),0.012,u,Math.min(u+0.91,b))}   /* acceleration / deceleration lane: the dotted lane line (3 ft dashes, 9 ft gaps, 8 in wide) */
       if(e.T.bike){stripInto(bikeL,e,tt(u=>out(u)-0.03),tt(u=>out(u)-sd+0.12),0.009,l0,l1);   // painted bike lane with a bike symbol every 60 m
         for(let u=l0+20;u<l1-10;u+=60){const uu=dir>0?u:e.L-u,c=-(e.m/2+nL+sd/2);for(const k of [-0.5,0.5]){const q=ePt(e,uu+k*dir,dir*c);discInto(white,q[0],q[1],0.26,(e.hz?ez(e,uu):0)+0.014,10)}
           stripInto(white,e,dir*(c-0.05),dir*(c+0.05),0.014,uu-0.45,uu+0.45)}}
@@ -11743,7 +11766,7 @@ function worldScenery(){CUTO.clear();W2P.length=0;
           const pe=Math.min(span/2-2.6,span/2-0.8-2.25);sgPlate(X,N,pe,6.1,0.26,"rect",4.5,2.3,sgFace("gx1_"+no,4.5,2.3,sgGuide({exit:no,dest:[to],dist:"1/4 MILE"}),110));
           if(span>10){const nm=/^I-\d+/.test(e.name)?e.name.match(/^I-\d+/)[0]:null;sgPlate(X,N,pe-5.0,6.1,0.26,"rect",4.5,2.3,sgFace("gm_"+e.name+card(p[2]),4.5,2.3,sgGuide({route:nm,card:nm?card(p[2]):null,dest:nm?[]:[e.name],arrow:"down",arrows:[0.3,0.7]}),110))}}
         // the cantilever at the exit: EXIT n, where it goes, the arrow up and right
-        const s2=e.L-110;if(s2>rStart(e,dir)+40){const oc=oR-2.2+6,p=fpt(e,dir,s2,oc),z=sgZ(e,dir,s2,p),f=p[2]+Math.PI,X=sgXf(p[0],p[1],z,f),N=sgNx(f);SGN.list.push({k:"cant",x:p[0],y:p[1],z,f});sgStruct("cant",X,N,12,0,true);
+        const s2=e.L-110;if(s2>rStart(e,dir)+40){let oc=oR-2.2+6,p=fpt(e,dir,s2,oc);for(let k=0;k<14&&sgOnRoad(p[0],p[1],sgZ(e,dir,s2,p));k++){oc-=1;p=fpt(e,dir,s2,oc)}const z=sgZ(e,dir,s2,p),f=p[2]+Math.PI,X=sgXf(p[0],p[1],z,f),N=sgNx(f);SGN.list.push({k:"cant",x:p[0],y:p[1],z,f});sgStruct("cant",X,N,12,0,true);
           sgBoxL(SGM.conc,X,N,6,0.2,0,0.9,0.5,0.9);{const w=X(6,0,0);collAdd({t:"c",x:w[0],y:-w[2],r:0.32,z0:z-0.3,z1:z+7,what:"the sign gantry"})}
           sgPlate(X,N,1.9,6.1,0.26,"rect",4.5,2.3,sgFace("gx2_"+no,4.5,2.3,sgGuide({exit:no,dest:[to],arrow:"ur"}),110))}
         // the gore: EXIT n and an arrow, where the ramp splits off
@@ -12700,14 +12723,14 @@ function audiNewScreen(g,W,H,M){const F=CF2,C=cluCommon(),red="#f50537";const P=
 // ---------------------------------------------------------------- park sensor views, drawn the way each make shows them
 // n bands per sensor; "dist" = every lit band takes the colour of how close it is, "grad" = green/yellow/red from the outside in,
 // "fan" = one field per sensor that shrinks toward the car (BMW), "block" = straight bars instead of arcs
-const PDC_ST={
+const PDC_ST={   /* Mercedes MBUX: blue segments = nothing there, yellow about 1-0.7 m, orange 0.7-0.4 m, red under 0.4 m (owner's manual) */
   toyota:{name:"Intuitive Parking Assist",bg:"#0a1326",brd:"#27407a",car:"#f4f6f9",glass:"#1a2333",n:4,mode:"dist",col:d=>d<0.45?"#ff2d2d":d<0.9?"#ff9a1f":"#ffd400",dim:"rgba(140,170,230,.14)",lw:5,blink:0.45,tx:"#dfe8ff",warn:"BRAKE!"},
   honda:{name:"Parking Sensor System",bg:"#0c1422",brd:"#2a3a55",car:"#c9ced6",glass:"#10161f",n:3,mode:"dist",shape:"block",col:d=>d<0.4?"#ff3326":d<0.8?"#ff8a1c":"#ffc400",dim:"rgba(255,255,255,.08)",lw:7,blink:0.4,tx:"#e8eef6",warn:"STOP"},
   hk:{name:"Parking Distance Warning",bg:"#07090c",brd:"#2b3138",car:"#eef1f4",glass:"#11161b",n:3,mode:"dist",col:d=>d<0.3?"#ff2d2d":d<0.6?"#ff9f1a":"#ffe14a",dim:"rgba(255,255,255,.1)",lw:8,blink:0.3,tx:"#ffffff",warn:"STOP"},
   gm:{name:"Park Assist",bg:"#101214",brd:"#3a3f45",car:"#b9c0c8",glass:"#0d1114",n:4,mode:"grad",pal:["#f2b01e","#f2b01e","#f2681e","#e8262a"],dim:"rgba(255,255,255,.07)",lw:5,blink:0.3,tx:"#f3f4f5",warn:"⚠ STOP",inch:true},
   ford:{name:"Parking Aid",bg:"#0b1a2e",brd:"#2b5aa0",car:"#3f8bd6",glass:"#0b1626",n:5,mode:"grad",pal:["#22c55e","#22c55e","#facc15","#facc15","#ef4444"],dim:"rgba(120,170,255,.12)",lw:4,blink:0.3,tx:"#e6f0ff",warn:"STOP"},
   bmw:{name:"Park Distance Control",bg:"#050607",brd:"#3b2a12",car:"#f2f2f2",glass:"#15181b",n:1,mode:"fan",col:d=>d<0.35?"#ff2a1f":d<0.8?"#ffc21a":"#27c93f",dim:"rgba(255,255,255,.07)",lw:2,blink:0.3,tx:"#f2f2f2",warn:"STOP",accent:"#ff7a1a"},
-  mb:{name:"Active Parking Assist · PARKTRONIC",bg:"#06080c",brd:"#1e2f44",car:"#cfd5db",glass:"#0c1016",n:6,mode:"grad",pal:["#2f7bd6","#2f7bd6","#f5c518","#f5c518","#e5232b","#e5232b"],dim:"rgba(90,140,200,.16)",lw:3.4,blink:0.25,tx:"#e9eef5",warn:"STOP"},
+  mb:{name:"Active Parking Assist · PARKTRONIC",bg:"#06080c",brd:"#1e2f44",car:"#cfd5db",glass:"#0c1016",n:6,mode:"dist",col:d=>d<0.4?"#e5232b":d<0.7?"#ff8a1a":"#f5c518",dim:"rgba(47,123,214,.55)",lw:3.4,blink:0.25,tx:"#e9eef5",warn:"STOP"},
   stl:{name:"ParkSense",bg:"#0d0d0f",brd:"#3a3a3f",car:"#e9e9ea",glass:"#141416",n:4,mode:"grad",shape:"block",pal:["#ffd21f","#ffd21f","#ff5a1f","#ff2020"],dim:"rgba(255,255,255,.08)",lw:6,blink:0.35,tx:"#f4f4f4",warn:"STOP"},
   nis:{name:"Sonar",bg:"#0a0f14",brd:"#2a3540",car:"#dfe4ea",glass:"#10161c",n:3,mode:"grad",pal:["#31c452","#f7c61b","#f0312b"],dim:"rgba(255,255,255,.08)",lw:7,blink:0.35,tx:"#eef2f6",warn:"STOP"},
   volvo:{name:"Park Assist",bg:"#0b0d10",brd:"#2f3540",car:"#eceff2",glass:"#12161b",n:1,mode:"fan",col:d=>d<0.3?"#ff3b30":d<0.7?"#ff9f0a":"#ffd60a",dim:"rgba(255,255,255,.06)",lw:2,blink:0.3,tx:"#f2f4f6",warn:"STOP"}};
@@ -16795,7 +16818,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=326;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
+const APP_VER="173",BUILD_VER=327;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   // BUILD_VER: bumped to make open copies reload without resetting saves;let VER_WIPED=false;try{if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
 try{const P=JSON.parse(localStorage.getItem("strata.prefs")||"{}");for(const k in P){if(typeof P[k]==="number"&&isFinite(P[k]))st[k]=P[k]}if(st.wheelUI)document.body.classList.add("wheelMode")}catch(e){}   /* your settings from last time */
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}try{const P=JSON.parse(localStorage.getItem("strata.ped")||"null");if(P){st.pedHold=+P.pedHold||0;st.thrRate=+P.thrRate||2;st.brkRate=+P.brkRate||2}}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
