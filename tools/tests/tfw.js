@@ -6,7 +6,7 @@ const drive=(label,x,y,h,v,T,thr)=>{   /* holds its lane like a driver would */r
   out.push(`${label}: to ${car.px.toFixed(0)},${car.py.toFixed(0)} z ${zmin.toFixed(1)}..${zmax.toFixed(1)} roads ${[...fr].join("|")} hits ${hits-h0}`)};
 // 1. I-38 eastbound (right lane) through County Rd 3's cut, then Woodward's, under the bridges
 {const e=EDGES.find(e=>e.type==="xway"&&e.a.x===-1420&&e.b.x===-580),p=fpt(e,1,5,laneOff(e,0));drive("I-38 EB through the Woodward cut",-1700,p[1],0,27,40,0.4)}
-{const e=EDGES.find(e=>e.type==="xway"&&e.a.x===-4020&&e.b.x===-3180),p=fpt(e,-1,5,laneOff(e,0));drive("I-38 WB through the County Rd 3 cut",p[0],p[1],p[2],27,30,0.4)}
+{const e=EDGES.find(e=>e.type==="xway"&&e.a.x===-4020&&(e.b.x===-3180||e.b.x===-3290)),p=fpt(e,-1,5,laneOff(e,0));drive("I-38 WB through the County Rd 3 cut",p[0],p[1],p[2],27,30,0.4)}
 // 2. Woodward Ave northbound across the cut at street level
 {const e=EDGES.find(e=>e.name==="Woodward Ave"&&e.ov&&e.a.y<-1400&&e.b.y>-1600||e.name==="Woodward Ave"&&e.ov),p=fpt(e,e.a.y<e.b.y?1:-1,2,laneOff(e,0));drive("Woodward Ave over the cut",p[0],p[1]-60,Math.PI/2,13,16,0.3)}
 // 3. the eastbound service drive from Woodward past the river to Maple
