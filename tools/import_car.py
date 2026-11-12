@@ -17,7 +17,20 @@ WHEEL = {"wheel_front_left": "FL", "wheel_front_right": "FR", "wheel_rear_left":
 # work equipment that moves (plows, salt spreader, rollback deck, wheel-lift): each its own object, centred on its box
 EQUIP = re.compile(r"^(plow_A_frame|blade_left|blade_right|hopper|spinner_chute|rollback_deck|underlift|boom|warning_bar|tipping_body|gutter_brush_-?1|stop_arm|crossing_arm|(red|amber)_(left|right)_(front|rear)|mq_door_(FL|FR|RL|RR)|mq_tailgate|mq_mirror_[LR])$")
 CABIN = re.compile(r"^(interior|headliner|driver_cab|passenger_seats|cabin_.*|driver_cluster|cluster_information_display|panoramic_display|center_touchscreen|flush_center_screen|period_dashboard|dash|dashboard|dashboard_trim|center_display|steering_wheel|steering_yoke)$")
-SCREEN_M = re.compile(r"cluster_blank|infotainment_blank|display_blank|blank screen|blank display surface|blank custom ui surface|blank custom display|blank center display|display glass|display graphics|navigation", re.I)
+SCREEN_M = re.compile(r"cluster_blank|infotainment_blank|display_blank|blank screen|blank display surface|blank custom ui surface|blank custom display|blank center display|display glass|display graphics|navigation|^blank display", re.I)
+# the detailed Tesla pack names its parts like Blender objects ("Steering rim.001"): its steering wheel pieces and its blank screens
+BASE = lambda n: re.sub(r"\.\d+$", "", n or "")
+STEER_N = {"steering_wheel", "steering_yoke", "Steering rim", "Steering center", "Steering spoke", "Steering scroll roller", "Lower steering spoke", "Squared steering rim", "Steering scroll", "Steering button pod", "Scroll wheel"}
+isSteer = lambda node: BASE(node) in STEER_N
+def matKind(n):   # that pack's paint and lamp materials
+    b = BASE(n).lower().replace("upgrade/", "")
+    if b in ("paint", "body paint"): return "paint"
+    if b in ("white drl", "daytime running led", "low beam lens", "led headlights"): return "head"
+    if b in ("red tail light", "brake light led"): return "tail"
+    if b in ("reverse light lens", "reverse light"): return "rev"
+    if b in ("amber turn signal", "rear turn signal"): return "sig"
+    if b in ("blank display", "blank center display"): return "screen"
+    return None
 
 
 def srgb(c):
@@ -72,7 +85,13 @@ def main(src, key, budget=60000, cab_budget=42000, wheels_only=False):
         if CABIN.match(node):
             if SCREEN_M.search(n): return "strata_screen"
             return hexcol(p["mat"]["color"])
-        if nl == "paint": return "strata_paint"
+        mk = matKind(n)
+        if mk == "screen": return "strata_screen"
+        if nl == "paint" or mk == "paint": return "strata_paint"
+        if mk == "head": return "strata_headlight"
+        if mk == "tail": return "strata_taillight"
+        if mk == "rev": return "strata_reverse"
+        if mk == "sig": return np.where(tri_c[:, 0] > 0, "strata_signal_L", "strata_signal_R")
         if "glass" in nl and "edge" not in nl: return "strata_glass"
         if "led headlight" in nl: return "strata_headlight"
         if "brake light" in nl or "red light guide" in nl or "ruby lens" in nl: return "strata_taillight"
@@ -115,14 +134,14 @@ def main(src, key, budget=60000, cab_budget=42000, wheels_only=False):
             rim = collect(lambda p, w=w: p["node"] in WHEEL and WHEEL[p["node"]] == w and "rubber" not in p["mat"]["name"].lower())
             cur["objects"]["tire_" + w] = build(tire, 2500, h); cur["objects"]["rim_" + w] = build(rim if rim else tire, 3000, h)
         open(f"models/{key}.json", "w").write(json.dumps(cur, separators=(",", ":"))); print(key, "wheels rebuilt"); return cur
-    out["objects"]["body"] = build(collect(lambda p: p["node"] not in WHEEL and not CABIN.match(p["node"]) and not EQUIP.match(p["node"]) and p["node"] != "driver_camera"), budget)
+    out["objects"]["body"] = build(collect(lambda p: p["node"] not in WHEEL and not CABIN.match(p["node"]) and not EQUIP.match(p["node"]) and not isSteer(p["node"]) and p["node"] != "driver_camera"), budget)
     eq = {}
     for nd in sorted({p["node"] for p in parts if EQUIP.match(p["node"])}):
         d = collect(lambda p, nd=nd: p["node"] == nd); Vu = d[0][np.unique(d[1])]; lo_, hi_ = Vu.min(0), Vu.max(0); c_ = (lo_ + hi_) / 2
         out["objects"]["eq_" + nd] = build(d, 9000, c_); eq[nd] = (c_, lo_, hi_)
-    cab = collect(lambda p: CABIN.match(p["node"]) and p["node"] not in ("steering_wheel", "steering_yoke"))
+    cab = collect(lambda p: CABIN.match(p["node"]) and not isSteer(p["node"]))
     if cab: out["objects"]["cabin"] = build(cab, cab_budget)
-    sw = collect(lambda p: p["node"] in ("steering_wheel", "steering_yoke")); steer_c = None
+    sw = collect(lambda p: isSteer(p["node"])); steer_c = None
     if sw:
         steer_c = (sw[0][np.unique(sw[1])].min(0) + sw[0][np.unique(sw[1])].max(0)) / 2
         out["objects"]["steer"] = build(sw, 6000, steer_c)
@@ -140,13 +159,14 @@ def main(src, key, budget=60000, cab_budget=42000, wheels_only=False):
     def cent(pred):
         pts = [p["V"][np.unique(p["F"])] for p in parts if pred(p)]
         return np.concatenate(pts).mean(0) if pts else None
-    hl = cent(lambda p: "led headlight" in p["mat"]["name"].lower() and not CABIN.match(p["node"]))
+    isHL = lambda p: ("led headlight" in p["mat"]["name"].lower() or matKind(p["mat"]["name"]) == "head") and not CABIN.match(p["node"])
+    hl = cent(isHL)
     if hl is not None:
-        pts = np.concatenate([p["V"][np.unique(p["F"])] for p in parts if "led headlight" in p["mat"]["name"].lower() and not CABIN.match(p["node"])])
+        pts = np.concatenate([p["V"][np.unique(p["F"])] for p in parts if isHL(p)])
         pts = pts[(pts[:, 0] < 0) & (pts[:, 1] < 0)]; hl = pts.mean(0) if len(pts) else hl
         m["head"] = P(hl); m["head"][0] = abs(m["head"][0])
     else: m["head"] = [round(hw * 0.68, 3), round(R * 2.3, 3), round(float(lo[1]) + 0.15, 3)]
-    tl = cent(lambda p: re.search(r"brake light|red light guide|ruby lens", p["mat"]["name"].lower()) and not CABIN.match(p["node"]))
+    tl = cent(lambda p: (re.search(r"brake light|red light guide|ruby lens", p["mat"]["name"].lower()) or matKind(p["mat"]["name"]) == "tail") and not CABIN.match(p["node"]))
     m["tail"] = [0, round(float(tl[2]), 4), round(float(tl[1]), 4)] if tl is not None else [0, round(R * 2.4, 3), round(float(hi[1]) - 0.1, 3)]
     eye = np.array([cam[0], steer_c[1] + 0.52, cam[2]]) if cam is not None and steer_c is not None else cam + np.array([0, 0.3, 0]) if cam is not None else np.array([hw * 0.38, lo[1] + m["length"] * 0.52, hi[2] * 0.85])
     m["eye"] = P(eye)
@@ -165,7 +185,7 @@ def main(src, key, budget=60000, cab_budget=42000, wheels_only=False):
     m["seats"] = seats   # vehicle Y (-front) is the same as page z (-front)
     if steer_c is not None: m["steer"] = P(steer_c)
     def quad(node, f0=0.0, f1=1.0, pts=None):
-        if pts is None: pts = [p["V"][np.unique(p["F"])] for p in parts if p["node"] == node and SCREEN_M.search(p["mat"]["name"])]
+        if pts is None: pts = [p["V"][np.unique(p["F"])] for p in parts if (p["node"] == node or BASE(p["node"]) == node) and SCREEN_M.search(p["mat"]["name"])]
         if not pts: return None
         Q = np.array([P(v) for v in np.concatenate(pts)]); c = Q.mean(0); U, S, Vt = np.linalg.svd(Q - c); n = Vt[2]
         if n[2] < 0: n = -n
@@ -180,6 +200,7 @@ def main(src, key, budget=60000, cab_budget=42000, wheels_only=False):
         m["pano"] = quad("panoramic_display"); m["clu"] = quad("panoramic_display", 0, 0.2304)
         m["xs"] = {"nav": quad("panoramic_display", 0.3074, 0.5996), "pas": quad("panoramic_display", 0.6826, 1.0)}
     elif quad("driver_cluster"): m["clu"] = quad("driver_cluster")
+    elif quad("Driver cluster blank"): m["clu"] = quad("Driver cluster blank")
     elif quad("cabin_cluster_blank"): m["clu"] = quad("cabin_cluster_blank")   # Fusion set 2: blank screen nodes for our own UI
     elif quad("cluster_information_display"): m["clu"] = quad("cluster_information_display")
     elif steer_c is not None and any(p["node"] == "period_dashboard" for p in parts):
@@ -192,9 +213,9 @@ def main(src, key, budget=60000, cab_budget=42000, wheels_only=False):
             r = lambda q: [round(float(t), 4) for t in q]
             bl = P([hi_[0], yf, lo_[2]]); br = P([lo_[0], yf, lo_[2]]); tl = P([hi_[0], yf, hi_[2]]); cc = P([(lo_[0] + hi_[0]) / 2, yf, (lo_[2] + hi_[2]) / 2])
             m["clu"] = {"bl": r(bl), "br": r(br), "tl": r(tl), "c": r(cc), "n": [0.0, 0.0, 1.0], "w": round(float(hi_[0] - lo_[0]), 4), "h": round(float(hi_[2] - lo_[2]), 4)}
-    s = quad("center_touchscreen") or quad("flush_center_screen") or quad("center_display") or quad("cabin_infotainment_blank")
+    s = quad("center_touchscreen") or quad("flush_center_screen") or quad("center_display") or quad("cabin_infotainment_blank") or quad("Center display blank")
     if s: m["scr"] = s
-    ps = quad("cabin_passenger_blank")
+    ps = quad("cabin_passenger_blank") or quad("Passenger screen blank")
     if ps and "xs" not in m: m["xs"] = {"pas": ps}   # Monarch Q6: a third, passenger-side screen
     if ("clu" not in m or "scr" not in m) and cam is not None:
         # no named screen nodes (a refreshed cabin): the display glass in the dashboard, split into separate panels side by side;
