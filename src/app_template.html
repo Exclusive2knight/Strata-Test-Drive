@@ -15099,22 +15099,44 @@ function insCharge(){const own=GARAGE.filter(g=>g&&TRIMS[g.trim]);if(!own.length
   if(ECON.cash>=tot){ECON.cash-=tot;bankTx(`Car insurance (${own.length} car${own.length>1?"s":""})`,-tot)}else{BANK.card.bal+=tot;bankTx(`Car insurance (${own.length} car${own.length>1?"s":""})`,-tot,"Credit card")}
   bankMsg("Westport Mutual Insurance",`Weekly premium ${money2(tot)} for ${own.length} car${own.length>1?"s":""}${BANK.score<680?" · a better credit score lowers your rate":""}`)}
 // ======================================================================= stocks (v109): a simulated market you can invest in from the phone
-// Prices move every few seconds of play (random walk with each company's trend and volatility); some pay a weekly dividend.
-const STK_LIST=[["STRM","Strata Motors","Autos",42,0.10,0.34,0],["VOLT","Voltline Energy","EV charging",18,0.16,0.55,0],["NRTH","Northline Financial","Banking",61,0.06,0.18,0.031],["HALD","Westport Grocers","Retail",33,0.04,0.14,0.024],
-  ["GIGR","GigRoute","Delivery apps",27,0.12,0.48,0],["CHIP","Lakeshore Semiconductor","Chips",115,0.14,0.42,0.006],["OILX","Great Lakes Oil","Energy",74,0.03,0.26,0.045],["TIRE","Ridgeway Tire","Auto parts",22,0.05,0.22,0.018],
-  ["SKY","Skyway Airlines","Travel",14,0.02,0.45,0],["AIQ","Quorum AI","Software",205,0.18,0.5,0],["UTIL","Midstate Power","Utilities",48,0.03,0.12,0.038],["SPDX","Market Index Fund","Index",480,0.08,0.16,0.013]];
-var STK=(()=>{let s=null;try{s=JSON.parse(localStorage.getItem("strata.stocks")||"null")}catch(e){}if(!s||!s.p){s={p:{},h:{},open:{},hist:{},own:{},tick:0}}for(const [k,,,p0] of STK_LIST){if(!s.p[k]){s.p[k]=p0;s.open[k]=p0;s.hist[k]=[p0]}}return s})();
+// v337: real companies at their real share prices, and the same market for every player. Each price wanders around its real-world
+// anchor (closes from Oct 23 to Nov 12, 2026) in a random walk worked out from the clock with a fixed seed, so every copy of the game
+// shows the same number at the same moment; the whole market moves together; and market events (crashes, rallies) set in maint.json,
+// by an admin for everyone, or by the admin panel just for you, hit at the same moment. Some pay a weekly dividend.
+//            ticker  name              sector        anchor  (unused) vol  dividend beta
+const STK_LIST=[["AAPL","Apple","Tech",355.42,0,0.28,0.004,1.1],["MSFT","Microsoft","Software",523.00,0,0.25,0.007,1.0],["NVDA","Nvidia","Chips",166.19,0,0.52,0.0002,1.6],
+  ["TSLA","Tesla","Autos",402.94,0,0.60,0,1.8],["GOOGL","Alphabet","Internet",314.19,0,0.32,0.003,1.1],["META","Meta Platforms","Internet",623.61,0,0.38,0.0034,1.3],
+  ["UBER","Uber","Ride sharing",68.68,0,0.42,0,1.3],["GM","General Motors","Autos",75.92,0,0.35,0.008,1.2],["F","Ford Motor","Autos",12.37,0,0.35,0.049,1.1],["SPY","S&P 500 ETF","Index",752.00,0,0.16,0.012,1.0]];
+const STK_STEP=30000,STK_TH=0.02,STK_K=Math.sqrt(1/(252*6.5));   // a 30-second step moves like an hour of trading; prices drift back toward their real-world anchor within about half an hour
+var STK=(()=>{let s=null;try{s=JSON.parse(localStorage.getItem("strata.stocks")||"null")}catch(e){}if(!s||!s.p){s={p:{},open:{},hist:{},own:{},tick:0}}s.ev=s.ev||[];return s})();
+const STKG={n:0,x:{},m:0,anc:{},mkt:[],live:null,day:-1,ready:false};
 function stkSave(){try{localStorage.setItem("strata.stocks",JSON.stringify(STK))}catch(e){}}
 const stkInfo=k=>STK_LIST.find(x=>x[0]===k);
-let stkT=0,stkMkt=0;
-function stkTick(dt){stkT+=dt;if(stkT<3)return;stkT=0;const yr=3/(60*60*24*7*2.8/7*365/7);   // 1 game year ≈ 52 game weeks
-  const g=()=>{let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)};
-  stkMkt=stkMkt*0.98+g()*0.004;   // the whole market drifts together a little
-  for(const [k,,,,mu,sig] of STK_LIST){const dtY=60/365/24;   // each tick ≈ one game hour of trading
-    let p=STK.p[k]*Math.exp((mu-sig*sig/2)*dtY+sig*Math.sqrt(dtY)*g()+stkMkt*(k==="SPDX"?1:0.8));if(Math.random()<0.0008){p*=Math.random()<0.5?0.85:1.15;if(STK.own[k])bankMsg("Market news",`${k} ${p>STK.p[k]?"jumped":"fell"} ${Math.abs(Math.round((p/STK.p[k]-1)*100))}% on company news`)}
-    STK.p[k]=Math.max(0.5,Math.round(p*100)/100);const H=STK.hist[k];H.push(STK.p[k]);if(H.length>96)H.shift()}
+const stkH=(a,b)=>{let h=Math.imul(a^0x9e3779b9,0x85ebca6b)^Math.imul((b+0x632be5ab)|0,0xc2b2ae35);h^=h>>>16;h=Math.imul(h,0x7feb352d);h^=h>>>15;h=Math.imul(h,0x846ca68b);h^=h>>>16;return (h>>>0)/4294967296};
+const stkG=(a,b)=>{const u=Math.max(1e-9,stkH(a,b)),v=stkH(a+7919,b^0x5bd1e995);return Math.sqrt(-2*Math.log(u))*Math.cos(6.283185307*v)};
+function stkStep(n){const th=1-STK_TH;STKG.m=STKG.m*th+0.16*STK_K*stkG(n,999);STK_LIST.forEach(([k,,,,,sig],i)=>{STKG.x[k]=(STKG.x[k]||0)*th+sig*STK_K*stkG(n,i+1)})}
+/* market events: {at: ms, d: -0.35 for a 35% crash or 0.25 for a rally, h: hours to recover, k: one ticker (optional)} */
+function stkEvents(){const L=[...STKG.mkt,...STK.ev];const lv=STKG.live;if(lv&&lv.at)L.push(lv);return L}
+function stkEvMul(t,k){let f=1;for(const E of stkEvents()){if(!E||!(t>=E.at)||E.k&&E.k!==k)continue;const age=t-E.at,ramp=Math.min(1,age/90000),dec=Math.exp(-age/((+E.h||6)*3600000));f*=Math.max(0.05,1+(+E.d||0)*ramp*dec)}return f}
+function stkPrice(k,t){const I=stkInfo(k);if(!I)return 0;const a=STKG.anc[k]||I[3];return Math.max(0.5,Math.round(a*Math.exp(I[7]*STKG.m+(STKG.x[k]||0))*stkEvMul(t,k)*100)/100)}
+function stkSync(){const now=Date.now(),N=Math.floor(now/STK_STEP),mid=new Date(now);mid.setHours(0,0,0,0);const nO=Math.floor(mid.getTime()/STK_STEP);
+  if(!STKG.ready||N-STKG.n>3000||N<STKG.n){STKG.m=0;STKG.x={};STKG.n=N-3000;STK.hist={};for(const [k] of STK_LIST)STK.hist[k]=[]}
+  while(STKG.n<N){STKG.n++;stkStep(STKG.n);const t=STKG.n*STK_STEP;if(STKG.n===nO||STKG.day!==nO&&STKG.n>=nO){for(const [k] of STK_LIST)STK.open[k]=stkPrice(k,t);STKG.day=nO}
+    if(N-STKG.n<384&&STKG.n%4===0)for(const [k] of STK_LIST){const H=STK.hist[k]||(STK.hist[k]=[]);H.push(stkPrice(k,t));if(H.length>96)H.shift()}}
+  for(const [k] of STK_LIST){STK.p[k]=stkPrice(k,now);if(!STK.open[k])STK.open[k]=STK.p[k]}STKG.ready=true}
+/* the shares you had in the old made-up companies are sold at their last price when this version starts */
+function stkMigrate(){let got=0,L=[];for(const k of Object.keys(STK.own)){if(stkInfo(k))continue;const O=STK.own[k],p=+STK.p[k]||O.cost/Math.max(1,O.n);got+=Math.round(O.n*p*100)/100;L.push(k);delete STK.own[k]}
+  for(const k of Object.keys(STK.p))if(!stkInfo(k))delete STK.p[k];if(got>0){ECON.cash+=got;try{bankTx(`Stocks: ${L.join(", ")} sold (market switched to real companies)`,got,"Brokerage")}catch(e){}toast(`Your old stocks were sold for ${money2(got)}: the market now has real companies`)}if(L.length)stkSave()}
+function stkMaint(d){STKG.mkt=Array.isArray(d.mkt)?d.mkt.filter(E=>E&&+E.at):[];STKG.anc={};if(d.stk&&typeof d.stk==="object")for(const k in d.stk)if(stkInfo(k)&&+d.stk[k]>0)STKG.anc[k]=+d.stk[k]}
+let stkT=0,stkMig=false;
+function stkTick(dt){if(!stkMig){stkMig=true;try{stkMigrate()}catch(e){}}stkT+=dt;if(stkT<2&&STKG.ready)return;stkT=0;const was={...STK.p};stkSync();
+  for(const [k] of STK_LIST)if(STK.own[k]&&was[k]&&STK.p[k]<was[k]*0.85){bankMsg("Market news",`${k} is down ${Math.round((1-STK.p[k]/was[k])*100)}% in minutes`);break}
   if(++STK.tick%20===0)stkSave();if(PHONE.open&&PHONE.app==="stocks"&&!PHONE.held)phRender(true)}
-function stkNewDay(){for(const [k] of STK_LIST)STK.open[k]=STK.p[k];
+/* admin market controls: "me" = only this game; "all" = everyone, through the live-events server (and maint.json for scheduled ones) */
+function stkAdmEvent(d,h,all){const E={at:Date.now(),d,h};if(!all){STK.ev.push(E);STK.ev=STK.ev.filter(e=>Date.now()-e.at<72*3600000).slice(-12);stkSave();stkSync();return}
+  if(!acctOn()||!ACCT.tok||!ACCT.admin){toast("Sign in with your admin account to change everyone's market");return}
+  const ev=Object.assign({},LIVE.evUntil>Date.now()?LIVE.ev||{}:{},{stk:E});acctRpc("admin_events",{p_token:ACCT.tok,p_ev:ev,p_hours:Math.max(+h||6,1)}).then(()=>{try{liveFetch()}catch(e){}toast(d<0?"Crash sent: every player's market drops within a minute":"Rally sent to every player");LIVE.ev=ev;LIVE.evUntil=Date.now()+(+h||6)*3600000;STKG.live=E;stkSync()}).catch(e=>toast("Couldn't send: "+e.message))}
+function stkNewDay(){
   if((GT.day||1)%7===0){let div=0;for(const [k,,,,,,y] of STK_LIST){const n=STK.own[k]?STK.own[k].n:0;if(n&&y)div+=n*STK.p[k]*y/52}if(div>0.01){div=Math.round(div*100)/100;ECON.cash+=div;bankTx("Stock dividends",div,"Brokerage")}}stkSave()}
 function stkTrade(k,n){const p=STK.p[k],O=STK.own[k]||(STK.own[k]={n:0,cost:0});
   if(n>0){const cost=Math.round(p*n*100)/100;if(ECON.cash<cost){toast("Not enough in checking");return}ECON.cash-=cost;O.cost+=cost;O.n+=n;bankTx(`Bought ${n} ${k} @ ${money2(p)}`,-cost,"Brokerage")}
@@ -15129,7 +15151,7 @@ function stkApp(){const sel=PHONE.sub;let val=0,cost=0;for(const k in STK.own){v
       <div class="chips">${[1,10,100].map(n=>`<button data-a="stkb" data-v="${k}:${n}">Buy ${n}</button>`).join("")}<button data-a="stkb" data-v="${k}:${Math.floor(ECON.cash/p)}">Buy max</button></div>
       ${O?`<div class="chips">${[1,10].map(n=>`<button data-a="stks" data-v="${k}:${n}">Sell ${n}</button>`).join("")}<button data-a="stks" data-v="${k}:${O.n}">Sell all</button></div>`:""}<div class="chips"><button data-a="sub" data-v="">‹ All stocks</button></div></div>`;return h}
   h+=`<div class="list">${STK_LIST.map(([k,nm])=>{const p=STK.p[k],ch=(p/STK.open[k]-1)*100,col=ch>=0?"#16a34a":"#dc2626",O=STK.own[k];return `<button class="li" data-a="sub" data-v="${k}" style="width:100%;text-align:left"><span><b>${k}</b>${O?` · ${O.n} sh`:""}<small>${nm}</small></span>${stkSpark(STK.hist[k].slice(-30),56,22,col)}<b style="color:${col}">${money2(p)}<small style="display:block;text-align:right">${ch>=0?"+":""}${ch.toFixed(2)}%</small></b></button>`}).join("")}</div>
-  <p class="fine">Prices move while you play. Buy and sell from checking. Dividend stocks pay out every game week. Prices can drop as well as rise.</p>`;return h}
+  <p class="fine">Real companies, matched to their real share prices. Everyone in Mission Strata sees the same prices at the same moment, and they keep moving while you play. Buy and sell from checking. Dividend stocks pay out every game week. Prices can drop as well as rise.</p>`;return h}
 // ---- (internal) developer panel
 const ADM={n:0,t:0,ok:false},ADM_H=2550347012;
 function admHash(s){let h=2166136261;for(const c of s){h^=c.charCodeAt(0);h=Math.imul(h,16777619)>>>0}return h}
@@ -15138,7 +15160,7 @@ function admOpen(){let el=$("adm");if(!el){el=document.createElement("div");el.i
     el.addEventListener("keydown",e=>{e.stopPropagation();if(e.key==="Enter")admPanelAct("code")});el.addEventListener("keyup",e=>e.stopPropagation())}
   el.hidden=false;el.innerHTML=ADM.ok?admHtml():`<div class="admBox"><b>Enter code</b><input id="admCode" type="password" autocomplete="off" spellcheck="false"><div class="admG"><button data-ad="code">OK</button><button data-ad="close">Cancel</button></div></div>`;const i=$("admCode");if(i)setTimeout(()=>i.focus(),30)}
 function admHtml(){const B=(k,n)=>`<button data-ad="${k}">${n}</button>`;return `<div class="admBox"><b>Admin</b><small>Cash ${money2(ECON.cash)} · score ${BANK.score} · level ${ECON.lvl}</small>
-  <div class="admG">${B("c1k","+$1,000")}${B("c10k","+$10,000")}${B("c100k","+$100,000")}${B("c1m","+$1,000,000")}${B("score","Credit score 850")}${B("loans","Pay off all loans")}${B("card","Clear credit card")}${B("lvl","+5 levels")}${B("free","Free car again")}${B("fill","Fill tank / battery")}${B("fix","Repair car")}${B("wmi","Wear +10,000 mi")}${B("wyr","Wear +1 year")}${B("day","Skip a day")}${B("boom","Stocks +25%")}${B("crash","Stocks −30%")}${B("gig","Gig offer now")}${B("ins","No insurance: "+(st.noIns?"on":"off"))}${B("dale","Dale mode: "+(st.dale?"ON":"off"))}${B("players","Players & bans")}${B("close","Close")}</div></div>`}
+  <div class="admG">${B("c1k","+$1,000")}${B("c10k","+$10,000")}${B("c100k","+$100,000")}${B("c1m","+$1,000,000")}${B("score","Credit score 850")}${B("loans","Pay off all loans")}${B("card","Clear credit card")}${B("lvl","+5 levels")}${B("free","Free car again")}${B("fill","Fill tank / battery")}${B("fix","Repair car")}${B("wmi","Wear +10,000 mi")}${B("wyr","Wear +1 year")}${B("day","Skip a day")}${B("boom","Stocks +25% (me)")}${B("crash","Stocks −35% (me)")}${B("crashAll","Crash everyone −35%")}${B("boomAll","Rally everyone +25%")}${B("stkClr","Clear my market events")}${B("m1k","−$1,000")}${B("m10k","−$10,000")}${B("m100k","−$100,000")}${B("m1m","−$1,000,000")}${B("zero","Cash to $0")}${B("gig","Gig offer now")}${B("ins","No insurance: "+(st.noIns?"on":"off"))}${B("dale","Dale mode: "+(st.dale?"ON":"off"))}${B("players","Players & bans")}${B("close","Close")}</div></div>`}
 // fast-forward wear on the car you're driving: moves its last-service marks back, so tyres, brakes, oil and the 12-volt battery age without touching the odometer
 function admWear(mi,days){const G=garageCur();if(!G){toast("Drive one of your own cars first (not a test drive)");return}const w0=wearOf(G),S=G.svc;
   if(mi){S.tyreMi-=mi;S.brakeMi-=mi;S.oilMi-=mi}if(days){S.oilDay-=days;S.batDay-=days;G.day=(G.day||1)-days}garageSave();wearRefresh();const w=wearOf(G),pc=v=>Math.round(Math.max(0,1-v)*100)+"%";
@@ -15148,7 +15170,7 @@ function admPanelAct(a){const el=$("adm");if(a==="close"){el.hidden=true;return}
   if(!ADM.ok)return;const add=n=>{ECON.cash+=n;bankTx("Adjustment",n)};
   ({c1k:()=>add(1000),c10k:()=>add(10000),c100k:()=>add(100000),c1m:()=>add(1000000),score:()=>{BANK.score=850},loans:()=>{BANK.loans=BANK.loans.filter(l=>l.kind==="lease");for(const l of BANK.loans){l.pastDue=0}},card:()=>{BANK.card.bal=0;BANK.card.minDue=0;BANK.card.pastDue=0},
     lvl:()=>{ECON.lvl+=5},free:()=>{try{localStorage.removeItem("mstrata.free1")}catch(e){}},fill:()=>{const H=car.hyb;if(H.tank)H.fuel=H.tank;H.soc=TRIMS[st.trim].hybrid?0.8:1},fix:()=>{car.fault=null;sys.overheat=0;sys.breakdown=null},wmi:()=>admWear(10000,0),wyr:()=>admWear(0,365),
-    day:()=>{try{skipTime("day")}catch(e){}},boom:()=>{for(const k in STK.p)STK.p[k]=Math.round(STK.p[k]*1.25*100)/100},crash:()=>{for(const k in STK.p)STK.p[k]=Math.round(STK.p[k]*0.7*100)/100},gig:()=>{GIG.online=true;gigOffer()},ins:()=>{st.noIns=!st.noIns},dale:()=>{st.dale=!st.dale;toast(st.dale?"Dale mode ON":"Dale mode off")}})[a]?.();if(a==="players"){el.hidden=true;acctOpen();if(ACCT.admin&&!ACCT.list)acctAct("load");else if(ACCT.tok&&!ACCT.admin)toast("Your account is not an admin yet");return}
+    day:()=>{try{skipTime("day")}catch(e){}},boom:()=>stkAdmEvent(0.25,6,false),crash:()=>stkAdmEvent(-0.35,6,false),crashAll:()=>{if(confirm("Crash the stock market for EVERY player (−35%, recovers over about 12 hours)?"))stkAdmEvent(-0.35,12,true)},boomAll:()=>{if(confirm("Rally the market for every player (+25%)?"))stkAdmEvent(0.25,12,true)},stkClr:()=>{STK.ev=[];stkSync()},m1k:()=>add(-1000),m10k:()=>add(-10000),m100k:()=>add(-100000),m1m:()=>add(-1000000),zero:()=>add(-ECON.cash),gig:()=>{GIG.online=true;gigOffer()},ins:()=>{st.noIns=!st.noIns},dale:()=>{st.dale=!st.dale;toast(st.dale?"Dale mode ON":"Dale mode off")}})[a]?.();if(a==="players"){el.hidden=true;acctOpen();if(ACCT.admin&&!ACCT.list)acctAct("load");else if(ACCT.tok&&!ACCT.admin)toast("Your account is not an admin yet");return}
   bankSave();econSave();stkSave();el.innerHTML=admHtml();toast("Done")}
 // ======================================================================= ACCOUNTS: a username and a password, no email. Your saved game (cash, cars, bank, phone,
 // gigs, houses...) is kept on the server, so it follows you to any device. Admins see every account and can ban one.
@@ -15202,9 +15224,9 @@ function acctBackup(){try{const B=JSON.parse(localStorage.getItem("msBackup")||"
 async function acctClaim(){if(!acctOn()||!ACCT.tok||ACCT.applying)return;let r;try{r=await acctRpc("claim_grants",{p_token:ACCT.tok})}catch(e){return}
   if(r&&"role" in r&&r.role!==ACCT.role){ACCT.role=r.role||null;acctKeep();if(ACCT.role)toast(`You're now a ${ACCT.role} in Mission Strata`)}
   const G=(r&&r.grants)||[];if(!G.length)return;let cash=0,paid=false;
-  for(const g of G){const c=+g.cash||0;if(c){ECON.cash+=c;cash+=c;try{bankTx(`Gift from ${g.from||"Mission Strata"}`,c)}catch(e){}}
+  for(const g of G){const c=+g.cash||0;if(c){ECON.cash+=c;cash+=c;try{bankTx(c>0?`Gift from ${g.from||"Mission Strata"}`:"Adjustment by Mission Strata",c)}catch(e){}}
     if(g.payLoans){paid=true;BANK.loans=(BANK.loans||[]).filter(l=>l.kind==="lease");for(const l of BANK.loans)l.pastDue=0}}
-  try{bankSave();econSave()}catch(e){}toast(`🎁 ${cash?money(cash)+" added to your checking":""}${cash&&paid?" and ":""}${paid?"your loans are paid off":""}`);acctSave(true)}
+  try{bankSave();econSave()}catch(e){}toast(cash<0?`💸 ${money(-cash)} was taken from your checking${paid?" and your loans are paid off":""}`:`🎁 ${cash?money(cash)+" added to your checking":""}${cash&&paid?" and ":""}${paid?"your loans are paid off":""}`);acctSave(true)}
 setInterval(acctClaim,60000);
 function acctMsg(m){ACCT.msg=m;const e=$("acMsg");if(e)e.textContent=m}
 function acctBanned(reason,boot){try{localStorage.setItem("msBan",reason||"")}catch(e){}ACCT.tok=null;acctKeep();if($("acctBan"))return;const d=document.createElement("div");d.id="acctBan";
@@ -15226,7 +15248,7 @@ function acctHtml(){if(!acctOn())return `<div class="acH"><b>Account</b><button 
     const L=ACCT.list;h+=`<div class="acH2"><b>All players</b><button data-ac="load">${L?"Refresh":"Show"}</button></div>`;
     if(L){const q=ACCT.q.toLowerCase(),F=L.filter(p=>!q||p.username.toLowerCase().includes(q));h+=`<input id="acQ" placeholder="Search ${L.length} players" value="${acctEsc(ACCT.q)}"><div class="acL">${F.map(p=>`<div class="acI${p.banned?" ban":""}"><div><b>${acctEsc(p.username)}</b>${p.admin?' <span class="acA">admin</span>':""}${p.role?` <span class="acA">${acctEsc(p.role)}</span>`:""}${p.banned?' <span class="acX">banned</span>':""}
       <small>seen ${acctAgo(p.seen)} · joined ${new Date(p.created).toLocaleDateString()} · ${p.cash!=null?money(+p.cash):"$0"} · ${(p.cars||[]).length} car${(p.cars||[]).length===1?"":"s"}${p.banned&&p.reason?" · "+acctEsc(p.reason):""}</small></div>
-      <div class="acBt"><button data-ac="gift" data-id="${p.id}" data-u="${acctEsc(p.username)}">Give $</button><button data-ac="pay" data-id="${p.id}" data-u="${acctEsc(p.username)}">Pay loans</button><button data-ac="role" data-id="${p.id}" data-u="${acctEsc(p.username)}" data-r="${acctEsc(p.role||"")}">Role</button>${p.admin?"":`<button data-ac="${p.banned?"unban":"ban"}" data-id="${p.id}" data-u="${acctEsc(p.username)}">${p.banned?"Unban":"Ban"}</button>`}</div></div>`).join("")||"<p class='fine'>No one matches.</p>"}</div>`}}
+      <div class="acBt"><button data-ac="gift" data-id="${p.id}" data-u="${acctEsc(p.username)}">Give $</button><button data-ac="take" data-id="${p.id}" data-u="${acctEsc(p.username)}">Take $</button><button data-ac="pay" data-id="${p.id}" data-u="${acctEsc(p.username)}">Pay loans</button><button data-ac="role" data-id="${p.id}" data-u="${acctEsc(p.username)}" data-r="${acctEsc(p.role||"")}">Role</button>${p.admin?"":`<button data-ac="${p.banned?"unban":"ban"}" data-id="${p.id}" data-u="${acctEsc(p.username)}">${p.banned?"Unban":"Ban"}</button>`}</div></div>`).join("")||"<p class='fine'>No one matches.</p>"}</div>`}}
   return h}
 // ---- admin tabs: message to everyone, events, player reports, stats
 function admTabHtml(at){const A=ACCT.adm||(ACCT.adm={});
@@ -15266,7 +15288,7 @@ const LIVE={msg:null,until:0,ev:{},evUntil:0,seen:""};
 function liveEvText(){const E=LIVE.ev||{},L=[];if(+E.cash>1)L.push(E.cash==2?"Double cash":E.cash==3?"Triple cash":E.cash+"× cash");if(E.gas)L.push("Free gas and charging");if(+E.sale>0)L.push(E.sale+"% off new cars");return L.join(" · ")}
 const liveCash=()=>LIVE.evUntil&&Date.now()<LIVE.evUntil?Math.max(1,Math.min(5,+(LIVE.ev||{}).cash||1)):1,liveGas=()=>!!(LIVE.evUntil&&Date.now()<LIVE.evUntil&&(LIVE.ev||{}).gas),liveSale=()=>LIVE.evUntil&&Date.now()<LIVE.evUntil?Math.max(0,Math.min(90,+(LIVE.ev||{}).sale||0)):0;
 async function liveFetch(){if(!acctOn())return;let r;try{const h={"Content-Type":"application/json",apikey:SUPA.key};if(/^eyJ/.test(SUPA.key))h.Authorization="Bearer "+SUPA.key;const q=await fetch(SUPA.url.replace(/\/+$/,"")+"/rest/v1/rpc/get_live",{method:"POST",headers:h,body:"{}"});if(!q.ok)return;r=await q.json()}catch(e){return}
-  if(!r)return;LIVE.msg=r.msg||null;LIVE.until=r.msg_until?Date.parse(r.msg_until):0;LIVE.ev=r.ev||{};LIVE.evUntil=r.ev_until?Date.parse(r.ev_until):0;liveBar()}
+  if(!r)return;LIVE.msg=r.msg||null;LIVE.until=r.msg_until?Date.parse(r.msg_until):0;LIVE.ev=r.ev||{};LIVE.evUntil=r.ev_until?Date.parse(r.ev_until):0;STKG.live=LIVE.ev&&LIVE.ev.stk&&+LIVE.ev.stk.at?LIVE.ev.stk:null;liveBar()}
 function liveBar(){let el=$("liveBar");const ev=LIVE.evUntil>Date.now()?liveEvText():"",msg=LIVE.until>Date.now()?LIVE.msg:"";if(!msg&&!ev){if(el)el.remove();return}
   if(!el){el=document.createElement("div");el.id="liveBar";document.body.appendChild(el);el.onclick=e=>{if(e.target.closest("button"))el.classList.add("min")}}
   const key=msg+"|"+ev;el.innerHTML=`${msg?`<span>📣 ${acctEsc(msg)}</span>`:""}${ev?`<span class="lbE">🎉 ${acctEsc(ev)}</span>`:""}<button aria-label="Hide">✕</button>`;if(key!==LIVE.seen){LIVE.seen=key;el.classList.remove("min");if(msg)try{beep(1046,0.08,"sine",0.06)}catch(e){}}}
@@ -15281,11 +15303,12 @@ async function acctAct(a,b){if(a==="x"){$("acct").hidden=true;return}if(await ad
   if(a==="in"||a==="up"){acctSign(a==="up");return}if(a==="restore"){const B=acctBackup();if(B&&confirm("Replace your account's game with the one this device had before? Your account will save it from now on.")){try{localStorage.removeItem("msBackup")}catch(e){}acctApply({ls:B.ls,at:Date.now()},false)}return}if(a==="out"){acctOut();return}
   if(a==="save"){acctMsg("Saving…");acctMsg(await acctSave(true)?"Saved":"Couldn't save. Check your connection");return}
   if(a==="load"){try{acctMsg("Loading players…");ACCT.list=await acctRpc("admin_players",{p_token:ACCT.tok})||[];ACCT.msg=""}catch(e){ACCT.msg=e.message}acctDraw();return}
-  if(a==="gift"||a==="pay"||a==="role"){const u=b.dataset.u;let args;
+  if(a==="gift"||a==="take"||a==="pay"||a==="role"){const u=b.dataset.u;let args;
+    if(a==="take"){const v=prompt(`Take how much money from ${u}? (for example 50000)`,"");if(v===null)return;const n=Math.round(+String(v).replace(/[$,\s]/g,""));if(!(n>0)){toast("Type an amount");return}args=["admin_grant",{p_token:ACCT.tok,p_id:b.dataset.id,p_cash:-n,p_payloans:false}]}else
     if(a==="gift"){const v=prompt(`Give ${u} how much money? (for example 10000000)`,"");if(v===null)return;const n=Math.round(+String(v).replace(/[$,\s]/g,""));if(!(n>0)){toast("Type an amount");return}args=["admin_grant",{p_token:ACCT.tok,p_id:b.dataset.id,p_cash:n,p_payloans:false}]}
     else if(a==="pay"){if(!confirm(`Pay off all of ${u}'s loans?`))return;args=["admin_grant",{p_token:ACCT.tok,p_id:b.dataset.id,p_cash:0,p_payloans:true}]}
     else{const v=prompt(`Role for ${u} (for example Contributor). Leave empty to remove it.`,b.dataset.r||"");if(v===null)return;args=["admin_role",{p_token:ACCT.tok,p_id:b.dataset.id,p_role:v.trim().slice(0,24)}]}
-    try{await acctRpc(...args);toast(a==="role"?`${u}'s role updated`:`Sent to ${u}: it lands in their game within a minute`);ACCT.list=await acctRpc("admin_players",{p_token:ACCT.tok})||[]}catch(e){ACCT.msg=/function/i.test(e.message)?"Run the latest SQL in Supabase first":e.message}acctDraw();return}
+    try{await acctRpc(...args);toast(a==="role"?`${u}'s role updated`:a==="take"?`Taking it from ${u}: it comes out of their game within a minute`:`Sent to ${u}: it lands in their game within a minute`);ACCT.list=await acctRpc("admin_players",{p_token:ACCT.tok})||[]}catch(e){ACCT.msg=/function/i.test(e.message)?"Run the latest SQL in Supabase first":e.message}acctDraw();return}
   if(a==="ban"||a==="unban"){let reason=null;if(a==="ban"){reason=prompt(`Ban ${b.dataset.u}? Reason (they'll see it):`,"");if(reason===null)return}
     try{await acctRpc("admin_ban",{p_token:ACCT.tok,p_id:b.dataset.id,p_ban:a==="ban",p_reason:reason||""});toast(`${b.dataset.u} ${a==="ban"?"banned":"unbanned"}`);ACCT.list=await acctRpc("admin_players",{p_token:ACCT.tok})||[]}catch(e){ACCT.msg=e.message}acctDraw()}}
 setTimeout(acctBoot,1500);
@@ -20648,6 +20671,7 @@ const MAINT={on:false,t:0},PAGE_T0=Date.now();
 
 function maintUrl(){const h=location.hostname;return(/github\.io$|^127\.|^localhost$/.test(h)?"maint.json":"https://exclusive2knight.github.io/Strata-Test-Drive/maint.json")+"?t="+Date.now()}
 async function maintCheck(){let d;try{const r=await fetch(maintUrl(),{cache:"no-store"});if(!r.ok)return;d=await r.json()}catch(e){return}
+  try{stkMaint(d)}catch(e){}
   const on=!!d.on&&!(d.until&&Date.now()>d.until),first=!MAINT.t;MAINT.t=Date.now();
   // "reload": copies opened before that moment restart (once), so everyone lands on the maintenance screen or the new version
   if(d.reload&&PAGE_T0<d.reload){let done="";try{done=sessionStorage.getItem("strata.mReload")||""}catch(e){}if(done!==String(d.reload)){try{sessionStorage.setItem("strata.mReload",String(d.reload))}catch(e){}location.reload();return}}
