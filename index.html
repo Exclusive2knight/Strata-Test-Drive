@@ -2464,12 +2464,23 @@ void main(){
  vec3 N=normalize(vN),V=normalize(uEye-vW); if(dot(N,V)<0.0)N=-N;
  vec3 base=uC*vC; float alpha=uA;
  if(uPat>5.5&&uPat<9.5){vec4 tx=texture2D(uTex,vC.xy);if(uPat>6.5&&tx.a<0.5)discard;base=tx.rgb*uC;}
- if(uPat>9.5&&uPat<10.5){float z=vC.z+0.5;float kind=floor(z/10000.0);float n=floor(mod(z,10000.0)/1000.0);float m2=floor(mod(z,1000.0))/10.0-20.0;float t=vC.x,v=vC.y;vec2 uv;float g=0.34;
+ if(uPat>9.5&&uPat<10.5){float ck=0.0;float z=vC.z+0.5;float kind=floor(z/10000.0);float n=floor(mod(z,10000.0)/1000.0);float m2=floor(mod(z,1000.0))/10.0-20.0;float t=vC.x,v=vC.y;vec2 uv;float g=0.34;
    if(kind>0.5&&kind<3.5){float x=m2<0.0?t-m2:abs(t)-m2;float nl=n*3.6;vec2 L=kind<1.5?vec2(0.100,0.184):vec2(0.005,0.090);g=kind<1.5?0.34:0.32;float q=x/3.6;float f=1.0-abs(mod(q,2.0)-1.0);
-     if(kind>1.5&&kind<2.5&&(x<0.0||x>nl)){float d=x<0.0?-x:x-nl;uv=vec2(mix(0.274,0.326,clamp(d/3.0,0.0,1.0)),v);g=0.30;}else uv=vec2(mix(L.x,L.y,f),v);}
+     if(kind>1.5&&kind<2.5&&(x<0.0||x>nl)){float d=x<0.0?-x:x-nl;uv=vec2(mix(0.274,0.326,clamp(d/3.0,0.0,1.0)),v);g=0.30;}
+     else{float li=floor(q);uv=vec2(mix(L.x,L.y,f),v+fract(li*0.618+floor(abs(vW.x+vW.z)/900.0)*0.37));   /* each lane shifted so the kit's cracks and patches don't line up across the road */
+#ifndef LITE
+       float de=length(uEye-vW),fd=1.0-smoothstep(16.0,60.0,de);
+       if(fd>0.0){float sl=v*12.0,rg=n2(vW.xz*0.011),amt=(kind<1.5?0.85:kind<2.5?0.3:0.6)*smoothstep(0.2,0.8,rg+0.2),xl=x-li*3.6,cw=0.011+0.005*(1.0-fd);
+         float bi=floor(sl/1.9),hb=h(vec2(bi,3.1));if(hb<amt*0.16){float pp=(bi+0.25+0.5*h(vec2(bi,7.7)))*1.9+0.35*(n2(vec2(x*1.1,bi*3.0))-0.5),x0=h(vec2(bi,1.3))*nl*0.6;if(abs(sl-pp)<cw&&x>x0&&x<x0+nl*(0.35+0.65*h(vec2(bi,5.9))))ck=0.72;}
+         float xj=x-floor(x/3.6+0.5)*3.6,jw=0.04*(n2(vec2(sl*0.35,li*9.0+2.0))-0.5)+0.012*(n2(vec2(sl*2.3,li))-0.5);if(n2(vec2(sl*0.045,floor(x/3.6+0.5)*5.3))>1.0-amt*0.55){bool tar=h(vec2(floor(sl/23.0),li+11.0))<0.45;if(abs(xj-jw)<(tar?0.03:cw))ck=max(ck,tar?0.55:0.72);}
+         float wp=min(abs(xl-0.95),abs(xl-2.65));if(wp<0.5&&n2(vec2(sl*0.11,li*7.0+0.5))>1.0-amt*0.42){vec2 pq=vec2(xl*3.2,sl*3.2),ce=floor(pq);float f1=9.0,f2=9.0;for(int j=-1;j<=1;j++)for(int i=-1;i<=1;i++){vec2 c=ce+vec2(float(i),float(j)),o=c+vec2(h(c),h(c+17.3))*0.85;float dd=length(o-pq);if(dd<f1){f2=f1;f1=dd;}else if(dd<f2)f2=dd;}
+           if(f2-f1<0.07)ck=max(ck,0.6*smoothstep(0.5,0.25,wp));}
+         ck*=fd;}
+#endif
+     }}
    else if(kind>4.5&&kind<5.5){uv=vec2(mix(0.453,0.486,1.0-abs(mod(abs(t)/2.4,2.0)-1.0)),v);g=0.5;}
    else{float f=1.0-abs(mod(t/3.6,2.0)-1.0);uv=kind>6.5?vec2(mix(0.005,0.090,f),v):vec2(mix(0.100,0.184,f),v);g=kind>6.5?0.32:0.34;}
-   base=texture2D(uTex,uv).rgb*uC*g;}   // v335 road kit: asphalt, wheel tracks, patches, shoulders with rumble strips and sidewalk slabs from one atlas   // road sign faces: one shared atlas, the UV rides in the vertex colour
+   base=texture2D(uTex,uv).rgb*uC*g*(1.0-ck);}   // v335 road kit: asphalt, wheel tracks, patches, shoulders with rumble strips and sidewalk slabs from one atlas   // road sign faces: one shared atlas, the UV rides in the vertex colour
  if(uBackOn>0.5&&!gl_FrontFacing&&alpha>0.99)base=vec3(0.045,0.048,0.052);
  if(vDent>0.02){float sc=step(0.55,fract(vL.x*23.0+vL.y*61.0+vL.z*17.0));base=mix(base,mix(base*0.45,vec3(0.32,0.31,0.3),sc*0.6),vDent*0.75);}   // inside of the body shell: dark trim
  if(uPat>4.5&&uPat<5.5){vec3 dd=vW-uSO;vec2 uv=vec2(dot(dd,uSU)/dot(uSU,uSU),dot(dd,uSV)/dot(uSV,uSV));gl_FragColor=vec4(texture2D(uTex,uv).rgb*uC.x,1.0);return;}
