@@ -1245,8 +1245,8 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
   <h4>Gears</h4><p><kbd>E</kbd> shift up (P → R → N → D) · <kbd>Q</kbd> shift down</p><p><kbd>P</kbd> (or tap <kbd>Shift</kbd>) parking brake on / off · with the manual gearbox, <kbd>Shift</kbd> is the clutch</p></div>
   <div><h4>Drive</h4><p><kbd>B</kbd> seatbelt (put it on first)</p><p><kbd>W</kbd> accelerator · <kbd>S</kbd> brake</p><p><kbd>Shift</kbd>+<kbd>W</kbd> smooth, gentle throttle · <kbd>Shift</kbd>+<kbd>S</kbd> smooth, gentle braking</p><p><kbd>A</kbd> steer left · <kbd>D</kbd> steer right</p>
   <h4>Vehicle</h4><p><kbd>Z</kbd> left signal · <kbd>C</kbd> right signal · <kbd>X</kbd> hazards</p><p><kbd>L</kbd> headlights · <kbd>J</kbd> high beams · <kbd>K</kbd> fog lights · <kbd>H</kbd> horn</p><p><kbd>V</kbd> inside view / first person</p><p><kbd>1</kbd>–<kbd>4</kbd> gas strength: soft 30 %, medium 50 %, strong 75 %, full</p></div>
-  <div><h4>Safety assists</h4><p><kbd>G</kbd> assist menu (turn features on and off; 1–9 to pick)</p><p><kbd>U</kbd> rear automatic braking on / off</p><p><kbd>J</kbd> switch the cluster screen (Trip, Energy / Hybrid, Driver Assist, Tires, Media) · <kbd>Shift</kbd>+<kbd>J</kbd> back</p><p><kbd>\</kbd> cruise control · <kbd>+</kbd> / <kbd>-</kbd> set speed up / down by 5</p><p><kbd>Y</kbd> park assist</p>
-  <h4>Other</h4><p><kbd>R</kbd> reset the car like new on the nearest road</p><p><kbd>Y</kbd> phone (bank, wallet, maps, music…) · <kbd>N</kbd> zoom into the cluster</p><p><kbd>T</kbd> switch between your cars · <kbd>I</kbd> comfort features (heated seats, ambient light…)</p><p><kbd>O</kbd> get out / use the pump or charger / get back in</p><p><kbd>M</kbd> lean in to the screen · <kbd>Tab</kbd> menu · <kbd>?</kbd> this help</p></div>
+  <div><h4>Safety assists</h4><p><kbd>G</kbd> assist menu (turn features on and off; 1–9 to pick)</p><p><kbd>U</kbd> rear automatic braking on / off</p><p><kbd>.</kbd> switch the cluster screen (Trip, Energy / Hybrid, Driver Assist, Tires, Media) · <kbd>Shift</kbd>+<kbd>.</kbd> back</p><p><kbd>\</kbd> cruise control · <kbd>+</kbd> / <kbd>-</kbd> set speed up / down by 5</p><p><kbd>Y</kbd> park assist</p>
+  <h4>Other</h4><p><kbd>R</kbd> reset the car like new on the nearest road</p><p><kbd>`</kbd> phone (bank, wallet, maps, music…) · <kbd>N</kbd> zoom into the cluster</p><p><kbd>T</kbd> switch between your cars · <kbd>I</kbd> comfort features (heated seats, ambient light…)</p><p><kbd>O</kbd> get out / use the pump or charger / get back in</p><p><kbd>M</kbd> lean in to the screen · <kbd>Tab</kbd> menu · <kbd>?</kbd> this help</p></div>
   <div><h4>Gamepad</h4><p>Left stick steer · RT go · LT brake · right stick look</p><p>A cruise · B parking brake · X camera · Y D/R</p><p>LB/RB signals · D-pad cruise speed · Start menu</p></div></div>
   <button id="pcHelpClose">Got it</button></div></div>
 <div id="controls">
@@ -5532,7 +5532,10 @@ let seedR=12345,CAR_ID=0; const rnd=()=>(seedR=(seedR*16807)%2147483647)/2147483
 const spW=e=>e.L*e.n*(e.type==="xway"?2.2:e.type==="ramp"?3:1);   // freeways and ramps get more of the traffic
 const EW=[];{let a=0;for(const e of EDGES){a+=spW(e);EW.push(a)}}
 function laneIdx(c){return clamp(Math.round(c.offT/LANE)-loOf(c.e.n),0,c.e.n-1+(c.inBay?1:0))}
-function carPose(c){if(c.fixed||c.dyn)return;if(c.jn){const P=c.jn.P,q=pathAt(P,c.jn.d),f=c.jn.ex!==undefined?Math.max(0,1-c.jn.d/10):0;c.wx=q[0]+(f?c.jn.ex*f:0);c.wy=q[1]+(f?c.jn.ey*f:0);c.wh=q[2]+(f?c.jn.eh*f:0);   // into a junction: ease from where the car really is onto the turning path over the first 10 m
+/* v334: an AI car's heading can't snap: it turns at most a car-like rate per step (no more "drifting" or twitching where a junction path or a lane change
+   bends sharply); big changes (a respawn, a spin-out) still apply at once */
+function carPose(c){const pw=c.wh;carPose0(c);if(pw===undefined||c.fixed||c.dyn||c.kind!=="ai"||c.stunned>0||c.slid)return;const d=wrapPi(c.wh-pw);if(Math.abs(d)<0.7){const mx=0.01+Math.abs(c.v||0)*0.0035;c.wh=pw+clamp(d,-mx,mx)}}
+function carPose0(c){if(c.fixed||c.dyn)return;if(c.jn){const P=c.jn.P,q=pathAt(P,c.jn.d),f=c.jn.ex!==undefined?Math.max(0,1-c.jn.d/10):0;c.wx=q[0]+(f?c.jn.ex*f:0);c.wy=q[1]+(f?c.jn.ey*f:0);c.wh=q[2]+(f?c.jn.eh*f:0);   // into a junction: ease from where the car really is onto the turning path over the first 10 m
 c.wz=P.z0+(P.z1-P.z0)*clamp(c.jn.d/Math.max(P.L,0.1),0,1);c.wp=0}
   else{const q=fpt(c.e,c.dir,c.s,c.off+(c.wob||0));c.wx=q[0];c.wy=q[1];c.wh=q[2]+(c.head||0);if(c.e.hz){const u=c.dir>0?c.s:c.e.L-c.s;c.wz=ez(c.e,u);c.wp=Math.atan((ez(c.e,u+c.dir)-ez(c.e,u-c.dir))/2)}else{c.wz=0;c.wp=0}}}
 // at a split (a merge-controlled node), which lane to be in for the road you're taking: right lane for the rightmost branch, left lane for the leftmost, any lane if
@@ -5550,7 +5553,8 @@ function planMove(c,prefer){const n=endNode(c.e,c.dir),inL=arrLeg(c.e,c.dir);c.m
   if(pick.e.type==="rbt"&&c.e.type!=="rbt"&&pick.e.n>1){let k=0;if(c.route){let ee=pick.e,dd=pick.dir;for(let g=0;g<12;g++){const nk=c.route.next.get(skey(ee,dd));if(nk==null)break;const e2=EDGES[nk>>1];if(e2.type!=="rbt")break;k++;ee=e2;dd=nk&1?1:-1}}c.rbLane=c.route?(k>=1?1:0):(rnd()<0.4?1:0)}
   c.avoidL=inL.ltl&&pick.t!=="L"&&pick.t!=="U"?c.e.n-1:null;  c.mv=pick;c.mvNode=n;c.mvLeg=inL;c.lanePinned=false;{const sl=splitLane(n,inL,pick,c.e.n,(()=>{try{return laneIdx(c)}catch(e){return null}})());c.needLane=c.e.type==="rbt"&&pick.e.type!=="rbt"?null:sl!==undefined?sl:pick.t==="R"?0:(pick.t==="L"||pick.t==="U")?c.e.n-1:null}
   if(c.needLane===null&&pick.e.n<c.e.n&&pick.t==="S"&&n.drop)c.needLane=c.e.n-1;   // right lane ends: merge left before the join
-  if(c.needLane===null&&pick.e.n<c.e.n&&pick.t==="S"&&n.ctrl!=="merge"){const th=wrapPi(pick.o.h-(inL.h+Math.PI));if(Math.abs(th)>0.12)c.needLane=th>0?c.e.n-1:0}}
+  if(c.needLane===null&&pick.e.n<c.e.n&&pick.t==="S"&&n.ctrl!=="merge"){const th=wrapPi(pick.o.h-(inL.h+Math.PI));if(Math.abs(th)>0.12)c.needLane=th>0?c.e.n-1:0}
+  if(c.needLane===null&&pick.e.n<c.e.n&&pick.t==="S")c.needLane=c.e.n-1}   /* v334: any lane drop going straight on (a 4-lane avenue narrowing to a 2-lane road): merge in good time instead of squeezing over in the junction */
 function outLane(c,i){const m=c.mv,nO=m.e.n,nI=c.e.n;if(m.e.type==="rbt"&&c.e.type!=="rbt"&&nO>1)return Math.min(nO-1,c.rbLane||0);   // into a two-lane roundabout: outer lane for the first exit, inner lane to go further round
   if(m.t==="R")return 0;if(c.mvNode&&c.mvNode.ctrl==="merge"&&c.mvLeg&&!c.mvLeg.major)return 0;/* a ramp joins the right-hand lane, not the fast lane */if(m.t==="L"||m.t==="U")return nO-1;return nO>nI?i+(nO-nI):Math.max(0,i-(nI-nO))}
 function mvP(c){const i=laneIdx(c);return mvPath(c.mvNode,c.e,c.dir,c.mv,i,outLane(c,i))}
@@ -6393,22 +6397,26 @@ function slDraw(ex,ey,night){if(!SL.pl){SL.pl=1;for(const k of ["sl_single","sl_
 function bbDraw(ex,ey,night){if(!BB.list){try{bbBuild()}catch(e){BB.list=[]}}for(const b of BB.list){if((b.x-ex)**2+(b.y-ey)**2>b.far*b.far||!PROPS[b.k])continue;propDraw(b.k,carMatrix(b.x,b.y,b.h,groundAt(b.x,b.y).h||0,0,0),{head:night})}}
 // road work that moves day to day: lanes coned off on a few busy roads, and one road closed outright with a detour round it
 const RW={day:-1,zones:[],items:[],closed:new Set(),warned:new Set()};
-function rwTick(){if(!st.started)return;const day=GT.day||1;if(RW.day===day)return;RW.day=day;const old=new Set(RW.items);cars=cars.filter(c=>!old.has(c));RW.items=[];RW.zones=[];RW.closed=new Set();RW.warned=new Set();
+/* road work, laid out the way the US work-zone rules draw it (MUTCD Part 6, Tables 6H-3 / 6H-4): ROAD WORK AHEAD and RIGHT LANE CLOSED signs ahead of the
+   closure (100 ft apart on a slow street, 350 ft on a faster one), a merging taper L = W·S²/60 (40 mph or less) or W·S (45 mph+) with cones one per S feet,
+   an arrow board at the end of the taper, a buffer, the work area with its truck, then a short taper back and END ROAD WORK. v334: fewer of them (one or two
+   lane closures and one closed street a day), and the lane closures only go out in working hours (7 am to 7 pm) instead of cones lying about all the time */
+function rwTick(){if(!st.started)return;const day=GT.day||1,hr=(GT.min/60)%24,work=hr>=7&&hr<19,key=day+(work?"w":"n");if(RW.day===key)return;RW.day=key;const old=new Set(RW.items);cars=cars.filter(c=>!old.has(c));RW.items=[];RW.zones=[];RW.closed=new Set();RW.warned=new Set();
   let h=(day*2654435761)>>>0;const rr=()=>{h=(h*1103515245+12345)>>>0;return h/4294967296},pick=L=>L[Math.floor(rr()*L.length)];
   const fwN=new Set();for(const e of EDGES)if(e.type==="xway"||e.type==="ramp"){fwN.add(e.a);fwN.add(e.b)}const offFw=e=>e.type!=="xway"&&e.type!=="ramp"&&e.type!=="aw"&&e.type!=="curb"&&!e.zo&&!e.fly&&!fwN.has(e.a)&&!fwN.has(e.b)&&!inApt(e.a.x,e.a.y,300);   // road work stays off the freeway, its ramps and the streets that meet them
-  const multi=EDGES.filter(e=>e.n>=2&&e.L>380&&offFw(e)&&!e.br&&!e.ov),two=EDGES.filter(e=>e.n===1&&!e.ow&&e.L>160&&e.L<700&&/res|st|col/.test(e.type)&&offFw(e)&&!e.br&&!e.ov&&!e.dip);
-  for(let k=0;k<3&&multi.length;k++){const e=pick(multi),dir=rr()<0.5?1:-1;if(RW.zones.some(z=>z.e===e))continue;const s0=rStart(e,dir)+60+rr()*Math.max(1,e.L-rEnd(e,dir)-rStart(e,dir)-260),lo=loOf(e.n),it=[];
-    for(let d=0;d<=40;d+=8)it.push(evStatic("cone",e,dir,s0+d,lo*LANE-1.7+d/40*3.3));for(let d=50;d<=150;d+=12)it.push(evStatic("cone",e,dir,s0+d,(lo+0.5)*LANE-0.25));
-    it.slice(0,6).forEach(c=>c.rwK="rw_drum");it.push(evStatic("wreck",e,dir,s0+90,lo*LANE,{haz:true,paint:"yellow"}));RW.items.push(...it);const p=fpt(e,dir,Math.max(2,s0-90),lo*LANE-LANE/2-1.6);
-    const side=(s_,k)=>{const q=fpt(e,dir,Math.max(2,s_),lo*LANE-LANE/2-2.2);return {k,x:q[0],y:q[1],h:q[2]}};
-    RW.zones.push({e,dir,s0,x:it[0].wx,y:it[0].wy,sign:p,label:"ROAD WORK",props:[{k:"rw_road_work",x:p[0],y:p[1],h:p[2]},side(s0-45,"rw_lane_closed")],mb:side(s0-150,"rw_mb_roadwork")})}
-  for(let k=0;k<3&&two.length;k++){const e=pick(two);if(RW.closed.has(e))continue;RW.closed.add(e);for(const dir of [1,-1]){const s0=rStart(e,dir)+12,it=[];for(let t=-1;t<=1;t+=0.5)it.push(evStatic("cone",e,dir,s0,t*LANE));RW.items.push(...it);
+  const multi=EDGES.filter(e=>e.n>=2&&e.L>450&&offFw(e)&&!e.br&&!e.ov),two=EDGES.filter(e=>e.n===1&&!e.ow&&e.L>160&&e.L<700&&/res|st|col/.test(e.type)&&offFw(e)&&!e.br&&!e.ov&&!e.dip);
+  const nLC=work?1+(rr()<0.5?1:0):0;
+  for(let k=0;k<nLC&&multi.length;k++){const e=pick(multi),dir=rr()<0.5?1:-1;if(RW.zones.some(z=>z.e===e))continue;const S=Math.max(25,e.lim||35),ft=0.3048,W=12;
+    const Lt=(S>=45?W*S:W*S*S/60)*ft,sp=S*ft,tan=2*S*ft,buf=30,wa=60+rr()*60,term=25,sg=(S>40?350:100)*ft,need=sg*2+Lt+buf+wa+term+40;
+    const room=e.L-rEnd(e,dir)-rStart(e,dir)-need;if(room<0)continue;const s0=rStart(e,dir)+sg*2+20+rr()*room,lo=loOf(e.n),it=[],inL=(lo+0.5)*LANE-0.25,outL=lo*LANE-1.7;
+    for(let d=0;d<=Lt+0.1;d+=sp)it.push(evStatic("cone",e,dir,s0+d,outL+(inL-outL)*d/Lt));   /* the merging taper */
+    for(let d=Lt+tan;d<=Lt+buf+wa;d+=tan)it.push(evStatic("cone",e,dir,s0+d,inL));             /* along the buffer and the work area */
+    for(let d=0;d<=term;d+=term/3)it.push(evStatic("cone",e,dir,s0+Lt+buf+wa+d,inL+(outL-inL)*d/term));
+    it.slice(0,4).forEach(c=>c.rwK="rw_drum");it.push(evStatic("wreck",e,dir,s0+Lt+buf+wa*0.5,lo*LANE,{haz:true,paint:"yellow"}));RW.items.push(...it);
+    const side=(s_,k)=>{const q=fpt(e,dir,Math.max(2,s_),lo*LANE-LANE/2-2.2);return {k,x:q[0],y:q[1],h:q[2]}},p=fpt(e,dir,Math.max(2,s0-sg*2),lo*LANE-LANE/2-1.6);
+    RW.zones.push({e,dir,s0,x:it[0].wx,y:it[0].wy,sign:p,label:"ROAD WORK",props:[{k:"rw_road_work",x:p[0],y:p[1],h:p[2]},side(s0-sg,"rw_lane_closed")],mb:side(s0+Lt,"rw_mb_roadwork")})}
+  for(let k=0;k<1&&two.length;k++){const e=pick(two);if(RW.closed.has(e))continue;RW.closed.add(e);for(const dir of [1,-1]){const s0=rStart(e,dir)+12,it=[];for(let t=-1;t<=1;t+=1)it.push(evStatic("cone",e,dir,s0,t*LANE));RW.items.push(...it);
       const p=fpt(e,dir,s0,0),q=fpt(e,dir,s0-2,LANE*1.6),q2=fpt(e,dir,s0-6,-LANE*1.7);RW.zones.push({e,dir,s0,x:p[0],y:p[1],barrier:p,label:"ROAD CLOSED · DETOUR",props:[{k:rr()<0.5?"rw_detour_left":"rw_detour_right",x:q[0],y:q[1],h:q[2]}],mb:{k:"rw_mb_detour",x:q2[0],y:q2[1],h:q2[2]}})}}
-  // the new world: a long-running lane closure on I-38 eastbound, with a flagger and a 45 mph limit
-  if(false&&W2){const Z=wzSpot();if(Z){   // the I-38 lane closure is retired: road work stays off the freeways
-const {e,dir,s0,s1}=Z,lo=loOf(e.n),it=[];for(let d=0;d<=80;d+=10)it.push(evStatic("cone",e,dir,s0+d,lo*LANE-1.7+d/80*3.3));for(let d=95;d<=s1-s0;d+=16)it.push(evStatic("cone",e,dir,s0+d,(lo+0.5)*LANE-0.25));
-      it.push(evStatic("wreck",e,dir,s0+(s1-s0)/2,lo*LANE,{haz:true,paint:"orange"}));RW.items.push(...it);const p=fpt(e,dir,Math.max(2,s0-250),lo*LANE-LANE/2-2.2);RW.zones.push({e,dir,s0,x:it[0].wx,y:it[0].wy,sign:p,label:"ROAD WORK"});
-      const f=fpt(e,dir,s0-30,lo*LANE-LANE/2-1.8);W2L.wz={e,dir,s0,s1,fx:f[0],fy:f[1],fz:ez(e,dir>0?s0-30:e.L-s0+30),fh:f[2]}}}
   try{if(NAV.dest&&NAV.place)navTo(NAV.place)}catch(e){}}
 function rwInto(ex,ey){for(const z of RW.zones){if((z.x-ex)**2+(z.y-ey)**2>350*350)continue;
     if(z.sign&&!PROPS.rw_road_work){const [x,y,h]=z.sign,g=groundAt(x,y).h||0;dBox("gateP",x,y,g,0.08,1.6,0.08,h);dBox("cone",x,y,g+1.25,0.9,0.9,0.05,h+0.785)}
@@ -6684,7 +6692,7 @@ function evTick(dt){try{slkTick(dt)}catch(e){}try{pullTick(dt)}catch(e){}try{cri
   EV.crz=[];for(const v of EV.list)if(v.label==="Crash"&&(v.phase===undefined||v.phase>=1)&&v.x!==undefined)EV.crz.push(v);   // live crash scenes: traffic slows to look
   const mul=EV_MUL[st.events]??1;if(!mul||!st.started)return;EV.lt=(EV.lt??45)-dt*mul;if(EV.lt<=0){EV.lt=50+Math.random()*60;if(!EV.list.some(v=>v.pair&&v.t>0))startEvent("aicrash")}   // a live crash in the traffic around you every minute or so
   EV.t-=dt*mul;if(EV.t>0)return;EV.t=55+Math.random()*75;
-  const M=me(),opts=["aicrash","aicrash","aicrash","aicrash"];if(M.n>=2)opts.push("crash","roadwork");if(M.side>=1.2)opts.push("breakdown");if(zoneName(car.px,car.py)==="rural"||M.zone==="h")opts.push("deer");if(st.night)opts.push("deer");
+  const M=me(),opts=["aicrash","aicrash","aicrash","aicrash"];if(M.n>=2)opts.push("crash");if(M.side>=1.2)opts.push("breakdown");if(zoneName(car.px,car.py)==="rural"||M.zone==="h")opts.push("deer");if(st.night)opts.push("deer");
   if(M.zone==="c")opts.push("jaywalk","jaywalk");opts.push("hardbrake");
   for(let k=0;k<6;k++){const t=opts[Math.floor(Math.random()*opts.length)];if(startEvent(t))break}}
 
@@ -12613,7 +12621,7 @@ function volvoBezel(P,q,sz){if(q.h>q.w*1.15)return;const u=sub(q.br,q.bl),v=sub(
   for(let i=0;i<P.length;i+=3){const d=[P[i]-bc[0],P[i+1]-bc[1],P[i+2]-bc[2]],a=d[0]*U[0]+d[1]*U[1]+d[2]*U[2],b=d[0]*V[0]+d[1]*V[1]+d[2]*V[2],n=d[0]*N[0]+d[1]*N[1]+d[2]*N[2];
     if(Math.abs(a)>lu/2+0.035||b<-0.035||b>lv+0.035||Math.abs(n)>0.07)continue;const a2=a*sx,b2=b<0?b:b*sy;for(let j=0;j<3;j++)P[i+j]=bc[j]+U[j]*a2+V[j]*b2+N[j]*n}}
 // screen and cluster sharpness: full on Medium/High, a bit softer on Low/Lowest (or when zoomed in, always full) so they can redraw every frame without lag
-function scrRes(){const q=GFX.q==="auto"?GFX.eff:GFX.q,z=SCR.focus||SCR.focusClu,s=z?2:q==="high"||q==="ultra"?2:q==="medium"?1.5:1.25;
+function scrRes(){const q=GFX.q==="auto"?GFX.eff:GFX.q,z=SCR.focus||SCR.focusClu,s=Math.min(3,Math.max(z?2.5:q==="high"||q==="ultra"?2:q==="medium"?1.75:1.5,(G().res||1)*1.25,z?(window.devicePixelRatio||1):0));   /* v334: car screens sharper, and they follow the Resolution setting */
   if(s!==SS){SS=s;SCR.cv.width=SCR.W*SS;SCR.cv.height=SCR.H*SS}if(s!==CLU.k){CLU.k=s;CLU.cv.width=CLU.W*s;CLU.cv.height=CLU.H*s}}
 function setScreenFrame(){const s=VEH.screen;let q=VEH.scr;if(isVolvo()&&q&&!q.vp){q=VEH.scr=Object.assign(volvoPortrait(q,TRIMS[st.trim].model),{vp:1})}{const portrait=q&&q.h>q.w*1.15,wide=!portrait&&(isMon()||isFV()),W_=portrait?420:wide?690:680,H_=portrait?620:wide?(isMon()?290:Math.round(690*q.h/q.w)):400;if(SCR.W!==W_){SCR.W=W_;SCR.H=H_;SCR.cv.width=W_*SS;SCR.cv.height=H_*SS}}SCR_N=[0,0.2419,0.9703];if(q){const f=fitQuad(q,SCR.W/SCR.H);SCR_BL=f.bl;SCR_BR=f.br;SCR_TL=f.tl;SCR_C=q.c;SCR_N=q.n}else if(!s){SCR_BL=[-0.17,0.9405,-0.5111];SCR_BR=[0.17,0.9405,-0.5111];SCR_TL=[-0.17,1.1346,-0.5595];SCR_C=[0,1.0375,-0.5353]}
   else{const [x,y,z]=s;SCR_BL=[x-0.17,y-0.097,z+0.024];SCR_BR=[x+0.17,y-0.097,z+0.024];SCR_TL=[x-0.17,y+0.097,z-0.024];SCR_C=[x,y,z]}
@@ -16518,7 +16526,7 @@ function gtTick(dt){if(st.night!==GT.lastN){GT.min=st.night?22*60:10*60;GT.lastN
   const n=GT.D<0.3;if(n!==GT.lastN){st.night=n;GT.lastN=n;}}
 function gtClock(){const h=Math.floor(GT.min/60),m=Math.floor(GT.min%60);return `${h%12||12}:${String(m).padStart(2,"0")} ${h<12?"am":"pm"}`}
 function render(dt){
-  const dpr=Math.max(0.5,Math.min(window.devicePixelRatio||1,G().res)*GFX.dyn), W=Math.floor(elSize(cv)[0]*dpr), H=Math.floor(elSize(cv)[1]*dpr);
+  const dpr=Math.max(0.5,(G().res>1?Math.min(3,G().res*Math.max(1,(window.devicePixelRatio||1)*0.75)):Math.min(window.devicePixelRatio||1,G().res))*(G().res>1?Math.max(0.85,GFX.dyn):GFX.dyn))   /* v334: 150% / 200% now really render sharper than the screen (they used to be capped at the screen's own pixel density) */, W=Math.floor(elSize(cv)[0]*dpr), H=Math.floor(elSize(cv)[1]*dpr);
   if(cv.width!==W||cv.height!==H){cv.width=W;cv.height=H}
   gl.viewport(0,0,W,H);
   if((st.cam!==1||st.walk)&&SCR.uiHid){SCR.uiHid=false;SCR.fz=0;document.body.classList.remove("scrview")}
@@ -17016,7 +17024,7 @@ function drawSensor(){if(isTesla()){vizTesla(sg,0,0,sensor.width,sensor.height,f
 function rr(x,y,w,h,r){sg.beginPath();sg.moveTo(x+r,y);sg.arcTo(x+w,y,x+w,y+h,r);sg.arcTo(x+w,y+h,x,y+h,r);sg.arcTo(x,y+h,x,y,r);sg.arcTo(x,y,x+w,y,r);sg.fill()}
 
 // ======================================================================= actions
-function act(a){ if(a==="codes"){closeDrawer();codeOpen();return} if(a==="gen3d"){st.gen3d=st.gen3d===false;toast(`3D cluster ${st.gen3d!==false?"on":"off"}`);try{renderTab()}catch(e){}return} if(typeof a==="string"&&a.startsWith("cluv:")){CLUV.i=+a.slice(5);toast(`Cluster: ${cluView()[1]}`);if(!$("drawer").hidden)renderTab();return} {const T0=TRIMS[st.trim];if(T0.real&&!has(a)){toast(`The real ${T0.short} doesn't have this`);return}} if(FEAT_PKG[a]&&!has(a)){toast(`Needs the ${PKGS[FEAT_PKG[a]].name} (tap ☰ › Car › Rebuild)`);return}
+function act(a){ if(typeof a==="string"&&a.startsWith("kb:")){const id=a.slice(3);if(id==="reset"){KBU={};try{localStorage.removeItem("strata.keys")}catch(e){}toast("Keys reset to the standard layout")}else{KBW.on=id;toast("Press the new key")}try{renderTab()}catch(e){}return} if(a==="codes"){closeDrawer();codeOpen();return} if(a==="gen3d"){st.gen3d=st.gen3d===false;toast(`3D cluster ${st.gen3d!==false?"on":"off"}`);try{renderTab()}catch(e){}return} if(typeof a==="string"&&a.startsWith("cluv:")){CLUV.i=+a.slice(5);toast(`Cluster: ${cluView()[1]}`);if(!$("drawer").hidden)renderTab();return} {const T0=TRIMS[st.trim];if(T0.real&&!has(a)){toast(`The real ${T0.short} doesn't have this`);return}} if(FEAT_PKG[a]&&!has(a)){toast(`Needs the ${PKGS[FEAT_PKG[a]].name} (tap ☰ › Car › Rebuild)`);return}
   const T=TRIMS[st.trim];
   switch(a){
     case "smartRegen":st.smartRegen=st.smartRegen===false;toast(st.smartRegen!==false?"Smart Regen on":"Smart Regen off");break;
@@ -17266,7 +17274,7 @@ TABS.features=()=>{const T=TRIMS[st.trim];const sec=(t,h)=>h.trim()?`<h3>${t}</h
   sec("Comfort and lights",tog("autoHold","Auto hold","Holds you still after you stop (off when you start)",st.autoHold)+tog("autoSS","Auto stop/start","Engine off at a stop",st.autoSS)+tog("autoHigh","Auto high beams","Dips for other cars at night",st.autoHigh)+tog("avas","Pedestrian warning sound","Sound outside at low speed",st.avas)+(hasHUD()?tog("hud","Head-up display","Speed and limit on the windshield",st.hudOn):""))}
 TABS.controls=()=>{const T=TRIMS[st.trim],H=car.hyb,ev=!T.ice&&!T.hybrid,o=(attr,on,b,sm)=>opt(attr,on,b,sm);
   const lv=T.plug?(H.pb||0):ev||T.hybrid?socShow(H):0,fl=(T.ice||T.hybrid)?H.fuel/H.tank:0;
-  return ALLS().filter(p=>secOf(p)==="controls").join("")+`<h3>Steering on a touchscreen</h3><div class="grid2">${o('data-set="wheelUI:0"',!st.wheelUI,"Slider","Slide left and right")}${o('data-set="wheelUI:1"',!!st.wheelUI,"Steering wheel","Turn a wheel on the screen")}</div>
+  return ALLS().filter(p=>secOf(p)==="controls").join("")+`<h3>Keyboard</h3><div class="std">Tap an action, then press the key you want. Taking a key another action uses swaps the two. The arrow keys always drive too.</div><div class="grid2">${KB_DEF.map(([id,n])=>opt(`data-a="kb:${id}"`,KBW.on===id,n,KBW.on===id?"Press a key… (Esc to cancel)":kbName(kbKey(id))+(KBU[id]?" · changed":""))).join("")}${opt(`data-a="kb:reset"`,false,"Reset all keys","Back to the standard layout")}</div><h3>Steering on a touchscreen</h3><div class="grid2">${o('data-set="wheelUI:0"',!st.wheelUI,"Slider","Slide left and right")}${o('data-set="wheelUI:1"',!!st.wheelUI,"Steering wheel","Turn a wheel on the screen")}</div>
   <h3>Haptics</h3><div class="grid2">${[[0,"Off","No vibration"],[1,"Light","Only the big moments: crashes, potholes, warnings, automatic braking"],[2,"Full","Also bumps, kerbs, rumble strips, ABS pulsing, gear shifts and button taps"]].map(([k,n,d])=>o(`data-set="haptic:${k}"`,hapLvl()===k,n,d)).join("")}</div>
   <h3>Steering wheel and pedals</h3><div class="grid2">${o('data-a="whlSetup"',!!(WHL.cfg&&WHL.cfg.gas!=null),"🎮 USB steering wheel","Set-up, button bindings, force feedback by effect")}</div>`}
 TABS.pedals=()=>{const T=TRIMS[st.trim],H=car.hyb,ev=!T.ice&&!T.hybrid,o=(attr,on,b,sm)=>opt(attr,on,b,sm);
@@ -17434,7 +17442,19 @@ function pedal(el,key){let id=null;el.fill=el.querySelector(".fill");
   el.addEventListener("pointermove",e=>{if(id===e.pointerId&&!st.pedHold)inp[key+"T"]=v2(e)});
   const up=e=>{if(id===e.pointerId){id=null;inp[key+"T"]=0}};el.addEventListener("pointerup",up);el.addEventListener("pointercancel",up)}
 pedal($("accel"),"thr");pedal($("brake"),"brk");
-window.addEventListener("keydown",e=>{const k=(e.key||"").toLowerCase();{const tg=e.target;if(tg&&(tg.tagName==="INPUT"||tg.tagName==="TEXTAREA"||tg.isContentEditable))return;const cs=$("cmS");if(cs&&!cs.hidden){if(k==="escape")carSearchClose();else{const q=$("cmQ");if(q)q.focus()}return}}inp.keys[k]=true;if(k==="shift"&&!e.repeat){inp.shT=performance.now();inp.shUsed=false}else if(inp.keys.shift)inp.shUsed=true;if(!matchMedia("(pointer:coarse)").matches)setPC(true);if(e.repeat)return;
+/* v334: change the keyboard controls. Every action has its default key; you can give it another one (Settings › Controls). A key you take from another
+   action swaps with it, so two actions never share a key. Under the hood a pressed key is translated to the action's default key */
+const KB_DEF=[["gas","Accelerator","w"],["brake","Brake","s"],["left","Steer left","a"],["right","Steer right","d"],["start","Start / stop (hold Brake)","f"],["shiftUp","Shift up","e"],["shiftDn","Shift down","q"],["epb","Parking brake","p"],["belt","Seatbelt","b"],
+  ["sigL","Left signal","z"],["sigR","Right signal","c"],["hazard","Hazards","x"],["lights","Lights (Auto/Parking/On/Off)","l"],["high","High beams","j"],["fog","Fog lights","k"],["horn","Horn","h"],["wipers","Wipers",";"],
+  ["view","Inside / outside view","v"],["cluster","Cluster screen","."],["cluZoom","Zoom into the cluster","n"],["scrZoom","Lean in to the screen","m"],["assist","Assist menu","g"],["comfort","Comfort menu","i"],["aebT","Automatic braking on / off","u"],
+  ["acc","Cruise control","\\"],["accUp","Cruise speed +","="],["accDown","Cruise speed −","-"],["pa","Park assist","y"],["phone","Phone","`"],["fleet","Switch car","t"],["reset","Reset the car","r"],["out","Get out / in","o"]];
+const KBW={on:null};let KBU=(()=>{try{return JSON.parse(localStorage.getItem("strata.keys")||"{}")}catch(e){return {}}})();
+function kbKey(id){const d=KB_DEF.find(x=>x[0]===id);return KBU[id]||d[2]}
+function kbCanon(k){if(!Object.keys(KBU).length)return k;for(const [id,,d] of KB_DEF){if(kbKey(id)===k)return d}for(const [id,,d] of KB_DEF)if(d===k&&kbKey(id)!==k)return k.startsWith("arrow")?k:null;return k}
+function kbSet(id,k){const old=kbKey(id),o=KB_DEF.find(x=>x[0]!==id&&kbKey(x[0])===k);if(o)KBU[o[0]]=old;KBU[id]=k;for(const [i,,d] of KB_DEF)if(KBU[i]===d)delete KBU[i];try{localStorage.setItem("strata.keys",JSON.stringify(KBU))}catch(e){}return o}
+function kbCapture(e){e.preventDefault();const k=(e.key||"").toLowerCase(),id=KBW.on;KBW.on=null;if(k==="escape"||!k||k.length>1&&!/^arrow|^f\d+$/.test(k)&&k!==" "){toast("Key unchanged");try{renderTab()}catch(_){}return}const o=kbSet(id,k);toast(`${KB_DEF.find(x=>x[0]===id)[1]}: ${kbName(k)}`+(o?` (swapped with ${o[1]})`:""));try{renderTab()}catch(_){}}
+const kbName=k=>k===" "?"Space":k==="\\"?"\\":k.startsWith("arrow")?k.replace("arrow","Arrow ").replace(/\b\w/g,c=>c.toUpperCase()):k.toUpperCase();
+window.addEventListener("keydown",e=>{if(KBW.on){kbCapture(e);return}const k=kbCanon((e.key||"").toLowerCase());if(k===null)return;{const tg=e.target;if(tg&&(tg.tagName==="INPUT"||tg.tagName==="TEXTAREA"||tg.isContentEditable))return;const cs=$("cmS");if(cs&&!cs.hidden){if(k==="escape")carSearchClose();else{const q=$("cmQ");if(q)q.focus()}return}}inp.keys[k]=true;if(k==="shift"&&!e.repeat){inp.shT=performance.now();inp.shUsed=false}else if(inp.keys.shift)inp.shUsed=true;if(!matchMedia("(pointer:coarse)").matches)setPC(true);if(e.repeat)return;
   if(document.body.classList.contains("help")&&(k==="escape"||k==="?"||k==="/")){document.body.classList.remove("help");return}
   if(k==="?"||k==="/"||k==="f1"){document.body.classList.toggle("help");e.preventDefault();return}
   if(k==="escape"){if(RADIAL.open){radialToggle(false);return}closeDrawer();if(SCR.focus)SCR.focus=false;return}
@@ -17451,15 +17471,14 @@ window.addEventListener("keydown",e=>{const k=(e.key||"").toLowerCase();{const t
   if([" ","arrowup","arrowdown","arrowleft","arrowright"].includes(k))e.preventDefault();return}if(k==="h"){if(!e.repeat)hornOn(true);return}if(k==="y"){paOpenMenu();return}
   if(k==="t"){fleetSwitch();return}
   if(k==="`"&&!st.walk){FOOT.phone=!FOOT.phone;renderPhone();return}
-  if(k==="y"&&!st.walk){FOOT.phone=!FOOT.phone;renderPhone();return}
   if(k==="g"||k==="i"){const m=k==="i"?"comfort":"assist";if(RADIAL.open&&RADIAL.mode===m){radialToggle(false);return}RADIAL.mode=m;radialToggle(true);return}if(RADIAL.open&&/^[1-9]$/.test(k)){radialPick(+k-1);return}
   if(/^[1-4]$/.test(k)&&!st.walk){act("kThr:"+k);return}
-  if(k==="r"&&st.started){resetNearest();return}if(e.key==="F2"){e.preventDefault();hudHide();return}if(k==="u"){const on=!(st.rAeb||st.aebAuto!==false);st.rAeb=on;st.aebAuto=on;if(!on){sys.rAebBrake=0;sys.aebBrake=0}toast(on?"Auto braking on, front and rear (U)":"Auto braking off, front and rear (U): the collision warnings still beep, but you have to brake");return}if(k==="j"&&!st.walk){cluViewNext(e.shiftKey?-1:1);return}if(k==="v"){st.cam=st.cam===1?0:1;$("screen").hidden=true;SCR.focus=false;toast(st.cam===1?"Inside view":"Outside view");return}
+  if(k==="r"&&st.started){resetNearest();return}if(e.key==="F2"){e.preventDefault();hudHide();return}if(k==="u"){const on=!(st.rAeb||st.aebAuto!==false);st.rAeb=on;st.aebAuto=on;if(!on){sys.rAebBrake=0;sys.aebBrake=0}toast(on?"Auto braking on, front and rear (U)":"Auto braking off, front and rear (U): the collision warnings still beep, but you have to brake");return}if((k==="."||k===">")&&!st.walk){cluViewNext(e.shiftKey||k===">"?-1:1);return}if(k==="v"){st.cam=st.cam===1?0:1;$("screen").hidden=true;SCR.focus=false;toast(st.cam===1?"Inside view":"Outside view");return}
   if(k==="b"){st.belt=!st.belt;beep(st.belt?1400:700,.05,"square",.1);toast(st.belt?"Seatbelt fastened":"Seatbelt unfastened");return}
   if(k==="k"){st.fog=!st.fog;tick(1);toast(st.fog?"Fog lights on":"Fog lights off");return}
   const KM={j:"high",l:"lights",z:"sigL",c:"sigR",x:"hazard",e:"shiftDn",q:"shiftUp","]":"padUp","[":"padDn",p:"epb","\\":"acc","+":"accUp","=":"accUp","-":"accDown","_":"accDown"};if(KM[k]&&!(st.walk&&["shiftUp","shiftDn","epb"].includes(KM[k])))act(KM[k]);
   if([" ","arrowup","arrowdown","arrowleft","arrowright"].includes(k))e.preventDefault()});
-window.addEventListener("keyup",e=>{const k=(e.key||"").toLowerCase();inp.keys[k]=false;if(k==="h")hornOff();if(k==="shift"){const tap=!inp.shUsed&&performance.now()-(inp.shT||0)<400;inp.shUsed=false;if(tap&&!st.walk&&!manOn())act("epb")}});
+window.addEventListener("keyup",e=>{const k=kbCanon((e.key||"").toLowerCase());if(k===null)return;inp.keys[k]=false;if(k==="h")hornOff();if(k==="shift"){const tap=!inp.shUsed&&performance.now()-(inp.shT||0)<400;inp.shUsed=false;if(tap&&!st.walk&&!manOn())act("epb")}});
 document.addEventListener("gesturestart",e=>e.preventDefault());
 // look around: drag on the view to look, pinch to zoom, double-tap to reset
 const ptrs=new Map(); let pinch0=0, lastTap=0;
