@@ -12,7 +12,7 @@ prep("hwy",22.4);act("acc");st.accSet=22.4;placeTest("cutin");c=cars.find(x=>x.k
 SIM(15,t=>{if(c){const g=Math.hypot(c.wx-car.px,c.wy-car.py);minG=Math.min(minG,g)}});out.push(`Cut-in: minGap ${minG.toFixed(1)} hits ${hits} | ${LOG.slice(0,2).join(" / ")}`);
 // 4 Pilot lane centering on hwy 90 s
 prep("hwy",26);act("pilot");let maxE=0,sumE=0,n=0,lc=0;const z0=me().e;
-SIM(90,t=>{const M=me();const e=Math.abs(M.off-M.lo*LANE+LANE/2*0);const lane=laneOf(M.off),ce=Math.abs(M.off-lane*LANE);if(t>3&&!sys.pilotLC){maxE=Math.max(maxE,ce);sumE+=ce;n++}});
+SIM(90,t=>{sys.handsT=0;const M=me();const e=Math.abs(M.off-M.lo*LANE+LANE/2*0);   /* hands on the wheel: the Pilot switches off after 22 s without them */const lane=laneOf(M.off),ce=Math.abs(M.off-lane*LANE);if(t>3&&!sys.pilotLC){maxE=Math.max(maxE,ce);sumE+=ce;n++}});
 out.push(`Pilot hwy: maxErr ${maxE.toFixed(2)} meanErr ${(sumE/n).toFixed(3)} pilot=${st.pilot} state=${sys.pilotState} v ${car.vx.toFixed(1)} hits ${hits}`);
 // 5 Pilot in city (curves/junctions)
 prep("city",12);act("pilot");maxE=0;sumE=0;n=0;
