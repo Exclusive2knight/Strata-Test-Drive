@@ -2791,7 +2791,7 @@ function buildNet2(){
    /* v333: the terminal roads leave and rejoin the approach road at two separate points, the way a divided road splits. Inbound starts where the approach ends;
       outbound merges onto it 60 m short of that. (All four ends sharing one point made cars going in and out lock up there) */
    const D0b=[D0[0]-60,D0[1]],D1b=[D1[0]+30,D1[1]];N(...D0b,{ctrl:"merge",minT:"aw"});N(...D1b,{ctrl:"merge",minT:"aw"});
-   N(-1800,-4500,{ctrl:"signal"});rd("blvd","John D. Dingell Dr",[[-1800,-3300],[-1800,-4500],[-1800,-5000,0],[-1800,-5360,0],D0b,D0],{lim:45});
+   N(-1800,-4500,{ctrl:"signal"});rd("blvd","John D. Dingell Dr",[[-1800,-3300],[-1800,-4500],[-1800,-5000,0],[-1800,-5360,0]],{lim:45});N(-1800,-5360,{ctrl:"merge"});rd("blvd","John D. Dingell Dr",[[-1800,-5360],D0b,D0],{lim:45,m:0,shL:0});   /* v337: the last stretch has no median, so the outbound roadway merging at D0b no longer runs cars across the grass */
    // McNamara: in along the south roadway (M1), dipping under taxiway T in a tunnel, round the garage to the curbs; out along the north roadway (M4)
    const tun=X0=>function(u){return aptDz(X0+(this.a.x<this.b.x?u:-u))};
    rd("aw","McNamara Terminal",[D0,A(-2380,470,0),A(-1100,470)],{lim:45});
@@ -3424,6 +3424,7 @@ function xoHit(n,x,y){const dx=x-n.x,dy=y-n.y,c=Math.cos(n.xo.h),s=Math.sin(n.xo
 const LOTS=[[-60,100],[230,470],[530,770],[830,1070],[1130,1370]],G_LOT={h:0,mu:1.1,kind:"lot"};
 const G_ROAD={h:0,mu:1.15,kind:"road"},G_PAD={h:0,mu:1.05,kind:"pad"},G_KERB={h:0.04,mu:1.0,kind:"kerb"},G_WALK={h:0,mu:0.95,kind:"pavement"};
 // more gas stations and parking lots, placed on open ground beside the town roads
+var SHELL={on:true,mesh:null,busy:false,sites:[]};   /* v337 Shell stations, see shellSite */
 const XSITES=[];   // {kind:"stn"|"lot",x,y,a (along the road),L,D,U,N}
 // v173: sites bucketed in 128 m cells (rebuilt whenever a site is added) so the terrain and ground lookups don't scan every site
 const XSG={n:-1,g:new Map()};function xsGrid(){if(XSG.n===XSITES.length)return XSG.g;const g=new Map();for(const S of XSITES){const r=Math.hypot(S.L/2,S.D/2)+40,i0=Math.floor((S.x-r)/128),i1=Math.floor((S.x+r)/128),j0=Math.floor((S.y-r)/128),j1=Math.floor((S.y+r)/128);
@@ -11336,8 +11337,8 @@ function uSamples(e,u0,u1,step){const out=[u0];if(e.tp||e.hz)for(let u=u0+step;u
    grass embankment edge; country roads a gravel shoulder and a grassed slope. The lanes and the markings stay the game's own.
    e.rkH[side][metre] is how much of the kerb height is there (1 raised, 0 dropped); the physics (rkLift) and the pedestrians use it too. */
 function rkLift(e,u,t){const H=e&&e.rkH;if(!H)return 0;const A=H[t>0?0:1];if(!A)return 0;return 0.15*A[clamp(Math.round(u),0,A.length-1)]}
-function rkBuild(drive,lot){const B={P:[],N:[],I:[],C:[]},cell=new Set(),K=(x,y)=>(Math.floor(x)+30000)*60000+(Math.floor(y)+30000);
-  for(const M of [drive,lot]){if(!M)continue;const P=M.P,I=M.I;for(let i=0;i<I.length;i+=3){const a=I[i]*3,b=I[i+1]*3,c=I[i+2]*3;const xs=[P[a],P[b],P[c]],ys=[-P[a+2],-P[b+2],-P[c+2]],x0=Math.floor(Math.min(...xs)),x1=Math.ceil(Math.max(...xs)),y0=Math.floor(Math.min(...ys)),y1=Math.ceil(Math.max(...ys));if((x1-x0)*(y1-y0)>6000)continue;
+function rkBuild(drive,lot,pad){const B={P:[],N:[],I:[],C:[]},cell=new Set(),K=(x,y)=>(Math.floor(x)+30000)*60000+(Math.floor(y)+30000);
+  for(const M of [drive,lot,pad]){if(!M)continue;const P=M.P,I=M.I;for(let i=0;i<I.length;i+=3){const a=I[i]*3,b=I[i+1]*3,c=I[i+2]*3;const xs=[P[a],P[b],P[c]],ys=[-P[a+2],-P[b+2],-P[c+2]],x0=Math.floor(Math.min(...xs)),x1=Math.ceil(Math.max(...xs)),y0=Math.floor(Math.min(...ys)),y1=Math.ceil(Math.max(...ys));if((x1-x0)*(y1-y0)>6000)continue;
       const ar=(xs[1]-xs[0])*(ys[2]-ys[0])-(xs[2]-xs[0])*(ys[1]-ys[0]);if(Math.abs(ar)<1e-6)continue;
       for(let x=x0;x<=x1;x++)for(let y=y0;y<=y1;y++){const px=x+0.5,py=y+0.5,w0=((xs[1]-px)*(ys[2]-py)-(xs[2]-px)*(ys[1]-py))/ar,w1=((xs[2]-px)*(ys[0]-py)-(xs[0]-px)*(ys[2]-py))/ar,w2=1-w0-w1;if(w0>-0.15&&w1>-0.15&&w2>-0.15)cell.add(K(px,py))}}}
   const push=(pts,uv,nr)=>{const k=B.P.length/3;for(let i=0;i<pts.length;i++){B.P.push(pts[i][0],pts[i][2],-pts[i][1]);B.N.push(nr[i][0],nr[i][1],nr[i][2]);B.C.push(uv[i][0],uv[i][1],0)}return k};
@@ -12535,7 +12536,9 @@ function worldScenery(){CUTO.clear();W2P.length=0;LKP.length=0;LK.sky=0;LK.used=
      if(near-re<0.8)continue;const q0=ePt(en.e,p.u,sg*re),q1=ePt(en.e,p.u,sg*(near+0.6)),mx=(q0[0]+q1[0])/2,my=(q0[1]+q1[1])/2,tg=[Math.cos(q0[2]),Math.sin(q0[2])],nn=[-tg[1]*sg,tg[0]*sg];
      let paved=true;for(let t=re+0.4;t<near;t+=0.8){const g=groundAt(...ePt(en.e,p.u,sg*t).slice(0,2)).kind;if(g!=="road"&&g!=="lot"&&g!=="pad"){paved=false;break}}if(paved)continue;
      const A={kind:"lot",custom:true,drive:true,apron:true,x:mx,y:my,L:8,D:near+0.6-re,U:tg,N:nn,stalls:[]};XSITES.push(A);S._dw=undefined}
-   for(const S of XSITES){if(S.apron){Bx(lot,S,0,0,0.004,0.02,S.L,S.D);continue}if(S.custom&&S.kind!=="stn")continue;if(S.kind==="stn"){Bx(pad,S,0,0,0.002,0.02,S.L,S.D);
+   SHELL.sites=[];SHELL.mesh=null;SHELL.busy=false;
+   for(const S of XSITES){if(S.apron){Bx(lot,S,0,0,0.004,0.02,S.L,S.D);continue}if(S.custom&&S.kind!=="stn")continue;if(S.kind==="stn"&&SHELL.on){Bx(pad,S,0,0,0.002,0.02,S.L,S.D);shellSite(S,Bx,stall)}
+     else if(S.kind==="stn"){Bx(pad,S,0,0,0.002,0.02,S.L,S.D);
        Bx(XM.canopy,S,0,-4,5.1,0.6,24,12);Bx(XM.glow,S,0,-4,5.08,0.03,22,10);for(const a of [-9,9])for(const b of [-7,-1])Bx(XM.pillar,S,a,b,0,5.1,0.45,0.45,"a canopy pillar");
        for(const a of [-6,6])for(const b of [-7,-1]){Bx(XM.pump,S,a,b,0,1.9,0.85,0.7,"a fuel pump");Bx(XM.glow,S,a,b,1.92,0.1,0.9,0.75)}
        {const kind=(CHG_STN_N++)%2===0?"sc":"ea";for(let k=0;k<4;k++){const [x,y]=xLocal(S,-17+k*3.4,10);collAdd({t:"b",x,y,h:Math.atan2(S.U[1],S.U[0]),hl:0.3,hw:0.25,what:"a charger"});chgAdd(x,y,Math.atan2(-S.N[1],-S.N[0]),kind,{name:kind==="sc"?"Tesla Supercharger":"Electrify America"})}}for(let k=0;k<=4;k++)Bx(stall,S,-18.7+k*3.4,7.0,0.012,0.012,0.12,5.2);
@@ -12545,7 +12548,7 @@ function worldScenery(){CUTO.clear();W2P.length=0;LKP.length=0;LK.sky=0;LK.used=
        for(let a=-S.L/2+2.75;a<S.L/2-1.4;a+=2.7)S.stalls.push({p:xLocal(S,a,-S.D/2+8),h:Math.atan2(S.N[1],S.N[0])},{p:xLocal(S,a,S.D/2-2.9),h:Math.atan2(-S.N[1],-S.N[0])})}}}
   const SM={};for(const k of Object.keys(SM_MAT))SM[k]=M_();retailInto(SM,lamp,treeAt);
   const mf=m=>meshFrom(m.P,m.N,m.I);SCN.sm=Object.fromEntries(Object.entries(SM).map(([k,m])=>[k,mf(m)]));
-  try{rkBuild(drive,lot)}catch(e){console.error(e);SCN.rk=null}
+  try{rkBuild(drive,lot,pad)}catch(e){console.error(e);SCN.rk=null}
   Object.assign(SCN,{xm:SCN_TMP.xm?Object.fromEntries(Object.entries(SCN_TMP.xm).map(([k,m])=>[k,mf(m)])):null,hm:Object.fromEntries(Object.entries(HM).map(([k,m])=>[k,mf(m)])),crowns:mf(tree),trunks:mf(trunk),bld:bld.map(mf),roofs:mf(roofs),house:mf(house),post:mf(post),head:mf(head),xroad:mf(M_()),xlines:mf(xl),pole:mf(pole),
     hedge:SCN_TMP.hedge?mf(SCN_TMP.hedge):null,hedge:SCN_TMP.hedge?mf(SCN_TMP.hedge):null,pad:mf(pad),chg:mf(chg),stall:mf(stall),zebra:mf(zebra),patchD:mf(patchD),patchL:mf(patchL),crack:mf(crack),rpm:mf(M_()),plate:mf(plate),green:mf(green),barrier:mf(M_()),rail:mf(M_()),
     sg:Object.fromEntries(Object.entries(SGM).filter(([k,m])=>m.I.length&&["face","plate","conc","dark"].includes(k)).map(([k,m])=>[k,meshFrom(m.P,m.N,m.I,k==="face"?m.C:undefined)])),signW:mf(signW),signK:mf(signK),signG:mf(signG),signGW:mf(signGW),stopR:mf(stopR),sigH:mf(sigH),lens:mf(lens),sigPole:mf(sigPole),sigBP:mf(sigBP),sigY:mf(sigY),lot:mf(lot),drive:mf(drive),furn:mf(furn),
@@ -15331,7 +15334,9 @@ function bankNewDay(){const day=GT.day||1,C=BANK.card;try{mktNewDay()}catch(e){}
 // ---- the economy: a living market. Crude oil wanders (and jumps on news), refiners' margins swing with the seasons and outages,
 // pump prices follow wholesale up fast and down slowly ("rockets and feathers"), every station prices a bit differently, and
 // inflation, interest rates and the new- and used-car markets move day by day. Saved, so it carries on between sessions.
-const MKT=(()=>{const m={day:0,crude:76,crack:0.72,dcrack:0.92,reg:3.19,dsl:3.71,cpi:1,used:1,newc:1,fed:4.4,ev:null,evT:0,hist:[],news:[]};try{Object.assign(m,JSON.parse(localStorage.getItem("strata.mkt")||"{}"))}catch(e){}return m})();
+const MKT=(()=>{const m={v:2,day:0,crude:95,crack:0.82,dcrack:3.05,reg:3.95,dsl:6.39,cpi:1,used:1,newc:1,fed:4.4,ev:null,evT:0,hist:[],news:[]};let o={};try{o=JSON.parse(localStorage.getItem("strata.mkt")||"{}")||{}}catch(e){}
+  /* v337: fuel matched to the real Michigan averages (AAA, Nov 12 2026: regular $3.95, premium $5.25, diesel $6.39); older saves start from these */
+  if(o.v!==2){for(const k of ["crude","crack","dcrack","reg","dsl"])delete o[k];o.hist=[]}Object.assign(m,o);m.v=2;return m})();
 function mktSave(){try{localStorage.setItem("strata.mkt",JSON.stringify(MKT))}catch(e){}}
 const MKT_EV=[["OPEC+ announces a production cut","crude",0.08,7],["A refinery fire takes a big plant offline","crack",0.32,5],["Hurricane threatens Gulf Coast refineries","crack",0.45,6],["Pipeline outage squeezes Midwest supply","crack",0.22,4],["Oil demand slumps as the economy cools","crude",-0.08,8],["Record US oil output pushes crude lower","crude",-0.06,6],["Middle East tensions spike oil prices","crude",0.11,5],["Summer driving season starts: demand up","crack",0.12,10],["Strong dollar pulls oil prices down","crude",-0.04,4]];
 function mktGauss(){let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
@@ -15340,8 +15345,8 @@ function mktNewDay(){const M=MKT,day=GT.day||1;if(M.day===day)return;const steps
     const mo=gDate().getMonth(),summer=mo>=3&&mo<=8?0.13:0,winterD=mo>=10||mo<=1?0.12:0;
     if(M.ev&&--M.evT<=0)M.ev=null;
     if(!M.ev&&Math.random()<0.045){const E=MKT_EV[Math.floor(Math.random()*MKT_EV.length)];M.ev={n:E[0],k:E[1],a:E[2]};M.evT=E[3];if(E[1]==="crude")M.crude*=1+E[2];mktNews("📰 "+E[0])}
-    M.crude=Math.max(35,Math.min(150,M.crude+0.04*(78-M.crude)+M.crude*0.021*mktGauss()));
-    M.crack+=0.25*((0.68+summer+(M.ev&&M.ev.k==="crack"?M.ev.a:0))-M.crack)+0.03*mktGauss();M.dcrack+=0.2*((0.88+winterD)-M.dcrack)+0.025*mktGauss();
+    M.crude=Math.max(35,Math.min(150,M.crude+0.04*(95-M.crude)+M.crude*0.021*mktGauss()));
+    M.crack+=0.25*((0.82+summer+(M.ev&&M.ev.k==="crack"?M.ev.a:0))-M.crack)+0.03*mktGauss();M.dcrack+=0.2*((2.93+winterD)-M.dcrack)+0.025*mktGauss();
     const tgt=M.crude/42+M.crack+0.57+0.30,dtg=M.crude/42+M.dcrack+0.63+0.32;const was=M.reg;
     M.reg+=(tgt-M.reg)*(tgt>M.reg?0.55:0.18);M.dsl+=(dtg-M.dsl)*(dtg>M.dsl?0.5:0.15);M.reg=Math.round(M.reg*1000)/1000;M.dsl=Math.round(M.dsl*1000)/1000;
     M.cpi*=1+0.00008+0.00012*mktGauss();M.fed=Math.max(0.25,Math.min(8,M.fed+(Math.random()<0.03?(Math.random()<0.5?-0.25:0.25):0)));
@@ -15354,7 +15359,7 @@ function stnOff(x,y){const gx=Math.round(x/180),gy=Math.round(y/180),d=GT.day||1
 const mktCar=p=>Math.round(p*MKT.newc/10)*10,mktUsed=()=>MKT.used,mktRate=()=>MKT.fed-4.4;
 // fuel and electricity prices (US averages, moving a little each day)
 function fuelGrade(k=st.trim){const T=TRIMS[k],d=(T.desc||"")+" "+(T.name||"");if(/diesel|duramax|power stroke|cummins|ecodiesel/i.test(d))return "diesel";if(/^(Audi|Lexus|Lincoln|Cadillac|Acura|Infiniti|Volvo|Jeep Grand Wagoneer)/.test(T.group||"")||/AMG|Type S|RS |TRX|SRT|Raptor|ZR2|Type R/.test(d))return "premium";return "regular"}
-function fuelPrice(g=fuelGrade(),x=car.px,y=car.py){if(liveGas())return 0;try{mktNewDay()}catch(e){}const base=g==="diesel"?MKT.dsl:MKT.reg+({regular:0,midgrade:0.46,premium:0.82}[g]||0);return Math.round((Math.round((base+stnOff(x,y))*100)/100+0.009)*1000)/1000}   // stations post prices ending in 9/10 of a cent
+function fuelPrice(g=fuelGrade(),x=car.px,y=car.py){if(liveGas())return 0;try{mktNewDay()}catch(e){}const base=g==="diesel"?MKT.dsl:MKT.reg+({regular:0,midgrade:0.62,premium:1.30}[g]||0);return Math.round((Math.round((base+stnOff(x,y))*100)/100+0.009)*1000)/1000}   // stations post prices ending in 9/10 of a cent
 // electricity: public fast chargers cost more at the afternoon peak; Superchargers have cheaper off-peak hours; it all follows inflation
 const kwhPrice=()=>{if(liveGas())return 0;const h=hourNow(),peak=h>=16&&h<21,off=h<6||h>=23;return Math.round((TRIMS[st.trim].tesla?(peak?0.48:off?0.27:0.40):(peak?0.56:0.48))*MKT.cpi*100)/100};
 var PUMP={amt:0,kwh:0,gal:0};
@@ -16077,6 +16082,30 @@ function nx3d(g,b,P,k,NS){const pts=[[b[0]-b[2],b[1]-b[3]],[b[0]+b[2],b[1]-b[3]]
   g.fillStyle=NS.dk?"rgba(0,0,0,.35)":"rgba(0,0,0,.14)";g.beginPath();pts.forEach((q,i)=>i?g.lineTo(q[0],q[1]):g.moveTo(q[0],q[1]));g.closePath();g.fill();
   g.fillStyle=NS.dk?"#3a4658":NS.sat?"#8b877c":"#d3cdc2";for(let i=0;i<4;i++){const a=pts[i],c=pts[(i+1)%4];g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(c[0],c[1]);g.lineTo(c[0],c[1]-h);g.lineTo(a[0],a[1]-h);g.closePath();g.fill()}
   g.fillStyle=NS.bld;g.beginPath();pts.forEach((q,i)=>i?g.lineTo(q[0],q[1]-h):g.moveTo(q[0],q[1]-h));g.closePath();g.fill()}
+
+
+// ======================================================================= v337: the gas stations use the Shell station model you supplied (props/shell_stn.json,
+// converted from Shell_Gas_Station.glb: shop, canopy, six pump islands, price pylon, air and water). Its frontage road and driveways are left out; the
+// game's own road and the station pad stay. Pumps, colliders and the EV chargers behind the canopy are placed from the model's layout at build time;
+// the model itself streams in and is baked into one mesh for every station.
+/* model (x right, z toward the road) to the site's local (a along the road, b away from it) */
+function shellAB(S,x,z){const R=[S.N[1],-S.N[0]],sg=Math.sign(R[0]*S.U[0]+R[1]*S.U[1])||1;return [sg*x,3.5-z]}   /* the model's front edge (z 18.5) sits on the site's road edge */
+function shellSite(S,Bx,stall){S.shell=true;SHELL.sites.push(S);const yaw=Math.atan2(S.U[1],S.U[0]),L=(x,z)=>xLocal(S,...shellAB(S,x,z)),co=(x,z,hx,hz,what)=>{const [px,py]=L(x,z);collAdd({t:"b",x:px,y:py,h:yaw,hl:hx,hw:hz,what})};
+  S.pumps=[];for(const x of [-9,0,9])for(const z of [0,6]){S.pumps.push(L(x,z));co(x,z,0.95,1.55,"a pump island")}
+  for(const x of [-9,0,9])co(x,3,0.25,0.25,"a canopy column");co(0,-15,10.2,6.2,"the shop");co(18,12,1.05,0.35,"the price sign");for(const x of [-18,18])co(x,-15,1.6,2.6,"a planter bed");for(const x of [-8,8])co(x,-6.3,0.35,0.35,"a planter");co(-18,-9,0.45,0.35,"the air machine");
+  /* two EV chargers in the back corner by the trees, cars nose in toward them */
+  const kind=(CHG_STN_N++)%2===0?"sc":"ea";S.chargers=[];for(const x of [-15.2,-12.5]){const [cx,cy]=L(x,-17.6);collAdd({t:"b",x:cx,y:cy,h:yaw,hl:0.3,hw:0.25,what:"a charger"});chgAdd(cx,cy,Math.atan2(-S.N[1],-S.N[0]),kind,{name:kind==="sc"?"Tesla Supercharger":"Electrify America"});S.chargers.push(L(x,-16.2))}
+  for(const x of [-16.55,-13.85,-11.15]){const [a,b]=shellAB(S,x,-15);Bx(stall,S,a,b,0.012,0.012,0.12,5.2)}}
+async function shellLoad(){if(SHELL.busy||SHELL.mesh||!SHELL.sites.length||st.headless)return;SHELL.busy=true;let J=null;
+  for(const u of ["props/shell_stn.json?v="+BUILD_VER,"https://cdn.jsdelivr.net/gh/Exclusive2knight/Strata-Test-Drive@/*ASSET_REF*/main/props/shell_stn.json"]){try{const r=await fetch(u);if(r.ok){J=await r.json();break}}catch(e){}if(/github\.io$/.test(location.hostname))break}
+  if(!J){SHELL.busy=false;return}
+  const d=k=>{const b=atob(J[k]),a=new Uint8Array(b.length);for(let i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return a.buffer},V=new Int16Array(d("v")),Nn=new Int8Array(d("n")),C=new Uint8Array(d("c")),I=new Uint16Array(d("i")),nv=V.length/3;
+  const P=[],N=[],CC=[],II=[];
+  for(const S of SHELL.sites){const k0=P.length/3,R=[S.N[1],-S.N[0]],z0=S.z||0;
+    for(let i=0;i<nv;i++){const x=V[i*3]/100,y=V[i*3+1]/100,z=V[i*3+2]/100,[a,b]=shellAB(S,x,z),[wx,wy]=xLocal(S,a,b);P.push(wx,y+0.012+z0,-wy);
+      const nx=Nn[i*3]/127,ny=Nn[i*3+1]/127,nz=Nn[i*3+2]/127,ex=nx*R[0]-nz*S.N[0],ey=nx*R[1]-nz*S.N[1];N.push(ex,ny,-ey);const c=J.pal[C[i]]||[0.7,0.7,0.7];CC.push(c[0],c[1],c[2])}
+    for(let i=0;i<I.length;i++)II.push(I[i]+k0)}
+  SHELL.mesh=meshFrom(P,N,II,CC);SHELL.busy=false}
 
 // ======================================================================= Apple CarPlay and Android Auto on the centre screen (only with a phone connected)
 var PJ={page:"dash",app:null,mic:0};
@@ -17090,7 +17119,7 @@ function render(dt){
   if(SCN.w2p)w2pDraw(night);if(W2&&LKP.length&&(!SCN.lk||LK.n!==LKP.length))lkLoad();if(SCN.lk)try{lkDraw(night)}catch(e){}
   if(W2)try{aptDraw(night)}catch(e){console.error(e)}
   SCN.bld.forEach((m,i)=>{mat([[0.46,0.43,0.38],[0.24,0.27,0.31],[0.58,0.55,0.5],[0.34,0.27,0.22],[0.17,0.2,0.23]][i],null,0.35,40,1,4);draw(m)});
-  mat([0.25,0.25,0.26],null,0.2,20);draw(SCN.roofs);mat([0.62,0.55,0.45],null,0.1,10);draw(SCN.house);if(SCN.xm){const X_=SCN.xm;mat([0.9,0.9,0.92],null,0.3,20);draw(X_.canopy);mat([0.55,0.57,0.6],null,0.4,30);draw(X_.pillar);mat([0.15,0.17,0.2],null,0.5,30);draw(X_.pump);mat([0.95,0.95,0.9],[1.6,1.6,1.4],0,1);draw(X_.glow);mat([0.75,0.72,0.66],null,0.1,10);draw(X_.shop);mat([0.2,0.3,0.36],night?[0.9,0.8,0.5]:null,1.2,80);draw(X_.win);mat([0.8,0.12,0.1],null,0.3,20);draw(X_.sign)}if(SCN.sm){const px_=st.walk?st.walk.x:car.px,py_=st.walk?st.walk.y:car.py,nearS=STORES.some(S=>Math.hypot(S.x-px_,S.y-py_)<170);
+  mat([0.25,0.25,0.26],null,0.2,20);draw(SCN.roofs);mat([0.62,0.55,0.45],null,0.1,10);draw(SCN.house);if(SHELL.mesh){const cf=gl.isEnabled(gl.CULL_FACE);gl.disable(gl.CULL_FACE);mat([1,1,1],null,0.25,24);draw(SHELL.mesh);if(cf)gl.enable(gl.CULL_FACE)}else if(SHELL.sites.length)shellLoad();if(SCN.xm){const X_=SCN.xm;mat([0.9,0.9,0.92],null,0.3,20);draw(X_.canopy);mat([0.55,0.57,0.6],null,0.4,30);draw(X_.pillar);mat([0.15,0.17,0.2],null,0.5,30);draw(X_.pump);mat([0.95,0.95,0.9],[1.6,1.6,1.4],0,1);draw(X_.glow);mat([0.75,0.72,0.66],null,0.1,10);draw(X_.shop);mat([0.2,0.3,0.36],night?[0.9,0.8,0.5]:null,1.2,80);draw(X_.win);mat([0.8,0.12,0.1],null,0.3,20);draw(X_.sign)}if(SCN.sm){const px_=st.walk?st.walk.x:car.px,py_=st.walk?st.walk.y:car.py,nearS=STORES.some(S=>Math.hypot(S.x-px_,S.y-py_)<170);
     gl.enable(gl.POLYGON_OFFSET_FILL);const OFF={asph:[6,6],walk:[6,6],drive:[5,5],tile:[3,3],epoxy:[3,3],grass:[4,4],paint:[-1,-1],blue:[0,0],ev:[0,0]};
     for(const [k,m] of Object.entries(SCN.sm)){const q=SM_MAT[k];if(!q||!nearS&&SM_INT.has(k))continue;const o=OFF[k]||[0,0];gl.polygonOffset(o[0],o[1]);mat(q[0],q[1]&&(!k.startsWith("sign")||night)?q[1]:null,q[2],q[3]);draw(m)}
     gl.polygonOffset(0,0);gl.disable(gl.POLYGON_OFFSET_FILL)}if(SCN.hm){const H_=SCN.hm;mat([0.55,0.4,0.25],null,0.4,30);draw(H_.floor);mat([0.88,0.86,0.82],null,0.05,8);draw(H_.plaster);mat([0.3,0.36,0.45],null,0.05,6);draw(H_.sofa);mat([0.32,0.2,0.12],null,0.5,30);draw(H_.wood);mat([0.9,0.9,0.9],null,0.6,40);draw(H_.white);mat([0.02,0.02,0.025],null,1.2,90);draw(H_.tv);mat([0.55,0.25,0.2],null,0.02,4);draw(H_.rug);mat([0.2,0.2,0.22],null,0.9,60);draw(H_.tile);mat([1,0.95,0.85],[2.2,2.0,1.7],0,1);draw(H_.lamp);
