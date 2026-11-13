@@ -2928,7 +2928,7 @@ function auxBuild(n){for(const l of n.legs){if(l.major)continue;const e=l.e;
     if(S.length<2)continue;S.sort((a,b)=>a[0]-b[0]);(o.e.aux=o.e.aux||[]).push({u0:S[0][0],u1:S[S.length-1][0],sg,S,n,l})}}}
 for(const n of NODES){if(n.ctrl==="merge")auxBuild(n)}
 if(W2)for(const n of NODES){if(n.legs.length!==2||n.kind!=="cont")continue;const [A,B]=n.legs,wa=A.e.m/2+A.e.n*LANE+A.e.side,wb=B.e.m/2+B.e.n*LANE+B.e.side;if(Math.abs(wa-wb)<1)continue;
-  const nr=wa<wb?A:B,d=Math.abs(wa-wb),e=nr.e,L=Math.min(110,e.L*0.6),S=[];for(let k=0;k<=10;k++){const q=k/10,w=d*(1-q*q*(3-2*q));S.push(nr.end===0?[q*L,w]:[e.L-q*L,w])}if(nr.end===1)S.reverse();
+  const nr=wa<wb?A:B,wd=nr===A?B:A,d=Math.abs(wa-wb),e=nr.e,S_=Math.max(25,Math.max(e.lim||30,wd.e.lim||30)),L=Math.min(Math.max(110,12*S_*0.3048*(nr.e.ow||nr.e.type==="ramp"?0.7:0.5)),e.L*0.85),S=[];   /* v334: a lane is added or dropped over a real taper (about 12 ft x speed, MUTCD), not a sudden step */for(let k=0;k<=10;k++){const q=k/10,w=d*(1-q*q*(3-2*q));S.push(nr.end===0?[q*L,w]:[e.L-q*L,w])}if(nr.end===1)S.reverse();
   for(const sg of [1,-1])(e.aux=e.aux||[]).push({u0:S[0][0],u1:S[S.length-1][0],sg,S:S.map(p=>p.slice()),drop:true});n.drop=true}
 // a phase: [leading left arrow][yellow arrow][through green (lefts flash yellow: turn when clear)][yellow][all red], then the other phase
 function sigPh(n,grp,t){const c=n.cyc,x=((t+c.off)%c.C+c.C)%c.C,L=c.L||[0,0],ph=g=>(L[g]?L[g]+c.YL:0)+c.g[g]+c.Y+c.AR,S=grp===0?0:ph(0),lg=L[grp]?L[grp]:0,yl=lg?c.YL:0,ts=S+lg+yl,te=ts+c.g[grp];return {x,S,lg,yl,ts,te,ye:te+c.Y}}
