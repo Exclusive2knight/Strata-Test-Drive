@@ -1342,8 +1342,13 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
 <script data-boot>(function(){var p=0;window.__bootP=0;var t=setInterval(function(){if(window.__bootReal){clearInterval(t);return}p+=(0.7-p)*0.025;window.__bootP=p;var a=document.getElementById("bootArc"),n=document.getElementById("bootNeedle"),c=document.getElementById("bootPct");if(a)a.setAttribute("stroke-dasharray",(p*100).toFixed(1)+" 100");if(n)n.style.setProperty("--a",(-135+p*270)+"deg");if(c)c.textContent=String(Math.round(p*100))},120)})()</script>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 335 · New roads, three navigation apps and a better phone</h2></div>
+    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 336 · Real kerbs, sidewalks and cracked asphalt</h2></div>
     <div class="nb">
+      <h4>Real kerbs, sidewalks and cracked asphalt</h4><ul>
+      <li>🧱 <b>The road kit is now 3D</b>, bent along every road: town streets have a 15 cm kerb with a gutter and a raised concrete sidewalk, freeways and ramps end in a grass embankment, and country roads have a gravel shoulder and a grassy slope.</li>
+      <li>🚗 The kerb drops where driveways and parking lot entrances cross the sidewalk, and every corner has a kerb ramp. Drive up a kerb and the car really climbs it; people walk on top of the sidewalk.</li>
+      <li>🕳️ <b>Real cracks in the asphalt</b>: cracks across the road, long cracks along the lane joints (some sealed with tar), and spider-web cracking in the worn wheel tracks. Town streets are the most worn, freeways the least, and it changes from area to area. Each lane is shifted so the same patch doesn't repeat across the road.</li>
+      </ul>
       <h4>New roads, three navigation apps and a better phone</h4><ul>
       <li>🛣️ <b>Every road and highway has a new surface</b> from a real road kit: asphalt with worn wheel tracks, cracks and patches, darker fresh asphalt on the highways, rumble strips cut into the freeway shoulders, and concrete slab sidewalks. The roads are in the same places, so the AI traffic, navigation and every driver assist work exactly as before.</li>
       <li>⛰️ <b>No more grass poking through the road</b> on the tight mountain roads (Kestrel Pass, Kestrel Trailhead Rd, Quarry Rd).</li>
@@ -3463,7 +3468,7 @@ function groundAt0(x,y){
   if(inGarage(x,y))return garageGround(x,y);
   if(Math.abs(x-PAD.cx)<PAD.rad&&Math.abs(y-PAD.cy)<PAD.rad&&padHit(x,y))return G_PAD;
   for(const n of gAt(GRID.n,x,y)){if(n.pr&&(x-n.x)*(x-n.x)+(y-n.y)*(y-n.y)<n.pr*n.pr)return n.z?{h:n.z,mu:1.15,kind:"road"}:G_ROAD;if(n.xo&&xoHit(n,x,y))return n.z?{h:n.z,mu:1.15,kind:"road"}:G_ROAD}
-  let kerb=false,walk=false,dmin=60,kz=0,hits=null;
+  let kerb=false,walk=false,dmin=60,kz=0,hits=null,kl=0;
   // where roads cross on a bridge there are two surfaces here: take the one you are on (the highest one not above you)
   const pick=g=>{if(!hits)hits=[];hits.push(g)};
   for(const e of gAt(GRID.e,x,y)){const p=eProj(e,x,y);if(p.u<e.p0-0.5||p.u>e.L-e.p1+0.5)continue;
@@ -3474,14 +3479,14 @@ function groundAt0(x,y){
         pick({h:(e.hz?ez(e,p.u):0)+hb+(rum?0.006:0),mu:1.15,kind:"road",rum,hole:RB_HOLE,deck:overDeck(e,p.u)});continue}}
     if(inner>0&&a<inner&&(e.br&&onBridge(e,p.u)||e.ov&&onOver(e,p.u))){pick({h:ez(e,p.u),mu:1.0,kind:"pavement",deck:overDeck(e,p.u)});continue}     // bridge deck between the carriageways
     const kOK=!(e.T.kerb||e.T.walk)||(p.u>=kerbTrim(e,0)&&p.u<=e.L-kerbTrim(e,1));
-    if(kOK&&e.T.kerb&&((a>outer&&a<outer+0.45)||(inner>0&&a<inner&&a>inner-0.45))){if(e.ov&&onOver(e,p.u))pick({h:ez(e,p.u)+0.04,mu:1.0,kind:"kerb",deck:overDeck(e,p.u)});else{const zz=e.hz?ez(e,p.u):0;if(!kerb||Math.abs(zz-GREF)<Math.abs(kz-GREF))kz=zz;kerb=true}}
-    else if(kOK&&e.T.walk&&a>outer&&a<outer+0.45+e.T.walk){if(e.ov&&onOver(e,p.u))pick({h:ez(e,p.u),mu:0.95,kind:"pavement",deck:overDeck(e,p.u)});else{const zz=e.hz?ez(e,p.u):0;if(!(walk||kerb)||Math.abs(zz-GREF)<Math.abs(kz-GREF))kz=zz;walk=true}}   /* two levels of sidewalk (a deck over a street): the one you're on */
+    if(kOK&&e.T.kerb&&((a>outer&&a<outer+0.45)||(inner>0&&a<inner&&a>inner-0.45))){if(e.ov&&onOver(e,p.u))pick({h:ez(e,p.u)+0.04,mu:1.0,kind:"kerb",deck:overDeck(e,p.u)});else{const zz=e.hz?ez(e,p.u):0;if(!kerb||Math.abs(zz-GREF)<Math.abs(kz-GREF))kz=zz;kerb=true;kl=Math.max(kl,rkLift(e,p.u,p.t))}}
+    else if(kOK&&e.T.walk&&a>outer&&a<outer+0.45+e.T.walk){if(e.ov&&onOver(e,p.u))pick({h:ez(e,p.u),mu:0.95,kind:"pavement",deck:overDeck(e,p.u)});else{const zz=e.hz?ez(e,p.u):0;if(!(walk||kerb)||Math.abs(zz-GREF)<Math.abs(kz-GREF))kz=zz;walk=true;kl=Math.max(kl,rkLift(e,p.u,p.t))}}   /* two levels of sidewalk (a deck over a street): the one you're on */
     dmin=Math.min(dmin,a>outer?a-outer:inner-a)}
-  if(hits){if(hits.length===1&&!kerb&&!walk&&!hits[0].deck)return hits[0];if(kerb)hits.push({h:kz+0.04,mu:1.0,kind:"kerb"});else if(walk)hits.push({h:kz,mu:0.95,kind:"pavement"});
+  if(hits){if(hits.length===1&&!kerb&&!walk&&!hits[0].deck)return hits[0];if(kerb)hits.push({h:kz+Math.max(0.04,kl),mu:1.0,kind:"kerb"});else if(walk)hits.push({h:kz+kl,mu:0.95,kind:"pavement"});
     let best=null,low=null;for(const g of hits){if(!low||g.h<low.h)low=g;if(g.h<=GREF+1.2&&(!best||g.h>best.h))best=g}
     if(best)return best;if(!low.deck)return low}
-  if(kerb)return kz?{h:kz+0.04,mu:1.0,kind:"kerb"}:G_KERB;
-  if(walk)return kz?{h:kz,mu:0.95,kind:"pavement"}:G_WALK;
+  if(kerb)return kz||kl>0.04?{h:kz+Math.max(0.04,kl),mu:1.0,kind:"kerb"}:G_KERB;
+  if(walk)return kz||kl?{h:kz+kl,mu:0.95,kind:"pavement"}:G_WALK;
   if(inCity(x,y))return G_WALK;
   if(W2&&inApt(x,y))return aptGround(x,y);
   if(!W2&&Math.abs(y)>24&&Math.abs(y)<64&&x>-45&&x<1355){const ax=Math.abs(y);for(const [xa,xb] of LOTS)if(x>xa+15&&x<xb-15)return G_LOT}
@@ -6268,7 +6273,7 @@ function pedSpot(minD,maxD){for(let k=0;k<60;k++){const x=rnd()*EW[EW.length-1];
     if(d<minD||d>maxD||onBridge(e,u)&&e.type!=="blvd")continue;return {e,u,side}}return null}
 function newPed(e,u,side){const long=rnd()<0.4,jog=rnd()<0.07;return {kind:"ped",e,u,side,du:rnd()<0.5?1:-1,v0:jog?2.5+rnd()*0.7:1.1+rnd()*0.5,jog,v:0,mode:"walk",ph:rnd()*6,skin:Math.floor(rnd()*4),shirt:Math.floor(rnd()*10),pants:Math.floor(rnd()*4),hair:Math.floor(rnd()*4),long,skirt:long&&rnd()<0.35,
   bag:rnd()<0.25?(rnd()<0.5?1:-1):0,shoe:rnd()<0.3?1:0,sc:0.88+rnd()*0.22,wd:0.9+rnd()*0.25,wx:0,wy:0,wz:0,wh:0}}
-function pedPos(p){const q=ePt(p.e,p.u,p.side*(walkT(p.e)+(p.lat||0)));return [q[0],q[1],p.e.hz?ez(p.e,p.u):0]}
+function pedPos(p){const q=ePt(p.e,p.u,p.side*(walkT(p.e)+(p.lat||0)));return [q[0],q[1],(p.e.hz?ez(p.e,p.u):0)+rkLift(p.e,p.u,p.side)]}
 // people look out for each other and for cars: keep right when meeting someone, pass slower walkers, pause or hurry on a crosswalk
 // your horn: people nearby jump, look, and hurry on (faster still if they're crossing in front of you)
 function pedHorn(p,dt){if(st.hornAt&&st.clock-st.hornAt<0.3&&p.hornSeen!==st.hornAt&&!st.walk&&Math.hypot(p.wx-car.px,p.wy-car.py)<16){p.hornSeen=st.hornAt;if(Math.abs(p.v||0)<0.2&&Math.random()<0.55){p.waveT=st.clock+2.6;return}p.startT=0.5;p.hurryT=3;brainLearn("pedScare")}
@@ -11071,8 +11076,9 @@ void main(){
 #endif
      }}
    else if(kind>4.5&&kind<5.5){uv=vec2(mix(0.453,0.486,1.0-abs(mod(abs(t)/2.4,2.0)-1.0)),v);g=0.5;}
+   else if(kind<0.5){uv=vC.xy;g=-1.0;}
    else{float f=1.0-abs(mod(t/3.6,2.0)-1.0);uv=kind>6.5?vec2(mix(0.005,0.090,f),v):vec2(mix(0.100,0.184,f),v);g=kind>6.5?0.32:0.34;}
-   base=texture2D(uTex,uv).rgb*uC*g*(1.0-ck);}   // v335 road kit: asphalt, wheel tracks, patches, shoulders with rumble strips and sidewalk slabs from one atlas   // road sign faces: one shared atlas, the UV rides in the vertex colour
+   vec3 tc=texture2D(uTex,uv).rgb;base=(g<0.0?pow(tc,vec3(2.2))*1.1:tc*g)*uC*(1.0-ck);}   // v335 road kit: asphalt, wheel tracks, patches, shoulders with rumble strips and sidewalk slabs from one atlas   // road sign faces: one shared atlas, the UV rides in the vertex colour
  if(uBackOn>0.5&&!gl_FrontFacing&&alpha>0.99)base=vec3(0.045,0.048,0.052);
  if(vDent>0.02){float sc=step(0.55,fract(vL.x*23.0+vL.y*61.0+vL.z*17.0));base=mix(base,mix(base*0.45,vec3(0.32,0.31,0.3),sc*0.6),vDent*0.75);}   // inside of the body shell: dark trim
  if(uPat>4.5&&uPat<5.5){vec3 dd=vW-uSO;vec2 uv=vec2(dot(dd,uSU)/dot(uSU,uSU),dot(dd,uSV)/dot(uSV,uSV));gl_FragColor=vec4(texture2D(uTex,uv).rgb*uC.x,1.0);return;}
@@ -11324,6 +11330,42 @@ function boxInto(B,cx,cy,cz,sx,sy,sz,rot){
 const SCN={};
 function uSamples(e,u0,u1,step){const out=[u0];if(e.tp||e.hz)for(let u=u0+step;u<u1;u+=step)out.push(u);for(const g of e.S){const a=g.s0,b=g.s0+g.len;if(b<=u0||a>=u1)continue;if(a>u0)out.push(a);if(g.t===1)for(let u=Math.max(a,u0)+step;u<Math.min(b,u1);u+=step)out.push(u)}out.push(u1);return out.sort((a,b)=>a-b)}
 // a flat strip along an edge between sideways positions t0..t1 (raw, + = left of the edge direction)
+
+/* v335 road kit in 3D: the kit's cross-sections bent along every road. Kerb roads get a 15 cm kerb (face and top), a gutter pan and a raised
+   concrete sidewalk with dropped kerbs where driveways and lot entrances cross and kerb ramps at the corners; freeways and ramps get the
+   grass embankment edge; country roads a gravel shoulder and a grassed slope. The lanes and the markings stay the game's own.
+   e.rkH[side][metre] is how much of the kerb height is there (1 raised, 0 dropped); the physics (rkLift) and the pedestrians use it too. */
+function rkLift(e,u,t){const H=e&&e.rkH;if(!H)return 0;const A=H[t>0?0:1];if(!A)return 0;return 0.15*A[clamp(Math.round(u),0,A.length-1)]}
+function rkBuild(drive,lot){const B={P:[],N:[],I:[],C:[]},cell=new Set(),K=(x,y)=>(Math.floor(x)+30000)*60000+(Math.floor(y)+30000);
+  for(const M of [drive,lot]){if(!M)continue;const P=M.P,I=M.I;for(let i=0;i<I.length;i+=3){const a=I[i]*3,b=I[i+1]*3,c=I[i+2]*3;const xs=[P[a],P[b],P[c]],ys=[-P[a+2],-P[b+2],-P[c+2]],x0=Math.floor(Math.min(...xs)),x1=Math.ceil(Math.max(...xs)),y0=Math.floor(Math.min(...ys)),y1=Math.ceil(Math.max(...ys));if((x1-x0)*(y1-y0)>6000)continue;
+      const ar=(xs[1]-xs[0])*(ys[2]-ys[0])-(xs[2]-xs[0])*(ys[1]-ys[0]);if(Math.abs(ar)<1e-6)continue;
+      for(let x=x0;x<=x1;x++)for(let y=y0;y<=y1;y++){const px=x+0.5,py=y+0.5,w0=((xs[1]-px)*(ys[2]-py)-(xs[2]-px)*(ys[1]-py))/ar,w1=((xs[2]-px)*(ys[0]-py)-(xs[0]-px)*(ys[2]-py))/ar,w2=1-w0-w1;if(w0>-0.15&&w1>-0.15&&w2>-0.15)cell.add(K(px,py))}}}
+  const push=(pts,uv,nr)=>{const k=B.P.length/3;for(let i=0;i<pts.length;i++){B.P.push(pts[i][0],pts[i][2],-pts[i][1]);B.N.push(nr[i][0],nr[i][1],nr[i][2]);B.C.push(uv[i][0],uv[i][1],0)}return k};
+  for(const e of EDGES){e.rkH=null;if(e.n<1||e.T.col==="d"||e.T.dirt)continue;const city=!!e.T.kerb,fw=!!e.T.rumble,rural=!city&&!fw&&e.T.col==="h";if(!city&&!fw&&!rural)continue;
+    const k0=city?kerbTrim(e,0):Math.max(0,e.p0),k1=city?e.L-kerbTrim(e,1):e.L-e.p1;if(k1-k0<4)continue;
+    const Wf=u=>mAt(e,u)/2+e.n*LANE+e.side,walk=e.T.walk||0,skip=u=>e.gap&&u>e.gap[0]-0.5&&u<e.gap[1]+0.5||e.ov&&overDeck(e,u)||e.br&&Math.abs(u-e.br.uc)<e.br.half+(e.br.rp||0)||flyUp(e,u);
+    if(city)e.rkH=[new Float32Array(Math.ceil(e.L)+2),new Float32Array(Math.ceil(e.L)+2)];
+    for(const sg of [1,-1]){
+      // where the kerb is dropped: driveways and lot entrances crossing the sidewalk, and kerb ramps at both ends
+      const L=Math.ceil(e.L)+2,hk=new Float32Array(L);
+      if(city){for(let u=0;u<L;u++){if(u<k0||u>k1){hk[u]=0;continue}const q=ePt(e,Math.min(u,e.L),sg*(Wf(Math.min(u,e.L))+0.35+Math.max(0.6,walk*0.5)));hk[u]=cell.has(K(q[0],q[1]))?0:1}
+        const h2=Float32Array.from(hk);for(let u=0;u<L;u++)if(hk[u]===0)for(let d=-1;d<=1;d++){const v=u+d;if(v>=0&&v<L)h2[v]=0}   /* a dropped kerb is a little wider than the driveway */
+        for(let u=0;u<L;u++){if(h2[u]>0){let m=1;for(let d=1;d<=2;d++){if(u-d>=0&&h2[u-d]===0)m=Math.min(m,d/2.5);if(u+d<L&&h2[u+d]===0)m=Math.min(m,d/2.5)}hk[u]=m}else hk[u]=0}   /* the 1:8 ramp each side */
+        e.rkH[sg>0?0:1]=hk}
+      const H=u=>city?hk[clamp(Math.round(u),0,L-1)]:1;
+      let us=uSamples(e,k0,k1,4);if(city){const ex=[];for(let u=Math.ceil(k0);u<k1;u++){const a=hk[u],b=hk[Math.min(L-1,u+1)];if(a!==b||a<1&&a>0)ex.push(u,u+1)}us=[...new Set(us.concat(ex.filter(u=>u>k0&&u<k1)))].sort((a,b)=>a-b)}
+      // the cross-section, outward from the edge of the roadway: [offset0, offset1, y0, y1, u0, u1, lifts with the kerb]
+      const prof=city?[[-0.45,0,0,0,0.503,0.512,0],[0,0,0,0.15,0.491,0.501,1],[0,0.15,0.15,0.15,0.491,0.501,1],[0.15,0.35+walk,0.15,0.15,0.450,0.489,1],[0.35+walk,0.65+walk,0.15,-0.5,0.515,0.573,1]]
+        :fw?[[0,2.4,0,-0.5,0.515,0.573,0]]:[[0,1.8,0,-0.06,0.575,0.606,0],[1.8,3.3,-0.06,-0.5,0.515,0.573,0]];
+      let prev=null;
+      for(const u of us){if(skip(u)){prev=null;continue}const W=Wf(u),z=e.hz?ez(e,u):0,h=H(u),v=u/12,a=ePt(e,u,sg*W),b=ePt(e,u,sg*(W+1)),lx=b[0]-a[0],ly=b[1]-a[1];
+        const row=prof.map(([o0,o1,y0,y1,u0,u1,lift])=>{const yy0=lift?y0*h:y0,yy1=lift?(y1<0?y1:y1*h):y1;const p0=ePt(e,u,sg*(W+o0)),p1=ePt(e,u,sg*(W+o1));
+          const dx=o1-o0,dy=yy1-yy0,nl=Math.hypot(dx,dy)||1,nx=-dy/nl,ny=dx/nl;return {P:[[p0[0],p0[1],z+yy0],[p1[0],p1[1],z+yy1]],U:[[u0,v],[u1,v]],N:[lx*nx,ny,-ly*nx]}});
+        if(prev)row.forEach((r,i)=>{const q=prev[i];if(Math.hypot(r.P[0][2]-r.P[1][2],r.P[0][0]-r.P[1][0],r.P[0][1]-r.P[1][1])<0.004&&Math.hypot(q.P[0][2]-q.P[1][2],q.P[0][0]-q.P[1][0],q.P[0][1]-q.P[1][1])<0.004)return;
+          const k=push([q.P[0],q.P[1],r.P[0],r.P[1]],[q.U[0],q.U[1],r.U[0],r.U[1]],[q.N,q.N,r.N,r.N]);if(sg>0)B.I.push(k,k+2,k+1,k+1,k+2,k+3);else B.I.push(k,k+1,k+2,k+1,k+3,k+2)});
+        prev=row}}}
+  SCN.rk=B.I.length?meshFrom(B.P,B.N,B.I,B.C):null;RK.n=B.I.length/3}
+
 /* v335 road kit atlas (props/road_atlas.jpg): loaded once; until it arrives (or if it can't load) the roads keep the old procedural look.
    Binds it on TEXTURE0 and returns true when ready (the sign shaders bind their own atlas before drawing) */
 const RK={tex:null,ok:false,busy:false};
@@ -12503,6 +12545,7 @@ function worldScenery(){CUTO.clear();W2P.length=0;LKP.length=0;LK.sky=0;LK.used=
        for(let a=-S.L/2+2.75;a<S.L/2-1.4;a+=2.7)S.stalls.push({p:xLocal(S,a,-S.D/2+8),h:Math.atan2(S.N[1],S.N[0])},{p:xLocal(S,a,S.D/2-2.9),h:Math.atan2(-S.N[1],-S.N[0])})}}}
   const SM={};for(const k of Object.keys(SM_MAT))SM[k]=M_();retailInto(SM,lamp,treeAt);
   const mf=m=>meshFrom(m.P,m.N,m.I);SCN.sm=Object.fromEntries(Object.entries(SM).map(([k,m])=>[k,mf(m)]));
+  try{rkBuild(drive,lot)}catch(e){console.error(e);SCN.rk=null}
   Object.assign(SCN,{xm:SCN_TMP.xm?Object.fromEntries(Object.entries(SCN_TMP.xm).map(([k,m])=>[k,mf(m)])):null,hm:Object.fromEntries(Object.entries(HM).map(([k,m])=>[k,mf(m)])),crowns:mf(tree),trunks:mf(trunk),bld:bld.map(mf),roofs:mf(roofs),house:mf(house),post:mf(post),head:mf(head),xroad:mf(M_()),xlines:mf(xl),pole:mf(pole),
     hedge:SCN_TMP.hedge?mf(SCN_TMP.hedge):null,hedge:SCN_TMP.hedge?mf(SCN_TMP.hedge):null,pad:mf(pad),chg:mf(chg),stall:mf(stall),zebra:mf(zebra),patchD:mf(patchD),patchL:mf(patchL),crack:mf(crack),rpm:mf(M_()),plate:mf(plate),green:mf(green),barrier:mf(M_()),rail:mf(M_()),
     sg:Object.fromEntries(Object.entries(SGM).filter(([k,m])=>m.I.length&&["face","plate","conc","dark"].includes(k)).map(([k,m])=>[k,meshFrom(m.P,m.N,m.I,k==="face"?m.C:undefined)])),signW:mf(signW),signK:mf(signK),signG:mf(signG),signGW:mf(signGW),stopR:mf(stopR),sigH:mf(sigH),lens:mf(lens),sigPole:mf(sigPole),sigBP:mf(sigBP),sigY:mf(sigY),lot:mf(lot),drive:mf(drive),furn:mf(furn),
@@ -17006,14 +17049,14 @@ function render(dt){
   if(SCN.tc){const T_=SCN.tc;mat([0.42,0.42,0.4],null,0.05,10,1,2);draw(T_.conc);mat([0.55,0.5,0.43],null,0.08,12,1,2);draw(T_.sec);mat([0.09,0.09,0.095],null,0.2,30,1,2);draw(T_.asph);mat([0.33,0.29,0.25],null,0.1,10,1,2);draw(T_.cob);mat([0.36,0.3,0.22],null,0.05,8,1,1);draw(T_.grav);mat([0.40,0.38,0.35],null,0.1,10,1,2);draw(T_.rock);mat([0.20,0.14,0.09],null,0.25,30,1,1);draw(T_.mud);mat([0.92,0.94,0.97],null,0.2,20,1,2);draw(T_.snow);mat([0.76,0.66,0.47],null,0.03,6,1,1);draw(T_.sand);
     mat([0.85,0.7,0.1],null,0.2,20);draw(T_.paint);mat([0.95,0.38,0.05],null,0.2,20);draw(T_.dark);mat([0.55,0.55,0.55],null,0.3,20);draw(T_.post);mat([0.1,0.35,0.75],null,0.2,20);draw(T_.board);if(T_.rail){mat([0.62,0.64,0.66],null,0.6,40);draw(T_.rail)}try{orDraw()}catch(e){}tcSignsDraw()}
   try{txbDraw()}catch(e){console.error(e)}
-  gl.polygonOffset(6,6);if(rkTex()){mat([1,1,1],null,0.05,10,1,10);draw(SCN.walk);mat([0.36,0.36,0.35],null,0.05,10,1,2)}else{mat([0.36,0.36,0.35],null,0.05,10,1,2);draw(SCN.walk)}draw(SCN.drive);mat([0.1,0.102,0.11],null,0.2,30,1,2);draw(SCN.lot);mat([0.11,0.23,0.07],null,0.02,8,1,1);draw(SCN.green);mat([0.13,0.135,0.14],null,0.2,30,1,2);draw(SCN.pad);if(SCN.parkLane){mat([0.095,0.098,0.105],null,0.25,30,1,2);draw(SCN.parkLane)}
+  gl.polygonOffset(6,6);if(rkTex()){if(!SCN.rk){mat([1,1,1],null,0.05,10,1,10);draw(SCN.walk)}mat([0.36,0.36,0.35],null,0.05,10,1,2)}else{mat([0.36,0.36,0.35],null,0.05,10,1,2);draw(SCN.walk)}draw(SCN.drive);mat([0.1,0.102,0.11],null,0.2,30,1,2);draw(SCN.lot);mat([0.11,0.23,0.07],null,0.02,8,1,1);draw(SCN.green);mat([0.13,0.135,0.14],null,0.2,30,1,2);draw(SCN.pad);if(SCN.parkLane){mat([0.095,0.098,0.105],null,0.25,30,1,2);draw(SCN.parkLane)}
   gl.polygonOffset(4,4);
   {const wet=st.surface==="wet",snow=st.surface==="snow",sp_=wet?1.6:0.22,sh_=wet?90:26;
    const RKon=rkTex();for(const [c,m1] of SCN.roadZ){if(RKon&&c!=="d"){mat(snow?[1.25,1.27,1.3]:wet?[0.6,0.6,0.63]:[1,1,1],null,sp_,sh_,1,10);draw(m1);continue}const col=snow?[0.42,0.43,0.45]:c==="d"?(wet?[0.16,0.12,0.08]:[0.3,0.25,0.18]):wet?[0.045,0.047,0.052]:c==="c"?[0.112,0.112,0.116]:[0.068,0.07,0.076];mat(col,null,c==="d"?0.05:sp_,c==="d"?8:sh_,1,c==="d"?1:2);draw(m1)}
    gl.polygonOffset(3,3);if(!snow)for(const [c,m] of SCN.wear){if(RKon&&c!=="d")continue;mat(c==="d"?(wet?[0.12,0.09,0.06]:[0.23,0.19,0.14]):wet?[0.035,0.037,0.042]:c==="c"?[0.088,0.088,0.092]:[0.056,0.058,0.064],null,c==="d"?0.05:wet?2:0.5,c==="d"?8:wet?110:40,1,c==="d"?1:2);draw(m)}
    if(!snow){mat([0.05,0.05,0.055],null,0.3,30,1,2);draw(SCN.patchD);mat([0.15,0.15,0.155],null,0.15,20,1,2);draw(SCN.patchL);mat([0.03,0.03,0.032],null,0.6,50);draw(SCN.crack);
      if(!RKon){mat([0.16,0.16,0.165],null,0.2,20,1,2);for(const m of SCN.rumble)draw(m)}}}
-  gl.polygonOffset(2,2);for(const k of SCN.kerbs){mat([0.32,0.32,0.30],null,0.05,10,1,2);draw(k)}
+  gl.polygonOffset(2,2);if(SCN.rk&&rkTex()){const cf=gl.isEnabled(gl.CULL_FACE);gl.disable(gl.CULL_FACE);mat([1,1,1],null,0.08,14,1,10);draw(SCN.rk);if(cf)gl.enable(gl.CULL_FACE)}else for(const k of SCN.kerbs){mat([0.32,0.32,0.30],null,0.05,10,1,2);draw(k)}
   if(SCN.rbI){mat([0.34,0.34,0.32],null,0.05,10,1,2);draw(SCN.rbI.k);gl.polygonOffset(1,1);mat(st.surface==="snow"?[0.8,0.82,0.86]:[0.11,0.23,0.07],null,0.02,8,1,1);draw(SCN.rbI.g);gl.polygonOffset(2,2)}
   gl.polygonOffset(0,0);mat([0.78,0.78,0.75],night?[0.012,0.012,0.012]:null,0.1,10);draw(SCN.xlines);draw(SCN.stall);draw(SCN.zebra);mat([0.9,0.9,0.85],night?[0.5,0.5,0.45]:null,0.8,60);draw(SCN.rpm);
   gl.disable(gl.CULL_FACE);mat([0.11,0.105,0.1],null,0.05,8);draw(SCN.bumps.rim);mat([0.018,0.017,0.016],null,0.3,30);draw(SCN.bumps.holes);mat([0.07,0.068,0.065],null,0.6,40);draw(SCN.bumps.man);mat([0.045,0.046,0.05],null,0.3,30);draw(SCN.bumps.cut);mat([0.75,0.6,0.08],night?[0.03,0.02,0]:null,0.3,20);draw(SCN.bumps.speed);
@@ -17806,7 +17849,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=335;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   /* BUILD_VER: bumped to make open copies reload without resetting saves */
+const APP_VER="173",BUILD_VER=336;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   /* BUILD_VER: bumped to make open copies reload without resetting saves */
 /* v333: this used to sit behind a // comment on the line above, so it never ran: VER_WIPED was undefined and signing in threw before your account save could load.
    Version 173 never wiped anyone, so it is adopted quietly; later APP_VER bumps reset local saves again as intended */
 let VER_WIPED=false;try{if(APP_VER==="173")localStorage.setItem("strata.ver",APP_VER);if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
