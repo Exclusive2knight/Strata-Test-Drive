@@ -1031,6 +1031,7 @@ html body.ui2 #ui2 .u2left .dk svg{width:17px;height:17px}html body.ui2 #ui2 .u2
 html body.ui2 #ui2 .u2left .dk button.warn,html body.ui2 #ui2 .u2left .dk button.warn small{color:var(--good)}html body.ui2 #ui2 .u2left .dk button.blu,html body.ui2 #ui2 .u2left .dk button.blu small{color:var(--ev)}
 html body.ui2 #ui2 #u2dock{border-radius:10px!important;background:var(--card)!important;border:1px solid var(--brd)!important;color:var(--tx)}
 body.dkMin #ui2 .u2left .dk button{width:42px!important}body.dkMin #ui2 .u2left .dk small{display:none}
+html body.ui2 #ui2 .u2left .dk button i{position:static;margin-left:auto;flex:none}body.dkMin #ui2 .u2left .dk button i{position:absolute;top:2px;right:2px;margin:0}   /* unread badge sits after the label in the list, not on top of it */
 /* right: signals, hazards, more */
 html body.ui2 #ui2 .u2right{padding:6px;border-radius:18px;background:var(--card);border:1px solid var(--brd);box-shadow:var(--sh)}
 html body.ui2 #ui2 .u2right button,html body.ui2 #ui2 .u2right .u2pair{background:transparent!important;border:0!important;box-shadow:none!important;border-radius:12px}
@@ -11411,10 +11412,16 @@ function rkBuild(drive,lot,pad){const B={P:[],N:[],I:[],C:[]},cell=new Set(),K=(
    Binds it on TEXTURE0 and returns true when ready (the sign shaders bind their own atlas before drawing) */
 const RK={tex:null,ok:false,busy:false};
 function rkTex(){if(RK.ok){gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,RK.tex);return true}if(RK.busy||st.headless)return false;RK.busy=true;
-  const im=new Image();im.crossOrigin="anonymous";let tried=0;im.onload=()=>{try{const t=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,im);gl.generateMipmap(gl.TEXTURE_2D);
+  /* fetched as bytes and decoded with createImageBitmap so it doesn't depend on the page's image rules (the Claude artifact on iPhone refused the plain <img> load and the roads came out in debug colours);
+     if every source fails, a plain asphalt-grey texture goes in so the roads still look like roads */
+  const up=(src)=>{try{const t=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);
+      if(src)gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,src);else gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,1,1,0,gl.RGB,gl.UNSIGNED_BYTE,new Uint8Array([118,118,116]));gl.generateMipmap(gl.TEXTURE_2D);
       gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.REPEAT);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
-      try{const ext=gl.getExtension("EXT_texture_filter_anisotropic");if(ext)gl.texParameterf(gl.TEXTURE_2D,ext.TEXTURE_MAX_ANISOTROPY_EXT,Math.min(8,gl.getParameter(ext.MAX_TEXTURE_MAX_ANISOTROPY_EXT)))}catch(e){}RK.tex=t;RK.ok=true}catch(e){console.error(e)}};
-  im.onerror=()=>{if(tried++||/github\.io$/.test(location.hostname))return;im.src="https://cdn.jsdelivr.net/gh/Exclusive2knight/Strata-Test-Drive@/*ASSET_REF*/main/props/road_atlas.jpg"};im.src="props/road_atlas.jpg?v="+BUILD_VER;return false}
+      try{const ext=gl.getExtension("EXT_texture_filter_anisotropic");if(ext)gl.texParameterf(gl.TEXTURE_2D,ext.TEXTURE_MAX_ANISOTROPY_EXT,Math.min(8,gl.getParameter(ext.MAX_TEXTURE_MAX_ANISOTROPY_EXT)))}catch(e){}RK.tex=t;RK.ok=true;RK.plain=!src}catch(e){console.error(e)}};
+  const get=u=>fetch(u).then(r=>{if(!r.ok)throw 0;return r.blob()});
+  const dec=bl=>typeof createImageBitmap==="function"?createImageBitmap(bl):new Promise((ok,no)=>{const im=new Image(),u=URL.createObjectURL(bl);im.onload=()=>{ok(im);URL.revokeObjectURL(u)};im.onerror=no;im.src=u});
+  get("props/road_atlas.jpg?v="+BUILD_VER).catch(e=>{if(/github\.io$/.test(location.hostname))throw e;return get("https://cdn.jsdelivr.net/gh/Exclusive2knight/Strata-Test-Drive@/*ASSET_REF*/main/props/road_atlas.jpg")})
+    .then(dec).then(up).catch(e=>{console.warn("road atlas unavailable",e);up(null)});return false}
 function stripInto(B,e,t0,t1,y,u0,u1){if(u1-u0<0.05)return;if(e.gap&&u1>e.gap[0]&&u0<e.gap[1]){stripInto(B,e,t0,t1,y,u0,Math.min(u1,e.gap[0]));stripInto(B,e,t0,t1,y,Math.max(u0,e.gap[1]),u1);return}const us=uSamples(e,u0,u1,e.tp||e.hz?4:3);let k=B.P.length/3;const T0=typeof t0==="function"?t0:()=>t0,T1=typeof t1==="function"?t1:()=>t1;
   us.forEach((u,q)=>{const a=ePt(e,u,T0(u)),b=ePt(e,u,T1(u)),yy=y+(e.hz?ez(e,u):0);const yo=B.C&&B.kind===undefined?RKY:0;B.P.push(a[0],yy+yo,-a[1],b[0],yy+yo,-b[1]);B.N.push(0,1,0,0,1,0);if(B.C){const z=B.kind!==undefined?B.kind*10000+200:RKE?RKE(u):200,v=u/12;B.C.push(T0(u),v,z,T1(u),v,z)}if(q>0)B.I.push(k-2,k-1,k,k-1,k+1,k);k+=2})}
 let RKE=null,RKY=0;   /* road kit: the current edge's texture code (kind, lanes, half median) for stripInto */
