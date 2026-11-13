@@ -16,7 +16,7 @@ SIM(90,t=>{sys.handsT=0;const M=me();const e=Math.abs(M.off-M.lo*LANE+LANE/2*0);
 out.push(`Pilot hwy: maxErr ${maxE.toFixed(2)} meanErr ${(sumE/n).toFixed(3)} pilot=${st.pilot} state=${sys.pilotState} v ${car.vx.toFixed(1)} hits ${hits}`);
 // 5 Pilot in city (curves/junctions)
 prep("city",12);act("pilot");maxE=0;sumE=0;n=0;
-SIM(60,t=>{const M=me(),ce=Math.abs(M.off-laneOf(M.off)*LANE);if(t>3&&!sys.pilotLC&&!M.jn){maxE=Math.max(maxE,ce);sumE+=ce;n++}});
+SIM(60,t=>{sys.handsT=0;const M=me(),ce=Math.abs(M.off-laneOf(M.off)*LANE);if(t>3&&!sys.pilotLC&&!M.jn){maxE=Math.max(maxE,ce);sumE+=ce;n++}});
 out.push(`Pilot city: maxErr ${maxE.toFixed(2)} meanErr ${(sumE/Math.max(1,n)).toFixed(3)} pilot=${st.pilot} state=${sys.pilotState} v ${car.vx.toFixed(1)} hits ${hits} off ${car.offroad}`);
 // 6 LKA drift test at 55 mph
 prep("hwy",24.6);placeTest("drift");SIM(10,t=>{inp.thrT=0.25});out.push(`LKA drift: ${LOG.slice(0,2).join(" / ")} offroad ${car.offroad}`);

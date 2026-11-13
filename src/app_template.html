@@ -1347,8 +1347,20 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
 <script data-boot>(function(){var p=0;window.__bootP=0;var t=setInterval(function(){if(window.__bootReal){clearInterval(t);return}p+=(0.7-p)*0.025;window.__bootP=p;var a=document.getElementById("bootArc"),n=document.getElementById("bootNeedle"),c=document.getElementById("bootPct");if(a)a.setAttribute("stroke-dasharray",(p*100).toFixed(1)+" 100");if(n)n.style.setProperty("--a",(-135+p*270)+"deg");if(c)c.textContent=String(Math.round(p*100))},120)})()</script>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 336 · Real kerbs, sidewalks and cracked asphalt</h2></div>
+    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 337 · Real stocks, Shell stations and smoother roads</h2></div>
     <div class="nb">
+      <h4>Real stocks, Shell stations and smoother roads</h4><ul>
+      <li>📈 <b>The stock market uses real companies now</b>, starting at their real share prices. Prices move the same way for every player, so you all see the same market at the same time, and big market news hits everyone at once.</li>
+      <li>⛽ <b>Fuel prices match real Michigan averages</b>: regular, midgrade, premium and diesel are priced the way they are at real pumps today, and they still move with the market.</li>
+      <li>🐚 <b>New Shell gas stations</b> with a full canopy, six pumps and two EV chargers each. Pull up to a pump to fill up or to a charger to plug in.</li>
+      <li>🛣️ <b>Merges, ramps and service drives line up properly</b>: no more flickering road surfaces where two roads overlap, ramps meet the freeway cleanly, and sidewalks are cut back where roads join.</li>
+      <li>🟩 <b>Raised medians are solid</b>: drive into one and your wheels climb the kerb instead of passing through it. Downtown sidewalks also ramp down at every crossing.</li>
+      <li>✈️ The last stretch of John D. Dingell Dr into the airport now merges smoothly instead of ending in a sudden lane drop.</li>
+      <li>🚦 <b>Traffic jams clear themselves</b>: cars that get stuck in gridlock out of your view are cleared away, and AI drivers now go around a car stopped in their lane instead of waiting behind it forever.</li>
+      <li>🤖 <b>Fixed:</b> the Pilot sometimes slowed down and pulled over with an Emergency Driving Stop right after you turned it on, if the car had been sitting still for a while first.</li>
+      <li>📺 <b>Fixed:</b> the 2019 RAV4's centre screen was hidden behind the dashboard. It now shows in front where it belongs.</li>
+      <li>📱 <b>Phones work much better</b>: the game uses the real phone layout instead of a zoomed-out desktop page, typing in a text box no longer zooms the screen in, turning the phone between portrait and landscape no longer reloads the game, the loading screen fits in landscape, and the browser stops asking to save passwords.</li>
+      </ul>
       <h4>Real kerbs, sidewalks and cracked asphalt</h4><ul>
       <li>🧱 <b>The road kit is now 3D</b>, bent along every road: town streets have a 15 cm kerb with a gutter and a raised concrete sidewalk, freeways and ramps end in a grass embankment, and country roads have a gravel shoulder and a grassy slope.</li>
       <li>🚗 The kerb drops where driveways and parking lot entrances cross the sidewalk, and every corner has a kerb ramp. Drive up a kerb and the car really climbs it; people walk on top of the sidewalk.</li>
@@ -3486,7 +3498,7 @@ function groundAt0(x,y){
         pick({h:(e.hz?ez(e,p.u):0)+hb+(rum?0.006:0),mu:1.15,kind:"road",rum,hole:RB_HOLE,deck:overDeck(e,p.u)});continue}}
     if(inner>0&&a<inner&&(e.br&&onBridge(e,p.u)||e.ov&&onOver(e,p.u))){pick({h:ez(e,p.u),mu:1.0,kind:"pavement",deck:overDeck(e,p.u)});continue}     // bridge deck between the carriageways
     const kOK=!(e.T.kerb||e.T.walk)||(p.u>=kerbTrim(e,0)&&p.u<=e.L-kerbTrim(e,1));
-    if(kOK&&e.T.kerb&&((a>outer&&a<outer+0.45)||(inner>0&&a<inner&&a>inner-0.45))){if(e.ov&&onOver(e,p.u))pick({h:ez(e,p.u)+0.04,mu:1.0,kind:"kerb",deck:overDeck(e,p.u)});else{const zz=e.hz?ez(e,p.u):0;if(!kerb||Math.abs(zz-GREF)<Math.abs(kz-GREF))kz=zz;kerb=true;kl=Math.max(kl,rkLift(e,p.u,p.t))}}
+    if(kOK&&e.T.kerb&&((a>outer&&a<outer+0.45)||(inner>0&&a<inner&&(a>inner-0.45||rkMedUp(e,p.u))))){if(e.ov&&onOver(e,p.u))pick({h:ez(e,p.u)+0.04,mu:1.0,kind:"kerb",deck:overDeck(e,p.u)});else{const zz=e.hz?ez(e,p.u):0;if(!kerb||Math.abs(zz-GREF)<Math.abs(kz-GREF))kz=zz;kerb=true;kl=Math.max(kl,inner>0&&a<inner?(rkMedUp(e,p.u)?0.15:0):rkLift(e,p.u,p.t))}}
     else if(kOK&&e.T.walk&&a>outer&&a<outer+0.45+e.T.walk){if(e.ov&&onOver(e,p.u))pick({h:ez(e,p.u),mu:0.95,kind:"pavement",deck:overDeck(e,p.u)});else{const zz=e.hz?ez(e,p.u):0;if(!(walk||kerb)||Math.abs(zz-GREF)<Math.abs(kz-GREF))kz=zz;walk=true;kl=Math.max(kl,rkLift(e,p.u,p.t))}}   /* two levels of sidewalk (a deck over a street): the one you're on */
     dmin=Math.min(dmin,a>outer?a-outer:inner-a)}
   if(hits){if(hits.length===1&&!kerb&&!walk&&!hits[0].deck)return hits[0];if(kerb)hits.push({h:kz+Math.max(0.04,kl),mu:1.0,kind:"kerb"});else if(walk)hits.push({h:kz+kl,mu:0.95,kind:"pavement"});
@@ -11349,6 +11361,8 @@ function uSamples(e,u0,u1,step){const out=[u0];if(e.tp||e.hz)for(let u=u0+step;u
    concrete sidewalk with dropped kerbs where driveways and lot entrances cross and kerb ramps at the corners; freeways and ramps get the
    grass embankment edge; country roads a gravel shoulder and a grassed slope. The lanes and the markings stay the game's own.
    e.rkH[side][metre] is how much of the kerb height is there (1 raised, 0 dropped); the physics (rkLift) and the pedestrians use it too. */
+/* v337: the raised median is solid: where it's built (see rkBuild), the ground between its kerbs is 15 cm up */
+function rkMedUp(e,u){return !!SCN.rk&&e.m>0&&!!e.T.kerb&&!(e.gap&&u>e.gap[0]-1&&u<e.gap[1]+1)&&!(e.br&&Math.abs(u-e.br.uc)<e.br.half+(e.br.rp||0))&&!(e.ov&&overDeck(e,u))&&!flyUp(e,u)&&u>Math.max(kerbTrim(e,0),e.tp?e.tp[0]+8:0)&&u<e.L-kerbTrim(e,1)}
 function rkLift(e,u,t){const H=e&&e.rkH;if(!H)return 0;const A=H[t>0?0:1];if(!A)return 0;return 0.15*A[clamp(Math.round(u),0,A.length-1)]}
 function rkBuild(drive,lot,pad){const B={P:[],N:[],I:[],C:[]},cell=new Set(),K=(x,y)=>(Math.floor(x)+30000)*60000+(Math.floor(y)+30000);
   for(const M of [drive,lot,pad]){if(!M)continue;const P=M.P,I=M.I;for(let i=0;i<I.length;i+=3){const a=I[i]*3,b=I[i+1]*3,c=I[i+2]*3;const xs=[P[a],P[b],P[c]],ys=[-P[a+2],-P[b+2],-P[c+2]],x0=Math.floor(Math.min(...xs)),x1=Math.ceil(Math.max(...xs)),y0=Math.floor(Math.min(...ys)),y1=Math.ceil(Math.max(...ys));if((x1-x0)*(y1-y0)>6000)continue;
@@ -17635,7 +17649,7 @@ function act(a){ if(typeof a==="string"&&a.startsWith("kb:")){const id=a.slice(3
     case "accUp":if(st.pilot&&isTesla()&&fsdOwned()){const P_=["sloth","chill","standard","hurry","madmax"],i=Math.min(4,P_.indexOf(TSL.profile)+1);TSL.profile=P_[i];toast(`Speed profile: ${P_[i]}`);break}st.accSet=Math.min(st.accSet+(st.units==="mph"?2.2352:1.3889),55);break;
     case "accDown":if(st.pilot&&isTesla()&&fsdOwned()){const P_=["sloth","chill","standard","hurry","madmax"],i=Math.max(0,P_.indexOf(TSL.profile)-1);TSL.profile=P_[i];toast(`Speed profile: ${P_[i]}`);break}st.accSet=Math.max(st.accSet-(st.units==="mph"?2.2352:1.3889),8);break;
     case "gap":st.accGap=st.accGap%3+1;break;
-    case "pilot":if(st.pilot){st.pilot=false;sys.pilotLC=null;fsdReset();toast(`${T.pilotName||"Westport Pilot"} off: you are steering`);if(!T.tesla)beep(500,.15,"sine",.2)}
+    case "pilot":try{SAFE.idleT=0;SAFE.ems=0;sys.emsB=0}catch(e){}if(st.pilot){st.pilot=false;sys.pilotLC=null;fsdReset();toast(`${T.pilotName||"Westport Pilot"} off: you are steering`);if(!T.tesla)beep(500,.15,"sine",.2)}
       else if(T.tesla&&sys.apStrike){tsS("unavail",0.6);toast("Autosteer unavailable for the rest of this drive (shift to P to reset)")}
       else if(T.tesla&&TOPT.as===false&&tslLeg()){if(st.gear==="D"&&car.vx>0.5){st.acc=true;st.accSet=Math.max(car.vx,8.94)}tsS("unavail",0.5);toast("Autosteer is turned off: Controls > Autopilot > Autosteer")}
       else if(T.tesla&&fsdOwned()&&(st.gear==="D"||(st.gear==="P"&&Math.abs(car.vx)<0.2))&&p2pStart()){}
@@ -17927,7 +17941,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=336;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   /* BUILD_VER: bumped to make open copies reload without resetting saves */
+const APP_VER="173",BUILD_VER=337;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   /* BUILD_VER: bumped to make open copies reload without resetting saves */
 /* v333: this used to sit behind a // comment on the line above, so it never ran: VER_WIPED was undefined and signing in threw before your account save could load.
    Version 173 never wiped anyone, so it is adopted quietly; later APP_VER bumps reset local saves again as intended */
 let VER_WIPED=false;try{if(APP_VER==="173")localStorage.setItem("strata.ver",APP_VER);if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
@@ -20117,7 +20131,7 @@ function sfTick(dt){sys.steerOv=null;if(!st.started)return;try{ownTick(dt)}catch
   if(SAFE.call){SAFE.call.t-=dt;const e=$("sfCallT");if(e)e.textContent=Math.max(0,Math.ceil(SAFE.call.t));if(SAFE.call.t<=0)sfCallEnd(true)}
   if(st.walk)return;const M=me();
   // driver input: anything on the wheel or pedals counts
-  const inSig=(Math.abs(inp.steer)>0.04?"s":"")+(inp.thr>0.04?"t":"")+(inp.brk>0.04?"b":"")+Math.round(inp.steer*10);if(inSig!==SAFE.lastIn){SAFE.lastIn=inSig;SAFE.idleT=0;if(SAFE.ems){SAFE.ems=0;sys.emsB=0;carMsg("Emergency stop cancelled: you're driving again")}}else SAFE.idleT+=dt;
+  const inSig=(Math.abs(inp.steer)>0.04?"s":"")+(inp.thr>0.04?"t":"")+(inp.brk>0.04?"b":"")+Math.round(inp.steer*10);if(inSig!==SAFE.lastIn||!st.pilot){SAFE.lastIn=inSig;SAFE.idleT=0;if(SAFE.ems){SAFE.ems=0;sys.emsB=0;carMsg("Emergency stop cancelled: you're driving again")}}else SAFE.idleT+=dt;
   // drowsiness: long stretches without a break, or weaving in the lane
   if(sp>5){SAFE.drive+=dt;SAFE.stopT=0}else{SAFE.stopT+=dt;if(SAFE.stopT>90)SAFE.drive=0}
   if(false){SAFE.wobble.push(M.off);if(SAFE.wobble.length>600)SAFE.wobble.shift();
