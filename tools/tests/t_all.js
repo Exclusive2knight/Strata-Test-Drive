@@ -1,4 +1,4 @@
-(async()=>{const out=[],trim="camry25";setTrim(trim,true);const prep=(start,v)=>{resetCar(STARTS[start]);cars=[];st.power=true;sys.epb=false;st.gear="D";st.acc=false;st.pilot=false;st.aeb=true;st.lka=true;st.bsm=true;car.vx=v;hits=0;LOG.length=0;inp.thrT=0;inp.brkT=0;inp.steerT=0};
+(async()=>{const out=[],trim="camry25";setTrim(trim,true);const prep=(start,v)=>{resetCar(STARTS[start]);cars=[];st.power=true;sys.epb=false;st.gear="D";st.acc=false;st.pilot=false;st.aeb=true;st.lka=true;st.bsm=true;car.vx=v;hits=0;LOG.length=0;inp.thrT=0;inp.brkT=0;inp.steerT=0;EV.t=1e9;for(const v of EV.list)v.t=0;sys.hold=false;sys.aebBrake=0;sys.lkaHold=0;sys.pilotLC=null;sys.elkT=0;sys.esa=null;sys.summon=null;sys.p2p=null;sys.pa=null;try{fsdReset()}catch(e){}};
 // 1 ACC follow a 20 mph car from 60 mph
 prep("hwy",26.8);placeTest("slow");act("acc");st.accSet=26.8;let c=cars.find(x=>x.kind==="test"),minG=999,maxDec=0,pv=car.vx,gaps=[];
 SIM(40,t=>{const g=Math.hypot(c.wx-car.px,c.wy-car.py);minG=Math.min(minG,g);const d=(pv-car.vx)/0.02;if(t>0.5)maxDec=Math.max(maxDec,d);pv=car.vx;if(t>30)gaps.push(g)});

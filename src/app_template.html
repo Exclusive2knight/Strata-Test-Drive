@@ -3430,6 +3430,7 @@ const LOTS=[[-60,100],[230,470],[530,770],[830,1070],[1130,1370]],G_LOT={h:0,mu:
 const G_ROAD={h:0,mu:1.15,kind:"road"},G_PAD={h:0,mu:1.05,kind:"pad"},G_KERB={h:0.04,mu:1.0,kind:"kerb"},G_WALK={h:0,mu:0.95,kind:"pavement"};
 // more gas stations and parking lots, placed on open ground beside the town roads
 var SHELL={on:true,mesh:null,busy:false,sites:[]};   /* v337 Shell stations, see shellSite */
+var TRF_GLT=0;
 const XSITES=[];   // {kind:"stn"|"lot",x,y,a (along the road),L,D,U,N}
 // v173: sites bucketed in 128 m cells (rebuilt whenever a site is added) so the terrain and ground lookups don't scan every site
 const XSG={n:-1,g:new Map()};function xsGrid(){if(XSG.n===XSITES.length)return XSG.g;const g=new Map();for(const S of XSITES){const r=Math.hypot(S.L/2,S.D/2)+40,i0=Math.floor((S.x-r)/128),i1=Math.floor((S.x+r)/128),j0=Math.floor((S.y-r)/128),j1=Math.floor((S.y+r)/128);
@@ -5788,7 +5789,7 @@ function aiVsPlayer(c,L,dt){if(st.walk||!st.started)return null;const dx=c.wx-ca
     const gap=fw-CARLEN,tail=pv>7&&gap<Math.max(3,pv*0.5)&&c.v>7;c.tgT=tail?(c.tgT||0)+dt:Math.max(0,(c.tgT||0)-dt*2);
     if(c.tgT>2.2&&(ag||(c.anger||0)>0.6||c.pers&&c.pers.k==="brisk"&&c.tgT>5)&&!(c.bcCd>0)&&L.gap>35){c.bcT=0.6+rnd()*0.4;c.bcCd=18;c.tgT=0;c.anger=(c.anger||0)+0.2}}
   else c.tgT=0;
-  if(L.who==="me"&&same&&fw<-3&&fw>-45){const gap=-fw-CARLEN,slow=pv<c.v0*0.72&&pv>2.5&&gap<32&&c.v0>8&&!(c.cg<1e6);
+  if(L.who==="me"&&same&&fw<-3&&fw>-45){const gap=-fw-CARLEN,slow=pv<c.v0*0.72&&pv>2.5&&gap<32&&c.v0>8&&!(c.cg<1e6)||pv<0.5&&gap<25&&(()=>{const M=me();if(!M||!M.e)return false;const de=M.dir>0?M.e.L-M.s:M.s;return de>30})();   /* v337: you stopped in the lane away from a junction (not waiting in a queue): after a while they go round you */
     c.slowT=slow?(c.slowT||0)+dt:Math.max(0,(c.slowT||0)-dt);
     if(c.slowT>(ag?2:4)&&!(c.flCd>0)){c.flashT=1.1;c.flCd=ag?5:9;c.anger=(c.anger||0)+0.15;if(ag&&gap<20&&Math.hypot(dx,dy)<40&&rnd()<0.5){aiHonk(c);emoB(c,"annoyed",2)}}
     if((ag&&c.slowT>2.5||c.slowT>8)&&!c.jn&&c.e.n>1&&!c.lcPending&&Math.abs(c.offT-c.off)<0.05){const li=laneIdx(c);
@@ -5993,6 +5994,9 @@ function updateTraffic(dt){try{sigSense(dt)}catch(e){}try{sfTick(dt)}catch(e){co
     c.spin+=c.v/0.36*dt;c.idle=c.v<0.1?(c.idle||0)+dt:0;
     carPose(c);aiSusp(c,dt);{const yr=c.pwh===undefined?0:wrapPi(c.wh-c.pwh)/Math.max(dt,1e-3);c.pwh=c.wh;c.yr=(c.yr||0)+(yr-(c.yr||0))*Math.min(1,dt*6)}   // how fast it's turning, for the front wheels
     if(!isFinite(c.wx)||!isFinite(c.wy)||!isFinite(c.v))c.dead=true}
+  /* v337 gridlock breaker: a dense downtown grid can lock up (every block's exit full, so nobody may enter the next box). A car that hasn't moved
+     for 75 s and is out of your sight is quietly taken away; the traffic pool puts a new one somewhere else, which frees the loop */
+  if((TRF_GLT=(typeof TRF_GLT==="number"?TRF_GLT:0)+dt)>2){TRF_GLT=0;const ch=Math.cos(car.psi),sh=Math.sin(car.psi);for(const c of cars){if(c.kind!=="ai"||!(c.idle>75)||c.wx===undefined)continue;const dx=c.wx-car.px,dy=c.wy-car.py,d=Math.hypot(dx,dy),ahead=(dx*ch+dy*sh)/Math.max(1,d);if(d>160||d>45&&ahead<0.3)c.dead=true}}
   if(cars.some(c=>c.dead))cars=cars.filter(c=>!c.dead);   // a car whose numbers went bad is quietly removed
   // keep traffic around you: cars far behind you and out of sight (or stuck for ages) are moved to a new spot you can't see
   respT-=dt;if(respT<=0){respT=1;
@@ -11365,7 +11369,8 @@ function rkBuild(drive,lot,pad){const B={P:[],N:[],I:[],C:[]},cell=new Set(),K=(
       const H=u=>city?hk[clamp(Math.round(u),0,L-1)]:1;
       let us=uSamples(e,k0,k1,4);if(city){const ex=[];for(let u=Math.ceil(k0);u<k1;u++){const a=hk[u],b=hk[Math.min(L-1,u+1)];if(a!==b||a<1&&a>0)ex.push(u,u+1)}us=[...new Set(us.concat(ex.filter(u=>u>k0&&u<k1)))].sort((a,b)=>a-b)}
       // the cross-section, outward from the edge of the roadway: [offset0, offset1, y0, y1, u0, u1, lifts with the kerb]
-      const prof=city?[[-0.45,0,0,0,0.503,0.512,0],[0,0,0,0.15,0.491,0.501,1],[0,0.15,0.15,0.15,0.491,0.501,1],[0.15,0.35+walk,0.15,0.15,0.450,0.489,1],[0.35+walk,0.65+walk,0.15,-0.5,0.515,0.573,1]]
+      const dt_=city&&(()=>{const q=ePt(e,e.L/2,sg*(Wf(e.L/2)+walk+1.5));return inCity(q[0],q[1])})();   /* downtown the plaza behind the sidewalk is paved: the walk ramps gently down to it instead of stepping off */
+      const prof=city?[[-0.45,0,0,0,0.503,0.512,0],[0,0,0,0.15,0.491,0.501,1],[0,0.15,0.15,0.15,0.491,0.501,1],[0.15,0.35+walk,0.15,0.15,0.450,0.489,1],dt_?[0.35+walk,2.35+walk,0.15,0.0,0.450,0.489,1]:[0.35+walk,0.65+walk,0.15,-0.5,0.515,0.573,1]]
         :fw?[[0,2.4,0,-0.5,0.515,0.573,0]]:[[0,1.8,0,-0.06,0.575,0.606,0],[1.8,3.3,-0.06,-0.5,0.515,0.573,0]];
       let prev=null;
       for(const u of us){if(skip(u)){prev=null;continue}const W=Wf(u),z=e.hz?ez(e,u):0,h=H(u),v=u/12,a=ePt(e,u,sg*W),b=ePt(e,u,sg*(W+1)),lx=b[0]-a[0],ly=b[1]-a[1];
@@ -11374,6 +11379,18 @@ function rkBuild(drive,lot,pad){const B={P:[],N:[],I:[],C:[]},cell=new Set(),K=(
         if(prev)row.forEach((r,i)=>{const q=prev[i];if(Math.hypot(r.P[0][2]-r.P[1][2],r.P[0][0]-r.P[1][0],r.P[0][1]-r.P[1][1])<0.004&&Math.hypot(q.P[0][2]-q.P[1][2],q.P[0][0]-q.P[1][0],q.P[0][1]-q.P[1][1])<0.004)return;
           const k=push([q.P[0],q.P[1],r.P[0],r.P[1]],[q.U[0],q.U[1],r.U[0],r.U[1]],[q.N,q.N,r.N,r.N]);if(sg>0)B.I.push(k,k+2,k+1,k+1,k+2,k+3);else B.I.push(k,k+1,k+2,k+1,k+3,k+2)});
         prev=row}}}
+  /* raised medians on divided town roads: a 15 cm kerb each side and a grass top, cut back where a turn bay is carved into the median, open at
+     U-turn gaps and junction ends, and left flat on bridges and decks */
+  for(const e of EDGES){if(!(e.T.kerb&&e.m>0)||e.T.col==="d")continue;const k0=Math.max(kerbTrim(e,0),e.tp?e.tp[0]+8:0),k1=e.L-kerbTrim(e,1);if(k1-k0<6)continue;
+    const M2=u=>mAt(e,u)/2,edge=(u,sg)=>sg*(M2(u)-(e.shL||0)-bayW(e,u,-sg)),skip=u=>e.gap&&u>e.gap[0]-1&&u<e.gap[1]+1||e.ov&&overDeck(e,u)||e.br&&Math.abs(u-e.br.uc)<e.br.half+(e.br.rp||0)||flyUp(e,u);
+    let prev=null;const us=uSamples(e,k0,k1,4);if(e.bay)for(const d of [1,-1]){const Bb=e.bay[d];if(Bb)for(let u=Math.min(Bb.t0,Bb.f0);u<=Math.max(Bb.t0,Bb.f0);u+=3)if(u>k0&&u<k1)us.push(u)}us.sort((a,b)=>a-b);
+    for(const u of us){if(skip(u)){prev=null;continue}const z=e.hz?ez(e,u):0,v=u/12,R=edge(u,1),Lf=edge(u,-1);if(R-Lf<0.7){prev=null;continue}const c=(R+Lf)/2,h=Math.min(0.15,(R-Lf)*0.1);
+      const pts=[[Lf,0],[Lf,h],[Lf+0.15,h],[c,h],[R-0.15,h],[R,h],[R,0]],uvs=[0.491,0.501,0.491,0.515,0.573,0.501,0.491];   /* face, kerb top, grass, grass, kerb top, face */
+      const row=pts.map(([t,y],i)=>{const q=ePt(e,u,t);return {P:[q[0],q[1],z+y],u:uvs[i]}});
+      if(prev){const a_=ePt(e,u,0),b_=ePt(e,u,1),lx=b_[0]-a_[0],ly=b_[1]-a_[1];for(let i=0;i<6;i++){const q0=prev[i],q1=prev[i+1],r0=row[i],r1=row[i+1];if(Math.hypot(r0.P[0]-r1.P[0],r0.P[1]-r1.P[1],r0.P[2]-r1.P[2])<0.003)continue;
+          const nx=i===0?-1:i===5?1:0,ny=i===0||i===5?0:1,N=[lx*nx,ny,-ly*nx],u0=i===0||i===5?[0.491,0.501]:i===1||i===4?[0.491,0.501]:[0.515,0.573];
+          const k=push([q0.P,q1.P,r0.P,r1.P],[[u0[0],v-(u-pu)/12],[u0[1],v-(u-pu)/12],[u0[0],v],[u0[1],v]],[N,N,N,N]);B.I.push(k,k+1,k+2,k+1,k+3,k+2)}}
+      prev=row;var pu=u}}
   SCN.rk=B.I.length?meshFrom(B.P,B.N,B.I,B.C):null;RK.n=B.I.length/3}
 
 /* v335 road kit atlas (props/road_atlas.jpg): loaded once; until it arrives (or if it can't load) the roads keep the old procedural look.
