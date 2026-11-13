@@ -11341,14 +11341,14 @@ function rkBuild(drive,lot){const B={P:[],N:[],I:[],C:[]},cell=new Set(),K=(x,y)
       const ar=(xs[1]-xs[0])*(ys[2]-ys[0])-(xs[2]-xs[0])*(ys[1]-ys[0]);if(Math.abs(ar)<1e-6)continue;
       for(let x=x0;x<=x1;x++)for(let y=y0;y<=y1;y++){const px=x+0.5,py=y+0.5,w0=((xs[1]-px)*(ys[2]-py)-(xs[2]-px)*(ys[1]-py))/ar,w1=((xs[2]-px)*(ys[0]-py)-(xs[0]-px)*(ys[2]-py))/ar,w2=1-w0-w1;if(w0>-0.15&&w1>-0.15&&w2>-0.15)cell.add(K(px,py))}}}
   const push=(pts,uv,nr)=>{const k=B.P.length/3;for(let i=0;i<pts.length;i++){B.P.push(pts[i][0],pts[i][2],-pts[i][1]);B.N.push(nr[i][0],nr[i][1],nr[i][2]);B.C.push(uv[i][0],uv[i][1],0)}return k};
-  for(const e of EDGES){e.rkH=null;if(e.n<1||e.T.col==="d"||e.T.dirt)continue;const city=!!e.T.kerb,fw=!!e.T.rumble,rural=!city&&!fw&&e.T.col==="h";if(!city&&!fw&&!rural)continue;
+  for(const e of EDGES){e.rkH=null;if(e.n<1||e.T.col==="d"||e.T.dirt)continue;const city=!!e.T.kerb,fw=!!e.T.rumble,rural=!city&&!fw&&e.T.col==="h"&&e.type!=="ramp"&&!/sd|svc|service/.test(e.type);if(!city&&!fw&&!rural)continue;
     const k0=city?kerbTrim(e,0):Math.max(0,e.p0),k1=city?e.L-kerbTrim(e,1):e.L-e.p1;if(k1-k0<4)continue;
     const Wf=u=>mAt(e,u)/2+e.n*LANE+e.side,walk=e.T.walk||0,skip=u=>e.gap&&u>e.gap[0]-0.5&&u<e.gap[1]+0.5||e.ov&&overDeck(e,u)||e.br&&Math.abs(u-e.br.uc)<e.br.half+(e.br.rp||0)||flyUp(e,u);
     if(city)e.rkH=[new Float32Array(Math.ceil(e.L)+2),new Float32Array(Math.ceil(e.L)+2)];
     for(const sg of [1,-1]){
       // where the kerb is dropped: driveways and lot entrances crossing the sidewalk, and kerb ramps at both ends
       const L=Math.ceil(e.L)+2,hk=new Float32Array(L);
-      if(city){for(let u=0;u<L;u++){if(u<k0||u>k1){hk[u]=0;continue}const q=ePt(e,Math.min(u,e.L),sg*(Wf(Math.min(u,e.L))+0.35+Math.max(0.6,walk*0.5)));hk[u]=cell.has(K(q[0],q[1]))?0:1}
+      if(city){for(let u=0;u<L;u++){if(u<k0||u>k1){hk[u]=0;continue}const q=ePt(e,Math.min(u,e.L),sg*(Wf(Math.min(u,e.L))+0.35+Math.max(0.6,walk*0.5)));let cut=cell.has(K(q[0],q[1]));if(!cut){const g_=groundAt(q[0],q[1]);cut=!!g_&&(g_.kind==="road"||g_.kind==="lot"||g_.kind==="pad")}hk[u]=cut?0:1}
         const h2=Float32Array.from(hk);for(let u=0;u<L;u++)if(hk[u]===0)for(let d=-1;d<=1;d++){const v=u+d;if(v>=0&&v<L)h2[v]=0}   /* a dropped kerb is a little wider than the driveway */
         for(let u=0;u<L;u++){if(h2[u]>0){let m=1;for(let d=1;d<=2;d++){if(u-d>=0&&h2[u-d]===0)m=Math.min(m,d/2.5);if(u+d<L&&h2[u+d]===0)m=Math.min(m,d/2.5)}hk[u]=m}else hk[u]=0}   /* the 1:8 ramp each side */
         e.rkH[sg>0?0:1]=hk}
@@ -11375,8 +11375,8 @@ function rkTex(){if(RK.ok){gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTU
       try{const ext=gl.getExtension("EXT_texture_filter_anisotropic");if(ext)gl.texParameterf(gl.TEXTURE_2D,ext.TEXTURE_MAX_ANISOTROPY_EXT,Math.min(8,gl.getParameter(ext.MAX_TEXTURE_MAX_ANISOTROPY_EXT)))}catch(e){}RK.tex=t;RK.ok=true}catch(e){console.error(e)}};
   im.onerror=()=>{if(tried++||/github\.io$/.test(location.hostname))return;im.src="https://cdn.jsdelivr.net/gh/Exclusive2knight/Strata-Test-Drive@/*ASSET_REF*/main/props/road_atlas.jpg"};im.src="props/road_atlas.jpg?v="+BUILD_VER;return false}
 function stripInto(B,e,t0,t1,y,u0,u1){if(u1-u0<0.05)return;if(e.gap&&u1>e.gap[0]&&u0<e.gap[1]){stripInto(B,e,t0,t1,y,u0,Math.min(u1,e.gap[0]));stripInto(B,e,t0,t1,y,Math.max(u0,e.gap[1]),u1);return}const us=uSamples(e,u0,u1,e.tp||e.hz?4:3);let k=B.P.length/3;const T0=typeof t0==="function"?t0:()=>t0,T1=typeof t1==="function"?t1:()=>t1;
-  us.forEach((u,q)=>{const a=ePt(e,u,T0(u)),b=ePt(e,u,T1(u)),yy=y+(e.hz?ez(e,u):0);B.P.push(a[0],yy,-a[1],b[0],yy,-b[1]);B.N.push(0,1,0,0,1,0);if(B.C){const z=B.kind!==undefined?B.kind*10000+200:RKE?RKE(u):200,v=u/12;B.C.push(T0(u),v,z,T1(u),v,z)}if(q>0)B.I.push(k-2,k-1,k,k-1,k+1,k);k+=2})}
-let RKE=null;   /* road kit: the current edge's texture code (kind, lanes, half median) for stripInto */
+  us.forEach((u,q)=>{const a=ePt(e,u,T0(u)),b=ePt(e,u,T1(u)),yy=y+(e.hz?ez(e,u):0);const yo=B.C&&B.kind===undefined?RKY:0;B.P.push(a[0],yy+yo,-a[1],b[0],yy+yo,-b[1]);B.N.push(0,1,0,0,1,0);if(B.C){const z=B.kind!==undefined?B.kind*10000+200:RKE?RKE(u):200,v=u/12;B.C.push(T0(u),v,z,T1(u),v,z)}if(q>0)B.I.push(k-2,k-1,k,k-1,k+1,k);k+=2})}
+let RKE=null,RKY=0;   /* road kit: the current edge's texture code (kind, lanes, half median) for stripInto */
 function dashInto(B,e,t,w,y,u0,u1,per,on){for(let u=u0+((-u0%per)+per)%per;u<u1;u+=per)stripInto(B,e,t-w/2,t+w/2,y,u,Math.min(u+on,u1))}
 function discInto(B,x,y,r,yy,seg=28){const k=B.P.length/3;B.P.push(x,yy,-y);B.N.push(0,1,0);if(B.C)B.C.push(x,y/12,(B.jk||4)*10000+200);for(let i=0;i<=seg;i++){const a=i/seg*Math.PI*2,px=x+Math.cos(a)*r,py=y+Math.sin(a)*r;B.P.push(px,yy,-py);B.N.push(0,1,0);if(B.C)B.C.push(px,py/12,(B.jk||4)*10000+200);if(i>0)B.I.push(k,k+i,k+i+1)}}
 function quadInto(B,x,y,h,len,w,yy){const c=Math.cos(h),s=Math.sin(h),k=B.P.length/3;for(const [a,b] of [[-1,-1],[1,-1],[1,1],[-1,1]]){const px=x+c*a*len/2-s*b*w/2,py=y+s*a*len/2+c*b*w/2;B.P.push(px,yy,-py);B.N.push(0,1,0);if(B.C)B.C.push(px,py/12,(B.jk||4)*10000+200)}B.I.push(k,k+1,k+2,k,k+2,k+3)}
@@ -11532,7 +11532,7 @@ function buildWorld(){retailSites();placeExtras();
   for(const e of EDGES){const R=road[e.T.col],u0=e.p0,u1=e.L-e.p1,nL=e.n*LANE,sd=e.side,tp=!!e.tp;
     const m2=tp?(u=>mAt(e,u)/2):e.m/2,F=f=>tp?f:f(0),M2=u=>tp?m2(u):m2;   // sideways positions follow the median where it tapers
     const mu0=tp?e.tp[0]+8:0;   // where a tapering median is wide enough for kerbs and grass
-    RKE=u=>(e.T.col==="c"?1:e.type==="xway"?2:3)*10000+Math.min(9,e.n)*1000+Math.round((clamp(M2(u),-19.9,79)+20)*10);
+    RKY={xway:0.006,blvd:0.0045,ave:0.003,art:0.003,ramp:0}[e.type]??0.0015;RKE=u=>(e.T.col==="c"?1:e.type==="xway"?2:3)*10000+Math.min(9,e.n)*1000+Math.round((clamp(M2(u),-19.9,79)+20)*10);
     if(e.m>0){stripInto(R,e,F(u=>M2(u)-e.shL),F(u=>M2(u)+nL+sd),0,u0,u1);stripInto(R,e,F(u=>-M2(u)-nL-sd),F(u=>-(M2(u)-e.shL)),0,u0,u1);
       if(tp)stripInto(R,e,u=>-Math.max(0,M2(u)-e.shL),u=>Math.max(0,M2(u)-e.shL),0,u0,mu0);
       if(e.br||e.ov){const b0=e.br?e.br.uc-e.br.half-e.br.rp*0.75:e.ov.uc-e.ov.half-e.ov.rA*0.75,b1=e.br?e.br.uc+e.br.half+e.br.rp*0.75:e.ov.uc+e.ov.half+e.ov.rB*0.75;stripInto(green,e,-(e.m/2-e.shL-0.3),e.m/2-e.shL-0.3,-0.02,mu0,b0);stripInto(green,e,-(e.m/2-e.shL-0.3),e.m/2-e.shL-0.3,-0.02,b1,e.L);stripInto(walk,e,-(e.m/2-e.shL),e.m/2-e.shL,0.004,b0,b1)}
@@ -11573,8 +11573,8 @@ function buildWorld(){retailSites();placeExtras();
     if(tp)stripInto(yellow,e,0.08,0.2,0.012,l0,e.tp[0]),stripInto(yellow,e,-0.08,-0.2,0.012,l0,e.tp[0])}
   // junctions: paved box, stop lines, crosswalks downtown and in the subdivisions
   for(const n of NODES){const col=n.legs.some(l=>l.e.T.col==="h")&&!n.legs.some(l=>l.e.T.col==="c")?"h":"c";
-    if(n.pr)discInto(road[col],n.x,n.y,n.pr,n.z+(W2?0.006:0));
-    if(n.xo){quadInto(road.h,n.x,n.y,n.xo.h,n.xo.len,n.xo.w,n.z)}
+    if(n.pr)discInto(road[col],n.x,n.y,n.pr,n.z+0.008);
+    if(n.xo){quadInto(road.h,n.x,n.y,n.xo.h,n.xo.len,n.xo.w,n.z+0.008)}
     if(n.kind!=="x"||n.ctrl==="merge")continue;
     for(const l of n.legs){if(l.r<=0)continue;const e=l.e,dir=l.end===1?1:-1,L=e.L,m2=mAt(e,l.end===0?0:e.L)/2,W=m2+e.n*LANE;
       const uAt=d=>dir>0?L-d:d;   // distance d from the node along this leg
@@ -11583,7 +11583,7 @@ function buildWorld(){retailSites();placeExtras();
       if(l.ltl||l.bay){const hi=loOf(e.n)+e.n-(l.bay?0:1);for(const d of [7,24]){const p=fpt(e,dir,e.L-l.r-d,hi*LANE),z=(e.hz?ez(e,uAt(l.r+d)):0)+0.014,c_=Math.cos(p[2]),s_=Math.sin(p[2]),G=(f,lt)=>[p[0]+c_*f-s_*lt,p[1]+s_*f+c_*lt];   // white turn arrow, curving left
           for(const P of [[[0,-0.15],[2.9,-0.15],[2.9,0.15],[0,0.15]],[[2.55,0.15],[2.9,0.15],[2.9,0.85],[2.55,0.85]],[[2.25,0.85],[3.2,0.85],[2.72,1.55]]]){const k=stopL.P.length/3;for(const [f,lt] of P){const w=G(f,lt);stopL.P.push(w[0],z,-w[1]);stopL.N.push(0,1,0)}for(let i=1;i<P.length-1;i++)stopL.I.push(k,k+i+1,k+i,k,k+i,k+i+1)}}}
       if(n.ctrl!=="minor"&&e.T.z==="c"&&!e.T.rumble)for(let t=-W+0.5;t<W-0.3;t+=1.2){if(e.m>0&&Math.abs(t)<m2)continue;stripInto(zebra,e,t,t+0.6,0.011,Math.min(uAt(l.r-0.4),uAt(l.r-3.4)),Math.max(uAt(l.r-0.4),uAt(l.r-3.4)))}}}
-  RKE=null;SCN.roadZ=[["c",mfC(road.c)],["h",mfC(road.h)],["d",mf(road.d)]];SCN.wear=[["c",mf(wear.c)],["h",mf(wear.h)],["d",mf(wear.d)]];SCN.lines=[mf(white)];SCN.ylines=mf(yellow);SCN.kerbs=[mf(kerb)];SCN.walk=mfC(walk);
+  RKE=null;RKY=0;SCN.roadZ=[["c",mfC(road.c)],["h",mfC(road.h)],["d",mf(road.d)]];SCN.wear=[["c",mf(wear.c)],["h",mf(wear.h)],["d",mf(wear.d)]];SCN.lines=[mf(white)];SCN.ylines=mf(yellow);SCN.kerbs=[mf(kerb)];SCN.walk=mfC(walk);
   SCN.rumble=[mf(rumble)];SCN.bikeL=mf(bikeL);SCN.zebraB=zebra;SCN.stopLB=stopL;SCN.greenB=green;
   SCN.ground=terrainMesh();try{SCN.groundFar=terrainFar()}catch(e){console.error(e)}SCN.bumps=bumpMesh();SCN.tc=tcMesh();if(!W2||W2C.orp){try{orBuild()}catch(e){console.error(e)}setTimeout(()=>{try{SCN.or=orMesh()}catch(e){console.error(e)}},2500)}   // v173: the off-road park mesh builds after the game is up (faster loading)
   worldScenery();
