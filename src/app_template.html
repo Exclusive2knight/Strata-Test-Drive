@@ -2780,12 +2780,14 @@ function buildNet2(){
   // With the two loops that stay (I-61 north to I-38 west, I-61 south to I-38 east) the ramps wind over and under each other like a pretzel
   for(const sgn of [1,-1]){const Q=(x,y,r)=>{const p=[Math.round((ccx+sgn*x)*100)/100,Math.round((ccy+sgn*y)*100)/100];if(r)p.push(r);return p},H=CLD.FH;
     E("ramp",sgn>0?"I-38 E to I-61 N":"I-38 W to I-61 S",[Q(-CLD.dF,0),Q(-CLD.dF+80,-20.6),Q(-CLD.dF+150,-23.75,120),Q(-CLD.dF+220,-32,120),Q(34,-32,150),Q(34,CLD.dJ-60,80),Q(40,CLD.dJ)],
-      {zo:function(u){const up=(a,b)=>0.5*smooth01(a,b,u)+0.5*clamp((u-a)/(b-a),0,1);return H*up(205,CLD.dF-35)*(1-up(760,this.L-25))},fly:1,rank:1})}   /* climbs about 6% once clear of the deceleration lane, holds 16 m over both freeways and the loop ramp, about 5% down to the ramp junction (where it gives way) */
+      {zo:function(u){const up=(a,b)=>0.5*smooth01(a,b,u)+0.5*clamp((u-a)/(b-a),0,1);return H*up(225,CLD.dF-25)*(1-up(760,this.L-25))},fly:1,rank:1})}   /* climbs about 6% once clear of the deceleration lane, holds 16 m over both freeways and the loop ramp, about 5% down to the ramp junction (where it gives way) */
   // level 4: the I-61 left turns (I-61 north to I-38 west, I-61 south to I-38 east), 23 m up: the same shape turned a quarter round, crossing over the level-3 flyovers
   // where they curve across the middle; about 6% up off I-61 and 6% down to the ramp junction with the right turn heading the same way
   for(const sgn of [1,-1]){const Q=(x,y,r)=>{const p=[Math.round((ccx-sgn*y)*100)/100,Math.round((ccy+sgn*x)*100)/100];if(r)p.push(r);return p},H=CLD.FH2;
-    E("ramp",sgn>0?"I-61 N to I-38 W":"I-61 S to I-38 E",[Q(-CLD.dF,0),Q(-CLD.dF+80,-20.6),Q(-CLD.dF+150,-23.75,120),Q(-CLD.dF+220,-32,120),Q(34,-32,150),Q(34,CLD.dJ2-60,80),Q(40,CLD.dJ2)],
-      {zo:function(u){const up=(a,b)=>0.25*smooth01(a,b,u)+0.75*clamp((u-a)/(b-a),0,1);return H*up(100,500)*(1-up(650,this.L-20))},fly:1,rank:1})}
+    /* v338: it peels away from I-61 more quickly and only starts to climb once it is clear of the freeway's shoulder (it used to rise 100 m into the
+       deceleration lane, so the bridge deck sat on top of I-61's pavement) */
+    E("ramp",sgn>0?"I-61 N to I-38 W":"I-61 S to I-38 E",[Q(-CLD.dF,0),Q(-CLD.dF+80,-20.6),Q(-CLD.dF+130,-23.75,100),Q(-CLD.dF+180,-35,100),Q(34,-35,150),Q(34,CLD.dJ2-60,80),Q(40,CLD.dJ2)],
+      {zo:function(u){const up=(a,b)=>0.25*smooth01(a,b,u)+0.75*clamp((u-a)/(b-a),0,1);return H*up(190,540)*(1-up(650,this.L-20))},fly:1,rank:1})}
   // ---- I-138, the airport spur, and a trumpet interchange where it ends at I-38 (v332). I-38 runs east-west here along its south leg; I-138 comes up from the south.
   // One bridge carries I-138 over I-38. North of it the "bell": a loop ramp (about 70 m radius, 25 mph) for traffic off westbound I-38 heading south, and a directional ramp
   // wrapping round outside the loop for I-138 north onto westbound I-38. South of I-38 the two right turns are plain directional ramps. Merges and exits have the usual
@@ -3028,6 +3030,7 @@ function auxBuild(n){for(const l of n.legs){if(l.major)continue;const e=l.e;
     /* v338: the gore. Past the merge point the ramp pulls away from the freeway at a slant; the thin wedge between the two used to be a sliver of grass
        running right up to the nose. Real gores are paved and painted until they are a few metres wide, so the freeway's shoulder pavement follows the ramp out */
     if(o.e.type==="xway"||o.e.type==="ramp"){const G=[];let gs=0;for(let d=l.r;d<=Math.min(e.L,l.r+160);d+=2){const q=eAt(e,l.end===0?d:e.L-d),pp=eProj(o.e,q.x,q.y);if(pp.u<0||pp.u>o.e.L)continue;
+        if(e.fly&&ez(e,l.end===0?d:e.L-d)-(o.e.hz?ez(o.e,pp.u):0)>0.6)break;   /* a flyover lifting off: no paved gore under its deck */
         const gap=Math.abs(pp.t)-(LANE/2+e.side)-(o.e.m/2+o.e.n*LANE+o.e.side);
         if(gap>4.5){if(G.length>=2){const [ua,wa]=G[G.length-1],dir_=Math.sign(ua-G[G.length-2][0])||1;for(let k=1;k<=4;k++)G.push([ua+dir_*k*wa*0.9,wa*(1-k/4)])}break}   /* the grass gore begins in a point, not a square edge */
         if(gap>0){gs=Math.sign(pp.t);G.push([pp.u,gap+0.5])}}
