@@ -14767,7 +14767,7 @@ function drawScreen0(dt){
   if(SCR.cam==="front"&&SCR.autoCam){SCR.frontT=(SCR.frontT||0)-dt;if(SCR.frontT<=0||Math.abs(car.vx)>6.7||st.gear!=="D"){SCR.autoCam=false;SCR.cam="rear";SCR.page=SCR.prevPage||"map"}}
   // the reverse camera and park assist take over from CarPlay / Android Auto, like the real cars; the phone screen comes back afterwards
   if(SCR.proj&&st.phoneConn&&projKind()&&!(SCR.page==="camera"&&(SCR.autoCam||st.gear==="R"))&&SCR.page!=="park"&&!sys.pa){projDraw(g,W,H);gl.bindTexture(gl.TEXTURE_2D,SCR.tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,SCR.cv);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);return}
-  SCR.rcOn=false;if(SCR.page==="camera"&&!sys.pa){let ok=false;try{ok=rcDraw(g,W,H)}catch(e){console.error(e)}if(ok){gl.bindTexture(gl.TEXTURE_2D,SCR.tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,SCR.cv);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);return}}
+  SCR.rcOn=false;if(SCR.page==="camera"){let ok=false;try{ok=rcDraw(g,W,H)}catch(e){console.error(e)}if(ok){gl.bindTexture(gl.TEXTURE_2D,SCR.tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,SCR.cv);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);return}}
   SCR.split=isSync()||(!isTesla()&&hasFrontCam());if(SCR.cam==="top"||(SCR.cam==="side"&&(!SCR.split||!has360())))SCR.cam=st.gear==="R"||!hasFrontCam()?"rear":"front";   // before the brand screens too, so their camera pages get the right views
   if(tslLeg()){legScreen(g,W,H,M);gl.bindTexture(gl.TEXTURE_2D,SCR.tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,SCR.cv);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);return}
   if(isRav19()&&!isTesla()){rav19Screen(g,W,H,M);gl.bindTexture(gl.TEXTURE_2D,SCR.tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,SCR.cv);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);return}
@@ -14922,7 +14922,7 @@ function rcProj(kind,p,x0,y0,w,h,mirror){const M=SCR[kind+"VP"],cm_=SCR[kind+"Cm
    L.d = cross lines at set distances, L.c = centre line; d0/d1 in metres from the bumper */
 function rcLines(g,kind,x0,y0,w,h,mirror,L,fr){if(!L||st.noGuides)return;g.save();g.beginPath();g.rect(x0,y0,w,h);g.clip();g.lineCap="round";g.lineJoin="round";
   const hw=(VEH.width||1.9)/2+(L.pad||0.05),tz=fr?(VEH.head?VEH.head[2]-0.2:-2.4):(VEH.tail?VEH.tail[2]:2.4),R=Math.abs(car.dF)>0.01?WB/Math.tan(car.dF):1e9,sgn=fr?-1:1;
-  const P=(lat,d,bend)=>{const off=bend?d*d/(2*R)*(fr?-1:1):0;return rcProj(kind,[lat-off,0.03,tz+sgn*d],x0,y0,w,h,mirror)};
+  const P=(lat,d,bend)=>{const off=bend?d*d/(2*R):0;return rcProj(kind,[lat-off,0.03,tz+sgn*d],x0,y0,w,h,mirror)};
   /* real overlays are drawn in perspective: thick close to the car, thin far away, with a dark edge so they read on bright ground */
   const hz=(()=>{const q=P(0,80,false);return q?q[1]:y0})(),yb=y0+h,k=y=>clamp((y-hz)/Math.max(20,yb-hz),0.12,1.25),base=L.lw||3;
   const seg=(a,b,col,lw)=>{const m=(k(a[1])+k(b[1]))/2,wd=lw*(0.3+0.85*m);g.strokeStyle="rgba(0,0,0,.42)";g.lineWidth=wd+2.2;g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(b[0],b[1]);g.stroke();
@@ -14961,7 +14961,11 @@ function rcDraw(g,W,H){const id=rcStyleId(),S=id&&RC_STYLES[id];if(!S)return fal
   // the render pass reads these: which camera to draw, and whether the top view is needed too
   SCR.cam=RC.view==="rearW"?"rearW":RC.view==="frontW"?"frontW":RC.view;SCR.split=(S.lay!=="full"||RC.view==="side")&&has360();SCR.rcOn=true;
   const ctx={S,W,H,views,boot:(performance.now()-RC.t0)/1000,set:v=>{RC.view=v;SCR.cam=v;SCR.camX=false},near:rcNear(),mirror:RC.view==="rear"||RC.view==="rearW"};
-  S.ui(g,ctx);return true}
+  S.ui(g,ctx);
+  if(sys.pa){try{const P_=pkSys(),dd=pkDriverDo(),tx=(P_?P_.name:"Park Assist")+" · "+(dd||sys.pa.msg||"Parking");g.font="600 13px Arial,sans-serif";const tw=Math.min(W-130,g.measureText(tx).width+28);
+    g.fillStyle="rgba(0,0,0,.72)";rr2(g,W/2-tw/2-46,8,tw+92,34,17);g.fill();g.fillStyle="#fff";g.textAlign="center";g.fillText(tx,W/2-24,30,tw-10);
+    g.fillStyle="#e5484d";rr2(g,W/2+tw/2-20,12,62,26,13);g.fill();g.fillStyle="#fff";g.font="700 12px Arial,sans-serif";g.fillText("Cancel",W/2+tw/2+11,29);hit(W/2+tw/2-20,12,62,26,()=>paStop((P_?P_.name:"Park assist")+" cancelled"))}catch(e){}}
+  return true}
 /* a standard picture-plus-top-view arrangement most brands use, with the brand's own sizes; returns the boxes */
 function rcLayout(g,ctx,x,y,w,h,o){const S=ctx.S,v=RC.view,top=SCR.split&&has360()&&v!=="side",tw=top?Math.round(w*(o.topW||0.34)):0,gap=o.gap||0;
   const tx=o.topRight?x+w-tw:x,cx=o.topRight?x:x+tw+gap,cw=w-tw-(top?gap:0);
@@ -14977,7 +14981,7 @@ function rcLayout(g,ctx,x,y,w,h,o){const S=ctx.S,v=RC.view,top=SCR.split&&has360
 function rcTopPath(g,x0,y0,w,h,L,src){const M=SCR.topVP,cm_=SCR.topCm;if(!M)return;const sx=src[0]/480,sw=src[2]/480;
   const pr=p=>{const q=M4.p(cm_,p);const X=M[0]*q[0]+M[4]*q[1]+M[8]*q[2]+M[12],Y=M[1]*q[0]+M[5]*q[1]+M[9]*q[2]+M[13],Wq=M[3]*q[0]+M[7]*q[1]+M[11]*q[2]+M[15];const u=((X/Wq+1)/2-sx)/sw,v=(1-Y/Wq)/2;return [x0+u*w,y0+v*h]};
   const hw=(VEH.width||1.9)/2+0.05,rev=st.gear==="R",tz=rev?(VEH.tail?VEH.tail[2]:2.4):(VEH.head?VEH.head[2]:-2.4),R=Math.abs(car.dF)>0.01?WB/Math.tan(car.dF):1e9,sg=rev?1:-1;
-  g.save();g.beginPath();g.rect(x0,y0,w,h);g.clip();g.lineWidth=L.lw||2.5;for(const [d0,d1,col] of L.p||[])for(const s of [-1,1]){g.strokeStyle=col;g.beginPath();let on=false;for(let d=d0;d<=d1;d+=0.2){const off=d*d/(2*R)*(rev?1:-1),q=pr([s*hw-off,0.05,tz+sg*d]);on?g.lineTo(q[0],q[1]):g.moveTo(q[0],q[1]);on=true}g.stroke()}g.restore()}
+  g.save();g.beginPath();g.rect(x0,y0,w,h);g.clip();g.lineWidth=L.lw||2.5;for(const [d0,d1,col] of L.p||[])for(const s of [-1,1]){g.strokeStyle=col;g.beginPath();let on=false;for(let d=d0;d<=d1;d+=0.2){const off=d*d/(2*R),q=pr([s*hw-off,0.05,tz+sg*d]);on?g.lineTo(q[0],q[1]):g.moveTo(q[0],q[1]);on=true}g.stroke()}g.restore()}
 // ---- Toyota / Lexus / Mazda
 /* small icons drawn in code (original, generic shapes) */
 function rcIcon(g,k,x,y,s,col){g.save();g.strokeStyle=col;g.fillStyle=col;g.lineWidth=Math.max(1.5,s*0.09);g.lineJoin="round";const r=s/2;
