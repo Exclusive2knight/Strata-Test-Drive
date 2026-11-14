@@ -13984,7 +13984,7 @@ function lotApp(){const sub=["scratch","mega"].includes(PHONE.sub)?PHONE.sub:"sc
   else{const mine=LOT.tix.filter(t=>t.d>=(GT.day||1));h+=`<div class="card"><b>Jackpot ${money(LOT.jack)}</b><small>Pick 5 of 1–40 plus a Mega ball 1–15. Drawn every night at 11 PM. $2 a ticket.</small><button class="big" data-a="lotM">Quick pick · $2</button><button class="big" data-a="lotM5">5 quick picks · $10</button></div>`;
     h+=`<div class="card"><b>Your tickets tonight (${mine.length})</b><small>${mine.slice(-6).map(t=>`${t.n.join(" ")} · ${t.m}`).join("<br>")||"None yet"}</small></div>`;if(LOT.res)h+=`<div class="card"><b>Last draw (day ${LOT.res.day})</b><small>${LOT.res.nums.join(" ")} · Mega ${LOT.res.mb}<br>${LOT.res.total?`You won ${money(LOT.res.total)}`:"No win"}</small></div>`}
   h+=`<p class="fine">Spent ${money(LOT.spent)} · won ${money(LOT.won)}. Play for fun: the odds are like the real thing.</p>`;return h}
-function drawScreen(dt){drawScreen0(dt);try{if(!sys.parkOn||st.power!==true||!sys.pdc||isTesla()||dogShow())return;if(isJLR()&&SCR.page==="camera")return;if(isAudiNew()&&SCR.page!=="camera")return;const g=SCR.g,W=SCR.W,H=SCR.H,cam=SCR.page==="camera",port=H>W;
+function drawScreen(dt){drawScreen0(dt);try{if(!sys.parkOn||st.power!==true||!sys.pdc||isTesla()||dogShow())return;if(isJLR()&&SCR.page==="camera")return;if(SCR.rcOn)return;if(isAudiNew()&&SCR.page!=="camera")return;const g=SCR.g,W=SCR.W,H=SCR.H,cam=SCR.page==="camera",port=H>W;
   const key=pdcStyleOf(),Z=SCR.dz||{x0:0,x1:W,y0:0,y1:H},zw=Z.x1-Z.x0,zh=Z.y1-Z.y0;SCR.dz=null;
   const w=key?(port?Math.min(170,zw*0.36):Math.min(cam?124:176,zw*(cam?0.19:0.27))):(port?Math.min(130,W*0.26):Math.min(118,W*0.14)),h=key?(port?Math.min(250,zh*0.34):zh*(cam?0.52:0.72)):(port?Math.min(170,H*0.22):H*0.4),x=cam?Z.x0+10:Z.x1-w-10,y=Z.y0+(cam?zh*0.14:port?zh*0.3:zh*0.13);g.save();g.setTransform(SS,0,0,SS,0,0);pdcView(g,x,y,w,h,key);g.restore();
   gl.bindTexture(gl.TEXTURE_2D,SCR.tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,SCR.cv);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false)}catch(e){}}
@@ -14760,6 +14760,7 @@ function drawScreen0(dt){
   if(SCR.cam==="front"&&SCR.autoCam){SCR.frontT=(SCR.frontT||0)-dt;if(SCR.frontT<=0||Math.abs(car.vx)>6.7||st.gear!=="D"){SCR.autoCam=false;SCR.cam="rear";SCR.page=SCR.prevPage||"map"}}
   // the reverse camera and park assist take over from CarPlay / Android Auto, like the real cars; the phone screen comes back afterwards
   if(SCR.proj&&st.phoneConn&&projKind()&&!(SCR.page==="camera"&&(SCR.autoCam||st.gear==="R"))&&SCR.page!=="park"&&!sys.pa){projDraw(g,W,H);gl.bindTexture(gl.TEXTURE_2D,SCR.tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,SCR.cv);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);return}
+  SCR.rcOn=false;if(SCR.page==="camera"&&!sys.pa){let ok=false;try{ok=rcDraw(g,W,H)}catch(e){console.error(e)}if(ok){gl.bindTexture(gl.TEXTURE_2D,SCR.tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,SCR.cv);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);return}}
   SCR.split=isSync()||(!isTesla()&&hasFrontCam());if(SCR.cam==="top"||(SCR.cam==="side"&&(!SCR.split||!has360())))SCR.cam=st.gear==="R"||!hasFrontCam()?"rear":"front";   // before the brand screens too, so their camera pages get the right views
   if(tslLeg()){legScreen(g,W,H,M);gl.bindTexture(gl.TEXTURE_2D,SCR.tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,SCR.cv);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);return}
   if(isRav19()&&!isTesla()){rav19Screen(g,W,H,M);gl.bindTexture(gl.TEXTURE_2D,SCR.tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,SCR.cv);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);return}
@@ -14891,6 +14892,145 @@ function scrLimit(g,x,y){if(!sys.limit)return;g.fillStyle="#f4f4f0";rr2(g,x,y,58
   g.fillStyle="#111";g.textAlign="center";g.font=FONT(10);g.fillText("SPEED",x+29,y+17);g.fillText("LIMIT",x+29,y+28);g.font=FONT(26);g.fillText(sys.limit,x+29,y+52);
   if(sys.over){g.strokeStyle="#ffb340";g.lineWidth=4;rr2(g,x-3,y-3,64,80,9);g.stroke()}}
 // ---- Camera: rear-view camera with guidelines, or a 360° top view, plus the parking sensor zones
+// ======================================================================= v340 manufacturer camera screens. Each brand / infotainment generation gets its
+// own layout (where the camera picture sits, the top view, the view buttons, guide-line colours and distances, sensor graphics, wording), drawn over the
+// game's live cameras (real renders from the car's own camera positions). Specs come from the owner's manuals; see docs/cameras/ for sources and what
+// is unverified. A spec: {lay:"full"|"topL"|"topR", topW, lines:{w:[[d0,d1,col]],p:[[d0,d1,col]],d:[[dist,col]],c:col,lw,dyn}, views, ui(g,ctx)}
+const RC={on:false,t0:0,id:null,view:"rear",last:null};
+const RC_STYLES={};
+function rcYear(T){const m=/·\s*(\d{4})/.exec(T.group||"");return m?+m[1]:2026}
+function rcBrand(T){const g=(T.group||T.name||"");return /^Land Rover/.test(g)?"Land Rover":/^Mercedes-Maybach/.test(g)?"Mercedes-Benz":g.split(" ")[0]}
+/* which screen a car gets: brand + infotainment generation (by model year; a few models by name) */
+function rcStyleId(){const T=TRIMS[st.trim];if(!T||!T.real)return null;const b=rcBrand(T),y=rcYear(T);const f=RC_MAP[b];return f?f(T,y):null}
+const RC_MAP={};
+/* views this car really has */
+function rcViews(S){const v=["rear"];const f=hasFrontCam(),s=has360();if(S.wide)v.push("rearW");if(s)v.push("side");if(f)v.push("front");if(f&&S.wide)v.push("frontW");return v}
+/* the camera image: the off-screen render, the right way up (the rear camera is a mirror image, like every real one) */
+function rcFeed(g,cv,x,y,w,h,mirror,src){const s=src||[0,0,480,288];g.save();g.beginPath();g.rect(x,y,w,h);g.clip();
+  if(mirror){g.translate(x+w,y+h);g.scale(-w/s[2],-h/s[3])}else{g.translate(x,y+h);g.scale(w/s[2],-h/s[3])}g.drawImage(cv,s[0],288-s[1]-s[3],s[2],s[3],0,0,s[2],s[3]);g.restore()}
+/* a point near the car (car frame: x right, y up, z back) on the screen of a camera that was rendered with a stored view matrix */
+function rcProj(kind,p,x0,y0,w,h,mirror){const M=SCR[kind+"VP"],cm_=SCR[kind+"Cm"];if(!M)return null;const q=cm_?M4.p(cm_,p):p;
+  const X=M[0]*q[0]+M[4]*q[1]+M[8]*q[2]+M[12],Y=M[1]*q[0]+M[5]*q[1]+M[9]*q[2]+M[13],Wq=M[3]*q[0]+M[7]*q[1]+M[11]*q[2]+M[15];if(Wq<0.05)return null;let u=(X/Wq+1)/2,v=(1-Y/Wq)/2;if(mirror)u=1-u;return [x0+u*w,y0+v*h]}
+/* guide lines on the ground behind (or ahead of) the car: L.w = static vehicle-width lines, L.p = projected path that bends with the wheel,
+   L.d = cross lines at set distances, L.c = centre line; d0/d1 in metres from the bumper */
+function rcLines(g,kind,x0,y0,w,h,mirror,L,fr){if(!L||st.noGuides)return;g.save();g.beginPath();g.rect(x0,y0,w,h);g.clip();g.lineCap="round";g.lineJoin="round";
+  const hw=(VEH.width||1.9)/2+(L.pad||0.05),tz=fr?(VEH.head?VEH.head[2]-0.2:-2.4):(VEH.tail?VEH.tail[2]:2.4),R=Math.abs(car.dF)>0.01?WB/Math.tan(car.dF):1e9,sgn=fr?-1:1;
+  const P=(lat,d,bend)=>{const off=bend?d*d/(2*R)*(fr?-1:1):0;return rcProj(kind,[lat-off,0.03,tz+sgn*d],x0,y0,w,h,mirror)};
+  const run=(lat,d0,d1,bend,col,lw,dash)=>{g.strokeStyle=col;g.lineWidth=lw;if(dash)g.setLineDash(dash);g.beginPath();let on=false;for(let d=d0;d<=d1+1e-6;d+=0.2){const q=P(lat,d,bend);if(!q){on=false;continue}on?g.lineTo(q[0],q[1]):g.moveTo(q[0],q[1]);on=true}g.stroke();g.setLineDash([])};
+  const cross=(d,col,lw,bend,frac)=>{const a=P(-hw,d,bend),b=P(hw,d,bend);if(!a||!b)return;g.strokeStyle=col;g.lineWidth=lw;g.beginPath();if(frac){const f=frac;g.moveTo(a[0],a[1]);g.lineTo(a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f);g.moveTo(b[0],b[1]);g.lineTo(b[0]+(a[0]-b[0])*f,b[1]+(a[1]-b[1])*f)}else{g.moveTo(a[0],a[1]);g.lineTo(b[0],b[1])}g.stroke()};
+  const lw=L.lw||3;if(L.sh){g.shadowColor="rgba(0,0,0,.55)";g.shadowBlur=3}
+  for(const [d0,d1,col] of L.w||[])for(const s of [-1,1])run(s*hw,d0,d1,false,col,lw,L.wDash);
+  if(L.wTicks)for(const [d0,d1,col] of L.w||[])cross(d1,col,lw,false,0.18);
+  const bend=Math.abs(car.vx)<6.7;if(L.p&&(L.dyn!==false))for(const [d0,d1,col] of L.p)for(const s of [-1,1])run(s*(hw+(L.pOut||0)),d0,d1,bend,col,L.plw||lw,L.pDash);
+  for(const [d,col,fr_] of L.d||[])cross(d,col,L.dlw||lw,L.dBend&&bend,fr_);
+  if(L.c)run(0,L.c0||0.3,L.c1||2.2,false,L.c,L.clw||2,[6,6]);
+  g.restore()}
+/* the car seen from above, drawn over the top view where it sits (cameras can't see the car itself): body colour, glass, mirrors */
+function rcCarTop(g,x0,y0,w,h,o){const hw=(VEH.width||1.9)/2,fz=VEH.head?VEH.head[2]:-2.3,rz=VEH.tail?VEH.tail[2]:2.3;
+  const ht=(VEH.height||1.5)*0.85,a=rcProj("top",[-hw,ht,fz],x0,y0,w,h),b=rcProj("top",[hw,ht,rz],x0,y0,w,h);if(!a||!b)return;let X0=Math.min(a[0],b[0]),X1=Math.max(a[0],b[0]),Y0=Math.min(a[1],b[1]),Y1=Math.max(a[1],b[1]);{const k=0.1,dx=(X1-X0)*k,dy=(Y1-Y0)*k*0.5;X0-=dx;X1+=dx;Y0-=dy;Y1+=dy}const W_=X1-X0,H_=Y1-Y0;
+  g.save();g.fillStyle=(o&&o.body)||"#d9dde2";rr2(g,X0,Y0,W_,H_,W_*0.32);g.fill();g.strokeStyle=(o&&o.edge)||"rgba(0,0,0,.35)";g.lineWidth=1;g.stroke();
+  g.fillStyle=(o&&o.glass)||"#2b333b";rr2(g,X0+W_*0.12,Y0+H_*0.2,W_*0.76,H_*0.16,W_*0.12);g.fill();rr2(g,X0+W_*0.14,Y0+H_*0.74,W_*0.72,H_*0.1,W_*0.1);g.fill();
+  g.fillStyle=(o&&o.roof)||"#c4c9cf";rr2(g,X0+W_*0.12,Y0+H_*0.38,W_*0.76,H_*0.34,W_*0.08);g.fill();
+  g.fillStyle=(o&&o.body)||"#d9dde2";g.fillRect(X0-W_*0.1,Y0+H_*0.27,W_*0.12,H_*0.05);g.fillRect(X1-W_*0.02,Y0+H_*0.27,W_*0.12,H_*0.05);
+  if(o&&o.tyres){g.fillStyle="#111";const tw=W_*0.13,th=H_*0.15,sa=-clamp(car.dF,-0.6,0.6);for(const [tx,ty,st_] of [[X0-tw*0.35,Y0+H_*0.2,1],[X1-tw*0.65,Y0+H_*0.2,1],[X0-tw*0.35,Y0+H_*0.66,0],[X1-tw*0.65,Y0+H_*0.66,0]]){g.save();g.translate(tx+tw/2,ty+th/2);if(st_)g.rotate(sa);g.fillRect(-tw/2,-th/2,tw,th);g.restore()}}
+  g.restore();return [X0,Y0,W_,H_]}
+/* parking-sensor zones round the car on the top view: arcs that go green, yellow, red as an obstacle gets closer */
+function rcSensorsTop(g,box,cols,thick){const P=sys.pdc;if(!P||!box)return;const [X0,Y0,W_,H_]=box,c=cols||["#34c759","#ffcc00","#ff3b30"],lv=d=>d>1.8?-1:d>0.9?0:d>0.45?1:2;
+  g.save();g.lineWidth=thick||5;g.lineCap="butt";
+  const zone=(arr,front)=>arr.forEach((d,i)=>{const l=lv(d);if(l<0)return;g.strokeStyle=c[l];const n=arr.length,cx=X0+W_/2,cy=front?Y0+H_*0.18:Y0+H_*0.82,r=W_*(0.75+0.22*(2-l)),a0=front?Math.PI*(1.15+0.7*i/n):Math.PI*(0.15+0.7*(n-1-i)/n),a1=a0+Math.PI*0.7/n-0.05;
+    g.beginPath();g.ellipse(cx,cy,r,r*0.75,0,a0,a1);g.stroke()});
+  zone(P.f||[],true);zone(P.r||[],false);g.restore()}
+function rcNear(){const P=sys.pdc;if(!P)return 9;return Math.min(...(P.r||[9]),...(P.f||[9]))}
+/* the brand screen when the camera is up: replaces the brand's own camera page; returns true when it drew */
+function rcDraw(g,W,H){const id=rcStyleId(),S=id&&RC_STYLES[id];if(!S)return false;
+  if(RC.id!==id){RC.id=id;RC.view=st.gear==="R"?"rear":(SCR.cam||"rear")}
+  const views=rcViews(S);
+  if(st.gear==="R"&&!["rear","rearW","side"].includes(RC.view))RC.view="rear";
+  if(st.gear!=="R"&&(RC.view==="rear"||RC.view==="rearW")&&SCR.cam==="front"&&views.includes("front"))RC.view="front";
+  if(!views.includes(RC.view))RC.view=views[0];
+  if(RC.lastGear!==st.gear){if(st.gear==="R")RC.t0=performance.now();RC.lastGear=st.gear}
+  // the render pass reads these: which camera to draw, and whether the top view is needed too
+  SCR.cam=RC.view==="rearW"?"rearW":RC.view==="frontW"?"frontW":RC.view;SCR.split=(S.lay!=="full"||RC.view==="side")&&has360();SCR.rcOn=true;
+  const ctx={S,W,H,views,boot:(performance.now()-RC.t0)/1000,set:v=>{RC.view=v;SCR.cam=v;SCR.camX=false},near:rcNear(),mirror:RC.view==="rear"||RC.view==="rearW"};
+  S.ui(g,ctx);return true}
+/* a standard picture-plus-top-view arrangement most brands use, with the brand's own sizes; returns the boxes */
+function rcLayout(g,ctx,x,y,w,h,o){const S=ctx.S,v=RC.view,top=SCR.split&&has360()&&v!=="side",tw=top?Math.round(w*(o.topW||0.34)):0,gap=o.gap||0;
+  const tx=o.topRight?x+w-tw:x,cx=o.topRight?x:x+tw+gap,cw=w-tw-(top?gap:0);
+  g.fillStyle="#000";g.fillRect(x,y,w,h);let box=null;
+  if(v==="side"){const hw2=(w-(o.gap||4))/2;rcFeed(g,SCR.camCv,x,y,hw2,h,true,[0,0,240,288]);rcFeed(g,SCR.camCv,x+hw2+(o.gap||4),y,hw2,h,true,[240,0,240,288])}
+  else{const kind=v==="front"||v==="frontW"?"front":"rear",mir=kind==="rear";rcFeed(g,SCR.camCv,cx,y,cw,h,mir);if(ctx.boot>=0)rcLines(g,kind,cx,y,cw,h,mir,v==="rearW"||v==="frontW"?(S.wideLines||S.lines):S.lines,kind==="front");
+    if(top){const sw=480*tw/h*288/480,src=[240-Math.min(240,sw*0.5*288/288),0,Math.min(480,sw),288];   /* centre crop of the overhead render to the panel's shape */
+      const cw2=Math.min(480,288*tw/h);rcFeed(g,SCR.camCv2,tx,y,tw,h,false,[240-cw2/2,0,cw2,288]);box=rcCarTop(g,tx,y,tw,h,o.car);if(o.topSensors!==false)rcSensorsTop(g,box,o.sensorCols);
+      if(S.topLines)rcTopPath(g,tx,y,tw,h,S.topLines,[240-cw2/2,0,cw2,288])}}
+  if(ctx.boot<(S.delay||0.8)){g.fillStyle="#000";g.globalAlpha=clamp(1-(ctx.boot-(S.delay||0.8)+0.25)/0.25,0,1);g.fillRect(x,y,w,h);g.globalAlpha=1}
+  return {cx,cw,tx,tw,top,box}}
+/* projected path on the top view (Mazda, Nissan and others draw it there too) */
+function rcTopPath(g,x0,y0,w,h,L,src){const M=SCR.topVP,cm_=SCR.topCm;if(!M)return;const sx=src[0]/480,sw=src[2]/480;
+  const pr=p=>{const q=M4.p(cm_,p);const X=M[0]*q[0]+M[4]*q[1]+M[8]*q[2]+M[12],Y=M[1]*q[0]+M[5]*q[1]+M[9]*q[2]+M[13],Wq=M[3]*q[0]+M[7]*q[1]+M[11]*q[2]+M[15];const u=((X/Wq+1)/2-sx)/sw,v=(1-Y/Wq)/2;return [x0+u*w,y0+v*h]};
+  const hw=(VEH.width||1.9)/2+0.05,rev=st.gear==="R",tz=rev?(VEH.tail?VEH.tail[2]:2.4):(VEH.head?VEH.head[2]:-2.4),R=Math.abs(car.dF)>0.01?WB/Math.tan(car.dF):1e9,sg=rev?1:-1;
+  g.save();g.beginPath();g.rect(x0,y0,w,h);g.clip();g.lineWidth=L.lw||2.5;for(const [d0,d1,col] of L.p||[])for(const s of [-1,1]){g.strokeStyle=col;g.beginPath();let on=false;for(let d=d0;d<=d1;d+=0.2){const off=d*d/(2*R)*(rev?1:-1),q=pr([s*hw-off,0.05,tz+sg*d]);on?g.lineTo(q[0],q[1]):g.moveTo(q[0],q[1]);on=true}g.stroke()}g.restore()}
+// ---- Toyota / Lexus / Mazda
+/* small icons drawn in code (original, generic shapes) */
+function rcIcon(g,k,x,y,s,col){g.save();g.strokeStyle=col;g.fillStyle=col;g.lineWidth=Math.max(1.5,s*0.09);g.lineJoin="round";const r=s/2;
+  if(k==="rear"||k==="front"){g.strokeRect(x-r*0.35,y-r*0.6,r*0.7,r*1.2);g.beginPath();const d=k==="rear"?1:-1;g.moveTo(x-r*0.55,y+d*r*0.75);g.lineTo(x,y+d*r);g.lineTo(x+r*0.55,y+d*r*0.75);g.stroke()}
+  else if(k==="rearW"||k==="frontW"){g.strokeRect(x-r*0.3,y-r*0.55,r*0.6,r*1.1);const d=k==="rearW"?1:-1;g.beginPath();g.moveTo(x-r,y+d*r*0.55);g.quadraticCurveTo(x,y+d*r*1.15,x+r,y+d*r*0.55);g.stroke()}
+  else if(k==="side"){g.strokeRect(x-r*0.3,y-r*0.6,r*0.6,r*1.2);g.beginPath();g.moveTo(x-r*0.45,y-r*0.2);g.lineTo(x-r,y-r*0.45);g.moveTo(x-r*0.45,y-r*0.2);g.lineTo(x-r,y+r*0.05);g.moveTo(x+r*0.45,y-r*0.2);g.lineTo(x+r,y-r*0.45);g.moveTo(x+r*0.45,y-r*0.2);g.lineTo(x+r,y+r*0.05);g.stroke()}
+  else if(k==="cam"){g.strokeRect(x-r*0.7,y-r*0.4,r*1.1,r*0.8);g.beginPath();g.moveTo(x+r*0.4,y-r*0.15);g.lineTo(x+r*0.8,y-r*0.4);g.lineTo(x+r*0.8,y+r*0.4);g.lineTo(x+r*0.4,y+r*0.15);g.closePath();g.stroke()}
+  else if(k==="lines"){g.beginPath();g.moveTo(x-r*0.7,y+r);g.lineTo(x-r*0.3,y-r);g.moveTo(x+r*0.7,y+r);g.lineTo(x+r*0.3,y-r);g.moveTo(x-r*0.55,y+r*0.2);g.lineTo(x+r*0.55,y+r*0.2);g.stroke()}
+  else if(k==="sonar"){for(let i=0;i<3;i++){g.beginPath();g.arc(x,y+r*0.6,r*(0.4+i*0.3),Math.PI*1.25,Math.PI*1.75);g.stroke()}}
+  else if(k==="back"){g.beginPath();g.moveTo(x+r*0.3,y-r*0.6);g.lineTo(x-r*0.3,y);g.lineTo(x+r*0.3,y+r*0.6);g.stroke()}
+  g.restore()}
+const RC_LBL={rear:"Rear",rearW:"Rear Wide",front:"Front",frontW:"Front Wide",side:"Side"};
+/* Toyota, 2018-2022 (Entune 3.0 / the 8-inch display): reverse brings up the rear view monitor full screen. The manual's lines: vehicle width guide
+   lines, a vehicle center guide line, distance lines red at 0.5 m and blue at 1 m (the width-line colour is not given in the manual) */
+RC_STYLES.toy_e3={delay:1.0,lines:{w:[[0.25,3.0,"#3fd27a"]],d:[[0.5,"#ff3b30"],[1.0,"#2f8cff"]],c:"#3fd27a",c1:3,lw:3,sh:1},
+  ui(g,c){const {W,H}=c;g.fillStyle="#000";g.fillRect(0,0,W,H);const L=rcLayout(g,c,0,0,W,H,{topW:0.38,car:{tyres:false}});
+    // the guide-line mode button and the view button (with the optional panoramic view)
+    const bx=W-66;g.fillStyle="rgba(20,22,26,.72)";rr2(g,bx,H-58,54,44,6);g.fill();rcIcon(g,"lines",bx+27,H-36,22,"#fff");hit(bx,H-58,54,44,()=>{st.noGuides=!st.noGuides});
+    if(c.views.length>1){g.fillStyle="rgba(20,22,26,.72)";rr2(g,bx-62,H-58,54,44,6);g.fill();rcIcon(g,"cam",bx-35,H-36,22,"#fff");hit(bx-62,H-58,54,44,()=>{const v=c.views;c.set(v[(v.indexOf(RC.view)+1)%v.length])})}
+    if(RC.view!=="rear"){g.fillStyle="rgba(0,0,0,.55)";rr2(g,L.cx+10,10,120,26,5);g.fill();g.fillStyle="#fff";g.font="600 14px Arial,sans-serif";g.textAlign="left";g.fillText(RC_LBL[RC.view]+" View",L.cx+20,28)}}};
+/* Toyota, 2023 on (Toyota Audio Multimedia, 8 / 12.3 / 14-inch): the panoramic view monitor puts the overhead view beside the camera picture, yellow
+   estimated course lines that turn with the wheel, red 0.5 m line, view buttons along the bottom; without it, the rear picture fills the screen */
+RC_STYLES.toy_tam={delay:0.8,wide:true,lines:{w:[[0.25,0.5,"#ff3b30"],[0.5,2.0,"#2f8cff"]],p:[[0.25,3.0,"#ffd400"]],d:[[0.5,"#ff3b30"],[1.0,"#ffd400",0.25],[2.0,"#ffd400",0.25]],lw:3.2,sh:1},
+  wideLines:{w:[[0.25,0.5,"#ff3b30"],[0.5,2.0,"#2f8cff"]],d:[[0.5,"#ff3b30"]],lw:3,sh:1},topLines:{p:[[0,2.2,"#ffd400"]]},
+  ui(g,c){const {W,H}=c,bh=52;g.fillStyle="#0e1013";g.fillRect(0,0,W,H);const L=rcLayout(g,c,0,0,W,H-bh,{topW:0.3,car:{tyres:true}});
+    // view buttons: white outline icons, the chosen one with a filled pill
+    const vs=c.views,bw=Math.min(118,(W-120)/vs.length);vs.forEach((v,i)=>{const x=12+i*(bw+8),on=RC.view===v;g.fillStyle=on?"#f2f4f6":"#23272d";rr2(g,x,H-bh+7,bw,bh-14,(bh-14)/2);g.fill();
+      rcIcon(g,v,x+22,H-bh/2,18,on?"#111":"#e8eaed");g.fillStyle=on?"#111":"#e8eaed";g.font="600 13px Arial,sans-serif";g.textAlign="left";g.fillText(RC_LBL[v],x+38,H-bh/2+5);hit(x,H-bh+7,bw,bh-14,()=>c.set(v))});
+    g.fillStyle="#23272d";rr2(g,W-60,H-bh+7,48,bh-14,(bh-14)/2);g.fill();rcIcon(g,"lines",W-36,H-bh/2,18,st.noGuides?"#777":"#e8eaed");hit(W-60,H-bh+7,48,bh-14,()=>{st.noGuides=!st.noGuides});
+    if(c.near<1.8){g.fillStyle="rgba(0,0,0,.6)";rr2(g,L.cx+L.cw-126,10,116,30,6);g.fill();rcIcon(g,"sonar",L.cx+L.cw-108,26,18,pdcCol(c.near));g.fillStyle="#fff";g.font="600 13px Arial,sans-serif";g.textAlign="left";g.fillText(`${(c.near*3.281).toFixed(1)} ft`,L.cx+L.cw-88,30)}}};
+/* Lexus, 2022 on (Lexus Interface, 14-inch): the same camera hardware as Toyota with Lexus's own look: black, thin white type, a slim strip of view icons
+   down the right edge */
+RC_STYLES.lex_li={delay:0.8,wide:true,lines:RC_STYLES.toy_tam.lines,wideLines:RC_STYLES.toy_tam.wideLines,topLines:{p:[[0,2.2,"#ffd400"]]},
+  ui(g,c){const {W,H}=c,rw=70;g.fillStyle="#000";g.fillRect(0,0,W,H);const L=rcLayout(g,c,0,0,W-rw,H,{topW:0.32,car:{tyres:true,body:"#e6e6e6"}});
+    g.fillStyle="#0b0b0c";g.fillRect(W-rw,0,rw,H);g.strokeStyle="#2a2a2c";g.beginPath();g.moveTo(W-rw+0.5,0);g.lineTo(W-rw+0.5,H);g.stroke();
+    const vs=c.views,bh=Math.min(64,(H-70)/vs.length);vs.forEach((v,i)=>{const y=10+i*bh,on=RC.view===v;if(on){g.fillStyle="#c8a96a";g.fillRect(W-rw,y+6,3,bh-12)}rcIcon(g,v,W-rw/2,y+bh/2-6,22,on?"#fff":"#8a8a8e");
+      g.fillStyle=on?"#fff":"#8a8a8e";g.font="300 10px 'Helvetica Neue',Arial,sans-serif";g.textAlign="center";g.fillText(RC_LBL[v].toUpperCase(),W-rw/2,y+bh/2+17);hit(W-rw,y,rw,bh,()=>c.set(v))});
+    rcIcon(g,"lines",W-rw/2,H-30,20,st.noGuides?"#555":"#fff");hit(W-rw,H-56,rw,52,()=>{st.noGuides=!st.noGuides});
+    g.fillStyle="rgba(0,0,0,.5)";g.fillRect(L.cx,H-26,L.cw,26);g.fillStyle="#d8d8d8";g.font="300 12px 'Helvetica Neue',Arial,sans-serif";g.textAlign="center";g.fillText("Check surroundings for safety.",L.cx+L.cw/2,H-9)}};
+/* Lexus up to 2021 (Remote Touch / Lexus Enform, 10.3 / 12.3-inch split screen): the camera fills the screen with grey square buttons along the
+   bottom; panoramic view when fitted */
+RC_STYLES.lex_old={delay:1.1,lines:RC_STYLES.toy_e3.lines,
+  ui(g,c){const {W,H}=c,bh=40;g.fillStyle="#101418";g.fillRect(0,0,W,H);const L=rcLayout(g,c,0,0,W,H-bh,{topW:0.36,car:{tyres:false}});
+    const grad=g.createLinearGradient(0,H-bh,0,H);grad.addColorStop(0,"#3a4048");grad.addColorStop(1,"#1d2126");g.fillStyle=grad;g.fillRect(0,H-bh,W,bh);
+    const vs=c.views;vs.forEach((v,i)=>{const x=8+i*96,on=RC.view===v;g.fillStyle=on?"#5d87b8":"#2b3138";g.fillRect(x,H-bh+5,88,bh-10);g.strokeStyle="#6b7480";g.strokeRect(x+0.5,H-bh+5.5,87,bh-11);
+      g.fillStyle="#fff";g.font="13px Arial,sans-serif";g.textAlign="center";g.fillText(RC_LBL[v],x+44,H-bh/2+5);hit(x,H-bh+5,88,bh-10,()=>c.set(v))});
+    g.fillStyle="#2b3138";g.fillRect(W-98,H-bh+5,90,bh-10);g.fillStyle="#fff";g.textAlign="center";g.fillText(st.noGuides?"Guides On":"Guides Off",W-53,H-bh/2+5);hit(W-98,H-bh+5,90,bh-10,()=>{st.noGuides=!st.noGuides})}};
+/* Mazda (Mazda Connect, commander knob; the 2026 cars' 10.25 / 12.3-inch screens): 360 view monitor with the top view on the left and the camera on the
+   right. Manual's lines: amber projected path lines that turn with the wheel, a red line at 0.5 m and amber at 1 m and 2 m; in the wide views blue
+   extended width lines (red for the first 0.5 m); tyre icons on the top view turn with the wheel; a view status icon shows the chosen view */
+RC_STYLES.mazda_mc={delay:1.2,wide:true,lines:{p:[[0.3,2.4,"#ffb000"]],d:[[0.5,"#ff2a2a",0.3],[1.0,"#ffb000",0.22],[2.0,"#ffb000",0.22]],w:[[0.3,0.5,"#ff2a2a"]],lw:3,sh:1},
+  wideLines:{w:[[0.3,0.5,"#ff2a2a"],[0.5,2.0,"#3aa0ff"]],d:[[0.5,"#ff2a2a"]],lw:3,sh:1},topLines:{p:[[0,2.0,"#ffb000"]]},
+  ui(g,c){const {W,H}=c,sw=56;g.fillStyle="#000";g.fillRect(0,0,W,H);const L=rcLayout(g,c,sw,0,W-sw,H,{topW:0.36,gap:3,car:{tyres:true,body:"#cfd3d8"}});
+    // the knob's selection list on the left (Mazda highlights the chosen item with a red-orange bar)
+    g.fillStyle="#0c0d0f";g.fillRect(0,0,sw,H);const vs=c.views,bh=Math.min(58,(H-20)/vs.length);
+    vs.forEach((v,i)=>{const y=8+i*bh,on=RC.view===v;if(on){g.fillStyle="#26282c";g.fillRect(2,y,sw-4,bh-4);g.fillStyle="#c8102e";g.fillRect(2,y,3,bh-4)}rcIcon(g,v,sw/2,y+bh/2-2,20,on?"#fff":"#9a9ca0");hit(0,y,sw,bh,()=>c.set(v))});
+    // view status icon over the camera picture
+    g.fillStyle="rgba(0,0,0,.55)";rr2(g,L.cx+8,8,34,30,4);g.fill();rcIcon(g,RC.view,L.cx+25,23,18,"#fff");
+    if(RC.view!=="side"&&!L.top&&c.near<1.8){rcIcon(g,"sonar",L.cx+L.cw-24,24,20,pdcCol(c.near))}}};
+RC_MAP.Toyota=(T,y)=>y<=2022?"toy_e3":"toy_tam";
+RC_MAP.Lexus=(T,y)=>y<=2021?"lex_old":"lex_li";
+RC_MAP.Mazda=()=>"mazda_mc";
 function scrCamera(g,top,bot,W){
   const h=bot-top;
   if(isTesla()&&SCR.cam==="rear"){// Tesla: the rear camera big, both side repeaters underneath
@@ -17528,14 +17668,14 @@ function render(dt){
   };
   // the car's own cameras render into a small off-screen image for the centre screen
   if(st.cam===1&&SCR.page==="camera"&&SCR.fboOk&&(SCR.fr=(SCR.fr||0)+1)%(G().camEvery||2)===0){gl.bindFramebuffer(gl.FRAMEBUFFER,SCR.fbo);gl.viewport(0,0,480,288);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
-    const T3=isTesla()&&SCR.cam==="rear";SCR.t3=(SCR.t3||0)+1;const vc=T3?["rear","repL","repR"][SCR.t3%3]:SCR.split&&SCR.cam==="side"?["sides","top"][SCR.t3%2]:SCR.split&&SCR.cam!=="dash"&&SCR.cam!=="ground"?((SCR.alt=!SCR.alt)?(SCR.cam==="top"?"rear":SCR.cam):"top"):SCR.cam;let e2,t2,u2,f2;
+    const T3=isTesla()&&SCR.cam==="rear";SCR.t3=(SCR.t3||0)+1;const vc=T3?["rear","repL","repR"][SCR.t3%3]:SCR.split&&SCR.cam==="side"?["sides","top"][SCR.t3%2]:SCR.split&&SCR.cam!=="dash"&&SCR.cam!=="ground"?((SCR.altN=(SCR.altN||0)+1)%2?(SCR.cam==="top"?"rear":SCR.cam):"top"):SCR.cam;let e2,t2,u2,f2;
     if(vc==="sides"){const hw=(VEH.width||1.9)/2,hz=VEH.head?VEH.head[2]:-2.3;for(const sd of [-1,1]){const e3=M4.p(cm,[sd*(hw+0.12),1.0,hz+1.35]),t3=M4.p(cm,[sd*(hw+0.9),0.1,hz+9]);gl.viewport(sd<0?0:240,0,240,288);pass(M4.mul(M4.persp(1.25,240/288,0.2,500),M4.look(e3,t3,M4.d(cm,[0,1,0]))),e3,t3,"rear")}gl.viewport(0,0,480,288);gl.readPixels(0,0,480,288,gl.RGBA,gl.UNSIGNED_BYTE,SCR.px);SCR.img.data.set(SCR.px);SCR.camG.putImageData(SCR.img,0,0);gl.bindFramebuffer(gl.FRAMEBUFFER,null);gl.viewport(0,0,W,H)}
     else{if(vc==="sideL"){}
     else if(vc==="repL"||vc==="repR"){const sd=vc==="repL"?-1:1,hw=(VEH.width||1.9)/2;e2=M4.p(cm,[sd*hw,0.95,VEH.head[2]+0.95]);t2=M4.p(cm,[sd*(hw+2.2),0.55,8]);u2=M4.d(cm,[0,1,0]);f2=1.2}
-    else if(vc==="front"){e2=M4.p(cm,[0,VEH.head[1]+0.15,VEH.head[2]-0.05]);t2=M4.p(cm,[0,-0.8,VEH.head[2]-7]);u2=M4.d(cm,[0,1,0]);f2=1.7}
+    else if(vc==="front"||vc==="frontW"){e2=M4.p(cm,[0,VEH.head[1]+0.15,VEH.head[2]-0.05]);t2=M4.p(cm,[0,vc==="frontW"?-1.4:-0.8,VEH.head[2]-7]);u2=M4.d(cm,[0,1,0]);f2=vc==="frontW"?2.3:1.7}
     else if(vc==="ground"){const hz=VEH.head?VEH.head[2]:-2.3;e2=M4.p(cm,[0,(VEH.head?VEH.head[1]:0.8)+1.05,hz+1.0]);t2=M4.p(cm,[0,-0.6,hz-1.9]);u2=M4.d(cm,[0,1,0]);f2=1.65}
-    else if(vc==="rear"){e2=M4.p(cm,VEH.rearCam);t2=M4.p(cm,[0,-0.2,8]);u2=M4.d(cm,[0,1,0]);f2=1.55}else if(vc==="dash"){const E=VEH.eye;e2=M4.p(cm,[0,E[1]+0.06,E[2]-0.62]);t2=M4.p(cm,[0,E[1]-0.6,-40]);u2=M4.d(cm,[0,1,0]);f2=1.25}else if(inGarage(car.px,car.py)){e2=[cp[0]+0.001,cp[1]+2.45,cp[2]];t2=cp;u2=fwd;f2=2.25}else{e2=[cp[0]+0.001,cp[1]+12,cp[2]];t2=cp;u2=fwd;f2=1.1}
-    const VPc=M4.mul(M4.persp(f2,480/288,0.2,700),M4.look(e2,t2,u2));if(vc==="rear"){SCR.rearVP=VPc;SCR.rearCm=cm}if(vc==="front"){SCR.frontVP=VPc;SCR.frontCm=cm}pass(VPc,e2,t2,vc==="front"||vc==="ground"?"dash":vc==="repL"||vc==="repR"||vc==="sideL"||vc==="sideR"?"rear":vc);
+    else if(vc==="rear"||vc==="rearW"){e2=M4.p(cm,VEH.rearCam);t2=M4.p(cm,[0,vc==="rearW"?-1.3:SCR.rcOn?-1.0:-0.2,8]);u2=M4.d(cm,[0,1,0]);f2=vc==="rearW"?2.3:1.55}else if(vc==="dash"){const E=VEH.eye;e2=M4.p(cm,[0,E[1]+0.06,E[2]-0.62]);t2=M4.p(cm,[0,E[1]-0.6,-40]);u2=M4.d(cm,[0,1,0]);f2=1.25}else if(inGarage(car.px,car.py)){e2=[cp[0]+0.001,cp[1]+2.45,cp[2]];t2=cp;u2=fwd;f2=2.25}else{e2=[cp[0]+0.001,cp[1]+(SCR.rcOn?7.5:12),cp[2]];t2=cp;u2=fwd;f2=1.1}
+    const VPc=M4.mul(M4.persp(f2,480/288,0.2,700),M4.look(e2,t2,u2));if(vc==="rear"||vc==="rearW"){SCR.rearVP=VPc;SCR.rearCm=cm}if(vc==="front"||vc==="frontW"){SCR.frontVP=VPc;SCR.frontCm=cm}if(vc==="top"){SCR.topVP=VPc;SCR.topCm=cm}pass(VPc,e2,t2,vc==="rearW"?"rear":vc==="front"||vc==="frontW"||vc==="ground"?"dash":vc==="repL"||vc==="repR"||vc==="sideL"||vc==="sideR"?"rear":vc);
     gl.readPixels(0,0,480,288,gl.RGBA,gl.UNSIGNED_BYTE,SCR.px);SCR.img.data.set(SCR.px);(vc==="repL"?SCR.camG2:vc==="repR"||vc==="sideR"?SCR.camG3:SCR.split&&vc==="top"?SCR.camG2:SCR.camG).putImageData(SCR.img,0,0);
     gl.bindFramebuffer(gl.FRAMEBUFFER,null);gl.viewport(0,0,W,H)}}
   if(bvmActive()&&(BVM.fr=(BVM.fr+1))%(G().camEvery||2)===0){gl.bindFramebuffer(gl.FRAMEBUFFER,SCR.fbo);gl.viewport(0,0,480,288);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
