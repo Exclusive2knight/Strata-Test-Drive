@@ -15798,6 +15798,7 @@ function acctBackup(){try{const B=JSON.parse(localStorage.getItem("msBackup")||"
 // Discord: money sent with /transfer in the Discord server (at most $2,000 every 5 hours, enforced by the server)
 // waits on the server until this game collects it into checking: once the account has loaded, then every minute.
 async function discClaim(){if(!acctOn()||!ACCT.tok||ACCT.applying||!ACCT.booted)return;let r;try{r=await acctRpc("discord_claim",{p_token:ACCT.tok})}catch(e){return}
+  if(r&&"linked" in r&&ACCT.disc!==!!r.linked){ACCT.disc=!!r.linked;if($("acct")&&!$("acct").hidden)acctDraw()}
   const a=Math.round((+(r&&r.amount)||0)*100)/100;if(!(a>0))return;
   ECON.cash+=a;try{bankTx("Transfer from Discord",a)}catch(e){}try{bankSave();econSave()}catch(e){}toast(`💵 ${money2(a)} from Discord landed in your checking`);acctSave(true)}
 setInterval(()=>{if(!document.hidden)discClaim()},60000);
@@ -15824,7 +15825,7 @@ function acctHtml(){if(!acctOn())return `<div class="acH"><b>Account</b><button 
   h+=achHtml();
   /* v340: link this account to Discord. The bot gives you a code in Discord; you type it here. The game sends it, with your sign-in, to the
      server function link_discord(p_token, p_code) (other common names are tried too), which checks the code the bot saved and ties the two together */
-  h+=`<div class="acH2"><b>Link Discord</b></div><p class="fine">Type <b>/link</b> in our Discord: the bot shows you a code only you can see. Type it here. Then <b>/transfer</b> in Discord sends Strata Cash into your checking (up to $2,000 every 5 hours).</p><input id="acDC" placeholder="Code from the Discord bot" maxlength="40" autocomplete="off" autocapitalize="characters"><button data-ac="dlink">Link Discord</button>`;
+  h+=`<div class="acH2"><b>Link Discord</b></div>${ACCT.disc?`<p class="fine">✅ <b>Linked to Discord.</b> Use <b>/transfer</b> in Discord to send Strata Cash into your checking (up to $2,000 every 5 hours). To link a different Discord account, type <b>/link</b> there and enter the new code.</p>`:`<p class="fine">Type <b>/link</b> in our Discord: the bot shows you a code only you can see. Type it here. Then <b>/transfer</b> in Discord sends Strata Cash into your checking (up to $2,000 every 5 hours).</p>`}<input id="acDC" placeholder="Code from the Discord bot" maxlength="40" autocomplete="off" autocapitalize="characters"><button data-ac="dlink">Link Discord</button>`;
   if(!ACCT.admin)h+=`<div class="acH2"><b>Report a player</b></div><input id="acRT" placeholder="Their username" maxlength="20"><input id="acRR" placeholder="What happened?" maxlength="300"><button data-ac="report">Send report</button>`;
   if(ACCT.admin){const at=ACCT.atab||"players";h+=`<div class="acT acTabs">${[["players","Players"],["msg","Message"],["events","Events"],["reports","Reports"],["stats","Stats"]].map(([k,n])=>`<button data-ac="at_${k}" class="${at===k?"on":""}">${n}</button>`).join("")}</div>`;
     if(at!=="players")return h+admTabHtml(at);
@@ -15865,7 +15866,7 @@ async function admAct(a,b){const A=ACCT.adm||(ACCT.adm={}),T=ACCT.tok,run=async(
   if(a==="statload"){try{A.stats=await acctRpc("admin_stats",{p_token:T});ACCT.msg=""}catch(e){ACCT.msg=/function/i.test(e.message)?"Run the admin tools SQL in Supabase first":e.message}acctDraw();return true}
   if(a==="dlink"){const code=(($("acDC")||{}).value||"").trim().replace(/\s+/g,"");if(!code){acctMsg("Type the code the Discord bot gave you");return true}acctMsg("Linking…");
     let last=null;for(const fn of ["link_discord","discord_link","redeem_discord_code","discord_redeem","link_discord_code"]){try{const r=await acctRpc(fn,{p_token:T,p_code:code});
-        const nm=r&&typeof r==="object"?(r.discord||r.discord_name||r.username||r.name||""):typeof r==="string"?r:"";acctMsg(nm?`Linked to Discord as ${nm}`:"Discord linked");$("acDC").value="";return true}
+        const nm=r&&typeof r==="object"?(r.discord||r.discord_name||r.username||r.name||""):typeof r==="string"?r:"";ACCT.disc=true;acctDraw();acctMsg(nm?`Linked to Discord as ${nm}`:"Discord linked");return true}
       catch(e){last=e;if(!/Could not find the function|PGRST202|does not exist/i.test(e.message))break}}
     acctMsg(/Could not find the function|PGRST202|does not exist/i.test(last&&last.message||"")?"Discord linking isn't switched on on the server yet":(last&&last.message)||"Couldn't link");return true}
   if(a==="report"){const t=(($("acRT")||{}).value||"").trim(),r=(($("acRR")||{}).value||"").trim();if(!t){acctMsg("Type their username");return true}
