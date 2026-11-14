@@ -37,3 +37,34 @@ Sources
   Camry https://www.manualslib.com/manual/967439/Toyota-Camry.html?page=209
 - 2019 RAV4 owner's manual, panoramic view monitor: https://manualslib.com/manual/1780848/Toyota-Rav-4-2019.html?page=334
 - Toyota multimedia owner's manuals index (Audio Multimedia): https://assets.sia.toyota.com/publications/en/omnav-s/OM06269U/pdf/OM06269U.pdf
+
+## Group 2+: every other brand (done)
+All built with `rcMake()` (one factory, each brand's own layout, button strip position and style, colours, safety text and lines).
+
+| Screen id | Cars | Layout | Lines (colours) | Confidence |
+|---|---|---|---|---|
+| `ford_s3` | Ford / Lincoln to MY2020 (SYNC 3) | camera full, soft keys bottom | fixed lines green / yellow / red zones, active guidelines, centerline | VERIFIED line types (Ford support page); zone distances UNVERIFIED |
+| `ford_s4` | Ford MY2021 on (SYNC 4 / 4A) | overhead left, icon buttons bottom, settings cog | as above | LIKELY layout |
+| `lincoln` | Lincoln MY2021 on | overhead left, view strip right | as above | LIKELY |
+| `gm` | Chevrolet / GMC / Buick | overhead beside camera, view bar bottom | amber guidelines turning with the wheel, distance marks | VERIFIED views (Chevrolet Surround Vision page); colours LIKELY |
+| `cadillac` | Cadillac | views in a left column | as `gm` | LIKELY |
+| `stla` | Jeep / Ram / Dodge / Chrysler | camera + overhead, X (close) and zoom buttons, "Check Entire Surroundings" for 5 s, More Cams | red 0-1 ft, yellow 1-6.5 ft, green beyond (Ram manual) | VERIFIED distances/text |
+| `hyk` / `genesis` | Hyundai, Kia / Genesis | view column left, settings cog | red / yellow / green distance lines, path turns with the wheel | VERIFIED behaviour (Hyundai manual); colours LIKELY |
+| `honda` / `acura` | Honda / Acura | Normal / Wide / Top Down, view name on screen, sensor graphic | fixed guidelines red / yellow / green, dynamic guidelines | VERIFIED views (Honda manual); colours LIKELY |
+| `nissan` / `infiniti` | Nissan / Infiniti | camera left, bird's-eye right, "Check entire surroundings." | red 0.5 m, yellow 1 m, green 2 m and 3 m; green width lines; yellow predictive course | VERIFIED distances (Nissan manual) |
+| `subaru`, `vw`, `audi`, `porsche`, `bmw`, `merc`, `volvo`, `jlr`, `rivian`, `lucid` | those brands | each its own arrangement | see `RCL` in code | LIKELY (from general knowledge of each system; no manual fetched) |
+
+Not changed: Tesla keeps its existing camera screen; concept cars, work trucks and pre-2012 cars without cameras keep the generic screen.
+
+## Parking sensors (`pdcKit()`)
+Every car used to have front and rear sensors. Now: 360 camera -> front and rear; premium brands -> front and rear; mainstream cars -> none on the
+cheapest third of the model's trims, then front and rear for Toyota / Honda / Hyundai / Kia / Mazda / VW, rear only for GM / Ford / Stellantis /
+Nissan / Subaru (front too on the top trim); 2011 and older -> none (premium: rear, 5/7 Series front too); Tesla -> camera-based (Tesla Vision)
+distances. This is a rule, not a per-trim spec lookup: individual trims may differ (UNVERIFIED per trim).
+
+Sources (group 2): Ford rear view camera https://www.ford.ca/support/how-tos/ford-technology/driver-assist-features/rear-view-camera/ ;
+Chevrolet Surround Vision https://www.chevrolet.com/support/vehicle/driving-safety/mirrors-and-cameras/surround-vision ;
+Ram 2022 Surround View Camera https://vehicleinfo.mopar.com/assets/publications/en-us/Ram/2022/2500_3500/om_html/GUID-7F83E962-52CD-46D8-9C86-FF4C39D1E9A5.html ;
+Hyundai Parking Assistance screen https://ownersmanual.hyundai.com/ivi/ccNC_Lite/AV/MEX/English/Cameraview_rvm.html ;
+Honda Multi View Camera System https://techinfo.honda.com/rjanisis/pubs/OM/AH/A3BM2626IOM/enu/details/66333ff6c65dd9-62000111.html ;
+Nissan Juke 2024 front and rear view https://www.nissan.ie/ownership/car-owner-manual/manuals/iom/juke/0f16/e1/2024/front-and-rearview-1.shtml
