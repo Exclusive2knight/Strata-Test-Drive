@@ -15795,7 +15795,13 @@ async function acctSign(up){const u=(($("acU")||{}).value||"").trim(),p=($("acP"
 async function acctOut(){await acctSave(true);ACCT.tok=null;ACCT.user=null;ACCT.admin=false;ACCT.at=0;acctKeep();ACCT.applying=true;try{localStorage.setItem("msPending",JSON.stringify({ls:{}}))}catch(e){}location.reload()}
 function acctBackup(){try{const B=JSON.parse(localStorage.getItem("msBackup")||"null");return B&&B.ls&&Object.keys(B.ls).length?B:null}catch(e){return null}}
 // gifts and roles an admin set on the server: claimed once, applied to this game, then saved
-async function acctClaim(){if(!acctOn()||!ACCT.tok||ACCT.applying)return;let r;try{r=await acctRpc("claim_grants",{p_token:ACCT.tok})}catch(e){return}
+// Discord: money sent with /transfer in the Discord server (at most $2,000 every 5 hours, enforced by the server)
+// waits on the server until this game collects it into checking: once the account has loaded, then every minute.
+async function discClaim(){if(!acctOn()||!ACCT.tok||ACCT.applying||!ACCT.booted)return;let r;try{r=await acctRpc("discord_claim",{p_token:ACCT.tok})}catch(e){return}
+  const a=Math.round((+(r&&r.amount)||0)*100)/100;if(!(a>0))return;
+  ECON.cash+=a;try{bankTx("Transfer from Discord",a)}catch(e){}try{bankSave();econSave()}catch(e){}toast(`💵 ${money2(a)} from Discord landed in your checking`);acctSave(true)}
+setInterval(()=>{if(!document.hidden)discClaim()},60000);
+async function acctClaim(){if(!acctOn()||!ACCT.tok||ACCT.applying)return;ACCT.booted=true;setTimeout(discClaim,800);let r;try{r=await acctRpc("claim_grants",{p_token:ACCT.tok})}catch(e){return}
   if(r&&"role" in r&&r.role!==ACCT.role){ACCT.role=r.role||null;acctKeep();if(ACCT.role)toast(`You're now a ${ACCT.role} in Mission Strata`)}
   const G=(r&&r.grants)||[];if(!G.length)return;let cash=0,paid=false;
   for(const g of G){const c=+g.cash||0;if(c){ECON.cash+=c;cash+=c;try{bankTx(c>0?`Gift from ${g.from||"Mission Strata"}`:"Adjustment by Mission Strata",c)}catch(e){}}
@@ -15818,7 +15824,7 @@ function acctHtml(){if(!acctOn())return `<div class="acH"><b>Account</b><button 
   h+=achHtml();
   /* v340: link this account to Discord. The bot gives you a code in Discord; you type it here. The game sends it, with your sign-in, to the
      server function link_discord(p_token, p_code) (other common names are tried too), which checks the code the bot saved and ties the two together */
-  h+=`<div class="acH2"><b>Link Discord</b></div><p class="fine">Ask the bot in our Discord for a link code, then type it here.</p><input id="acDC" placeholder="Code from the Discord bot" maxlength="40" autocomplete="off" autocapitalize="characters"><button data-ac="dlink">Link Discord</button>`;
+  h+=`<div class="acH2"><b>Link Discord</b></div><p class="fine">Type <b>/link</b> in our Discord: the bot shows you a code only you can see. Type it here. Then <b>/transfer</b> in Discord sends Strata Cash into your checking (up to $2,000 every 5 hours).</p><input id="acDC" placeholder="Code from the Discord bot" maxlength="40" autocomplete="off" autocapitalize="characters"><button data-ac="dlink">Link Discord</button>`;
   if(!ACCT.admin)h+=`<div class="acH2"><b>Report a player</b></div><input id="acRT" placeholder="Their username" maxlength="20"><input id="acRR" placeholder="What happened?" maxlength="300"><button data-ac="report">Send report</button>`;
   if(ACCT.admin){const at=ACCT.atab||"players";h+=`<div class="acT acTabs">${[["players","Players"],["msg","Message"],["events","Events"],["reports","Reports"],["stats","Stats"]].map(([k,n])=>`<button data-ac="at_${k}" class="${at===k?"on":""}">${n}</button>`).join("")}</div>`;
     if(at!=="players")return h+admTabHtml(at);
@@ -18501,7 +18507,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=342;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   /* BUILD_VER: bumped to make open copies reload without resetting saves */
+const APP_VER="173",BUILD_VER=343;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   /* BUILD_VER: bumped to make open copies reload without resetting saves */
 /* v333: this used to sit behind a // comment on the line above, so it never ran: VER_WIPED was undefined and signing in threw before your account save could load.
    Version 173 never wiped anyone, so it is adopted quietly; later APP_VER bumps reset local saves again as intended */
 let VER_WIPED=false;try{if(APP_VER==="173")localStorage.setItem("strata.ver",APP_VER);if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
