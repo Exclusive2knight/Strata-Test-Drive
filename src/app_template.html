@@ -12227,11 +12227,13 @@ function rectFree(k,x,y,a){const R=fpRect(k,x,y,a,0.05),f=W2_FP[k],r0=Math.hypot
   for(const b of BLD_LIST){if(b[4])continue;if(Math.abs(b[0]-x)>b[2]+r0||Math.abs(b[1]-y)>b[3]+r0)continue;if(!W2P.some(o=>o.x===b[0]&&o.y===b[1])&&rectHit(R,[[b[0]-b[2],b[1]-b[3]],[b[0]+b[2],b[1]-b[3]],[b[0]+b[2],b[1]+b[3]],[b[0]-b[2],b[1]+b[3]]]))return false}return true}
 /* a continuous street wall: buildings side by side along both sides of a street, fronts on the back of the sidewalk, 0.2 m apart;
    where the next pick doesn't fit (a cross street, a driveway, the park) a narrower one is tried before stepping on */
+/* v340: does a footprint (its corners) overlap the Fort St parking garage? Corner checks alone let a building bigger than the garage swallow it */
+function garHit(cs){const xs=cs.map(p=>p[0]),ys=cs.map(p=>p[1]);return Math.min(...xs)<GAR.x1+8&&Math.max(...xs)>GAR.x0-8&&Math.min(...ys)<GAR.y1+4&&Math.max(...ys)>GAR.y0-8}
 function streetWall(e,pickK,ok){const W=hwOf(e),walk=e.T.walk||0,k0=kerbTrim(e,0)+walk+0.6,k1=e.L-kerbTrim(e,1)-walk-0.6;if(k1-k0<10)return;
   const NARROW=/lk_Town_/.test(pickK(e,k0,1))?["lk_Town_MainSt_B_TanBrick_2F","lk_Town_Shop_Barber_2F","lk_Town_Shop_IceCream_1F"]:["lk_walkup","lk_brown","lk_market"];
   for(const sd of [1,-1]){let u=k0;while(u<k1-10){let put=false;const first=pickK(e,u,sd);
       for(const k of [first,...NARROW.filter(n=>n!==first)]){if(!W2_FP[k])continue;const f=W2_FP[k],w=f[1]-f[0];if(u+w>k1)continue;const uc=u+w/2,back=W+walk+0.3+f[3],p=ePt(e,uc,sd*back),rp=ePt(e,uc,0),a=Math.atan2(rp[1]-p[1],rp[0]-p[0]);
-        const cx=p[0]+Math.cos(a)*(-(f[3]+f[2])/2)*0,cs=fpRect(k,p[0],p[1],a,0);if(!cs.every(c=>ok(c[0],c[1],e)))continue;if(!rectFree(k,p[0],p[1],a))continue;void cx;
+        const cx=p[0]+Math.cos(a)*(-(f[3]+f[2])/2)*0,cs=fpRect(k,p[0],p[1],a,0);if(!cs.every(c=>ok(c[0],c[1],e)))continue;if(garHit(cs))continue;if(!rectFree(k,p[0],p[1],a))continue;void cx;
         w2Put(k,p[0],p[1],a);u+=w+0.2;put=true;break}
       if(!put)u+=2}}}
 
@@ -12393,7 +12395,9 @@ function worldScenery(){CUTO.clear();W2P.length=0;LKP.length=0;LK.sky=0;LK.used=
     pick=A=>A[Math.floor(r()*A.length)];
   const lkFace=(x,y)=>{let fa=(r()*4|0)*Math.PI/2,fd=1e9;for(const e of edgesNear(x,y,70)){if(e.n<1)continue;const q=eProj(e,x,y);if(q.u<0||q.u>e.L||Math.abs(q.t)>=fd)continue;fd=Math.abs(q.t);const p=ePt(e,q.u,0),to=Math.atan2(p[1]-y,p[0]-x);fa=[p[2]+Math.PI/2,p[2]-Math.PI/2].sort((A,B)=>Math.abs(wrapPi(A-to))-Math.abs(wrapPi(B-to)))[0]}return fa};
   const okD=(cx,cy)=>roadDist(cx,cy,6)>4.7&&!nearBr(cx,cy)&&!inExtra(cx,cy,2)&&!(cx>GAR.x0-8&&cx<GAR.x1+8&&cy>GAR.y0-8&&cy<GAR.y1+4)&&!(cx>PARKB[0]-3&&cx<PARKB[1]+3&&cy>PARKB[2]-3&&cy<PARKB[3]+3)&&cx>X0+1&&cx<X1-1&&cy>Y0+1&&cy<Y1-1&&riverD(cx,cy)>RIVER.w/2+8;
-  const lkTry=(k,x,y)=>{if(!W2)return false;const fa=lkFace(x,y);if(!fpRect(k,x,y,fa,0).every(([cx,cy])=>okD(cx,cy)))return false;if(!rectFree(k,x,y,fa))return false;w2Put(k,x,y,fa,0);return true};
+  const lkTry=(k,x,y)=>{if(!W2)return false;const fa=lkFace(x,y),fr=fpRect(k,x,y,fa,0);if(!fr.every(([cx,cy])=>okD(cx,cy)))return false;
+    {const xs=fr.map(p=>p[0]),ys=fr.map(p=>p[1]);if(Math.min(...xs)<GAR.x1+8&&Math.max(...xs)>GAR.x0-8&&Math.min(...ys)<GAR.y1+4&&Math.max(...ys)>GAR.y0-8)return false}   /* v340: a footprint bigger than the garage used to pass with all its corners outside it, and the parking garage ended up inside a 222 m tower */
+if(!rectFree(k,x,y,fa))return false;w2Put(k,x,y,fa,0);return true};
   if(W2){const c0=main?[-925,0]:[(X0+X1)/2,(Y0+Y1)/2],cR=main?330:220;let nS=0;
     /* street walls first: every street in the block, towers in the core (up to 10), offices and glass round them, walk-ups, brownstones, markets and shop rows further out */
     const pk=(e,u,sd)=>{const p=ePt(e,u,sd*20),cd=Math.hypot(p[0]-c0[0],p[1]-c0[1])/cR;if(main&&cd<0.85&&r()<0.5){const q=LK_SKY.filter(k=>!LK.used[k]);if(q.length)return pick(q)}if(main&&cd>0.5&&cd<1.6&&r()<0.12){const q=LK_LMK.filter(k=>!LK.used[k]);if(q.length)return q[0]}if(!main)return pick(LK_TOWN);if(cd<1.0)return pick(r()<0.7?LK_MID:LK_LOW);if(cd<1.5&&r()<0.3)return pick(LK_MID);return pick(LK_LOW)};   /* v333 zoning: towers and mid-rises only in downtown Westport; the other blocks stay 2-4 storeys */
