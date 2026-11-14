@@ -1199,6 +1199,29 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
   html body .cfgFoot{position:sticky!important;bottom:0;z-index:3;padding:6px 12px calc(6px + env(safe-area-inset-bottom))!important;background:#0c1215!important;box-shadow:0 -8px 18px rgba(0,0,0,.35)}
   html body .cfgFoot #cfgNext{display:none!important}   /* the big Next button already does this */
 }
+/* v338: the arrow is a tab on the left edge; it slides the whole left column (lock, phone, pair, remote, mini map) off to the left and back */
+html body #ui2 #u2dock{position:fixed!important;left:calc(env(safe-area-inset-left,0px))!important;right:auto!important;bottom:auto!important;top:calc(34% + 4px)!important;width:18px!important;height:52px!important;border-radius:0 12px 12px 0!important;border-left:0!important;z-index:9!important;display:flex!important}
+html body #ui2 #u2dock{width:22px!important;background:rgba(18,20,24,.82)!important;border:1px solid rgba(255,255,255,.16)!important}html body #ui2 #u2dock svg{transform:none!important;width:14px!important;height:14px!important;stroke:#fff!important;stroke-width:2.6!important;fill:none!important;display:block!important}
+html body.dkHide #ui2 #u2dock svg{transform:rotate(180deg)!important}
+html body #ui2 .u2left{left:calc(env(safe-area-inset-left,0px) + 24px)!important}
+html body #ui2 .u2left .dk,html body #ui2 #u2mm{transition:transform .28s cubic-bezier(.3,.7,.3,1),opacity .2s}
+html body.dkHide #ui2 .u2left .dk,html body.dkHide #ui2 #u2mm{transform:translateX(calc(-100% - 40px))!important;opacity:0;pointer-events:none}
+/* v338: chat */
+#ui2 #u2chat{position:relative}#ui2 #u2chat.on{background:var(--acc,#2f7cf6)!important}#ui2 #u2chat.on svg{stroke:#fff}
+#u2chatB{position:absolute;top:2px;right:2px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:#e5484d;color:#fff;font:700 10px/16px system-ui,sans-serif;font-style:normal;text-align:center}
+#chatP{position:fixed;left:calc(env(safe-area-inset-left,0px) + 14px);top:max(calc(env(safe-area-inset-top,0px) + 132px),30%);width:min(340px,calc(100vw - 28px));z-index:12;display:flex;flex-direction:column;gap:6px;
+  background:rgba(12,14,18,.58);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:8px;color:#fff;font:500 13px/1.35 system-ui,-apple-system,sans-serif}
+#chatP[hidden]{display:none}
+#chatLog{max-height:min(30vh,220px);overflow-y:auto;display:flex;flex-direction:column;gap:3px;padding:2px 4px;-webkit-overflow-scrolling:touch;user-select:text;-webkit-user-select:text}
+#chatLog .cm{text-shadow:0 1px 2px rgba(0,0,0,.6);word-wrap:break-word}#chatLog .cm b{color:#9fd0ff;font-weight:700}#chatLog .cm.me b{color:#ffd479}#chatLog .cm.sys{color:rgba(255,255,255,.7);font-style:italic}
+#chatP .chatRow{display:flex;gap:6px}
+#chatIn{flex:1;min-width:0;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,.18);background:rgba(0,0,0,.35);color:#fff;padding:0 10px;font:500 14px system-ui,sans-serif;outline:none;user-select:text;-webkit-user-select:text}
+@media (pointer:coarse){#chatIn{font-size:16px}}
+#chatIn:focus{border-color:#5aa9ff}
+#chatGo{width:38px;height:34px;border-radius:9px;border:0;background:#2f7cf6;display:flex;align-items:center;justify-content:center}#chatGo svg{width:18px;height:18px;fill:#fff;stroke:none}
+#ui2 #u2chat svg{fill:none;stroke:currentColor;stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+html body.chatOn #ui2 .u2left .dk,html body.chatOn #ui2 #u2mm{transform:translateX(calc(-100% - 40px))!important;opacity:0;pointer-events:none}   /* the chat sits where the left column was */
+@media (max-height:500px){#chatP{top:max(calc(env(safe-area-inset-top,0px) + 112px),30%)}#chatLog{max-height:22vh}}
 </style>
 
 <canvas id="gl"></canvas>
@@ -1294,7 +1317,7 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
 
 
 <div id="ui2">
-  <div class="u2tl"><button class="u2c" id="u2eye" aria-label="Hide the HUD (F2)"><svg viewBox="0 0 24 24"><path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="2.6"/></svg></button><button class="u2c" id="u2menu" aria-label="Settings"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><button class="u2c" id="u2acct" aria-label="Account"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.2-4 4.4-6 8-6s6.8 2 8 6"/></svg></button><button class="u2c" id="u2photo" aria-label="Photo mode (F8)"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></button><button class="u2c" id="u2help" aria-label="Controls"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5V14M12 17h.01"/></svg></button></div>
+  <div class="u2tl"><button class="u2c" id="u2eye" aria-label="Hide the HUD (F2)"><svg viewBox="0 0 24 24"><path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="2.6"/></svg></button><button class="u2c" id="u2menu" aria-label="Settings"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><button class="u2c" id="u2acct" aria-label="Account"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.2-4 4.4-6 8-6s6.8 2 8 6"/></svg></button><button class="u2c" id="u2photo" aria-label="Photo mode (F8)"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></button><button class="u2c" id="u2chat" aria-label="Chat (/)"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9.5h8M8 12.5h5"/></svg><i id="u2chatB" hidden>0</i></button><button class="u2c" id="u2help" aria-label="Controls"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5V14M12 17h.01"/></svg></button></div>
   <div class="u2tr">
     <div class="u2wal" id="u2cashP"><svg class="u2ring" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="18" class="rt"/><circle id="u2ringv" cx="22" cy="22" r="18" class="rv" pathLength="100" stroke-dasharray="0 100" transform="rotate(-90 22 22)"/><text x="22" y="26.5" id="u2l0">1</text></svg><div><b>$<span id="u2cash">0</span></b><small>Level <span id="u2lvN">1</span> · <span id="u2xpt">0/100</span> XP · <span id="u2clock">9:00 am</span></small></div><i id="u2xpf" hidden></i><b id="u2l1" hidden>2</b></div>
     <div class="u2bar"><button id="u2car" aria-label="My car"><svg viewBox="0 0 24 24"><path d="M3 13l2-5a2 2 0 0 1 2-1h10a2 2 0 0 1 2 1l2 5v5h-3v-2H6v2H3z"/><circle cx="7" cy="14" r="1.2"/><circle cx="17" cy="14" r="1.2"/></svg><span>Garage</span></button><button id="u2home" aria-label="Spawn"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9h-6v-6H9v6H3z"/></svg><span>Spawn</span></button><button id="u2tests" aria-label="Tests"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9zM8 11h8M8 15h8"/></svg><span>Tests</span></button><button id="u2shop" class="g" aria-label="Dealer"><svg viewBox="0 0 24 24"><path d="M3 4h2l2.5 11h11L21 7H6.5"/><circle cx="9" cy="19" r="1.4"/><circle cx="17" cy="19" r="1.4"/></svg><span>Dealer</span></button><button id="u2fs" aria-label="Full screen"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span>Full screen</span></button><button id="u2more" aria-label="More"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg><span>More</span></button></div>
@@ -1318,7 +1341,7 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
     <button id="u2comfort" aria-label="Comfort (I)"><svg viewBox="0 0 24 24"><path d="M7 21h10M8 17c-2-3 2-5 0-8s1-5 1-5M12 17c-2-3 2-5 0-8s1-5 1-5M16 17c-2-3 2-5 0-8s1-5 1-5"/></svg></button>
     <button id="u2assist" aria-label="Assists (G)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v6M12 15v6M3 12h6M15 12h6"/></svg></button>
   </div>
-  <div id="u2msg"></div><div id="u2nav" hidden></div>
+  <div id="chatP" hidden><div id="chatLog" aria-live="polite"></div><div class="chatRow"><input id="chatIn" maxlength="140" placeholder="Tap here to chat" autocomplete="off" enterkeyhint="send"><button id="chatGo" aria-label="Send"><svg viewBox="0 0 24 24"><path d="M4 12l16-8-6 16-2-6z"/></svg></button></div></div><div id="u2msg"></div><div id="u2nav" hidden></div>
   <div class="u2mid"><div id="u2cc" hidden></div><div id="u2lv" hidden><canvas width="400" height="224"></canvas></div>
     <div class="u2row"><button id="u2vol" aria-label="Volume"><svg viewBox="0 0 24 24"><path d="M4 10v4h4l6 4V6L8 10z" class="f"/><path d="M17 9a4 4 0 0 1 0 6"/></svg></button><button id="u2gearsel" aria-label="Gear selector"><svg viewBox="0 0 24 24"><path d="M6 4v16M12 4v16M18 4v8M6 12h12"/></svg></button><button id="u2up" aria-label="Shift up (E)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button><button id="u2dn" aria-label="Shift down (Q)"><svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button><div id="u2prs" role="group" aria-label="Gear"><button data-g="P" aria-label="Park">P</button><button data-g="R" aria-label="Reverse">R</button><button data-g="N" aria-label="Neutral">N</button><button data-g="D" aria-label="Drive">D</button></div><span class="sp"></span><button id="u2exit" class="red" aria-label="Get out (O)"><svg viewBox="0 0 24 24"><path d="M14 4h5v16h-5"/><path d="M10 8l-4 4 4 4M6 12h9"/></svg></button></div>
     <div class="u2line"><i id="u2thr"></i><i id="u2brk"></i></div>
@@ -1357,8 +1380,19 @@ html body.ui2 #ui2 button:active,html body.ui2 #brake:active,html body.ui2 #acce
 <script data-boot>(function(){var p=0;window.__bootP=0;var t=setInterval(function(){if(window.__bootReal){clearInterval(t);return}p+=(0.7-p)*0.025;window.__bootP=p;var a=document.getElementById("bootArc"),n=document.getElementById("bootNeedle"),c=document.getElementById("bootPct");if(a)a.setAttribute("stroke-dasharray",(p*100).toFixed(1)+" 100");if(n)n.style.setProperty("--a",(-135+p*270)+"deg");if(c)c.textContent=String(Math.round(p*100))},120)})()</script>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 337 · Real stocks, Shell stations and smoother roads</h2></div>
+    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 338 · Chat, clouds and real freeway merges</h2></div>
     <div class="nb">
+      <h4>Chat, clouds and real freeway merges</h4><ul>
+      <li>💬 <b>In-game chat.</b> Tap the new chat button in the top-left bar to open it, and tap it again to hide it. On a keyboard, press <b>/</b>. Everyone in the same online server sees what you type. A red number on the button shows messages you haven't read, links are removed, and bad words are blocked out.</li>
+      <li>☁️ <b>Clouds.</b> Clouds now drift across the sky with the wind, lit from the sun's side. On a clear day they're scattered; before rain, snow and storms they thicken into a grey overcast. Turn them off in Settings → World → Clouds if you want a plain sky.</li>
+      <li>🛣️ <b>The I-38 / I-61 stack flyovers no longer jump from one lane to two.</b> Each flyover now carries straight on as one lane, and the other ramp joins it from the right with a proper acceleration lane, a dotted line and a solid edge line, like a real freeway entrance. The connector also no longer drops back to one lane with no warning, and the dashed lines that floated over the grass are gone.</li>
+      <li>🟰 <b>Freeway entrances and exits look like real ones.</b> The wedge between a ramp and the freeway is now paved, with white lines meeting at the point, instead of a thin strip of grass running up to the merge. The grass behind it starts in a point, not a square edge. Lane lines on the freeway stay dashed past every ramp instead of turning solid for 100 m.</li>
+      <li>↔️ <b>The I-38 C-D road west of the stack</b> no longer splits from the middle of a road that just ends (the two yellow lines used to cross in an X). The ramp from I-38 joins it with an acceleration lane, and the way back to I-38 peels off with its own lane.</li>
+      <li>⬅️ <b>The arrow tab on the left edge</b> now slides the whole left column (lock, phone, pair, remote and the mini map) off the screen, and back again with a second tap. It used to sit in the bottom-right corner.</li>
+      <li>🔍 <b>Fixed:</b> typing in the phone's Google search box showed a red "ggSearch is not defined" game error.</li>
+      <li>📱 <b>Fixed:</b> with a phone held sideways, the car builder's list of cars was squashed to almost nothing, so you couldn't pick a car. The whole panel now scrolls, with the price bar at the bottom.</li>
+      <li>🛣️ <b>Fixed:</b> if the road textures couldn't load, roads turned bright blue and pink. They now retry, and fall back to plain grey asphalt if they still can't load.</li>
+      </ul>
       <h4>Real stocks, Shell stations and smoother roads</h4><ul>
       <li>📈 <b>The stock market uses real companies now</b>, starting at their real share prices. Prices move the same way for every player, so you all see the same market at the same time, and big market news hits everyone at once.</li>
       <li>⛽ <b>Fuel prices match real Michigan averages</b>: regular, midgrade, premium and diesel are priced the way they are at real pumps today, and they still move with the market.</li>
@@ -2720,20 +2754,27 @@ function buildNet2(){
     void dX;void dM;void o;   /* (the loop ramps are gone: every left turn is a flyover) */
     // outer ramp: off P well before the crossing, round the outside of the loop, onto Q well after it
     {const oN=`${Pn} ${dirName(Fi)} to ${Qn} ${dirName(Fo)}`;
-      if(/^(I-38 (W to I-61 N|E to I-61 S)|I-61 (S to I-38 W|N to I-38 E))$/.test(oN)){const dJ=Pn==="I-38"?CLD.dJ:CLD.dJ2;E("ramp",oN,[W(0,dOX),W(20.6,dOX-80),W(23.75,dOX-150),W(24.1,Dd,150),W(dJ-90,64,140),W(dJ,40)]);   // into the ramp junction with the flyover, from the right (it never crosses the flyover's path)
-        N(...W(dJ,40),{ctrl:"merge"});const cdW=oN==="I-61 S to I-38 W",cN=oN.replace(/^(I-38|I-61) [EWNS]/,"$1");
-        /* the two ramps join side by side into a two-lane connector (a lane each, nobody waits); 110 m on, its right lane ends and the flyover traffic zips in, then it joins the freeway */
-        E("ramp",cN,cdW?[W(dJ,40),W(dJ+110,44)]:[W(dJ,40),W(dJ+60,30,120),W(dJ+110,22.5)],{n:2,m:-2*LANE});
-        E("ramp",cN,cdW?[W(dJ+110,44),W(dJ+230,45)]:[W(dJ+110,22.5),W(dJ+150,20.6),W(dJ+230,0)])}   /* westbound: onto the C-D road (it gives way to the lane off I-38 there) */
+      if(/^(I-38 (W to I-61 N|E to I-61 S)|I-61 (S to I-38 W|N to I-38 E))$/.test(oN)){const dJ=Pn==="I-38"?CLD.dJ:CLD.dJ2;const cdW=oN==="I-61 S to I-38 W",cN=oN.replace(/^(I-38|I-61) [EWNS]/,"$1");
+        /* v338: the flyover carries straight on as a one-lane connector, and this ramp joins it from the right like any freeway entrance: it runs alongside as an
+           acceleration lane (a dotted line, no kerb) and merges about 100 m past the flyover's foot. It used to meet the flyover nose to nose, the road jumped
+           straight from one lane to two, and 110 m later dropped back to one with no taper */
+        const MJ=cdW?W(dJ+105,44.2):W(dJ+105,27.83);N(...MJ,{ctrl:"merge",minN:oN});
+        E("ramp",oN,cdW?[W(0,dOX),W(20.6,dOX-80),W(23.75,dOX-150),W(24.1,Dd,150),W(dJ-90,64,140),W(dJ+30,46.8,150),W(dJ+70,47.4),MJ]
+                      :[W(0,dOX),W(20.6,dOX-80),W(23.75,dOX-150),W(24.1,Dd,150),W(dJ-90,64,140),W(dJ+65,38.3),MJ]);
+        E("ramp",cN,cdW?[W(dJ,40),W(dJ+20,42,120),W(dJ+50,43.4,200),MJ]:[W(dJ,40),W(dJ+20,42,120),MJ]);
+        E("ramp",cN,cdW?[MJ,W(dJ+230,45)]:[MJ,W(dJ+150,20.6,150),W(dJ+230,0)])}   /* westbound: onto the C-D road (it gives way to the lane off I-38 there) */
       else E("ramp",oN,[W(0,dOX),W(20.6,dOX-80),W(23.75,dOX-150),W(24.1,Dd,150),W(Dd,24.1,150),W(dOM-150,23.75),W(dOM-80,20.6),W(dOM,0)])}}
   // ---- a collector-distributor road on westbound I-38 between the stack and County Rd 3 (v332). The stack's ramp onto westbound I-38 joins 730 m west of the crossing,
   // and the County Rd 3 exit is only 150 m further on: a short weave across the through lanes. Instead, as the design manuals recommend for closely spaced ramps,
   // traffic for County Rd 3 leaves I-38 at a slip ramp 620 m out onto a two-lane C-D road beside it; the stack ramp joins that, and it splits again:
   // County Rd 3 to the right, the rest back onto I-38 left of it, clear of the through lanes until the cut under County Rd 3
-  {const Y=ccy,M=[ccx-730,Y+45],Qs=[-3140,Y+45];N(ccx-620,Y,{ctrl:"merge"});N(...M,{ctrl:"merge",minN:"I-61 to I-38 W"});N(...Qs,{ctrl:"merge"});N(-3290,Y,{ctrl:"merge"});
-    E("ramp","Exit to County Rd 3",[[ccx-620,Y],[ccx-680,Y+20.6],[ccx-705,Y+30,0],M],{lim:45});   /* the slip ramp off I-38 */
-    E("ramp","I-38 C-D Rd",[M,Qs],{n:2,m:-2*LANE,lim:45});
-    E("ramp","I-38 C-D Rd",[Qs,[-3180,Y+34,0],[-3220,Y+23.75],[-3250,Y+20.6],[-3290,Y]],{lim:45})}
+  /* v338: the C-D road is one lane. The slip ramp off I-38 joins it from the left with an acceleration lane (it used to meet the stack ramp nose to nose and
+     open straight into two lanes), and the way back onto I-38 peels off to the left with a deceleration lane (it used to split from the middle of a
+     two-lane road that just ended, the two yellow lines crossing) */
+  {const Y=ccy,M=[ccx-730,Y+45],M2=[ccx-775,Y+45],Qs=[-3140,Y+45];N(ccx-620,Y,{ctrl:"merge"});N(...M2,{ctrl:"merge",minN:"Exit to County Rd 3"});N(...Qs,{ctrl:"merge",minN:"C-D Rd to I-38 W"});N(-3290,Y,{ctrl:"merge"});
+    E("ramp","Exit to County Rd 3",[[ccx-620,Y],[ccx-680,Y+20.6],[ccx-705,Y+31,40],[ccx-735,Y+41.25,60],[ccx-760,Y+41.25,40],M2],{lim:45});   /* the slip ramp off I-38 */
+    E("ramp","I-38 C-D Rd",[M,M2],{lim:45});E("ramp","I-38 C-D Rd",[M2,Qs],{lim:45});
+    E("ramp","C-D Rd to I-38 W",[Qs,[-3185,Y+41.1,60],[-3225,Y+27,80],[-3245,Y+23.75],[-3265,Y+20.6],[-3290,Y]],{lim:45})}
   // ---- the pretzel: two of the four left turns (I-38 east to I-61 north, I-38 west to I-61 south) are flyovers, 16 m up. Each leaves I-38 450 m before the crossing,
   // climbs along the freeway, swings left over both freeways and the I-61 bridge, then runs down beside I-61 right over the loop ramp underneath and joins it 520 m out.
   // With the two loops that stay (I-61 north to I-38 west, I-61 south to I-38 east) the ramps wind over and under each other like a pretzel
@@ -2983,7 +3024,14 @@ function auxW(e,u,t){const A=e.aux;if(!A)return 0;let w=0;for(const a of A){if(u
 function auxBuild(n){for(const l of n.legs){if(l.major)continue;const e=l.e;
   for(const o of n.legs){if(!o.major)continue;if(o.e.aux)o.e.aux=o.e.aux.filter(a=>a.n!==n||a.l!==l);const S=[];let sg=0;
     for(let d=0;d<=l.r+6;d+=3){const q=eAt(e,l.end===0?d:e.L-d),pp=eProj(o.e,q.x,q.y);if(pp.u<0||pp.u>o.e.L)continue;const need=Math.abs(pp.t)+LANE/2+e.side-(o.e.m/2+o.e.n*LANE+o.e.side);if(need<=0)continue;sg=Math.sign(pp.t);S.push([pp.u,need])}
-    if(S.length<2)continue;S.sort((a,b)=>a[0]-b[0]);(o.e.aux=o.e.aux||[]).push({u0:S[0][0],u1:S[S.length-1][0],sg,S,n,l})}}}
+    if(S.length>=2){S.sort((a,b)=>a[0]-b[0]);(o.e.aux=o.e.aux||[]).push({u0:S[0][0],u1:S[S.length-1][0],sg,S,n,l})}
+    /* v338: the gore. Past the merge point the ramp pulls away from the freeway at a slant; the thin wedge between the two used to be a sliver of grass
+       running right up to the nose. Real gores are paved and painted until they are a few metres wide, so the freeway's shoulder pavement follows the ramp out */
+    if(o.e.type==="xway"||o.e.type==="ramp"){const G=[];let gs=0;for(let d=l.r;d<=Math.min(e.L,l.r+160);d+=2){const q=eAt(e,l.end===0?d:e.L-d),pp=eProj(o.e,q.x,q.y);if(pp.u<0||pp.u>o.e.L)continue;
+        const gap=Math.abs(pp.t)-(LANE/2+e.side)-(o.e.m/2+o.e.n*LANE+o.e.side);
+        if(gap>4.5){if(G.length>=2){const [ua,wa]=G[G.length-1],dir_=Math.sign(ua-G[G.length-2][0])||1;for(let k=1;k<=4;k++)G.push([ua+dir_*k*wa*0.9,wa*(1-k/4)])}break}   /* the grass gore begins in a point, not a square edge */
+        if(gap>0){gs=Math.sign(pp.t);G.push([pp.u,gap+0.5])}}
+      if(G.length>=2){G.sort((a,b)=>a[0]-b[0]);(o.e.aux=o.e.aux||[]).push({u0:G[0][0],u1:G[G.length-1][0],sg:gs,S:G,n,l,gore:true})}}}}}
 for(const n of NODES){if(n.ctrl==="merge")auxBuild(n)}
 if(W2)for(const n of NODES){if(n.legs.length!==2||n.kind!=="cont")continue;const [A,B]=n.legs,wa=A.e.m/2+A.e.n*LANE+A.e.side,wb=B.e.m/2+B.e.n*LANE+B.e.side;if(Math.abs(wa-wb)<1)continue;
   const nr=wa<wb?A:B,wd=nr===A?B:A,d=Math.abs(wa-wb),e=nr.e,S_=Math.max(25,Math.max(e.lim||30,wd.e.lim||30)),L=Math.min(Math.max(110,12*S_*0.3048*(nr.e.ow||nr.e.type==="ramp"?0.7:0.5)),e.L*0.85),S=[];   /* v334: a lane is added or dropped over a real taper (about 12 ft x speed, MUTCD), not a sudden step */for(let k=0;k<=10;k++){const q=k/10,w=d*(1-q*q*(3-2*q));S.push(nr.end===0?[q*L,w]:[e.L-q*L,w])}if(nr.end===1)S.reverse();
@@ -7189,8 +7237,8 @@ function ui2Init(){{const u=$("ui2");u.addEventListener("pointerdown",e=>{const 
   on("u2menu",()=>openDrawer());on("u2acct",()=>acctOpen());on("u2help",()=>document.body.classList.toggle("help"));on("u2photo",()=>pmOpen());on("u2more",()=>openDrawer());
   on("u2car",()=>{closeDrawer();st.site="garage";openBuilder()});on("u2home",()=>{st.tab="spawn";openDrawer()});on("u2tests",()=>{st.tab="tests";openDrawer()});on("u2shop",()=>act("redoCar"));
   on("u2key",()=>fobPress(st.locked?"unlock":"lock"));on("u2phone",()=>{FOOT.phone=!FOOT.phone;if(!st.walk){toast(st.phoneConn?"Phone connected":"Phone in your pocket: connect it with the Bluetooth button")}renderPhone()});
-  on("u2bt",()=>phoneConnect(!st.phoneConn));on("u2scr",()=>{SCR.focus=!SCR.focus;tick(1)});on("u2rs",()=>rsOpen(!RSC.open));on("rsX",()=>rsOpen(false));on("rsWake",()=>{st.power=true;tick(1)});on("u2dock",()=>{const m=!document.body.classList.contains("dkMin");document.body.classList.toggle("dkMin",m);try{localStorage.setItem("mstrata.dkmin",m?"1":"")}catch(e){}});
-  try{if(localStorage.getItem("mstrata.dkmin"))document.body.classList.add("dkMin")}catch(e){}
+  on("u2bt",()=>phoneConnect(!st.phoneConn));on("u2scr",()=>{SCR.focus=!SCR.focus;tick(1)});on("u2rs",()=>rsOpen(!RSC.open));on("rsX",()=>rsOpen(false));on("rsWake",()=>{st.power=true;tick(1)});on("u2dock",()=>{const m=!document.body.classList.contains("dkHide");document.body.classList.toggle("dkHide",m);try{localStorage.setItem("mstrata.dkhide",m?"1":"")}catch(e){}});
+  try{if(localStorage.getItem("mstrata.dkhide"))document.body.classList.add("dkHide")}catch(e){}
   on("u2cam",()=>{st.cam=st.cam===1?0:1;$("screen").hidden=true;SCR.focus=false});on("u2belt",()=>{st.belt=!st.belt;beep(st.belt?1400:700,.05,"square",.1);toast(st.belt?"Seatbelt fastened":"Seatbelt unfastened")});
   on("u2haz",()=>act("hazard"));on("u2rc",()=>{const o=document.body.classList.toggle("rcOpen");try{localStorage.setItem("mstrata.rc",o?"1":"")}catch(e){}});try{if(localStorage.getItem("mstrata.rc"))document.body.classList.add("rcOpen")}catch(e){}on("u2sl",()=>act("sigL"));on("u2sr",()=>act("sigR"));on("u2lights",()=>act("lights"));on("u2high",()=>act("high"));on("u2epb",()=>act("epb"));on("u2fs",()=>fsToggle());{// the cluster screen: arrows on PC, swipe left / right on touch (no tap-to-open panel any more)
    const vw=$("u2carbtn");let sx=null,sy=0;vw.addEventListener("pointerdown",e=>{e.stopPropagation();if(e.target.closest(".u2va"))return;sx=e.clientX;sy=e.clientY;try{vw.setPointerCapture(e.pointerId)}catch(_){}});
@@ -11397,7 +11445,8 @@ function rkBuild(drive,lot,pad){const B={P:[],N:[],I:[],C:[]},cell=new Set(),K=(
       const prof=city?[[-0.45,0,0,0,0.503,0.512,0],[0,0,0,0.15,0.491,0.501,1],[0,0.15,0.15,0.15,0.491,0.501,1],[0.15,0.35+walk,0.15,0.15,0.450,0.489,1],dt_?[0.35+walk,2.35+walk,0.15,0.0,0.450,0.489,1]:[0.35+walk,0.65+walk,0.15,-0.5,0.515,0.573,1]]
         :fw?[[0,2.4,0,-0.5,0.515,0.573,0]]:[[0,1.8,0,-0.06,0.575,0.606,0],[1.8,3.3,-0.06,-0.5,0.515,0.573,0]];
       let prev=null;
-      for(const u of us){if(skip(u)){prev=null;continue}const W=Wf(u),z=e.hz?ez(e,u):0,h=H(u),v=u/12,a=ePt(e,u,sg*W),b=ePt(e,u,sg*(W+1)),lx=b[0]-a[0],ly=b[1]-a[1];
+      const paved=u=>{if(!fw)return false;if(auxW(e,u,sg)>0.2)return true;const W=Wf(u);for(const o of [0.6,1.6]){const q=ePt(e,u,sg*(W+o)),g_=groundAt(q[0],q[1]);if(g_&&(g_.kind==="road"||g_.kind==="lot"||g_.kind==="pad"))return true}return false};   /* v338: no grass embankment where a ramp's pavement runs alongside (it showed as a green stripe up to every merge) */
+      for(const u of us){if(skip(u)||paved(u)){prev=null;continue}const W=Wf(u),z=e.hz?ez(e,u):0,h=H(u),v=u/12,a=ePt(e,u,sg*W),b=ePt(e,u,sg*(W+1)),lx=b[0]-a[0],ly=b[1]-a[1];
         const row=prof.map(([o0,o1,y0,y1,u0,u1,lift])=>{const yy0=lift?y0*h:y0,yy1=lift?(y1<0?y1:y1*h):y1;const p0=ePt(e,u,sg*(W+o0)),p1=ePt(e,u,sg*(W+o1));
           const dx=o1-o0,dy=yy1-yy0,nl=Math.hypot(dx,dy)||1,nx=-dy/nl,ny=dx/nl;return {P:[[p0[0],p0[1],z+yy0],[p1[0],p1[1],z+yy1]],U:[[u0,v],[u1,v]],N:[lx*nx,ny,-ly*nx]}});
         if(prev)row.forEach((r,i)=>{const q=prev[i];if(Math.hypot(r.P[0][2]-r.P[1][2],r.P[0][0]-r.P[1][0],r.P[0][1]-r.P[1][1])<0.004&&Math.hypot(q.P[0][2]-q.P[1][2],q.P[0][0]-q.P[1][0],q.P[0][1]-q.P[1][1])<0.004)return;
@@ -11598,7 +11647,7 @@ function buildWorld(){retailSites();placeExtras();
       else stripInto(green,e,F(u=>-(M2(u)-e.shL-0.3)),F(u=>M2(u)-e.shL-0.3),-0.02,mu0,e.L)}
     else stripInto(R,e,-(e.m/2+nL+sd),e.m/2+nL+sd,0,u0,u1);
     {const k0_=RKE,ex=(Math.ceil(sd/3.6)+1)*1000;RKE=u=>Math.min(k0_(u)+ex,k0_(u)-(Math.floor(k0_(u)/1000)%10)*1000+9000)}
-    for(const a of e.aux||[]){const o=e.m/2+nL+sd;stripInto(R,e,u=>a.sg*(o-0.05),u=>a.sg*(o+auxW(e,u,a.sg)),0,a.u0,a.u1)}
+    for(const a of e.aux||[]){const o=e.m/2+nL+sd,ua=Math.max(a.u0,u0),ub=Math.min(a.u1,u1);if(ub>ua)stripInto(R,e,u=>a.sg*(o-0.05),u=>a.sg*(o+auxW(e,u,a.sg)),0,ua,ub)}
     const l0=Math.max(e.r0+0.4,lineTrim(e,0)),l1=Math.min(e.L-e.r1-0.4,e.L-lineTrim(e,1)),k0=kerbTrim(e,0),k1=e.L-kerbTrim(e,1),W=u=>M2(u)+nL+sd;
     // acceleration / deceleration lanes: where a ramp runs alongside the freeway there is one dashed white line between them,
     // not the ramp's yellow edge line next to the freeway's solid edge line and rumble strip
@@ -11607,14 +11656,20 @@ function buildWorld(){retailSites();placeExtras();
       for(let u=l0;u<=l1+2;u+=2){const uu=Math.min(u,l1),q=ePt(e,uu,M2(uu)+nL+0.1),zq=e.hz?ez(e,uu):0,near=uu<l1&&gAt(GRID.e,q[0],q[1]).some(f=>{if(f.type!=="xway")return false;const pp=eProj(f,q[0],q[1]);return pp.u>=0&&pp.u<=f.L&&Math.abs((f.hz?ez(f,pp.u):0)-zq)<1.5&&Math.abs(pp.t)<mAt(f,pp.u)/2+f.n*LANE+f.side+0.9});
         if(near&&a0===null)a0=uu;else if(!near&&a0!==null){besideFw.push([a0-1,uu+1]);a0=null}}}
     for(const dir of [1,-1]){const tt=f=>tp?(u=>dir*f(u)):dir*f(0);   // travel-frame sideways -> raw
-      const auxI=(e.aux||[]).filter(a=>a.sg===-dir).map(a=>[a.u0,a.u1]).concat(e.type==="xway"?fwAccelI(e,-dir,l0,l1):[]),skipI=e.type==="ramp"&&dir<0?besideFw:auxI;
+      const auxI=(e.aux||[]).filter(a=>a.sg===-dir&&!a.gore).map(a=>[a.u0,a.u1]).concat(e.type==="xway"?fwAccelI(e,-dir,l0,l1):[]),skipI=e.type==="ramp"&&dir<0?besideFw:auxI;
       for(let i=0;i<e.n;i++){const c=u=>-(M2(u)+(e.n-0.5-i)*LANE);for(const d of [-0.62,0.62])stripInto(wear[e.T.col],e,tt(u=>c(u)+d-0.3),tt(u=>c(u)+d+0.3),0.002,l0,l1)}
-      const sz=e.type==="ramp"||l1-l0<SOLID_L*2.5?null:dir>0?[l1-SOLID_L,l1]:[l0,l0+SOLID_L];
+      const sz=e.type==="ramp"||e.type==="xway"||l1-l0<SOLID_L*2.5?null:dir>0?[l1-SOLID_L,l1]:[l0,l0+SOLID_L];
       for(let i=0;i<e.n-1;i++){const bnd=u=>-(M2(u)+(e.n-1-i)*LANE);for(let u=l0+((-l0%(e.T.z==="c"?9:12))+(e.T.z==="c"?9:12))%(e.T.z==="c"?9:12);u<l1;u+=(e.T.z==="c"?9:12)){if(sz&&u+3>sz[0]&&u<sz[1])continue;stripInto(white,e,tt(v=>bnd(v)-0.065),tt(v=>bnd(v)+0.065),0.012,u,Math.min(u+3,l1))}
         if(sz)stripInto(white,e,tt(v=>bnd(v)-0.065),tt(v=>bnd(v)+0.065),0.012,sz[0],sz[1])}
       const out=u=>-(M2(u)+nL);
-      if(e.T.edgeL||e.T.parkLine){for(const [a,b] of minus(l0,l1,skipI))stripInto(e.ow&&dir<0?yellow:white,e,tt(u=>out(u)+0.05),tt(u=>out(u)+0.2),0.012,a,b);
-        for(const [a,b] of auxI)for(let u=a;u<b;u+=3.66)stripInto(white,e,tt(v=>out(v)-0.1),tt(v=>out(v)+0.1),0.012,u,Math.min(u+0.91,b))}   /* acceleration / deceleration lane: the dotted lane line (3 ft dashes, 9 ft gaps, 8 in wide) */
+      let goreI=[];if(e.type==="ramp"&&e.ow&&dir<0){let g0=null;for(let u=l0;u<=l1+2;u+=2){const uu=Math.min(u,l1),q=ePt(e,uu,-dir*(M2(uu)+nL)),zq=e.hz?ez(e,uu):0;   /* where the ramp's left edge runs beside the freeway's paved shoulder: the gore's white channelizing line, not the yellow edge line */
+          const near=uu<l1&&[...edgesNear(q[0],q[1],30)].some(f=>{if(f.type!=="xway")return false;const pp=eProj(f,q[0],q[1]);return pp.u>=0&&pp.u<=f.L&&Math.abs((f.hz?ez(f,pp.u):0)-zq)<1.5&&Math.abs(pp.t)-(f.m/2+f.n*LANE+f.side)<6.5});
+          if(near&&g0===null)g0=uu;else if(!near&&g0!==null){goreI.push([g0,uu]);g0=null}}}
+      if(e.T.edgeL||e.T.parkLine){for(const [a,b] of minus(l0,l1,skipI)){for(const [c,d] of minus(a,b,goreI))stripInto(e.ow&&dir<0?yellow:white,e,tt(u=>out(u)+0.05),tt(u=>out(u)+0.2),0.012,c,d);
+          for(const [c,d] of goreI){const x=Math.max(a,c),y=Math.min(b,d);if(y>x)stripInto(white,e,tt(u=>out(u)+0.05),tt(u=>out(u)+0.2),0.012,x,y)}}
+        for(const [a,b] of auxI)for(let u=Math.max(a,l0);u<Math.min(b,l1);u+=3.66)stripInto(white,e,tt(v=>out(v)-0.1),tt(v=>out(v)+0.1),0.012,u,Math.min(u+0.91,b,l1))
+        if(e.type!=="xway")for(const [a,b] of auxI){let s0=null;for(let u=Math.max(a,l0);u<=Math.min(b,l1)+2;u+=2){const uu=Math.min(u,Math.min(b,l1)),wide=uu<Math.min(b,l1)&&auxW(e,uu,-dir)>1.5;   /* the solid edge line on the outside of the acceleration lane, where it is wide enough to drive in */
+          if(wide&&s0===null)s0=uu;else if(!wide&&s0!==null){stripInto(white,e,v=>dir*(out(v)-auxW(e,v,-dir)+0.05),v=>dir*(out(v)-auxW(e,v,-dir)+0.2),0.012,s0,uu);s0=null}}}}   /* acceleration / deceleration lane: the dotted lane line (3 ft dashes, 9 ft gaps, 8 in wide) */
       if(e.T.bike){stripInto(bikeL,e,tt(u=>out(u)-0.03),tt(u=>out(u)-sd+0.12),0.009,l0,l1);   // painted bike lane with a bike symbol every 60 m
         for(let u=l0+20;u<l1-10;u+=60){const uu=dir>0?u:e.L-u,c=-(e.m/2+nL+sd/2);for(const k of [-0.5,0.5]){const q=ePt(e,uu+k*dir,dir*c);discInto(white,q[0],q[1],0.26,(e.hz?ez(e,uu):0)+0.014,10)}
           stripInto(white,e,dir*(c-0.05),dir*(c+0.05),0.014,uu-0.45,uu+0.45)}}
@@ -12745,6 +12800,66 @@ function postSize(w,h){if(POST.w===w&&POST.h===h&&POST.fbo)return POST.good;
   gl.bindFramebuffer(gl.FRAMEBUFFER,null);POST.good=good;if(!good)console.warn("post-processing off: framebuffer incomplete");return good}
 // which effects are on right now (from the graphics settings)
 function postWant(){const g=G();if(!POST.ok||(XR&&XR.on))return null;const f={fxaa:g.aa!=="off",ao:!!g.ao,bloom:!!g.bloom,rays:!!g.rays,dof:!!g.dof,mb:g.mb|0,mbMe:!!g.mbMe};if(g.aa==="msaa"&&!f.ao&&!f.bloom&&!f.rays&&!f.dof&&!f.mb)return null;return f}
+/* v338: clouds. A sky pass drawn behind the world: a layer of cloud about 1.6 km up, shaped from a baked tileable noise texture (four octaves), lit
+   from the sun's side and shaded on the far side, drifting with the wind. Cover follows the weather: scattered fair-weather cloud when it's clear,
+   thickening to a grey overcast for rain, snow and storms. Settings > World > Clouds turns it off (a plain sky, like before) */
+const CLOUDS={p:null,tex:null,q:null,fail:false};
+function cloudsOn(){return st.clouds!==false&&!st.lowEnd&&!CLOUDS.fail}
+function inv4(m){const a=m,o=new Float32Array(16);
+  const b00=a[0]*a[5]-a[1]*a[4],b01=a[0]*a[6]-a[2]*a[4],b02=a[0]*a[7]-a[3]*a[4],b03=a[1]*a[6]-a[2]*a[5],b04=a[1]*a[7]-a[3]*a[5],b05=a[2]*a[7]-a[3]*a[6],
+        b06=a[8]*a[13]-a[9]*a[12],b07=a[8]*a[14]-a[10]*a[12],b08=a[8]*a[15]-a[11]*a[12],b09=a[9]*a[14]-a[10]*a[13],b10=a[9]*a[15]-a[11]*a[13],b11=a[10]*a[15]-a[11]*a[14];
+  let d=b00*b11-b01*b10+b02*b09+b03*b08-b04*b07+b05*b06;if(!d)return null;d=1/d;
+  o[0]=(a[5]*b11-a[6]*b10+a[7]*b09)*d;o[1]=(a[2]*b10-a[1]*b11-a[3]*b09)*d;o[2]=(a[13]*b05-a[14]*b04+a[15]*b03)*d;o[3]=(a[10]*b04-a[9]*b05-a[11]*b03)*d;
+  o[4]=(a[6]*b08-a[4]*b11-a[7]*b07)*d;o[5]=(a[0]*b11-a[2]*b08+a[3]*b07)*d;o[6]=(a[14]*b02-a[12]*b05-a[15]*b01)*d;o[7]=(a[8]*b05-a[10]*b02+a[11]*b01)*d;
+  o[8]=(a[4]*b10-a[5]*b08+a[7]*b06)*d;o[9]=(a[1]*b08-a[0]*b10-a[3]*b06)*d;o[10]=(a[12]*b04-a[13]*b02+a[15]*b00)*d;o[11]=(a[9]*b02-a[8]*b04-a[11]*b00)*d;
+  o[12]=(a[5]*b07-a[4]*b09-a[6]*b06)*d;o[13]=(a[0]*b09-a[1]*b07+a[2]*b06)*d;o[14]=(a[13]*b01-a[12]*b03-a[14]*b00)*d;o[15]=(a[8]*b03-a[9]*b01+a[10]*b00)*d;return o}
+function cloudsInit(){if(CLOUDS.p||CLOUDS.fail)return;try{
+  const N=256,lat=(n,seed)=>{const g=new Float32Array(n*n);let s=seed;for(let i=0;i<g.length;i++){s=(s*1103515245+12345)&0x7fffffff;g[i]=s/0x7fffffff}return g},
+    sm=t=>t*t*(3-2*t),val=(g,n,x,y)=>{const x0=Math.floor(x),y0=Math.floor(y),fx=sm(x-x0),fy=sm(y-y0),a=(i,j)=>g[((j%n+n)%n)*n+((i%n+n)%n)];
+      return (a(x0,y0)*(1-fx)+a(x0+1,y0)*fx)*(1-fy)+(a(x0,y0+1)*(1-fx)+a(x0+1,y0+1)*fx)*fy};
+  const G=[lat(8,7),lat(16,19),lat(32,31),lat(64,47)],G2=[lat(8,101),lat(16,113),lat(32,127),lat(64,131)],px=new Uint8Array(N*N*4);   /* tileable: each octave's lattice wraps exactly once across the texture */
+  for(let y=0;y<N;y++)for(let x=0;x<N;x++){let v=0,w=0,v2=0;for(let o=0;o<4;o++){const n=8<<o,a=0.5**o;v+=val(G[o],n,x/N*n,y/N*n)*a;v2+=val(G2[o],n,x/N*n,y/N*n)*a;w+=a}
+    const i=(y*N+x)*4;px[i]=Math.round(v/w*255);px[i+1]=Math.round(v2/w*255);px[i+2]=0;px[i+3]=255}
+  const t=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,N,N,0,gl.RGBA,gl.UNSIGNED_BYTE,px);gl.generateMipmap(gl.TEXTURE_2D);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.REPEAT);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.REPEAT);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+  const VSc=`attribute vec2 aQ;varying vec2 vQ;void main(){vQ=aQ;gl_Position=vec4(aQ,0.9999,1.0);}`,
+    FSc=`#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
+precision mediump float;
+#endif
+varying vec2 vQ;uniform mat4 uIVP;uniform vec3 uEye,uSky,uSun,uSunC,uAmb;uniform vec4 uP;uniform vec2 uDr;uniform sampler2D uN;
+float fb(vec2 p){vec4 a=texture2D(uN,p),b=texture2D(uN,p*2.37+vec2(0.31,0.17));return a.r*0.62+b.g*0.38;}
+void main(){vec4 w=uIVP*vec4(vQ,1.0,1.0);vec3 d=normalize(w.xyz/w.w-uEye);float cov=uP.x,day=uP.y,oc=uP.z;
+ float h=max(d.y,0.0);vec3 col=mix(uSky*1.06+vec3(0.015)*day,uSky*vec3(0.80,0.88,1.0),pow(h,0.55));
+ float sd=max(dot(d,uSun),0.0);col+=uSunC*(pow(sd,48.0)*0.35+pow(sd,6.0)*0.06)*day*(1.0-oc*0.8);
+ if(d.y>0.004){float t=(1600.0-uEye.y)/d.y;vec2 p=(uEye.xz+d.xz*t)/7000.0+uDr;
+  float f=fb(p),c=smoothstep(1.0-cov,1.0-cov+0.22+0.25*oc,f);
+  float f2=fb(p+uSun.xz*0.012);float sh=clamp((f2-f)*5.0+0.45,0.0,1.0);
+  vec3 lit=vec3(1.0,0.985,0.96)*(0.12+0.95*day)*(1.0-0.45*oc)+uAmb*0.4;
+  vec3 dk=mix(uSky,vec3(0.50,0.53,0.58),0.6)*(0.18+0.62*day)*(1.0-0.35*oc);
+  vec3 cc=mix(lit,dk,sh*0.8+oc*0.35);cc+=uSunC*pow(sd,10.0)*0.45*(1.0-sh)*day*(1.0-oc);
+  float fade=exp(-t*0.000035)*smoothstep(0.004,0.10,d.y);col=mix(col,cc,clamp(c,0.0,1.0)*fade);}
+ gl_FragColor=vec4(pow(max(col,vec3(0.0)),vec3(0.4545)),1.0);}`;
+  const p=gl.createProgram();gl.attachShader(p,sh(gl.VERTEX_SHADER,VSc));gl.attachShader(p,sh(gl.FRAGMENT_SHADER,FSc));gl.bindAttribLocation(p,0,"aQ");gl.linkProgram(p);
+  if(!gl.getProgramParameter(p,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(p));
+  const u={};["uIVP","uEye","uSky","uSun","uSunC","uAmb","uP","uDr","uN"].forEach(n=>u[n]=gl.getUniformLocation(p,n));
+  const q=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,q);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
+  Object.assign(CLOUDS,{p,u,tex:t,q,t0:performance.now(),dr:[0.37,0.61]})}catch(e){console.warn("clouds off",e);CLOUDS.fail=true}finally{gl.useProgram(prog)}}
+function cloudsDraw(VP,eye,sky,D_){if(!cloudsOn())return;cloudsInit();if(!CLOUDS.p)return;const IV=inv4(VP);if(!IV)return;
+  const wk=WX.cur,ww=wk&&wk!=="clear"?(WX.w||0):0,wc={rain:0.86,snow:0.84,fog:0.80,storm:0.98,blizzard:0.98}[wk]||0.5,cov=lerp(0.5,wc,ww),oc=clamp((cov-0.6)/0.35,0,1);
+  /* the cloud field drifts with the wind (a steady breeze when there isn't any) */
+  const now=performance.now(),dt=Math.min(0.1,(now-(CLOUDS.tl||now))/1000);CLOUDS.tl=now;const spd=6+((typeof WXR!=="undefined"&&WXR.spd)||0)*1.5,hd=(typeof WXR!=="undefined"&&WXR.dir!=null)?WXR.dir:0.6;
+  CLOUDS.dr[0]+=Math.cos(hd)*spd*dt/7000;CLOUDS.dr[1]+=Math.sin(hd)*spd*dt/7000;
+  const sunC=[1.05,1.0,0.92].map((v,i)=>v*[1,0.78+0.22*D_,0.55+0.45*D_][i]);
+  if(typeof VAO_CUR!=="undefined"&&VAO_CUR)vaoOff();
+  gl.useProgram(CLOUDS.p);const u=CLOUDS.u;gl.uniformMatrix4fv(u.uIVP,false,IV);gl.uniform3fv(u.uEye,eye);gl.uniform3fv(u.uSky,sky);gl.uniform3fv(u.uSun,POST.sun||[0.3,0.8,0.2]);
+  gl.uniform3fv(u.uSunC,sunC);gl.uniform3fv(u.uAmb,[0.30,0.34,0.40].map(v=>v*D_+0.02));gl.uniform4f(u.uP,cov,D_,oc,0);gl.uniform2f(u.uDr,CLOUDS.dr[0]%1,CLOUDS.dr[1]%1);
+  gl.activeTexture(gl.TEXTURE7);gl.bindTexture(gl.TEXTURE_2D,CLOUDS.tex);gl.uniform1i(u.uN,7);gl.activeTexture(gl.TEXTURE0);
+  const bl=gl.isEnabled(gl.BLEND),cf=gl.isEnabled(gl.CULL_FACE);gl.disable(gl.DEPTH_TEST);gl.depthMask(false);gl.disable(gl.BLEND);gl.disable(gl.CULL_FACE);
+  gl.bindBuffer(gl.ARRAY_BUFFER,CLOUDS.q);gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);for(let i=1;i<4;i++)gl.disableVertexAttribArray(i);
+  gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
+  gl.useProgram(prog);gl.enable(gl.DEPTH_TEST);gl.depthMask(true);gl.disableVertexAttribArray(0);if(aC>=0){gl.disableVertexAttribArray(aC);gl.vertexAttrib3f(aC,1,1,1)}bind.col=false;if(bl)gl.enable(gl.BLEND);if(cf)gl.enable(gl.CULL_FACE)}
 function postBegin(W,H,sky){const f=postWant();POST.on=false;if(!f||!postSize(W,H))return false;POST.f=f;POST.on=true;gl.bindFramebuffer(gl.FRAMEBUFFER,POST.fbo);gl.viewport(0,0,W,H);gl.clearColor(sky[0],sky[1],sky[2],1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);return true}
 function inv4(m){const a=m,o=new Float32Array(16),b00=a[0]*a[5]-a[1]*a[4],b01=a[0]*a[6]-a[2]*a[4],b02=a[0]*a[7]-a[3]*a[4],b03=a[1]*a[6]-a[2]*a[5],b04=a[1]*a[7]-a[3]*a[5],b05=a[2]*a[7]-a[3]*a[6],b06=a[8]*a[13]-a[9]*a[12],b07=a[8]*a[14]-a[10]*a[12],b08=a[8]*a[15]-a[11]*a[12],b09=a[9]*a[14]-a[10]*a[13],b10=a[9]*a[15]-a[11]*a[13],b11=a[10]*a[15]-a[11]*a[14];
   let det=b00*b11-b01*b10+b02*b09+b03*b08-b04*b07+b05*b06;if(!det)return null;det=1/det;
@@ -15230,7 +15345,7 @@ function admPanelAct(a){const el=$("adm");if(a==="close"){el.hidden=true;return}
   if(!ADM.ok)return;const add=n=>{ECON.cash+=n;bankTx("Adjustment",n)};
   ({c1k:()=>add(1000),c10k:()=>add(10000),c100k:()=>add(100000),c1m:()=>add(1000000),score:()=>{BANK.score=850},loans:()=>{BANK.loans=BANK.loans.filter(l=>l.kind==="lease");for(const l of BANK.loans){l.pastDue=0}},card:()=>{BANK.card.bal=0;BANK.card.minDue=0;BANK.card.pastDue=0},
     lvl:()=>{ECON.lvl+=5},free:()=>{try{localStorage.removeItem("mstrata.free1")}catch(e){}},fill:()=>{const H=car.hyb;if(H.tank)H.fuel=H.tank;H.soc=TRIMS[st.trim].hybrid?0.8:1},fix:()=>{car.fault=null;sys.overheat=0;sys.breakdown=null},wmi:()=>admWear(10000,0),wyr:()=>admWear(0,365),
-    day:()=>{try{skipTime("day")}catch(e){}},boom:()=>stkAdmEvent(0.25,6,false),crash:()=>stkAdmEvent(-0.35,6,false),crashAll:()=>{if(confirm("Crash the stock market for EVERY player (−35%, recovers over about 12 hours)?"))stkAdmEvent(-0.35,12,true)},boomAll:()=>{if(confirm("Rally the market for every player (+25%)?"))stkAdmEvent(0.25,12,true)},stkClr:()=>{STK.ev=[];stkSync()},m1k:()=>add(-1000),m10k:()=>add(-10000),m100k:()=>add(-100000),m1m:()=>add(-1000000),zero:()=>add(-ECON.cash),gig:()=>{GIG.online=true;gigOffer()},ins:()=>{st.noIns=!st.noIns},dale:()=>{st.dale=!st.dale;toast(st.dale?"Dale mode ON":"Dale mode off")}})[a]?.();if(a==="players"){el.hidden=true;acctOpen();if(ACCT.admin&&!ACCT.list)acctAct("load");else if(ACCT.tok&&!ACCT.admin)toast("Your account is not an admin yet");return}
+    day:()=>{try{skipTime("day")}catch(e){}},boom:()=>stkAdmEvent(0.25,6,false),crash:()=>stkAdmEvent(-0.35,6,false),crashAll:()=>{stkAdmEvent(-0.35,12,true)},boomAll:()=>{stkAdmEvent(0.25,12,true)},stkClr:()=>{STK.ev=[];stkSync()},m1k:()=>add(-1000),m10k:()=>add(-10000),m100k:()=>add(-100000),m1m:()=>add(-1000000),zero:()=>add(-ECON.cash),gig:()=>{GIG.online=true;gigOffer()},ins:()=>{st.noIns=!st.noIns},dale:()=>{st.dale=!st.dale;toast(st.dale?"Dale mode ON":"Dale mode off")}})[a]?.();if(a==="players"){el.hidden=true;acctOpen();if(ACCT.admin&&!ACCT.list)acctAct("load");else if(ACCT.tok&&!ACCT.admin)toast("Your account is not an admin yet");return}
   bankSave();econSave();stkSave();el.innerHTML=admHtml();toast("Done")}
 // ======================================================================= ACCOUNTS: a username and a password, no email. Your saved game (cash, cars, bank, phone,
 // gigs, houses...) is kept on the server, so it follows you to any device. Admins see every account and can ban one.
@@ -15609,6 +15724,7 @@ function ggPage(id){const back=`<div class="ggTop web"><button data-a="ggpgback"
     <table class="sp">${[["Power",T.kW?Math.round(T.kW/0.7457)+" hp":"-"],["Weight",T.mass?Math.round(T.mass*2.2046).toLocaleString()+" lb":"-"],["Price",T.price?"$"+Math.round(T.price).toLocaleString():"see dealer"],["Fuel",T.ice?(T.mpg?T.mpg+" mpg":"Gas"):T.hybrid?"Hybrid":"Electric"]].map(([a,b])=>`<tr><td>${a}</td><td>${b}</td></tr>`).join("")}</table>
     <p class="fine">${(T.std||"").slice(0,240)}</p></div></div></div>`}
   return ""}
+window.ggSearch=ggSearch;window.ggType=ggType;   /* called from the Google search box (onkeydown / oninput): they must survive name mangling in the published build */
 function ggAct(a,v){if(a==="ggq"){ggSearch(v);return true}if(a==="ggraw"){GG.q=v;const T=ggTok(v);GG.res=ggRank(T);GG.fix=null;GG.orig=null;GG.ans=ggAnswer(v);phRender(true);return true}
   if(a==="ggclr"){GG.q="";GG.res=null;phRender(true);setTimeout(()=>{const i=document.getElementById("ggQ");if(i)i.focus()},30);return true}
   if(a==="ggmic"){toast("🎙 Listening… (type instead: the mic is just for show)");return true}
@@ -17144,7 +17260,7 @@ function render(dt){
   headlights(cm,fwd,lampsOn);
   const braking=car.brake>0.05; gl.uniform3fv(U.uTP,M4.p(cm,VEH.tail)); gl.uniform1f(U.uTail,braking?1:(lampsOn||parkL?0.25:0));
   if(GFX.frame%90===0||DD_N<0)try{ddAssign()}catch(e){}
-  const pass=(VP,eye,tgt,cam2)=>{gl.uniformMatrix4fv(U.uVP,false,VP);gl.uniform3fv(U.uEye,eye);cullSet(VP,eye);CULL.sec=!!cam2;
+  const pass=(VP,eye,tgt,cam2)=>{gl.uniformMatrix4fv(U.uVP,false,VP);gl.uniform3fv(U.uEye,eye);cullSet(VP,eye);CULL.sec=!!cam2;if(!cam2)try{cloudsDraw(VP,eye,sky,D_)}catch(e){console.warn(e);CLOUDS.fail=true;gl.useProgram(prog)}
   if(cam2==="mini"){gl.disable(gl.CULL_FACE);gl.uniformMatrix4fv(U.uM,false,M4.id());gl.depthMask(true);gl.disable(gl.BLEND);
     const lo=hlOn(),pk=!lo&&st.park&&st.power!==false,bk=car.brake>0.05||inp.brk>0.05&&st.power!==false,fl=sys.flashT>0&&((sys.flashT*6|0)%2===0),so=((st.signal||st.hazard)&&st.blink)||fl,AM=[2.2,1.0,0.08],OF=[0,0,0];
     const litM={head:lo?[1.6,1.6,1.5]:[0.35,0.36,0.38],tail:bk?[1.4,0.04,0.02]:(lo||pk?[0.45,0.01,0.01]:OF),sigL:so&&(fl||st.hazard||st.signal===-1)?AM:OF,sigR:so&&(fl||st.hazard||st.signal===1)?AM:OF,rev:st.gear==="R"?[1.4,1.4,1.4]:OF};{const pw=st.power!==false,aL=pw&&(st.hazard||st.signal===-1)||fl,aR=pw&&(st.hazard||st.signal===1)||fl;litM.act=[aL,aR];litM.on=[aL&&(st.blink||fl),aR&&(st.blink||fl)];litM.ph=fl?1:blinkPh();litM.fog=st.fog&&pw}
@@ -17779,7 +17895,7 @@ const TABS={
     ${POST.ok?(POST.dx?"":`<p class="note">This device can't read depth in the browser, so ambient occlusion, depth of field and motion blur stay off.</p>`):`<p class="note">Effects aren't supported on this device.</p>`}
     <h3>Weather · now ${WX.w>0.05?WX.cur:"clear"}</h3><div class="grid2">${[["auto","Auto","Changes every few minutes"],["clear","Clear","Dry road"],["rain","Rain","Wet road, about 70% grip"],["snow","Snow","About 30% grip: try TCS and ABS"],["fog","Fog","You see a lot less"],["storm","Thunderstorm","Heavy rain, strong gusts, lightning and thunder"],["blizzard","Blizzard","Heavy snow, strong wind, hard to see"]].map(([k,n,d])=>opt(`data-wx="${k}"`,st.weather===k,n,d)).join("")}</div>
     <h3>Temperature · now ${Math.round(ambF())}°F</h3><div class="grid2">${[["auto","Auto","Follows the season and time of day"],[10,"10°F","Bitter cold: snow stays"],[25,"25°F","Below freezing: snow stays, roads ice up"],[32,"32°F","Freezing: snow stays"],[38,"38°F","Above freezing: snow slowly melts, snow turns to rain"],[50,"50°F","Snow melts in a few minutes"],[70,"70°F","Warm: snow melts fast"],[90,"90°F","Hot"]].map(([k,n,d])=>opt(`data-tmp="${k}"`,String(st.tempF??"auto")===String(k),n,d)).join("")}</div>
-    <h3>Weather effects</h3><div class="grid2">${opt(`data-wxo="real"`,st.wxReal!==false,"🌦️ Realistic weather","Storms, gusts, roads that stay wet after rain, snow that builds up and melts. Off = simple weather")}${opt(`data-wxo="wind"`,st.wind!==false,"🌬️ Wind",`Crosswinds and gusts push the car, rain and snow blow sideways${WXR.spd>0.5?` · now ${Math.round(WXR.spd*2.237)} mph`:""}`,st.wxReal===false)}${opt(`data-wxo="snow"`,st.snowAcc!==false,"❄️ Snow builds up",`Snow covers the ground, roofs and cars, and roads stay slippery until it melts${WXR.snow>0.02?` · now ${Math.round(WXR.snow*100)}%`:""}`,st.wxReal===false)}</div>
+    <h3>Weather effects</h3><div class="grid2">${opt(`data-wxo="real"`,st.wxReal!==false,"🌦️ Realistic weather","Storms, gusts, roads that stay wet after rain, snow that builds up and melts. Off = simple weather")}${opt(`data-wxo="clouds"`,st.clouds!==false,"☁️ Clouds","Clouds drift across the sky and thicken into grey overcast before rain and snow. Off = a plain sky")}${opt(`data-wxo="wind"`,st.wind!==false,"🌬️ Wind",`Crosswinds and gusts push the car, rain and snow blow sideways${WXR.spd>0.5?` · now ${Math.round(WXR.spd*2.237)} mph`:""}`,st.wxReal===false)}${opt(`data-wxo="snow"`,st.snowAcc!==false,"❄️ Snow builds up",`Snow covers the ground, roofs and cars, and roads stay slippery until it melts${WXR.snow>0.02?` · now ${Math.round(WXR.snow*100)}%`:""}`,st.wxReal===false)}</div>
     <h3>Work gear · trucks only</h3><div class="grid2">${(()=>{const T=TRIMS[st.trim],ok=T&&isTruckT(T)&&!/^wk_/.test(T.model),cur=eqAcc();return [["none","None","No plow or spreader"],...Object.entries(EQ_ACC).map(([k,v])=>[k,v[1],v[2]])].map(([k,n,d])=>opt(`data-eqa="${k}"`,ok?(cur||"none")===k:k==="none",n,ok?d:"Only on pickup trucks. City work trucks are in the car list under Work Trucks",!ok)).join("")})()}</div>
     <h3>Road condition</h3><div class="rcRow"><span>Potholes</span><div class="seg5">${ROADC_N.map((n,i)=>`<button class="${ROADC.holes===i?"on":""}" data-rch="${i}">${n}</button>`).join("")}</div><small>${["Perfect pavement","A pothole now and then","Like most towns","Spring after a hard winter","Every few metres","Craters everywhere, some a car-length wide"][ROADC.holes]}</small></div>
     <div class="rcRow"><span>Bumps</span><div class="seg5">${ROADC_N.map((n,i)=>`<button class="${ROADC.bumps===i?"on":""}" data-rcb="${i}">${n}</button>`).join("")}</div><small>${["Glass smooth","Smooth","Like most towns: heaves, manholes, patches","Bumpy","Washboard everywhere","Broken up and heaved like an earthquake hit"][ROADC.bumps]}</small></div>
@@ -17917,7 +18033,7 @@ $("tabBody").addEventListener("click",e=>{const b=e.target.closest("button");if(
           if(k==="wheelUI")document.body.classList.toggle("wheelMode",!!n);if(k==="pedHold"||k==="thrRate"||k==="brkRate"){try{localStorage.setItem("strata.ped",JSON.stringify({pedHold:st.pedHold||0,thrRate:st.thrRate||2,brkRate:st.brkRate||2}))}catch(e){}renderTab()}}
     if(k==="cargoKg"||k==="dummies"||k==="dummyKg"){car.cargo=loadKg();toast(`Load: ${Math.round(loadKg()*2.205)} lb`)}}
   else if(d.rch!==undefined||d.rcb!==undefined){if(d.rch!==undefined)ROADC.holes=+d.rch;if(d.rcb!==undefined)ROADC.bumps=+d.rcb;try{localStorage.setItem("strata.roadc",JSON.stringify(ROADC))}catch(e){}genBumps();SCN.bumps=bumpMesh();toast(`Road condition: potholes ${ROADC_N[ROADC.holes].toLowerCase()}, bumps ${ROADC_N[ROADC.bumps].toLowerCase()}`);renderTab()}
-  else if(d.mir!==undefined){st.mirrors=d.mir==="1";toast(st.mirrors?"Realistic mirrors on":"Simple mirrors")}else if(d.gfx){setGfx(d.gfx);toast(`Graphics: ${GFX.q==="auto"?"Auto":G().label}. Traffic amount changes next time you add cars`)}else if(d.rsrc){toast("📡 Tuning…");liveLoad(d.rsrc)}else if(d.gopt){const k=d.gopt.split(":")[0];gfxOpt(k,d.gopt.slice(k.length+1))}else if(d.gfxreset){GFX.ov={};GFX.ovV++;try{localStorage.removeItem("strata.gfxov")}catch(e){}}else if(d.glite!==undefined){if((GFX_LITE?"1":"0")!==d.glite){try{localStorage.setItem("strata.lite",d.glite)}catch(e){}toast("Reloading with the new lighting…");setTimeout(()=>location.reload(),700)}}else if(d.regen!==undefined){st.regen=+d.regen;act("noop")}else if(d.ev!==undefined){st.engVol=+d.ev}else if(d.wx){setWeather(d.wx,true);toast(`Weather: ${d.wx}`)}else if(d.tmp!==undefined){st.tempF=d.tmp==="auto"?null:+d.tmp;toast(d.tmp==="auto"?"Temperature: auto":`Temperature set to ${d.tmp}°F`)}else if(d.eqa){st.eqAcc=st.eqAcc||{};if(d.eqa==="none")delete st.eqAcc[st.trim];else{st.eqAcc[st.trim]=d.eqa;loadModel(EQ_ACC[d.eqa][0]).catch(()=>{})}EQ.sig="";toast(d.eqa==="none"?"Work gear removed":`${EQ_ACC[d.eqa][1]} fitted. Use the buttons on the left`)}else if(d.wxo){const k=d.wxo;if(k==="real"){st.wxReal=st.wxReal===false;toast(st.wxReal?"Realistic weather on":"Simple weather")}else if(k==="wind"){st.wind=st.wind===false;toast(st.wind?"Wind on":"Wind off")}else if(k==="snow"){st.snowAcc=st.snowAcc===false;if(!st.snowAcc)WXR.snow=0;toast(st.snowAcc?"Snow builds up":"Snow build-up off")}else if(k==="grass"){st.grass=!grassOn();GRS.cells.clear();GRS.key="";toast(st.grass?"3D grass on":"3D grass off")}}else if(d.evf){st.events=d.evf;EV.t=Math.min(EV.t,20)}else if(d.aiw){st.aiWreck=st.aiWreck===false;try{localStorage.setItem("strata.aiw",st.aiWreck?"1":"0")}catch(e){}if(!st.aiWreck){for(const v of EV.list)if(v.pair)v.t=0}toast(st.aiWreck?"AI crashes on":"AI crashes off: traffic gets back on the road after a hit")}else if(d.ppl){st.people=st.people===false;if(st.people===false){peds=[];cars=cars.filter(c=>c.kind!=="bike")}else spawnBikes(Math.max(2,Math.round(G().traffic/6)))}else if(d.build){closeDrawer();openBuilder();return}else if(d.test)placeTest(d.test);else if(d.reset){const M=me();resetCar(M.s,laneOf(M.off));closeDrawer()}
+  else if(d.mir!==undefined){st.mirrors=d.mir==="1";toast(st.mirrors?"Realistic mirrors on":"Simple mirrors")}else if(d.gfx){setGfx(d.gfx);toast(`Graphics: ${GFX.q==="auto"?"Auto":G().label}. Traffic amount changes next time you add cars`)}else if(d.rsrc){toast("📡 Tuning…");liveLoad(d.rsrc)}else if(d.gopt){const k=d.gopt.split(":")[0];gfxOpt(k,d.gopt.slice(k.length+1))}else if(d.gfxreset){GFX.ov={};GFX.ovV++;try{localStorage.removeItem("strata.gfxov")}catch(e){}}else if(d.glite!==undefined){if((GFX_LITE?"1":"0")!==d.glite){try{localStorage.setItem("strata.lite",d.glite)}catch(e){}toast("Reloading with the new lighting…");setTimeout(()=>location.reload(),700)}}else if(d.regen!==undefined){st.regen=+d.regen;act("noop")}else if(d.ev!==undefined){st.engVol=+d.ev}else if(d.wx){setWeather(d.wx,true);toast(`Weather: ${d.wx}`)}else if(d.tmp!==undefined){st.tempF=d.tmp==="auto"?null:+d.tmp;toast(d.tmp==="auto"?"Temperature: auto":`Temperature set to ${d.tmp}°F`)}else if(d.eqa){st.eqAcc=st.eqAcc||{};if(d.eqa==="none")delete st.eqAcc[st.trim];else{st.eqAcc[st.trim]=d.eqa;loadModel(EQ_ACC[d.eqa][0]).catch(()=>{})}EQ.sig="";toast(d.eqa==="none"?"Work gear removed":`${EQ_ACC[d.eqa][1]} fitted. Use the buttons on the left`)}else if(d.wxo){const k=d.wxo;if(k==="clouds"){st.clouds=st.clouds===false;toast(st.clouds?"Clouds on":"Clouds off: plain sky")}else if(k==="real"){st.wxReal=st.wxReal===false;toast(st.wxReal?"Realistic weather on":"Simple weather")}else if(k==="wind"){st.wind=st.wind===false;toast(st.wind?"Wind on":"Wind off")}else if(k==="snow"){st.snowAcc=st.snowAcc===false;if(!st.snowAcc)WXR.snow=0;toast(st.snowAcc?"Snow builds up":"Snow build-up off")}else if(k==="grass"){st.grass=!grassOn();GRS.cells.clear();GRS.key="";toast(st.grass?"3D grass on":"3D grass off")}}else if(d.evf){st.events=d.evf;EV.t=Math.min(EV.t,20)}else if(d.aiw){st.aiWreck=st.aiWreck===false;try{localStorage.setItem("strata.aiw",st.aiWreck?"1":"0")}catch(e){}if(!st.aiWreck){for(const v of EV.list)if(v.pair)v.t=0}toast(st.aiWreck?"AI crashes on":"AI crashes off: traffic gets back on the road after a hit")}else if(d.ppl){st.people=st.people===false;if(st.people===false){peds=[];cars=cars.filter(c=>c.kind!=="bike")}else spawnBikes(Math.max(2,Math.round(G().traffic/6)))}else if(d.build){closeDrawer();openBuilder();return}else if(d.test)placeTest(d.test);else if(d.reset){const M=me();resetCar(M.s,laneOf(M.off));closeDrawer()}
   renderTab()});
 $("drawer").addEventListener("click",e=>{if(e.target.id==="drawer"||e.target.id==="close")closeDrawer()});
 $("redo").addEventListener("click",()=>redoCar());
@@ -17958,7 +18074,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=337;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   /* BUILD_VER: bumped to make open copies reload without resetting saves */
+const APP_VER="173",BUILD_VER=338;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   /* BUILD_VER: bumped to make open copies reload without resetting saves */
 /* v333: this used to sit behind a // comment on the line above, so it never ran: VER_WIPED was undefined and signing in threw before your account save could load.
    Version 173 never wiped anyone, so it is adopted quietly; later APP_VER bumps reset local saves again as intended */
 let VER_WIPED=false;try{if(APP_VER==="173")localStorage.setItem("strata.ver",APP_VER);if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
@@ -19457,7 +19573,7 @@ function mpTick(dt){const R_=MP.room;try{mpwTick(dt)}catch(e){console.warn(e)}if
     const p={x:+car.px.toFixed(2),y:+car.py.toFixed(2),z:+(car.zb||0).toFixed(2),h:+car.psi.toFixed(3),v:+car.vx.toFixed(2),m:TRIMS[st.trim].model||"",pc,b:(inp.brk>0.1||st.gear==="P")?1:0,sg:st.hazard?2:(st.signal||0),w:st.walk?1:0,st:Math.round((car.dF||0)*25)/25,li:st.power===false?0:st.high?2:hlOn()?1:0,rv:st.gear==="R"?1:0,pt:Math.round((car.pitch||0)*100)/100,rl:Math.round((car.roll||0)*100)/100,hn:st.hornAt&&(st.clock||0)-st.hornAt<0.6?1:0};
     if(st.walk){p.wx=+st.walk.x.toFixed(2);p.wy=+st.walk.y.toFixed(2);p.wz=+(st.walk.z||0).toFixed(2);p.wh=+(st.walk.h||0).toFixed(2);p.wv=+(Math.abs(st.walk.v||0)).toFixed(1);if(MPW.ride)p.rd=MPW.ride.peer}
     if(mpGuest()){const X=[];for(const c of cars)if(c.kind!=="net"&&c.wx!==undefined&&poolKeep(c)&&X.length<4){let m="";try{m=trafficModel(c)}catch(e){}X.push([Math.round(c.wx*10),Math.round(c.wy*10),Math.round(c.wh*100),Math.round((c.v||0)*10),m,String(c.paint||"white")])}if(X.length)p.xc=X}
-    const key=JSON.stringify(p),now=performance.now();if(key!==MP.last||now-MP.lastT>1000){MP.last=key;MP.lastT=now;R_.presence({car:p,playing:true,ver:BUILD_VER}).catch(()=>{})}}
+    const key=JSON.stringify(p),now=performance.now();if(key!==MP.last||now-MP.lastT>1000){MP.last=key;MP.lastT=now;R_.presence({car:p,playing:true,ver:BUILD_VER,chat:CHAT.mine.length?CHAT.mine:undefined}).catch(()=>{})}}
   const now=performance.now(),seen=new Set();let peers=[];try{peers=R_.peers()}catch(e){}
   for(const pr of peers){if(pr.sameTab||pr.kind!=="viewer")continue;const c=pr.presence&&pr.presence.car;if(!c||typeof c.x!=="number"||!isFinite(c.x)||!isFinite(c.y))continue;seen.add(pr.peer);
     let o=MP.objs.get(pr.peer);if(!o){o={kind:"remote",peer:pr.peer,wx:c.x,wy:c.y,wz:c.z||0,wh:c.h||0,v:0,spin:0,sig:0,head:0,paint:"white",occ:{pax:false,a:{skin:Math.floor(Math.random()*3),shirt:Math.floor(Math.random()*6)},b:{skin:0,shirt:0}}};MP.objs.set(pr.peer,o);if(MP.ready)toast(`${netClean(pr.presence.n,20)||"Another player"} joined the drive`)}o.name=netClean(pr.presence.n,20)||o.name;
@@ -19540,6 +19656,7 @@ function netOnMsg(topic,m){
   if(m.k==="P"){let p=NET.peers.get(id);if(!p){if(NET.peers.size>=NET.max+2)return;p={j:+m.j||Date.now()};NET.peers.set(id,p);netUI()}
     p.n=netClean(m.n,20)||"Driver";if(+m.j)p.j=+m.j;p.c=m.c&&typeof m.c==="object"&&typeof m.c.x==="number"?m.c:null;p.t=performance.now()}
   else if(m.k==="B"){if(NET.peers.delete(id))netUI()}
+  else if(m.k==="C"&&typeof m.t==="string"){const p=NET.peers.get(id);try{chatRecv(id,(p&&p.n)||m.n,m.t)}catch(e){}}
   else if(m.k==="W"&&id===netHostId()){try{mpwRecv(m)}catch(e){console.warn(e)}}
   else if(m.k==="H"&&m.to===NET.me&&Array.isArray(m.dv)&&!st.walk){const dx=clamp(+m.dv[0]||0,-15,15),dy=clamp(+m.dv[1]||0,-15,15),c=Math.cos(car.psi),s_=Math.sin(car.psi);car.vx+=dx*c+dy*s_;car.vy+=-dx*s_+dy*c;car.r+=clamp((Math.random()-0.5)*Math.hypot(dx,dy)*0.15,-0.8,0.8);const p=NET.peers.get(id);crashFx(clamp(+m.v||Math.hypot(dx,dy),0,30),(p&&p.n)||"another player")}
   else if(m.k==="E"&&id===netHostId()){if(typeof m.min==="number"&&isFinite(m.min)&&Math.abs(GT.min-m.min)>3)GT.min=m.min;if(+m.day>0&&+m.day!==GT.day&&Math.abs(+m.day-(GT.day||1))<400)GT.day=+m.day;if(typeof m.sp==="number"&&isFinite(m.sp)&&m.sp>=0&&m.sp<=60)GT.speed=m.sp;
@@ -19547,6 +19664,38 @@ function netOnMsg(topic,m){
 // ---- the room interface the game's multiplayer code already uses (same shape as the Claude artifact room)
 const NETROOM={presence(o){Object.assign(NET.pres,o);if(NET.on&&performance.now()-NET.sentT>140)netSendP();return Promise.resolve()},
   peers(){const out=[];for(const [id,p] of NET.peers)if(p.c)out.push({peer:id,kind:"viewer",presence:{car:p.c,n:p.n}});return out},onPeers(){}};
+// ======================================================================= v338: in-game chat (like Roblox's). The chat button in the top-left bar opens it and
+// hides it again; "/" opens it on a keyboard. Messages go to everyone in the same online server (over the server's MQTT topic) or, in the Claude artifact, to
+// everyone in the shared room (carried in each player's presence). Short messages only, a few a second at most, links removed and a basic word filter
+const chEsc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const CHAT={open:false,list:[],seq:0,mine:[],seen:new Map(),unread:0,lastSend:0};
+const CHAT_BAD=/\b(fuck\w*|shit\w*|bitch\w*|cunt\w*|dick\w*|cock\w*|pussy\w*|asshole\w*|bastard\w*|slut\w*|whore\w*|fag\w*|nigg\w*|retard\w*|porn\w*|sex\w*|nude\w*|kys)\b/gi;
+function chatClean(t){t=String(t||"").replace(/[\u0000-\u001f<>]/g,"").replace(/\s+/g," ").trim().slice(0,140);
+  t=t.replace(/\b(?:https?:\/\/|www\.)\S+|\b\S+\.(?:com|net|org|gg|io|co|xyz|ly|me|tv|app)\b\S*/gi,"[link removed]");
+  return t.replace(CHAT_BAD,w=>"#".repeat(w.length))}
+function chatWhere(){if(NET.on)return "server";if(MP.room&&MP.room!==NETROOM)return "room";return ""}
+function chatAdd(n,t,kind){CHAT.list.push({n:String(n||"").slice(0,20),t,kind:kind||"",ts:Date.now()});if(CHAT.list.length>60)CHAT.list.shift();
+  if(!CHAT.open&&kind!=="me"&&kind!=="sys"){CHAT.unread++;chatBadge()}chatRender()}
+function chatBadge(){const b=$("u2chatB");if(!b)return;b.hidden=CHAT.open||CHAT.unread<1;b.textContent=CHAT.unread>9?"9+":String(CHAT.unread)}
+function chatRender(){const L=$("chatLog");if(!L)return;const w=chatWhere();
+  L.innerHTML=(CHAT.list.length?"":`<div class="cm sys">${w?"Say hi 👋 Everyone in this "+(w==="server"?"server":"room")+" sees what you type.":"You're driving on your own. Join an online server (☰ Menu → Online) to chat with other players."}</div>`)+
+    CHAT.list.map(m=>`<div class="cm ${m.kind}">${m.kind==="sys"?"":`<b>${chEsc(m.n)}:</b> `}${chEsc(m.t)}</div>`).join("");L.scrollTop=L.scrollHeight}
+function chatOpen(o){CHAT.open=o!=null?o:!CHAT.open;const P=$("chatP");if(!P)return;P.hidden=!CHAT.open;document.body.classList.toggle("chatOn",CHAT.open);$("u2chat")&&$("u2chat").classList.toggle("on",CHAT.open);
+  if(CHAT.open){CHAT.unread=0;chatRender();if(!matchMedia("(pointer:coarse)").matches)setTimeout(()=>{try{$("chatIn").focus()}catch(e){}},30)}else{try{$("chatIn").blur()}catch(e){}}chatBadge()}
+function chatSend(){const I=$("chatIn");if(!I)return;const t=chatClean(I.value);I.value="";if(!t)return;const now=performance.now();if(now-CHAT.lastSend<900){toast("Slow down a little");return}CHAT.lastSend=now;
+  const w=chatWhere(),me=NET.name||"You";chatAdd(me,t,"me");if(!w){chatAdd("",`Nobody else can see this: you're not in an online server.`,"sys");return}
+  if(w==="server")netSend("C",{n:me,t});else{CHAT.mine.push({s:++CHAT.seq,t,n:me});if(CHAT.mine.length>3)CHAT.mine.shift();MP.last="";}}   /* the room copy rides on the next presence update (within a second) */
+function chatRecv(id,n,t){t=chatClean(t);if(!t)return;chatAdd(netClean(n,20)||"Driver",t)}
+/* the shared room: each player's last few messages travel in their presence; show the new ones once */
+setInterval(()=>{try{if(chatWhere()!=="room")return;for(const p of MP.room.peers()){const c=p.presence&&p.presence.chat;if(!Array.isArray(c))continue;const k=p.peer,last=CHAT.seen.get(k);
+  if(last===undefined){CHAT.seen.set(k,Math.max(0,...c.map(m=>+m.s||0)));continue}   /* someone already here: don't replay what they said before we arrived */
+  for(const m of c){if(+m.s>CHAT.seen.get(k)){CHAT.seen.set(k,+m.s);chatRecv(k,m.n,m.t)}}}}catch(e){}},500);
+(function chatUI(){const b=$("u2chat");if(!b)return;b.addEventListener("click",e=>{e.stopPropagation();chatOpen()});
+  const I=$("chatIn");I.addEventListener("keydown",e=>{e.stopPropagation();if(e.key==="Enter"){e.preventDefault();chatSend()}else if(e.key==="Escape"){chatOpen(false)}});
+  I.addEventListener("keyup",e=>e.stopPropagation());I.addEventListener("pointerdown",e=>e.stopPropagation());
+  $("chatGo").addEventListener("click",e=>{e.stopPropagation();chatSend();if(!matchMedia("(pointer:coarse)").matches)I.focus()});
+  $("chatP").addEventListener("pointerdown",e=>e.stopPropagation());
+  window.addEventListener("keydown",e=>{if(e.key!=="/"||CHAT.open)return;const t=e.target;if(t&&(t.tagName==="INPUT"||t.tagName==="TEXTAREA"||t.isContentEditable))return;e.preventDefault();e.stopImmediatePropagation();chatOpen(true)},true)})();
 async function netEnter(sid,pub,code,name,create){if(NET.on||NET.busy){toast("Leave this server first");return}if(MP.room&&MP.room!==NETROOM){toast("You're already in the shared online room");return}
   NET.busy=create?"Creating your server…":"Joining…";NET.err="";netUI();
   NET.sid=sid;NET.pub=pub;NET.code=code;NET.listTopic=NET.pre+(pub?"s/":"c/")+sid;NET.gameTopic=NET.pre+"g/"+sid;NET.listing=null;NET.peers.clear();NET.last.clear();
