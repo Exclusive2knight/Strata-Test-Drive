@@ -3290,7 +3290,7 @@ function sgAtlas(){if(!SGN.dirty&&SGN.tex)return SGN.tex;const A=SGN.A,AH=SGN.AH
   const t=SGN.tex||gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,c);
   gl.generateMipmap(gl.TEXTURE_2D);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
   try{const ext=gl.getExtension("EXT_texture_filter_anisotropic");if(ext)gl.texParameterf(gl.TEXTURE_2D,ext.TEXTURE_MAX_ANISOTROPY_EXT,Math.min(4,gl.getParameter(ext.MAX_TEXTURE_MAX_ANISOTROPY_EXT)))}catch(e){}
-  SGN.tex=t;SGN.dirty=false;SGN.cv=c;return t}
+  SGN.tex=t;SGN.dirty=false;c.width=c.height=0;return t}   /* v340: let the 32 MB canvas go once it is on the GPU */
 // ---- painters (MUTCD colours: red 186,12,47 / yellow 255,205,0 / orange 255,108,0 / green 0,107,63 / blue 0,62,126)
 const SGC={red:"#b70c2f",yel:"#ffcd00",org:"#ff6c00",grn:"#006b3f",blu:"#003e7e",blk:"#111",wht:"#fafafa",brn:"#5b3a1d"};
 function sgTxt(g,t,x,y,size,w,col,wt){g.fillStyle=col;let f=size;g.font=`${wt||700} ${f}px ${SG_FONT}`;while(g.measureText(t).width>w&&f>6){f-=1;g.font=`${wt||700} ${f}px ${SG_FONT}`}g.textAlign="center";g.textBaseline="middle";g.fillText(t,x,y);return f}
@@ -11280,7 +11280,12 @@ const U={};["uM","uVP","uC","uE","uSun","uSunC","uAmb","uEye","uFog","uTP","uHig
 const aP=gl.getAttribLocation(prog,"aP"), aN=gl.getAttribLocation(prog,"aN"), aC=gl.getAttribLocation(prog,"aC");if(aC>=0){gl.disableVertexAttribArray(aC);gl.vertexAttrib3f(aC,1,1,1)}
 gl.enable(gl.DEPTH_TEST);
 function b64(s,T){const bin=atob(s),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return new T(u.buffer)}
-function upload(pos,nrm,idx,col){const o={};if(col){o.cb=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,o.cb);gl.bufferData(gl.ARRAY_BUFFER,col,gl.STATIC_DRAW)}o.p=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,o.p);gl.bufferData(gl.ARRAY_BUFFER,pos,gl.STATIC_DRAW);
+function upload(pos,nrm,idx,col){const o={};
+  /* v340 memory: static meshes keep normals as 3 signed bytes (+1 pad) and colours as 3 unsigned bytes when they're plain 0-1 colours, instead of
+     floats: 36 -> 20 bytes a vertex on the GPU (the world's tiled meshes were ~250 MB; a 4 GB tablet ran out of room). bind0 already reads both */
+  if(nrm instanceof Float32Array&&nrm.length===pos.length){const n=nrm.length/3,q=new Int8Array(n*4);for(let i=0;i<n;i++){q[i*4]=Math.round(clamp(nrm[i*3],-1,1)*127);q[i*4+1]=Math.round(clamp(nrm[i*3+1],-1,1)*127);q[i*4+2]=Math.round(clamp(nrm[i*3+2],-1,1)*127)}nrm=q;o.n8=true}
+  if(col instanceof Float32Array&&col.length===pos.length){let ok=true;for(let i=0;i<col.length;i++){const v=col[i];if(!(v>=0&&v<=1)){ok=false;break}}
+    if(ok){const n=col.length/3,q=new Uint8Array(n*4);for(let i=0;i<n;i++){q[i*4]=Math.round(col[i*3]*255);q[i*4+1]=Math.round(col[i*3+1]*255);q[i*4+2]=Math.round(col[i*3+2]*255)}col=q;o.c8=true}}if(col){o.cb=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,o.cb);gl.bufferData(gl.ARRAY_BUFFER,col,gl.STATIC_DRAW)}o.p=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,o.p);gl.bufferData(gl.ARRAY_BUFFER,pos,gl.STATIC_DRAW);
   o.n=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,o.n);gl.bufferData(gl.ARRAY_BUFFER,nrm,gl.STATIC_DRAW);
   o.i=gl.createBuffer();gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,o.i);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,idx,gl.STATIC_DRAW);o.count=idx.length;o.type=idx instanceof Uint32Array?gl.UNSIGNED_INT:gl.UNSIGNED_SHORT;return o}
 const EXT_U32=gl.getExtension("OES_element_index_uint");
@@ -15801,6 +15806,9 @@ function acctHtml(){if(!acctOn())return `<div class="acH"><b>Account</b><button 
   h+=`<p>Signed in as <b>${acctEsc(ACCT.user)}</b>${ACCT.admin?' <span class="acA">admin</span>':""}${ACCT.role?` <span class="acA">${acctEsc(ACCT.role)}</span>`:""}</p><p class="fine">Your game saves to your account every minute and when you close the page${ACCT.at?` · last saved ${acctAgo(ACCT.at)}`:""}.</p>
     <div class="acR"><button data-ac="save">Save now</button><button data-ac="out">Sign out</button></div>${acctBackup()?`<p class="fine">This device's own game from ${new Date(acctBackup().at).toLocaleString()} was kept when your account's game loaded. <button data-ac="restore" class="acLink">Use that one instead</button></p>`:""}<p id="acMsg" class="acM">${acctEsc(ACCT.msg)}</p>`;
   h+=achHtml();
+  /* v340: link this account to Discord. The bot gives you a code in Discord; you type it here. The game sends it, with your sign-in, to the
+     server function link_discord(p_token, p_code) (other common names are tried too), which checks the code the bot saved and ties the two together */
+  h+=`<div class="acH2"><b>Link Discord</b></div><p class="fine">Ask the bot in our Discord for a link code, then type it here.</p><input id="acDC" placeholder="Code from the Discord bot" maxlength="40" autocomplete="off" autocapitalize="characters"><button data-ac="dlink">Link Discord</button>`;
   if(!ACCT.admin)h+=`<div class="acH2"><b>Report a player</b></div><input id="acRT" placeholder="Their username" maxlength="20"><input id="acRR" placeholder="What happened?" maxlength="300"><button data-ac="report">Send report</button>`;
   if(ACCT.admin){const at=ACCT.atab||"players";h+=`<div class="acT acTabs">${[["players","Players"],["msg","Message"],["events","Events"],["reports","Reports"],["stats","Stats"]].map(([k,n])=>`<button data-ac="at_${k}" class="${at===k?"on":""}">${n}</button>`).join("")}</div>`;
     if(at!=="players")return h+admTabHtml(at);
@@ -15839,6 +15847,11 @@ async function admAct(a,b){const A=ACCT.adm||(ACCT.adm={}),T=ACCT.tok,run=async(
   if(a==="repload"){try{A.reports=await acctRpc("admin_reports",{p_token:T})||[];ACCT.msg=""}catch(e){ACCT.msg=/function/i.test(e.message)?"Run the admin tools SQL in Supabase first":e.message}acctDraw();return true}
   if(a==="repdone"){try{await acctRpc("admin_report_done",{p_token:T,p_id:+b.dataset.id});A.reports=(A.reports||[]).filter(r=>String(r.id)!==b.dataset.id)}catch(e){ACCT.msg=e.message}acctDraw();return true}
   if(a==="statload"){try{A.stats=await acctRpc("admin_stats",{p_token:T});ACCT.msg=""}catch(e){ACCT.msg=/function/i.test(e.message)?"Run the admin tools SQL in Supabase first":e.message}acctDraw();return true}
+  if(a==="dlink"){const code=(($("acDC")||{}).value||"").trim().replace(/\s+/g,"");if(!code){acctMsg("Type the code the Discord bot gave you");return true}acctMsg("Linking…");
+    let last=null;for(const fn of ["link_discord","discord_link","redeem_discord_code","discord_redeem","link_discord_code"]){try{const r=await acctRpc(fn,{p_token:T,p_code:code});
+        const nm=r&&typeof r==="object"?(r.discord||r.discord_name||r.username||r.name||""):typeof r==="string"?r:"";acctMsg(nm?`Linked to Discord as ${nm}`:"Discord linked");$("acDC").value="";return true}
+      catch(e){last=e;if(!/Could not find the function|PGRST202|does not exist/i.test(e.message))break}}
+    acctMsg(/Could not find the function|PGRST202|does not exist/i.test(last&&last.message||"")?"Discord linking isn't switched on on the server yet":(last&&last.message)||"Couldn't link");return true}
   if(a==="report"){const t=(($("acRT")||{}).value||"").trim(),r=(($("acRR")||{}).value||"").trim();if(!t){acctMsg("Type their username");return true}
     try{await acctRpc("report_player",{p_token:T,p_target:t,p_reason:r});acctMsg("Thanks: an admin will look at it");$("acRT").value="";$("acRR").value=""}catch(e){acctMsg(e.message)}return true}
   return false}
@@ -18483,7 +18496,15 @@ let VER_WIPED=false;try{if(APP_VER==="173")localStorage.setItem("strata.ver",APP
 try{const P=JSON.parse(localStorage.getItem("strata.prefs")||"{}");for(const k in P){if(typeof P[k]==="number"&&isFinite(P[k]))st[k]=P[k]}if(st.wheelUI)document.body.classList.add("wheelMode")}catch(e){}   /* your settings from last time */
 try{const v=+localStorage.getItem("strata.kThr");if(GAS_N[v])st.kThr=v}catch(e){}try{const P=JSON.parse(localStorage.getItem("strata.ped")||"null");if(P){st.pedHold=+P.pedHold||0;st.thrRate=+P.thrRate||2;st.brkRate=+P.brkRate||2}}catch(e){}
 GFX.eff=gfxDetect();try{const s=localStorage.getItem("strata.gfx");if(s&&(s==="auto"||GQ[s]))GFX.q=s}catch(e){}
-function G(){const k=GFX.q==="auto"?GFX.eff:GFX.q;if(G.k!==k||G.v!==GFX.ovV||!G.m){G.k=k;G.v=GFX.ovV;const m={...GQ[k]};for(const o of GOPT)if(GFX.ov[o[0]]!==undefined)Object.assign(m,o[4](GFX.ov[o[0]]));if(Object.keys(GFX.ov).length)m.label=GQ[k].label+" (custom)";G.m=m;COLL.nt=!m.trees}return G.m}
+function G(){const k=GFX.q==="auto"?GFX.eff:GFX.q;if(G.k!==k||G.v!==GFX.ovV||!G.m){G.k=k;G.v=GFX.ovV;const m={...GQ[k]};for(const o of GOPT)if(GFX.ov[o[0]]!==undefined)Object.assign(m,o[4](GFX.ov[o[0]]));if(Object.keys(GFX.ov).length)m.label=GQ[k].label+" (custom)";
+    /* v340: weak tablets and laptops (a Surface Go: 2-core Pentium, Intel UHD 615, 4-8 GB shared with the GPU) picked on Medium or above get the same look
+       with less work behind it: fewer AI cars simulated, a shorter draw distance, the cameras and screens redrawn less often and a lower render scale,
+       so the CPU and memory stop running flat out */
+    if(gfxWeak()&&(k==="medium"||k==="high"||k==="ultra")){m.traffic=Math.min(m.traffic,10);m.onc=Math.min(m.onc,8);m.fullCars=Math.min(m.fullCars,6);m.cullD=Math.min(m.cullD||2800,2000);m.lod=Math.min(m.lod,80);
+      m.res=Math.min(m.res,0.8);m.camEvery=Math.max(m.camEvery,3);m.scrEvery=Math.max(m.scrEvery,2);m.hz=Math.min(m.hz,450);m.cap=Math.min(m.cap||60,45);m.aiSnd=false;m.bloom=0;m.rays=0;m.ao=0;m.dof=0;m.mb=0;m.aa=null}
+    G.m=m;COLL.nt=!m.trees}return G.m}
+function gfxWeak(){if(gfxWeak.v!==undefined)return gfxWeak.v;let v=false;try{const mem=navigator.deviceMemory||8,cores=navigator.hardwareConcurrency||8,gpu=gpuName()||"";
+  v=cores<=4&&(mem<=4||/Intel/i.test(gpu)&&/(UHD|HD) Graphics/i.test(gpu)&&!/Iris/i.test(gpu))||mem<=2}catch(e){}return gfxWeak.v=v}
 function gfxOpt(k,v){const o=GOPT.find(x=>x[0]===k);if(!o)return;const base={...GQ[GFX.q==="auto"?GFX.eff:GFX.q]};if(o[5](base)===v)delete GFX.ov[k];else GFX.ov[k]=v;GFX.ovV++;GFX.dyn=1;try{localStorage.setItem("strata.gfxov",JSON.stringify(GFX.ov))}catch(e){}}
 function setGfx(q){GFX.q=q;GFX.dyn=1;GFX.ov={};GFX.ovV++;try{localStorage.setItem("strata.gfx",q);localStorage.removeItem("strata.gfxov")}catch(e){}}
 function gfxTick(dt){GFX.fps=lerp(GFX.fps,1/Math.max(dt,1e-3),0.05);GFX.t+=dt;GFX.frame++;
