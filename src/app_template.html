@@ -14916,14 +14916,20 @@ function rcProj(kind,p,x0,y0,w,h,mirror){const M=SCR[kind+"VP"],cm_=SCR[kind+"Cm
 function rcLines(g,kind,x0,y0,w,h,mirror,L,fr){if(!L||st.noGuides)return;g.save();g.beginPath();g.rect(x0,y0,w,h);g.clip();g.lineCap="round";g.lineJoin="round";
   const hw=(VEH.width||1.9)/2+(L.pad||0.05),tz=fr?(VEH.head?VEH.head[2]-0.2:-2.4):(VEH.tail?VEH.tail[2]:2.4),R=Math.abs(car.dF)>0.01?WB/Math.tan(car.dF):1e9,sgn=fr?-1:1;
   const P=(lat,d,bend)=>{const off=bend?d*d/(2*R)*(fr?-1:1):0;return rcProj(kind,[lat-off,0.03,tz+sgn*d],x0,y0,w,h,mirror)};
-  const run=(lat,d0,d1,bend,col,lw,dash)=>{g.strokeStyle=col;g.lineWidth=lw;if(dash)g.setLineDash(dash);g.beginPath();let on=false;for(let d=d0;d<=d1+1e-6;d+=0.2){const q=P(lat,d,bend);if(!q){on=false;continue}on?g.lineTo(q[0],q[1]):g.moveTo(q[0],q[1]);on=true}g.stroke();g.setLineDash([])};
-  const cross=(d,col,lw,bend,frac)=>{const a=P(-hw,d,bend),b=P(hw,d,bend);if(!a||!b)return;g.strokeStyle=col;g.lineWidth=lw;g.beginPath();if(frac){const f=frac;g.moveTo(a[0],a[1]);g.lineTo(a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f);g.moveTo(b[0],b[1]);g.lineTo(b[0]+(a[0]-b[0])*f,b[1]+(a[1]-b[1])*f)}else{g.moveTo(a[0],a[1]);g.lineTo(b[0],b[1])}g.stroke()};
-  const lw=L.lw||3;if(L.sh){g.shadowColor="rgba(0,0,0,.55)";g.shadowBlur=3}
-  for(const [d0,d1,col] of L.w||[])for(const s of [-1,1])run(s*hw,d0,d1,false,col,lw,L.wDash);
-  if(L.wTicks)for(const [d0,d1,col] of L.w||[])cross(d1,col,lw,false,0.18);
-  const bend=Math.abs(car.vx)<6.7;if(L.p&&(L.dyn!==false))for(const [d0,d1,col] of L.p)for(const s of [-1,1])run(s*(hw+(L.pOut||0)),d0,d1,bend,col,L.plw||lw,L.pDash);
-  for(const [d,col,fr_] of L.d||[])cross(d,col,L.dlw||lw,L.dBend&&bend,fr_);
-  if(L.c)run(0,L.c0||0.3,L.c1||2.2,false,L.c,L.clw||2,[6,6]);
+  /* real overlays are drawn in perspective: thick close to the car, thin far away, with a dark edge so they read on bright ground */
+  const hz=(()=>{const q=P(0,80,false);return q?q[1]:y0})(),yb=y0+h,k=y=>clamp((y-hz)/Math.max(20,yb-hz),0.12,1.25),base=L.lw||3;
+  const seg=(a,b,col,lw)=>{const m=(k(a[1])+k(b[1]))/2,wd=lw*(0.3+0.85*m);g.strokeStyle="rgba(0,0,0,.42)";g.lineWidth=wd+2.2;g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(b[0],b[1]);g.stroke();
+    g.strokeStyle=col;g.lineWidth=wd;g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(b[0],b[1]);g.stroke()};
+  const run=(lat,d0,d1,bend,col,lw,dash)=>{const pts=[];for(let d=d0;d<=d1+1e-6;d+=0.12){const q=P(lat,d,bend);if(q)pts.push(q)}
+    if(dash){let acc=0,on=true;const [dl,gl]=dash;for(let i=1;i<pts.length;i++){const a=pts[i-1],b=pts[i],l=Math.hypot(b[0]-a[0],b[1]-a[1]);if(on)seg(a,b,col,lw);acc+=l;if(acc>(on?dl:gl)*(0.4+0.8*k(b[1]))){acc=0;on=!on}}}
+    else{/* outline in one pass, then colour, so joints stay clean */
+      for(const pass of [0,1]){for(let i=1;i<pts.length;i++){const a=pts[i-1],b=pts[i],m=(k(a[1])+k(b[1]))/2,wd=lw*(0.3+0.85*m);g.strokeStyle=pass?col:"rgba(0,0,0,.42)";g.lineWidth=pass?wd:wd+2.2;g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(b[0],b[1]);g.stroke()}}}};
+  const cross=(d,col,lw,bend,frac)=>{const a=P(-hw,d,bend),b=P(hw,d,bend);if(!a||!b)return;if(frac){const f=frac;seg(a,[a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f],col,lw);seg(b,[b[0]+(a[0]-b[0])*f,b[1]+(a[1]-b[1])*f],col,lw)}else seg(a,b,col,lw)};
+  for(const [d0,d1,col] of L.w||[])for(const s of [-1,1])run(s*hw,d0,d1,false,col,base,L.wDash);
+  if(L.wTicks)for(const [d0,d1,col] of L.w||[])cross(d1,col,base,false,0.16);
+  const bend=Math.abs(car.vx)<6.7;if(L.p&&(L.dyn!==false))for(const [d0,d1,col] of L.p)for(const s of [-1,1])run(s*(hw+(L.pOut||0)),d0,d1,bend,col,L.plw||base,L.pDash);
+  for(const [d,col,fr_] of L.d||[])cross(d,col,L.dlw||base,!!(L.p&&bend),fr_);
+  if(L.c)run(0,L.c0||0.3,L.c1||2.2,false,L.c,L.clw||2,[10,9]);
   g.restore()}
 /* the car seen from above, drawn over the top view where it sits (cameras can't see the car itself): body colour, glass, mirrors */
 function rcCarTop(g,x0,y0,w,h,o){const hw=(VEH.width||1.9)/2,fz=VEH.head?VEH.head[2]:-2.3,rz=VEH.tail?VEH.tail[2]:2.3;
@@ -14958,7 +14964,7 @@ function rcLayout(g,ctx,x,y,w,h,o){const S=ctx.S,v=RC.view,top=SCR.split&&has360
   const tx=o.topRight?x+w-tw:x,cx=o.topRight?x:x+tw+gap,cw=w-tw-(top?gap:0);
   g.fillStyle="#000";g.fillRect(x,y,w,h);let box=null;
   if(v==="side"){const hw2=(w-(o.gap||4))/2;rcFeed(g,SCR.camCv,x,y,hw2,h,true,[0,0,240,288]);rcFeed(g,SCR.camCv,x+hw2+(o.gap||4),y,hw2,h,true,[240,0,240,288])}
-  else{const kind=v==="front"||v==="frontW"?"front":"rear",mir=kind==="rear";rcFeed(g,SCR.camCv,cx,y,cw,h,mir);if(ctx.boot>=0)rcLines(g,kind,cx,y,cw,h,mir,v==="rearW"||v==="frontW"?(S.wideLines||S.lines):S.lines,kind==="front");
+  else{const kind=v==="front"||v==="frontW"?"front":"rear",mir=kind==="rear";rcFeed(g,SCR.camCv,cx,y,cw,h,mir);{const vg=g.createRadialGradient(cx+cw/2,y+h*0.45,Math.min(cw,h)*0.35,cx+cw/2,y+h*0.45,Math.hypot(cw,h)*0.62);vg.addColorStop(0,"rgba(0,0,0,0)");vg.addColorStop(1,"rgba(0,0,0,.38)");g.fillStyle=vg;g.fillRect(cx,y,cw,h)}if(ctx.boot>=0)rcLines(g,kind,cx,y,cw,h,mir,v==="rearW"||v==="frontW"?(S.wideLines||S.lines):S.lines,kind==="front");
     if(top){const sw=480*tw/h*288/480,src=[240-Math.min(240,sw*0.5*288/288),0,Math.min(480,sw),288];   /* centre crop of the overhead render to the panel's shape */
       const cw2=Math.min(480,288*tw/h);rcFeed(g,SCR.camCv2,tx,y,tw,h,false,[240-cw2/2,0,cw2,288]);box=rcCarTop(g,tx,y,tw,h,o.car);if(o.topSensors!==false)rcSensorsTop(g,box,o.sensorCols);
       if(S.topLines)rcTopPath(g,tx,y,tw,h,S.topLines,[240-cw2/2,0,cw2,288])}}
@@ -14991,14 +14997,17 @@ RC_STYLES.toy_e3={delay:1.0,lines:{w:[[0.25,3.0,"#3fd27a"]],d:[[0.5,"#ff3b30"],[
     if(RC.view!=="rear"){g.fillStyle="rgba(0,0,0,.55)";rr2(g,L.cx+10,10,120,26,5);g.fill();g.fillStyle="#fff";g.font="600 14px Arial,sans-serif";g.textAlign="left";g.fillText(RC_LBL[RC.view]+" View",L.cx+20,28)}}};
 /* Toyota, 2023 on (Toyota Audio Multimedia, 8 / 12.3 / 14-inch): the panoramic view monitor puts the overhead view beside the camera picture, yellow
    estimated course lines that turn with the wheel, red 0.5 m line, view buttons along the bottom; without it, the rear picture fills the screen */
-RC_STYLES.toy_tam={delay:0.8,wide:true,lines:{w:[[0.25,0.5,"#ff3b30"],[0.5,2.0,"#2f8cff"]],p:[[0.25,3.0,"#ffd400"]],d:[[0.5,"#ff3b30"],[1.0,"#ffd400",0.25],[2.0,"#ffd400",0.25]],lw:3.2,sh:1},
+RC_STYLES.toy_tam={delay:0.8,wide:true,lines:{p:[[0.25,3.0,"#ffd400"]],d:[[0.5,"#ff3b30"],[1.0,"#ffd400",0.25],[2.0,"#ffd400",0.25]],lw:3.2,sh:1},
   wideLines:{w:[[0.25,0.5,"#ff3b30"],[0.5,2.0,"#2f8cff"]],d:[[0.5,"#ff3b30"]],lw:3,sh:1},topLines:{p:[[0,2.2,"#ffd400"]]},
-  ui(g,c){const {W,H}=c,bh=52;g.fillStyle="#0e1013";g.fillRect(0,0,W,H);const L=rcLayout(g,c,0,0,W,H-bh,{topW:0.3,car:{tyres:true}});
-    // view buttons: white outline icons, the chosen one with a filled pill
-    const vs=c.views,bw=Math.min(118,(W-120)/vs.length);vs.forEach((v,i)=>{const x=12+i*(bw+8),on=RC.view===v;g.fillStyle=on?"#f2f4f6":"#23272d";rr2(g,x,H-bh+7,bw,bh-14,(bh-14)/2);g.fill();
-      rcIcon(g,v,x+22,H-bh/2,18,on?"#111":"#e8eaed");g.fillStyle=on?"#111":"#e8eaed";g.font="600 13px Arial,sans-serif";g.textAlign="left";g.fillText(RC_LBL[v],x+38,H-bh/2+5);hit(x,H-bh+7,bw,bh-14,()=>c.set(v))});
-    g.fillStyle="#23272d";rr2(g,W-60,H-bh+7,48,bh-14,(bh-14)/2);g.fill();rcIcon(g,"lines",W-36,H-bh/2,18,st.noGuides?"#777":"#e8eaed");hit(W-60,H-bh+7,48,bh-14,()=>{st.noGuides=!st.noGuides});
-    if(c.near<1.8){g.fillStyle="rgba(0,0,0,.6)";rr2(g,L.cx+L.cw-126,10,116,30,6);g.fill();rcIcon(g,"sonar",L.cx+L.cw-108,26,18,pdcCol(c.near));g.fillStyle="#fff";g.font="600 13px Arial,sans-serif";g.textAlign="left";g.fillText(`${(c.near*3.281).toFixed(1)} ft`,L.cx+L.cw-88,30)}}};
+  ui(g,c){const {W,H}=c,bh=58;g.fillStyle="#0b0c0e";g.fillRect(0,0,W,H);const L=rcLayout(g,c,0,0,W,H-bh,{topW:0.3,car:{tyres:true}});
+    const gr=g.createLinearGradient(0,H-bh,0,H);gr.addColorStop(0,"#17191d");gr.addColorStop(1,"#0d0e10");g.fillStyle=gr;g.fillRect(0,H-bh,W,bh);g.fillStyle="#2a2d33";g.fillRect(0,H-bh,W,1);
+    const vs=c.views,n=vs.length+1,bw=Math.min(104,(W-24-(n-1)*6)/n);
+    const btn=(x,on,ic,lab,fn,dim)=>{g.fillStyle=on?"#e9ecef":"rgba(255,255,255,.06)";rr2(g,x,H-bh+7,bw,bh-14,10);g.fill();if(!on){g.strokeStyle="rgba(255,255,255,.12)";g.lineWidth=1;g.stroke()}
+      const cl=on?"#121417":dim?"#6b7078":"#dfe3e8";rcIcon(g,ic,x+bw/2,H-bh+22,16,cl);g.fillStyle=cl;g.font="600 10.5px 'Helvetica Neue',Arial,sans-serif";g.textAlign="center";g.fillText(lab,x+bw/2,H-12);hit(x,H-bh+7,bw,bh-14,fn)};
+    vs.forEach((v,i)=>btn(12+i*(bw+6),RC.view===v,v,RC_LBL[v],()=>c.set(v)));
+    btn(W-12-bw,false,"lines",st.noGuides?"Lines Off":"Lines On",()=>{st.noGuides=!st.noGuides},st.noGuides);
+    g.fillStyle="rgba(0,0,0,.45)";rr2(g,L.cx+L.cw/2-118,8,236,24,12);g.fill();g.fillStyle="#f1f1f1";g.font="500 12px 'Helvetica Neue',Arial,sans-serif";g.textAlign="center";g.fillText("Check surroundings for safety.",L.cx+L.cw/2,24);
+    if(c.near<1.8){g.fillStyle="rgba(0,0,0,.6)";rr2(g,L.cx+L.cw-118,40,108,30,8);g.fill();rcIcon(g,"sonar",L.cx+L.cw-100,56,18,pdcCol(c.near));g.fillStyle="#fff";g.font="600 13px Arial,sans-serif";g.textAlign="left";g.fillText(`${(c.near*3.281).toFixed(1)} ft`,L.cx+L.cw-82,60)}}};
 /* Lexus, 2022 on (Lexus Interface, 14-inch): the same camera hardware as Toyota with Lexus's own look: black, thin white type, a slim strip of view icons
    down the right edge */
 RC_STYLES.lex_li={delay:0.8,wide:true,lines:RC_STYLES.toy_tam.lines,wideLines:RC_STYLES.toy_tam.wideLines,topLines:{p:[[0,2.2,"#ffd400"]]},
@@ -15024,7 +15033,9 @@ RC_STYLES.mazda_mc={delay:1.2,wide:true,lines:{p:[[0.3,2.4,"#ffb000"]],d:[[0.5,"
   ui(g,c){const {W,H}=c,sw=56;g.fillStyle="#000";g.fillRect(0,0,W,H);const L=rcLayout(g,c,sw,0,W-sw,H,{topW:0.36,gap:3,car:{tyres:true,body:"#cfd3d8"}});
     // the knob's selection list on the left (Mazda highlights the chosen item with a red-orange bar)
     g.fillStyle="#0c0d0f";g.fillRect(0,0,sw,H);const vs=c.views,bh=Math.min(58,(H-20)/vs.length);
-    vs.forEach((v,i)=>{const y=8+i*bh,on=RC.view===v;if(on){g.fillStyle="#26282c";g.fillRect(2,y,sw-4,bh-4);g.fillStyle="#c8102e";g.fillRect(2,y,3,bh-4)}rcIcon(g,v,sw/2,y+bh/2-2,20,on?"#fff":"#9a9ca0");hit(0,y,sw,bh,()=>c.set(v))});
+    vs.forEach((v,i)=>{const y=8+i*bh,on=RC.view===v;if(on){const gg=g.createLinearGradient(0,y,sw,y);gg.addColorStop(0,"#3a3d42");gg.addColorStop(1,"#1d1f22");g.fillStyle=gg;g.fillRect(2,y,sw-4,bh-4);g.fillStyle="#c8102e";g.fillRect(2,y,3,bh-4)}
+      rcIcon(g,v,sw/2,y+bh/2-8,18,on?"#fff":"#8e9196");g.fillStyle=on?"#fff":"#8e9196";g.font="9px Arial,sans-serif";g.textAlign="center";g.fillText({rear:"REAR",rearW:"WIDE",front:"FRONT",frontW:"WIDE",side:"SIDE"}[v],sw/2,y+bh-12);
+      if(i)g.fillStyle="#1c1e21",g.fillRect(8,y-3,sw-16,1);hit(0,y,sw,bh,()=>c.set(v))});
     // view status icon over the camera picture
     g.fillStyle="rgba(0,0,0,.55)";rr2(g,L.cx+8,8,34,30,4);g.fill();rcIcon(g,RC.view,L.cx+25,23,18,"#fff");
     if(RC.view!=="side"&&!L.top&&c.near<1.8){rcIcon(g,"sonar",L.cx+L.cw-24,24,20,pdcCol(c.near))}}};
