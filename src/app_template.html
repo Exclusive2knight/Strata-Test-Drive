@@ -1380,8 +1380,15 @@ html body.chatOn #ui2 .u2left .dk,html body.chatOn #ui2 #u2mm{transform:translat
 <script data-boot>(function(){var p=0;window.__bootP=0;var t=setInterval(function(){if(window.__bootReal){clearInterval(t);return}p+=(0.7-p)*0.025;window.__bootP=p;var a=document.getElementById("bootArc"),n=document.getElementById("bootNeedle"),c=document.getElementById("bootPct");if(a)a.setAttribute("stroke-dasharray",(p*100).toFixed(1)+" 100");if(n)n.style.setProperty("--a",(-135+p*270)+"deg");if(c)c.textContent=String(Math.round(p*100))},120)})()</script>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 338 · Chat, clouds and real freeway merges</h2></div>
+    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 339 · The Kestrel Tunnel and smarter headlights</h2></div>
     <div class="nb">
+      <h4>The Kestrel Tunnel and smarter headlights</h4><ul>
+      <li>🚇 <b>The Kestrel Tunnel.</b> I-61 north of the Kestrel Rd exit no longer climbs over the shoulder of Mount Kestrel. A ridge now runs across it, and the freeway goes straight through in twin bores, one for each direction, about 660 m long. You drive down into an open cut between tall retaining walls, past a concrete portal, and into a tiled, lit tunnel with lights along the ceiling.</li>
+      <li>🏛️ <b>The portals have real detail:</b> the KESTREL TUNNEL name plate over each bore, a lit green arrow over every lane, a height-clearance sign, floodlights, vent grilles, an SOS phone sign and a raised concrete frame round each opening. The headwall follows the hillside instead of being a flat block.</li>
+      <li>🌗 <b>It's darker inside, like a real tunnel.</b> Daylight fades over the first 40 m, and the tunnel lights take over. No rain or snow falls inside, the road stays dry and grippy, and auto headlights switch on as you go in.</li>
+      <li>🔦 <b>Active headlight levelling now only works on cars that have it</b> (it used to run on every car). It aims the low beam at the road 30 to 50 m ahead, so the beam drops as you top a crest and doesn't dazzle oncoming drivers, and lifts in a dip so you can see the road climbing ahead. Cars without it keep a beam fixed to the body. Turn it off in Settings → Display → Lights and display.</li>
+      <li>🛣️ <b>Fixed:</b> the two flyovers beside I-61 at the I-38 stack started climbing while still on top of the freeway's lanes. They now peel away first and only rise once there's grass between them and I-61.</li>
+      </ul>
       <h4>Chat, clouds and real freeway merges</h4><ul>
       <li>💬 <b>In-game chat.</b> Tap the new chat button in the top-left bar to open it, and tap it again to hide it. On a keyboard, press <b>/</b>. Everyone in the same online server sees what you type. A red number on the button shows messages you haven't read, links are removed, and bad words are blocked out.</li>
       <li>☁️ <b>Clouds.</b> Clouds now drift across the sky with the wind, lit from the sun's side. On a clear day they're scattered; before rain, snow and storms they thicken into a grey overcast. Turn them off in Settings → World → Clouds if you want a plain sky.</li>
@@ -3100,6 +3107,40 @@ function w2Profiles(){const ok=e=>e.mtn||/^(road|lane|dirt|xway)$/.test(e.type),
     for(const c of chain){const e=c.e,n=Math.ceil(e.L/4)+1,zp=new Float32Array(n);for(let i=0;i<n;i++){const u=Math.min(i*4,e.L);zp[i]=at(c.off+(c.rev?e.L-u:u))}e.zp=zp}
     for(let k=1;k<chain.length;k++){const c=chain[k],n=c.rev?c.e.b:c.e.a;n.zs=at(c.off)}}}
 if(W2)w2Profiles();
+/* ===== v339: the Kestrel Tunnel. I-61 north of the Kestrel Rd interchange used to climb straight over the shoulder of Mount Kestrel. A ridge now runs
+   across it and the freeway goes through it in twin bores (one per direction, built from the road kit's 3-lane tunnel tube), level and lit, with an open
+   cut held by retaining walls leading to a concrete portal at each end. Everything below works in a straight frame: the freeway runs due north here
+   along x = TUN.xc, so a point is (t = x - xc across, y along) */
+const TUN={on:false,xc:-2300,ya:1900,yb:2975,m2:11,Wc:24.8,tI:7.85,zrA:null};
+if(W2){(()=>{const xs=EDGES.filter(e=>e.type==="xway"&&e.name==="I-61"&&e.zp&&Math.abs(e.a.x-TUN.xc)<1||e.type==="xway"&&e.name==="I-61"&&e.zp&&Math.abs(e.b.x-TUN.xc)<1);if(!xs.length)return;
+  const zAt=y=>{for(const e of xs){const p=eProj(e,TUN.xc,y);if(p.u>=0&&p.u<=e.L&&Math.abs(p.t)<1)return ez0(e,p.u)}return null};
+  const zA=zAt(TUN.ya),zB=zAt(TUN.yb);if(zA===null||zB===null)return;TUN.xs=xs;
+  /* the road: a straight, gentle grade between the two ends instead of the climb over the hill */
+  const nz=(y,z0)=>{const w=smooth01(TUN.ya,TUN.ya+60,y)*(1-smooth01(TUN.yb-60,TUN.yb,y));return z0+(zA+(zB-zA)*(y-TUN.ya)/(TUN.yb-TUN.ya)-z0)*w};
+  for(const e of xs){if(!e.zp)continue;for(let i=0;i<e.zp.length;i++){const u=Math.min(i*4,e.L),p=eAt(e,u);if(Math.abs(p.x-TUN.xc)<1&&p.y>TUN.ya&&p.y<TUN.yb)e.zp[i]=nz(p.y,e.zp[i])}}
+  for(const n of NODES)if(Math.abs(n.x-TUN.xc)<1&&n.y>TUN.ya&&n.y<TUN.yb&&n.zs!==undefined)n.zs=nz(n.y,n.zs);
+  TUN.zA=zA;TUN.zB=zB;TUN.on=true;
+  HILLS2.push([TUN.xc,2470,26,260])})()}   /* the ridge (nothing else stands within half a kilometre of it) */
+function tunZr(y){/* the road surface along the tunnel (after dips) */if(!TUN.zrA){const A=[];for(let y=TUN.ya;y<=TUN.yb+0.1;y+=2){let z=null;for(const e of TUN.xs){const p=eProj(e,TUN.xc,y);if(p.u>=0&&p.u<=e.L&&Math.abs(p.t)<1){z=ez(e,p.u);break}}A.push(z===null?(A.length?A[A.length-1]:TUN.zA):z)}TUN.zrA=A}
+  const f=clamp((y-TUN.ya)/2,0,TUN.zrA.length-1.001),i=Math.floor(f);return TUN.zrA[i]+(TUN.zrA[i+1]-TUN.zrA[i])*(f-i)}
+/* portals and cuts, snapped to the rows of the ground grid so the ground mesh can stop exactly at the portal: each portal sits where the ridge is 9 m
+   above the road across the full width (room for the tube and cover over it), each cut starts where it is 0.6 m deep */
+function tunGeo(){if(!TUN.on||TUN.g)return;const N=800,X0=WORLD.x0,X1=WORLD.x1,Y0=WORLD.y0,Y1=WORLD.y1,NY=Math.round(N*(Y1-Y0)/(X1-X0)),dy=(Y1-Y0)/NY,dx=(X1-X0)/N;
+  const minT=y=>{let m=1e9;for(let t=-TUN.Wc-1;t<=TUN.Wc+1;t+=2)m=Math.min(m,hillZ(TUN.xc+t,y));return m};
+  let y0=null,y1=null,c0=null,c1=null;for(let y=TUN.ya+70;y<=TUN.yb-70;y+=1){const d=minT(y)-tunZr(y);if(d>0.6){if(c0===null)c0=y;c1=y}if(d>9.2){if(y0===null)y0=y;y1=y}}
+  if(y0===null){TUN.on=false;return}
+  const row=y=>Y0+Math.round((y-Y0)/dy)*dy;TUN.y0=row(y0+dy*0.5);TUN.y1=row(y1-dy*0.5);TUN.yc0=Math.min(row(c0),TUN.y0-dy*3);TUN.yc1=Math.max(row(c1),TUN.y1+dy*3);
+  TUN.xL=X0+Math.floor((TUN.xc-TUN.Wc-0.6-X0)/dx)*dx;TUN.xR=X0+Math.ceil((TUN.xc+TUN.Wc+0.6-X0)/dx)*dx;TUN.dx=dx;TUN.dy=dy;TUN.g=true}
+const tunCut=y=>y>=TUN.yc0&&y<=TUN.y0||y>=TUN.y1&&y<=TUN.yc1;
+const tunBore=y=>y>TUN.y0&&y<TUN.y1;
+/* the ground grid's height here, or null where the normal rules apply */
+function tunH(x,y){if(!TUN.on)return null;tunGeo();const t=Math.abs(x-TUN.xc);if(t>TUN.Wc+40||y<TUN.yc0-0.01||y>TUN.yc1+0.01)return null;
+  if(y>TUN.y0-0.01&&y<TUN.y1+0.01)return hillZ(x,y);
+  return x>TUN.xL+0.01&&x<TUN.xR-0.01?tunZr(y)-0.3:hillZ(x,y)}
+/* a quad of the ground grid that is left out: the cuts are open down to the road (the walls, a grass strip and the slopes above the walls fill it in) */
+function tunHole(x0,x1,y0,y1){return TUN.on&&TUN.g&&x0>=TUN.xL-0.01&&x1<=TUN.xR+0.01&&(y0>=TUN.yc0-0.01&&y1<=TUN.y0+0.01||y0>=TUN.y1-0.01&&y1<=TUN.yc1+0.01)}
+/* inside the walls (cut or bore): where the car's ground comes from the road, not the hill */
+function tunIn(x,y,m){if(!TUN.on)return false;tunGeo();return Math.abs(x-TUN.xc)<TUN.Wc+(m||0)&&y>=TUN.yc0&&y<=TUN.yc1}
 
 if(W2){const C=W2C.SD;for(const e of EDGES){if(e.type!=="xway"||Math.abs(e.a.y-C.y)>1||Math.abs(e.b.y-C.y)>1)continue;const xa=e.a.x,xb=e.b.x,ux=x=>(x-xa)/(xb-xa)*e.L;   /* I-38's sunken stretches either side of the river */
   for(const [x0,x1] of C.cuts){const lo=Math.min(ux(x0+C.full),ux(x1-C.full)),hi=Math.max(ux(x0+C.full),ux(x1-C.full)),u0=clamp(lo,0,e.L),u1=clamp(hi,0,e.L);if(u1<=u0)continue;
@@ -3542,7 +3583,8 @@ function retailSites(){if(XSITES.some(S=>S.custom))return;
   XSITES.push({kind:"lot",custom:true,drive:true,x:(GAR.wEdge+GAR.x0+0.6)/2,y:GAR.cy+12,L:GAR.x0+0.6-GAR.wEdge,D:8,U:[1,0],N:[0,1],stalls:[]});
   XSITES.push({kind:"lot",custom:true,drive:true,x:(GAR.x1-0.6+GAR.eEdge)/2,y:GAR.cy-12,L:GAR.eEdge-GAR.x1+0.6,D:8,U:[1,0],N:[0,1],stalls:[]});
   for(const T of RETAIL_STN)XSITES.push({kind:"stn",custom:true,x:T.x,y:T.s*(RB0+15.5),L:40,D:30,U:[1,0],N:[0,T.s],name:T.name})}
-function groundAt(x,y){if(inTC(x,y))return tcH(x,y);if(ORP.ready&&inOR(x,y))return orH(x,y,groundAt0(x,y));return groundAt0(x,y)}
+function groundAt(x,y){if(TUN.on&&TUN.g&&Math.abs(x-TUN.xc)<TUN.Wc+40&&y>=TUN.yc0&&y<=TUN.yc1&&!tunIn(x,y,0.3))return {h:hillZ(x,y),mu:MAP.offMu,kind:"grass"};   /* on the ridge or above the cut walls */
+  if(TUN.on&&tunIn(x,y,0.3)){const g=groundAt0(x,y);if(g.kind==="road")return g;const zr=tunZr(y);return {h:zr,mu:Math.abs(x-TUN.xc)<TUN.tI?0.7:1.0,kind:Math.abs(x-TUN.xc)<TUN.tI?"grass":"pavement"}}if(inTC(x,y))return tcH(x,y);if(ORP.ready&&inOR(x,y))return orH(x,y,groundAt0(x,y));return groundAt0(x,y)}
 function groundAt0(x,y){
   {const S=XSITES.length&&inExtra(x,y,0);if(S)return S.kind==="stn"?G_PAD:G_LOT}
   if(inGarage(x,y))return garageGround(x,y);
@@ -6095,11 +6137,11 @@ function weatherTick(dt){
   try{wxWheels()}catch(e){}
   try{wxRealTick(dt)}catch(e){}try{eqTick(dt);snmTick(dt);plowAiTick(dt)}catch(e){console.error(e)}
   const sl=wxOn()?snowHere(car.px,car.py):0,surf=wxOn()?(sl>0.3?"snow":WXR.wet>0.3||(WXR.snow>0.1&&snmSaltAt(car.px,car.py)>0.2)?"wet":"dry"):WX.cur==="rain"&&WX.w>0.35?"wet":WX.cur==="snow"&&WX.w>0.45?"snow":"dry";
-  if(st.surface!==surf)st.surface=surf;
+  if(st.surface!==surf&&!(TUN.g&&tunAt(car.px,car.py)&&Math.abs(car.px-TUN.xc)<TUN.Wc&&car.py>TUN.y0+30&&car.py<TUN.y1-30))st.surface=surf;else if(TUN.g&&car.py>TUN.y0+30&&car.py<TUN.y1-30&&Math.abs(car.px-TUN.xc)<TUN.Wc)st.surface="dry";   /* dry deep inside the tunnel */
   // rain on the roof
   if(au.ctx){const c=au.ctx;if(!au.rain){const b=c.createBuffer(1,c.sampleRate*2,c.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
       const s=c.createBufferSource();s.buffer=b;s.loop=true;const f=c.createBiquadFilter();f.type="bandpass";f.frequency.value=2600;f.Q.value=0.4;const g=c.createGain();g.gain.value=0;s.connect(f);f.connect(g);g.connect(au.master);s.start();au.rain={g,f}}
-    const v=WX.cur==="rain"?WX.w*(st.cam===1?0.09:0.05):0;au.rain.g.gain.setTargetAtTime(v,c.currentTime,0.4);au.rain.f.frequency.setTargetAtTime(st.cam===1?1500:2800,c.currentTime,0.3)}}
+    const v=WX.cur==="rain"&&!tunAt(car.px,car.py)?WX.w*(st.cam===1?0.09:0.05):0;au.rain.g.gain.setTargetAtTime(v,c.currentTime,0.4);au.rain.f.frequency.setTargetAtTime(st.cam===1?1500:2800,c.currentTime,0.3)}}
 // ---- realistic weather (Settings › World › Weather effects, each part can be turned off): wind with gusts that pushes the car,
 // thunderstorms and blizzards, snow that builds up on the ground, roofs and cars and melts afterwards, roads that stay wet after rain
 const WXR={wind:[0,0],spd:0,dir:Math.random()*6.283,base:3,gt:0,g:0,gT:0,snow:0,wet:0,storm:0,flash:0,thT:0,off:[0,0]};
@@ -6252,7 +6294,7 @@ function pudBuild(){const G_=new Map();let n=0;for(const e of EDGES){if(/dirt|la
       const key=Math.floor(p[0]/25)+","+Math.floor(p[1]/25);let L=G_.get(key);if(!L)G_.set(key,L=[]);L.push({x:p[0],y:p[1],z,r,h:p[2]});n++}}PUD.grid=G_;PUD.n=n}
 function pudAt(x,y){if(!PUD.grid)return null;const cx=Math.floor(x/25),cy=Math.floor(y/25);for(let i=-1;i<=1;i++)for(let j=-1;j<=1;j++){const L=PUD.grid.get((cx+i)+","+(cy+j));if(!L)continue;for(const q of L)if((q.x-x)**2+(q.y-y)**2<q.r*q.r)return q}return null}
 function onDeckAt(x,y){for(const e of gAt(GRID.e,x,y)){if(!e.br&&!e.ov)continue;const p=eProj(e,x,y);if(Math.abs(p.t)<e.W+1&&(e.br?Math.abs(p.u-e.br.uc)<e.br.half+20:overDeck(e,p.u)))return true}return false}
-function wxWheels(){const rain=WX.cur==="rain"&&WX.w>0.4,snow=WX.cur==="snow"&&WX.w>0.55,hi=summitIce();car.wxMu=car.wxMu||[1,1,1,1];if(hi&&!st.walk){car.wxMu.fill(hi);car.aqua=0;const now=performance.now();if(now-(PUD.seen.s||0)>20000){PUD.seen.s=now;toast(hi<0.4?"🧊 Ice on the summit road: chains or winter tyres, and go gently":"❄️ Frost on the mountain this early: careful on the bends")}return}if(!rain&&!snow||st.walk){car.wxMu.fill(1);car.aqua=0;return}if(!PUD.grid)pudBuild();
+function wxWheels(){const rain=WX.cur==="rain"&&WX.w>0.4,snow=WX.cur==="snow"&&WX.w>0.55,hi=summitIce();car.wxMu=car.wxMu||[1,1,1,1];if(TUN.g&&!st.walk&&Math.abs(car.px-TUN.xc)<TUN.Wc&&car.py>TUN.y0+20&&car.py<TUN.y1-20){car.wxMu.fill(1);car.aqua=0;return}if(hi&&!st.walk){car.wxMu.fill(hi);car.aqua=0;const now=performance.now();if(now-(PUD.seen.s||0)>20000){PUD.seen.s=now;toast(hi<0.4?"🧊 Ice on the summit road: chains or winter tyres, and go gently":"❄️ Frost on the mountain this early: careful on the bends")}return}if(!rain&&!snow||st.walk){car.wxMu.fill(1);car.aqua=0;return}if(!PUD.grid)pudBuild();
   const c=Math.cos(car.psi),s_=Math.sin(car.psi),v=Math.abs(car.vx);let aq=0,ice=0;
   for(let i=0;i<4;i++){const [x,y]=WPOS[i],wx=car.px+c*x-s_*y,wy=car.py+s_*x+c*y,q=pudAt(wx,wy);let m=1;
     if(rain&&q){m=v>17?Math.max(0.1,1-(v-17)/9*WX.w):0.88;if(m<0.6)aq++}
@@ -11139,7 +11181,7 @@ precision highp float;
 #else
 precision mediump float;
 #endif
-varying vec3 vW,vN,vL,vC;varying float vDent;uniform vec2 uTy;uniform vec3 uC,uE,uSun,uSunC,uAmb,uEye,uFog,uTP;uniform vec3 uLP[3];uniform vec3 uLD[3];uniform float uLI[3];uniform vec2 uLC[3];uniform vec4 uMask[6];uniform vec4 uSL[6];uniform float uHigh;uniform float uSp,uSh,uA,uFD,uPat,uTail;uniform vec4 uLm,uLs,uLg,uLw;
+varying vec3 vW,vN,vL,vC;varying float vDent;uniform vec2 uTy;uniform vec3 uC,uE,uSun,uSunC,uAmb,uEye,uFog,uTP;uniform vec4 uTn,uTn2;uniform vec3 uLP[3];uniform vec3 uLD[3];uniform float uLI[3];uniform vec2 uLC[3];uniform vec4 uMask[6];uniform vec4 uSL[6];uniform float uHigh;uniform float uSp,uSh,uA,uFD,uPat,uTail;uniform vec4 uLm,uLs,uLg,uLw;
 uniform vec2 uShC,uShF,uWX;uniform float uNt;uniform sampler2D uSnT;uniform vec3 uSnO;uniform vec4 uKO[10];uniform float uKOn;uniform float uBackOn;uniform sampler2D uTex;uniform vec3 uSO,uSU,uSV;
 float h(vec2 p){return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453);}
 float n2(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}
@@ -11147,6 +11189,7 @@ void main(){
  if(uKOn>0.5){for(int i=0;i<10;i++){vec4 k=uKO[i];if(k.z>0.0&&length(vW.xz-k.xy)<k.z&&vW.y>k.w+0.3)discard;}}
  vec3 N=normalize(vN),V=normalize(uEye-vW); if(dot(N,V)<0.0)N=-N;
  vec3 base=uC*vC; float alpha=uA;
+ float tun=0.0,tRoof=0.0;if(uTn2.w>0.5){float wy=-vW.z;if(abs(vW.x-uTn.x)<uTn.w&&wy>uTn.y-2.0&&wy<uTn.z+2.0){float k=clamp((wy-uTn.y)/(uTn.z-uTn.y),0.0,1.0);tRoof=mix(uTn2.x,uTn2.y,k)+5.35;if(vW.y<tRoof)tun=smoothstep(uTn.y-2.0,uTn.y+40.0,wy)*(1.0-smoothstep(uTn.z-40.0,uTn.z+2.0,wy));}}   // inside the Kestrel Tunnel: no sun, no snow or rain on the road, its own lights
  if(uPat>5.5&&uPat<9.5){vec4 tx=texture2D(uTex,vC.xy);if(uPat>6.5&&tx.a<0.5)discard;base=tx.rgb*uC;}
  if(uPat>9.5&&uPat<10.5){float ck=0.0;float z=vC.z+0.5;float kind=floor(z/10000.0);float n=floor(mod(z,10000.0)/1000.0);float m2=floor(mod(z,1000.0))/10.0-20.0;float t=vC.x,v=vC.y;vec2 uv;float g=0.34;
    if(kind>0.5&&kind<3.5){float x=m2<0.0?t-m2:abs(t)-m2;float nl=n*3.6;vec2 L=kind<1.5?vec2(0.100,0.184):vec2(0.005,0.090);g=kind<1.5?0.34:0.32;float q=x/3.6;float f=1.0-abs(mod(q,2.0)-1.0);
@@ -11187,16 +11230,16 @@ void main(){
    else if(uTy.x<3.5){g=max(step(0.8,fract(l/0.045+0.5)),step(0.82,fract(s/0.022+abs(fract(l/0.03)-0.5)*1.4)));}
    else{float row=floor(l/0.05);g=max(step(0.7,fract(s/0.075+row*0.5)),step(0.78,fract(l/0.05)));}
    base*=mix(1.0,0.28,clamp(g,0.0,1.0));}}
- if(uWX.x>0.003){float up=smoothstep(0.35,0.8,N.y);float nz=n2(vL.xz*0.8)*0.6+n2(vL.xz*5.0)*0.4;float cov=clamp((uWX.x*1.8-0.12-nz*0.5)*(uPat>1.5&&uPat<2.5||uPat>9.5&&uPat<10.5?0.95:1.0),0.0,1.0)*up;vec2 sq=(vec2(vW.x,-vW.z)-uSnO.xy)/uSnO.z;if(uSnO.z>0.0&&sq.x>0.0&&sq.y>0.0&&sq.x<1.0&&sq.y<1.0){vec4 sm=texture2D(uSnT,sq);cov*=1.0-sm.r;base=mix(base,base*vec3(0.78,0.74,0.7),sm.a*up*0.6);}base=mix(base,vec3(0.86,0.88,0.92),cov);}   // snow cover on anything facing up (roads less: tyre tracks)
- if(uWX.y>0.01&&(uPat>1.5&&uPat<2.5||uPat>9.5&&uPat<10.5))base*=1.0-0.32*uWX.y;   // wet asphalt is darker
+ if(uWX.x>0.003){float up=smoothstep(0.35,0.8,N.y);float nz=n2(vL.xz*0.8)*0.6+n2(vL.xz*5.0)*0.4;float cov=clamp((uWX.x*1.8-0.12-nz*0.5)*(uPat>1.5&&uPat<2.5||uPat>9.5&&uPat<10.5?0.95:1.0),0.0,1.0)*up*(1.0-tun);vec2 sq=(vec2(vW.x,-vW.z)-uSnO.xy)/uSnO.z;if(uSnO.z>0.0&&sq.x>0.0&&sq.y>0.0&&sq.x<1.0&&sq.y<1.0){vec4 sm=texture2D(uSnT,sq);cov*=1.0-sm.r;base=mix(base,base*vec3(0.78,0.74,0.7),sm.a*up*0.6);}base=mix(base,vec3(0.86,0.88,0.92),cov);}   // snow cover on anything facing up (roads less: tyre tracks)
+ if(uWX.y>0.01&&(uPat>1.5&&uPat<2.5||uPat>9.5&&uPat<10.5))base*=1.0-0.32*uWX.y*(1.0-tun);   // wet asphalt is darker
  vec3 em=vec3(0.0);float gls=0.0;
  if(uPat>3.5&&uPat<4.5&&abs(N.y)<0.5){vec2 hz=normalize(vec2(-N.z,N.x));float u=dot(vW.xz,hz);float fl=vW.y/3.6;float wx=fract(u/3.2),wy=fract(fl);
    float win=step(0.16,wx)*step(wx,0.84)*step(0.24,wy)*step(wy,0.84);
    if(vW.y<4.6)win=step(0.05,wx)*step(wx,0.95)*step(0.4,vW.y)*step(vW.y,4.0);
    float lit=step(0.52,h(floor(vec2(u/3.2,fl))+floor(vW.xz/37.0)));
    base=mix(base,vec3(0.05,0.07,0.09),win*0.9);gls=win;em=win*lit*uNt*vec3(1.0,0.8,0.5)*0.5;}
- vec3 L=uAmb+uSunC*max(dot(N,uSun),0.0);
- vec3 H=normalize(uSun+V);float sp=pow(max(dot(N,H),0.0),uSh)*uSp*length(uSunC)*0.6;if(uWX.y>0.01&&(uPat>1.5&&uPat<2.5||uPat>9.5&&uPat<10.5))sp+=pow(max(dot(N,H),0.0),70.0)*uWX.y*0.9*length(uSunC);
+ vec3 sunC=uSunC*(1.0-tun);vec3 L=mix(uAmb,vec3(0.2,0.19,0.17)*uTn2.z,tun)+sunC*max(dot(N,uSun),0.0);if(tun>0.0&&N.y<-0.6&&vW.y>tRoof-0.3)em+=base*tun*0.9*uTn2.z;
+ vec3 H=normalize(uSun+V);float sp=pow(max(dot(N,H),0.0),uSh)*uSp*length(sunC)*0.6;if(uWX.y>0.01&&(uPat>1.5&&uPat<2.5||uPat>9.5&&uPat<10.5))sp+=pow(max(dot(N,H),0.0),70.0)*uWX.y*0.9*(1.0-tun)*length(sunC);
  if(uLI[0]+uLI[1]+uLI[2]>0.001)for(int i=0;i<3;i++){vec3 l=uLP[i]-vW;float d=length(l);l/=d;vec3 rd=-l;float s=smoothstep(uLC[i].x,uLC[i].y,dot(rd,uLD[i]));
    if(i<2){s*=mix(1.0-smoothstep(0.0,0.03,rd.y-uLD[i].y),1.0,uHigh);                 // low beam: sharp cut-off above the beam axis
      if(uHigh>0.5)for(int j=0;j<6;j++){s*=1.0-uHigh*0.92*step(0.5,uMask[j].w)*smoothstep(uMask[j].w,uMask[j].w+0.0015,dot(rd,uMask[j].xyz));}}   // matrix: shade other cars
@@ -11225,7 +11268,7 @@ void main(){
 function sh(type,src){const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(s));return s}
 function mkProg(lite){const p=gl.createProgram();gl.attachShader(p,sh(gl.VERTEX_SHADER,VS));gl.attachShader(p,sh(gl.FRAGMENT_SHADER,(lite?"#define LITE\n":"")+FS));gl.linkProgram(p);if(!gl.getProgramParameter(p,gl.LINK_STATUS))throw new Error("link: "+gl.getProgramInfoLog(p));return p}
 let prog;try{prog=mkProg(GFX_LITE)}catch(e){console.warn("full shader failed, using the light one",e);prog=mkProg(true)}gl.useProgram(prog);
-const U={};["uM","uVP","uC","uE","uSun","uSunC","uAmb","uEye","uFog","uTP","uHigh","uSp","uSh","uA","uFD","uPat","uTail","uShC","uShF","uNt","uBackOn","uTex","uSO","uSU","uSV","uTy","uKOn","uDentOn","uFl","uFlD","uLm","uLs","uLg","uLw","uWX","uGr","uSnT","uSnO"].forEach(n=>U[n]=gl.getUniformLocation(prog,n));U.uDent=gl.getUniformLocation(prog,"uDent");U.uKO=gl.getUniformLocation(prog,"uKO");
+const U={};["uM","uVP","uC","uE","uSun","uSunC","uAmb","uEye","uFog","uTP","uHigh","uSp","uSh","uA","uFD","uPat","uTail","uShC","uShF","uNt","uBackOn","uTex","uSO","uSU","uSV","uTy","uKOn","uDentOn","uFl","uFlD","uLm","uLs","uLg","uLw","uWX","uGr","uSnT","uSnO","uTn","uTn2"].forEach(n=>U[n]=gl.getUniformLocation(prog,n));U.uDent=gl.getUniformLocation(prog,"uDent");U.uKO=gl.getUniformLocation(prog,"uKO");
 ["uLP","uLD","uLI","uLC","uMask","uSL"].forEach(n=>U[n]=gl.getUniformLocation(prog,n+"[0]"));
 const aP=gl.getAttribLocation(prog,"aP"), aN=gl.getAttribLocation(prog,"aN"), aC=gl.getAttribLocation(prog,"aC");if(aC>=0){gl.disableVertexAttribArray(aC);gl.vertexAttrib3f(aC,1,1,1)}
 gl.enable(gl.DEPTH_TEST);
@@ -11425,6 +11468,81 @@ function uSamples(e,u0,u1,step){const out=[u0];if(e.tp||e.hz)for(let u=u0+step;u
 /* v337: the raised median is solid: where it's built (see rkBuild), the ground between its kerbs is 15 cm up */
 function rkMedUp(e,u){return !!SCN.rk&&e.m>0&&!!e.T.kerb&&!(e.gap&&u>e.gap[0]-1&&u<e.gap[1]+1)&&!(e.br&&Math.abs(u-e.br.uc)<e.br.half+(e.br.rp||0))&&!(e.ov&&overDeck(e,u))&&!flyUp(e,u)&&u>Math.max(kerbTrim(e,0),e.tp?e.tp[0]+8:0)&&u<e.L-kerbTrim(e,1)}
 function rkLift(e,u,t){const H=e&&e.rkH;if(!H)return 0;const A=H[t>0?0:1];if(!A)return 0;return 0.15*A[clamp(Math.round(u),0,A.length-1)]}
+/* the tunnel's meshes: the two bores (the kit's tube profile: tiled walls, a lit ceiling), the cuts (the kit's retaining wall and median barrier, the
+   walls as tall as the cut is deep), a grass median and the ground above the walls, and the portal faces. Kit pieces use the road atlas UVs directly */
+function tunBuild(){SCN.tun=null;SCN.tunG=null;SCN.tunC=null;if(!TUN.on)return;tunGeo();if(!TUN.g)return;
+  const K={P:[],N:[],I:[],C:[]},G={P:[],N:[],I:[]},C={P:[],N:[],I:[]},xc=TUN.xc,Wc=TUN.Wc,tI=TUN.tI;
+  const P3=(t,y,z)=>[xc+t,z,-y];
+  /* a strip swept along y: the profile is [[t,z,u],...] in pairs (each pair one flat face), v = y/12 */
+  const sweep=(M,prof,ya,yb,uv,flip)=>{if(yb-ya<0.2)return;const n=Math.max(1,Math.ceil((yb-ya)/6));
+    for(let s=0;s<prof.length;s+=2){const A=prof[s],B=prof[s+1];let prev=null;
+      for(let k=0;k<=n;k++){const y=ya+(yb-ya)*k/n,zr=tunZr(y),a=typeof A==="function"?A(y):A,b=typeof B==="function"?B(y):B,pa=P3(a[0],y,zr+a[1]),pb=P3(b[0],y,zr+b[1]);
+        const dt=b[0]-a[0],dz=b[1]-a[1],l=Math.hypot(dt,dz)||1;let nx=dz/l,ny=-dt/l;if(flip){nx=-nx;ny=-ny}
+        const i0=M.P.length/3;M.P.push(...pa,...pb);M.N.push(nx,ny,0,nx,ny,0);if(uv)M.C.push(a[2],y/12,0,b[2],y/12,0);
+        if(prev!==null)M.I.push(prev,prev+1,i0,prev+1,i0+1,i0);prev=i0}}};
+  const quad=(M,a,b,c,d,n)=>{const i0=M.P.length/3;M.P.push(...a,...b,...c,...d);for(let k=0;k<4;k++)M.N.push(...n);M.I.push(i0,i0+1,i0+2,i0,i0+2,i0+3)};
+  for(const sg of [1,-1]){const T=x=>sg*(TUN.m2-3.15+x);   /* kit x (0 = the median side) to t */
+    const flip=sg<0;
+    // bores: median-side wall, outer wall, the ceiling in four light panels, a strip of floor along the median side (the game's road covers the rest)
+    const tube=[[T(0),0,0.688],[T(0),5.4,0.657], [T(16.95),5.4,0.688],[T(16.95),0,0.657], [T(0),-0.02,0.329],[T(3.0),-0.02,0.271]];
+    for(let p=0;p<4;p++)tube.push([T(16.95-p*4.2375),5.4,0.691],[T(16.95-(p+1)*4.2375),5.4,0.714]);
+    sweep(K,tube,TUN.y0,TUN.y1,true,flip);
+    // the cuts: the median barrier, the floor strip, the retaining wall (as tall as the ground behind it) and its coping
+    const wallTop=y=>Math.max(0.9,hillZ(xc+sg*(Wc+0.5),y)-tunZr(y)+0.05);
+    for(const [ya,yb] of [[TUN.yc0,TUN.y0],[TUN.y1,TUN.yc1]]){
+      sweep(K,[[T(-0.3),0,0.417],[T(-0.08),0.81,0.448], [T(-0.08),0.81,0.417],[T(0.08),0.81,0.448], [T(0.08),0.81,0.417],[T(0.18),0.25,0.448], [T(0.18),0.25,0.417],[T(0.3),0,0.448],
+        [T(0.3),-0.02,0.329],[T(3.0),-0.02,0.271],
+        [T(16.95),0,0.734],y=>[T(16.95),wallTop(y),0.734+0.03*Math.min(1,wallTop(y)/6.4)], y=>[T(16.95),wallTop(y),0.417],y=>[T(17.45),wallTop(y),0.448]],ya,yb,true,flip);
+      // grass median between the barriers, and the ground above the wall out to where the ground mesh picks up again
+      sweep(G,[[sg*0.01,-0.03],[T(-0.3),-0.03]],ya,yb,false,flip);
+      const xo=sg>0?TUN.xR-xc:TUN.xL-xc,n=6;
+      const sk=[];for(let k=0;k<n;k++){const ta=T(17.45)+(xo-T(17.45))*k/n,tb=T(17.45)+(xo-T(17.45))*(k+1)/n;
+        const h=(tt,y)=>(Math.abs(Math.abs(tt)-Math.abs(xo))<0.01?terrDrawn(xc+tt,y):Math.abs(Math.abs(tt)-(Wc+0.5))<0.01?tunZr(y)+wallTop(y):hillZ(xc+tt,y))-tunZr(y);
+        sk.push(y=>[ta,h(ta,y)],y=>[tb,h(tb,y)])}
+      sweep(G,sk,ya,yb,false,flip)}}
+  // the portal faces (v339): concrete headwalls that follow the ground line, a raised frame round each bore, a beam over it carrying lane signals (a lit
+  // green arrow over each lane), the tunnel's name plate, a height-clearance sign, floodlights, vent grilles on the pillar between the bores, and a
+  // ledge running across the face
+  const F={P:[],N:[],I:[]},D={P:[],N:[],I:[]},E={P:[],N:[],I:[]},Wl={P:[],N:[],I:[]},S={P:[],N:[],I:[],C:[]};
+  const bx=(M,t0,t1,z0,z1,ya,yb)=>boxInto(M,xc+(t0+t1)/2,(z0+z1)/2,-(ya+yb)/2,Math.abs(t1-t0),z1-z0,Math.abs(yb-ya),0);
+  const sq=(M,t0,t1,z0,z1,y,uv)=>{if(uv&&sq.flip)uv=[uv[2],uv[1],uv[0],uv[3]];const i0=M.P.length/3;M.P.push(...P3(t0,y,z0),...P3(t1,y,z0),...P3(t1,y,z1),...P3(t0,y,z1));for(let k=0;k<4;k++)M.N.push(0,0,1);
+    if(uv)M.C.push(uv[0],uv[3],0,uv[2],uv[3],0,uv[2],uv[1],0,uv[0],uv[1],0);M.I.push(i0,i0+1,i0+2,i0,i0+2,i0+3)};
+  for(const [yp,dir] of [[TUN.y0,-1],[TUN.y1,1]]){sq.flip=dir>0;const zr=tunZr(yp),rs=zr+5.4,xo=Math.max(TUN.xR-xc,xc-TUN.xL)+0.2,o=d=>yp+dir*d;
+    const top=t=>Math.max(terrDrawn(xc+t,yp)+0.7,zr+9.6);
+    // headwall in 2 m strips so its top follows the hillside
+    const face=(t0,t1,z0)=>{for(let t=t0;t<t1-0.01;t+=2){const ta=t,tb=Math.min(t1,t+2),ha=top(ta),hb=top(tb),i0=C.P.length/3;
+        C.P.push(...P3(ta,yp,z0),...P3(tb,yp,z0),...P3(tb,yp,hb),...P3(ta,yp,ha));for(let k=0;k<4;k++)C.N.push(0,0,1);C.I.push(i0,i0+1,i0+2,i0,i0+2,i0+3);
+        const j0=C.P.length/3,ba=o(-1.2);C.P.push(...P3(ta,ba,ha),...P3(tb,ba,hb),...P3(tb,yp,hb),...P3(ta,yp,ha));for(let k=0;k<4;k++)C.N.push(0,1,0);C.I.push(j0,j0+1,j0+2,j0,j0+2,j0+3)}};
+    face(-xo,-Wc,zr);face(-Wc,-tI,rs);face(-tI,tI,zr);face(tI,Wc,rs);face(Wc,xo,zr);
+    // a coping along the top edge and a ledge across the face
+    for(let t=-xo;t<xo-0.01;t+=2){const tb=Math.min(xo,t+2),h=Math.min(top(t),top(tb));bx(F,t,tb,h-0.05,h+0.3,o(-0.2),o(0.25))}
+    bx(F,-xo,xo,rs+3.3,rs+3.65,yp,o(0.45));
+    for(const s of [-1,1]){const a=s*tI,b=s*Wc,lo=Math.min(a,b),hi=Math.max(a,b),mid=(lo+hi)/2;
+      // frame: two jambs and the beam over the opening, standing 0.5 m proud of the face
+      bx(F,lo-0.8,lo,zr,rs+1.1,yp,o(0.5));bx(F,hi,hi+0.8,zr,rs+1.1,yp,o(0.5));bx(F,lo-0.8,hi+0.8,rs,rs+1.1,yp,o(0.55));
+      // lane-use signals on the beam: a dark box with a lit green arrow pointing down at each lane
+      for(let k=0;k<3;k++){const c=s*(TUN.m2+(k+0.5)*LANE);bx(D,c-0.38,c+0.38,rs+0.18,rs+0.94,o(0.55),o(0.8));
+        const y=o(0.86);sq(E,c-0.06,c+0.06,rs+0.5,rs+0.82,o(0.86));const i0=E.P.length/3;E.P.push(...P3(c-0.2,y,rs+0.52),...P3(c+0.2,y,rs+0.52),...P3(c,y,rs+0.28));for(let q=0;q<3;q++)E.N.push(0,0,1);E.I.push(i0,i0+1,i0+2)}
+      // name plate over the bore and a clearance sign beside it
+      bx(D,mid-5.6,mid+5.6,rs+1.45,rs+3.05,yp,o(0.12));sq(S,mid-5.5,mid+5.5,rs+1.55,rs+2.95,o(0.26),[0,0,1,0.5]);
+      const cs=s>0?hi+1.6:lo-1.6;bx(D,cs-0.85,cs+0.85,zr+3.0,zr+4.0,yp,o(0.08));sq(S,cs-0.8,cs+0.8,zr+3.05,zr+3.95,o(0.2),[0.25,0.5,0.75,1]);
+      // floodlights high on the face, aimed down at the road
+      for(const ft of [lo+2.5,hi-2.5]){bx(D,ft-0.45,ft+0.45,rs+3.75,rs+4.15,o(0.3),o(1.1));const i0=Wl.P.length/3,y0_=o(0.35),y1_=o(1.05);Wl.P.push(...P3(ft-0.35,y0_,rs+3.74),...P3(ft+0.35,y0_,rs+3.74),...P3(ft+0.35,y1_,rs+3.74),...P3(ft-0.35,y1_,rs+3.74));for(let q=0;q<4;q++)Wl.N.push(0,-1,0);Wl.I.push(i0,i0+1,i0+2,i0,i0+2,i0+3)}}
+    // vent grilles on the pillar between the bores, and a little emergency phone sign
+    for(const s of [-1,1]){const c=s*3.6;bx(D,c-1.6,c+1.6,zr+1.0,zr+4.2,yp,o(0.06));for(let k=0;k<7;k++)bx(F,c-1.5,c+1.5,zr+1.15+k*0.43,zr+1.25+k*0.43,o(0.06),o(0.12))}
+    bx(D,-0.45,0.45,zr+1.4,zr+2.2,yp,o(0.08));sq(S,-0.4,0.4,zr+1.45,zr+2.15,o(0.2),[0,0.5,0.25,1])}
+  SCN.tunF=meshFrom(F.P,F.N,F.I);SCN.tunD=meshFrom(D.P,D.N,D.I);SCN.tunE=meshFrom(E.P,E.N,E.I);SCN.tunW=meshFrom(Wl.P,Wl.N,Wl.I);SCN.tunS=meshFrom(S.P,S.N,S.I,S.C);
+  if(!TUN.tex)try{const cv=document.createElement("canvas");cv.width=1024;cv.height=512;const g=cv.getContext("2d");
+    g.fillStyle="#0d5c34";g.fillRect(0,0,1024,256);g.strokeStyle="#f4f6f2";g.lineWidth=10;g.strokeRect(14,14,996,228);g.fillStyle="#f4f6f2";g.font="bold 118px Arial, Helvetica, sans-serif";g.textAlign="center";g.textBaseline="middle";g.fillText("KESTREL TUNNEL",512,132);
+    g.fillStyle="#1b3f8f";g.fillRect(0,256,256,256);g.fillStyle="#fff";g.font="bold 64px Arial, sans-serif";g.fillText("SOS",128,330);g.font="bold 40px Arial, sans-serif";g.fillText("☎ 911",128,420);
+    g.fillStyle="#f2c200";g.fillRect(256,256,512,256);g.strokeStyle="#111";g.lineWidth=12;g.strokeRect(268,268,488,232);g.fillStyle="#111";g.font="bold 58px Arial, sans-serif";g.fillText("CLEARANCE",512,340);g.font="bold 92px Arial, sans-serif";g.fillText("16'-6\"",512,438);
+    const t=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,cv);gl.generateMipmap(gl.TEXTURE_2D);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);TUN.tex=t}catch(e){console.warn(e)}
+  SCN.tun=meshFrom(K.P,K.N,K.I,K.C);SCN.tunG=meshFrom(G.P,G.N,G.I);SCN.tunC=meshFrom(C.P,C.N,C.I);
+  // walls you can hit
+  const wall=(t,ya,yb,h,what)=>{for(let y=ya;y<yb;y+=40){const y2=Math.min(yb,y+40),z=Math.min(tunZr(y),tunZr(y2));collAdd({t:"b",x:xc+t,y:(y+y2)/2,h:Math.PI/2,hl:(y2-y)/2,hw:0.25,z0:z-3,z1:Math.max(tunZr(y),tunZr(y2))+h,what})}};
+  for(const s of [-1,1]){wall(s*(tI-0.25),TUN.y0,TUN.y1,40,"the tunnel wall");wall(s*(Wc+0.25),TUN.yc0,TUN.yc1,40,"the tunnel wall");
+    wall(s*(tI+0.05),TUN.yc0,TUN.y0,0.81,"the median barrier");wall(s*(tI+0.05),TUN.y1,TUN.yc1,0.81,"the median barrier")}}
 function rkBuild(drive,lot,pad){const B={P:[],N:[],I:[],C:[]},cell=new Set(),K=(x,y)=>(Math.floor(x)+30000)*60000+(Math.floor(y)+30000);
   for(const M of [drive,lot,pad]){if(!M)continue;const P=M.P,I=M.I;for(let i=0;i<I.length;i+=3){const a=I[i]*3,b=I[i+1]*3,c=I[i+2]*3;const xs=[P[a],P[b],P[c]],ys=[-P[a+2],-P[b+2],-P[c+2]],x0=Math.floor(Math.min(...xs)),x1=Math.ceil(Math.max(...xs)),y0=Math.floor(Math.min(...ys)),y1=Math.ceil(Math.max(...ys));if((x1-x0)*(y1-y0)>6000)continue;
       const ar=(xs[1]-xs[0])*(ys[2]-ys[0])-(xs[2]-xs[0])*(ys[1]-ys[0]);if(Math.abs(ar)<1e-6)continue;
@@ -11432,7 +11550,7 @@ function rkBuild(drive,lot,pad){const B={P:[],N:[],I:[],C:[]},cell=new Set(),K=(
   const push=(pts,uv,nr)=>{const k=B.P.length/3;for(let i=0;i<pts.length;i++){B.P.push(pts[i][0],pts[i][2],-pts[i][1]);B.N.push(nr[i][0],nr[i][1],nr[i][2]);B.C.push(uv[i][0],uv[i][1],0)}return k};
   for(const e of EDGES){e.rkH=null;if(e.n<1||e.T.col==="d"||e.T.dirt)continue;const city=!!e.T.kerb,fw=!!e.T.rumble,rural=!city&&!fw&&e.T.col==="h"&&e.type!=="ramp"&&!/sd|svc|service/.test(e.type);if(!city&&!fw&&!rural)continue;
     const k0=city?kerbTrim(e,0):Math.max(0,e.p0),k1=city?e.L-kerbTrim(e,1):e.L-e.p1;if(k1-k0<4)continue;
-    const Wf=u=>mAt(e,u)/2+e.n*LANE+e.side,walk=e.T.walk||0,skip=u=>e.gap&&u>e.gap[0]-0.5&&u<e.gap[1]+0.5||e.ov&&overDeck(e,u)||e.br&&Math.abs(u-e.br.uc)<e.br.half+(e.br.rp||0)||flyUp(e,u);
+    const Wf=u=>mAt(e,u)/2+e.n*LANE+e.side,walk=e.T.walk||0,skip=u=>e.gap&&u>e.gap[0]-0.5&&u<e.gap[1]+0.5||e.ov&&overDeck(e,u)||e.br&&Math.abs(u-e.br.uc)<e.br.half+(e.br.rp||0)||flyUp(e,u)||TUN.g&&e.type==="xway"&&(()=>{const q=eAt(e,u);return tunIn(q.x,q.y,0)})();
     if(city)e.rkH=[new Float32Array(Math.ceil(e.L)+2),new Float32Array(Math.ceil(e.L)+2)];
     for(const sg of [1,-1]){
       // where the kerb is dropped: driveways and lot entrances crossing the sidewalk, and kerb ramps at both ends
@@ -11538,9 +11656,9 @@ function terrainFar(){const K=5,N=TERR.N,NY=TERR.NY,X0=WORLD.x0,X1=WORLD.x1,Y0=W
   return meshFrom(P,Nn,I)}
 function drawGroundFar(){const G_=SCN.groundFar;if(!G_||!G_.chunks)return;const e=CULL.eye,far=CULL.fogD||4800,near=CULL.maxD-80;
   for(const c of G_.chunks){const d=Math.hypot(c.c[0]-e[0],c.c[1]-e[1],c.c[2]-e[2])-c.r;if(d<near||d>far)continue;let ok=true;if(CULL.pl)for(const p of CULL.pl)if(p[0]*c.c[0]+p[1]*c.c[1]+p[2]*c.c[2]+p[3]<-c.r){ok=false;break}if(ok)draw(c)}}
-function terrainMesh(){CUTO.clear();const N=W2?800:360,X0=WORLD.x0,X1=WORLD.x1,Y0=WORLD.y0,Y1=WORLD.y1,P=[],Nn=[],I=[];const NY=Math.round(N*(Y1-Y0)/(X1-X0));
+function terrainMesh(){CUTO.clear();try{TUN.zrA=null;TUN.g=false;tunGeo()}catch(e){console.error(e);TUN.on=false}const N=W2?800:360,X0=WORLD.x0,X1=WORLD.x1,Y0=WORLD.y0,Y1=WORLD.y1,P=[],Nn=[],I=[];const NY=Math.round(N*(Y1-Y0)/(X1-X0));
   const onPad=(x,y)=>Math.abs(x-PAD.cx)<PAD.rad+8&&Math.abs(y-PAD.cy)<PAD.rad+8&&[[0,0],[7,0],[-7,0],[0,7],[0,-7]].some(([a,b])=>padHit(x+a,y+b));
-  const H2=(x,y)=>{if(inApt(x,y,-6)){const X=x-APT.cx,Z=APT.cy-y;if(Math.abs(X-APT.TX)<APT.TH&&APT.TZ.some(z=>Math.abs(Z-z)<APT.TW+14))return APT.z+aptDz(X)-0.6;return APT.z-1.2}   /* the tunnel trench: the land under it is sunk to the road (the airport's own ground hides it outside the walls) */if(inCity(x,y)||inTC(x,y,4)||inExtra(x,y,6)||onPad(x,y))return -0.14;const d=dfAt(x,y);let z=Math.max(d<45?hillZ(x,y)+riverCut(x,y):terrainH(x,y,d),embZ(x,y));z=Math.min(z,cutZ(x,y));if(d<40)z=w2Blend(x,y,z);return z-0.08};
+  const H2=(x,y)=>{{const tz=tunH(x,y);if(tz!==null)return tz-0.08}if(inApt(x,y,-6)){const X=x-APT.cx,Z=APT.cy-y;if(Math.abs(X-APT.TX)<APT.TH&&APT.TZ.some(z=>Math.abs(Z-z)<APT.TW+14))return APT.z+aptDz(X)-0.6;return APT.z-1.2}   /* the tunnel trench: the land under it is sunk to the road (the airport's own ground hides it outside the walls) */if(inCity(x,y)||inTC(x,y,4)||inExtra(x,y,6)||onPad(x,y))return -0.14;const d=dfAt(x,y);let z=Math.max(d<45?hillZ(x,y)+riverCut(x,y):terrainH(x,y,d),embZ(x,y));z=Math.min(z,cutZ(x,y));if(d<40)z=w2Blend(x,y,z);return z-0.08};
   const H=W2?H2:(x,y)=>{if(inCity(x,y)||inTC(x,y,4)||inExtra(x,y,6)||onPad(x,y))return -0.14;const d=dfAt(x,y);let z=Math.max(d<45?hillZ(x,y)+riverCut(x,y):terrainH(x,y,d),embZ(x,y));
     for(const n of gAt(GRID.n,x,y)){if(n.pr){const dn=Math.hypot(x-n.x,y-n.y)-n.pr;if(dn<14)z=Math.min(z,n.z-0.25+Math.max(0,dn)*0.12)}}
     if(d<70){let best=1e9,rz=null,zc=1e9;for(const e of edgesNear(x,y,34)){const p=eProj(e,x,y);if(p.u<-6||p.u>e.L+6)continue;const dd=Math.abs(p.t)-e.W-auxW(e,p.u,p.t),zz=e.hz?ez(e,clamp(p.u,0,e.L)):0;
@@ -11550,11 +11668,11 @@ function terrainMesh(){CUTO.clear();const N=W2?800:360,X0=WORLD.x0,X1=WORLD.x1,Y
   TERR.N=N;TERR.NY=NY;TERR.h=new Float32Array((N+1)*(NY+1));TERR.h0=new Float32Array((N+1)*(NY+1));
   for(let j=0;j<=NY;j++)for(let i=0;i<=N;i++){const x=X0+(X1-X0)*i/N,y=Y0+(Y1-Y0)*j/NY,h0=H(x,y),h=h0-((!W2||W2C.orp)&&orBogQ(x,y)<1.6?1.4:0)-(W2&&ORP.rav&&orRav(x,y)?3:0),hx=H(x+3,y)-h0,hy=H(x,y+3)-h0;TERR.h[j*(N+1)+i]=h;TERR.h0[j*(N+1)+i]=h0;P.push(x,h,-y);Nn.push(...norm([-hx/3,1,hy/3]))}
   /* v335: where the coarse ground grid still rises over a road (hairpins on the mountain, tight hill roads), the grid corners round it are pulled down to just under the road */
-  for(let pass=0;pass<3;pass++){let fixed=0;for(const e of EDGES){const hw=e.m/2+e.n*LANE+(e.side||0);for(let u=Math.max(0,e.p0);u<=e.L-e.p1;u+=2){if(e.ov&&overDeck(e,u))continue;const rz=e.hz?ez(e,u):0;
+  for(let pass=0;pass<3;pass++){let fixed=0;for(const e of EDGES){const hw=e.m/2+e.n*LANE+(e.side||0);for(let u=Math.max(0,e.p0);u<=e.L-e.p1;u+=2){if(e.ov&&overDeck(e,u))continue;if(TUN.on&&TUN.g){const pq=eAt(e,u);if(tunIn(pq.x,pq.y,20))continue}const rz=e.hz?ez(e,u):0;
       for(const f of [-1,-0.5,0,0.5,1]){const t=f*Math.max(0.5,hw);if(e.m>0&&Math.abs(t)<e.m/2-0.5)continue;const q=ePt(e,u,t);if(terrDrawn(q[0],q[1])<=rz-0.02)continue;
         const fx=(q[0]-X0)/(X1-X0)*N,fy=(q[1]-Y0)/(Y1-Y0)*NY,i=Math.floor(fx),j=Math.floor(fy);if(i<0||j<0||i>=N||j>=NY)continue;
         for(const [di,dj] of [[0,0],[1,0],[0,1],[1,1]]){const k=(j+dj)*(N+1)+i+di;if(TERR.h[k]>rz-0.15){TERR.h[k]=rz-0.15;P[k*3+1]=rz-0.15;fixed++}}}}}if(!fixed)break}
-  for(let j=0;j<NY;j++)for(let i=0;i<N;i++){const a=j*(N+1)+i;I.push(a,a+1,a+N+1,a+1,a+N+2,a+N+1)}return meshFrom(P,Nn,I)}
+  for(let j=0;j<NY;j++)for(let i=0;i<N;i++){if(TUN.g&&tunHole(X0+(X1-X0)*i/N,X0+(X1-X0)*(i+1)/N,Y0+(Y1-Y0)*j/NY,Y0+(Y1-Y0)*(j+1)/NY))continue;const a=j*(N+1)+i;I.push(a,a+1,a+N+1,a+1,a+N+2,a+N+1)}return meshFrom(P,Nn,I)}
 function bumpMesh(){const B={P:[],N:[],I:[]},H={P:[],N:[],I:[]};
   for(const b of BUMPS.speed){const p=ePt(b.e,b.u,0);boxInto(B,p[0],0.035,-p[1],0.9,0.07,hwOf(b.e)*2-0.4,p[2])}
   const Rm={P:[],N:[],I:[]};
@@ -12664,6 +12782,7 @@ function worldScenery(){CUTO.clear();W2P.length=0;LKP.length=0;LK.sky=0;LK.used=
   const SM={};for(const k of Object.keys(SM_MAT))SM[k]=M_();retailInto(SM,lamp,treeAt);
   const mf=m=>meshFrom(m.P,m.N,m.I);SCN.sm=Object.fromEntries(Object.entries(SM).map(([k,m])=>[k,mf(m)]));
   try{rkBuild(drive,lot,pad)}catch(e){console.error(e);SCN.rk=null}
+  try{tunBuild()}catch(e){console.error(e);SCN.tun=null}
   Object.assign(SCN,{xm:SCN_TMP.xm?Object.fromEntries(Object.entries(SCN_TMP.xm).map(([k,m])=>[k,mf(m)])):null,hm:Object.fromEntries(Object.entries(HM).map(([k,m])=>[k,mf(m)])),crowns:mf(tree),trunks:mf(trunk),bld:bld.map(mf),roofs:mf(roofs),house:mf(house),post:mf(post),head:mf(head),xroad:mf(M_()),xlines:mf(xl),pole:mf(pole),
     hedge:SCN_TMP.hedge?mf(SCN_TMP.hedge):null,hedge:SCN_TMP.hedge?mf(SCN_TMP.hedge):null,pad:mf(pad),chg:mf(chg),stall:mf(stall),zebra:mf(zebra),patchD:mf(patchD),patchL:mf(patchL),crack:mf(crack),rpm:mf(M_()),plate:mf(plate),green:mf(green),barrier:mf(M_()),rail:mf(M_()),
     sg:Object.fromEntries(Object.entries(SGM).filter(([k,m])=>m.I.length&&["face","plate","conc","dark"].includes(k)).map(([k,m])=>[k,meshFrom(m.P,m.N,m.I,k==="face"?m.C:undefined)])),signW:mf(signW),signK:mf(signK),signG:mf(signG),signGW:mf(signGW),stopR:mf(stopR),sigH:mf(sigH),lens:mf(lens),sigPole:mf(sigPole),sigBP:mf(sigBP),sigY:mf(sigY),lot:mf(lot),drive:mf(drive),furn:mf(furn),
@@ -17073,7 +17192,8 @@ function pxFlush(){const n=PXB.n;if(!n)return;PXB.n=0;const L=n*72;
 /* light switch: Auto (follows dusk and dawn), Parking (tail and side lamps only), On, Off */
 function hlMode(){return st.lights?"on":st.park?"park":st.autoLights===false?"off":"auto"}
 function hlSet(m){st.lights=m==="on";st.park=m==="park";st.autoLights=m==="auto"||m==="on";TOPT.hl=m}
-function hlOn(){return st.power!==false&&(st.lights||st.night&&!st.park&&st.autoLights!==false)}
+function tunAt(x,y){return !!TUN.g&&Math.abs(x-TUN.xc)<TUN.Wc&&y>TUN.y0-30&&y<TUN.y1+30}
+function hlOn(){return st.power!==false&&(st.lights||(st.night||tunAt(car.px,car.py))&&!st.park&&st.autoLights!==false)}   /* auto lights come on in the tunnel too */
 function drawProxy(model,paint,brk,dist,hl){ /* distant traffic: a simple box with lamps; at night the headlamps and tail lamps stay lit at any distance */
   const bm=chain(model,M4.T(0,0.95,0),M4.S(1.9,1.2,4.6));if(!pxAdd(bm,paint)){bind(SCN.box);gl.uniformMatrix4fv(U.uM,false,bm);mat(paint,null,0.6,40);gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_SHORT,0)}if(dist>160&&!brk&&!hl)return;bind(SCN.box);
   const g=hl?Math.min(3,1+dist/400):1;
@@ -17094,9 +17214,13 @@ function headlights(cm,fwd,on){
   // active levelling: aim at the ground ~35 m ahead, so the beam drops over a crest and lifts into a dip.
   // Without it the beam is fixed to the body, so it pitches with the car (and loading the trunk aims it up).
   const c_=Math.cos(car.psi),s_=Math.sin(car.psi),g=(dx_)=>groundAt(car.px+c_*dx_,car.py+s_*dx_).h;
-  const gF=g(1.45),gR=g(-1.45),slopeHere=(gF-gR)/2.9, slopeAhead=(g(35)-(gF+gR)/2)/35;
-  car.aimS=lerp(car.aimS||0,slopeAhead,0.08);
-  let tilt=st.leveling?car.aimS:-car.th-(car.th+slopeHere)*3;
+  /* v338: only on cars that have it (it used to run on every car), and it aims at the road 30-50 m ahead along where you're going, so the beam drops
+     as you top a crest (no dazzling oncoming drivers) and lifts in a dip (you can see the road climbing ahead). Without it the beam is fixed to the
+     body: it follows the slope you're on and the car's pitch */
+  const lev=!!st.leveling&&has("leveling");
+  const gF=g(1.45),gR=g(-1.45),g0=(gF+gR)/2,slopeHere=(gF-gR)/2.9,slopeAhead=((g(30)-g0)/30+(g(40)-g0)/40+(g(50)-g0)/50)/3;
+  car.aimS=lerp(car.aimS||0,clamp(slopeAhead,-0.16,0.16),0.06);sys.levAct=lev;
+  let tilt=lev?car.aimS:slopeHere-car.th*2;
   // self-test when the car is switched on (or the lights come on): the levelling motors run the beam down to the stop, up past the
   // normal aim and back, and adaptive (swivelling) lamps look left and right; about 2.5 s
   {if(on&&!sys.levOn)sys.levAnim=0.001;sys.levOn=on;
@@ -17168,7 +17292,7 @@ function dynBuild(eye,cm){if(dynFrame===GFX.frame)return;dynFrame=GFX.frame;CHAR
       cy=Math.cos(look.yaw+car.camYaw||0),sy=Math.sin(look.yaw+car.camYaw||0),rx=-sy,rz=-cy;let k=0;
     for(let i=0;i<N;i++){const a=(i*0.618034)%1,b=(i*0.754877)%1,c=(i*0.569840)%1,sp=snow?1.3+0.6*b:14+5*c;
       const x=eye[0]+((a*44+WXR.off[0]-eye[0])%44+44)%44-22,z=eye[2]+((b*44+WXR.off[1]-eye[2])%44+44)%44-22,y=eye[1]+((c*22-t*sp)%22+22)%22-11+(snow?0:0);
-      const wob=snow?Math.sin(t*1.3+i)*0.4:0,w=snow?0.045:0.012,len=snow?0.045:0.5;const px=x+wob,pz=z;
+      const wob=snow?Math.sin(t*1.3+i)*0.4:0,w=snow?0.045:0.012,len=snow?0.045:0.5;const px=x+wob,pz=z;if(TUN.g&&tunAt(px,-pz)&&y<tunZr(-pz)+7)continue;
       B.P.push(px-rx*w,y,pz-rz*w,px+rx*w,y,pz+rz*w,px+rx*w+SLX,y+len,pz+rz*w+SLZ,px-rx*w+SLX,y+len,pz-rz*w+SLZ);B.N.push(0,1,0,0,1,0,0,1,0,0,1,0);B.I.push(k,k+1,k+2,k,k+2,k+3);k+=4}}
   accessoriesInto(cm);trainInto(eye);if(DALE.p.length||DALE.pools.length)daleInto();if(COP.chase.length||COP.spikes.length)copInto();if(EV.list.some(v=>v.beacons))evBeaconInto();try{trlParkedInto()}catch(e){}if(TRL.on)trlInto();if(GIG.online&&GIG.svc==="taxi"&&!st.walk){if(!DMAT.taxiS)DMAT.taxiS=[[1,0.85,0.1],[0.9,0.7,0.05],0.6,40];const h_=(VEH.height||(MODELS[TRIMS[st.trim].model]&&MODELS[TRIMS[st.trim].model].meta.height)||1.5)+0.12,p=M4.p(cm,[0,h_,0.2]);oBox("taxiS",p[0],-p[2],p[1],0.3,0.18,0.75,car.psi,0)}try{dmgInto(cm)}catch(e){}if(RW.zones.length)rwInto(ex,ey);dynUpload()}
 function segBox(k,A,B,th,wd){const d=[B[0]-A[0],B[1]-A[1],B[2]-A[2]],len=Math.hypot(...d)||1e-3,hz=Math.hypot(d[0],d[1]);oBox(k,(A[0]+B[0])/2,(A[1]+B[1])/2,(A[2]+B[2])/2,th,len,wd,Math.atan2(d[1],d[0]),Math.atan2(hz,d[2]))}
@@ -17256,7 +17380,7 @@ function render(dt){
   gl.uniformMatrix4fv(U.uVP,false,VP); gl.uniform3fv(U.uEye,eye);cullSet(VP,eye);
   {const az=(GT.min/1440)*Math.PI*2-Math.PI/2,e=Math.max(0.12,GT.el??0.8);gl.uniform3fv(U.uSun,POST.sun=norm(D_<0.15?[0.3,0.5,0.2]:[Math.cos(az)*0.8,e+0.1,Math.sin(az)*0.6+0.25]))}
   gl.uniform3fv(U.uSunC,[0.03,0.035,0.05].map((v,i)=>lerp(v,[1.05,1.0,0.92][i]*[1,0.78+0.22*D_,0.55+0.45*D_][i],D_)).map(v=>v*(1-(wsky?ww*0.55:0)))); gl.uniform3fv(U.uAmb,[0.014,0.016,0.024].map((v,i)=>lerp(v,[0.30,0.34,0.40][i],D_)));
-  gl.uniform3fv(U.uFog,sky);gl.uniform1f(U.uNt,clamp(1-(GT.D??(night?0:1))*1.4,0,1));gl.uniform1i(U.uTex,0);WXR.u=[WXR.snow,WXR.wet*(1-WXR.snow)];gl.uniform2f(U.uWX,WXR.u[0],WXR.u[1]);snmBind();gl.uniform4f(U.uGr,0,0,0,0);if(WXR.flash>0.02)gl.uniform3fv(U.uAmb,[0.014,0.016,0.024].map((v,i)=>lerp(v,[0.30,0.34,0.40][i],D_)+WXR.flash*[0.9,0.95,1.1][i])); {const fd=(night?0.004:0.0011)+(wsky?ww*{rain:0.0032,snow:0.0055,fog:0.021}[wk]*(1+WXR.storm*(wk==="snow"?2.2:0.8)):0);gl.uniform1f(U.uFD,fd);CULL.fogD=3.6/Math.max(1e-4,fd);CULL.maxD=Math.min(G().cullD||4800,CULL.fogD)}
+  gl.uniform3fv(U.uFog,sky);if(U.uTn2){if(TUN.g)gl.uniform4f(U.uTn,TUN.xc,TUN.y0,TUN.y1,TUN.Wc+0.6),gl.uniform4f(U.uTn2,tunZr(TUN.y0),tunZr(TUN.y1),1,1);else gl.uniform4f(U.uTn2,0,0,0,0)}gl.uniform1f(U.uNt,clamp(1-(GT.D??(night?0:1))*1.4,0,1));gl.uniform1i(U.uTex,0);WXR.u=[WXR.snow,WXR.wet*(1-WXR.snow)];gl.uniform2f(U.uWX,WXR.u[0],WXR.u[1]);snmBind();gl.uniform4f(U.uGr,0,0,0,0);if(WXR.flash>0.02)gl.uniform3fv(U.uAmb,[0.014,0.016,0.024].map((v,i)=>lerp(v,[0.30,0.34,0.40][i],D_)+WXR.flash*[0.9,0.95,1.1][i])); {const fd=(night?0.004:0.0011)+(wsky?ww*{rain:0.0032,snow:0.0055,fog:0.021}[wk]*(1+WXR.storm*(wk==="snow"?2.2:0.8)):0);gl.uniform1f(U.uFD,fd);CULL.fogD=3.6/Math.max(1e-4,fd);CULL.maxD=Math.min(G().cullD||4800,CULL.fogD)}
   const lampsOn=hlOn(),parkL=!lampsOn&&st.park&&st.power!==false;
   /* other drivers switch their own lights on: after dark, at dusk and dawn, and in rain, snow or fog (not when you switch yours on) */
   const aiL=night||(()=>{const h=(GT.min/60)%24;return h>=19||h<7})()||(WX.cur==="rain"||WX.cur==="snow"||WX.cur==="fog")&&(WX.w||0)>0.25;
@@ -17271,7 +17395,7 @@ function render(dt){
   gl.disable(gl.CULL_FACE);gl.uniformMatrix4fv(U.uM,false,M4.id());
   // layered flat surfaces: push lower layers back in depth so the road and paint never flicker at distance
   gl.enable(gl.POLYGON_OFFSET_FILL);
-  gl.polygonOffset(8,8);mat(st.surface==="snow"&&!wxOn()?[0.8,0.82,0.86]:MAP.ground,null,0.02,8,1,MAP.gpat);draw(SCN.ground);if(!CULL.sec)drawGroundFar();if(!CULL.sec){grassDraw();try{rwPropsDraw()}catch(e){}}
+  gl.polygonOffset(8,8);mat(st.surface==="snow"&&!wxOn()?[0.8,0.82,0.86]:MAP.ground,null,0.02,8,1,MAP.gpat);draw(SCN.ground);if(SCN.tunG)draw(SCN.tunG);if(!CULL.sec)drawGroundFar();if(!CULL.sec){grassDraw();try{rwPropsDraw()}catch(e){}}
   gl.uniformMatrix4fv(U.uM,false,M4.id());   /* road-work props above leave their own matrix set: without this the town plate got drawn moved out over the fields (the grey patches) */
   gl.polygonOffset(7,7);mat([0.33,0.33,0.32],null,0.05,10,1,2);draw(SCN.plate);
   if(SCN.tc){const T_=SCN.tc;mat([0.42,0.42,0.4],null,0.05,10,1,2);draw(T_.conc);mat([0.55,0.5,0.43],null,0.08,12,1,2);draw(T_.sec);mat([0.09,0.09,0.095],null,0.2,30,1,2);draw(T_.asph);mat([0.33,0.29,0.25],null,0.1,10,1,2);draw(T_.cob);mat([0.36,0.3,0.22],null,0.05,8,1,1);draw(T_.grav);mat([0.40,0.38,0.35],null,0.1,10,1,2);draw(T_.rock);mat([0.20,0.14,0.09],null,0.25,30,1,1);draw(T_.mud);mat([0.92,0.94,0.97],null,0.2,20,1,2);draw(T_.snow);mat([0.76,0.66,0.47],null,0.03,6,1,1);draw(T_.sand);
@@ -17284,7 +17408,7 @@ function render(dt){
    gl.polygonOffset(3,3);if(!snow)for(const [c,m] of SCN.wear){if(RKon&&c!=="d")continue;mat(c==="d"?(wet?[0.12,0.09,0.06]:[0.23,0.19,0.14]):wet?[0.035,0.037,0.042]:c==="c"?[0.088,0.088,0.092]:[0.056,0.058,0.064],null,c==="d"?0.05:wet?2:0.5,c==="d"?8:wet?110:40,1,c==="d"?1:2);draw(m)}
    if(!snow){mat([0.05,0.05,0.055],null,0.3,30,1,2);draw(SCN.patchD);mat([0.15,0.15,0.155],null,0.15,20,1,2);draw(SCN.patchL);mat([0.03,0.03,0.032],null,0.6,50);draw(SCN.crack);
      if(!RKon){mat([0.16,0.16,0.165],null,0.2,20,1,2);for(const m of SCN.rumble)draw(m)}}}
-  gl.polygonOffset(2,2);if(SCN.rk&&rkTex()){const cf=gl.isEnabled(gl.CULL_FACE);gl.disable(gl.CULL_FACE);mat([1,1,1],null,0.08,14,1,10);draw(SCN.rk);if(cf)gl.enable(gl.CULL_FACE)}else for(const k of SCN.kerbs){mat([0.32,0.32,0.30],null,0.05,10,1,2);draw(k)}
+  gl.polygonOffset(2,2);if(SCN.tun&&rkTex()){const cf=gl.isEnabled(gl.CULL_FACE);gl.disable(gl.CULL_FACE);mat([1,1,1],null,0.08,14,1,10);draw(SCN.tun);if(SCN.tunC){mat([0.5,0.49,0.47],null,0.05,10,1,0);draw(SCN.tunC);if(SCN.tunF){mat([0.62,0.61,0.58],null,0.06,12,1,0);draw(SCN.tunF)}if(SCN.tunD){mat([0.06,0.065,0.07],null,0.2,30,1,0);draw(SCN.tunD)}if(SCN.tunE){const nk=night?1.6:0.7;mat([0.25,0.3,0.25],[0.1*nk,0.9*nk,0.3*nk],0.1,20,1,0);draw(SCN.tunE)}if(SCN.tunW){const nk=night?2.2:0.4;mat([0.8,0.8,0.75],[nk,nk*0.95,nk*0.8],0.1,20,1,0);draw(SCN.tunW)}if(SCN.tunS&&TUN.tex){gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,TUN.tex);mat([1,1,1],null,0.1,20,1,6);draw(SCN.tunS);RK.ok&&gl.bindTexture(gl.TEXTURE_2D,RK.tex)}}if(cf)gl.enable(gl.CULL_FACE)}if(SCN.rk&&rkTex()){const cf=gl.isEnabled(gl.CULL_FACE);gl.disable(gl.CULL_FACE);mat([1,1,1],null,0.08,14,1,10);draw(SCN.rk);if(cf)gl.enable(gl.CULL_FACE)}else for(const k of SCN.kerbs){mat([0.32,0.32,0.30],null,0.05,10,1,2);draw(k)}
   if(SCN.rbI){mat([0.34,0.34,0.32],null,0.05,10,1,2);draw(SCN.rbI.k);gl.polygonOffset(1,1);mat(st.surface==="snow"?[0.8,0.82,0.86]:[0.11,0.23,0.07],null,0.02,8,1,1);draw(SCN.rbI.g);gl.polygonOffset(2,2)}
   gl.polygonOffset(0,0);mat([0.78,0.78,0.75],night?[0.012,0.012,0.012]:null,0.1,10);draw(SCN.xlines);draw(SCN.stall);draw(SCN.zebra);mat([0.9,0.9,0.85],night?[0.5,0.5,0.45]:null,0.8,60);draw(SCN.rpm);
   gl.disable(gl.CULL_FACE);mat([0.11,0.105,0.1],null,0.05,8);draw(SCN.bumps.rim);mat([0.018,0.017,0.016],null,0.3,30);draw(SCN.bumps.holes);mat([0.07,0.068,0.065],null,0.6,40);draw(SCN.bumps.man);mat([0.045,0.046,0.05],null,0.3,30);draw(SCN.bumps.cut);mat([0.75,0.6,0.08],night?[0.03,0.02,0]:null,0.3,20);draw(SCN.bumps.speed);
@@ -18077,7 +18201,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=338;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   /* BUILD_VER: bumped to make open copies reload without resetting saves */
+const APP_VER="173",BUILD_VER=339;try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+BUILD_VER;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+BUILD_VER)}catch(e){}   /* BUILD_VER: bumped to make open copies reload without resetting saves */
 /* v333: this used to sit behind a // comment on the line above, so it never ran: VER_WIPED was undefined and signing in threw before your account save could load.
    Version 173 never wiped anyone, so it is adopted quietly; later APP_VER bumps reset local saves again as intended */
 let VER_WIPED=false;try{if(APP_VER==="173")localStorage.setItem("strata.ver",APP_VER);if(localStorage.getItem("strata.ver")!==APP_VER){VER_WIPED=true;if(localStorage.getItem("msAcct")){const ls={};for(const k of Object.keys(localStorage))if(/^m?strata\./.test(k)&&!ACCT_SKIP.has(k))ls[k]=localStorage.getItem(k);if(Object.keys(ls).some(k=>k.startsWith("strata.")))localStorage.setItem("msBackup",JSON.stringify({at:Date.now(),ls}))}for(const k of Object.keys(localStorage))if(k.startsWith("strata."))localStorage.removeItem(k);localStorage.setItem("strata.ver",APP_VER)}}catch(e){}
