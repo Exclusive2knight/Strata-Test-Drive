@@ -167,6 +167,19 @@ Columns: power (hp), weight (kg), powertrain, drive modes as shown in the game, 
 | `escalade` | 2026 Cadillac Escalade Sport Platinum | 420 | 2750 | gas | Tour/Sport/Snow/Ice/Off-Road/Tow/Haul/Terrain/My Mode | — | Air Ride Adaptive Suspension + Magnetic Ride Control 4.0 · double wishbone front, multi-link rear · air springs | confirmed |
 | `escaladeV` | 2026 Cadillac Escalade-V | 683 | 2950 | gas | Tour/Sport/V-Mode/Snow/Ice/Off-Road/Tow/Haul/Terrain/My Mode | — | Air Ride + performance-calibrated Magnetic Ride Control 4.0 · double wishbone front, multi-link rear · air springs | confirmed |
 
+## Cadillac Escalade ESV · Escalade IQ / IQL · XT5 · 2026 (v349, models from the All Vehicles GLB pack)
+
+| Key | Trim | hp | kg | Power | Price (MSRP) | Research |
+|---|---|---|---|---|---|---|
+| `esv_lux` / `esv_sport` / `esv_platsport` | Escalade ESV Luxury / Sport / Platinum Sport | 420 | 2830-2860 | gas | ~$3,000 over the matching Escalade | prices estimated |
+| `esv_v` | Escalade-V ESV | 682 | 3040 | gas | $171,000 | estimated |
+| `iq_lux` / `iq_sport` / `iq_plux` / `iq_psport` | Escalade IQ | 680 (750 Velocity Max) | 4143 | EV 205 kWh, ~465 mi | $127,405 / $127,905 / $147,705 / $148,205 | confirmed (carwhere) |
+| `iql_*` | Escalade IQL (long) | 680 (750) | 4230-4250 | EV 205 kWh, ~460 mi | IQ + $3,000 | IQL Luxury confirmed, others derived |
+| `xt5_lux` / `xt5_plux` / `xt5_sport` | XT5 Luxury FWD / Premium Luxury AWD / Sport AWD | 235 / 235 / 310 | 1866-2000 | gas | $44,800 / $53,500 / $62,800 | confirmed (carwhere) |
+
+Suspension and drive modes are borrowed from the nearest sibling (Escalade for ESV/IQ/IQL, VISTIQ for XT5) in `oldCarsApply`.
+The pack's one-piece curved dash screens are measured by `tools/import_pack.py` (meta `arc`) and drawn bent the same way.
+
 > **Chevrolet trim check (Nov 2026).** Lineups checked against current Chevrolet trims: Silverado 1500 adds Custom Trail Boss (`chv_silverado_1500_ctb`); Custom is the 2.7 L TurboMax, RST and LT Trail Boss the 5.3 L V8. Silverado HD adds Custom (`chv_silverado_2500_hd_cus`). Silverado EV has no RST for 2026, so `chv_silverado_ev_rst` is now the LT Max Range (760 hp). Tahoe and Suburban: 5.3 L on LS/LT, 6.2 L (420 hp) on RST, Z71, Premier and High Country. Traverse adds High Country (`chv_traverse_hc`). Trax adds LT (`chv_trax_lt2`; `chv_trax_lt` is the 1RS). Trailblazer adds LT (`chv_trailblazer_lt`); LS/LT are the 1.2 L with a CVT. Blazer Premier was dropped, so `chv_blazer_prem` is the 3LT AWD. Equinox EV trims are LT, RS and RS eAWD. Colorado WT now has 310 hp like the rest.
 
 ## Chevrolet Blazer EV · 2027
