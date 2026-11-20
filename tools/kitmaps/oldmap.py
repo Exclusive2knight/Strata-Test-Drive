@@ -113,6 +113,51 @@ for ni, L in legs_at.items():
     nj += 1
 print(f"kit junctions: {nj}")
 
+# ---- freeway exits and entrances: the kit's merge pieces (placed and checked by the game, kitMerges / kitMrgOut: the ramps there were
+# reshaped to the piece). The carriageway straights and the ramp's own pieces stop where a merge piece takes over.
+MP = []
+for nm, x, y, h, z, nx, ny in NET.get("M", []):
+    K.start(nm, x, y, h, z)
+    Lp = float(nm.split("@")[1].split("^")[0])
+    MP.append((x, y, math.sin(math.radians(h)), math.cos(math.radians(h)), Lp, nx, ny, h))
+print(f"kit merge pieces: {len(MP)}")
+
+def mcov(p, hd, kind):
+    """is this point under a merge piece? kind "c": a carriageway centre line travelling at heading hd; "r": a ramp"""
+    for x, y, fx, fy, Lp, _, _, h in MP:
+        dx, dy = p[0] - x, p[1] - y
+        a = dx * fx + dy * fy
+        if a < -0.01 or a > Lp + 0.01: continue
+        t = dx * fy - dy * fx
+        if kind == "c":
+            if abs(t + 1.85) < 2.5 and abs(((hd - h + 180) % 360) - 180) < 25: return True
+        elif 12 < t < 46: return True
+    return False
+
+def mcut(P, kind):
+    """P with the stretches under merge pieces cut out (cut exactly at the piece's ends): a list of polylines"""
+    out, cur = [], []
+    hd = lambda i: head(P[max(0, i - 1)], P[min(len(P) - 1, i + 1)])
+    cov = [mcov(P[i], hd(i), kind) for i in range(len(P))]
+    for i in range(len(P)):
+        if i and cov[i] != cov[i - 1]:
+            a, b = P[i - 1], P[i]; lo, hi = 0.0, 1.0; h_ = hd(i)
+            for _ in range(24):
+                m = (lo + hi) / 2; q = [a[j] + (b[j] - a[j]) * m for j in range(3)]
+                if mcov(q, h_, kind) == cov[i - 1]: lo = m
+                else: hi = m
+            q = [a[j] + (b[j] - a[j]) * (lo + hi) / 2 for j in range(3)]
+            if cov[i - 1]: cur = [q]
+            else: cur.append(q); out.append(cur); cur = []
+        if not cov[i]: cur.append(P[i])
+    if len(cur) > 1: out.append(cur)
+    return [c for c in out if len(c) > 1]
+
+def mfull(i):
+    """every ramp at this node got a merge piece"""
+    n = NET["N"][i]; m = sum(1 for q in MP if abs(n["x"] - q[5]) < 1 and abs(n["y"] - q[6]) < 1)
+    return m > 0 and m >= sum(1 for f in NET["E"] if f["t"] == "ramp" and i in (f["a"], f["b"]))
+
 for e in NET["E"]:
     base = BASE.get(e["t"])
     if not base: continue
@@ -122,7 +167,19 @@ for e in NET["E"]:
     FL = (80 if NET["N"][e["a"]]["c"] == "merge" else 0, 80 if NET["N"][e["b"]]["c"] == "merge" else 0)
     P = part(e)
     if len(P) < 2: continue
-    if e["t"] == "xway":
+    if MP and e["t"] in ("xway", "ramp"):
+        # an open (kerbless) stretch stays only by a node where some ramp got no merge piece, and only on the pieces that still reach it
+        if e["t"] == "xway": FL = tuple(0 if mfull(i) else f for f, i in zip(FL, (e["a"], e["b"])))
+        fl = lambda sub, F: (F[0] if sub[0] is P[0] or sub[0] == P[0] else 0, F[1] if sub[-1] is P[-1] or sub[-1] == P[-1] else 0)
+        if e["t"] == "xway":
+            for sub in mcut(P, "c"): follow(sub, base, side=1.85, flat=fl(sub, FL))
+            R_ = P[::-1]
+            for sub in mcut(R_, "c"): follow(sub, base, side=1.85, flat=(FL[1] if sub[0] == R_[0] else 0, FL[0] if sub[-1] == R_[-1] else 0))
+        else:
+            subs = mcut(P, "r")
+            cut = len(subs) != 1 or len(subs[0]) != len(P)
+            for sub in subs: follow(sub, base, flat=(0, 0) if cut else FL)
+    elif e["t"] == "xway":
         follow(P, base, side=1.85, flat=FL)              # this direction: lanes from 11 m right of the centre line
         follow(P[::-1], base, side=1.85, flat=FL[::-1])  # and the other way
     else:
