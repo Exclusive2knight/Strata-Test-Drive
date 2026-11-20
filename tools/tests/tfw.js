@@ -2,7 +2,7 @@
 (async()=>{const out=[];const W_=new Map();const _c=window.crashFx;window.crashFx=function(v,w){W_.set(w+"@"+car.px.toFixed(0)+","+car.py.toFixed(0),1);return _c.apply(this,arguments)};
 setTrim("camry25",true);cars=[];st.power=true;st.started=true;sys.epb=false;st.gear="D";st.aeb=false;
 const drive=(label,x,y,h,v,T,thr)=>{   /* holds its lane like a driver would */resetCar({free:true,x,y,h});car.vx=v;let zmin=9,zmax=-9;const fr=new Set(),h0=hits;
-  let o0=null;SIM(T,()=>{inp.thrT=car.vx<v?thr:0;inp.brkT=0;try{const M=me(),he=wrapPi(car.psi-M.h);if(o0===null)o0=M.off;inp.steerT=clamp(0.25*(M.off-o0)+1.2*he,-0.4,0.4)}catch(e){inp.steerT=0}try{const M=me();fr.add(M.e.name)}catch(e){}zmin=Math.min(zmin,car.zb||0);zmax=Math.max(zmax,car.zb||0)});
+  let o0=null;SIM(T,()=>{inp.thrT=car.vx<v?thr:0;inp.brkT=0;try{const M=me(),he=wrapPi(car.psi-M.h);if(o0===null)o0=M.off;inp.steerT=clamp(0.1*(M.off-o0)+0.8*he,-0.4,0.4)}catch(e){inp.steerT=0}try{const M=me();fr.add(M.e.name)}catch(e){}zmin=Math.min(zmin,car.zb||0);zmax=Math.max(zmax,car.zb||0)});
   out.push(`${label}: to ${car.px.toFixed(0)},${car.py.toFixed(0)} z ${zmin.toFixed(1)}..${zmax.toFixed(1)} roads ${[...fr].join("|")} hits ${hits-h0}`)};
 // 1. I-38 eastbound (right lane) through County Rd 3's cut, then Woodward's, under the bridges
 {const e=EDGES.find(e=>e.type==="xway"&&e.a.x===-1420&&e.b.x===-580),p=fpt(e,1,5,laneOff(e,0));drive("I-38 EB through the Woodward cut",-1700,p[1],0,27,40,0.4)}
