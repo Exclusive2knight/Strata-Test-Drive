@@ -71,10 +71,12 @@ It is a silent change: nothing about it goes in the changelog.
 3. DONE v35.8, traffic: curve speed from grip (`aiMu`, `aiLatG`: 0.22-0.46 g by driving style, x0.7 in rain, x0.45 on snow), GTA-style
    nudging round stopped things that stick part way into the lane (`aiNudge`, up to 1.2 m, 0.6 m past an outside lane, not with someone
    alongside), two new styles (eco, sport). `tools/tests/txover.js` 5-min heavy traffic: overlaps ~950-1030 vs 1020-1500 before, stuck 19-24 vs 35-39.
-4. Road props v2 (three.js): not done. The work zones already use the roadwork pack's cones, drums, signs and message boards (RW_PROPS),
-   so v2 would mostly duplicate them. What it would add: gantries, cantilever guide signs, DMS boards, guardrail and concrete barrier runs.
-   Way in: run strata-road-props.js in headless Chromium with a small `three` shim (Group/Mesh/Box/Cylinder/Plane/Sphere/Torus/Shape/
-   ShapeGeometry/ExtrudeGeometry/CanvasTexture), bake each prop to one mesh with UVs into one atlas, draw with the textured shader (pattern 6).
+4. DONE v35.9, road props v2: `tools/props2/bake.py` runs strata-road-props.js (its `three` import pointed at `three-shim.js`) in the game page,
+   builds every freeway sign the game lists in `RP2_SPEC` (sign bridges, cantilevers, gore signs, message boards; `rp2Clear` keeps sign bridges
+   out from under overpasses) plus median guardrail at bridge piers, and bakes them to props/rp2.json (base64 binary pieces, colliders) +
+   props/rp2_atlas.jpg. The game draws them with the textured shader (`rp2Load` / `rp2Draw`); ?props=old brings back the generated signs.
+   Rebake after anything that moves the freeway signs: build, then `python3 tools/props2/bake.py`.
+   Flyovers: raised stretches (over 2.5 m above ground) use `ramp1_flyover_st48!p` (the kit's deck, pier stripped); the generated dark deck is hidden.
 5. Notes: tfw.js steering was under-damped (its own scripted car weaved into the piers now and then); it now steers 0.1 x offset + 0.8 x heading.
    Random scripted traffic crashes (evCrash) can still put a crash scene in its path. Flyover decks: the generated dark deck (SCN.fDeck)
    is drawn over the kit ramp up there; hiding it showed patchy kit pieces, so it stays.
