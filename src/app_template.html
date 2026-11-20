@@ -5953,7 +5953,7 @@ function copTick(dt){if(st.police===false){if(COP.stars)copClear();return}if(!st
 function copInto(){copMats();const on=(performance.now()%500)<250;for(const c of COP.chase){if(!c.lights)continue;const M=aiMat(c),h=(MODELS.city_police?MODELS.city_police.meta.height:1.8)+0.04;
     dBoxM(on?"copR":"copOff",M,c.wh,[0.32,h,0.1],0.32,0.08,0.18);dBoxM(on?"copOff":"copB",M,c.wh,[-0.32,h,0.1],0.32,0.08,0.18)}
   for(const S of COP.spikes){for(let k=-3;k<=3;k++){const x=S.x-Math.sin(S.h)*k*0.6,y=S.y+Math.cos(S.h)*k*0.6;dBox(k%2?"spikeY":"spike",x,y,0.02,0.5,0.05,0.12,S.h+Math.PI/2)}}}
-function crashFx(v,what){const now=performance.now();if(v<0.6||now-(sys.lastHitT||0)<450)return;if(v>1.2)sys.hitClk=st.clock;if(v>4)try{for(const o of cars)if(o.kind==="ai"&&Math.hypot(o.wx-car.px,o.wy-car.py)<45){o.fear=(o.fear||0)+0.8;o.hzT=3+rnd()*4;emoB(o,"shock",2.5)}}catch(e){}try{ACH.clean=0;if(VALET.on&&VALET.cur)VALET.ding=true;}catch(e){}if(v>9)setTimeout(()=>{try{txt("Mom","I just saw a crash on the news. Was that you?? Call me!","crash"+(GT.day||1))}catch(e){}},9000);sys.lastHitT=now;if(st.dale){try{if(/pedestrian|deer|cyclist/.test(String(what)))daleGore(v);else if(v>6.5)daleBoom()}catch(e){}}try{if(/pedestrian|cyclist/.test(String(what))){const st_=v>8?3:2;if(copSeer(120)){copOffense(st_,`Hit ${what}`);copRadio(`Unit 4: suspect just struck ${what}! In pursuit`)}else copReport(st_,`Hit ${what}`,undefined,`${what} struck by a car that kept going`)}}catch(e){}haptic(Math.min(450,70+v*30),Math.min(1,0.4+v/10));if(v>1.5)dashClip("Impact: "+what);try{sfCrash(v)}catch(e){}
+function crashFx(v,what){const now=performance.now();if(v<0.6||now-(sys.lastHitT||0)<450)return;if(v>4)try{brainYou("crash");brainSpot(car.px,car.py,"cr",1)}catch(e){}if(v>1.2)sys.hitClk=st.clock;if(v>4)try{for(const o of cars)if(o.kind==="ai"&&Math.hypot(o.wx-car.px,o.wy-car.py)<45){o.fear=(o.fear||0)+0.8;o.hzT=3+rnd()*4;emoB(o,"shock",2.5)}}catch(e){}try{ACH.clean=0;if(VALET.on&&VALET.cur)VALET.ding=true;}catch(e){}if(v>9)setTimeout(()=>{try{txt("Mom","I just saw a crash on the news. Was that you?? Call me!","crash"+(GT.day||1))}catch(e){}},9000);sys.lastHitT=now;if(st.dale){try{if(/pedestrian|deer|cyclist/.test(String(what)))daleGore(v);else if(v>6.5)daleBoom()}catch(e){}}try{if(/pedestrian|cyclist/.test(String(what))){const st_=v>8?3:2;if(copSeer(120)){copOffense(st_,`Hit ${what}`);copRadio(`Unit 4: suspect just struck ${what}! In pursuit`)}else copReport(st_,`Hit ${what}`,undefined,`${what} struck by a car that kept going`)}}catch(e){}haptic(Math.min(450,70+v*30),Math.min(1,0.4+v/10));if(v>1.5)dashClip("Impact: "+what);try{sfCrash(v)}catch(e){}
   const sev=clamp(v/12,0.15,1);if(au.ctx){const c=au.ctx,t=c.currentTime;rNoiseFx(t,0.25+sev*0.4,0.25+sev*0.5);beep(90+sev*40,0.25+sev*0.3,"sawtooth",0.12+sev*0.2)}
   if(v>1.5){logResult(`Hit ${what} at ${fmtSpeed(v)}${st.aeb?"":" (AEB off)"}`);toast(`Impact: ${what} at ${fmtSpeed(v)}`)}
   if(navigator.vibrate)navigator.vibrate(Math.round(40+sev*120));if(v>3)car.crashed=1.0;dmgHit(v,what)}
@@ -6197,7 +6197,7 @@ function brainGen(){const j=BSYNC.shared;if(j&&j.w>0){const n=(+j.stops||0)+(+j.
 function brainApply(j){if(!j||!(j.w>0))return;BSYNC.shared=j;const B=BRAIN;B.stopWait=clamp(+j.stopWait||6,2.5,9);B.gapK=clamp(+j.gapK||1,0.72,1.5);B.pedPat=clamp(+j.pedPat||45,12,70);B.pedGapK=clamp(+j.pedGapK||1,1,1.6)}
 async function brainSync(){if(BSYNC.off||typeof acctOn!=="function"||!acctOn())return;const U=BSYNC.pend,B=BRAIN;
   try{if(brainOK()==="yes"&&U.n>=5){const sent={...U};const j=await acctRpc("brain_contribute",{p_dev:MSDEV.id,p_n:U.n,p_stop_wait:B.stopWait,p_gap_k:B.gapK,p_ped_pat:B.pedPat,p_ped_gap_k:B.pedGapK,p_stops:U.stops,p_cross:U.cross,p_scares:U.scares,p_crashes:U.crashes});
-      for(const k in sent)U[k]=Math.max(0,U[k]-sent[k]);brainApply(j)}
+      for(const k in sent)U[k]=Math.max(0,U[k]-sent[k]);BX.sent=(BX.sent||0)+sent.n;if(BX.sent>=100)achHit("brain100");brainApply(j)}
     else brainApply(await acctRpc("brain_get",{}))}
   catch(e){if(/Could not find the function|PGRST202|does not exist/i.test(e.message||""))BSYNC.off=true}}   // the server side isn't set up (docs/ai_brain.sql): just learn locally
 function brainAsk(){if($("brainAsk"))return;const d=document.createElement("div");d.id="brainAsk";d.style.cssText="position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;background:rgba(4,8,10,.55);padding:16px;box-sizing:border-box";
@@ -6208,20 +6208,165 @@ function brainAsk(){if($("brainAsk"))return;const d=document.createElement("div"
     <p style="margin:0 0 12px;opacity:.85"><b>Never sent:</b> your account name, where you are, chats or anything personal. You can stop any time in Spawn › Traffic brain.</p>
     <div style="display:flex;gap:8px;justify-content:flex-end"><button data-b="no" style="padding:9px 14px;border-radius:12px;border:0;background:#26313a;color:#fff;font-weight:600">No thanks</button><button data-b="yes" style="padding:9px 14px;border-radius:12px;border:0;background:#2fbf8f;color:#04120d;font-weight:700">I agree, join</button></div></div>`;
   d.addEventListener("click",e=>{const b=e.target.closest("[data-b]");if(!b)return;try{localStorage.setItem("mstrata.brainOK",b.dataset.b)}catch(e){}d.remove();toast(b.dataset.b==="yes"?"🧠 Thanks! Your traffic now helps the shared AI learn":"No problem: your traffic still learns, just on this device");BSYNC.t=3;try{renderTab()}catch(e){}});document.body.appendChild(d)}
-function brainTick(dt){BSYNC.t-=dt;if(BSYNC.t<=0){BSYNC.t=300;brainSync()}
+function brainTick(dt){BSYNC.t-=dt;if(BSYNC.t<=0){BSYNC.t=300;brainSync();setTimeout(()=>brainSync2(),4000)}try{brainTick2(dt)}catch(e){}
   if(!brainOK()&&acctOn()&&!BSYNC.off&&st.started&&!st.walk&&Math.abs(car.vx)>3){BSYNC.askT-=dt;if(BSYNC.askT<=0){BSYNC.askT=1e9;brainAsk()}}}
-function brainLearn(k,v){const B=BRAIN;B.ev++;B.gen=1+Math.floor(B.ev/250);const U=BSYNC.pend;U.n++;if(k==="stop")U.stops++;else if(k==="cross")U.cross++;else if(k==="scare"||k==="pedScare")U.scares++;else if(k==="crash")U.crashes++;
+function brainLearn(k,v,x,y){const B=BRAIN;try{const m=bxWeek().learn||1;if(k==="scare"||k==="pedScare"){if(x!==undefined)brainSpot(x,y,"nm",m);brainCondLearn("bad");brainMixLearn("scare")}else if(k==="crash"){if(x!==undefined)brainSpot(x,y,"cr",1);brainCondLearn("bad");brainMixLearn("crash")}else if(k==="stop"&&v>8){brainCondLearn("wait");brainMixLearn("wait")}}catch(e){}B.ev++;B.gen=1+Math.floor(B.ev/250);const U=BSYNC.pend;U.n++;if(k==="stop")U.stops++;else if(k==="cross")U.cross++;else if(k==="scare"||k==="pedScare")U.scares++;else if(k==="crash")U.crashes++;
   if(k==="stop"){B.stops++;B.wait+=(v-B.wait)*0.03;if(v>8){B.stopWait=Math.max(2.5,B.stopWait*0.98);B.gapK=Math.max(0.72,B.gapK*0.995)}else if(v<2.5){B.stopWait=Math.min(8,B.stopWait*1.003);B.gapK=Math.min(1.3,B.gapK*1.001)}}
   else if(k==="scare"){B.scares++;B.gapK=Math.min(1.5,B.gapK*1.03);B.stopWait=Math.min(9,B.stopWait*1.02)}
   else if(k==="crash"){B.crashes++;B.gapK=Math.min(1.5,B.gapK*1.05)}
   else if(k==="cross"){B.cross++;if(v>30)B.pedPat=Math.max(12,B.pedPat*0.98);else if(v<8)B.pedPat=Math.min(70,B.pedPat*1.004)}
   else if(k==="pedScare"){B.scares++;B.pedGapK=Math.min(1.6,B.pedGapK*1.04);B.pedPat=Math.min(70,B.pedPat*1.03)}
   if(B.ev%20===0)brainSave()}
+/* ---- v362: the traffic brain, part 2. Besides the four habits above it now remembers:
+   places (an 80 m grid of close calls, crashes, hard braking and jams: drivers ease off where trouble keeps happening, pedestrians wait
+   longer there), the weather and the dark (a following-gap multiplier each for rain, snow and night, learned from the close calls in them),
+   the mix of driving styles on the road (crashes bring more calm drivers, long waits more brisk ones), how readily cars zipper merge at the
+   work zone, and how you drive (cut-ins, tailgating, red lights, honking against clean miles): a courteous driver gets let in when signalling,
+   a pushy one gets a wider berth. All of it is clamped to sane ranges, fades over a few weeks unless it keeps happening, and is shared
+   (anonymous, opt-in) through brain2_contribute / brain2_get (docs/ai_brain2.sql); "how you drive" never leaves this device */
+const BX_MIX=[0.08,0.19,0.37,0.10,0.12,0.09,0.05],BX_PERS=[{k:"eco",v:0.9,T:1.9,lc:2,a:0.95,b:2.1,lg:0.22},{k:"calm",v:0.93,T:1.7,lc:1.6,a:1.25,b:2.4},{k:"normal",v:1,T:1.3,lc:1,a:1.6,b:2.8},
+  {k:"sport",v:1.02,T:1.15,lc:0.8,a:2.4,b:3.4,lg:0.42},{k:"brisk",v:1.06,T:1.0,lc:0.6,a:2.1,b:3.2},{k:"aggr",v:1.12,T:0.75,lc:0.4,a:2.6,b:3.8},{k:"aggr",reck:true,v:1.28,T:0.5,lc:0.22,a:3.2,b:4.8}],
+  BX_MIXN=["Eco","Calm","Normal","Sporty","Brisk","Pushy","Reckless"],BX_CELL=80;
+function brainCellScore(c){return (c.nm||0)*3+(c.cr||0)*6+(c.hb||0)*0.4+(c.jam||0)/90}
+const BX=(()=>{const d={cells:{},cond:{rain:1.12,snow:1.3,night:1.06},mix:BX_MIX.slice(),zip:1,you:{cut:0,tail:0,red:0,honk:0,nm:0,crash:0,good:0},jamH:new Array(24).fill(0),
+    log:[],coach:false,expo:0,lastDecay:Date.now(),lastGen:0,sent:0,coached:0};
+  try{const s=JSON.parse(localStorage.getItem("strata.brain2")||"{}");for(const k in d)if(s[k]!==undefined&&typeof s[k]===typeof d[k])d[k]=s[k]}catch(e){}
+  if(!Array.isArray(d.mix)||d.mix.length!==7)d.mix=BX_MIX.slice();if(!Array.isArray(d.jamH)||d.jamH.length!==24)d.jamH=new Array(24).fill(0);
+  const days=(Date.now()-(+d.lastDecay||Date.now()))/864e5;if(days>0.05){const f=Math.pow(0.93,days);   /* fading: a spot is forgotten in a few weeks unless it keeps happening */
+    for(const k in d.cells){const c=d.cells[k];for(const q of ["nm","cr","hb","jam"])if(c[q])c[q]*=f;if(brainCellScore(c)<0.3)delete d.cells[k]}
+    for(const q in d.you)d.you[q]*=Math.pow(0.9,days);d.expo*=Math.pow(0.85,days);for(let i=0;i<24;i++)d.jamH[i]*=f;d.lastDecay=Date.now()}
+  return d})();
+const BX_RT={ct:1,hc:new Map(),hcT:0,shared:new Map(),pend:{},t1:0,saveT:20,coachCd:new Map(),coachP:null,mek:1,zipT:30,dirty:false,w2:null,off2:false};
+function bxSave(){try{const o={...BX};localStorage.setItem("strata.brain2",JSON.stringify(o))}catch(e){}BX_RT.dirty=false}
+const bxKey=(x,y)=>Math.floor(x/BX_CELL)+","+Math.floor(y/BX_CELL);
+function bxRoadAt(x,y){let b=null;try{for(const e of gAt(GRID.e,x,y)){const p=eProj(e,x,y);if(p.u<-2||p.u>e.L+2)continue;if(!b||p.d<b.d)b={d:p.d,n:e.name}}}catch(e){}return b&&b.d<60?b.n:"this stretch"}
+function brainNote(txt){BX.log.unshift({t:Date.now(),g:brainGen(),txt});if(BX.log.length>40)BX.log.length=40;BX_RT.dirty=true}
+/* something happened here: a close call (nm), crash (cr), hard braking (hb) or a car stuck in a jam (jam, in seconds) */
+function brainSpot(x,y,kind,amt=1){if(!isFinite(x)||!isFinite(y))return;const k=bxKey(x,y),c=BX.cells[k]||(BX.cells[k]={});const s0=brainCellScore(c);c[kind]=(c[kind]||0)+amt;
+  const P=BX_RT.pend[k]||(BX_RT.pend[k]={});P[kind]=(P[kind]||0)+amt;BX_RT.hc.delete(k);BX_RT.dirty=true;
+  const s1=brainCellScore(c);if(s0<10&&s1>=10&&!c.noted){c.noted=1;const why=(c.cr||0)*6>=(c.nm||0)*3&&(c.cr||0)*6>=(c.jam||0)/90?"crashes":(c.nm||0)*3>=(c.jam||0)/90?"close calls":"jams";
+    brainNote(`Lots of ${why} on ${bxRoadAt(x,y)}: drivers now slow down there${why==="close calls"||why==="crashes"?" and people wait longer to cross":""}`)}
+  const ks=Object.keys(BX.cells);if(ks.length>700){ks.sort((a,b)=>brainCellScore(BX.cells[a])-brainCellScore(BX.cells[b]));for(let i=0;i<ks.length-600;i++)delete BX.cells[ks[i]]}}
+/* how risky a spot is, 0..1: this device's memory or the shared one, whichever knows more */
+function brainHot(x,y){const k=bxKey(x,y);let r=BX_RT.hc.get(k);if(r!==undefined)return r;const c=BX.cells[k];r=Math.max(c?Math.min(1,brainCellScore(c)/25):0,BX_RT.shared.get(k)||0);BX_RT.hc.set(k,r);return r}
+const brainNight=()=>{const h=hourNow();return h>=21||h<5.5};
+function brainCondK(){let k=1;try{if(WX.cur==="rain")k*=1+(BX.cond.rain-1)*clamp(WX.w,0,1);else if(WX.cur==="snow")k*=1+(BX.cond.snow-1)*clamp(WX.w,0,1);if(brainNight())k*=BX.cond.night}catch(e){}return k*(bxWeek().gap||1)}
+function brainCondLearn(kind){let b=null;try{if(WX.cur==="rain"&&WX.w>0.3)b="rain";else if(WX.cur==="snow"&&WX.w>0.3)b="snow";else if(brainNight())b="night"}catch(e){}if(!b)return;
+  const cap={rain:1.6,snow:2.0,night:1.35}[b],v0=BX.cond[b];if(kind==="bad")BX.cond[b]=Math.min(cap,v0*1.015);else if(kind==="wait")BX.cond[b]=Math.max(1,v0*0.998);
+  if(Math.round(v0*20)!==Math.round(BX.cond[b]*20))brainNote(`${b==="night"?"After dark":b==="rain"?"In the rain":"On snow"} drivers now leave ${Math.round((BX.cond[b]-1)*100)}% more room`)}
+function brainMixLearn(kind){const m=BX.mix,d=kind==="crash"?[0,0.002,0,0,0,-0.0012,-0.0008]:kind==="scare"?[0,0.0006,0.0008,0,0,-0.0006,-0.0008]:kind==="wait"?[0,-0.0004,0,0,0.001,0,0]:null;if(!d)return;
+  const before=m.slice();for(let i=0;i<7;i++)m[i]=clamp(m[i]+d[i],BX_MIX[i]*0.5,BX_MIX[i]*1.7);const s=m.reduce((a,b)=>a+b,0);for(let i=0;i<7;i++)m[i]/=s;
+  for(let i=0;i<7;i++)if(Math.round(before[i]*50)!==Math.round(m[i]*50)){brainNote(`${BX_MIXN[i]} drivers are now ${Math.round(m[i]*100)}% of traffic (started at ${Math.round(BX_MIX[i]*100)}%)`);break}}
+/* a new driver's style, from the learned mix */
+function brainPers(){const r=rnd();let a=0;for(let i=0;i<7;i++){a+=BX.mix[i];if(r<a)return {...BX_PERS[i]}}return {...BX_PERS[2]}}
+/* how you drive, as other drivers see it: -1 (a menace) .. 1 (courteous) */
+function brainYou(k,n=1){BX.you[k]=(BX.you[k]||0)+n;BX_RT.dirty=true}
+function brainRep(){const y=BX.you,bad=(y.cut||0)*2+(y.tail||0)+(y.red||0)*2+(y.honk||0)*0.3+(y.nm||0)*1.5+(y.crash||0)*2,good=(y.good||0)*0.15;return clamp((good-bad)/(4+good+bad),-1,1)}
+function brainRepName(r=brainRep()){return r>0.45?"Courteous":r>0.1?"Considerate":r>-0.2?"Average":r>-0.5?"Pushy":"A menace"}
+/* the week's shared event: every player gets the same one (the week number picks it) */
+const BX_WEEKS=[{id:"rush",n:"Rush-hour week",d:"More cars in the morning and evening rush",traf:()=>{const h=hourNow();return h>=7&&h<9.5||h>=16&&h<18.5?1.3:1}},
+  {id:"safe",n:"Safety week",d:"Drivers leave a little more room, and the brain learns twice as fast from close calls",gap:1.08,learn:2},
+  {id:"owl",n:"Night-owl week",d:"Busier roads after dark",traf:()=>brainNight()?1.4:1},
+  {id:"trip",n:"Road-trip week",d:"More traffic on the freeways",traf:(fw)=>fw?1.25:1},
+  {id:"sun",n:"Sunday-driver week",d:"Everyone takes it a bit easier: slower, calmer traffic",vK:0.95}];
+function bxWeek(){return BX_WEEKS[Math.floor((Date.now()/864e5+3)/7)%BX_WEEKS.length]}
+function brainTrafMul(onFw){const w=bxWeek();return w.traf?w.traf(onFw):1}
+/* the brain's effect on one traffic car's target speed: easing off at known trouble spots, the week's mood */
+function brainV0(c){c.hotT=(c.hotT||0)-1;if(c.hotT<=0){c.hotT=20+(c.id%7);c.hot=brainHot(c.wx,c.wy)}const w=bxWeek();return (1-0.14*(c.hot||0))*(w.vK||1)}
+/* once a second: jams and hard braking (where they happen, and the hour), exposure for insurance, clean miles, the coach, generations */
+function brainSec(){const h=Math.floor(hourNow())%24;let jam=0;
+  for(const c of cars){if(c.kind!=="ai"||c.jn||!c.e)continue;
+    if(c.e.type==="xway"&&c.v<3&&!(c.sbT>0)){jam++;if(jam<=12)brainSpot(c.wx,c.wy,"jam",1)}
+    if(c._bv!==undefined&&c._bv>9&&c._bv-c.v>6&&!(c.hbCd>0)){c.hbCd=8;brainSpot(c.wx,c.wy,"hb",1);if(c.e.type==="xway"&&c._bv>18)c.hzT=Math.max(c.hzT||0,4)}   /* braking hard into a freeway queue: hazards on to warn the cars behind */if(c.hbCd>0)c.hbCd--;c._bv=c.v}
+  if(jam)BX.jamH[h]=(BX.jamH[h]||0)+jam;
+  const r=brainRep();BX_RT.mek=1+0.5*Math.max(0,-r);BX_RT.ct=Math.sqrt(brainCondK());
+  const g=brainGen();if(g>(BX.lastGen||0)){if(BX.lastGen){brainNote(`The traffic brain reached generation ${g}`);toast(`🧠 The traffic brain reached Gen ${g}`)}BX.lastGen=g;BX_RT.dirty=true}
+  if(g>=10)achHit("brainGen10");if(r>0.45&&(BX.you.good||0)>20)achHit("courteous")}
+function brainTick2(dt){BX_RT.t1-=dt;if(BX_RT.t1<=0){BX_RT.t1=1;try{brainSec()}catch(e){}}
+  BX_RT.hcT-=dt;if(BX_RT.hcT<=0){BX_RT.hcT=5;BX_RT.hc.clear()}
+  if(st.started&&!st.walk){const v=Math.abs(car.vx);let lim=99;try{lim=(me().e.lim||99)}catch(e){}
+    if(v>2&&v*2.237<lim+10)BX.you.good=(BX.you.good||0)+v*dt/1609;
+    if(v>15&&brainHot(car.px,car.py)>0.4)BX.expo+=dt;brainCoach(dt)}
+  /* zipper merging at the work zone: a long queue means drivers should take turns more readily, a short one that they can relax */
+  if(RW.xz){BX_RT.zipT-=dt;if(BX_RT.zipT<=0){BX_RT.zipT=30;const Z=RW.xz;let q=0;for(const c of cars)if(c.kind==="ai"&&c.e===Z.e&&c.dir===Z.dc&&c.s>Z.sA-900&&c.s<Z.sA+Z.Lm&&c.v<4)q++;
+    const z0=BX.zip;if(q>8)BX.zip=Math.min(1.5,BX.zip*1.02);else if(q<3)BX.zip=Math.max(0.8,BX.zip*0.997);if(Math.round(z0*10)!==Math.round(BX.zip*10))brainNote(BX.zip>z0?"Long queues at the work zone: drivers now let merging cars in more readily":"Short queues at the work zone: drivers zipper merge a little less eagerly")}}
+  BX_RT.saveT-=dt;if(BX_RT.saveT<=0){BX_RT.saveT=20;if(BX_RT.dirty)bxSave()}}
+/* the brain coach: points out the trouble spots ahead (and notices when you take the hint) */
+function brainCoach(dt){const P=BX_RT.coachP;if(P){P.t-=dt;if(Math.abs(car.vx)<P.v*0.85){BX_RT.coachP=null;BX.coached=(BX.coached||0)+1;BX_RT.dirty=true;try{carMsg("👍 Coach: nice, that's the way")}catch(e){}if(BX.coached>=10)achHit("coach10")}else if(P.t<=0)BX_RT.coachP=null}
+  if(!BX.coach||Math.abs(car.vx)<13||P)return;for(const d of [70,120]){const x=car.px+Math.cos(car.psi)*d,y=car.py+Math.sin(car.psi)*d,r=brainHot(x,y);if(r<0.45)continue;const k=bxKey(x,y),t=BX_RT.coachCd.get(k)||0;if(performance.now()-t<90000)continue;
+    BX_RT.coachCd.set(k,performance.now());const c=BX.cells[k]||{},why=(c.cr||0)>1?"a crash hotspot":(c.nm||0)>1?"a close-call hotspot":(c.jam||0)>300?"a spot where traffic often backs up":"a trouble spot";
+    const msg=`🧑‍🏫 Coach: ${why} ahead on ${bxRoadAt(x,y)}. Ease off a little`;try{carMsg(msg)}catch(e){}toast(msg);BX_RT.coachP={t:8,v:Math.abs(car.vx)};break}}
+/* insurance: time spent at speed through known trouble spots, and how other drivers rate you */
+function brainInsK(){const r=brainRep();return 1+Math.min(0.12,BX.expo/36000)+(r<-0.3?0.08:0)-(r>0.4?0.05:0)}
+function brainReset(){Object.assign(BX,{cells:{},cond:{rain:1.12,snow:1.3,night:1.06},mix:BX_MIX.slice(),zip:1,you:{cut:0,tail:0,red:0,honk:0,nm:0,crash:0,good:0},jamH:new Array(24).fill(0),log:[],expo:0,coached:0});BX_RT.hc.clear();BX_RT.pend={};bxSave()}
+/* the shared part: send this device's places (the 40 busiest since last time) and settings, get everyone's back */
+async function brainSync2(){if(BX_RT.off2||typeof acctOn!=="function"||!acctOn())return;
+  try{let j;if(brainOK()==="yes"){const ks=Object.keys(BX_RT.pend).sort((a,b)=>brainCellScore(BX_RT.pend[b])-brainCellScore(BX_RT.pend[a])).slice(0,40),cells={};
+      for(const k of ks){const p=BX_RT.pend[k];cells[k]={nm:Math.min(5,p.nm||0),cr:Math.min(3,p.cr||0),hb:Math.min(20,p.hb||0),jam:Math.min(600,p.jam||0)}}
+      j=await acctRpc("brain2_contribute",{p_dev:MSDEV.id,p_rain:BX.cond.rain,p_snow:BX.cond.snow,p_night:BX.cond.night,p_zip:BX.zip,p_mix:BX.mix,p_cells:cells});BX_RT.pend={};}
+    else j=await acctRpc("brain2_get",{});
+    if(j&&j.w>0){BX_RT.w2=j;const c=j.cond||{};BX.cond.rain=clamp(+c.rain||BX.cond.rain,1,1.6);BX.cond.snow=clamp(+c.snow||BX.cond.snow,1,2);BX.cond.night=clamp(+c.night||BX.cond.night,1,1.35);BX.zip=clamp(+j.zip||BX.zip,0.8,1.5);
+      if(Array.isArray(j.mix)&&j.mix.length===7){const m=j.mix.map((v,i)=>clamp(+v||BX_MIX[i],BX_MIX[i]*0.5,BX_MIX[i]*1.7)),s=m.reduce((a,b)=>a+b,0);BX.mix=m.map(v=>v/s)}}
+    if(j&&Array.isArray(j.cells)){BX_RT.shared.clear();for(const [k,r] of j.cells)if(typeof k==="string"&&/^-?\d+,-?\d+$/.test(k))BX_RT.shared.set(k,clamp(+r||0,0,1));BX_RT.hc.clear()}}
+  catch(e){if(/Could not find the function|PGRST202|does not exist/i.test(e.message||""))BX_RT.off2=true}}
+/* v362: the Traffic Brain screen (Spawn › Traffic brain): generation, the week's event, a map of the trouble spots, what drivers have learned,
+   the style mix, the busiest hours, how other drivers see you, the coach, and the latest lessons */
+function brainMap(cv){const g=cv.getContext("2d"),W=cv.width,H=cv.height;if(!BX_RT.map){const L=[];let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;
+    for(const e of EDGES){if(!/xway|ramp|art|ave|blvd|col|road|st|res/.test(e.type))continue;const w=e.type==="xway"?2.2:e.type==="ramp"?1:/art|ave|blvd/.test(e.type)?1.3:0.7;let p=eAt(e,0);
+      for(let u=Math.min(40,e.L);;u=Math.min(e.L,u+40)){const q=eAt(e,u);L.push([p.x,p.y,q.x,q.y,w]);x0=Math.min(x0,q.x);x1=Math.max(x1,q.x);y0=Math.min(y0,q.y);y1=Math.max(y1,q.y);p=q;if(u>=e.L)break}}
+    BX_RT.map={L,x0,x1,y0,y1}}
+  const M=BX_RT.map,s=Math.min((W-16)/(M.x1-M.x0),(H-16)/(M.y1-M.y0)),ox=(W-(M.x1-M.x0)*s)/2,oy=(H-(M.y1-M.y0)*s)/2,X=x=>ox+(x-M.x0)*s,Y=y=>H-oy-(y-M.y0)*s;
+  g.fillStyle="#0b1214";g.fillRect(0,0,W,H);g.strokeStyle="#3d4a4f";g.lineCap="round";for(const [a,b,c,d,w] of M.L){g.lineWidth=w;g.beginPath();g.moveTo(X(a),Y(b));g.lineTo(X(c),Y(d));g.stroke()}
+  const spots=new Map();for(const [k,c] of Object.entries(BX.cells))spots.set(k,Math.min(1,brainCellScore(c)/25));for(const [k,r] of BX_RT.shared)spots.set(k,Math.max(spots.get(k)||0,r));
+  for(const [k,r] of spots){if(r<0.08)continue;const [i,j]=k.split(",").map(Number),x=(i+0.5)*BX_CELL,y=(j+0.5)*BX_CELL,c=BX.cells[k]||{},jamy=(c.jam||0)/90>(c.nm||0)*3+(c.cr||0)*6;
+    g.fillStyle=jamy?`rgba(255,190,60,${0.25+0.6*r})`:`rgba(255,80,60,${0.25+0.6*r})`;g.beginPath();g.arc(X(x),Y(y),2+5*r,0,7);g.fill()}
+  if(st.started&&!st.walk){g.fillStyle="#5fd0ff";g.beginPath();g.arc(X(car.px),Y(car.py),4,0,7);g.fill();g.strokeStyle="#fff";g.lineWidth=1.5;g.stroke()}}
+function brainPanel(){let d=$("brainPanel");if(!d){d=document.createElement("div");d.id="brainPanel";d.style.cssText="position:fixed;inset:0;z-index:61;display:flex;align-items:center;justify-content:center;background:rgba(4,8,10,.6);padding:12px;box-sizing:border-box";document.body.appendChild(d);
+    d.addEventListener("click",e=>{const b=e.target.closest("[data-bp]");if(e.target===d||b&&b.dataset.bp==="x"){d.remove();return}if(!b)return;const k=b.dataset.bp;
+      if(k==="coach"){BX.coach=!BX.coach;bxSave();toast(BX.coach?"🧑‍🏫 Brain coach on: it points out trouble spots ahead":"Brain coach off")}
+      else if(k==="ok"){if(brainOK()==="yes"){try{localStorage.setItem("mstrata.brainOK","no")}catch(_){}toast("Stopped sending traffic stats")}else{d.remove();brainAsk();return}}
+      else if(k==="reset"){if(!b.dataset.sure){b.dataset.sure=1;b.textContent="Tap again to forget everything this device learned";return}for(const q of Object.keys(BRAIN))delete BRAIN[q];Object.assign(BRAIN,{gen:1,ev:0,stops:0,cross:0,wait:3,stopWait:6,gapK:1,pedPat:45,pedGapK:1,scares:0,crashes:0});brainSave();brainReset();toast("🧠 This device's traffic brain was reset (the shared one keeps going)")}
+      brainPanel()})}
+  const sh=BSYNC.shared,n=sh&&sh.w>0?(+sh.stops||0)+(+sh.cross||0)+(+sh.scares||0)+(+sh.crashes||0):BRAIN.ev,g=brainGen(),into=((n%250)+250)%250,w=bxWeek(),r=brainRep(),y=BX.you,pc=v=>Math.round((v-1)*100),
+    bar=(v,c)=>`<span style="display:inline-block;height:8px;border-radius:4px;background:${c};width:${Math.max(2,Math.round(v*100))}%"></span>`,
+    row=(a,b)=>`<div style="display:flex;justify-content:space-between;gap:10px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.06)"><span style="opacity:.8">${a}</span><b style="text-align:right">${b}</b></div>`,
+    ago=t=>{const m=(Date.now()-t)/60000;return m<1?"just now":m<60?Math.round(m)+" min ago":m<1440?Math.round(m/60)+" h ago":Math.round(m/1440)+" d ago"},
+    hot=Object.keys(BX.cells).length+BX_RT.shared.size,ins=brainInsK();
+  const mx=Math.max(1,...BX.jamH),peak=BX.jamH.indexOf(Math.max(...BX.jamH)),hr=h=>`${(h%12)||12} ${h<12?"AM":"PM"}`;
+  d.innerHTML=`<div style="width:min(560px,100%);max-height:100%;overflow:auto;background:#0e1517;color:#e8eef0;border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:16px 16px 12px;font:13.5px/1.45 system-ui,sans-serif">
+    <div style="display:flex;align-items:center;justify-content:space-between"><h3 style="margin:0;font-size:19px">🧠 Traffic brain · Gen ${g}</h3><button data-bp="x" style="background:none;border:0;color:#9ab;font-size:20px;cursor:pointer">✕</button></div>
+    <div style="margin:6px 0 2px;opacity:.8;font-size:12.5px">${sh&&sh.w>0?`Shared by ${(+sh.devices||0).toLocaleString()} players · `:"This device only · "}${into} of 250 lessons to Gen ${g+1}</div>
+    <div style="background:rgba(255,255,255,.08);border-radius:5px;height:8px;overflow:hidden">${bar(into/250,"#5fd0ff")}</div>
+    <div style="margin:10px 0;padding:8px 10px;border-radius:10px;background:rgba(95,208,255,.1)">📅 <b>This week: ${w.n}</b><br><span style="opacity:.85">${w.d}</span></div>
+    <h4 style="margin:10px 0 4px">Trouble spots it remembers (${hot})</h4>
+    <canvas id="bpMap" width="528" height="250" style="width:100%;border-radius:10px;display:block"></canvas>
+    <div style="font-size:12px;opacity:.75;margin-top:3px"><span style="color:#ff6a50">●</span> close calls and crashes · <span style="color:#ffbe3c">●</span> jams · <span style="color:#5fd0ff">●</span> you. Drivers ease off near the red ones and people wait longer to cross there</div>
+    <h4 style="margin:12px 0 4px">What drivers have learned</h4>
+    ${row("Wait for their turn at 4-way stops",BRAIN.stopWait.toFixed(1)+" s (started at 6)")}${row("Gap they want before pulling out",Math.round(BRAIN.gapK*100)+"% of normal")}
+    ${row("Extra room in the rain / on snow / after dark",`+${pc(BX.cond.rain)}% / +${pc(BX.cond.snow)}% / +${pc(BX.cond.night)}%`)}
+    ${row("Zipper merging at work zones",BX.zip>1.05?"lets cars in readily":BX.zip<0.95?"a bit reluctant":"takes turns")}
+    ${row("Pedestrians give up waiting after",Math.round(BRAIN.pedPat)+" s (started at 45)")}
+    <h4 style="margin:12px 0 4px">Driving styles on the road</h4>
+    ${BX.mix.map((v,i)=>`<div style="display:flex;align-items:center;gap:8px;padding:1px 0"><span style="width:72px;opacity:.85">${BX_MIXN[i]}</span><span style="flex:1;background:rgba(255,255,255,.06);border-radius:4px">${bar(v/0.45,["#7fd18b","#7fbfd1","#c9d3d6","#d1b57f","#e0a060","#e07a60","#ff5050"][i])}</span><b style="width:38px;text-align:right">${Math.round(v*100)}%</b></div>`).join("")}
+    <h4 style="margin:12px 0 4px">When the freeways jam${BX.jamH.some(v=>v>0)?` · worst around ${hr(peak)}`:""}</h4>
+    <div style="display:flex;align-items:flex-end;gap:2px;height:46px">${BX.jamH.map((v,h)=>`<span title="${hr(h)}" style="flex:1;background:${h===peak&&v>0?"#ffbe3c":"#4a5a60"};height:${Math.max(2,Math.round(v/mx*46))}px;border-radius:2px"></span>`).join("")}</div>
+    <div style="display:flex;justify-content:space-between;font-size:11px;opacity:.6"><span>12 AM</span><span>6 AM</span><span>12 PM</span><span>6 PM</span><span>11 PM</span></div>
+    <h4 style="margin:12px 0 4px">How other drivers see you: ${brainRepName(r)}</h4>
+    <div style="background:linear-gradient(90deg,#ff5050,#c9d3d6 50%,#7fd18b);height:8px;border-radius:4px;position:relative"><span style="position:absolute;top:-3px;left:calc(${Math.round((r+1)*50)}% - 7px);width:14px;height:14px;border-radius:50%;background:#fff;border:2px solid #0e1517"></span></div>
+    <div style="font-size:12.5px;opacity:.85;margin-top:6px">${Math.round(y.good||0)} clean miles · ${Math.round(y.cut||0)} cut-ins · ${Math.round(y.tail||0)} tailgating · ${Math.round(y.red||0)} red lights · ${Math.round(y.honk||0)} honks · ${Math.round(y.nm||0)} close calls · ${Math.round(y.crash||0)} crashes (older ones fade)</div>
+    <div style="font-size:12.5px;opacity:.85;margin-top:3px">${r>0.1?"Drivers are more likely to ease off and let you in when you signal.":r<-0.2?"Drivers keep their distance from you and rarely let you in.":"Some drivers will let you in when you signal."} Insurance: ${ins>1.005?`+${Math.round((ins-1)*100)}% for risky driving`:ins<0.995?`${Math.round((ins-1)*100)}% for safe driving`:"no change"}.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0 4px">
+      <button data-bp="coach" class="opt${BX.coach?" on":""}"><b>🧑‍🏫 Brain coach: ${BX.coach?"on":"off"}</b><small>Warns you about trouble spots ahead · ${BX.coached||0} tips taken</small></button>
+      <button data-bp="ok" class="opt${brainOK()==="yes"?" on":""}"><b>Help the AI learn: ${brainOK()==="yes"?"on":"off"}</b><small>${brainOK()==="yes"?"Sending anonymous stats":"Tap to read and join"}</small></button></div>
+    <h4 style="margin:12px 0 4px">Latest lessons</h4>
+    ${BX.log.length?BX.log.slice(0,12).map(l=>`<div style="padding:3px 0;border-bottom:1px solid rgba(255,255,255,.06)">${l.txt}<span style="opacity:.55;font-size:11.5px"> · Gen ${l.g} · ${ago(l.t)}</span></div>`).join(""):`<div style="opacity:.7">Nothing yet: drive around, and the brain writes down what it learns here.</div>`}
+    <button data-bp="reset" style="margin-top:12px;width:100%;padding:9px;border-radius:10px;border:1px solid rgba(255,120,100,.4);background:none;color:#ff9f8f;cursor:pointer">Reset what this device learned</button></div>`;
+  try{brainMap($("bpMap"))}catch(e){}}
 // do two paths through a junction cross (within about 2.4 m)? Used so drivers going opposite ways straight through an all-way stop can go together
 function pathsCross(P,a0,Q,b0){if(!P||!Q)return true;for(let a=Math.max(0,a0);a<=P.L;a+=2){const p=pathAt(P,a);for(let b=Math.max(0,b0);b<=Q.L;b+=2){const q=pathAt(Q,b);if((p[0]-q[0])**2+(p[1]-q[1])**2<5.8)return true}}return false}
 function boxConf(n,c){let P=null;for(const o of cars){if(o===c||!o.jn||o.jn.n!==n)continue;if(!P){try{P=mvP(c)}catch(e){return true}}if(pathsCross(P,0,o.jn.P,o.jn.d))return true}
   return c&&c.kind!=="fsd"&&Math.hypot(car.px-n.x,car.py-n.y)<Math.max(n.pr,10)+2}
-const withinFor=e=>(e.lim/2.23694*5.5+14)*BRAIN.gapK;
+const withinFor=e=>(e.lim/2.23694*5.5+14)*BRAIN.gapK*brainCondK();
 function approaching(n,leg,within,except){const dir=leg.end===1?1:-1,e=leg.e,meToo=!(except&&except.kind==="fsd");
   for(const o of cars){if(o===except||o.jn||o.e!==e||o.dir!==dir)continue;const d=e.L-o.s;if(d<within&&(o.v>0.8||d<rEnd(e,dir)+7))return true}
   const M=me();if(meToo&&M.e===e&&M.dir===dir){const d=M.L-M.s;if(d>-2&&d<within&&(car.vx>0.8||d<rEnd(e,dir)+7))return true}
@@ -6322,19 +6467,22 @@ function laneSafe(c,i){if(i<0||i>=c.e.n)return false;const g=laneGaps(c,i);retur
 function aiVsPlayer(c,L,dt){if(st.walk||!st.started)return null;const dx=c.wx-car.px,dy=c.wy-car.py;if(Math.abs(dx)>70||Math.abs(dy)>70){c.tgT=0;c.slowT=0;return null}
   const cp=Math.cos(car.psi),sp=Math.sin(car.psi),fw=dx*cp+dy*sp,lt=-dx*sp+dy*cp,same=Math.abs(wrapPi(c.wh-car.psi))<0.5,ag=c.pers&&c.pers.k==="aggr"||c.rageT>0,pv=car.vx;
   // you cut in right in front of me: stamp on the brakes, lean on the horn, flash; scared first, then mad
-  if(same&&fw<-2&&fw>-40){const inLane=Math.abs(lt)<1.7,gB=-fw-CARLEN;if(inLane&&c.wasSide&&gB<Math.max(6,c.v*0.55)&&c.v>6&&!(c.coCd>0)){c.coCd=12;c.hardT=0.3+rnd()*0.3;c.fear=(c.fear||0)+0.6;c.anger=(c.anger||0)+(ag?0.6:0.35);c.flashT=1.2;aiHonk(c,ag||c.anger>0.6?1.1:0.45);emoB(c,"scared",1.4,"mad")}c.wasSide=Math.abs(lt)>2.6}else c.wasSide=false;
-  if(c.coCd>0)c.coCd-=dt;
+  if(same&&fw<-2&&fw>-40){const inLane=Math.abs(lt)<1.7,gB=-fw-CARLEN;if(inLane&&c.wasSide&&gB<Math.max(6,c.v*0.55)&&c.v>6&&!(c.coCd>0)){c.coCd=12;brainYou("cut");c.hardT=0.3+rnd()*0.3;c.fear=(c.fear||0)+0.6;c.anger=(c.anger||0)+(ag?0.6:0.35);c.flashT=1.2;aiHonk(c,ag||c.anger>0.6?1.1:0.45);emoB(c,"scared",1.4,"mad")}c.wasSide=Math.abs(lt)>2.6}else c.wasSide=false;
+  if(c.coCd>0)c.coCd-=dt;if(c.tgN>0)c.tgN-=dt;
+  /* v362: you signal toward this car's lane, just ahead of it: a driver may ease off to let you in (more likely the better your name with other drivers) */
+  if(st.signal&&!c.jn&&c.e&&c.e.n>1&&same&&fw>-28&&fw<3&&(st.signal===-1?lt>1.8&&lt<5.6:lt<-1.8&&lt>-5.6)&&!(c.yCd>0)&&pv>3){c.yCd=25;const ag2=c.pers&&c.pers.k==="aggr";if(rnd()<(ag2?0.12:0.35)+0.5*brainRep())c.yMe=4.5}
+  if(c.yCd>0)c.yCd-=dt;
   // a near miss across my path (you ran the light, pulled out on me): panic stop, long horn
-  if(!same&&dx*dx+dy*dy<49&&pv>6&&c.v>2&&Math.abs(Math.abs(wrapPi(c.wh-car.psi))-Math.PI/2)<1&&!(c.nmCd>0)){c.nmCd=10;brainLearn("scare");c.hardT=0.6;c.fear=(c.fear||0)+0.8;c.anger=(c.anger||0)+0.4;aiHonk(c,1.2);emoB(c,"scared",1.5,"mad")}
+  if(!same&&dx*dx+dy*dy<49&&pv>6&&c.v>2&&Math.abs(Math.abs(wrapPi(c.wh-car.psi))-Math.PI/2)<1&&!(c.nmCd>0)){c.nmCd=10;brainLearn("scare",0,car.px,car.py);brainYou("nm");c.hardT=0.6;c.fear=(c.fear||0)+0.8;c.anger=(c.anger||0)+0.4;aiHonk(c,1.2);emoB(c,"scared",1.5,"mad")}
   if(c.nmCd>0)c.nmCd-=dt;
   // stuck behind you at a green light: a tap on the horn after a moment (sooner for pushy drivers), a long blast if they're already annoyed
   if(L.who==="me"&&c.v<0.3&&Math.abs(pv)<0.3&&L.gap<12&&!(c.cg<1e6)){c.grT=(c.grT||0)+dt;const k=c.pers&&c.pers.k,lim=ag?1.3:k==="brisk"?2.2:k==="calm"?6:3.5;
     if(c.grT>lim&&!(c.gHk>0)){aiHonk(c,(c.anger||0)>0.5?0.9:0.2);c.anger=(c.anger||0)+0.2;c.gHk=(c.anger||0)>0.6?2.5:5;emoB(c,(c.anger||0)>0.6?"mad":"annoyed",2.4)}}else c.grT=0;
   if(c.gHk>0)c.gHk-=dt;
   if(same&&fw>2&&fw<45&&Math.abs(lt)<2.3){   // this car is just ahead of you
-    if(st.hornAt&&st.clock-st.hornAt<0.35&&c.hornSeen!==st.hornAt){c.hornSeen=st.hornAt;c.anger=(c.anger||0)+0.3;if(ag||c.anger>0.7){emoB(c,"mad",2.2);if(rnd()<0.5)setTimeout(()=>aiHonk(c,0.6),500+rnd()*500)}else emoB(c,"annoyed",1.8);c.honkT=ag||c.anger>0.6?7:4.5;if(c.v<0.5)c.waitT=Math.max(c.waitT||0,30)}
+    if(st.hornAt&&st.clock-st.hornAt<0.35&&c.hornSeen!==st.hornAt){c.hornSeen=st.hornAt;brainYou("honk");c.anger=(c.anger||0)+0.3;if(ag||c.anger>0.7){emoB(c,"mad",2.2);if(rnd()<0.5)setTimeout(()=>aiHonk(c,0.6),500+rnd()*500)}else emoB(c,"annoyed",1.8);c.honkT=ag||c.anger>0.6?7:4.5;if(c.v<0.5)c.waitT=Math.max(c.waitT||0,30)}
     const gap=fw-CARLEN,tail=pv>7&&gap<Math.max(3,pv*0.5)&&c.v>7;c.tgT=tail?(c.tgT||0)+dt:Math.max(0,(c.tgT||0)-dt*2);
-    if(c.tgT>2.2&&(ag||(c.anger||0)>0.6||c.pers&&c.pers.k==="brisk"&&c.tgT>5)&&!(c.bcCd>0)&&L.gap>35){c.bcT=0.6+rnd()*0.4;c.bcCd=18;c.tgT=0;c.anger=(c.anger||0)+0.2}}
+    if((c.tgT>2.2&&!(c.tgN>0)&&(c.tgN=20,brainYou("tail"),false))||c.tgT>2.2&&(ag||(c.anger||0)>0.6||c.pers&&c.pers.k==="brisk"&&c.tgT>5)&&!(c.bcCd>0)&&L.gap>35){c.bcT=0.6+rnd()*0.4;c.bcCd=18;c.tgT=0;c.anger=(c.anger||0)+0.2}}
   else c.tgT=0;
   if(L.who==="me"&&same&&fw<-3&&fw>-45){const gap=-fw-CARLEN,slow=pv<c.v0*0.72&&pv>2.5&&gap<32&&c.v0>8&&!(c.cg<1e6)||pv<0.5&&gap<25&&(()=>{const M=me();if(!M||!M.e)return false;const de=M.dir>0?M.e.L-M.s:M.s;return de>30})();   /* v337: you stopped in the lane away from a junction (not waiting in a queue): after a while they go round you */
     c.slowT=slow?(c.slowT||0)+dt:Math.max(0,(c.slowT||0)-dt);
@@ -6470,8 +6618,9 @@ function updateTraffic(dt){try{sigSense(dt)}catch(e){}try{sfTick(dt)}catch(e){co
     if(c.wait){c.v=0;carPose(c);continue}
     if(c.kind==="ai"&&c.pers===undefined&&(hourNow()>=22||hourNow()<4.5)){const r_=rnd();c.pers=r_<0.15?{k:"calm",v:0.93,T:1.7,lc:1.6,a:1.25,b:2.4}:r_<0.45?{k:"normal",v:1,T:1.3,lc:1,a:1.6,b:2.8}:r_<0.66?{k:"brisk",v:1.08,T:1.0,lc:0.6,a:2.1,b:3.2}:r_<0.86?{k:"aggr",v:1.18,T:0.7,lc:0.35,a:2.8,b:4}:{k:"aggr",reck:true,v:1.32,T:0.45,lc:0.2,a:3.3,b:5}; if(rnd()<0.07)c.drunk={ph:rnd()*6.28}}
     if(c.drunk){const t_=st.clock*0.55+c.drunk.ph;c.wob=Math.sin(t_)*0.75+Math.sin(t_*2.3)*0.25}
-    if(c.kind==="ai"&&c.pers===undefined){const r_=rnd();c.pers=r_<0.08?{k:"eco",v:0.9,T:1.9,lc:2,a:0.95,b:2.1,lg:0.22}:r_<0.27?{k:"calm",v:0.93,T:1.7,lc:1.6,a:1.25,b:2.4}:r_<0.64?{k:"normal",v:1,T:1.3,lc:1,a:1.6,b:2.8}:r_<0.74?{k:"sport",v:1.02,T:1.15,lc:0.8,a:2.4,b:3.4,lg:0.42}:r_<0.86?{k:"brisk",v:1.06,T:1.0,lc:0.6,a:2.1,b:3.2}:r_<0.95?{k:"aggr",v:1.12,T:0.75,lc:0.4,a:2.6,b:3.8}:{k:"aggr",reck:true,v:1.28,T:0.5,lc:0.22,a:3.2,b:4.8}}
+    if(c.kind==="ai"&&c.pers===undefined)c.pers=brainPers();   /* v362: the style mix the traffic brain has learned */
     if(c.kind==="ai")c.v0=c.e.lim/2.23694*c.vf*wxSpeed()*(c.pers?c.pers.v:1)*(c.drunk?1+0.12*Math.sin(st.clock*0.3+c.drunk.ph):1)*(c.e.n>1?[0.96,1,1.05][Math.min(2,laneIdx(c))]:1)*jamMul(c);if(c.kind==="ai"&&NWZ.zone&&nwzIn(c.e,c.dir,c.s))c.v0=Math.min(c.v0,45/2.23694*(c.pers?c.pers.v:1));if(c.kind==="ai"&&c.e.sch&&schoolOn())c.v0=Math.min(c.v0,20/2.23694*(c.pers&&c.pers.reck?1.35:c.pers?c.pers.v:1));
+    if(c.kind==="ai"){c.v0*=brainV0(c);if(c.yMe>0){c.yMe-=dt;c.v0=Math.min(c.v0,Math.max(0,Math.abs(car.vx)-2.5))}}   /* v362: easing off at trouble spots; making room for you when you signal */
     if(c.kind==="ai"&&SAFE.emvList.length)emvYield(c);if(c.kind==="ai"&&TOLL.e)tollAI(c);if(c.kind==="ai"){if(c.honkT>0){c.honkT-=dt;c.v0*=1.14}if(c.passT>0){c.passT-=dt;c.v0*=1.2}if(c.pullCop&&PULL.cur&&PULL.cur.ph==="chase")c.v0*=1.5;if(c.pullTg&&!c.jn&&c.pmE!==c.e){c.pmE=c.e;if(c.mv&&c.mv.t!=="S"){try{planMove(c,"S")}catch(e){}}}   // a driver being followed by police keeps straight on
       if(c.pullTg&&PULL.cur&&PULL.cur.ph==="chase"&&Math.hypot(PULL.cur.cop.wx-c.wx,PULL.cur.cop.wy-c.wy)<160){c.v0=Math.min(c.v0,c.e.lim/2.237*0.8);c.rageT=0;c.passT=0;c.honkT=0}/* they see the lights in the mirror and ease off */if(c.flashT>0)c.flashT-=dt;if(c.bcCd>0)c.bcCd-=dt;if(c.flCd>0)c.flCd-=dt;
       // fear makes a driver hang back for a while, anger can boil over into road rage (faster, closer, pushy)
@@ -6511,7 +6660,7 @@ function updateTraffic(dt){try{sigSense(dt)}catch(e){}try{sfTick(dt)}catch(e){co
       else c.passW=0}
     c.lw=L.who;c.lg=L.gap;
     const PR=c.kind==="ai"?aiVsPlayer(c,L,dt):null,hurry=c.honkT>0||c.passT>0;
-    let a=c.v0<=0?-9:idm(c.v,vc,L.gap,L.v,(c.pers?c.pers.T:1.3)*(hurry?0.75:1)*(1+0.7*Math.min(1,c.fear||0))*(c.rageT>0?0.7:1)*(1+0.7*SLK.v),(c.pers?c.pers.a:1.6)*(hurry?1.4:1)*(1-0.4*SLK.v),(c.pers?c.pers.b:2.8)*(1-0.4*SLK.v));a=clamp(a,-8.5,hurry?3.2:2.2);if(c.hardT>0){c.hardT-=dt;a=-7.5}
+    let a=c.v0<=0?-9:idm(c.v,vc,L.gap,L.v,(c.pers?c.pers.T:1.3)*BX_RT.ct*(L.who==="me"?BX_RT.mek:1)*(hurry?0.75:1)*(1+0.7*Math.min(1,c.fear||0))*(c.rageT>0?0.7:1)*(1+0.7*SLK.v),(c.pers?c.pers.a:1.6)*(hurry?1.4:1)*(1-0.4*SLK.v),(c.pers?c.pers.b:2.8)*(1-0.4*SLK.v));a=clamp(a,-8.5,hurry?3.2:2.2);if(c.hardT>0){c.hardT-=dt;a=-7.5}
     if(c.bcT>0){c.bcT-=dt;a=Math.min(a,-5.2)}   // brake check
     // people don't all pull away the instant the car ahead moves: a short reaction delay, longer for calm drivers, and now and then someone looking at their phone
     if(c.kind==="ai"&&!c.emv&&!c.jn&&!(dStop<12&&endNode(c.e,c.dir).ctrl!=="signal")){if(c.v<0.2&&a>0.3){if(c.goDl===undefined){const k=c.pers&&c.pers.k;c.goDl=(0.3+rnd()*0.7)*(k==="calm"?1.4:k==="aggr"?0.45:k==="brisk"?0.7:1)+(rnd()<0.05?2+rnd()*2.5:0)}if(c.goDl>0){c.goDl-=dt;a=Math.min(a,0)}}else if(c.v>1.5)c.goDl=undefined}
@@ -6833,7 +6982,7 @@ function newPed(e,u,side){const long=rnd()<0.4,jog=rnd()<0.07;return {kind:"ped"
 function pedPos(p){const q=ePt(p.e,p.u,p.side*(walkT(p.e)+(p.lat||0)));return [q[0],q[1],(p.e.hz?ez(p.e,p.u):0)+rkLift(p.e,p.u,p.side)]}
 // people look out for each other and for cars: keep right when meeting someone, pass slower walkers, pause or hurry on a crosswalk
 // your horn: people nearby jump, look, and hurry on (faster still if they're crossing in front of you)
-function pedHorn(p,dt){if(st.hornAt&&st.clock-st.hornAt<0.3&&p.hornSeen!==st.hornAt&&!st.walk&&Math.hypot(p.wx-car.px,p.wy-car.py)<16){p.hornSeen=st.hornAt;if(Math.abs(p.v||0)<0.2&&Math.random()<0.55){p.waveT=st.clock+2.6;return}p.startT=0.5;p.hurryT=3;brainLearn("pedScare")}
+function pedHorn(p,dt){if(st.hornAt&&st.clock-st.hornAt<0.3&&p.hornSeen!==st.hornAt&&!st.walk&&Math.hypot(p.wx-car.px,p.wy-car.py)<16){p.hornSeen=st.hornAt;if(Math.abs(p.v||0)<0.2&&Math.random()<0.55){p.waveT=st.clock+2.6;return}p.startT=0.5;p.hurryT=3;brainLearn("pedScare",0,p.wx,p.wy)}
   if(p.startT>0){p.startT-=dt;p.vMul=0}else if(p.hurryT>0){p.hurryT-=dt;p.vMul=Math.max(p.vMul??1,1.7)}}
 function pedSmart(p,dt){if(p.mode==="walk"){let want=0,slow=1;const hw=(p.e.T.walk||2)/2-0.35;
     for(const o of peds){if(o===p||o.mode!=="walk"||o.e!==p.e||o.side!==p.side)continue;const d=(o.u-p.u)*p.du;if(d<0||d>4.5)continue;
@@ -6843,7 +6992,7 @@ function pedSmart(p,dt){if(p.mode==="walk"){let want=0,slow=1;const hw=(p.e.T.wa
     {const ux=Math.cos(p.wh||0),uy=Math.sin(p.wh||0),B=pedAhead(p,ux,uy);if(B){const dx=p.wx-B.x,dy=p.wy-B.y,away=(-uy*dx+ux*dy)>=0?1:-1;p.latT=clamp((p.lat||0)+away*1.2,-hw,hw);p.vMul=Math.min(p.vMul,0.15);p.blk=(p.blk||0)+dt;if(p.blk>3){p.du=-p.du;p.blk=0}}else p.blk=0}}
   if(p.mode==="cross"){let danger=false,near=false;for(const c of cars){if(c.wx===undefined||c.kind==="cone"||c.kind==="parked")continue;const dx=p.wx-c.wx,dy=p.wy-c.wy,d=Math.hypot(dx,dy);if(d>30)continue;const vh=(c.v||0);if(vh<1.5)continue;
       const tow=(dx*Math.cos(c.wh)+dy*Math.sin(c.wh))/d;if(tow<0.85)continue;near=true;if(d<9)danger=true}
-    {const dx=p.wx-car.px,dy=p.wy-car.py,d=Math.hypot(dx,dy);if(!st.walk&&d<30&&Math.abs(car.vx)>1.5&&(dx*Math.cos(car.psi)+dy*Math.sin(car.psi))/d>0.85){near=true;if(d<9){danger=true;if(!p.scared&&Math.abs(car.vx)>6){p.scared=true;brainLearn("pedScare")}}}}
+    {const dx=p.wx-car.px,dy=p.wy-car.py,d=Math.hypot(dx,dy);if(!st.walk&&d<30&&Math.abs(car.vx)>1.5&&(dx*Math.cos(car.psi)+dy*Math.sin(car.psi))/d>0.85){near=true;if(d<9){danger=true;if(!p.scared&&Math.abs(car.vx)>6){p.scared=true;brainLearn("pedScare",0,p.wx,p.wy)}}}}
     p.vMul=danger?0:near?1.4:1}}
 function pedObs(p){const O=[];if(!st.walk&&Math.abs((p.wz||0)-(car.zb||0))<1.6&&Math.hypot(car.px-p.wx,car.py-p.wy)<9)O.push({x:car.px,y:car.py,h:car.psi,hl:BODY_HL,hw:BODY_HW,me:true});
   for(const c of cars){if(c.wx===undefined||c.kind==="cone"||c.kind==="bike")continue;const d=Math.hypot(c.wx-p.wx,c.wy-p.wy);if(d>8)continue;if(c._hl===undefined){let m=null;try{m=MODELS[trafficModel(c)]}catch(e){}c._hl=m&&m.meta?m.meta.length/2:2.35;c._hw=m&&m.meta?m.meta.width/2:0.95}O.push({x:c.wx,y:c.wy,h:c.wh,hl:c._hl,hw:c._hw})}return O}
@@ -6872,9 +7021,9 @@ function pedTick(dt){if(st.people===false){peds=[];return}
     if(p.mode==="toX"){if(pedTarget(p,p.tx,p.ty,p.v0,dt)){p.mode="waitX";p.wait=0}continue}
     if(p.mode==="waitX"){p.v=0;p.wait+=dt;const n=p.node,L=p.leg;let ok=false;
       if(n.ctrl==="signal")ok=sigState(n,L.grp,st.clock||0)==="red"&&sigState(n,L.grp,(st.clock||0)+6)==="red";
-      else ok=!approaching(n,L,22*BRAIN.pedGapK)&&!cars.some(c=>c.jn&&c.jn.n===n)&&!(!st.walk&&Math.abs(car.vx)>0.5&&Math.hypot(car.px-n.x,car.py-n.y)<Math.max(n.pr||10,10)+6);
+      else ok=!approaching(n,L,22*BRAIN.pedGapK*(1+0.4*brainHot(n.x,n.y)))&&!cars.some(c=>c.jn&&c.jn.n===n)&&!(!st.walk&&Math.abs(car.vx)>0.5&&Math.hypot(car.px-n.x,car.py-n.y)<Math.max(n.pr||10,10)+6);
       // fed up waiting (each person has their own patience): go when the nearest car is still a good way off, even against the light
-      if(!ok&&p.wait>BRAIN.pedPat*(p.pat||(p.pat=0.6+Math.random()*0.8))){const fx=n.x,fy=n.y;let close=!st.walk&&Math.abs(car.vx)>0.5&&Math.hypot(car.px-fx,car.py-fy)<45;if(!close)for(const c of cars)if((c.v||0)>1&&Math.hypot(c.wx-fx,c.wy-fy)<40*BRAIN.pedGapK){close=true;break}if(!close)ok=true}
+      if(!ok&&p.wait>BRAIN.pedPat*(1+brainHot(n.x,n.y))*(p.pat||(p.pat=0.6+Math.random()*0.8))){const fx=n.x,fy=n.y;let close=!st.walk&&Math.abs(car.vx)>0.5&&Math.hypot(car.px-fx,car.py-fy)<45;if(!close)for(const c of cars)if((c.v||0)>1&&Math.hypot(c.wx-fx,c.wy-fy)<40*BRAIN.pedGapK){close=true;break}if(!close)ok=true}
       if(ok||p.wait>90){p.mode="cross";brainLearn("cross",p.wait)}continue}
     if(p.mode==="cross"||p.mode==="jay"){const v=p.mode==="jay"?1.75:Math.max(p.v0,1.35)*(p.vMul??1);if(v<0.05){p.v=0;continue}if(pedTarget(p,p.cx,p.cy,v,dt)){p.side=-p.side;p.u=p.cu;p.du=p.mode==="jay"?p.du:-p.du;p.mode="walk"}continue}
     if(p.mode==="corner"){if(pedTarget(p,p.tx,p.ty,p.v0,dt)){Object.assign(p,p.nxt);p.mode="walk"}continue}
@@ -7083,7 +7232,7 @@ function rwXSteer(c,dt=0.016){const Z=RW.xz;c.rwZ=false;if(!Z||c.e!==Z.e||c.jn||
   if(d>160){if(need(2.2))go();return}                 /* well before: only into an open lane (light traffic) */
   if((d>=18||c.v<1)&&need(1)){go();return}             /* (or waiting at the end of the lane, once a gap is made) */                     /* the merge area: any gap that works at this speed (a car needs ~20 m of rolling to get across) */
   /* no gap: ask the car level with or just behind us in that lane to let us in (once each: they take turns) */
-  if(d<220){let best=null;for(const o of cars){if(o===c||o.e!==e||o.dir!==c.dir||o.jn||laneIdx(o)!==j||Math.abs(o.off-laneOff(e,j))>1.2)continue;const ds=c.s-o.s;if(ds<5||ds>14+o.v*o.v/7)continue;   /* (far enough back to stop comfortably) */if(!best||ds<c.s-best.s)best=o}
+  if(d<220){let best=null;for(const o of cars){if(o===c||o.e!==e||o.dir!==c.dir||o.jn||laneIdx(o)!==j||Math.abs(o.off-laneOff(e,j))>1.2)continue;const ds=c.s-o.s;if(ds<5||ds>(14+o.v*o.v/7)*BX.zip)continue;   /* (far enough back to stop comfortably) */if(!best||ds<c.s-best.s)best=o}
     if(best&&!(best.zipT>0)&&!(best.zipCool>0)){best.zipFor=c;best.zipT=6;best.zipCool=14}}
   if(!fsd&&d<45)c.v0=Math.min(c.v0,Math.max(0,(d-20)*0.5))}  /* the end of the lane: wait, with room to get across once the gap opens */
 /* the plan for a car on the zone's freeway: its speed, the lane it must reach (and where its own lane is closed), or the crossover path to follow */
@@ -7140,7 +7289,7 @@ function jamMul(c){if(c.sbT>0||c.tStop>0||c.sbHold||c.pullH)return 0.002;   // a
   if(EV.crz&&EV.crz.length&&!c.emv){for(const v of EV.crz){const d=Math.hypot(c.wx-v.x,c.wy-v.y);if(d<220){const fw=c.e.type==="xway";return Math.min(1,(fw?0.38:0.62)+(1-(fw?0.38:0.62))*Math.max(0,d-60)/160)*jamMul0(c)}}}
   return jamMul0(c)*(NX.az.length?nxAIMul(c):1)}
 function jamMul0(c){  if(!JAM.zones.length||c.e.type!=="xway")return 1;for(const z of JAM.zones)if(z.e===c.e&&z.dir===c.dir&&c.s>z.s0-60&&c.s<z.s1){const k=c.s<z.s0?(z.s0-c.s)/60:c.s>z.s1-80?(c.s-(z.s1-80))/80:0;return z.m+(1-z.m)*clamp(k,0,1)}return 1}
-function trafTOD(dt){try{jamTick(TOD.t>0?0:2.5)}catch(e){}TOD.t-=dt;if(TOD.t>0||!st.started||mpGuest())return;TOD.t=2.5;const M_=me(),onFw=M_&&M_.e&&(M_.e.type==="xway"||M_.e.type==="ramp"),want=Math.round(G().traffic*todMul()*(onFw?1.4:1))+(TOD.add||0),ai=cars.filter(c=>c.kind==="ai");   // cars you added stay on top of the normal amount
+function trafTOD(dt){try{jamTick(TOD.t>0?0:2.5)}catch(e){}TOD.t-=dt;if(TOD.t>0||!st.started||mpGuest())return;TOD.t=2.5;const M_=me(),onFw=M_&&M_.e&&(M_.e.type==="xway"||M_.e.type==="ramp"),want=Math.round(G().traffic*todMul()*(onFw?1.4:1)*brainTrafMul(onFw))+(TOD.add||0),ai=cars.filter(c=>c.kind==="ai");   // cars you added stay on top of the normal amount
   if(ai.length<want){for(let k=0;k<Math.min(3,want-ai.length);k++){const p=poolSpot(160);if(p)cars.push(newCar(p.e,p.dir,p.s,p.i))}}
   else if(ai.length>want+2){let n=Math.min(3,ai.length-want);for(const c of ai){if(n<=0)break;const d=Math.hypot(c.wx-car.px,c.wy-car.py),ahead=(c.wx-car.px)*Math.cos(car.psi)+(c.wy-car.py)*Math.sin(car.psi);if(!poolKeep(c)&&!aiSeen(c.wx,c.wy,c.wz)&&(d>300||d>140&&ahead<0)){const k=cars.indexOf(c);if(k>=0){cars.splice(k,1);n--}}}}
   st.trafficN=cars.filter(c=>c.kind==="ai").length}
@@ -7148,7 +7297,7 @@ function trafTOD(dt){try{jamTick(TOD.t>0?0:2.5)}catch(e){}TOD.t-=dt;if(TOD.t>0||
 function evCrashTick(v,dt){v.pt+=dt;const [L_,F]=v.pair;
   if(v.phase===0){if(!cars.includes(L_)||!cars.includes(F)){v.t=0;return}const hit=v.real||Math.hypot(L_.wx-F.wx,L_.wy-F.wy)<4.5||(F.e===L_.e&&F.s>L_.s-4.6);
     if(hit){for(const [c,h] of [[L_,0.35],[F,-0.45]]){c.kind="wreck";c.haz=true;c.v=0;c.v0=0;c.head=h;c.distractT=0;c.hardT=0;carPose(c)}v.items.push(L_,F);v.phase=1;v.pt=0;v.x=L_.wx;v.y=L_.wy;v.label="Crash";v.quiet=false;
-      brainLearn("crash");for(const o of cars)if(o.kind==="ai"&&o!==L_&&o!==F&&Math.hypot(o.wx-L_.wx,o.wy-L_.wy)<50){o.fear=(o.fear||0)+0.7;emoB(o,"shock",2.5);if(rnd()<0.4)aiHonk(o,0.5)}
+      brainLearn("crash",0,L_.wx,L_.wy);for(const o of cars)if(o.kind==="ai"&&o!==L_&&o!==F&&Math.hypot(o.wx-L_.wx,o.wy-L_.wy)<50){o.fear=(o.fear||0)+0.7;emoB(o,"shock",2.5);if(rnd()<0.4)aiHonk(o,0.5)}
       const d=Math.hypot(L_.wx-car.px,L_.wy-car.py);if(d<260&&au.ctx){try{rNoiseFx(au.ctx.currentTime,0.6,clamp(1-d/260,0.1,1)*0.6)}catch(e){}}logResult(`Crash between two cars ${distTxt(d)} away`);
       const lo=F.off;for(const k of [12,18,24])v.items.push(evStatic("cone",F.e,F.dir,Math.max(2,F.s-k),lo+(24-k)*0.05))}
     else if(v.pt>9){F.distractT=0;v.t=0}return}
@@ -11529,7 +11678,7 @@ function assist(dt){
   sys.red=null;sys.redWarn=false;
   {const n=M.node;if(n&&n.ctrl==="signal"&&M.s<M.L){const leg=arrLeg(M.e,M.dir),d=M.sStop-M.s,ls=sigState(n,leg.grp,st.clock||0);
      if(d>0&&d<150&&ls!=="green"&&M.off>M.rEdge-1&&M.off<M.lEdge+0.5)sys.red={d,state:ls};
-     if(st.gear==="D"&&sp>3&&sys.redLast&&sys.redLast.n===n&&sys.redLast.d>0&&d<=0&&d>-6&&ls==="red"){sys.ranRed=st.clock;logResult(`Ran a red light at ${fmtSpeed(sp)}`);try{tcamRed(n,sp)}catch(e){}}
+     if(st.gear==="D"&&sp>3&&sys.redLast&&sys.redLast.n===n&&sys.redLast.d>0&&d<=0&&d>-6&&ls==="red"){sys.ranRed=st.clock;try{brainYou("red")}catch(e){}logResult(`Ran a red light at ${fmtSpeed(sp)}`);try{tcamRed(n,sp)}catch(e){}}
      sys.redLast={n,d}}else sys.redLast=null}
   // ---- stop sign recognition
   {const n=M.node,L=n&&arrLeg(M.e,M.dir),has_=n&&L&&(n.ctrl==="allstop"||(n.ctrl==="minor"&&!L.major));let ss=null;
@@ -16344,7 +16493,7 @@ const ACH_DEF=[["first100","🏎️","Triple digits","Hit 100 mph"],["ton150","�
   ["escape3","🚨","Ghost","Get away from the police at 3 stars or more"],["ticket","📸","Smile for the camera","Get a ticket from a speed or red-light camera"],
   ["auctionWin","🔨","Sold!","Win a car at the auction"],["flip","💸","The flip","Sell an auction car for more than you paid for it"],["carwash","🫧","Squeaky clean","Go through the car wash"],
   ["photo","📷","Photographer","Take a picture in photo mode"],["show","🎆","Showtime","Run a Tesla Light Show"],["boombox","🐐","Goat mode","Play a sound on the Tesla Boombox"],
-  ["night3","🦉","Night owl","Be driving at 3 AM"],["vr","🥽","Into the matrix","Drive in VR"],["wheel","🎮","Sim racer","Drive with a steering wheel"]];
+  ["night3","🦉","Night owl","Be driving at 3 AM"],["brain100","🧠","Teacher","Help the traffic brain learn 100 lessons"],["brainGen10","🎓","Gen 10","See the traffic brain reach generation 10"],["coach10","🧑‍🏫","Model student","Take the brain coach's advice 10 times"],["courteous","🤝","After you","Earn a Courteous name with other drivers"],["vr","🥽","Into the matrix","Drive in VR"],["wheel","🎮","Sim racer","Drive with a steering wheel"]];
 const ACH={u:{},d:{},c:{},t:0,clean:0,s60:null};try{Object.assign(ACH,JSON.parse(localStorage.getItem("mstrata.ach")||"{}"))}catch(e){}
 function achSave(){try{localStorage.setItem("mstrata.ach",JSON.stringify({u:ACH.u,d:ACH.d,c:ACH.c,clean:ACH.clean}))}catch(e){}}
 function achHit(id){const D=ACH_DEF.find(a=>a[0]===id);if(!D||ACH.u[id])return;ACH.u[id]={day:GT.day||1,at:Date.now()};achSave();
@@ -19336,7 +19485,7 @@ const TABS={
   traffic(){const n=cars.filter(c=>c.kind==="ai").length;return `<h3>AI traffic · ${n} car${n===1?"":"s"} in town and on Hwy 7</h3><div class="grid2">
     ${[5,10,20].map(k=>`<button class="opt" data-spawn="${k}"><b>Add ${k}</b><small>Random lanes and speeds</small></button>`).join("")}
     <button class="opt" data-spawn="0"><b>Clear traffic</b><small>Remove every AI car</small></button>
-    <button class="opt" data-brain="1"><b>🧠 Traffic brain · Gen ${brainGen()}</b><small>${BSYNC.shared?`Shared brain: ${(+BSYNC.shared.stops||0).toLocaleString()} stops and ${(+BSYNC.shared.cross||0).toLocaleString()} crossings from ${BSYNC.shared.devices} players · `:""}This device: ${BRAIN.stops.toLocaleString()} stops, ${BRAIN.cross.toLocaleString()} crossings, ${BRAIN.wait.toFixed(1)} s average wait · tap to reset</small></button>
+    <button class="opt" data-brain="1"><b>🧠 Traffic brain · Gen ${brainGen()}</b><small>${BSYNC.shared?`Shared by ${BSYNC.shared.devices} players · `:""}${Object.keys(BX.cells).length+BX_RT.shared.size} trouble spots remembered · ${bxWeek().n} · you: ${brainRepName()} · tap to open</small></button>
     <div class="note" style="grid-column:1/-1;margin:2px 0 6px;font-size:12.5px;line-height:1.5">🧠 What the brain has learned so far: drivers wait <b>${BRAIN.stopWait.toFixed(1)} s</b> for their turn at 4-way stops (started at 6), want <b>${Math.round(BRAIN.gapK*100)}%</b> of a normal gap before pulling out, and pedestrians give up waiting after <b>${Math.round(BRAIN.pedPat)} s</b> (started at 45)${BRAIN.pedGapK>1.01?` and leave <b>${Math.round(BRAIN.pedGapK*100)}%</b> more room to cars`:""}. ${BRAIN.scares} close calls and ${BRAIN.crashes} crashes taught it to be careful.</div>
     <button class="opt${brainOK()==="yes"?" on":""}" data-brainok="1"><b>Help the AI learn: ${brainOK()==="yes"?"on":"off"}</b><small>${brainOK()==="yes"?"Your traffic adds to the shared brain (anonymous). Tap to stop":"Send anonymous traffic stats so everyone's AI gets smarter. Tap to read and join"}</small></button>
     <button class="opt" data-mbset="1"><b>🟧 Message boards: ${(MB_PRESETS.find(p=>JSON.stringify(p[1])===JSON.stringify(st.mbMsg||null))||["Your own text"])[0]}</b><small>Tap to change what the amber road work boards say (or write your own)</small></button>
@@ -19444,7 +19593,7 @@ $("tabBody").addEventListener("click",e=>{const b=e.target.closest("button");if(
       if(t&&t.trim()){st.mbMsg=t.toUpperCase().slice(0,80).split("/").map(pg=>pg.split("|").map(x=>x.trim().slice(0,14)).filter(Boolean).slice(0,3)).filter(pg=>pg.length).slice(0,3);toast("Message boards: your own text")}else{st.mbMsg=null;toast("Message boards: Auto")}}
     renderTab&&renderTab()}
   else if(d.brainok!==undefined){if(brainOK()==="yes"){try{localStorage.setItem("mstrata.brainOK","no")}catch(e){}toast("Stopped sending traffic stats");renderTab&&renderTab()}else brainAsk()}
-  else if(d.brain!==undefined){for(const k of Object.keys(BRAIN))delete BRAIN[k];Object.assign(BRAIN,{gen:1,ev:0,stops:0,cross:0,wait:3,stopWait:6,gapK:1,pedPat:45,pedGapK:1,scares:0,crashes:0});brainSave();toast("Traffic brain reset: drivers and people start learning again");renderTab&&renderTab()}
+  else if(d.brain!==undefined){brainPanel()}
   else if(d.emo!==undefined){st.emo=st.emo===false;toast(st.emo?"Driver reaction faces on":"Driver reaction faces off");renderTab&&renderTab()}
   else if(d.spawn!==undefined){const n=+d.spawn;if(n===0){cars=cars.filter(c=>c.kind!=="ai");TOD.add=0;toast("Traffic cleared")}else{spawnTraffic(n);TOD.add=Math.min(200,(TOD.add||0)+n);toast(`${n} AI cars added`)}}
   else if(d.aebs){st.aebSens=d.aebs;toast(`Collision warning: ${d.aebs}`)}else if(d.lkam){st.lkaMode=d.lkam;toast(`Lane keeping: ${{both:"Alert + Aid",aid:"Aid",alert:"Alert"}[d.lkam]}`)}else if(d.lkas){st.lkaSens=d.lkas;toast(`Lane keeping sensitivity: ${d.lkas}`)}
@@ -22031,7 +22180,7 @@ function insMulFor(co){const Q=INS_CO[co]||INS_CO.westport,r=insRec(),d=GT.day||
 function insYear(price,co,cov,ded){const s=BANK.score,f=s<600?1.6:s<680?1.25:s<740?1.0:0.88,Q=INS_CO[co]||INS_CO.westport;
   const base=cov==="liab"?620+price*0.002:1150+price*0.021;return base*f*Q.rate*(cov==="liab"?1:INS_DEDF[ded]||1)*insMulFor(co)}
 function insCars(){const own=GARAGE.filter(g=>g&&TRIMS[g.trim]);return own.length?own.map(g=>({k:g.trim,price:g.price||PRICE[g.trim]||30000})):[{k:st.trim,price:PRICE[st.trim]||TRIMS[st.trim].price||30000}]}
-function insQuote(co,cov,ded){const L=insCars();let y=0;for(const c of L)y+=insYear(c.price,co,cov,ded);if(L.length>1)y*=0.92;return {wk:Math.round(y/52*100)/100,six:Math.round(y/2),mo:Math.round(y/12),n:L.length}}
+function insQuote(co,cov,ded){const L=insCars();let y=0;for(const c of L)y+=insYear(c.price,co,cov,ded);if(L.length>1)y*=0.92;y*=brainInsK();return {wk:Math.round(y/52*100)/100,six:Math.round(y/2),mo:Math.round(y/12),n:L.length}}
 function insWeekly(price){const P=insPol();if(!P)return 0;return Math.round(insYear(price,P.co,P.cov,P.ded)/52*100)/100}
 function insCharge(){const P=insPol(),own=GARAGE.filter(g=>g&&TRIMS[g.trim]);if(!P||!own.length)return;const Q=INS_CO[P.co],tot=insQuote(P.co,P.cov,P.ded).wk;
   if(ECON.cash>=tot){ECON.cash-=tot;bankTx(`${Q.name} · car insurance (${own.length} car${own.length>1?"s":""})`,-tot)}else{BANK.card.bal+=tot;bankTx(`${Q.name} · car insurance (${own.length} car${own.length>1?"s":""})`,-tot,"Credit card")}
