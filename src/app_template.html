@@ -2800,9 +2800,11 @@ const W2_AT=Date.UTC(2026,9,23,19,0,0);
 const W2=true;
 /* v352: the road-kit world (in progress): ?world=kit builds the roads from the snap-together road kit layout (props/kitmap.json, spliced in at build) */
 const KITW=(()=>{try{return /[?&]world=kit\b/.test(location.search)}catch(e){return false}})(),KITMAP=/*KIT_MAP*/null;
-/* v352: the old map's roads rebuilt in road-kit pieces (?roads=kit while it is being finished): every road is followed by kit straights cut to
+/* v352: the old map's roads rebuilt in road-kit pieces (on by default; ?roads=old for the generated look): every road is followed by kit straights cut to
    length, graded and bent to its curve (props/kitold.json, made by tools/kitmaps/oldmap.py); the road graph, junction surfaces and places stay */
-const KITOLD=!KITW&&(()=>{try{return /[?&]roads=kit\b/.test(location.search)}catch(e){return false}})();   // the new world is the only world now (the old Westport map was retired on Oct 24 2026)
+const KIT_J=/*KIT_J*/[];   /* the old map's junctions that got a kit intersection piece: [x, y, ...] (spliced in at build from props/kitold.json) */
+const kitJ=n=>{if(!KITOLD)return false;for(let i=0;i<KIT_J.length;i+=2)if(Math.abs(KIT_J[i]-n.x)<1.5&&Math.abs(KIT_J[i+1]-n.y)<1.5)return true;return false};
+const KITOLD=!KITW&&(()=>{try{return !/[?&]roads=old\b/.test(location.search)}catch(e){return true}})();   /* on for everyone; ?roads=old shows the generated roads */   // the new world is the only world now (the old Westport map was retired on Oct 24 2026)
 const NODES=[], EDGES=[];let BUILD_IC=[];
 function N(x,y,o){for(const n of NODES)if(Math.abs(n.x-x)<1&&Math.abs(n.y-y)<1){if(o)Object.assign(n,o);return n}
   const n=Object.assign({i:NODES.length,x,y,ctrl:null,kind:null,E:[]},o||{});NODES.push(n);return n}
@@ -12353,9 +12355,9 @@ function buildWorld(){retailSites();placeExtras();
     if(tp)stripInto(yellow,e,0.08,0.2,0.012,l0,e.tp[0]),stripInto(yellow,e,-0.08,-0.2,0.012,l0,e.tp[0])}
   // junctions: paved box, stop lines, crosswalks downtown and in the subdivisions
   for(const n of NODES){const col=n.legs.some(l=>l.e.T.col==="h")&&!n.legs.some(l=>l.e.T.col==="c")?"h":"c";
-    if(n.pr)discInto(road[col],n.x,n.y,n.pr,n.z+0.008);
+    if(n.pr&&!kitJ(n))discInto(road[col],n.x,n.y,n.pr,n.z+0.008);   /* a kit intersection brings its own surface and kerbs */
     if(n.xo){quadInto(road.h,n.x,n.y,n.xo.h,n.xo.len,n.xo.w,n.z+0.008)}
-    if(n.kind!=="x"||n.ctrl==="merge")continue;
+    if(n.kind!=="x"||n.ctrl==="merge"||kitJ(n))continue;   /* a kit intersection paints its own crosswalks and stop lines */
     for(const l of n.legs){if(l.r<=0)continue;const e=l.e,dir=l.end===1?1:-1,L=e.L,m2=mAt(e,l.end===0?0:e.L)/2,W=m2+e.n*LANE;
       const uAt=d=>dir>0?L-d:d;   // distance d from the node along this leg
       stripInto(stopL,e,dir*(-m2-0.2),dir*(-W+0.2),0.012,Math.min(uAt(l.r+0.2),uAt(l.r+0.75)),Math.max(uAt(l.r+0.2),uAt(l.r+0.75)));
