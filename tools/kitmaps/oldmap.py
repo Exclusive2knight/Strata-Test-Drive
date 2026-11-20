@@ -57,9 +57,61 @@ def part(e):
         f = (d - D[i]) / max(1e-9, D[i + 1] - D[i]); return [P[i][j] + (P[i + 1][j] - P[i][j]) * min(1, max(0, f)) for j in range(3)]
     return [at(u0)] + [P[i] for i in range(len(P)) if u0 * k < D[i] < u1 * k] + [at(u1)]
 
+# ---- junctions: a kit intersection wherever the old one is a plain 4-way or T with roads meeting near right angles
+CLS = {"st": "c2", "col": "c2", "res": "r2", "road": "u2", "lane": "u2", "dirt": "u2", "ave": "c4", "art": "c4"}
+JP = {  # piece: (leg names and their class in the piece, with the class each accepts)
+    "x_city2_4way": {"leg_N": "c2", "leg_E": "c2", "leg_S": "c2", "leg_W": "c2"},
+    "x_res2_4way": {"leg_N": "r2", "leg_E": "r2", "leg_S": "r2", "leg_W": "r2"},
+    "x_rural2_4way": {"leg_N": "u2", "leg_E": "u2", "leg_S": "u2", "leg_W": "u2"},
+    "x_city4_4way": {"leg_N": "c4", "leg_E": "c4", "leg_S": "c4", "leg_W": "c4"},
+    "x_city4_city2_4way": {"leg_N": "c4", "leg_E": "c2", "leg_S": "c4", "leg_W": "c2"},
+    "x_city2_T": {"leg_N": "c2", "leg_E": "c2", "leg_S": "c2"},
+    "x_res2_T": {"leg_N": "r2", "leg_E": "r2", "leg_S": "r2"},
+    "x_rural2_T": {"leg_N": "u2", "leg_E": "u2", "leg_S": "u2"},
+    "x_city4_res2_T": {"leg_N": "c4", "leg_E": "r2", "leg_S": "c4"}}
+ACC = {"c2": {"c2", "r2", "u2"}, "r2": {"r2", "c2"}, "u2": {"u2", "c2"}, "c4": {"c4"}}   # two-lane kinds stand in for each other
+LEGH = {"leg_N": 0, "leg_E": 90, "leg_S": 180, "leg_W": 270}
+TRIM = {}        # (edge index, end) -> distance from the node where the kit junction's leg ends
+legs_at = {}
+for e in NET["E"]:
+    P = e["P"]
+    if len(P) < 3: continue
+    legs_at.setdefault(e["a"], []).append((e, 0, head(P[0], P[2])))
+    legs_at.setdefault(e["b"], []).append((e, 1, head(P[-1], P[-3])))
+nj = 0
+for ni, L in legs_at.items():
+    nd = NET["N"][ni]
+    if nd["k"] != "x" or len(L) not in (3, 4) or any(e["t"] not in CLS for e, _, _ in L): continue
+    best = None
+    for exact in (True, False):
+     if best: break
+     for pc, legs in JP.items():
+        if len(legs) != len(L): continue
+        for e0, _, h0 in L:
+            for base_leg in legs:
+                h = (h0 - LEGH[base_leg]) % 360; used = {}; ok = True
+                for ln, cl in legs.items():
+                    want = (LEGH[ln] + h) % 360
+                    m = [q for q in L if abs(((q[2] - want + 180) % 360) - 180) < 9 and id(q) not in used.values() and (CLS[q[0]["t"]] == cl if exact else CLS[q[0]["t"]] in ACC[cl])]
+                    if not m: ok = False; break
+                    used[ln] = id(m[0]); used[ln + "_q"] = m[0]
+                if ok: best = (pc, h, {ln: used[ln + "_q"] for ln in legs}); break
+            if best: break
+        if best: break
+    if not best: continue
+    pc, h, M = best
+    out = K.start(pc, nd["x"], nd["y"], h, nd["z"])
+    for ln, (e, end, _) in M.items():
+        c = out[ln]; d = math.hypot(c["x"] - nd["x"], c["y"] - nd["y"])
+        TRIM[(e["i"], end)] = d
+    nj += 1
+print(f"kit junctions: {nj}")
+
 for e in NET["E"]:
     base = BASE.get(e["t"])
     if not base: continue
+    if (e["i"], 0) in TRIM: e["u0"] = TRIM[(e["i"], 0)]
+    if (e["i"], 1) in TRIM: e["u1"] = e["L"] - TRIM[(e["i"], 1)]
     P = part(e)
     if len(P) < 2: continue
     if e["t"] == "xway":
