@@ -57,14 +57,24 @@ It is a silent change: nothing about it goes in the changelog.
   Remaining: ~770 overlap samples / 5 min in very heavy traffic at the start of the drum taper.
 
 ## Next (asked for: "all of it")
-1. DONE v35.7: kit merges on the old freeway. The game reshapes each straight-freeway exit / entrance ramp to the kit piece
-   (`kitMerges`: hidden diagonal off the centre line, the kit's parallel lane and S-shaped split (`KMD`), a bend onto the old ramp; the
-   piece is cut shorter (k 0.42-1) where the ramp is short) and holds the ramp level with the freeway along it (`e.kmH`, zfx). `kitMrgOut`
-   lists the ones that fit (level or evenly graded), `tools/export_net.js` exports them as `M`, `oldmap.py` places them and cuts the
-   carriageway / ramp straights around them. 29 of 35 placed; the rest sit on uneven grades (cut, I-61 bridge).
+1. DONE v35.7-35.8: kit merges on the old freeway. The game reshapes each straight-freeway exit / entrance ramp to the kit piece
+   (`kitMerges`: hidden diagonal off the centre line, the kit's parallel lane and S-shaped split (`KMD`), a bend onto the old ramp). The split
+   runs as far out as the bend onto the rest of the ramp allows (`fits`), the piece is cut to k = 0.74-1 so the S stays gentle (traffic keeps
+   ~22 m/s through it), a plain joint in the replaced stretch moves to where the split starts, and the ramp's junction leg heading is taken
+   there (`e.kmLeg`; merge nodes only allow straight-on moves, and the hidden diagonal is steep). The ramp holds the freeway's height along
+   the piece (`e.kmH`, zfx). `kitMrgOut` lists the ones that fit (level or evenly graded), `tools/export_net.js` exports them as `M`,
+   `oldmap.py` places them and cuts the carriageway / ramp straights around them. 22 of 32 placed; the rest cross grade changes (the cuts,
+   the I-61 bridge, the stack's outer exits) and keep the reshaped ramp drawn with bent straights.
 2. The I-38/I-61 interchange from a kit interchange piece (`ix01_full_cloverleaf`, `ix05_stack_four_level`, …): replace the old cloverleaf's
    edges in `buildNet2` with the kit piece's ramps (derive lane paths from the piece mesh or author them along its ramps), line I-38 and I-61
    up to its eight joints, rebuild AI routes / GPS there, keep `tfw.js` and `tai.js` clean.
-3. Traffic: BeamNG-style curve speed from grip (slower in rain / snow), GTA-style side probes so cars steer round off-lane obstacles
-   (also fixes the crossover taper bunching), more driving styles.
-4. Road props v2 (three.js) need a THREE shim; place them with the work zones.
+3. DONE v35.8, traffic: curve speed from grip (`aiMu`, `aiLatG`: 0.22-0.46 g by driving style, x0.7 in rain, x0.45 on snow), GTA-style
+   nudging round stopped things that stick part way into the lane (`aiNudge`, up to 1.2 m, 0.6 m past an outside lane, not with someone
+   alongside), two new styles (eco, sport). `tools/tests/txover.js` 5-min heavy traffic: overlaps ~950-1030 vs 1020-1500 before, stuck 19-24 vs 35-39.
+4. Road props v2 (three.js): not done. The work zones already use the roadwork pack's cones, drums, signs and message boards (RW_PROPS),
+   so v2 would mostly duplicate them. What it would add: gantries, cantilever guide signs, DMS boards, guardrail and concrete barrier runs.
+   Way in: run strata-road-props.js in headless Chromium with a small `three` shim (Group/Mesh/Box/Cylinder/Plane/Sphere/Torus/Shape/
+   ShapeGeometry/ExtrudeGeometry/CanvasTexture), bake each prop to one mesh with UVs into one atlas, draw with the textured shader (pattern 6).
+5. Notes: tfw.js steering was under-damped (its own scripted car weaved into the piers now and then); it now steers 0.1 x offset + 0.8 x heading.
+   Random scripted traffic crashes (evCrash) can still put a crash scene in its path. Flyover decks: the generated dark deck (SCN.fDeck)
+   is drawn over the kit ramp up there; hiding it showed patchy kit pieces, so it stays.
