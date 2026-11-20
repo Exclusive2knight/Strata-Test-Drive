@@ -29,17 +29,18 @@ It is a silent change: nothing about it goes in the changelog.
 - Tests: `Q="?world=kit" python3 tools/run.py tools/tests/tai.js` (0 stuck in 5 min), `tools/tests/tkit.js` (ground follows every
   kit ramp / overpass, worst 0.15 m).
 
+## Also done
+- Outer two-lane ring road (x ±2200, y ±2900); the four main streets cross it at four-ways and end in residential loops;
+  a residential loop off the middle of each ring side. No dead ends (855 pieces, 0 bad joints, 0 open ends).
+- Pieces with two ends stay part of the road even when the profile changes; a road takes the lane layout of the narrowest
+  profile it runs through (lane counts changing at a node stopped traffic).
+- Kit world zones: downtown is "city", each cluster of residential streets is "sub" (the builders fill it with houses);
+  the freight line runs south of the map.
+- Homes pack: 8 house shells added to the house kit (`tools/import_homes.py`, objects `House_Pack*`), on the builders' lists.
+
 ## Still to do
-1. Game side: load the packed pieces (`props/kitmap_pieces.json` + the new atlas as `props/roadkit2_atlas.jpg`; keep the old
-   `props/road_atlas.jpg` until the old map is gone), draw them chunked by 320 m tiles like the other static meshes, and use the
-   `_col` meshes / road surface for `groundAt`.
-2. Road graph from the layout: chains of linear pieces between intersections become one edge each (polyline from the connector
-   poses, arcs sampled), intersections become nodes (signals from the kit's `conn_prop_signal_*`). Profile → road type:
-   CITY2 st, CITY4 art, CITY5 ave, CITY6D/BLVD6D blvd, RES2 res, RURAL2 road, FWYnG/B paired carriageways → xway, RAMP1/2 ramp.
-   The engine's own road meshes are skipped for kit edges.
-3. Grow the layout: the four outer streets stop 190 m past the freeway (dead ends for now); add suburbs (RES2 grids off
-   x_city4_res2_T), rural roads (RURAL2; no kit piece joins RURAL2 to the city profiles, so allow a CITY2/RURAL2 joint),
-   then re-place every place (garage, mall, airport, dealerships, gas stations, homes) along the new roads.
-4. Road props v2 (three.js library) need a small THREE shim that turns its meshes into the game's format; place them on the new map.
-5. Houses from the homes pack (cottage, modern shed); the apartments stay on hold.
-6. Tests: tai, tgr, tfw, pa1-5, t_all, tfsd on the new map; switch the default world when they pass.
+1. Re-place the places on the kit map: Fort St garage, the mall, the airport (its roads were built in buildNet2), dealerships,
+   gas stations, the service plaza (PAD) and the parallel-parking block (PARK), the start points.
+2. More country: rural roads (RURAL2 butts onto CITY2 / RES2, see COMPAT), hills, a river with the kit's river bridges.
+3. Road props v2 (three.js) need a small THREE shim; place them on the new map.
+4. Switch the default world to the kit world when the tests pass on it (tai, tkit, tgr, tfw, pa1-5, t_all, tfsd), silent release.
