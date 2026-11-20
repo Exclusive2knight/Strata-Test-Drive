@@ -7,11 +7,11 @@ NET = json.load(open("tools/kitmaps/oldnet.json"))
 BASE = {"st": "res2p_st96", "ave": "city4_st96", "road": "rural2_st96", "res": "res2_st96", "art": "city4_st96", "col": "city2_st96",
         "blvd": "blvd6d_st96", "ramp": "ramp1_st96", "rbt": "ramp1_st96", "sd": "svc2_st96", "aw": "svc3_st96", "curb": "svc3_st96",
         "lane": "forest2_st96", "dirt": "rural2_st96", "xway": "fwy3g_st96"}
-SEG = 24.0          # metres per piece: short enough that a bent straight follows any of the old curves within a few cm
+SEG = 16.0          # metres per piece: short enough that a bent straight follows any of the old curves within a few cm
 
 def head(a, b): return math.degrees(math.atan2(b[0] - a[0], b[1] - a[1])) % 360
 
-def follow(P, base, side=0.0):
+def follow(P, base, side=0.0, flat=(0, 0)):
     """kit pieces along polyline P (x, y, z), each placed on its own sample point and tangent and bent to reach the next one
     (no chaining, so nothing drifts); side shifts the pieces right of the line (the freeway carriageways)"""
     if len(P) < 2: return
@@ -42,6 +42,8 @@ def follow(P, base, side=0.0):
         if not (0.2 < Lp < 200): continue
         dz = B[2] - A[2]
         nm = f"{base}@{Lp:.3f}" + (f"~{R:.2f}" if R and abs(R) < 20000 else "") + (f"^{dz:.3f}" if abs(dz) > 0.005 else "")
+        dd = L * (k - 1) / n
+        if dd < flat[0] or dd > L - flat[1] - SEG: nm += "!f"
         K.start(nm, A[0], A[1], hc, A[2])
 
 def part(e):
@@ -112,10 +114,12 @@ for e in NET["E"]:
     if not base: continue
     if (e["i"], 0) in TRIM: e["u0"] = TRIM[(e["i"], 0)]
     if (e["i"], 1) in TRIM: e["u1"] = e["L"] - TRIM[(e["i"], 1)]
+    # where a ramp joins or leaves (a merge), the pieces nearest it lose their kerb and sidewalk ("!f") so the ramp's mouth is open
+    FL = (80 if NET["N"][e["a"]]["c"] == "merge" else 0, 80 if NET["N"][e["b"]]["c"] == "merge" else 0)
     P = part(e)
     if len(P) < 2: continue
     if e["t"] == "xway":
-        follow(P, base, side=1.85)                      # this direction: lanes from 11 m right of the centre line
-        follow(P[::-1], base, side=1.85)                # and the other way
+        follow(P, base, side=1.85, flat=FL)              # this direction: lanes from 11 m right of the centre line
+        follow(P[::-1], base, side=1.85, flat=FL[::-1])  # and the other way
     else:
-        follow(P, base)
+        follow(P, base, flat=FL)

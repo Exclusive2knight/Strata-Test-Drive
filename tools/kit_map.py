@@ -61,6 +61,8 @@ class Kit:
     def piece(self, name):
         """a kit piece, or a straight clipped to any length: "city4_st96@37.5" (the 96 m straight cut to 37.5 m)"""
         if name in self.man: return self.man[name]
+        if name.endswith("!f"):            # no kerb / sidewalk: same joints as the full piece
+            v = dict(self.piece(name[:-2])); v["name"] = name; v["flat"] = True; self.man[name] = v; return v
         base, L = name.split("@"); R = 0.0; dz = 0.0
         if "^" in L: L, dz = L.split("^"); dz = float(dz)
         if "~" in L: L, R = L.split("~"); R = float(R)

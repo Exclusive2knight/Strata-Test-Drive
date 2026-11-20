@@ -139,7 +139,7 @@ if __name__ == "__main__":
     args = sys.argv[3:]
     if args and args[0] == "--layout":
         L = json.load(open(args[1])); names = sorted({p[0] for p in L["place"]})
-        if "--base" in args: names = sorted({n.split("@")[0] for n in names})   # the game cuts, grades and bends these itself
+        if "--base" in args: names = sorted({n.split("@")[0].split("!")[0] for n in names})   # the game cuts, grades and bends these itself
     elif args:
         names = args
     else:
