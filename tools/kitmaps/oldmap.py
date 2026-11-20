@@ -7,11 +7,12 @@ NET = json.load(open("tools/kitmaps/oldnet.json"))
 BASE = {"st": "res2p_st96", "ave": "city4_st96", "road": "rural2_st96", "res": "res2_st96", "art": "city4_st96", "col": "city2_st96",
         "blvd": "blvd6d_st96", "ramp": "ramp1_st96", "rbt": "ramp1_st96", "sd": "svc2_st96", "aw": "svc3_st96", "curb": "svc3_st96",
         "lane": "forest2_st96", "dirt": "rural2_st96", "xway": "fwy3g_st96"}
+EDGE = {"res2p_st96": 6.05, "city4_st96": 7.35, "city2_st96": 4.2, "res2_st96": 4.2, "rural2_st96": 4.35, "blvd6d_st96": 18.3, "forest2_st96": 3.6}   # x of the kerb / road edge
 SEG = 16.0          # metres per piece: short enough that a bent straight follows any of the old curves within a few cm
 
 def head(a, b): return math.degrees(math.atan2(b[0] - a[0], b[1] - a[1])) % 360
 
-def follow(P, base, side=0.0, flat=(0, 0)):
+def follow(P, base, side=0.0, flat=(0, 0), dw=0.0):
     """kit pieces along polyline P (x, y, z), each placed on its own sample point and tangent and bent to reach the next one
     (no chaining, so nothing drifts); side shifts the pieces right of the line (the freeway carriageways)"""
     if len(P) < 2: return
@@ -19,7 +20,8 @@ def follow(P, base, side=0.0, flat=(0, 0)):
     for i in range(1, len(P)): D.append(D[-1] + math.hypot(P[i][0] - P[i - 1][0], P[i][1] - P[i - 1][1]))
     L = D[-1]
     if L < 1: return
-    n = max(1, round(L / SEG)); pts = []
+    hilly = max(p[2] for p in P) - min(p[2] for p in P) > 0.5
+    n = max(1, round(L / (SEG if hilly else 32.0))); pts = []      # short pieces only where the road climbs (fewer pieces, faster frames)
     for k in range(n + 1):
         d = L * k / n; i = 0
         while i < len(D) - 2 and D[i + 1] < d: i += 1
@@ -43,6 +45,7 @@ def follow(P, base, side=0.0, flat=(0, 0)):
         dz = B[2] - A[2]
         nm = f"{base}@{Lp:.3f}" + (f"~{R:.2f}" if R and abs(R) < 20000 else "") + (f"^{dz:.3f}" if abs(dz) > 0.005 else "")
         dd = L * (k - 1) / n
+        if abs(dw) > 0.05: nm += f"%{dw:.2f}"                   # kerb moved out (or in) to the road's own kerb line
         if dd < flat[0] or dd > L - flat[1] - SEG: nm += "!f"
         K.start(nm, A[0], A[1], hc, A[2])
 
@@ -103,6 +106,7 @@ for ni, L in legs_at.items():
     if not best: continue
     pc, h, M = best
     out = K.start(pc, nd["x"], nd["y"], h, nd["z"])
+    K.kj = getattr(K, "kj", []); K.kj.append([nd["x"], nd["y"], min(math.hypot(out[ln]["x"] - nd["x"], out[ln]["y"] - nd["y"]) for ln in M)])
     for ln, (e, end, _) in M.items():
         c = out[ln]; d = math.hypot(c["x"] - nd["x"], c["y"] - nd["y"])
         TRIM[(e["i"], end)] = d
@@ -122,4 +126,4 @@ for e in NET["E"]:
         follow(P, base, side=1.85, flat=FL)              # this direction: lanes from 11 m right of the centre line
         follow(P[::-1], base, side=1.85, flat=FL[::-1])  # and the other way
     else:
-        follow(P, base, flat=FL)
+        follow(P, base, flat=FL, dw=(e["hw"] - EDGE[base]) if base in EDGE else 0.0)

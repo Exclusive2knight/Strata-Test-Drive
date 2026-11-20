@@ -61,6 +61,9 @@ class Kit:
     def piece(self, name):
         """a kit piece, or a straight clipped to any length: "city4_st96@37.5" (the 96 m straight cut to 37.5 m)"""
         if name in self.man: return self.man[name]
+        if "%" in name:                       # kerb moved sideways: same joints
+            i = name.index("%"); rest = name[i + 1:]; tail = "!f" if rest.endswith("!f") else ""
+            v = dict(self.piece(name[:i] + tail)); v["name"] = name; self.man[name] = v; return v
         if name.endswith("!f"):            # no kerb / sidewalk: same joints as the full piece
             v = dict(self.piece(name[:-2])); v["name"] = name; v["flat"] = True; self.man[name] = v; return v
         base, L = name.split("@"); R = 0.0; dz = 0.0
@@ -253,7 +256,7 @@ if __name__ == "__main__":
     joints, bad, opn = K.check()
     # a layout that only dresses an existing road graph (the old map rebuilt in kit pieces) sets K.nograph
     nodes, edges = ([], []) if getattr(K, "nograph", False) else graph(K, getattr(K, "names", None))
-    json.dump({"place": K.place, "nodes": nodes, "edges": edges, "joints": joints, "bad": bad, "open": opn}, open(out, "w"), separators=(",", ":"))
+    json.dump({"place": K.place, "kj": getattr(K, "kj", []), "nodes": nodes, "edges": edges, "joints": joints, "bad": bad, "open": opn}, open(out, "w"), separators=(",", ":"))
     print(f"graph: {len(nodes)} junctions, {len(edges)} edges")
     print(f"{len(K.place)} pieces, {len(joints)} joints, {len(bad)} BAD joints, {len(opn)} open ends")
     for b in bad[:20]: print("  BAD", b)
