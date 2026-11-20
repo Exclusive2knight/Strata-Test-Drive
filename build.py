@@ -12,6 +12,11 @@ html = t.replace("/*MESH_DATA*/", m + models)
 import subprocess as _sp
 try: ref = _sp.run(["git", "-C", here, "log", "-1", "--format=%H", "--", "models", "props", "acc_out", "sounds"], capture_output=True, text=True).stdout.strip()
 except Exception: ref = ""
+import os as _os
+if _os.path.exists("props/kitmap.json"):
+    import json as _json
+    _k = _json.load(open("props/kitmap.json"))
+    html = html.replace("/*KIT_MAP*/null", _json.dumps({"nodes": _k["nodes"], "edges": _k["edges"], "place": _k["place"]}, separators=(",", ":")))
 html = html.replace("@/*ASSET_REF*/main/", "@" + (ref or "main") + "/")
 html = html.replace("<title>Mission Strata</title>", '<title>Mission Strata</title><meta name="description" content="Mission Strata: a realistic driving simulator in your browser with real cars, drive modes, suspension, a city, freeway and traffic.">', 1)
 out = os.path.join(here, "dev.html"); open(out, "w").write(html)

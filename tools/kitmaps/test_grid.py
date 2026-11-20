@@ -16,3 +16,5 @@ for j in range(N):
 for j in range(N - 1):
     for i in range(1, N):
         link(X[i, j], "leg_N", "leg_S")
+# a corner off the south-west leg, to test arcs
+c = K.add("city4_st48", X[0, 0]["leg_W"]); c = K.add("city4_c90r18", c["out"]); K.add("city4_st96", c["out"])

@@ -2785,6 +2785,7 @@ const RT={
   // one-way, one-lane ring of a roundabout (traffic goes round anticlockwise; it has priority, everyone entering yields)
   rbt:{n:1,m:-LANE,shR:1.2,lim:20,z:"c",rank:7,col:"h",kerb:true,edgeL:true,label:"Roundabout",ow:true},
   // a Michigan service drive: a one-way, two-lane frontage road beside a sunken freeway, kerbs and a sidewalk, running the same way as the freeway beside it
+  fwyc:{n:3,m:18.3,shR:3.0,shL:1.2,lim:65,z:"h",rank:6,col:"h",rumble:true,edgeL:true,label:"Freeway",ow:true},
   sd:{n:2,m:-2*LANE,shR:0.6,lim:40,z:"c",rank:4,col:"c",kerb:true,walk:2.0,edgeL:true,label:"Service drive",ow:true},
   // airport: one-way three-lane roadways in and out, and the four-lane terminal curb roads (arrivals below, departures on the deck above)
   aw:{n:3,m:-3*LANE,shR:2.0,shL:1.0,lim:40,z:"r",rank:4,col:"h",edgeL:true,label:"Airport road",ow:true},
@@ -2796,7 +2797,9 @@ const W2_AT=Date.UTC(2026,9,23,19,0,0);
 (()=>{const seen=new Set();const show=(m)=>{m=String(m||"").slice(0,160);if(!m||seen.has(m)||seen.size>5)return;seen.add(m);let el=document.getElementById("errBar");if(!el){el=document.createElement("div");el.id="errBar";el.style.cssText="position:fixed;left:8px;bottom:8px;z-index:2147483600;max-width:min(560px,92vw);background:rgba(120,20,20,.92);color:#fff;font:600 12px/1.35 system-ui,sans-serif;padding:8px 10px;border-radius:10px;box-shadow:0 4px 14px rgba(0,0,0,.4)";el.onclick=()=>el.remove();document.body.appendChild(el)}
   el.textContent="⚠️ Game error (screenshot this for a bug report, tap to hide): "+m+(st&&st.trim?" · car "+st.trim:"")};
   addEventListener("error",e=>{try{show(e.message+(e.lineno?" @"+e.lineno+":"+e.colno:""))}catch(_){}});addEventListener("unhandledrejection",e=>{try{show("promise: "+(e.reason&&e.reason.message||e.reason))}catch(_){}})})();
-const W2=true;   // the new world is the only world now (the old Westport map was retired on Oct 24 2026)
+const W2=true;
+/* v352: the road-kit world (in progress): ?world=kit builds the roads from the snap-together road kit layout (props/kitmap.json, spliced in at build) */
+const KITW=(()=>{try{return /[?&]world=kit\b/.test(location.search)}catch(e){return false}})(),KITMAP=/*KIT_MAP*/null;   // the new world is the only world now (the old Westport map was retired on Oct 24 2026)
 const NODES=[], EDGES=[];let BUILD_IC=[];
 function N(x,y,o){for(const n of NODES)if(Math.abs(n.x-x)<1&&Math.abs(n.y-y)<1){if(o)Object.assign(n,o);return n}
   const n=Object.assign({i:NODES.length,x,y,ctrl:null,kind:null,E:[]},o||{});NODES.push(n);return n}
@@ -3200,9 +3203,13 @@ function w2Climb(x0,y0,o){const [cx,cy]=W2C.MT,thc=Math.atan2(y0-cy,x0-cx),pts=[
   return pts}
 
 // ---- the map
-(function buildNet(){buildNet2()
+function buildNetKit(){const K=KITMAP;for(const [x,y,ctrl] of K.nodes)N(x,y,ctrl?{ctrl}:undefined);
+  for(const [type,name,pts,o] of K.edges){if(!RT[type])continue;const P=pts.map(p=>p.slice());E(type,name||RT[type].label,P,Object.assign({kit:1},o||{}))}}
+(function buildNet(){if(KITW&&KITMAP)buildNetKit();else buildNet2()
 })();
-const ePick=(ax,ay,bx,by)=>EDGES.find(e=>Math.hypot(e.a.x-ax,e.a.y-ay)<1&&Math.hypot(e.b.x-bx,e.b.y-by)<1);
+const ePick=(ax,ay,bx,by)=>{const f=EDGES.find(e=>Math.hypot(e.a.x-ax,e.a.y-ay)<1&&Math.hypot(e.b.x-bx,e.b.y-by)<1);if(f||!KITW)return f;
+  /* the kit world has different roads: places that hang off a named stretch of the old map take the longest two-way road instead, until they are placed on the new map */
+  return KITW_E||(KITW_E=EDGES.filter(e=>!e.ow&&e.L>60).sort((a,b)=>b.L-a.L)[0])};let KITW_E=null;
 // Main St opens out into Maple Blvd: the median grows from nothing over the first block
 {const e=ePick(-550,0,-330,0);if(e)e.tp=[14,150]}
 // ---- junctions: what kind, who has priority, where the stop lines are, which turns are allowed
@@ -12096,6 +12103,28 @@ function rkTex(){if(RK.ok){gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTU
   const one=n=>get("props/road_atlas.jpg?v="+BUILD_VER).catch(e=>{if(/github\.io$/.test(location.hostname))throw e;return get("https://cdn.jsdelivr.net/gh/Exclusive2knight/Strata-Test-Drive@/*ASSET_REF*/main/props/road_atlas.jpg?v="+BUILD_VER+"&r="+n)}).then(dec);
   const tryN=n=>one(n).catch(e=>n<2?new Promise(r=>setTimeout(r,3000*(n+1))).then(()=>tryN(n+1)):Promise.reject(e));
   tryN(0).then(up).catch(e=>{console.warn("road atlas unavailable",e);up(null);try{toast("Couldn't load the road textures ("+String(e&&e.message||e).slice(0,60)+"). Reload to try again.")}catch(_){}});return false}
+/* v352: the road-kit world's road meshes: every placed kit piece (props/kitmap_pieces.json, made by tools/kit_pack.py) turned into world
+   space and merged, textured with the kit's atlas (props/roadkit2_atlas.jpg: wrap S clamp, T repeat every 12 m). Kit local: X right, -Z ahead, Y up;
+   a piece at (x, y) turned h degrees clockwise from north. GL space is (east, up, -north) */
+const KIT={m:null,tex:null,busy:false,ok:false,fail:0};
+function kitGet(f,bin){const g=u=>fetch(u).then(r=>{if(!r.ok)throw new Error("HTTP "+r.status);return bin?r.blob():r.json()});
+  return g("props/"+f+"?v="+BUILD_VER).catch(e=>{if(/github\.io$/.test(location.hostname))throw e;return g("https://cdn.jsdelivr.net/gh/Exclusive2knight/Strata-Test-Drive@/*ASSET_REF*/main/props/"+f+"?v="+BUILD_VER)})}
+function kitLoad(){if(!KITW||!KITMAP||KIT.busy||KIT.ok||st.headless)return;KIT.busy=true;
+  Promise.all([kitGet("kitmap_pieces.json"),kitGet("roadkit2_atlas.jpg",true).then(b=>typeof createImageBitmap==="function"?createImageBitmap(b):null)]).then(([J,img])=>{
+    const P=[],Nn=[],C=[],I=[];
+    for(const [name,x,y,h] of KITMAP.place){const d=J.pieces[name];if(!d)continue;const c=Math.cos(h*Math.PI/180),sn=Math.sin(h*Math.PI/180),b=P.length/3,p=d.p,n=d.n,t=d.t;
+      for(let k=0;k<p.length;k+=3){const ex=p[k]/100,ny=-p[k+2]/100,wx=x+ex*c+ny*sn,wy=y-ex*sn+ny*c;P.push(wx,p[k+1]/100,-wy);
+        const nx=n[k]/127,nz=-n[k+2]/127;Nn.push(nx*c+nz*sn,n[k+1]/127,-(-nx*sn+nz*c));const q=k/3*2;C.push(t[q]/10000,t[q+1]/10000,0)}
+      for(const v of d.i)I.push(v+b)}
+    C.push(0,0,2);P.push(0,-50,0);Nn.push(0,1,0);   /* one value over 1 keeps the UVs as floats */
+    KIT.m=meshFrom(P,Nn,I,C);
+    if(img){const tx=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,tx);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,img);gl.generateMipmap(gl.TEXTURE_2D);
+      gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.REPEAT);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+      try{const ext=gl.getExtension("EXT_texture_filter_anisotropic");if(ext)gl.texParameterf(gl.TEXTURE_2D,ext.TEXTURE_MAX_ANISOTROPY_EXT,Math.min(8,gl.getParameter(ext.MAX_TEXTURE_MAX_ANISOTROPY_EXT)))}catch(e){}KIT.tex=tx}
+    KIT.ok=true;KIT.busy=false}).catch(e=>{console.warn("road kit",e);KIT.busy=false;if(++KIT.fail<4)setTimeout(kitLoad,4000*KIT.fail)})}
+function kitDraw(){if(!KITW)return false;kitLoad();if(!KIT.m)return true;gl.uniformMatrix4fv(U.uM,false,M4.id());
+  if(KIT.tex){gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,KIT.tex);const wet=st.surface==="wet";mat(st.surface==="snow"?[1.2,1.22,1.25]:wet?[0.62,0.62,0.65]:[1,1,1],null,wet?1.4:0.12,wet?90:20,1,6)}else mat([0.3,0.3,0.3],null,0.1,20);
+  draw(KIT.m);return true}
 function stripInto(B,e,t0,t1,y,u0,u1){if(u1-u0<0.05)return;if(e.gap&&u1>e.gap[0]&&u0<e.gap[1]){stripInto(B,e,t0,t1,y,u0,Math.min(u1,e.gap[0]));stripInto(B,e,t0,t1,y,Math.max(u0,e.gap[1]),u1);return}const us=uSamples(e,u0,u1,e.tp||e.hz?4:3);let k=B.P.length/3;const T0=typeof t0==="function"?t0:()=>t0,T1=typeof t1==="function"?t1:()=>t1;
   us.forEach((u,q)=>{const a=ePt(e,u,T0(u)),b=ePt(e,u,T1(u)),yy=y+(e.hz?ez(e,u):0);const yo=B.C&&B.kind===undefined?RKY:0;B.P.push(a[0],yy+yo,-a[1],b[0],yy+yo,-b[1]);B.N.push(0,1,0,0,1,0);if(B.C){const z=B.kind!==undefined?B.kind*10000+200:RKE?RKE(u):200,v=u/12;B.C.push(T0(u),v,z,T1(u),v,z)}if(q>0)B.I.push(k-2,k-1,k,k-1,k+1,k);k+=2})}
 let RKE=null,RKY=0;   /* road kit: the current edge's texture code (kind, lanes, half median) for stripInto */
@@ -18330,19 +18359,19 @@ function render(dt){
   if(SCN.tc){const T_=SCN.tc;mat([0.42,0.42,0.4],null,0.05,10,1,2);draw(T_.conc);mat([0.55,0.5,0.43],null,0.08,12,1,2);draw(T_.sec);mat([0.09,0.09,0.095],null,0.2,30,1,2);draw(T_.asph);mat([0.33,0.29,0.25],null,0.1,10,1,2);draw(T_.cob);mat([0.36,0.3,0.22],null,0.05,8,1,1);draw(T_.grav);mat([0.40,0.38,0.35],null,0.1,10,1,2);draw(T_.rock);mat([0.20,0.14,0.09],null,0.25,30,1,1);draw(T_.mud);mat([0.92,0.94,0.97],null,0.2,20,1,2);draw(T_.snow);mat([0.76,0.66,0.47],null,0.03,6,1,1);draw(T_.sand);
     mat([0.85,0.7,0.1],null,0.2,20);draw(T_.paint);mat([0.95,0.38,0.05],null,0.2,20);draw(T_.dark);mat([0.55,0.55,0.55],null,0.3,20);draw(T_.post);mat([0.1,0.35,0.75],null,0.2,20);draw(T_.board);if(T_.rail){mat([0.62,0.64,0.66],null,0.6,40);draw(T_.rail)}try{orDraw()}catch(e){}tcSignsDraw()}
   try{txbDraw()}catch(e){console.error(e)}
-  gl.polygonOffset(6,6);if(rkTex()){if(!SCN.rk){mat([1,1,1],null,0.05,10,1,10);draw(SCN.walk)}mat([0.36,0.36,0.35],null,0.05,10,1,2)}else{mat([0.36,0.36,0.35],null,0.05,10,1,2);draw(SCN.walk)}draw(SCN.drive);mat([0.1,0.102,0.11],null,0.2,30,1,2);draw(SCN.lot);mat([0.11,0.23,0.07],null,0.02,8,1,1);draw(SCN.green);mat([0.13,0.135,0.14],null,0.2,30,1,2);draw(SCN.pad);if(SCN.parkLane){mat([0.095,0.098,0.105],null,0.25,30,1,2);draw(SCN.parkLane)}
-  gl.polygonOffset(4,4);
-  {const wet=st.surface==="wet",snow=st.surface==="snow",sp_=wet?1.6:0.22,sh_=wet?90:26;
+  gl.polygonOffset(6,6);if(KITW){mat([0.36,0.36,0.35],null,0.05,10,1,2)}else if(rkTex()){if(!SCN.rk){mat([1,1,1],null,0.05,10,1,10);draw(SCN.walk)}mat([0.36,0.36,0.35],null,0.05,10,1,2)}else{mat([0.36,0.36,0.35],null,0.05,10,1,2);draw(SCN.walk)}draw(SCN.drive);mat([0.1,0.102,0.11],null,0.2,30,1,2);draw(SCN.lot);mat([0.11,0.23,0.07],null,0.02,8,1,1);draw(SCN.green);mat([0.13,0.135,0.14],null,0.2,30,1,2);draw(SCN.pad);if(SCN.parkLane){mat([0.095,0.098,0.105],null,0.25,30,1,2);draw(SCN.parkLane)}
+  gl.polygonOffset(4,4);const KD=kitDraw();
+  if(!KD){const wet=st.surface==="wet",snow=st.surface==="snow",sp_=wet?1.6:0.22,sh_=wet?90:26;
    const RKon=rkTex();for(const [c,m1] of SCN.roadZ){if(RKon&&c!=="d"){mat(snow?[1.25,1.27,1.3]:wet?[0.6,0.6,0.63]:[1,1,1],null,sp_,sh_,1,10);draw(m1);continue}const col=snow?[0.42,0.43,0.45]:c==="d"?(wet?[0.16,0.12,0.08]:[0.3,0.25,0.18]):wet?[0.045,0.047,0.052]:c==="c"?[0.112,0.112,0.116]:[0.068,0.07,0.076];mat(col,null,c==="d"?0.05:sp_,c==="d"?8:sh_,1,c==="d"?1:2);draw(m1)}
    gl.polygonOffset(3,3);if(!snow)for(const [c,m] of SCN.wear){if(RKon&&c!=="d")continue;mat(c==="d"?(wet?[0.12,0.09,0.06]:[0.23,0.19,0.14]):wet?[0.035,0.037,0.042]:c==="c"?[0.088,0.088,0.092]:[0.056,0.058,0.064],null,c==="d"?0.05:wet?2:0.5,c==="d"?8:wet?110:40,1,c==="d"?1:2);draw(m)}
    if(!snow){mat([0.05,0.05,0.055],null,0.3,30,1,2);draw(SCN.patchD);mat([0.15,0.15,0.155],null,0.15,20,1,2);draw(SCN.patchL);mat([0.03,0.03,0.032],null,0.6,50);draw(SCN.crack);
      if(!RKon){mat([0.16,0.16,0.165],null,0.2,20,1,2);for(const m of SCN.rumble)draw(m)}}}
   gl.polygonOffset(2,2);if(SCN.tun&&rkTex()){const cf=gl.isEnabled(gl.CULL_FACE);gl.disable(gl.CULL_FACE);mat([1,1,1],null,0.08,14,1,10);draw(SCN.tun);if(SCN.tunC){mat([0.5,0.49,0.47],null,0.05,10,1,0);draw(SCN.tunC);if(SCN.tunF){mat([0.62,0.61,0.58],null,0.06,12,1,0);draw(SCN.tunF)}if(SCN.tunD){mat([0.06,0.065,0.07],null,0.2,30,1,0);draw(SCN.tunD)}if(SCN.tunE){const nk=night?1.6:0.7;mat([0.25,0.3,0.25],[0.1*nk,0.9*nk,0.3*nk],0.1,20,1,0);draw(SCN.tunE)}if(SCN.tunW){const nk=night?2.2:0.4;mat([0.8,0.8,0.75],[nk,nk*0.95,nk*0.8],0.1,20,1,0);draw(SCN.tunW)}if(SCN.tunS&&TUN.tex){gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,TUN.tex);mat([1,1,1],null,0.1,20,1,6);draw(SCN.tunS);RK.ok&&gl.bindTexture(gl.TEXTURE_2D,RK.tex)}}if(cf)gl.enable(gl.CULL_FACE)}if(SCN.rk&&rkTex()){const cf=gl.isEnabled(gl.CULL_FACE);gl.disable(gl.CULL_FACE);mat([1,1,1],null,0.08,14,1,10);draw(SCN.rk);if(cf)gl.enable(gl.CULL_FACE)}else for(const k of SCN.kerbs){mat([0.32,0.32,0.30],null,0.05,10,1,2);draw(k)}
   if(SCN.rbI){mat([0.34,0.34,0.32],null,0.05,10,1,2);draw(SCN.rbI.k);gl.polygonOffset(1,1);mat(st.surface==="snow"?[0.8,0.82,0.86]:[0.11,0.23,0.07],null,0.02,8,1,1);draw(SCN.rbI.g);gl.polygonOffset(2,2)}
-  gl.polygonOffset(0,0);mat([0.78,0.78,0.75],night?[0.012,0.012,0.012]:null,0.1,10);draw(SCN.xlines);draw(SCN.stall);draw(SCN.zebra);mat([0.9,0.9,0.85],night?[0.5,0.5,0.45]:null,0.8,60);draw(SCN.rpm);
+  gl.polygonOffset(0,0);mat([0.78,0.78,0.75],night?[0.012,0.012,0.012]:null,0.1,10);if(!KD){draw(SCN.xlines);draw(SCN.zebra)}draw(SCN.stall);mat([0.9,0.9,0.85],night?[0.5,0.5,0.45]:null,0.8,60);draw(SCN.rpm);
   gl.disable(gl.CULL_FACE);mat([0.11,0.105,0.1],null,0.05,8);draw(SCN.bumps.rim);mat([0.018,0.017,0.016],null,0.3,30);draw(SCN.bumps.holes);mat([0.07,0.068,0.065],null,0.6,40);draw(SCN.bumps.man);mat([0.045,0.046,0.05],null,0.3,30);draw(SCN.bumps.cut);mat([0.75,0.6,0.08],night?[0.03,0.02,0]:null,0.3,20);draw(SCN.bumps.speed);
   if(SCN.bikeL&&st.surface!=="snow"){mat([0.13,0.4,0.2],null,0.15,15,1,2);draw(SCN.bikeL)}
-  for(const l of SCN.lines){mat([0.75,0.75,0.72],night?[0.012,0.012,0.012]:null,0.1,10);draw(l)}mat([0.78,0.56,0.08],night?[0.012,0.008,0]:null,0.1,10);draw(SCN.ylines);
+  if(!KD){for(const l of SCN.lines){mat([0.75,0.75,0.72],night?[0.012,0.012,0.012]:null,0.1,10);draw(l)}mat([0.78,0.56,0.08],night?[0.012,0.008,0]:null,0.1,10);draw(SCN.ylines)}
   gl.disable(gl.POLYGON_OFFSET_FILL);
   if(G().trees){mat([0.16,0.10,0.05]);draw(SCN.trunks); mat([0.04,0.15,0.04],null,0.05,8,1,1);draw(SCN.crowns)}if(SCN.hedge){mat([0.05,0.17,0.05],null,0.05,8,1,1);draw(SCN.hedge)}if(SCN.hedge){mat([0.05,0.17,0.05],null,0.05,8,1,1);draw(SCN.hedge)}
   if(SCN.w2p)w2pDraw(night);if(W2&&LKP.length&&(!SCN.lk||LK.n!==LKP.length))lkLoad();if(SCN.lk)try{lkDraw(night)}catch(e){}
