@@ -2799,7 +2799,10 @@ const W2_AT=Date.UTC(2026,9,23,19,0,0);
   addEventListener("error",e=>{try{show(e.message+(e.lineno?" @"+e.lineno+":"+e.colno:""))}catch(_){}});addEventListener("unhandledrejection",e=>{try{show("promise: "+(e.reason&&e.reason.message||e.reason))}catch(_){}})})();
 const W2=true;
 /* v352: the road-kit world (in progress): ?world=kit builds the roads from the snap-together road kit layout (props/kitmap.json, spliced in at build) */
-const KITW=(()=>{try{return /[?&]world=kit\b/.test(location.search)}catch(e){return false}})(),KITMAP=/*KIT_MAP*/null;   // the new world is the only world now (the old Westport map was retired on Oct 24 2026)
+const KITW=(()=>{try{return /[?&]world=kit\b/.test(location.search)}catch(e){return false}})(),KITMAP=/*KIT_MAP*/null;
+/* v352: the old map's roads rebuilt in road-kit pieces (?roads=kit while it is being finished): every road is followed by kit straights cut to
+   length, graded and bent to its curve (props/kitold.json, made by tools/kitmaps/oldmap.py); the road graph, junction surfaces and places stay */
+const KITOLD=!KITW&&(()=>{try{return /[?&]roads=kit\b/.test(location.search)}catch(e){return false}})();   // the new world is the only world now (the old Westport map was retired on Oct 24 2026)
 const NODES=[], EDGES=[];let BUILD_IC=[];
 function N(x,y,o){for(const n of NODES)if(Math.abs(n.x-x)<1&&Math.abs(n.y-y)<1){if(o)Object.assign(n,o);return n}
   const n=Object.assign({i:NODES.length,x,y,ctrl:null,kind:null,E:[]},o||{});NODES.push(n);return n}
@@ -12120,20 +12123,29 @@ function rkTex(){if(RK.ok){gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTU
 const KIT={m:null,tex:null,busy:false,ok:false,fail:0};
 function kitGet(f,bin){const g=u=>fetch(u).then(r=>{if(!r.ok)throw new Error("HTTP "+r.status);return bin?r.blob():r.json()});
   return g("props/"+f+"?v="+BUILD_VER).catch(e=>{if(/github\.io$/.test(location.hostname))throw e;return g("https://cdn.jsdelivr.net/gh/Exclusive2knight/Strata-Test-Drive@/*ASSET_REF*/main/props/"+f+"?v="+BUILD_VER)})}
-function kitLoad(){if(!KITW||!KITMAP||KIT.busy||KIT.ok||st.headless)return;KIT.busy=true;
-  Promise.all([kitGet("kitmap_pieces.json"),kitGet("roadkit2_atlas.jpg",true).then(b=>typeof createImageBitmap==="function"?createImageBitmap(b):null)]).then(([J,img])=>{
-    const P=[],Nn=[],C=[],I=[];
-    for(const [name,x,y,h,z0] of KITMAP.place){const d=J.pieces[name];if(!d)continue;const z=z0||0;const c=Math.cos(h*Math.PI/180),sn=Math.sin(h*Math.PI/180),b=P.length/3,p=d.p,n=d.n,t=d.t;
+/* a kit straight cut to L metres, graded dz and bent to radius R ("city4_st96@37.5~-220^0.8"): positions and the atlas V scale along the road */
+function kitShape(J,name){const at=name.indexOf("@");if(at<0)return J.pieces[name];const K_=kitShape.c||(kitShape.c={});if(K_[name])return K_[name];const base=J.pieces[name.slice(0,at)];if(!base)return null;
+  let rest=name.slice(at+1),dz=0,R=0;const hi=rest.indexOf("^");if(hi>=0){dz=+rest.slice(hi+1);rest=rest.slice(0,hi)}const ti=rest.indexOf("~");if(ti>=0){R=+rest.slice(ti+1);rest=rest.slice(0,ti)}
+  const L=+rest,L0=+name.slice(0,at).split("_st").pop(),k=L/L0,p=base.p.slice(),n=base.n.slice(),t=base.t.slice();
+  for(let i=0;i<p.length;i+=3){let x=p[i]/100,y=p[i+1]/100,zz=p[i+2]/100*k;y+=dz*(-zz)/L;let nx=n[i],nz=n[i+2];
+    if(R){const th=-zz/R,rr=R-x,c=Math.cos(th),sn=Math.sin(th);x=R-rr*c;zz=-rr*sn;const a=nx*c+nz*sn,b=-nx*sn+nz*c;nx=a;nz=b}p[i]=x*100;p[i+1]=y*100;p[i+2]=zz*100;n[i]=nx;n[i+2]=nz}
+  for(let i=1;i<t.length;i+=2)t[i]=t[i]*k;const out={p,n,t,i:base.i};if(Object.keys(K_).length<4000)K_[name]=out;return out}
+function kitLoad(){if(!(KITW&&KITMAP||KITOLD)||KIT.busy||KIT.ok||st.headless)return;KIT.busy=true;
+  Promise.all([kitGet(KITOLD?"kitold_pieces.json":"kitmap_pieces.json"),kitGet("roadkit2_atlas.jpg",true).then(b=>typeof createImageBitmap==="function"?createImageBitmap(b):null),KITOLD?kitGet("kitold.json"):Promise.resolve(KITMAP)]).then(([J,img,LAY])=>{
+    const P=[],Nn=[],C=[],I=[],PL=LAY.place;let pi=0;
+    /* built a slice at a time (8 ms a frame) so the old map's ten thousand pieces never freeze the game */
+    const step=()=>{const t0=performance.now();for(;pi<PL.length&&performance.now()-t0<(window.KIT_SLICE||8);pi++){const [name,x,y,h,z0]=PL[pi];const d=kitShape(J,name);if(!d)continue;const z=z0||0;const c=Math.cos(h*Math.PI/180),sn=Math.sin(h*Math.PI/180),b=P.length/3,p=d.p,n=d.n,t=d.t;
       for(let k=0;k<p.length;k+=3){const ex=p[k]/100,ny=-p[k+2]/100,wx=x+ex*c+ny*sn,wy=y-ex*sn+ny*c;P.push(wx,p[k+1]/100+z,-wy);
         const nx=n[k]/127,nz=-n[k+2]/127;Nn.push(nx*c+nz*sn,n[k+1]/127,-(-nx*sn+nz*c));const q=k/3*2;C.push(t[q]/10000,t[q+1]/10000,0)}
       for(const v of d.i)I.push(v+b)}
+    if(pi<PL.length){setTimeout(step,0);return}
     C.push(0,0,2);P.push(0,-50,0);Nn.push(0,1,0);   /* one value over 1 keeps the UVs as floats */
     KIT.m=meshFrom(P,Nn,I,C);
     if(img){const tx=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,tx);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,img);gl.generateMipmap(gl.TEXTURE_2D);
       gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.REPEAT);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
       try{const ext=gl.getExtension("EXT_texture_filter_anisotropic");if(ext)gl.texParameterf(gl.TEXTURE_2D,ext.TEXTURE_MAX_ANISOTROPY_EXT,Math.min(8,gl.getParameter(ext.MAX_TEXTURE_MAX_ANISOTROPY_EXT)))}catch(e){}KIT.tex=tx}
-    KIT.ok=true;KIT.busy=false}).catch(e=>{console.warn("road kit",e);KIT.busy=false;if(++KIT.fail<4)setTimeout(kitLoad,4000*KIT.fail)})}
-function kitDraw(){if(!KITW)return false;kitLoad();if(!KIT.m)return true;gl.uniformMatrix4fv(U.uM,false,M4.id());
+    KIT.ok=true;KIT.busy=false};step()}).catch(e=>{console.warn("road kit",e);KIT.busy=false;if(++KIT.fail<4)setTimeout(kitLoad,4000*KIT.fail)})}
+function kitDraw(){if(!KITW&&!KITOLD)return false;kitLoad();if(!KIT.m)return KITW;gl.uniformMatrix4fv(U.uM,false,M4.id());if(KITOLD){gl.polygonOffset(2,2)}
   if(KIT.tex){gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,KIT.tex);const wet=st.surface==="wet";mat(st.surface==="snow"?[1.2,1.22,1.25]:wet?[0.62,0.62,0.65]:[1,1,1],null,wet?1.4:0.12,wet?90:20,1,6)}else mat([0.3,0.3,0.3],null,0.1,20);
   draw(KIT.m);return true}
 function stripInto(B,e,t0,t1,y,u0,u1){if(u1-u0<0.05)return;if(e.gap&&u1>e.gap[0]&&u0<e.gap[1]){stripInto(B,e,t0,t1,y,u0,Math.min(u1,e.gap[0]));stripInto(B,e,t0,t1,y,Math.max(u0,e.gap[1]),u1);return}const us=uSamples(e,u0,u1,e.tp||e.hz?4:3);let k=B.P.length/3;const T0=typeof t0==="function"?t0:()=>t0,T1=typeof t1==="function"?t1:()=>t1;
@@ -18372,7 +18384,7 @@ function render(dt){
     mat([0.85,0.7,0.1],null,0.2,20);draw(T_.paint);mat([0.95,0.38,0.05],null,0.2,20);draw(T_.dark);mat([0.55,0.55,0.55],null,0.3,20);draw(T_.post);mat([0.1,0.35,0.75],null,0.2,20);draw(T_.board);if(T_.rail){mat([0.62,0.64,0.66],null,0.6,40);draw(T_.rail)}try{orDraw()}catch(e){}tcSignsDraw()}
   try{txbDraw()}catch(e){console.error(e)}
   gl.polygonOffset(6,6);if(KITW){mat([0.36,0.36,0.35],null,0.05,10,1,2)}else if(rkTex()){if(!SCN.rk){mat([1,1,1],null,0.05,10,1,10);draw(SCN.walk)}mat([0.36,0.36,0.35],null,0.05,10,1,2)}else{mat([0.36,0.36,0.35],null,0.05,10,1,2);draw(SCN.walk)}draw(SCN.drive);mat([0.1,0.102,0.11],null,0.2,30,1,2);draw(SCN.lot);mat([0.11,0.23,0.07],null,0.02,8,1,1);draw(SCN.green);mat([0.13,0.135,0.14],null,0.2,30,1,2);draw(SCN.pad);if(SCN.parkLane){mat([0.095,0.098,0.105],null,0.25,30,1,2);draw(SCN.parkLane)}
-  gl.polygonOffset(4,4);const KD=kitDraw();
+  gl.polygonOffset(4,4);const KD=KITW&&kitDraw();
   if(!KD){const wet=st.surface==="wet",snow=st.surface==="snow",sp_=wet?1.6:0.22,sh_=wet?90:26;
    const RKon=rkTex();for(const [c,m1] of SCN.roadZ){if(RKon&&c!=="d"){mat(snow?[1.25,1.27,1.3]:wet?[0.6,0.6,0.63]:[1,1,1],null,sp_,sh_,1,10);draw(m1);continue}const col=snow?[0.42,0.43,0.45]:c==="d"?(wet?[0.16,0.12,0.08]:[0.3,0.25,0.18]):wet?[0.045,0.047,0.052]:c==="c"?[0.112,0.112,0.116]:[0.068,0.07,0.076];mat(col,null,c==="d"?0.05:sp_,c==="d"?8:sh_,1,c==="d"?1:2);draw(m1)}
    gl.polygonOffset(3,3);if(!snow)for(const [c,m] of SCN.wear){if(RKon&&c!=="d")continue;mat(c==="d"?(wet?[0.12,0.09,0.06]:[0.23,0.19,0.14]):wet?[0.035,0.037,0.042]:c==="c"?[0.088,0.088,0.092]:[0.056,0.058,0.064],null,c==="d"?0.05:wet?2:0.5,c==="d"?8:wet?110:40,1,c==="d"?1:2);draw(m)}
@@ -18383,7 +18395,8 @@ function render(dt){
   gl.polygonOffset(0,0);mat([0.78,0.78,0.75],night?[0.012,0.012,0.012]:null,0.1,10);if(!KD){draw(SCN.xlines);draw(SCN.zebra)}draw(SCN.stall);mat([0.9,0.9,0.85],night?[0.5,0.5,0.45]:null,0.8,60);draw(SCN.rpm);
   gl.disable(gl.CULL_FACE);mat([0.11,0.105,0.1],null,0.05,8);draw(SCN.bumps.rim);mat([0.018,0.017,0.016],null,0.3,30);draw(SCN.bumps.holes);mat([0.07,0.068,0.065],null,0.6,40);draw(SCN.bumps.man);mat([0.045,0.046,0.05],null,0.3,30);draw(SCN.bumps.cut);mat([0.75,0.6,0.08],night?[0.03,0.02,0]:null,0.3,20);draw(SCN.bumps.speed);
   if(SCN.bikeL&&st.surface!=="snow"){mat([0.13,0.4,0.2],null,0.15,15,1,2);draw(SCN.bikeL)}
-  if(!KD){for(const l of SCN.lines){mat([0.75,0.75,0.72],night?[0.012,0.012,0.012]:null,0.1,10);draw(l)}mat([0.78,0.56,0.08],night?[0.012,0.008,0]:null,0.1,10);draw(SCN.ylines)}
+  if(KITOLD){gl.enable(gl.POLYGON_OFFSET_FILL);kitDraw();gl.polygonOffset(0,0)}
+  if(!KD&&!(KITOLD&&KIT.m)){for(const l of SCN.lines){mat([0.75,0.75,0.72],night?[0.012,0.012,0.012]:null,0.1,10);draw(l)}mat([0.78,0.56,0.08],night?[0.012,0.008,0]:null,0.1,10);draw(SCN.ylines)}
   gl.disable(gl.POLYGON_OFFSET_FILL);
   if(G().trees){mat([0.16,0.10,0.05]);draw(SCN.trunks); mat([0.04,0.15,0.04],null,0.05,8,1,1);draw(SCN.crowns)}if(SCN.hedge){mat([0.05,0.17,0.05],null,0.05,8,1,1);draw(SCN.hedge)}if(SCN.hedge){mat([0.05,0.17,0.05],null,0.05,8,1,1);draw(SCN.hedge)}
   if(SCN.w2p)w2pDraw(night);if(W2&&LKP.length&&(!SCN.lk||LK.n!==LKP.length))lkLoad();if(SCN.lk)try{lkDraw(night)}catch(e){}
