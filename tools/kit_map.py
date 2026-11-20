@@ -24,6 +24,22 @@ D2R = math.pi / 180
 COMPAT = [{"CITY2", "RES2"}, {"CITY2", "RURAL2"}, {"RES2", "RURAL2"}]
 
 
+def near_pairs(C, r):
+    """every pair of connectors within r of each other (grid buckets, so big maps stay fast)"""
+    G = {}
+    for i, c in enumerate(C): G.setdefault((math.floor(c["x"] / 2), math.floor(c["y"] / 2)), []).append(i)
+    for (gx, gy), L in G.items():
+        for dx in (-1, 0, 1):
+            for dy in (-1, 0, 1):
+                M = G.get((gx + dx, gy + dy))
+                if not M: continue
+                for i in L:
+                    for j in M:
+                        if j <= i: continue
+                        a, b = C[i], C[j]
+                        if abs(a["x"] - b["x"]) <= r and abs(a["y"] - b["y"]) <= r: yield i, a, b
+
+
 def flow_ok(a, b):
     fa, fb = a.get("flow", "both"), b.get("flow", "both")
     return fa == "both" or fb == "both" or fa != fb
@@ -45,10 +61,17 @@ class Kit:
     def piece(self, name):
         """a kit piece, or a straight clipped to any length: "city4_st96@37.5" (the 96 m straight cut to 37.5 m)"""
         if name in self.man: return self.man[name]
-        base, L = name.split("@"); L = float(L); v = json.loads(json.dumps(self.man[base]))
+        base, L = name.split("@"); R = 0.0; dz = 0.0
+        if "^" in L: L, dz = L.split("^"); dz = float(dz)
+        if "~" in L: L, R = L.split("~"); R = float(R)
+        L = float(L); v = json.loads(json.dumps(self.man[base]))
         for c in v["connectors"]:
-            if c["name"] == "out": c["pos"][2] = -L
-        v["name"] = name; v["clip"] = [base, L]; self.man[name] = v
+            if c["name"] == "out":
+                if R:                                   # bent: the end sits round the arc and turns by L / R
+                    th = L / R; c["pos"][0] = R - R * math.cos(th); c["pos"][2] = -R * math.sin(th); c["heading"] = (math.degrees(th)) % 360
+                else: c["pos"][2] = -L
+                c["pos"][1] = dz
+        v["name"] = name; v["clip"] = [base, L]; v["bend"] = R; v["dz"] = dz; self.man[name] = v
         return v
 
     def _put(self, name, x, y, h, z=0.0):
@@ -82,8 +105,8 @@ class Kit:
         """pair up connectors that coincide; report mismatches and open ends"""
         joints, bad = [], []
         C = self.conns
-        for i, a in enumerate(C):
-            for b in C[i + 1:]:
+        for i, a, b in near_pairs(C, 0.5):
+            if True:
                 if a["pi"] == b["pi"]: continue
                 d = math.hypot(a["x"] - b["x"], a["y"] - b["y"])
                 if d > 0.5: continue
@@ -132,8 +155,7 @@ def graph(K, names=None):
     """chains of linear pieces between junctions -> edges [type, name, pts, opts]; junctions -> nodes [x, y, ctrl]"""
     C = K.conns; key = lambda c: (c["pi"], c["name"])
     mate = {}
-    for i, a in enumerate(C):
-        for b in C[i + 1:]:
+    for i, a, b in near_pairs(C, 0.15):
             if a["pi"] != b["pi"] and math.hypot(a["x"] - b["x"], a["y"] - b["y"]) < 0.15 and abs(((a["h"] - b["h"]) % 360) - 180) < 5 and flow_ok(a, b): mate[key(a)] = b; mate[key(b)] = a
     byp = {}
     for c in C: byp.setdefault(c["pi"], []).append(c)
@@ -176,6 +198,7 @@ def graph(K, names=None):
             nxt = mate.get(key(other))
             if nxt is None: end = None; cur = None; break
             if nxt["pi"] not in linear: end = nxt; done.add(key(nxt)); break
+            if key(nxt) in done: break          # a closed loop of road with no junction on it
             cur = nxt
         if end is not None:
             pts.append((end["x"], end["y"], end["z"]))
@@ -203,13 +226,13 @@ def preview(K, root, path):
     import matplotlib; matplotlib.use("Agg")
     import matplotlib.pyplot as plt
     sys.path.insert(0, os.path.dirname(__file__))
-    from kit_pack import piece, clip
+    from kit_pack import piece, clip, bend, slope
     cache = {}
     f, ax = plt.subplots(figsize=(14, 14))
     for name, x, y, h, z in K.place:
         if name not in cache:
             v = K.piece(name); d = piece(os.path.join(root, K.man[v["clip"][0] if "clip" in v else name]["file"]))
-            if "clip" in v: d = clip(d, 96.0 if "_st96" in v["clip"][0] else 48.0 if "_st48" in v["clip"][0] else 24.0, v["clip"][1])
+            if "clip" in v: d = bend(slope(clip(d, 96.0 if "_st96" in v["clip"][0] else 48.0 if "_st48" in v["clip"][0] else 24.0, v["clip"][1]), v["clip"][1], v.get("dz", 0.0)), v.get("bend", 0.0))
             cache[name] = d
         d = cache[name]; P = d["p"]; I = d["i"]
         pts = [K.tw(P[k] / 100, P[k + 2] / 100, x, y, h) for k in range(0, len(P), 3)]
@@ -226,7 +249,8 @@ if __name__ == "__main__":
     K = Kit(root)
     exec(open(script).read(), {"K": K, "math": math})
     joints, bad, opn = K.check()
-    nodes, edges = graph(K, getattr(K, "names", None))
+    # a layout that only dresses an existing road graph (the old map rebuilt in kit pieces) sets K.nograph
+    nodes, edges = ([], []) if getattr(K, "nograph", False) else graph(K, getattr(K, "names", None))
     json.dump({"place": K.place, "nodes": nodes, "edges": edges, "joints": joints, "bad": bad, "open": opn}, open(out, "w"), separators=(",", ":"))
     print(f"graph: {len(nodes)} junctions, {len(edges)} edges")
     print(f"{len(K.place)} pieces, {len(joints)} joints, {len(bad)} BAD joints, {len(opn)} open ends")

@@ -90,13 +90,39 @@ def clip(d, L0, L):
     return {**d, "p": p, "t": t}
 
 
+def slope(d, L, dz):
+    """climb dz metres over the piece's length (a straight graded to the road's profile)"""
+    if not dz: return d
+    p = list(d["p"])
+    for i in range(0, len(p), 3): p[i + 1] = round(p[i + 1] + dz * 100 * (-p[i + 2] / 100.0) / L)
+    return {**d, "p": p}
+
+
+def bend(d, R):
+    """a straight bent round an arc of signed radius R (+ turns right): the along-road axis (-Z) follows the arc, X stays across it"""
+    if not R: return d
+    p = list(d["p"]); n = list(d["n"])
+    for i in range(0, len(p), 3):
+        x, z = p[i] / 100.0, p[i + 2] / 100.0
+        th = -z / R                       # distance along / radius (z is negative going forward)
+        rr = R - x
+        p[i] = round((R - rr * math.cos(th)) * 100); p[i + 2] = round(-rr * math.sin(th) * 100)
+        nx, nz = n[i], n[i + 2]
+        c, s_ = math.cos(th), math.sin(th)
+        n[i] = round(nx * c + nz * s_); n[i + 2] = round(-nx * s_ + nz * c)
+    return {**d, "p": p, "n": n}
+
+
 def main(root, out, names):
     man = {v["name"]: v for v in json.load(open(os.path.join(root, "manifest.json")))["pieces"]}
     res = {"cycle": 12, "pieces": {}}
     for nm in names:
         if "@" in nm:
-            base, L = nm.split("@"); v = man[base]; L0 = float(base.rsplit("_st", 1)[1])
-            d = clip(piece(os.path.join(root, v["file"])), L0, float(L))
+            base, L = nm.split("@"); R = 0.0; dz = 0.0
+            if "^" in L: L, dz = L.split("^"); dz = float(dz)
+            if "~" in L: L, R = L.split("~"); R = float(R)
+            v = man[base]; L0 = float(base.rsplit("_st", 1)[1])
+            d = bend(slope(clip(piece(os.path.join(root, v["file"])), L0, float(L)), float(L), dz), R)
             d["c"] = []; res["pieces"][nm] = d; continue
         v = man[nm]
         d = piece(os.path.join(root, v["file"]))
@@ -113,6 +139,7 @@ if __name__ == "__main__":
     args = sys.argv[3:]
     if args and args[0] == "--layout":
         L = json.load(open(args[1])); names = sorted({p[0] for p in L["place"]})
+        if "--base" in args: names = sorted({n.split("@")[0] for n in names})   # the game cuts, grades and bends these itself
     elif args:
         names = args
     else:
