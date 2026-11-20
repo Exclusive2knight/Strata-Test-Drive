@@ -44,3 +44,27 @@ It is a silent change: nothing about it goes in the changelog.
 2. More country: rural roads (RURAL2 butts onto CITY2 / RES2, see COMPAT), hills, a river with the kit's river bridges.
 3. Road props v2 (three.js) need a small THREE shim; place them on the new map.
 4. Switch the default world to the kit world when the tests pass on it (tai, tkit, tgr, tfw, pa1-5, t_all, tfsd), silent release.
+
+## Live since v35.2–35.6 (old map in kit pieces, on by default; ?roads=old for the generated look)
+- `tools/kitmaps/oldmap.py` fits kit pieces to `tools/kitmaps/oldnet.json` (exported by `tools/export_net.js` from the running game):
+  straights cut / graded / bent per segment (16 m on hills, 32 m flat), each placed on its own sample point (no drift);
+  `%dw` widens a piece's kerb to the road's own kerb line (`hw`), `!f` drops kerb + sidewalk within 80 m of a ramp merge;
+  95 kit intersections at near-right-angle 4-ways / T's (exact profile matches first), their leg reach saved as `kj`.
+- Game: `kitShape` cuts / grades / bends / widens / flattens base pieces itself (`props/kitold_pieces.json` holds only ~17 bases),
+  `kitLoad` builds the mesh 8 ms a slice; at kit intersections the generated crosswalks, stop lines and junction pad are skipped and
+  traffic stops at `kj` reach − 1.2 m; generated sidewalks / kerbs / bike lanes are not drawn under kit roads; the generated surface sits 4 cm lower.
+- Freeway crossover work zones (`rwXMake`, `rwXSteer`, test `tools/tests/txover.js`): lane 0 is the OUTSIDE lane, n-1 next to the median.
+  Remaining: ~770 overlap samples / 5 min in very heavy traffic at the start of the drum taper.
+
+## Next (asked for: "all of it")
+1. Kit merges on the old freeway: at each merge node on an `xway` edge, find which carriageway the ramp belongs to (the ramp is on its
+   right); if the freeway is within ~3° of straight over the piece length, place `fwy3g_exit_336` (ramp leaves) or `fwy3g_entrance_432`
+   (ramp joins) on that carriageway (origin on the centre line shifted 1.85 m right, like the carriageway straights) so its `ramp`
+   connector (local 36.4, 0, -336 / 0) lands on the old ramp where the ramp is 38.25 m from the centre line; drop the carriageway straights
+   whose midpoints fall inside the piece and the ramp straights before the connector. Curved stretches keep today's look.
+2. The I-38/I-61 interchange from a kit interchange piece (`ix01_full_cloverleaf`, `ix05_stack_four_level`, …): replace the old cloverleaf's
+   edges in `buildNet2` with the kit piece's ramps (derive lane paths from the piece mesh or author them along its ramps), line I-38 and I-61
+   up to its eight joints, rebuild AI routes / GPS there, keep `tfw.js` and `tai.js` clean.
+3. Traffic: BeamNG-style curve speed from grip (slower in rain / snow), GTA-style side probes so cars steer round off-lane obstacles
+   (also fixes the crossover taper bunching), more driving styles.
+4. Road props v2 (three.js) need a THREE shim; place them with the work zones.
