@@ -21,7 +21,7 @@ import import_car as C
 WH = {"Wheel_FL": "wheel_front_left", "Wheel_FR": "wheel_front_right", "Wheel_RL": "wheel_rear_left", "Wheel_RR": "wheel_rear_right"}
 NODE = {"Interior": "cabin_interior", "InteriorShell": "cabin_shell", "Dashboard": "dashboard", "Screens": "cabin_screens",
         "Seats": "cabin_seats", "SteeringWheel": "steering_wheel"}
-MAT = {"Light_Head": "LED headlights", "Light_Tail": "Red tail light", "Light_Reverse": "Reverse light",
+MAT = {"Light_DRL": "White DRL", "Light_Head": "LED headlights", "Light_Tail": "Red tail light", "Light_Reverse": "Reverse light",
        "Marker_Amber": "Amber turn signal", "Screen_Main": "blank display", "Screen_Aux": "blank display"}
 
 
