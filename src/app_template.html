@@ -6950,10 +6950,11 @@ function slDraw(ex,ey,night){if(!SL.pl){SL.pl=1;for(const k of ["sl_single","sl_
   if(SLC.raw&&SL.list.length){const CS=SLC.CS;if(!SLC.byCell){SLC.byCell=new Map();for(const l of SL.list){const k=(l.k==="sl_sidewalk"?"w":"")+Math.floor(l.x/CS)+","+Math.floor(l.y/CS);let L=SLC.byCell.get(k);if(!L)SLC.byCell.set(k,L=[]);L.push(l)}}
     const f=(SLC.fr=(SLC.fr||0)+1);let built=0;const i0=Math.floor((ex-R)/CS),i1=Math.floor((ex+R)/CS),j0=Math.floor((ey-R)/CS),j1=Math.floor((ey+R)/CS);
     const cf_=gl.isEnabled(gl.CULL_FACE);gl.disable(gl.CULL_FACE);gl.uniform1f(U.uBackOn,0);
+    const idM=()=>gl.uniformMatrix4fv(U.uM,false,M4.id());idM();   /* v361: the cell meshes are in world space (a billboard or prop drawn just before left its own matrix set: the median lights vanished) */
     for(const w of ["","w"])for(let i=i0;i<=i1;i++)for(let j=j0;j<=j1;j++){const k=w+i+","+j,L=SLC.byCell.get(k);if(!L)continue;const Rk=w?R*0.63:R;let C=SLC.cells.get(k);
       if(!C){if(built>=1){for(const l of L){const dx=l.x-ex,dy=l.y-ey,d2=dx*dx+dy*dy;if(d2>Rk*Rk||!PROPS[l.k])continue;if(!sphVis(l.x,(l.z||0)+4.5,-l.y,6,R))continue;propDraw(l.k,carMatrix(l.x,l.y,l.h+Math.PI/2,l.z||0,0,0),{head:night*1.2})}gl.disable(gl.CULL_FACE);gl.uniform1f(U.uBackOn,0);continue}
         built++;C=slCellBuild(k,L);if(!C)continue;SLC.cells.set(k,C)}
-      C.used=f;if(Math.hypot(C.x-ex,C.y-ey)-C.r>Rk||!sphVis(C.x,C.z,-C.y,C.r+8,Rk+C.r))continue;
+      C.used=f;if(Math.hypot(C.x-ex,C.y-ey)-C.r>Rk||!sphVis(C.x,C.z,-C.y,C.r+8,Rk+C.r))continue;idM();
       if(C.b){mat([1,1,1],null,0.45,40);draw(C.b)}if(C.h){const k_=night*1.2*3;mat([1,1,1],k_>0?[0.94*k_,0.95*k_,0.84*k_]:null,0.3,20);draw(C.h)}}
     if(aC>=0&&VAO_CUR)vaoOff();if(aC>=0){gl.disableVertexAttribArray(aC);gl.vertexAttrib3f(aC,1,1,1);bind.col=false}
     if(cf_)gl.enable(gl.CULL_FACE);
