@@ -96,6 +96,9 @@ for i, nd in enumerate(J["nodes"]):
         P = acc(pr["attributes"]["POSITION"]).astype(float) + T; N = acc(pr["attributes"]["NORMAL"]).astype(float)
         UV = acc(pr["attributes"]["TEXCOORD_0"]).astype(float) if "TEXCOORD_0" in pr["attributes"] else None
         I = acc(pr["indices"]).reshape(-1, 3).astype(np.int64)
+        if name in GROUND_N or name == "Streetscape":   # v350: past the ends of the game's full-width boulevard (it tapers down to two lanes), the model's Big Beaver walks would float in the grass
+            c = P[I].mean(1); keep = ~((np.abs(c[:, 2]) < 32) & ((c[:, 0] > 238) | (c[:, 0] < -348))); skipped += int((~keep).sum()); I = I[keep]
+            if not len(I): continue
         if name in GROUND_N:   # Big Beaver Rd and the site ground under it: the game's own road is drawn there
             n0 = len(I); r = clip_band(P, N, UV, I)
             if r is None: skipped += n0; continue
