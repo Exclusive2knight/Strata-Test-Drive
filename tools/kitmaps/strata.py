@@ -133,3 +133,50 @@ for k in range(4):
             K.add("city4_to_city5_turnlane_48", c, via="out")
         else:
             c = run(ap, "city5_st96", 192)
+
+def block(c, tee, prof):
+    """a T at the end of street c (entered through its stem), then round a block clockwise back to the T's other leg"""
+    L = K.add(tee, c, via="leg_E")
+    q = run(L["leg_S"], "res2_st96", 160); q = K.add("res2_c90r18", q)["out"]
+    q = run(q, "res2_st96", 260); q = K.add("res2_c90r18", q)["out"]
+    q = run(q, "res2_st96", 2 * (160 + 22.75 + 18) - 36); q = K.add("res2_c90r18", q)["out"]
+    q = run(q, "res2_st96", 260); q = K.add("res2_c90r18", q)["out"]
+    fill(q, L["leg_N"], "res2_st96")
+
+# ---------------------------------------------------------------- the outer ring road (two-lane) joining the four streets that leave the freeway,
+# with a residential loop off it on each side: stem out from a T on the ring, a T at the loop, round the block clockwise and back
+OX, OY = 2200.0, 2900.0
+T = {}
+# x_city2_T has legs N, E, S: the stem is E, turned to face inward
+# the main streets cross the ring at four-ways (four-lane through, the two-lane ring across) and stop 190 m further out
+for k, (x, y, inward) in enumerate([(OX, 0.05, 270), (-0.05, OY, 180), (-OX, -0.05, 90), (0.05, -OY, 0)]):
+    T[k] = K.start("x_city4_city2_4way", x, y, (inward + 180) % 360)
+stubs = {}
+for c in K.conns:
+    if not c["used"] and c["prof"] == "CITY5" and c["pi"] < len(K.place) - 4: stubs[c["pi"]] = c
+for k in range(4):
+    stem = facing(T[k], {0: 270, 1: 180, 2: 90, 3: 0}[k])
+    st_ = min(stubs.values(), key=lambda c: dist(c, stem))
+    c = K.add("city5_to_city4_48", st_)["out"]
+    fill(c, stem, "city4_st96")
+    # beyond the ring the main street narrows to two lanes and ends in a residential loop (no dead ends anywhere)
+    c = K.add("city4_to_city2_narrow_48", facing(T[k], {0: 90, 1: 0, 2: 270, 3: 180}[k]))["out"]
+    c = run(c, "city2_st96", 120)
+    block(c, "x_city2_T", "city2")
+# ring sides, driven clockwise from each T: along to 18 m short of the corner, the corner, on to the next T
+CORN = [(OX, -OY), (-OX, -OY), (-OX, OY), (OX, OY)]          # after east T (heading south) comes the south-east corner, etc.
+order = [0, 3, 2, 1]                                         # east, south, west, north going clockwise
+heads = {0: 180, 3: 270, 2: 0, 1: 90}
+for n, k in enumerate(order):
+    a = facing(T[k], heads[k]); nk = order[(n + 1) % 4]
+    corner = {0: (OX, -OY), 3: (-OX, -OY), 2: (-OX, OY), 1: (OX, OY)}[k]
+    # a residential loop off the middle of each side: a T with its stem outward, a short street, a T, round the block and back
+    side = math.hypot(corner[0] - a["x"], corner[1] - a["y"])
+    c = run(a, "city2_st96", side / 2)
+    R2 = K.add("x_city2_T", c, via="leg_N")
+    c = run(R2["leg_S"], "city2_st96", side / 2 - 18 - 47.5)
+    s0 = K.add("res2_st96@120", R2["leg_E"])["out"]
+    block(s0, "x_res2_T", "res2")
+    c = K.add("city2_c90r18", c)["out"]
+    b = facing(T[nk], (heads[nk] + 180) % 360)
+    fill(c, b, "city2_st96")

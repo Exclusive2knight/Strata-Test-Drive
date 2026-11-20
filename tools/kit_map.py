@@ -20,6 +20,10 @@ import sys, json, math, os
 D2R = math.pi / 180
 
 
+# profiles with the same lanes and nearly the same kerb line: allowed to butt straight onto each other (no kit transition piece exists)
+COMPAT = [{"CITY2", "RES2"}, {"CITY2", "RURAL2"}, {"RES2", "RURAL2"}]
+
+
 def flow_ok(a, b):
     fa, fb = a.get("flow", "both"), b.get("flow", "both")
     return fa == "both" or fb == "both" or fa != fb
@@ -65,7 +69,7 @@ class Kit:
         """snap `name` so its connector `via` sits on the open connector `at` (facing it)"""
         v = self.piece(name)
         c = next(c for c in v["connectors"] if c["name"] == via)
-        if c["profile"] != at["prof"] and not mirror_ok:
+        if c["profile"] != at["prof"] and not mirror_ok and {c["profile"], at["prof"]} not in COMPAT:
             raise ValueError(f"{name}.{via} is {c['profile']}, the joint is {at['prof']}")
         # the new connector must face the opposite way: c.heading + h = at.h + 180
         h = (at["h"] + 180 - c["heading"]) % 360
@@ -86,7 +90,7 @@ class Kit:
                 dh = abs(((a["h"] - b["h"]) % 360) - 180)
                 if dh > 90: continue          # same way round: the two carriageways of a freeway share the median line, they don't join
                 if not flow_ok(a, b): continue   # an "out" only joins an "in": the other carriageway's joints sit on the same spot
-                ok = d <= tol and dh <= 0.5 and a["prof"] == b["prof"] and abs(a["z"] - b["z"]) < 0.05
+                ok = d <= tol and dh <= 0.5 and (a["prof"] == b["prof"] or {a["prof"], b["prof"]} in COMPAT) and abs(a["z"] - b["z"]) < 0.05
                 (joints if ok else bad).append([a["pi"], a["name"], b["pi"], b["name"], round(d, 3), round(dh, 2), a["prof"], b["prof"]])
                 a["used"] = b["used"] = True
         opn = [[c["pi"], self.place[c["pi"]][0], c["name"], round(c["x"], 2), round(c["y"], 2), round(c["h"], 1), c["prof"]] for c in C if not c["used"]]
@@ -98,6 +102,7 @@ PROF = {"CITY2": ("col", {}), "CITY4": ("art", {}), "CITY5": ("art", {"m": 3.6})
         "CITY8D": ("blvd", {"n": 4, "m": 5.1, "shL": 0.2}), "BLVD6D": ("blvd", {"m": 14.0}), "RES2": ("res", {}), "RES2P": ("st", {}),
         "RURAL2": ("road", {}), "RURAL2P": ("road", {}), "FOREST2": ("road", {}), "RAMP1": ("ramp", {}), "RAMP2": ("ramp", {"n": 2, "m": -7.2}),
         "ONEWAY3": ("sd", {"n": 3, "m": -10.8}), "SVC3": ("sd", {"n": 3, "m": -10.8}), "SVC2": ("sd", {}), "FWY3G": ("fwyc", {}), "FWY3B": ("fwyc", {"m": 0.6})}
+LANES = {"CITY2": 1, "RES2": 1, "RES2P": 1, "RURAL2": 1, "CITY4": 2, "CITY5": 2, "CITY6D": 3, "CITY8D": 4, "BLVD6D": 3, "RAMP1": 1, "RAMP2": 2}
 ONEWAY = {"RAMP1", "RAMP2", "ONEWAY3", "SVC3", "SVC2", "FWY2G", "FWY3G", "FWY4G", "FWY5G", "FWY2B", "FWY3B", "FWY4B", "FWY5B"}
 
 
@@ -132,7 +137,9 @@ def graph(K, names=None):
             if a["pi"] != b["pi"] and math.hypot(a["x"] - b["x"], a["y"] - b["y"]) < 0.15 and abs(((a["h"] - b["h"]) % 360) - 180) < 5 and flow_ok(a, b): mate[key(a)] = b; mate[key(b)] = a
     byp = {}
     for c in C: byp.setdefault(c["pi"], []).append(c)
-    linear = {i for i, cs in byp.items() if len(cs) == 2 and cs[0]["prof"] == cs[1]["prof"]}
+    # two-ended pieces are part of the road even when the profile changes (city5 -> city4 transitions): a node there would make the
+    # lanes jump sideways and the traffic stop. The edge takes the lane layout of the end it starts from.
+    linear = {i for i, cs in byp.items() if len(cs) == 2}
     nodes, edges, done = [], [], set()
     jpos = {}; jin = {}        # jin[(piece, connector)]: points from the junction's node out to that connector (the ramp's own path)
     # freeway exits and entrances: the node sits on the median line where the ramp leaves / joins, the ramp curves away along the
@@ -158,9 +165,10 @@ def graph(K, names=None):
         if key(s) in jin: pts += jin[key(s)][:-1]
         pts.append((s["x"], s["y"], s["z"])); done.add(key(s))
         cur = mate.get(key(s)) if s["pi"] not in linear else s
-        prof = s["prof"]; end = None
+        prof = s["prof"]; end = None; profs_seen = {prof}
         while cur is not None and cur["pi"] in linear:
             done.add(key(cur))
+            profs_seen |= {c["prof"] for c in byp[cur["pi"]]}
             cl, n0, n1 = centreline(K, cur["pi"])
             if cur["name"] != n0: cl = cl[::-1]
             pts += [p for p in cl[1:]]
@@ -179,6 +187,9 @@ def graph(K, names=None):
         for p in pts[1:]:
             if math.hypot(p[0] - P[-1][0], p[1] - P[-1][1]) > 0.05: P.append(p)
         if len(P) < 2: continue
+        # the lane layout of the narrowest profile the road runs through (a four-lane street that narrows to two is modelled as two)
+        if profs_seen:
+            prof = min(profs_seen, key=lambda q: (LANES.get(q, 9), 0 if q == "CITY4" else 1))
         typ, o = PROF.get(prof, ("road", {}))
         # one-way roads run the way the traffic flows: a junction's "in" connector takes traffic into the junction, an open end's "out" lets it leave
         if prof in ONEWAY and ((s["pi"] not in linear and s.get("flow") == "in") or (s["pi"] in linear and s.get("flow") == "out")): P = P[::-1]
