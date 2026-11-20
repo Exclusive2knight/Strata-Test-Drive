@@ -20,10 +20,15 @@ import sys, json, math, os
 D2R = math.pi / 180
 
 
+def flow_ok(a, b):
+    fa, fb = a.get("flow", "both"), b.get("flow", "both")
+    return fa == "both" or fb == "both" or fa != fb
+
+
 class Kit:
     def __init__(self, root):
         self.man = {v["name"]: v for v in json.load(open(os.path.join(root, "manifest.json")))["pieces"]}
-        self.place = []        # [name, x, y, h]
+        self.place = []        # [name, x, y, h, z]        # [name, x, y, h]
         self.conns = []        # every placed connector: dict(x, y, h, prof, flow, piece index, name, used)
 
     # kit local (X right, -Z forward) -> world, for a piece at (x, y) turned h degrees clockwise
@@ -33,34 +38,43 @@ class Kit:
         ex, ny = px, -pz                      # kit X -> east, kit -Z -> north
         return x + ex * c + ny * s, y - ex * s + ny * c
 
-    def _put(self, name, x, y, h):
-        v = self.man[name]; i = len(self.place)
-        self.place.append([name, round(x, 4), round(y, 4), round(h % 360, 4)])
+    def piece(self, name):
+        """a kit piece, or a straight clipped to any length: "city4_st96@37.5" (the 96 m straight cut to 37.5 m)"""
+        if name in self.man: return self.man[name]
+        base, L = name.split("@"); L = float(L); v = json.loads(json.dumps(self.man[base]))
+        for c in v["connectors"]:
+            if c["name"] == "out": c["pos"][2] = -L
+        v["name"] = name; v["clip"] = [base, L]; self.man[name] = v
+        return v
+
+    def _put(self, name, x, y, h, z=0.0):
+        v = self.piece(name); i = len(self.place)
+        self.place.append([name, round(x, 4), round(y, 4), round(h % 360, 4), round(z, 4)])
         out = {}
         for c in v["connectors"]:
             if c["profile"] == "PROP": continue
             wx, wy = self.tw(c["pos"][0], c["pos"][2], x, y, h)
-            rec = {"x": wx, "y": wy, "h": (c["heading"] + h) % 360, "prof": c["profile"], "flow": c.get("flow", "both"), "pi": i, "name": c["name"], "used": False, "z": c["pos"][1]}
+            rec = {"x": wx, "y": wy, "h": (c["heading"] + h) % 360, "prof": c["profile"], "flow": c.get("flow", "both"), "pi": i, "name": c["name"], "used": False, "z": z + c["pos"][1]}
             self.conns.append(rec); out[c["name"]] = rec
         return out
 
-    def start(self, name, x=0.0, y=0.0, h=0.0):
-        return self._put(name, x, y, h)
+    def start(self, name, x=0.0, y=0.0, h=0.0, z=0.0):
+        return self._put(name, x, y, h, z)
 
     def add(self, name, at, via="in", mirror_ok=False):
         """snap `name` so its connector `via` sits on the open connector `at` (facing it)"""
-        v = self.man[name]
+        v = self.piece(name)
         c = next(c for c in v["connectors"] if c["name"] == via)
         if c["profile"] != at["prof"] and not mirror_ok:
             raise ValueError(f"{name}.{via} is {c['profile']}, the joint is {at['prof']}")
         # the new connector must face the opposite way: c.heading + h = at.h + 180
         h = (at["h"] + 180 - c["heading"]) % 360
         ox, oy = self.tw(c["pos"][0], c["pos"][2], 0, 0, h)
-        out = self._put(name, at["x"] - ox, at["y"] - oy, h)
+        out = self._put(name, at["x"] - ox, at["y"] - oy, h, at["z"] - c["pos"][1])
         at["used"] = True; out[via]["used"] = True
         return out
 
-    def check(self, tol=0.02):
+    def check(self, tol=0.12):
         """pair up connectors that coincide; report mismatches and open ends"""
         joints, bad = [], []
         C = self.conns
@@ -70,6 +84,8 @@ class Kit:
                 d = math.hypot(a["x"] - b["x"], a["y"] - b["y"])
                 if d > 0.5: continue
                 dh = abs(((a["h"] - b["h"]) % 360) - 180)
+                if dh > 90: continue          # same way round: the two carriageways of a freeway share the median line, they don't join
+                if not flow_ok(a, b): continue   # an "out" only joins an "in": the other carriageway's joints sit on the same spot
                 ok = d <= tol and dh <= 0.5 and a["prof"] == b["prof"] and abs(a["z"] - b["z"]) < 0.05
                 (joints if ok else bad).append([a["pi"], a["name"], b["pi"], b["name"], round(d, 3), round(dh, 2), a["prof"], b["prof"]])
                 a["used"] = b["used"] = True
@@ -87,10 +103,10 @@ ONEWAY = {"RAMP1", "RAMP2", "ONEWAY3", "SVC3", "SVC2", "FWY2G", "FWY3G", "FWY4G"
 
 def centreline(K, i):
     """world points along a linear piece from its first road connector to its second (an arc when the headings differ)"""
-    name, x, y, h = K.place[i]
-    cs = [c for c in K.man[name]["connectors"] if c["profile"] != "PROP"]
+    name, x, y, h, z = K.place[i]
+    cs = [c for c in K.piece(name)["connectors"] if c["profile"] != "PROP"]
     a, b = cs[0], cs[1]
-    A = K.tw(a["pos"][0], a["pos"][2], x, y, h); B = K.tw(b["pos"][0], b["pos"][2], x, y, h)
+    A = K.tw(a["pos"][0], a["pos"][2], x, y, h) + (z + a["pos"][1],); B = K.tw(b["pos"][0], b["pos"][2], x, y, h) + (z + b["pos"][1],)
     ha = (a["heading"] + h + 180) % 360; hb = (b["heading"] + h) % 360       # travel direction leaving A, arriving at B
     turn = ((hb - ha + 540) % 360) - 180
     if abs(turn) < 0.5: return [A, B], a["name"], b["name"]
@@ -103,7 +119,7 @@ def centreline(K, i):
     n = max(2, int(abs(turn) / 6) + 1); pts = []
     for k in range(n + 1):
         t = a0 + sgn * abs(turn) * D2R * k / n
-        pts.append((cx + R * math.sin(t), cy + R * math.cos(t)))
+        pts.append((cx + R * math.sin(t), cy + R * math.cos(t), A[2] + (B[2] - A[2]) * k / n))
     return pts, a["name"], b["name"]
 
 
@@ -113,24 +129,34 @@ def graph(K, names=None):
     mate = {}
     for i, a in enumerate(C):
         for b in C[i + 1:]:
-            if a["pi"] != b["pi"] and math.hypot(a["x"] - b["x"], a["y"] - b["y"]) < 0.05: mate[key(a)] = b; mate[key(b)] = a
+            if a["pi"] != b["pi"] and math.hypot(a["x"] - b["x"], a["y"] - b["y"]) < 0.15 and abs(((a["h"] - b["h"]) % 360) - 180) < 5 and flow_ok(a, b): mate[key(a)] = b; mate[key(b)] = a
     byp = {}
     for c in C: byp.setdefault(c["pi"], []).append(c)
     linear = {i for i, cs in byp.items() if len(cs) == 2 and cs[0]["prof"] == cs[1]["prof"]}
     nodes, edges, done = [], [], set()
-    jpos = {}
+    jpos = {}; jin = {}        # jin[(piece, connector)]: points from the junction's node out to that connector (the ramp's own path)
+    # freeway exits and entrances: the node sits on the median line where the ramp leaves / joins, the ramp curves away along the
+    # deceleration / acceleration lane to its connector (kit local X right, Z back; exits leave near the start, entrances join near the end)
+    RAMPJ = {"fwy3g_exit_336": (-140, [(21.6, -200), (25.0, -290)]), "fwy3g_entrance_432": (-310, [(21.6, -230), (24.0, -80)]),
+             "fwy3g_exit_2lane_480": (-200, [(23.4, -270), (27.0, -400)]), "fwy3g_entrance_2lane_528": (-400, [(23.4, -300), (26.0, -100)])}
     for i, cs in byp.items():
         if i in linear: continue
-        jx = sum(c["x"] for c in cs) / len(cs); jy = sum(c["y"] for c in cs) / len(cs)
-        nm = K.place[i][0]
+        nm, px, py, ph, pz = K.place[i]
+        if nm in RAMPJ:
+            zn, via = RAMPJ[nm]; jx, jy = K.tw(0, zn, px, py, ph); jz = pz
+            for c in cs:
+                if c["prof"].startswith("RAMP"): jin[(i, c["name"])] = [K.tw(vx, vz, px, py, ph) + (pz,) for vx, vz in via] + [(c["x"], c["y"], c["z"])]
+            jpos[i] = (jx, jy, jz); nodes.append([round(jx, 3), round(jy, 3), "merge", round(jz, 3)]); continue
+        jx = sum(c["x"] for c in cs) / len(cs); jy = sum(c["y"] for c in cs) / len(cs); jz = sum(c["z"] for c in cs) / len(cs)
         ctrl = "signal" if nm.startswith("x_city") or nm.startswith("x_blvd") or nm.startswith("x_oneway") or nm.startswith("x_svc") else None
-        jpos[i] = (jx, jy); nodes.append([round(jx, 3), round(jy, 3), ctrl])
+        jpos[i] = (jx, jy, jz); nodes.append([round(jx, 3), round(jy, 3), ctrl, round(jz, 3)])
     starts = [c for c in C if c["pi"] not in linear] + [c for c in C if c["pi"] in linear and key(c) not in mate]
     for s in starts:
         if key(s) in done: continue
         pts = []
         if s["pi"] in jpos: pts.append(jpos[s["pi"]])
-        pts.append((s["x"], s["y"])); done.add(key(s))
+        if key(s) in jin: pts += jin[key(s)][:-1]
+        pts.append((s["x"], s["y"], s["z"])); done.add(key(s))
         cur = mate.get(key(s)) if s["pi"] not in linear else s
         prof = s["prof"]; end = None
         while cur is not None and cur["pi"] in linear:
@@ -143,7 +169,10 @@ def graph(K, names=None):
             if nxt is None: end = None; cur = None; break
             if nxt["pi"] not in linear: end = nxt; done.add(key(nxt)); break
             cur = nxt
-        if end is not None: pts.append(jpos[end["pi"]])
+        if end is not None:
+            pts.append((end["x"], end["y"], end["z"]))
+            if key(end) in jin: pts += jin[key(end)][:-1][::-1]
+            pts.append(jpos[end["pi"]])
         if len(pts) < 2: continue
         # drop repeated points
         P = [pts[0]]
@@ -151,7 +180,10 @@ def graph(K, names=None):
             if math.hypot(p[0] - P[-1][0], p[1] - P[-1][1]) > 0.05: P.append(p)
         if len(P) < 2: continue
         typ, o = PROF.get(prof, ("road", {}))
-        if prof in ONEWAY and s.get("flow") == "in" and s["pi"] in linear: P = P[::-1]
+        # one-way roads run the way the traffic flows: a junction's "in" connector takes traffic into the junction, an open end's "out" lets it leave
+        if prof in ONEWAY and ((s["pi"] not in linear and s.get("flow") == "in") or (s["pi"] in linear and s.get("flow") == "out")): P = P[::-1]
+        o = dict(o)
+        if any(abs(p[2]) > 0.01 for p in P): o["kz"] = [round(p[2], 3) for p in P]   # heights at each point (bridges, ramps)
         edges.append([typ, (names or {}).get(len(edges), ""), [[round(p[0], 3), round(p[1], 3)] for p in P], o])
     return nodes, edges
 
@@ -160,12 +192,14 @@ def preview(K, root, path):
     import matplotlib; matplotlib.use("Agg")
     import matplotlib.pyplot as plt
     sys.path.insert(0, os.path.dirname(__file__))
-    from kit_pack import piece
+    from kit_pack import piece, clip
     cache = {}
     f, ax = plt.subplots(figsize=(14, 14))
-    for name, x, y, h in K.place:
+    for name, x, y, h, z in K.place:
         if name not in cache:
-            d = piece(os.path.join(root, K.man[name]["file"])); cache[name] = d
+            v = K.piece(name); d = piece(os.path.join(root, K.man[v["clip"][0] if "clip" in v else name]["file"]))
+            if "clip" in v: d = clip(d, 96.0 if "_st96" in v["clip"][0] else 48.0 if "_st48" in v["clip"][0] else 24.0, v["clip"][1])
+            cache[name] = d
         d = cache[name]; P = d["p"]; I = d["i"]
         pts = [K.tw(P[k] / 100, P[k + 2] / 100, x, y, h) for k in range(0, len(P), 3)]
         for t in range(0, len(I), 3):

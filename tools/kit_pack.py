@@ -81,10 +81,23 @@ def piece(path):
             "t": np.round(T * 10000).astype(int).ravel().tolist(), "i": I.astype(int).tolist()}
 
 
+def clip(d, L0, L):
+    """a straight cut / stretched to length L: along-road positions and the atlas V (12 m a cycle) scale together, so the texture keeps its size"""
+    k = L / L0; p = list(d["p"]); t = list(d["t"])
+    for i in range(0, len(p), 3): p[i + 2] = round(p[i + 2] * k)
+    # V runs along the road: rescale it about each vertex's own start so a 96 m piece cut to 40 m shows 40 m of markings
+    for i in range(1, len(t), 2): t[i] = round(t[i] * k)
+    return {**d, "p": p, "t": t}
+
+
 def main(root, out, names):
     man = {v["name"]: v for v in json.load(open(os.path.join(root, "manifest.json")))["pieces"]}
     res = {"cycle": 12, "pieces": {}}
     for nm in names:
+        if "@" in nm:
+            base, L = nm.split("@"); v = man[base]; L0 = float(base.rsplit("_st", 1)[1])
+            d = clip(piece(os.path.join(root, v["file"])), L0, float(L))
+            d["c"] = []; res["pieces"][nm] = d; continue
         v = man[nm]
         d = piece(os.path.join(root, v["file"]))
         if v.get("lod1"): d["lod"] = piece(os.path.join(root, v["lod1"]))
