@@ -6768,7 +6768,9 @@ function slkTick(dt){SLK.t-=dt;if(SLK.t<=0){SLK.t=1;let sn=0,wt=0;try{sn=Math.ma
   const C=cars.filter(c=>c.kind==="ai"&&!c.jn&&!poolKeep(c)&&c.v>9&&!c.stunned&&Math.hypot(c.wx-car.px,c.wy-car.py)>40&&Math.hypot(c.wx-car.px,c.wy-car.py)<260);const c=C[Math.floor(Math.random()*C.length)];if(!c)return;
   c.stunned=3+Math.random()*2.5;c.slid=true;c.head=(Math.random()<0.5?-1:1)*(0.45+Math.random()*0.5);c.haz=true;c.fear=(c.fear||0)+1;emoB(c,"scared",2.5);if(Math.random()<0.5)aiHonk(c,0.4)}
 // road work props: cones and drums, signs, and portable message boards that flip between their two pages every 2 seconds
-const RW_PROPS=["rw_cone28","rw_drum","rw_road_work","rw_lane_closed","rw_detour_left","rw_detour_right","rw_detour_ahead","rw_mb_roadwork","rw_mb_roadwork_1","rw_mb_roadwork_2","rw_mb_detour","rw_mb_detour_1","rw_mb_detour_2"];
+/* v352: the roadwork machines pack (paver, rollers, excavator, loaders, dump truck, generator, site module) works inside the closed lane */
+const RW_MACH=["rwv_asphalt_paver","rwv_tandem_road_roller","rwv_tracked_excavator","rwv_wheel_loader","rwv_backhoe_loader","rwv_dump_truck"];
+const RW_PROPS=[...RW_MACH,"rwv_portable_generator","rwv_roadwork_site_module","rw_cone28","rw_drum","rw_road_work","rw_lane_closed","rw_detour_left","rw_detour_right","rw_detour_ahead","rw_mb_roadwork","rw_mb_roadwork_1","rw_mb_roadwork_2","rw_mb_detour","rw_mb_detour_1","rw_mb_detour_2"];
 // your own words on the amber message boards: each page is drawn once as dot-matrix LED text and reused
 const MB_TEX=new Map();
 const MB_PRESETS=[["Auto (the board's own pages)",null],["ROAD WORK AHEAD / EXPECT DELAYS",[["ROAD WORK","AHEAD"],["EXPECT","DELAYS"]]],["LEFT LANE CLOSED / MERGE RIGHT",[["LEFT LANE","CLOSED"],["MERGE","RIGHT"]]],["DETOUR AHEAD / FOLLOW SIGNS",[["DETOUR","AHEAD"],["FOLLOW","SIGNS"]]],["SLOW DOWN / WORKERS AHEAD",[["SLOW","DOWN"],["WORKERS","AHEAD"]]],["BUCKLE UP / PHONES DOWN",[["BUCKLE","UP"],["PHONES","DOWN"]]]];
@@ -6847,7 +6849,10 @@ function rwTick(){if(!st.started)return;const day=GT.day||1,hr=(GT.min/60)%24,wo
     for(let d=0;d<=term;d+=term/3)it.push(evStatic("cone",e,dir,s0+Lt+buf+wa+d,inL+(outL-inL)*d/term));
     it.slice(0,4).forEach(c=>c.rwK="rw_drum");it.push(evStatic("wreck",e,dir,s0+Lt+buf+wa*0.5,lo*LANE,{haz:true,paint:"yellow"}));RW.items.push(...it);
     const side=(s_,k)=>{const q=fpt(e,dir,Math.max(2,s_),lo*LANE-LANE/2-2.2);return {k,x:q[0],y:q[1],h:q[2]}},p=fpt(e,dir,Math.max(2,s0-sg*2),lo*LANE-LANE/2-1.6);
-    RW.zones.push({e,dir,s0,x:it[0].wx,y:it[0].wy,sign:p,label:"ROAD WORK",props:[{k:"rw_road_work",x:p[0],y:p[1],h:p[2]},side(s0-sg,"rw_lane_closed")],mb:side(s0+Lt,"rw_mb_roadwork")})}
+    /* the crew: two machines working the closed lane (a paver followed by its roller, or a digger with a dump truck), a generator on the shoulder */
+    const mk=(d,k)=>{const q=fpt(e,dir,s0+Lt+buf+d,lo*LANE-0.4);return {k,x:q[0],y:q[1],h:q[2]}},pair=rr()<0.5?["rwv_asphalt_paver","rwv_tandem_road_roller"]:rr()<0.5?["rwv_tracked_excavator","rwv_dump_truck"]:["rwv_wheel_loader","rwv_backhoe_loader"];
+    const crew=[mk(wa*0.25,pair[0]),mk(wa*0.25+12,pair[1]),(()=>{const q=fpt(e,dir,s0+Lt+buf+wa*0.7,lo*LANE-LANE/2-2.4);return {k:"rwv_portable_generator",x:q[0],y:q[1],h:q[2]}})()];
+    RW.zones.push({e,dir,s0,x:it[0].wx,y:it[0].wy,sign:p,label:"ROAD WORK",props:[{k:"rw_road_work",x:p[0],y:p[1],h:p[2]},side(s0-sg,"rw_lane_closed"),...crew],mb:side(s0+Lt,"rw_mb_roadwork")})}
   for(let k=0;k<1&&two.length;k++){const e=pick(two);if(RW.closed.has(e))continue;RW.closed.add(e);for(const dir of [1,-1]){const s0=rStart(e,dir)+12,it=[];for(let t=-1;t<=1;t+=1)it.push(evStatic("cone",e,dir,s0,t*LANE));RW.items.push(...it);
       const p=fpt(e,dir,s0,0),q=fpt(e,dir,s0-2,LANE*1.6),q2=fpt(e,dir,s0-6,-LANE*1.7);RW.zones.push({e,dir,s0,x:p[0],y:p[1],barrier:p,label:"ROAD CLOSED · DETOUR",props:[{k:rr()<0.5?"rw_detour_left":"rw_detour_right",x:q[0],y:q[1],h:q[2]}],mb:{k:"rw_mb_detour",x:q2[0],y:q2[1],h:q2[2]}})}}
   try{if(NAV.dest&&NAV.place)navTo(NAV.place)}catch(e){}}
