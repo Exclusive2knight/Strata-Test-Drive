@@ -12,7 +12,7 @@ SEG = 16.0          # metres per piece: short enough that a bent straight follow
 
 def head(a, b): return math.degrees(math.atan2(b[0] - a[0], b[1] - a[1])) % 360
 
-def follow(P, base, side=0.0, flat=(0, 0), dw=0.0, tag=""):
+def follow(P, base, side=0.0, flat=(0, 0), dw=0.0, tag="", one=False):
     """kit pieces along polyline P (x, y, z), each placed on its own sample point and tangent and bent to reach the next one
     (no chaining, so nothing drifts); side shifts the pieces right of the line (the freeway carriageways)"""
     if len(P) < 2: return
@@ -21,7 +21,7 @@ def follow(P, base, side=0.0, flat=(0, 0), dw=0.0, tag=""):
     L = D[-1]
     if L < 1: return
     hilly = max(p[2] for p in P) - min(p[2] for p in P) > 0.5
-    n = max(1, round(L / (SEG if hilly else 32.0))); pts = []      # short pieces only where the road climbs (fewer pieces, faster frames)
+    n = 1 if one else max(1, round(L / (SEG if hilly else 32.0))); pts = []      # short pieces only where the road climbs (fewer pieces, faster frames)
     for k in range(n + 1):
         d = L * k / n; i = 0
         while i < len(D) - 2 and D[i + 1] < d: i += 1
@@ -159,6 +159,95 @@ def mfull(i):
     n = NET["N"][i]; m = sum(1 for q in MP if abs(n["x"] - q[5]) < 1 and abs(n["y"] - q[6]) < 1)
     return m > 0 and m >= sum(1 for f in NET["E"] if f["t"] == "ramp" and i in (f["a"], f["b"]))
 
+# ---- ramps that run alongside the freeway as an extra lane (the stack's back-to-back exits, weaving stretches) where no merge piece went:
+# that stretch of carriageway is the kit's 4-lane one (its 4th lane sits where the ramp runs, 23.65 m out), reached through the kit's own
+# lane-add / lane-end tapers over the hidden stretch where the ramp leaves or joins the centre line, and the ramp's own pieces stop there.
+import bisect
+XWE = [e for e in NET["E"] if e["t"] == "xway"]
+def cumd(P):
+    D = [0.0]
+    for i in range(1, len(P)): D.append(D[-1] + math.hypot(P[i][0] - P[i - 1][0], P[i][1] - P[i - 1][1]))
+    return D
+XD = {e["i"]: cumd(e["P"]) for e in XWE}
+GR = {}
+for e in XWE:
+    P = e["P"]
+    for i in range(len(P) - 1): GR.setdefault((int(P[i][0] // 60), int(P[i][1] // 60)), []).append((e, i))
+def xproj(q):
+    """the nearest freeway centre line: (edge, u, signed offset left of the edge's direction, its height there)"""
+    best = None
+    for cx in (-1, 0, 1):
+        for cy in (-1, 0, 1):
+            for e, i in GR.get((int(q[0] // 60) + cx, int(q[1] // 60) + cy), ()):
+                a, b = e["P"][i], e["P"][i + 1]; dx, dy = b[0] - a[0], b[1] - a[1]; l2 = dx * dx + dy * dy or 1e-9
+                f = max(0.0, min(1.0, ((q[0] - a[0]) * dx + (q[1] - a[1]) * dy) / l2)); px, py = a[0] + dx * f, a[1] + dy * f
+                d = math.hypot(q[0] - px, q[1] - py)
+                if best is None or d < best[0]:
+                    l = math.sqrt(l2); t = (dx * (q[1] - a[1]) - dy * (q[0] - a[0])) / l
+                    best = (d, e, XD[e["i"]][i] + l * f, t, a[2] + (b[2] - a[2]) * f, math.degrees(math.atan2(dx, dy)) % 360)
+    return best
+AUX = {}   # (edge, dir) -> sorted [(u, kind)]
+for r in NET["E"]:
+    if r["t"] != "ramp": continue
+    ends = [NET["N"][r["a"]], NET["N"][r["b"]]]
+    for sub in mcut(r["P"], "r"):
+        D = cumd(sub); Ltot = D[-1]
+        for k, q in enumerate(sub):
+            b = xproj(q)
+            if not b or b[0] > 27: continue
+            _, e, u, t, zf, hf = b
+            if abs(q[2] - zf) > 1.2: continue                                   # a flyover passing over, not alongside
+            hr = head(sub[max(0, k - 1)], sub[min(len(sub) - 1, k + 1)])
+            if abs(((hr - hf + 90) % 180) - 90) > 20: continue                  # crossing, not running alongside
+            nearend = min(math.hypot(q[0] - n["x"], q[1] - n["y"]) for n in ends) < 140
+            kind = "aux" if 20 <= abs(t) <= 26.5 else ("taper" if abs(t) < 20 and nearend else None)
+            if kind: AUX.setdefault((e["i"], 1 if t < 0 else -1), []).append((u, kind))
+for v in AUX.values(): v.sort()
+def aux_at(ei, dr, u):
+    v = AUX.get((ei, dr))
+    if not v: return None
+    i = bisect.bisect_left(v, (u, "")); c = [v[j] for j in (i - 1, i) if 0 <= j < len(v)]
+    c = [x for x in c if abs(x[0] - u) < 6]
+    if not c: return None
+    return "aux" if any(x[1] == "aux" for x in c) else "taper"
+def carriage(sub, e, dr, flat):
+    """one carriageway (travel along sub) in 3-lane, 4-lane and taper runs"""
+    if not AUX.get((e["i"], dr)): follow(sub, "fwy3g_st96", side=1.85, flat=flat); return
+    D = XD[e["i"]]; L = D[-1]; P = e["P"]; j = 0; cls = []
+    for q in sub:   # u along the edge for each point (points are in order, so a moving search)
+        best = None
+        for i in range(len(P)):
+            d = (P[i][0] - q[0]) ** 2 + (P[i][1] - q[1]) ** 2
+            if best is None or d < best[0]: best = (d, i)
+        u = D[best[1]]; cls.append(aux_at(e["i"], dr, u))
+    runs = []
+    for q, c in zip(sub, cls):
+        if runs and runs[-1][0] == c: runs[-1][1].append(q)
+        else:
+            if runs: runs[-1][1].append(q)
+            runs.append([c, [q]])
+    for k, (c, R) in enumerate(runs):
+        if len(R) < 2: continue
+        prv = runs[k - 1][0] if k else None; nxt = runs[k + 1][0] if k + 1 < len(runs) else None
+        if c == "aux": follow(R, "fwy4g_st96", side=1.85)
+        elif c == "taper" and nxt == "aux": follow(R, "fwy3g_lane_add_180", side=1.85, one=True)
+        elif c == "taper" and prv == "aux": follow(R, "fwy3g_lane_end_merge_180", side=1.85, one=True)
+        else: follow(R, "fwy3g_st96", side=1.85, flat=flat if k in (0, len(runs) - 1) else (0, 0))
+def ramp_off(P):
+    """a ramp without its stretches alongside (or merging across) the freeway: those are carriageway lanes now"""
+    out, cur = [], []
+    for q in P:
+        b = xproj(q); on = False
+        if b and b[0] <= 26.5 and abs(q[2] - b[4]) <= 1.2:
+            on = aux_at(b[1]["i"], 1 if b[3] < 0 else -1, b[2]) is not None
+        if on:
+            if len(cur) > 1: out.append(cur)
+            cur = []
+        else: cur.append(q)
+    if len(cur) > 1: out.append(cur)
+    return out
+print(f"ramp lanes alongside the freeway: {sum(len(v) for v in AUX.values())} samples on {len(AUX)} carriageways")
+
 for e in NET["E"]:
     base = BASE.get(e["t"])
     if not base: continue
@@ -173,14 +262,14 @@ for e in NET["E"]:
         if e["t"] == "xway": FL = tuple(0 if mfull(i) else f for f, i in zip(FL, (e["a"], e["b"])))
         fl = lambda sub, F: (F[0] if sub[0] is P[0] or sub[0] == P[0] else 0, F[1] if sub[-1] is P[-1] or sub[-1] == P[-1] else 0)
         if e["t"] == "xway":
-            for sub in mcut(P, "c"): follow(sub, base, side=1.85, flat=fl(sub, FL))
+            for sub in mcut(P, "c"): carriage(sub, e, 1, fl(sub, FL))
             R_ = P[::-1]
-            for sub in mcut(R_, "c"): follow(sub, base, side=1.85, flat=(FL[1] if sub[0] == R_[0] else 0, FL[0] if sub[-1] == R_[-1] else 0))
+            for sub in mcut(R_, "c"): carriage(sub, e, -1, (FL[1] if sub[0] == R_[0] else 0, FL[0] if sub[-1] == R_[-1] else 0))
         elif e.get("fly") and e.get("G"):
             # a flyover: where it is up in the air (over 2.5 m above the ground) it is the kit's flyover deck, no grass verges
             EP, G = e["P"], e["G"]
             gz = lambda q: G[min(range(len(EP)), key=lambda i: (EP[i][0] - q[0]) ** 2 + (EP[i][1] - q[1]) ** 2)]
-            for sub in mcut(P, "r"):
+            for sub in [r_ for s_ in mcut(P, "r") for r_ in ramp_off(s_)]:
                 runs, cur, up0 = [], [], None
                 for q in sub:
                     up = q[2] - gz(q) > 2.5
@@ -191,7 +280,7 @@ for e in NET["E"]:
                     if up: follow(r, "ramp1_flyover_st48", tag="!p")
                     else: follow(r, base)
         else:
-            subs = mcut(P, "r")
+            subs = [r for sub in mcut(P, "r") for r in ramp_off(sub)]
             cut = len(subs) != 1 or len(subs[0]) != len(P)
             for sub in subs: follow(sub, base, flat=(0, 0) if cut else FL)
     elif e["t"] == "xway":

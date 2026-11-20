@@ -69,7 +69,7 @@ class Kit:
         if name.endswith("!f"):            # no kerb / sidewalk: same joints as the full piece
             v = dict(self.piece(name[:-2])); v["name"] = name; v["flat"] = True; self.man[name] = v; return v
         base, L = name.split("@"); R = 0.0; dz = 0.0
-        if "^" in L: L, dz = L.split("^"); dz = float(dz)
+        if "^" in L: L, dz = L.split("^"); dz = float(dz.split(",")[0])
         if "~" in L: L, R = L.split("~"); R = float(R)
         L = float(L); v = json.loads(json.dumps(self.man[base]))
         for c in v["connectors"]:

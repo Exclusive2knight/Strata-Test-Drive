@@ -3225,14 +3225,16 @@ function kitMerges(){const XW=EDGES.filter(e=>e.type==="xway");
       /* right-hand traffic: the ramp is on the right of the carriageway it leaves or joins */
       const tr=exit?f:[-f[0],-f[1]];if(Math.abs(tr[1]-lt[0])+Math.abs(-tr[0]-lt[1])>0.01)continue;
       const A=W.map(p=>[(p[0]-n.x)*f[0]+(p[1]-n.y)*f[1],(p[0]-n.x)*lt[0]+(p[1]-n.y)*lt[1]]);
-      let j=0;for(let i=1;i<A.length&&A[i][1]<=25.5&&A[i][0]>A[i-1][0];i++)j=i;
-      if(j<1||A[j][1]<21.5||j+1>=A.length)continue;const Q=A[j+1];if(Q[1]<40)continue;
+      let j=0;for(let i=1;i<A.length&&A[i][1]<=26.5&&A[i][0]>A[i-1][0];i++)j=i;
+      if(j<1||A[j][1]<21.5||j+1>=A.length)continue;const Q=A[j+1];if(Q[1]<30)continue;
       /* the split ends as far out as the bend onto the rest of the ramp allows (a longer split is a gentler S: traffic keeps its speed through it) */
-      const Qr=W[j+1][2]||0,Nx=A[j+2],fits=C_=>{const ax=C_+20,an=Math.atan2(Q[1]-38.2,Q[0]-ax);if(an<=0||an>1.15)return false;const tC=50*Math.tan(an/2);if(tC>20)return false;
+      /* the bend onto the rest of the ramp: a corner (radius 50) far enough past the piece's end for the bend to fit, either way (a flyover alongside sits nearer) */
+      const Qr=W[j+1][2]||0,Nx=A[j+2],gap=C_=>{let g=20;for(let it=0;it<3;it++){const an=Math.atan2(Q[1]-38.2,Q[0]-C_-g);g=Math.max(20,50*Math.tan(Math.abs(an)/2)+2)}return g},
+        fits=C_=>{const g=gap(C_),ax=C_+g,an=Math.atan2(Q[1]-38.2,Q[0]-ax);if(Math.abs(an)>1.15||Q[0]-ax<10)return false;const tC=50*Math.tan(Math.abs(an)/2);if(tC>g-1)return false;
         let tQ=0;if(Nx&&Qr){const an2=Math.atan2(Nx[1]-Q[1],Nx[0]-Q[0]);tQ=Qr*Math.tan(Math.abs(wrapPi(an2-an))/2);if(tQ>Math.hypot(Nx[0]-Q[0],Nx[1]-Q[1])-1)return false}
         return Math.hypot(Q[0]-ax,Q[1]-38.2)>=tC+tQ+2};
       let Cc=A[j][0]-25;if(!fits(Cc))continue;for(let c_=Cc+5;c_<=A[j][0]+80&&fits(c_);c_+=5)Cc=c_;
-      const k=clamp((Cc-40)/156,0.35,1),D0=Cc-156*k;if(D0<25)continue;
+      const k=clamp((Cc-40)/156,0.35,1),D0=Cc-156*k;if(D0<25)continue;const Cg=gap(Cc);
       const Lp=(exit?336:432)*k,s0=exit?Cc-Lp:Cc-Lp;   /* the piece runs along [Cc-Lp, Cc] from the node, either way */
       let ok=true;for(let a=s0-10;a<=Cc+25&&ok;a+=12)if(offFw(n.x+f[0]*a,n.y+f[1]*a)>0.35)ok=false;   /* the freeway runs straight beside it */
       if(!ok)continue;
@@ -3240,7 +3242,7 @@ function kitMerges(){const XW=EDGES.filter(e=>e.type==="xway");
       /* the new line, in (along, across) from the node: hidden diagonal off the centre line (cars change onto it from the right lane), the split, a bend onto the old ramp */
       /* a plain joint in the replaced stretch moves to where the split starts (beside the lanes, not across them: traffic merges from there) */
       const Vd=[Math.max(D0*0.6,D0-40),23.55],V=[[0,0],Vd],nj=J.filter(i=>i>0&&i<=j).length;if(nj>3)continue;
-      for(const [s,t] of KMD)V.push([D0+s*k,t]);V.push([Cc+20,38.2,50]);
+      for(const [s,t] of KMD)V.push([D0+s*k,t]);V.push([Cc+Cg,38.2,50]);
       const keep=W.slice(j+1),Jn=[0];for(let i=1;i<=nj;i++)Jn.push(1+i);
       const W2=V.map(([a,t,r])=>{const p=[Math.round((n.x+f[0]*a+lt[0]*t)*100)/100,Math.round((n.y+f[1]*a+lt[1]*t)*100)/100];if(r)p.push(r);return p}).concat(keep);
       for(const i of J)if(i>j)Jn.push(i-(j+1)+V.length);
@@ -3257,14 +3259,18 @@ function kitMerges(){const XW=EDGES.filter(e=>e.type==="xway");
 /* the kit merge pieces that fit (the freeway and the ramp level with the piece all along it), for tools/kitmaps/oldmap.py */
 function kitMrgOut(){const out=[],zAt=(L,x,y)=>{let b=null;for(const e of L){const p=eProj(e,x,y);if(p.u<-0.5||p.u>e.L+0.5)continue;if(!b||p.d<b.d)b={d:p.d,z:ez(e,clamp(p.u,0,e.L))}}return b};
   const XW=EDGES.filter(e=>e.type==="xway");
-  for(const o of KIT_MRG){const at=a=>[o.nx+o.f[0]*a,o.ny+o.f[1]*a],za=zAt(XW,...at(o.s0)),zb=zAt(XW,...at(o.Cc));o.why="fw";if(!za||!zb)continue;
-    const zl=a=>za.z+(zb.z-za.z)*(a-o.s0)/(o.Cc-o.s0);let ok=true;   /* the freeway level or on an even grade beside it (the piece is graded to match) */
-    for(let a=o.s0;a<=o.Cc&&ok;a+=8){const g=zAt(XW,...at(a));if(!g||Math.abs(g.z-zl(a))>0.15)ok=false}
-    if(!ok)continue;o.why="ramp";
+  for(const o of KIT_MRG){const at=a=>[o.nx+o.f[0]*a,o.ny+o.f[1]*a];o.why="fw";
+    /* the freeway's profile beside the piece, fitted with a straight grade plus a vertical curve (the piece is graded and curved to match) */
+    const S=[];let ok=true;for(let a=o.s0;a<=o.Cc+0.01&&ok;a+=8){const g=zAt(XW,...at(a));if(!g)ok=false;else S.push([(a-o.s0)/(o.Cc-o.s0),g.z])}if(!ok||S.length<3)continue;
+    let A=[[0,0,0],[0,0,0],[0,0,0]],B=[0,0,0];for(const [t,z] of S){const r=[1,t,t*t];for(let i=0;i<3;i++){B[i]+=r[i]*z;for(let j=0;j<3;j++)A[i][j]+=r[i]*r[j]}}
+    const det=m=>m[0][0]*(m[1][1]*m[2][2]-m[1][2]*m[2][1])-m[0][1]*(m[1][0]*m[2][2]-m[1][2]*m[2][0])+m[0][2]*(m[1][0]*m[2][1]-m[1][1]*m[2][0]),D=det(A);if(Math.abs(D)<1e-9)continue;
+    const c=[0,1,2].map(k=>det(A.map((r,i)=>r.map((v,j)=>j===k?B[i]:v)))/D),zq=t=>c[0]+c[1]*t+c[2]*t*t,zl=a=>zq((a-o.s0)/(o.Cc-o.s0));
+    if(S.some(([t,z])=>Math.abs(z-zq(t))>0.12))continue;o.why="ramp";
     for(let a=o.Cc-156*o.k;a<=o.Cc&&ok;a+=8){const p=at(a),D0=o.Cc-156*o.k,v=clamp((a-D0)/o.k/12,0,KMD.length-1.001),i=Math.floor(v),t=KMD[i][1]+(KMD[i+1][1]-KMD[i][1])*(v-i),g=zAt(o.ch,p[0]+o.lt[0]*t,p[1]+o.lt[1]*t);if(!g||g.d>2||Math.abs(g.z-zl(a))>0.3)ok=false}
     if(!ok)continue;o.why="";
-    const z0=o.exit?za.z:zb.z,dz=(o.exit?zb.z-za.z:za.z-zb.z);
-    out.push([o.name+(Math.abs(dz)>0.005?"^"+dz.toFixed(3):""),+o.x.toFixed(3),+o.y.toFixed(3),+o.h.toFixed(3),+z0.toFixed(3),+o.nx.toFixed(2),+o.ny.toFixed(2)])}
+    /* along the piece's own direction: start height, rise, and how far the middle sits above the straight line between its ends */
+    const z0=o.exit?zq(0):zq(1),z1=o.exit?zq(1):zq(0),dz=z1-z0,q=zq(0.5)-(zq(0)+zq(1))/2;
+    out.push([o.name+(Math.abs(dz)>0.005||Math.abs(q)>0.005?"^"+dz.toFixed(3)+(Math.abs(q)>0.005?","+q.toFixed(3):""):""),+o.x.toFixed(3),+o.y.toFixed(3),+o.h.toFixed(3),+z0.toFixed(3),+o.nx.toFixed(2),+o.ny.toFixed(2)])}
   return out}
 // a road up a mountain: legs across the slope at grade g, a hairpin wherever a leg reaches the edge of its face (dTh either side of the start)
 function w2Climb(x0,y0,o){const [cx,cy]=W2C.MT,thc=Math.atan2(y0-cy,x0-cx),pts=[[x0,y0]];let x=x0,y=y0,s=o.s0||1,run=0,nAt=0,n=0;
@@ -6106,7 +6112,7 @@ const aiLatG=c=>{const P=c.pers;if(!P)return 0.28;if(P.lg)return P.lg;return P.r
 /* v357: like GTA's side probes: something stopped that sticks part way into the lane (a car half on the shoulder, a cone, a wreck, drums at
    a work zone) is passed by easing over up to 1.2 m inside the lane instead of stopping behind it, when nobody is alongside on that side */
 function aiNudge(c,pts,OB){if(window.NONUDGE)return;if(c.offT!==c.nudOT)c.nud=0;const base=c.offT-(c.nud||0);let want=0;
-  if(!c.jn&&!c.ovt&&!c.emv&&!c.dyn&&pts.length>2){const hw=(c.wid||1.9)/2,nd=c.nud||0;let push=0,bad=false;const side=[];
+  if(!c.jn&&!c.ovt&&!c.emv&&!c.dyn&&pts.length>2&&c.e&&(c.e.type==="xway"||c.e.type==="ramp"||c.e.type==="sd")){   /* freeways, ramps and service drives only: on tight town streets it scraped parked and queued cars */const hw=(c.wid||1.9)/2,nd=c.nud||0;let push=0,bad=false;const side=[];
     for(const CL of obCells(OB,c.wx,c.wy))for(const o of CL){if(o.o===c)continue;const dx=o.x-c.wx,dy=o.y-c.wy;if(dx*dx+dy*dy>2025)continue;if(o.z!==undefined&&Math.abs(o.z-(c.wz||0))>3)continue;
       let bd=1e9,bi=-1;for(let q=0;q<pts.length;q++){const ex=o.x-pts[q][0],ey=o.y-pts[q][1],d=ex*ex+ey*ey;if(d<bd){bd=d;bi=q}}if(bi<0)continue;
       const h=pts[bi][4],lat=-(o.x-pts[bi][0])*Math.sin(h)+(o.y-pts[bi][1])*Math.cos(h)+nd,al=pts[bi][2],O=o.o,ped=O&&O.kind==="ped";
@@ -12282,16 +12288,17 @@ function kitGet(f,bin){const g=u=>fetch(u).then(r=>{if(!r.ok)throw new Error("HT
 /* a kit straight cut to L metres, graded dz and bent to radius R ("city4_st96@37.5~-220^0.8"): positions and the atlas V scale along the road */
 const KIT_EDGE={res2p_st96:6.05,city4_st96:7.35,city2_st96:4.2,res2_st96:4.2,rural2_st96:4.35,blvd6d_st96:18.3,forest2_st96:3.6};
 function kitShape(J,name){if(name.endsWith("!p")){const K_=kitShape.c||(kitShape.c={});if(K_[name])return K_[name];const d=kitShape(J,name.slice(0,-2));if(!d)return null;
-    /* a flyover deck without its own pier (the flyover's piers are built by the game): triangles more than 2.6 m below the deck go */const I=[];for(let i=0;i<d.i.length;i+=3){const a=d.i[i],b=d.i[i+1],c=d.i[i+2];if(d.p[a*3+1]>-260&&d.p[b*3+1]>-260&&d.p[c*3+1]>-260)I.push(a,b,c)}
+    /* a flyover deck without its own pier (the flyover's piers are built by the game): triangles more than 2.6 m below the deck go */const I=[],n0=name.slice(0,-2),a0=n0.indexOf("@"),Y=(a0<0?d:J.pieces[n0.slice(0,a0)]||d).p;for(let i=0;i<d.i.length;i+=3){const a=d.i[i],b=d.i[i+1],c=d.i[i+2];if(Y[a*3+1]>-260&&Y[b*3+1]>-260&&Y[c*3+1]>-260)I.push(a,b,c)}
     const o={p:d.p,n:d.n,t:d.t,i:I};K_[name]=o;return o}
   if(name.endsWith("!f")){const K_=kitShape.c||(kitShape.c={});if(K_[name])return K_[name];const d=kitShape(J,name.slice(0,-2));if(!d)return null;
-    /* no kerb or sidewalk (where a ramp joins): only the triangles at road level stay */const I=[];for(let i=0;i<d.i.length;i+=3){const a=d.i[i],b=d.i[i+1],c=d.i[i+2];if(d.p[a*3+1]<6&&d.p[b*3+1]<6&&d.p[c*3+1]<6&&d.p[a*3+1]>-6&&d.p[b*3+1]>-6&&d.p[c*3+1]>-6)I.push(a,b,c)}
+    /* no kerb or sidewalk (where a ramp joins): only the triangles at road level stay */const I=[],n0=name.slice(0,-2),a0=n0.indexOf("@"),B=a0<0?d:J.pieces[n0.slice(0,a0)]||d,Y=B.p;   /* heights from the unshaped piece: on a graded piece the road itself rises past 6 cm (that dropped whole stretches of road on the hills) */
+    for(let i=0;i<d.i.length;i+=3){const a=d.i[i],b=d.i[i+1],c=d.i[i+2];if(Y[a*3+1]<6&&Y[b*3+1]<6&&Y[c*3+1]<6&&Y[a*3+1]>-6&&Y[b*3+1]>-6&&Y[c*3+1]>-6)I.push(a,b,c)}
     const o={p:d.p,n:d.n,t:d.t,i:I};K_[name]=o;return o}
   const at=name.indexOf("@");if(at<0)return J.pieces[name];const K_=kitShape.c||(kitShape.c={});if(K_[name])return K_[name];const base=J.pieces[name.slice(0,at)];if(!base)return null;
-  let rest=name.slice(at+1),dz=0,R=0,dw=0;const pi_=rest.indexOf("%");if(pi_>=0){dw=+rest.slice(pi_+1);rest=rest.slice(0,pi_)}const hi=rest.indexOf("^");if(hi>=0){dz=+rest.slice(hi+1);rest=rest.slice(0,hi)}const ti=rest.indexOf("~");if(ti>=0){R=+rest.slice(ti+1);rest=rest.slice(0,ti)}
+  let rest=name.slice(at+1),dz=0,R=0,dw=0;const pi_=rest.indexOf("%");if(pi_>=0){dw=+rest.slice(pi_+1);rest=rest.slice(0,pi_)}let vq=0;const hi=rest.indexOf("^");if(hi>=0){const g=rest.slice(hi+1).split(",");dz=+g[0];vq=+(g[1]||0);rest=rest.slice(0,hi)}const ti=rest.indexOf("~");if(ti>=0){R=+rest.slice(ti+1);rest=rest.slice(0,ti)}
   const L=+rest,L0=+name.slice(0,at).split("_").pop().replace(/^st/,""),k=L/L0,p=base.p.slice(),n=base.n.slice(),t=base.t.slice();
   const ed=KIT_EDGE[name.slice(0,at)]||99;
-  for(let i=0;i<p.length;i+=3){let x=p[i]/100,y=p[i+1]/100,zz=p[i+2]/100*k;if(dw&&Math.abs(x)>=ed-0.02)x+=Math.sign(x)*dw;   /* kerb and sidewalk out to the road's own kerb line */y+=dz*(-zz)/L;let nx=n[i],nz=n[i+2];
+  for(let i=0;i<p.length;i+=3){let x=p[i]/100,y=p[i+1]/100,zz=p[i+2]/100*k;if(dw&&Math.abs(x)>=ed-0.02)x+=Math.sign(x)*dw;   /* kerb and sidewalk out to the road's own kerb line */{const t_=-zz/L;y+=dz*t_+4*vq*t_*(1-t_)}   /* graded, and (merge pieces) curved over a crest or dip by vq at the middle */let nx=n[i],nz=n[i+2];
     if(R){const th=-zz/R,rr=R-x,c=Math.cos(th),sn=Math.sin(th);x=R-rr*c;zz=-rr*sn;const a=nx*c+nz*sn,b=-nx*sn+nz*c;nx=a;nz=b}p[i]=x*100;p[i+1]=y*100;p[i+2]=zz*100;n[i]=nx;n[i+2]=nz}
   for(let i=1;i<t.length;i+=2)t[i]=t[i]*k;const out={p,n,t,i:base.i};if(Object.keys(K_).length<4000)K_[name]=out;return out}
 function kitLoad(){if(!(KITW&&KITMAP||KITOLD)||KIT.busy||KIT.ok||st.headless)return;KIT.busy=true;
