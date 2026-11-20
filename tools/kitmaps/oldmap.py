@@ -248,6 +248,60 @@ def ramp_off(P):
     return out
 print(f"ramp lanes alongside the freeway: {sum(len(v) for v in AUX.values())} samples on {len(AUX)} carriageways")
 
+# ---- two one-lane ramps that meet and run on side by side (the stack's ramps joining before the freeway, the C-D road): that stretch
+# is the kit's two-lane ramp along the line between them, then its 2-to-1 taper (or 1-to-2 where one road splits in two), and the
+# single ramps' own pieces stop where it takes over
+def outward(e, end):
+    P = e["P"] if end == 0 else e["P"][::-1]
+    return P
+def at_dist(P, d):
+    D = cumd(P)
+    if d >= D[-1]: return None
+    i = bisect.bisect_right(D, d) - 1; f = (d - D[i]) / max(1e-9, D[i + 1] - D[i])
+    return [P[i][j] + (P[i + 1][j] - P[i][j]) * f for j in range(3)]
+LEGS = {}
+for e in NET["E"]:
+    for end, ni in ((0, e["a"]), (1, e["b"])): LEGS.setdefault(ni, []).append((e, end))
+RRCUT = {}   # (edge i, end) -> metres from that end the single-lane pieces leave out
+nrr = 0
+for ni, L in LEGS.items():
+    rl = [(e, end) for e, end in L if e["t"] == "ramp"]
+    if len(rl) != 3 or any(e["t"] == "xway" for e, _ in L): continue
+    ins = [(e, end) for e, end in rl if end == 1]; outs = [(e, end) for e, end in rl if end == 0]
+    if len(ins) == 2 and len(outs) == 1: pair, one, merge = ins, outs[0], True
+    elif len(outs) == 2 and len(ins) == 1: pair, one, merge = outs, ins[0], False
+    else: continue
+    A, B = outward(*pair[0]), outward(*pair[1]); C = outward(*one)
+    s1 = s2 = None; d = 2.0
+    while d < 180:
+        a, b = at_dist(A, d), at_dist(B, d)
+        if not a or not b: break
+        g = math.hypot(a[0] - b[0], a[1] - b[1])
+        if s1 is None and g >= 3.3: s1 = d
+        if s1 is not None:
+            if 3.0 <= g <= 5.4: s2 = d
+            else: break
+        d += 2.0
+    if s1 is None or s2 is None or s2 - s1 < 12: continue
+    M = []; d = s1
+    while d <= s2 + 0.01:
+        a, b = at_dist(A, d), at_dist(B, d); M.append([(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2]); d += 4.0
+    cl = max(8.0, 72.0 - s1); c = at_dist(C, cl)
+    if not c: continue
+    if merge:
+        follow(M[::-1], "ramp2_st48"); follow([M[0], c], "ramp_narrow_2to1_72", one=True)
+    else:
+        follow([c, M[0]], "ramp_widen_1to2_72", one=True); follow(M, "ramp2_st48")
+    for (e, end) in pair: RRCUT[(e["i"], end)] = s2
+    RRCUT[(one[0]["i"], one[1])] = cl
+    nrr += 1
+print(f"ramp pairs on a two-lane ramp: {nrr}")
+for e in NET["E"]:
+    for end in (0, 1):
+        if (e["i"], end) in RRCUT:
+            if end == 0: e["u0"] = max(e.get("u0", 0), RRCUT[(e["i"], 0)])
+            else: e["u1"] = min(e.get("u1", e["L"]), e["L"] - RRCUT[(e["i"], 1)])
+
 for e in NET["E"]:
     base = BASE.get(e["t"])
     if not base: continue
