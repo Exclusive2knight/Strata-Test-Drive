@@ -1,6 +1,6 @@
 (async()=>{const out=[];setTrim("camry25",true);st.started=true;RWX_TRY=true;GT.min=10*60;RW.day=-1;rwTick();const Z=RW.xz;if(!Z)return "no crossover zone";{const q=fpt(Z.e,Z.dc,Z.sX0+150,laneOff(Z.e,Z.e.n-1)+LANE/2+8);resetCar({free:true,x:q[0],y:q[1],h:car.psi})}
 
-  st.power=true;st.started=true;st.gear="P";car.vx=0;cars=[];{const q=fpt(Z.e,Z.dc,Z.sX0+150,laneOff(Z.e,Z.e.n-1)+LANE/2+8);resetCar({free:true,x:q[0],y:q[1],h:car.psi})}spawnTraffic(170);RW.day=-1;rwTick();const Z2=RW.xz;   /* the zone again: its drums are cars, and the list was just emptied */
+  st.power=true;st.started=true;st.gear="P";car.vx=0;cars=[];{const q=fpt(Z.e,Z.dc,Z.sX0+150,laneOff(Z.e,0)-LANE/2-9);resetCar({free:true,x:q[0],y:q[1],h:car.psi})}spawnTraffic(170);   /* the test's own car parked off the outside shoulder (it used to sit in the median, right on the crossover's path) */RW.day=-1;rwTick();const Z2=RW.xz;   /* the zone again: its drums are cars, and the list was just emptied */
   const passed=new Set();
 let over=0,overList=new Map(),stuckMax=0,stuck=new Map(),hardBrakes=0,redRun=0;const t0=performance.now();
 for(let k=0;k<1800;k++){SIMSTEP(0.1);

@@ -4034,6 +4034,7 @@ if(W2){const sOn=(ax,ay,bx,by,u,dir=1)=>{const e=ePick(ax,ay,bx,by);if(!e)return
 const COLL={g:new Map(),gN:new Map(),C:25}, BLD_LIST=[];   // gN: the same grid without trees (used when trees are turned off)
 const COLL_KEEP=[];function collReset(){COLL.g=new Map();COLL.gN=new Map();BLD_LIST.length=0;for(const o of COLL_KEEP)collAdd(o)}
 function collAdd(o){const Rr=o.t==="c"?o.r:Math.hypot(o.hl,o.hw),C=COLL.C;for(let i=Math.floor((o.x-Rr)/C);i<=Math.floor((o.x+Rr)/C);i++)for(let j=Math.floor((o.y-Rr)/C);j<=Math.floor((o.y+Rr)/C);j++){const k=i*100003+j;let a=COLL.g.get(k);if(!a)COLL.g.set(k,a=[]);a.push(o);if(!o.tree){let b=COLL.gN.get(k);if(!b)COLL.gN.set(k,b=[]);b.push(o)}}}
+function collDel(o){const Rr=o.t==="c"?o.r:Math.hypot(o.hl,o.hw),C=COLL.C;for(let i=Math.floor((o.x-Rr)/C);i<=Math.floor((o.x+Rr)/C);i++)for(let j=Math.floor((o.y-Rr)/C);j<=Math.floor((o.y+Rr)/C);j++){const k=i*100003+j;for(const G of [COLL.g,COLL.gN]){const a=G.get(k);if(a){const n=a.indexOf(o);if(n>=0)a.splice(n,1)}}}}
 function collNear(x,y){return (COLL.nt?COLL.gN:COLL.g).get(Math.floor(x/COLL.C)*100003+Math.floor(y/COLL.C))||[]}
 
 // ======================================================================= trims & modes
@@ -6100,13 +6101,15 @@ function randomSpot(minD,maxD){const NE=W2?nearEdges(maxD):{E:EDGES,W:EW};if(!NE
     if(RW.closed.size&&RW.closed.has(e))continue;const dir=e.ow||rnd()<0.5?1:-1,s0=rStart(e,dir)+4,s1=e.L-rEnd(e,dir)-12;if(s1<=s0)continue;const s=s0+rnd()*(s1-s0),i=Math.floor(rnd()*e.n);
     const p=fpt(e,dir,s,laneOff(e,i)),d=Math.hypot(p[0]-plX(),p[1]-plY());if(d<minD||d>maxD)continue;if(!freeSpot(e,dir,s,i,30))continue;return {e,dir,s,i}}
   return null}
-function spawnTraffic(n){for(let k=0;k<n;k++){const p=poolSpot(60)||randomSpot(45,900);if(p)cars.push(newCar(p.e,p.dir,p.s,p.i))}st.trafficN=cars.filter(c=>c.kind==="ai").length}
+function spawnTraffic(n){for(let k=0;k<n;k++){const p=poolSpot(60)||randomSpot(45,900);if(p&&!rwShut(p.e,p.dir,p.s,p.i))cars.push(newCar(p.e,p.dir,p.s,p.i))}st.trafficN=cars.filter(c=>c.kind==="ai").length}
 function spawnOncoming(){}
 function idm(v,v0,gap,vL,Th,aM,bM){const s0=2.5,T=Th||1.3,a=aM||1.6,b=bM||2.8;
   const ss=s0+Math.max(0,v*T+v*(v-vL)/(2*Math.sqrt(a*b)));return a*(1-Math.pow(v/Math.max(v0,0.1),4)-Math.pow(ss/Math.max(gap,0.1),2))}
 // where the car will drive next: points [x, y, distance, curvature, heading]
 function futurePath(c,P,maxD){const pts=[];
-  const lane=(e,dir,sFrom,sTo,offA,offB,base)=>{for(let s=sFrom;s<=sTo;s+=2.5){const d=s-sFrom,o=offA+(offB-offA)*Math.min(1,d/15),q=fpt(e,dir,s,o);pts.push([q[0],q[1],base+d,Math.abs(eAt(e,dir>0?s:e.L-s).k),q[2]]);if(base+d>maxD)return false}return true};
+  /* v361: a car on the crossover looks ahead along the curve it is following (not straight on), so it sees the cars ahead of it on it */
+  const Z=RW.xz,xo=Z&&c.e===Z.e&&c.dir===Z.dc&&!c.jn&&c.s>Z.sX0-90&&c.s<Z.sX1&&Math.abs(c.off-rwXOff(Z,c.s))<1.5;
+  const lane=(e,dir,sFrom,sTo,offA,offB,base)=>{for(let s=sFrom;s<=sTo;s+=2.5){const d=s-sFrom,o=xo&&e===Z.e&&s>Z.sX0&&s<Z.sX1?rwXOff(Z,s):offA+(offB-offA)*Math.min(1,d/15),q=fpt(e,dir,s,o);pts.push([q[0],q[1],base+d,Math.abs(eAt(e,dir>0?s:e.L-s).k),q[2]]);if(base+d>maxD)return false}return true};
   const jpath=(P,dFrom,base)=>{for(let d=dFrom;d<=P.L;d+=2.5){const q=pathAt(P,d);pts.push([q[0],q[1],base+d-dFrom,P.k,q[2]])}return base+P.L-dFrom};
   if(c.jn){const base=jpath(c.jn.P,c.jn.d,0),m=c.jn.mv;if(base<maxD)lane(m.e,m.dir,c.jn.P.s1,Math.min(m.e.L,c.jn.P.s1+maxD-base),laneOff(m.e,c.jn.j),laneOff(m.e,c.jn.j),base)}
   else if(P){const sTo=Math.min(P.s0,c.s+maxD);if(lane(c.e,c.dir,c.s,sTo,c.off,c.offT,0)&&P.s0-c.s<maxD){const base=jpath(P,0,P.s0-c.s);const m=c.mv;
@@ -6319,7 +6322,9 @@ function emoDraw(){let box=$("emoL");if(!box){box=document.createElement("div");
 // and once one is far behind and out of sight it is quietly moved to a new spot instead of driving off into nowhere
 function aiR(){const lb=G().label;return lb==="Ultra"||lb==="High"?650:lb==="Medium"?560:480}
 function aiSeen(x,y,z){if(!CULL.pl)return Math.hypot(x-plX(),y-plY())<60;return sphVis(x,(z||0)+1,-y,8,1e9)}
-function poolSpot(minD,ok){const R=aiR();for(let k=0;k<16;k++){const p=randomSpot(minD??140,R-40);if(!p)continue;if(ok&&!ok(p))continue;{const cap=Math.max(2,Math.floor(/curb/.test(p.e.type)?p.e.L/50:p.e.L*Math.max(1,p.e.n)/(p.e.type==="aw"?45:28)));let n=0;for(const c of cars)if(c.e===p.e&&c.kind==="ai")n++;if(n>=cap)continue}   /* no more cars on one road than fit with room between them (the airport curbs fill up fast when it's the only road near you) */const q=fpt(p.e,p.dir,p.s,laneOff(p.e,p.i)),d=Math.hypot(q[0]-plX(),q[1]-plY());
+/* v361: a lane the crossover work zone has closed (no traffic spawns into it) */
+function rwShut(e,dir,s,i){const Z=RW.xz;if(!Z||e!==Z.e)return false;if(dir===Z.dc)return i<e.n-1&&s>=Z.sA&&s<=Z.sEnd;return i>0&&s>=e.L-Z.sEnd-Z.Lm&&s<=e.L-Z.sA}
+function poolSpot(minD,ok){const R=aiR();for(let k=0;k<16;k++){const p=randomSpot(minD??140,R-40);if(!p)continue;if(ok&&!ok(p))continue;if(rwShut(p.e,p.dir,p.s,p.i))continue;{const cap=Math.max(2,Math.floor(/curb/.test(p.e.type)?p.e.L/50:p.e.L*Math.max(1,p.e.n)/(p.e.type==="aw"?45:28)));let n=0;for(const c of cars)if(c.e===p.e&&c.kind==="ai")n++;if(n>=cap)continue}   /* no more cars on one road than fit with room between them (the airport curbs fill up fast when it's the only road near you) */const q=fpt(p.e,p.dir,p.s,laneOff(p.e,p.i)),d=Math.hypot(q[0]-plX(),q[1]-plY());
     if(d<R*0.8&&aiSeen(q[0],q[1],p.e.hz?ez(p.e,p.dir>0?p.s:p.e.L-p.s):0))continue;const ah=(q[0]-plX())*Math.cos(car.psi)+(q[1]-plY())*Math.sin(car.psi);if(ah<0&&k<10&&rnd()<0.55)continue;return p}return null}
 function poolKeep(c){return c.ub||c.robo||c.emv||c.bus||c.plow||c.transit||c.towing||c.errand||c.pullH||c.pullCop||c.pullTg||(typeof GIG!=="undefined"&&GIG.job&&GIG.job.towCar===c)}
 // AI cars get the same suspension as the cars you drive: the suspension of their own model (passive coils, adaptive, magnetic or air),
@@ -6397,7 +6402,7 @@ function aiCollide(dt){AIC.cool-=dt;if(AIC.cool>0||st.aiWreck===false)return;con
   if(EV.list.filter(v=>v.pair&&v.phase>0).length>=2)return;
   for(let i=0;i<A.length;i++){const a=A[i];for(let j=i+1;j<A.length;j++){const b=A[j];const dx=b.wx-a.wx,dy=b.wy-a.wy;if(dx*dx+dy*dy>36||Math.abs((a.wz||0)-(b.wz||0))>1.5)continue;
     const H=obbSAT(a.wx,a.wy,a.wh,(a.len||CARLEN)/2-0.15,(a.wid||1.9)/2-0.1,b.wx,b.wy,b.wh,(b.len||CARLEN)/2-0.15,(b.wid||1.9)/2-0.1);if(!H||H.d<0.3)continue;
-    const rv=Math.hypot(a.v*Math.cos(a.wh)-b.v*Math.cos(b.wh),a.v*Math.sin(a.wh)-b.v*Math.sin(b.wh));if(rv<3.5)continue;
+    const rv=Math.hypot(a.v*Math.cos(a.wh)-b.v*Math.cos(b.wh),a.v*Math.sin(a.wh)-b.v*Math.sin(b.wh));if(rv<3.5||a.rwZ||b.rwZ)continue;   /* (not in the crossover zone's merge: a wreck there shuts the only lane left) */
     const L_=a.s!==undefined&&b.e===a.e&&b.s<a.s?a:b,F=L_===a?b:a;EV.list.push({type:"aicrash",label:"Crash",x:a.wx,y:a.wy,t:240,items:[],pair:[L_,F],phase:0,pt:0,quiet:false,real:true});AIC.cool=25;return}}}
 // signal sensors (the cameras on the mast arms): a light changes early for a car waiting on red when nobody is coming the other way,
 // and rests on green while no one is waiting on the cross street. Done by sliding the signal's cycle offset, so every driver sees the same light.
@@ -6481,13 +6486,13 @@ function updateTraffic(dt){try{sigSense(dt)}catch(e){}try{sfTick(dt)}catch(e){co
     if(c.kind==="bike"&&!c.jn){const home=bikeOff(c.e),W_=L.who,blk=W_&&W_!=="me"&&W_!=="ctrl"&&W_.kind!=="ped"&&L.gap<14&&(W_.kind==="parked"||W_.kind==="wreck"||W_.kind==="cone"||(W_.v||0)<0.5);
       if(blk&&!c.bpass){c.bwait=(c.bwait||0)+dt;const out=home+2.2;if(c.bwait>0.5&&bikeSide(c,out-c.off,-28,2,true))c.bpass=1}else if(!blk)c.bwait=0;
       if(c.bpass){c.offT=home+2.2;if(!blk&&!bikeSide(c,home-c.off,-4.5,11,false)){c.offT=home;c.bpass=0}}}
-    if(RW.xz)rwXSteer(c);
+    if(RW.xz)rwXSteer(c,dt);else c.rwZ=false;
     advance(c,c.v*dt,P);
-    if(!c.jn){const er=c.offT-c.off,lv=Math.min(c.passT>0?1.7:1.1,Math.max(0,c.v-0.4)*0.16+(c.v>0.4?0.12:0)),want=clamp(er*1.4,-lv,lv);   /* a car only drifts sideways while it rolls forward: no sliding across lanes while stopped at a light */c.offV=(c.offV||0)+clamp(want-(c.offV||0),-1.6*dt,1.6*dt);if(Math.abs(er)<0.02&&Math.abs(c.offV)<0.05){c.off=c.offT;c.offV=0}else c.off+=c.offV*dt;c.head=Math.atan2(c.offV,Math.max(c.v,1))*Math.min(1,c.v/3)}else c.offV=0
+    if(!c.jn){const er=c.offT-c.off,lv=Math.min(c.passT>0?1.7:1.1,Math.max(0,c.v-0.4)*0.16+(c.v>0.4?0.12:c.rwEnd?0.7:0)),want=clamp(er*1.4,-lv,lv);   /* a car only drifts sideways while it rolls forward: no sliding across lanes while stopped at a light */c.offV=(c.offV||0)+clamp(want-(c.offV||0),-1.6*dt,1.6*dt);if(Math.abs(er)<0.02&&Math.abs(c.offV)<0.05){c.off=c.offT;c.offV=0}else c.off+=c.offV*dt;c.head=Math.atan2(c.offV,Math.max(c.v,1))*Math.min(1,c.v/3)}else c.offV=0
     // indicators for the turn ahead, lane changes on multi-lane roads
     if(!c.jn&&c.mv&&!c.lcPending&&Math.abs(c.offT-c.off)<0.05)c.sig=dStop<70?(c.mv.t==="R"?1:c.mv.t==="L"||c.mv.t==="U"?-1:0):0;
     if(c.kind==="ai"&&!c.jn&&!c.inBay&&c.mv&&(c.mv.t==="L"||c.mv.t==="U")&&c.e.bay&&c.e.bay[c.dir]&&laneIdx(c)===c.e.n-1&&!c.lcPending){const B=c.e.bay[c.dir];if(dStop<B.len+B.tap*0.35&&dStop>8){c.inBay=true;c.offT=laneOff(c.e,c.e.n);c.sig=-1}}   // into the left-turn bay
-    if(c.kind==="ai"&&!c.jn&&c.e.n>1&&!c.inBay){const li=laneIdx(c);
+    if(c.kind==="ai"&&!c.jn&&c.e.n>1&&!c.inBay&&!c.rwZ){const li=laneIdx(c);   /* (in the crossover zone rwXSteer picks the lanes) */
       if(c.lcPending){c.lcPending-=dt;if(c.lcPending<=0&&c.v<2.5&&dStop<40)c.lcPending=0.3;if(c.lcPending<=0){c.lcPending=0;if(laneSafe(c,c.lcTarget))c.offT=laneOff(c.e,c.lcTarget);else c.sig=0}}
       else if(Math.abs(c.offT-c.off)<0.05){c.lcT-=dt;if(c.lcCool>0)c.lcCool-=dt;
         if(c.needLane!==null&&li!==c.needLane&&dStop<35&&!c.lanePinned){const was=c.mv&&c.mv.t;planMove(c,"S");if(!c.mv)planMove(c,was);c.lanePinned=true}       // missed the lane: go straight on instead
@@ -6883,7 +6888,7 @@ function slkTick(dt){SLK.t-=dt;if(SLK.t<=0){SLK.t=1;let sn=0,wt=0;try{sn=Math.ma
 // road work props: cones and drums, signs, and portable message boards that flip between their two pages every 2 seconds
 /* v352: the roadwork machines pack (paver, rollers, excavator, loaders, dump truck, generator, site module) works inside the closed lane */
 const RW_MACH=["rwv_asphalt_paver","rwv_tandem_road_roller","rwv_tracked_excavator","rwv_wheel_loader","rwv_backhoe_loader","rwv_dump_truck"];
-const RW_PROPS=[...RW_MACH,"rwv_portable_generator","rwv_roadwork_site_module","rw_cone28","rw_drum","rw_road_work","rw_lane_closed","rw_detour_left","rw_detour_right","rw_detour_ahead","rw_mb_roadwork","rw_mb_roadwork_1","rw_mb_roadwork_2","rw_mb_detour","rw_mb_detour_1","rw_mb_detour_2"];
+const RW_PROPS=[...RW_MACH,"rw_pcb","rw_water","rwv_portable_generator","rwv_roadwork_site_module","rw_cone28","rw_drum","rw_road_work","rw_lane_closed","rw_detour_left","rw_detour_right","rw_detour_ahead","rw_mb_roadwork","rw_mb_roadwork_1","rw_mb_roadwork_2","rw_mb_detour","rw_mb_detour_1","rw_mb_detour_2"];
 // your own words on the amber message boards: each page is drawn once as dot-matrix LED text and reused
 const MB_TEX=new Map();
 const MB_PRESETS=[["Auto (the board's own pages)",null],["ROAD WORK AHEAD / EXPECT DELAYS",[["ROAD WORK","AHEAD"],["EXPECT","DELAYS"]]],["LEFT LANE CLOSED / MERGE RIGHT",[["LEFT LANE","CLOSED"],["MERGE","RIGHT"]]],["DETOUR AHEAD / FOLLOW SIGNS",[["DETOUR","AHEAD"],["FOLLOW","SIGNS"]]],["SLOW DOWN / WORKERS AHEAD",[["SLOW","DOWN"],["WORKERS","AHEAD"]]],["BUCKLE UP / PHONES DOWN",[["BUCKLE","UP"],["PHONES","DOWN"]]]];
@@ -6903,7 +6908,7 @@ function rwPropsDraw(){if(!RW.pl){RW.pl=1;let i=0;const nx=()=>{if(i<RW_PROPS.le
   // every cone and drum out there (road work, crash scenes, breakdowns): drawn here as the 3D model (crash-scene and breakdown cones used to be skipped, so they were invisible but still solid)
   for(const c of cars){if(c.kind!=="cone"||c.down||Math.abs(c.wx-ex)>180||Math.abs(c.wy-ey)>180)continue;const k=c.rwK||"rw_cone28",M=carMatrix(c.wx,c.wy,c.wh,c.wz||0,0,0);if(PROPS[k])propDraw(k,M,{head:0})}   // (until the model loads, coneInto draws a simple cone)
   if(RW.xz){const Z=RW.xz;if(ex>Z.box[0]-600&&ex<Z.box[1]+600&&ey>Z.box[2]-600&&ey<Z.box[3]+600){for(const q of Z.props)if(PROPS[q.k])propDraw(q.k,carMatrix(q.x,q.y,q.h,gz(q.x,q.y),0,0),{head:0});
-      if(Z.mesh){gl.uniformMatrix4fv(U.uM,false,M4.id());gl.enable(gl.POLYGON_OFFSET_FILL);gl.polygonOffset(-1,-1);mat([0.09,0.09,0.095],null,0.2,30);draw(Z.mesh);gl.polygonOffset(0,0)}}}
+      if(Z.mesh){gl.uniformMatrix4fv(U.uM,false,M4.id());gl.enable(gl.POLYGON_OFFSET_FILL);gl.polygonOffset(-1,-1);mat([0.09,0.09,0.095],null,0.2,30);draw(Z.mesh);gl.polygonOffset(-3,-3);const nt=st.night?[0.03,0.03,0.025]:null;if(Z.paintW){mat([0.8,0.8,0.77],nt,0.1,10);draw(Z.paintW)}if(Z.paintY){mat([0.8,0.58,0.1],nt,0.1,10);draw(Z.paintY)}gl.polygonOffset(0,0)}}}
   for(const z of RW.zones){if((z.x-ex)**2+(z.y-ey)**2>380*380)continue;for(const q of z.props||[])if(PROPS[q.k])propDraw(q.k,carMatrix(q.x,q.y,q.h,gz(q.x,q.y),0,0),{head:0});
     const m=z.mb;if(m&&PROPS[m.k]){const M=carMatrix(m.x,m.y,m.h,gz(m.x,m.y),0,0);propDraw(m.k,M,{head:0});const pi=Math.floor(performance.now()/2000)%2;
       if(st.mbMsg&&st.mbMsg.length)mbLed(m,M,st.mbMsg[pi%st.mbMsg.length],night);else{const pg=m.k+"_"+(1+pi);if(PROPS[pg])propDraw(pg,M,{glow:1.6+night})}}}
@@ -6977,13 +6982,14 @@ function rwTick(){if(!st.started)return;const day=GT.day||1,hr=(GT.min/60)%24,wo
    other side's left lane with channelizer drums between the two directions, then crosses back. The open side keeps right. 55 mph through it all.
    Positions are along the closed direction (dc); "off" is the usual lateral offset (negative = left). */
 var RWX_ON={z:false},RWX_TRY=(()=>{try{return !/[?&]roadwork=nocrossover\b/.test(location.search)}catch(e){return true}})();   /* on for everyone (?roadwork=nocrossover turns it off) */   /* groundAt runs before RW exists at start-up: it checks this var instead */
-function rwXMake(rr){RW.xz=null;RWX_ON.z=false;const C=EDGES.filter(e=>e.type==="xway"&&e.L>2400&&!e.ov&&!e.br);if(!C.length)return;const e=C[Math.floor(rr()*C.length)],dc=rr()<0.5?1:-1;
+function rwXSL(){if(RW.slOut){SL.list.push(...RW.slOut.L);for(const o of RW.slOut.C)collAdd(o);RW.slOut=null;SLC.byCell=null;SLC.cells.clear()}}   /* v361: put back the median lights the last crossover took down */
+function rwXMake(rr){if(RW.xz&&RW.xz.coll)for(const o of RW.xz.coll)collDel(o);RW.xz=null;rwXSL();RWX_ON.z=false;const C=EDGES.filter(e=>e.type==="xway"&&e.L>2400&&!e.ov&&!e.br);if(!C.length)return;const e=C[Math.floor(rr()*C.length)],dc=rr()<0.5?1:-1;
   const Lm=320,Lx=330,Lw=900,span=250+Lm+80+2*Lx+Lw+300;
   /* somewhere along it clear of the tunnel and of anything built over the road */
   const okAt=s0=>{for(let s_=s0;s_<=s0+span;s_+=40){const p=eAt(e,dc>0?s_:e.L-s_);if(TUN.on&&Math.abs(p.x-TUN.xc)<TUN.Wc+60&&p.y>TUN.yc0-60&&p.y<TUN.yc1+60)return false}return true};
   let base=-1;for(let t=0;t<12;t++){const s0=200+rr()*Math.max(0,e.L-span-400);if(okAt(s0)){base=s0;break}}if(base<0)return;
   const sA=base,sX0=sA+Lm+80,sW0=sX0+Lx,sW1=sW0+Lw,sX1=sW1+Lx,sEnd=sX1+300;
-  const Z={e,dc,sA,Lm,Lx,sX0,sW0,sW1,sX1,sEnd,items:[],props:[]};RW.xz=Z;RWX_ON.z=true;
+  const Z={e,dc,sA,Lm,Lx,sX0,sW0,sW1,sX1,sEnd,items:[],props:[],coll:[]};RW.xz=Z;RWX_ON.z=true;
   const sh=s_=>shiftOf(e,dc>0?s_:e.L-s_),own0=laneOff(e,e.n-1),far=s_=>-own0-2*sh(s_);   /* lane 0 is the outside lane, n-1 the one by the median: the other side's inside lane, in the closed side's terms */
   const add=(k,s_,off)=>{const c=evStatic("cone",e,dc,s_,off);if(k)c.rwK=k;Z.items.push(c)};const add2=(k,s_,off)=>{const c=evStatic("cone",e,-dc,s_,off);if(k)c.rwK=k;Z.items.push(c)};
   /* the closing taper: drums from the right edge across to the left lane line, then a line of them along it */
@@ -6991,33 +6997,70 @@ function rwXMake(rr){RW.xz=null;RWX_ON.z=false;const C=EDGES.filter(e=>e.type===
   for(let s_=sA+Lm;s_<sW1+Lx;s_+=30)add("rw_drum",s_,own0-LANE/2-0.3);
   /* the open side: its left lanes taper shut ahead of the shared stretch (its own direction runs the other way along the edge) */
   {const so=e.L-sEnd-Lm;for(let d=0;d<=Lm;d+=24){const f=d/Lm;add2("rw_drum",so+d,laneOff(e,n-1)+LANE/2-f*(n-1)*LANE)}for(let q=so+Lm;q<e.L-sA;q+=30)add2("rw_drum",q,laneOff(e,0)+LANE/2+0.3)}   /* the open side keeps its outside lane */
-  /* channelizers down the middle lane of the shared side, between the two directions */
-  for(let s_=sW0-40;s_<=sW1+40;s_+=18)add("rw_drum",s_,far(s_)+LANE);
+  /* v361: between the two directions on the shared side, temporary concrete barrier (MoDOT 616.13 / MUTCD 6H: positive protection on a
+     long-term crossover), 6 m sections down the middle of the spare lane, its ends shielded by a row of water-filled barriers */
+  {const sec=(s_,k,hl,hw)=>{const q=fpt(e,dc,s_,far(s_)+LANE);Z.props.push({k,x:q[0],y:q[1],h:q[2]});const o={t:"b",x:q[0],y:q[1],h:q[2],hl,hw,z0:(e.hz?ez(e,dc>0?s_:e.L-s_):0)-0.3,z1:(e.hz?ez(e,dc>0?s_:e.L-s_):0)+0.9,what:k==="rw_pcb"?"the concrete barrier":"the water-filled barrier",rwX:1};Z.coll.push(o);collAdd(o)};
+    for(let s_=sW0;s_<=sW1;s_+=6)sec(s_+3,"rw_pcb",3,0.3);for(let k=1;k<=5;k++){sec(sW0-k*1.8+0.9,"rw_water",0.9,0.25);sec(sW1+6+k*1.8-0.9,"rw_water",0.9,0.25)}}
   RW.items.push(...Z.items);
+  /* v361: the median streetlights standing where the crossovers cut across come down for the works (light and pole) */
+  {const onX=(x,y)=>{const p=eProj(e,x,y);if(p.u<0||p.u>e.L)return false;const s_=dc>0?p.u:e.L-p.u;if(!(s_>sX0-15&&s_<sW0+15||s_>sW1-15&&s_<sX1+15))return false;const q=fpt(e,dc,s_,rwXOff(Z,s_));return Math.hypot(q[0]-x,q[1]-y)<5};
+    const L=SL.list.filter(l=>onX(l.x,l.y));if(L.length){const C=[];for(const l of L)for(const o of collNear(l.x,l.y))if(o.what==="a streetlight"&&Math.hypot(o.x-l.x,o.y-l.y)<0.5&&!C.includes(o))C.push(o);
+      for(const o of C)collDel(o);const Ls=new Set(L);for(let i=SL.list.length-1;i>=0;i--)if(Ls.has(SL.list[i]))SL.list.splice(i,1);RW.slOut={L,C};SLC.byCell=null;SLC.cells.clear()}}
   /* the closed side: the crew paving it */
   const mk=(s_,k)=>{const q=fpt(e,dc,s_,laneOff(e,1));Z.props.push({k,x:q[0],y:q[1],h:q[2]})};mk(sW0+300,"rwv_asphalt_paver");mk(sW0+318,"rwv_tandem_road_roller");mk(sW0+520,"rwv_dump_truck");mk(sW0+700,"rwv_wheel_loader");
   {const q=fpt(e,dc,sA-500,laneOff(e,0)-LANE/2-3);Z.props.push({k:"rw_road_work",x:q[0],y:q[1],h:q[2]});const q2=fpt(e,dc,sA-150,laneOff(e,0)-LANE/2-3);Z.props.push({k:"rw_mb_roadwork",x:q2[0],y:q2[1],h:q2[2]})}
   {const q=fpt(e,-dc,e.L-sEnd-400,laneOff(e,0)-LANE/2-3);Z.props.push({k:"rw_road_work",x:q[0],y:q[1],h:q[2]})}
   /* the crossover pavement: two strips across the median along the crossing paths */
-  const B={P:[],N:[],I:[]};const strip=(s0_,s1_)=>{for(let s_=s0_;s_<s1_;s_+=6){const o0=rwXOff(Z,s_),o1=rwXOff(Z,s_+6);const a=fpt(e,dc,s_,o0-2.6),b=fpt(e,dc,s_,o0+2.6),c=fpt(e,dc,s_+6,o1-2.6),d=fpt(e,dc,s_+6,o1+2.6),z=(e.hz?ez(e,dc>0?s_:e.L-s_):0)+0.03;
+  const B={P:[],N:[],I:[]};const strip=(s0_,s1_)=>{for(let s_=s0_;s_<s1_;s_+=6){const o0=rwXOff(Z,s_),o1=rwXOff(Z,s_+6);const a=fpt(e,dc,s_,o0-3.3),b=fpt(e,dc,s_,o0+3.3),c=fpt(e,dc,s_+6,o1-3.3),d=fpt(e,dc,s_+6,o1+3.3),z=(e.hz?ez(e,dc>0?s_:e.L-s_):0)+0.03;
       const k=B.P.length/3;B.P.push(a[0],z,-a[1],b[0],z,-b[1],c[0],z,-c[1],d[0],z,-d[1]);B.N.push(0,1,0,0,1,0,0,1,0,0,1,0);B.I.push(k,k+1,k+2,k+1,k+3,k+2,k,k+2,k+1,k+1,k+2,k+3)}};
-  strip(sX0-10,sW0+10);strip(sW1-10,sX1+10);Z.mesh=B.P.length?meshFrom(B.P,B.N,B.I):null;Z.box=[Math.min(e.a.x,e.b.x)-60,Math.max(e.a.x,e.b.x)+60,Math.min(e.a.y,e.b.y)-60,Math.max(e.a.y,e.b.y)+60]}
+  strip(sX0-10,sW0+10);strip(sW1-10,sX1+10);Z.mesh=B.P.length?meshFrom(B.P,B.N,B.I):null;
+  /* v361: the temporary lane markings: a double yellow centre line between the two directions on the shared side, and solid white edge lines
+     along both crossovers: yellow on the left, white on the right (MoDOT 616.13) */
+  {const W_={P:[],N:[],I:[]},Y_={P:[],N:[],I:[]},line=(M_,s0_,s1_,off,w)=>{for(let s_=s0_;s_<s1_;s_+=4){const o0=off(s_),o1=off(s_+4),a=fpt(e,dc,s_,o0-w/2),b=fpt(e,dc,s_,o0+w/2),c=fpt(e,dc,s_+4,o1-w/2),d=fpt(e,dc,s_+4,o1+w/2),z=(e.hz?ez(e,dc>0?s_:e.L-s_):0)+0.045;
+      const k=M_.P.length/3;M_.P.push(a[0],z,-a[1],b[0],z,-b[1],c[0],z,-c[1],d[0],z,-d[1]);M_.N.push(0,1,0,0,1,0,0,1,0,0,1,0);M_.I.push(k,k+1,k+2,k+1,k+3,k+2,k,k+2,k+1,k+1,k+2,k+3)}};
+    for(const d_ of [-0.11,0.11])line(Y_,sX0+Lx*0.5,sX1-Lx*0.5,s_=>rwXOff(Z,s_)+LANE/2+0.25+d_,0.11);
+    for(const [a_,b_] of [[sX0-10,sW0+20],[sW1-20,sX1+10]])line(W_,a_,b_,s_=>rwXOff(Z,s_)-(LANE/2+0.25),0.15);   /* white on the right */
+    for(const [a_,b_] of [[sX0-10,sX0+Lx*0.5],[sX1-Lx*0.5,sX1+10]])line(Y_,a_,b_,s_=>rwXOff(Z,s_)+LANE/2+0.25,0.15);   /* yellow on the left, up to where the double yellow starts */
+    Z.paintW=W_.P.length?meshFrom(W_.P,W_.N,W_.I):null;Z.paintY=Y_.P.length?meshFrom(Y_.P,Y_.N,Y_.I):null}{let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;for(let s_=sA-1200;s_<=sEnd+1200;s_+=20){const q=fpt(e,dc,Math.max(0,Math.min(e.L,s_)),own0);x0=Math.min(x0,q[0]);x1=Math.max(x1,q[0]);y0=Math.min(y0,q[1]);y1=Math.max(y1,q[1])}Z.box=[x0-80,x1+80,y0-80,y1+80]}}   /* v361: from the zone itself (the edge's end points missed a curved freeway) */
 /* where a closed-side car runs: its own left lane, an S-curve over to the other side's left lane, along it, and back */
 function rwXOff(Z,s_){const e=Z.e,own0=laneOff(e,e.n-1),sh=q=>shiftOf(e,Z.dc>0?q:e.L-q),far=q=>-own0-2*sh(q),S=t=>t*t*(3-2*t);
   if(s_<Z.sX0)return own0;if(s_<Z.sW0)return own0+(far(s_)-own0)*S((s_-Z.sX0)/Z.Lx);if(s_<Z.sW1)return far(s_);if(s_<Z.sX1)return far(s_)+(own0-far(s_))*S((s_-Z.sW1)/Z.Lx);return own0}
-/* every car on the zone's edge: the closed side follows the crossover, the open side keeps right; both at 55 mph or less */
-function rwXSteer(c){const Z=RW.xz;if(!Z||c.e!==Z.e||c.jn||c.kind!=="ai")return;const e=Z.e;
-  /* the signs start 1 km out: traffic moves over in good time (a car only drifts across at a lane's width every few seconds) */
-  if(c.dir===Z.dc){const s_=c.s;if(s_<Z.sA-1100||s_>Z.sEnd)return;c.v0=Math.min(c.v0,s_<Z.sA-500?29:24.6);
-    /* the drums close the other lanes and traffic merges the usual way (gap by gap); from the crossover on, the left-lane cars follow it */
-    if(s_>=Z.sX0&&laneIdx(c)===e.n-1){const o=rwXOff(Z,s_);c.off=o;c.offT=o;c.offV=0;return}
-    /* move in toward the inside lane one lane at a time when there's a gap (zipper merge); without one, ease off near the taper so one opens */
-    if(s_<Z.sX0){const i=laneIdx(c);if(i<e.n-1&&Math.abs(c.off-c.offT)<0.3){if(laneSafe(c,i+1)){c.offT=laneOff(e,i+1);c.sig=-1;c.sigT=2}else if(s_>Z.sA-400)c.v0=Math.min(c.v0,Math.max(4,c.v*0.9))}}}
-  else{const s_=e.L-c.s;if(s_<Z.sA-300||s_>Z.sEnd+1100)return;c.v0=Math.min(c.v0,s_>Z.sEnd+500?29:24.6);
-    /* the open side moves out to its outside lane the same way */
-    const i=laneIdx(c);if(s_>Z.sEnd-50&&i>0&&Math.abs(c.off-c.offT)<0.3){if(laneSafe(c,i-1)){c.offT=laneOff(e,i-1);c.sig=1;c.sigT=2}else if(s_<Z.sEnd+Z.Lm+400)c.v0=Math.min(c.v0,Math.max(4,c.v*0.9))}}}
+/* every car on the zone's edge: the closed side follows the crossover, the open side keeps right; both at 55 mph or less.
+   v361: a zipper merge. Cars keep using the closing lanes right up to the merge area (no early pile-up in one lane), then take turns:
+   a car merges into a gap it can actually use at queue speed, and the car beside / just behind it in the open lane eases off to make
+   that gap, then doesn't let the next one in (the car after it does). FSD (kind "fsd") and the Pilot use the same plan (rwXFor). */
+function rwXSteer(c,dt=0.016){const Z=RW.xz;c.rwZ=false;if(!Z||c.e!==Z.e||c.jn||(c.kind!=="ai"&&c.kind!=="fsd"))return;const e=Z.e,n=e.n,fsd=c.kind==="fsd";
+  if(c.zipT>0){c.zipT-=dt;const f=c.zipFor;if(!f||f.e!==c.e||laneIdx(f)===laneIdx(c)||f.jn||c.s-f.s>15)c.zipT=0;else if(!fsd)c.v0=Math.min(c.v0,Math.max(0,f.v-1.2))}   /* letting one in */
+  if(c.zipCool>0)c.zipCool-=dt;
+  /* a merge that never got going (stopped, nose behind the car ahead, still in its old lane) is called off, so it doesn't hold up both lanes */
+  if(Math.abs(c.offT-c.off)<0.3)c.rwEnd=false;
+  if(!fsd&&!c.rwEnd&&Math.abs(c.offT-c.off)>2.4&&c.v<0.3){c.mStall=(c.mStall||0)+dt;if(c.mStall>3){c.offT=laneOff(e,clamp(Math.round(c.off/LANE)-loOf(n),0,n-1));c.mStall=0;c.sig=0}}else c.mStall=0;
+  const P=rwXPlan(Z,c.dir,c.s,laneIdx(c));if(!P)return;c.rwZ=true;if(!fsd)c.v0=Math.min(c.v0,P.v);
+  if(P.off!=null){if(!fsd){c.off=P.off;c.offV=0}c.offT=fsd?rwXOff(Z,c.s+Math.max(6,c.v*0.8)):P.off;return}
+  if(P.to==null||Math.abs(c.off-c.offT)>0.3)return;const i=laneIdx(c),j=P.to,d=P.close-c.s;
+  const oj=laneOff(e,j),side=()=>{for(const o of cars){if(o===c||o.e!==e||o.dir!==c.dir||o.jn||o.kind==='cone')continue;if(Math.abs(o.s-c.s)<7.5&&(Math.abs(o.off-oj)<2.8||Math.abs(o.offT-oj)<0.5))return true}return false},   /* nobody alongside in it, or moving into it too */
+    g=laneGaps(c,j),g0=laneGaps(c,i),need=k=>!side()&&g.lg>4+c.v*0.45*k&&g.fg>3.5+Math.max(0,g.fv-c.v)*(c.v<3?5.5:1.4)+g.fv*0.3*k&&(g0.lg>6+c.v*0.3||c.v<1&&d<30);   /* (at the very end of the lane, stopped: it edges across at walking pace) */   /* (and room ahead to roll across)*/
+  const go=()=>{c.offT=laneOff(e,j);c.sig=j>i?-1:1;c.sigT=2;c.zipAsk=null;c.rwEnd=d<30};
+  if(d>160){if(need(2.2))go();return}                 /* well before: only into an open lane (light traffic) */
+  if((d>=18||c.v<1)&&need(1)){go();return}             /* (or waiting at the end of the lane, once a gap is made) */                     /* the merge area: any gap that works at this speed (a car needs ~20 m of rolling to get across) */
+  /* no gap: ask the car level with or just behind us in that lane to let us in (once each: they take turns) */
+  if(d<220){let best=null;for(const o of cars){if(o===c||o.e!==e||o.dir!==c.dir||o.jn||laneIdx(o)!==j||Math.abs(o.off-laneOff(e,j))>1.2)continue;const ds=c.s-o.s;if(ds<5||ds>14+o.v*o.v/7)continue;   /* (far enough back to stop comfortably) */if(!best||ds<c.s-best.s)best=o}
+    if(best&&!(best.zipT>0)&&!(best.zipCool>0)){best.zipFor=c;best.zipT=6;best.zipCool=14}}
+  if(!fsd&&d<45)c.v0=Math.min(c.v0,Math.max(0,(d-20)*0.5))}  /* the end of the lane: wait, with room to get across once the gap opens */
+/* the plan for a car on the zone's freeway: its speed, the lane it must reach (and where its own lane is closed), or the crossover path to follow */
+function rwXPlan(Z,dir,s,i){const e=Z.e,n=e.n;
+  if(dir===Z.dc){if(s<Z.sA-1100||s>Z.sEnd)return null;const v=s<Z.sA-500?29:24.6;
+    if(i===n-1)return s>=Z.sX0?{v,off:rwXOff(Z,s)}:{v};
+    /* "close": where the taper's drums first reach a car driving down the middle of this lane (it has to be over by then) */
+    return {v,to:i+1,close:Z.sA+Z.Lm*(i*LANE+LANE/2-1.3)/((n-1)*LANE)}}   /* (a car caught past it waits there for a gap) */
+  const so=e.L-Z.sEnd-Z.Lm;if(s<so-1100||s>e.L-Z.sA)return null;const v=s<so-500?29:24.6;
+  if(i===0)return {v};return {v,to:i-1,close:so+Z.Lm*((n-1-i)*LANE+0.5)/((n-1)*LANE)}}
+/* the same plan for your own car (Pilot / Autosteer and cruise): what lane to be in, the path through the crossover, where to stop if still in a closing lane */
+function rwXFor(M){const Z=RW&&RW.xz;if(!Z||!M||M.e!==Z.e||M.inJ)return null;const i=laneOf(M.off)-loOf(Z.e.n),P=rwXPlan(Z,M.dir,M.s,i);if(!P)return null;
+  const s1=M.s+Math.max(2,Math.abs(car.vx)*0.25);   /* a little ahead (steering lag), plus the path's own heading as feed-forward */
+  return {v:P.v,want:P.to!=null?P.to+loOf(Z.e.n):null,off:P.off!=null?rwXOff(Z,s1):null,ff:P.off!=null?Math.atan((rwXOff(Z,s1+3)-rwXOff(Z,s1-3))/6):0,stop:P.to!=null?P.close-18:null}}
 function rwXGround(x,y){const Z=RW&&RW.xz;if(!Z||!Z.mesh||x<Z.box[0]||x>Z.box[1]||y<Z.box[2]||y>Z.box[3])return null;const e=Z.e,pp=eProj(e,x,y);if(pp.u<0||pp.u>e.L)return null;
-  const s_=Z.dc>0?pp.u:e.L-pp.u;if(!(s_>Z.sX0-10&&s_<Z.sW0+10||s_>Z.sW1-10&&s_<Z.sX1+10))return null;const q=fpt(e,Z.dc,s_,rwXOff(Z,s_));if(Math.hypot(q[0]-x,q[1]-y)>2.8)return null;return {h:ez(e,pp.u),mu:1.1,kind:"road"}}
+  const s_=Z.dc>0?pp.u:e.L-pp.u;if(!(s_>Z.sX0-10&&s_<Z.sW0+10||s_>Z.sW1-10&&s_<Z.sX1+10))return null;const q=fpt(e,Z.dc,s_,rwXOff(Z,s_));if(Math.hypot(q[0]-x,q[1]-y)>3.4)return null;return {h:ez(e,pp.u),mu:1.1,kind:"road"}}
 function rwInto(ex,ey){for(const z of RW.zones){if((z.x-ex)**2+(z.y-ey)**2>350*350)continue;
     if(z.sign&&!PROPS.rw_road_work){const [x,y,h]=z.sign,g=groundAt(x,y).h||0;dBox("gateP",x,y,g,0.08,1.6,0.08,h);dBox("cone",x,y,g+1.25,0.9,0.9,0.05,h+0.785)}
     if(z.barrier){const [x,y,h]=z.barrier,g=groundAt(x,y).h||0;for(const o of [-2.4,0,2.4]){const bx=x-Math.sin(h)*o,by=y+Math.cos(h)*o;dBox("gateW",bx,by,g+0.55,2.1,0.25,0.06,h+Math.PI/2);dBox("cone",bx,by,g+0.85,2.1,0.12,0.07,h+Math.PI/2);dBox("gateP",bx,by,g,0.08,0.55,0.08,h)}}}
@@ -7026,7 +7069,7 @@ function rwInto(ex,ey){for(const z of RW.zones){if((z.x-ex)**2+(z.y-ey)**2>350*3
 const EV_MUL={off:0,rare:0.45,normal:1,often:2.2};
 function evStatic(kind,e,dir,s,off,o){const c=Object.assign({kind,e,dir,s,off,offT:off,v:0,v0:0,vf:1,spin:0,sig:0,head:0,jn:null,idle:0,paint:TRAFFIC_PAINTS[Math.floor(rnd()*TRAFFIC_PAINTS.length)]},o||{});carPose(c);cars.push(c);return c}
 function startEvent(type){const M=me();let made=null;if(st.aiWreck===false&&(type==="crash"||type==="aicrash"))return null;
-  const fits=(A,need2)=>A&&A.s>rStart(A.e,A.dir)+20&&A.s<A.e.L-rEnd(A.e,A.dir)-60&&(!need2||A.e.n>=2);
+  const fits=(A,need2)=>A&&A.s>rStart(A.e,A.dir)+20&&A.s<A.e.L-rEnd(A.e,A.dir)-60&&(!need2||A.e.n>=2)&&!(RW.xz&&A.e===RW.xz.e);   /* not on the freeway that has the crossover (it would block the only lane left) */
   if(type==="crash"){const A=aheadOnRoad(M,280+rnd()*260);if(!fits(A,true))return null;const lo=loOf(A.e.n),ln=(lo+(rnd()<0.5?0:1))*LANE;
     const a=evStatic("wreck",A.e,A.dir,A.s,ln,{haz:true,head:0.4}),b=evStatic("wreck",A.e,A.dir,A.s+5.6,ln+0.7,{haz:true,head:-0.6});
     const cs=[-14,-20,-26].map(d=>evStatic("cone",A.e,A.dir,A.s+d,ln+(d+26)*0.06));made={type,label:"Crash",x:a.wx,y:a.wy,t:170,items:[a,b,...cs]}}
@@ -8055,7 +8098,7 @@ function fsdDrive(dt,M,S){const prof={sloth:[0.96,1.7,1.9],chill:[1.0,2.0,1.6],s
     else if(M.e!==A.e||M.dir!==A.dir){Object.assign(A,{e:M.e,dir:M.dir,s:M.s,off:M.off,offT:clamp(Math.round(M.off/LANE),M.lo,M.hi)*LANE});fsdPlan(A)}else{A.s=M.s;A.off=M.off}
     if(A.mv){P=mvP(A);if(A.s>=P.s0-0.4)A.jn={P,d:0,mv:A.mv,j:P.j,n:A.mvNode,inLeg:A.mvLeg}}}
   // lane choice: the lane the next turn needs, passing slower cars, back to the right
-  if(!A.jn&&A.e.n>1&&!FSD.lcT){const li=laneIdx(A),dStop=P?P.s0-A.s:999;let want=0;
+  if(!A.jn&&A.e.n>1&&!FSD.lcT&&!A.rwZ){const li=laneIdx(A),dStop=P?P.s0-A.s:999;let want=0;
     if(sys.userSig&&st.signal&&!FSD.lcDoing){const w=st.signal<0?1:-1;sys.userSigT=(sys.userSigT||0)+dt;
       if(li+w<0||li+w>=A.e.n){sys.userSig=false;toast("No lane on that side")}
       else if(dStop<=SOLID_L+15){if(!sys.userSigWarn){sys.userSigWarn=1;toast("Solid lane line ahead of the junction: FSD will stay in lane")}}
@@ -8065,6 +8108,7 @@ function fsdDrive(dt,M,S){const prof={sloth:[0.96,1.7,1.9],chill:[1.0,2.0,1.6],s
     else if(st.autoLC&&dStop>150){const ld=sys.lead,slow=ld&&sys.gap<(MAD?130:70)&&ld.v<M.limit*prof[0]-(MAD?0.4:2.5);FSD.passT=slow?FSD.passT+dt:0;FSD.backT=!slow&&li>0?FSD.backT+dt:0;
       if(FSD.passT>(MAD?0.9:HUR?6:10)&&li<A.e.n-1)want=1;else if(FSD.backT>(FSD.backNeed||(FSD.backNeed=MAD?60+Math.random()*20:15+Math.random()*5))&&A.needLane===null)want=-1}
     if(want&&!FSD.lcT&&dStop>SOLID_L+15&&laneSafe(A,li+want)){FSD.lcT=MAD?0.7:3.2;FSD.lcTo=li+want;st.signal=want>0?-1:1;st.signalT=0;FSD.passT=0;FSD.backT=0;FSD.backNeed=0}}
+  if(RW.xz&&!A.jn){const o0=A.offT;rwXSteer(A,dt);if(A.offT!==o0&&A.rwZ&&Math.abs(A.offT-o0)>1){st.signal=A.offT>o0?-1:1;st.signalT=0;FSD.lcDoing=true}}   /* v361: the crossover work zone: merge over and follow the temporary path */
   if(FSD.lcT){FSD.lcT=Math.max(0,FSD.lcT-dt);if(FSD.lcT===0&&!A.jn){if(laneSafe(A,FSD.lcTo)){A.offT=laneOff(A.e,FSD.lcTo);FSD.lcDoing=true;logResult(`FSD changed lanes to the ${st.signal===-1?"left":"right"}`)}else st.signal=0}}
   if(FSD.lcDoing&&Math.abs(A.off-A.offT)<0.3){FSD.lcDoing=false;st.signal=0}
   if(!FSD.lcT&&!FSD.lcDoing&&A.mv&&!A.jn){const dS=P?P.s0-A.s:999;if(dS<60&&(A.mv.t==="L"||A.mv.t==="U"))st.signal=-1;else if(dS<60&&A.mv.t==="R")st.signal=1;else if(dS>=60&&st.signal&&!FSD.lcDoing&&!sys.userSig)st.signal=0}
@@ -8113,7 +8157,7 @@ function fsdDrive(dt,M,S){const prof={sloth:[0.96,1.7,1.9],chill:[1.0,2.0,1.6],s
     if(dd<gap+CARLEN&&!(FSD.huntV&&dd>-60)){gap=Math.max(0,dd);vL=0;sys.fsdWhy="destination"}
     if((dd<4&&car.vx<0.3||FSD.hunt===false&&dd<-60)&&!FSD.arrived){const nm=NAV.dest.name,dp=fpt(NAV.dest.e,NAV.dest.dir,NAV.dest.s,0);FSD.arrived=true;if(p2pPark(nm,dp[0],dp[1])){logResult(`FSD arrived at ${nm}`);navTo(null);st.pilot=false;fsdReset();return}toast(`You have arrived: ${NAV.dest.name}`);logResult(`FSD arrived at ${NAV.dest.name}`);navTo(null);st.pilot=false;st.acc=false;sys.hold=true;sys.holdGear="D";fsdReset();return}}
   // speed: the limit plus the profile, slower for bends and turns, IDM following
-  let vc=M.limit*prof[0]*wxSpeed();if(FSD.huntV)vc=Math.min(vc,FSD.huntV);if(FSD.emvV!=null)vc=Math.min(vc,FSD.emvV);if(FSD.over&&!FSD.over.ret)vc=Math.max(vc,FSD.over.vP);if(FSD.around||sys.fsdWhy==="going around")vc=Math.min(vc,9);for(const p of pts)if(p[3]>1e-3){const vk=Math.sqrt(prof[1]/p[3]);vc=Math.min(vc,Math.sqrt(vk*vk+3.2*p[2]))}
+  let vc=M.limit*prof[0]*wxSpeed();if(A.rwZ&&RW.xz){const P_=rwXPlan(RW.xz,A.dir,A.s,laneIdx(A));if(P_)vc=Math.min(vc,P_.v*Math.min(1.05,prof[0]))}   /* v361: the work zone's 55 */if(FSD.huntV)vc=Math.min(vc,FSD.huntV);if(FSD.emvV!=null)vc=Math.min(vc,FSD.emvV);if(FSD.over&&!FSD.over.ret)vc=Math.max(vc,FSD.over.vP);if(FSD.around||sys.fsdWhy==="going around")vc=Math.min(vc,9);for(const p of pts)if(p[3]>1e-3){const vk=Math.sqrt(prof[1]/p[3]);vc=Math.min(vc,Math.sqrt(vk*vk+3.2*p[2]))}
   const v=Math.max(car.vx,0),s0=MAD?2.0:2.6,Tg=prof[2],ss=s0+Math.max(0,v*Tg+v*(v-vL)/(2*Math.sqrt(1.8*3))),aDes=clamp((MAD?3.1:1.8)*(1-Math.pow(v/Math.max(vc,0.1),4)-Math.pow(ss/Math.max(gap,0.1),2)),-7,MAD?4.4:2);
   sys.fsdThr=aDes>=0?clamp(0.06+aDes*0.22+(vc-v)*0.02,0,MAD?1:0.85):0;sys.fsdBrk=aDes<0?clamp(-aDes/9,0,0.85):0;if(v<0.2&&(gap<6||vc<0.5))sys.fsdBrk=Math.max(sys.fsdBrk,0.35);
   // steering: pure pursuit on the planned path
@@ -11352,12 +11396,14 @@ function aebStatic(sp){const r=car.r||0,k=r/Math.max(sp,1),turn=Math.abs(r)>0.12
     if(o.z1!==undefined&&(zb<o.z0-0.6||zb>o.z1||o.z1<zb+0.3))return false;
     if(o.t==="c"){if(o.r<0.12)return false;const dx=o.x-ax,dy=o.y-ay,c=Math.cos(ps),s_=Math.sin(ps);return Math.abs(dx*c+dy*s_)<hl+o.r&&Math.abs(-dx*s_+dy*c)<hw+o.r}
     return obbSAT(ax,ay,ps,hl,hw,o.x,o.y,o.h||0,o.hl,o.hw)};
+  /* v361: on the crossover's path (or in the open side's lane), its barrier runs alongside: the swept arc of an S-bend would cross it, the road doesn't */
+  let rwOk=false;{const Z=RW.xz;if(Z&&Z.coll.length){const f=onEdgeAt(Z.e,Z.dc,car.px,car.py,false,30);if(f&&(Math.abs(f.off-rwXOff(Z,f.s))<1.6||Math.abs(-f.off-2*shiftOf(Z.e,Z.dc>0?f.s:Z.e.L-f.s)-laneOff(Z.e,0))<1.8))rwOk=true}}
   const skip=new Set();for(const o of pk)if(hitAt(car.px,car.py,p0,o))skip.add(o);for(const o of collNear(car.px,car.py))if(hitAt(car.px,car.py,p0,o))skip.add(o);   // already touching it: that's a scrape, not something to brake for
   let lastK=null,near=null;
   for(let s=0.5;s<=L;s+=s<12?0.5:1){const ps=p0+k*s,ax=Math.abs(k)>1e-4?car.px+(Math.sin(ps)-Math.sin(p0))/k:car.px+Math.cos(p0)*s,ay=Math.abs(k)>1e-4?car.py+(Math.cos(p0)-Math.cos(ps))/k:car.py+Math.sin(p0)*s;
     for(const o of pk)if(!skip.has(o)&&hitAt(ax,ay,ps,o))return {d:s,o};
     const fx=ax+Math.cos(ps)*hl,fy=ay+Math.sin(ps)*hl,ck=Math.floor(fx/COLL.C)*100003+Math.floor(fy/COLL.C);if(ck!==lastK){lastK=ck;near=collNear(fx,fy)}
-    for(const o of near)if(!skip.has(o)&&hitAt(ax,ay,ps,o))return {d:s,o}}
+    for(const o of near)if(!skip.has(o)&&!(rwOk&&o.rwX)&&hitAt(ax,ay,ps,o))return {d:s,o}}
   return null}
 function assist(dt){
   if(!st.walk){const w=inTC(car.px,car.py)?tcWhere(car.px,car.py):null,nm=w?w[3]:null;if(nm!==sys.tcSec)sys.tcSec=nm}   // no pop-up: each section has its own sign board
@@ -11503,6 +11549,7 @@ function assist(dt){
     if(was!==mph){tick(1);if(!(st.isa&&(st.acc||st.pilot)))toast(`Speed limit ${mph} mph`);logResult(`Sign recognised: ${mph} mph`)}}}
   // with no sign in view, the limit comes from the navigation map data a couple of seconds after you turn onto a road (like real speed-limit info)
   {const wz=NWZ.zone&&nwzIn(M.e,M.dir,M.s);if(wz){if(!sys.nwzOn){sys.nwzOn=true;sys.nwzPrev=sys.limit;carMsg("🚧 Work zone: right lane closed, 45 mph")}sys.limit=45}else if(sys.nwzOn){sys.nwzOn=false;sys.limit=sys.nwzPrev||M.e.lim||sys.limit}}
+  {const X=rwXFor(M);if(X){if(!sys.rwxOn){sys.rwxOn=true;sys.rwxPrev=sys.limit;carMsg("🚧 Work zone ahead: freeway crossover, 55 mph")}sys.limit=55}else if(sys.rwxOn){sys.rwxOn=false;sys.limit=sys.rwxPrev||M.e.lim||sys.limit}}
   {const zs=M.e&&M.e.sch&&schoolOn();if(zs){if(!sys.schOn){sys.schOn=true;sys.schPrev=sys.limit;carMsg("🏫 School zone: 20 mph while the lights flash")}sys.limit=20}else if(!zs&&sys.schOn){sys.schOn=false;sys.limit=sys.schPrev||M.e.lim||sys.limit}}
   if(M.e!==sys.limE){sys.limE=M.e;sys.limET=0}else if(sys.limET<99){sys.limET+=dt;if(sys.limET>2){sys.limET=99;if(M.e.lim&&(!sys.limitS||sys.limitS.e!==M.e)&&M.off<M.lEdge+1&&sys.limit!==M.e.lim){sys.limit=M.e.lim}}}
   /* v351: speed assist moves the cruise set speed on every limit change, wherever it comes from (a sign, the map data, a work zone or a school zone) */
@@ -11522,8 +11569,11 @@ function assist(dt){
   else if(sp<(TRIMS[st.trim].tjaMax?0.5:8)||st.gear!=="D"||car.offroad||sys.esa||(TRIMS[st.trim].pilotHwy&&zoneAt(M.s)==="c"))sys.pilotState="standby";
   else if(override){sys.pilotState="override";sys.pilotLC=null}
   else{
-    const lane=laneOf(M.off); let waiting=false;
-    if(!sys.pilotLC&&st.autoLC&&st.acc){   // pass slower traffic, then move back right
+    const lane=laneOf(M.off),RX=rwXFor(M); let waiting=false;
+    /* v361: the freeway crossover work zone: over into the lane that stays open (signal, wait for a gap, like a zipper merge), then the temporary path across */
+    if(RX&&RX.want!=null&&!sys.pilotLC&&!(st.signal&&st.signalT<3)){const dir=Math.sign(RX.want-lane);if(dir){if(st.signal!==(dir>0?-1:1)){st.signal=dir>0?-1:1;st.signalT=3;toast("Pilot: lane closed ahead, moving over")}
+      if(laneClearFor(S,dir,true)){sys.pilotLC={target:(lane+dir)*LANE,dir};logResult("Pilot moved over for the work zone")}else waiting=true}}
+    if(!RX&&!sys.pilotLC&&st.autoLC&&st.acc){   // pass slower traffic, then move back right
       const slow=lead&&gap<90&&lead.v<st.accSet-2.2&&lead.v>3&&!(M.sStop!==undefined&&M.sStop-M.s<150); sys.slowT=slow?(sys.slowT||0)+dt:0;   // not a queue at a light
       const rightFree=lane>M.lo&&S.list.every(t=>Math.abs(t.off-(lane-1)*LANE)>2.2||t.ds<-35||t.ds>110); sys.rightT=rightFree?(sys.rightT||0)+dt:0;
       if(sys.slowT>5&&lane<M.hi&&laneClearFor(S,1,true)&&!st.signal){st.signal=-1;st.signalT=0;sys.slowT=0;toast("Pilot: passing slower traffic")}
@@ -11535,7 +11585,7 @@ function assist(dt){
       else waiting=true}
     if(sys.pilotLC){sys.pilotState="changing";sys.pilotDelta=pathDelta(M,he,sys.pilotLC.target,0.05,1.1,0.55,0.6);
       if(Math.abs(M.off-sys.pilotLC.target)<0.25&&Math.abs(he)<0.02){sys.pilotLC=null;st.signal=0}}
-    else{sys.pilotState=waiting?"waiting":"active";sys.pilotDelta=pathDelta(M,he,lane*LANE,0.07+WB*Math.abs(M.k),0.8,0.5,0.5)}
+    else{sys.pilotState=waiting?"waiting":"active";sys.pilotDelta=RX&&RX.off!=null?pathDelta(M,he,RX.off,0.09+WB*Math.abs(M.k),1.0,0.6,0.5,RX.ff):pathDelta(M,he,lane*LANE,0.07+WB*Math.abs(M.k),0.8,0.5,0.5)}
   }
   // hands-on systems (Lane Tracing Assist): warn if your hands have been off the wheel, then switch off
   {const T=TRIMS[st.trim],handsOn=T.handsOn||(T.tjaMax&&sp>T.tjaMax);
@@ -11587,6 +11637,7 @@ function assist(dt){
     else{const Tg=(st.accClose?[0.6,1.0,1.5]:[1.0,1.5,2.1])[st.accGap-1];   /* v351: Close following shortens every gap */
       let g2=lead?gap:Infinity, vL=lead?lead.v:st.accSet;
       if(sys.red&&(sys.red.state==="red"||sys.red.d>sp*sp/6+3)&&sys.red.d-2.4<g2){g2=sys.red.d-2.4;vL=0}
+      if(st.pilot&&!sys.pilotLC){const RX=rwXFor(M);if(RX&&RX.stop!=null&&RX.stop-M.s<g2){g2=Math.max(0.05,RX.stop-M.s);vL=0}}   /* still in a closing lane: stop at its end until there's a gap */
       if(sys.stopSign&&!sys.ssGo&&sys.stopSign.d>-1&&sys.stopSign.d-1.2<g2){g2=Math.max(0.05,sys.stopSign.d-1.2);vL=0;if(sp<0.25)sys.accBrk=Math.max(sys.accBrk,0.35)}
       const ss=(st.accClose?2.2:3)+Math.max(0,sp*Tg+sp*(sp-vL)/(2*Math.sqrt(1.6*(st.accClose?3.6:3)))); const vSet=Math.min(st.accSet,curveV(M.s+sp*1.5)); const a=1.6*(1-Math.pow(Math.max(sp,0)/vSet,4)-Math.pow(ss/Math.max(g2,0.1),2));
       const aDes=clamp(a,-6,2.0); sys.accState=lead&&g2<120?"following":"set";
@@ -11594,8 +11645,8 @@ function assist(dt){
   }
 }
 // steer toward a lateral target: desired sideways speed -> desired heading -> steering angle (plus road curvature)
-function pathDelta(M,he,target,maxD,vlatMax,gain=0.9,tau=0.45){const v=Math.max(car.vx,5);
-  const vlat=clamp(gain*(target-M.off),-vlatMax,vlatMax), heDes=Math.asin(clamp(vlat/v,-0.3,0.3));
+function pathDelta(M,he,target,maxD,vlatMax,gain=0.9,tau=0.45,ff=0){const v=Math.max(car.vx,5);   /* ff: the heading the path itself takes across the lanes (the crossover) */
+  const vlat=clamp(gain*(target-M.off),-vlatMax,vlatMax), heDes=ff+Math.asin(clamp(vlat/v,-0.3,0.3));
   return clamp(WB*M.k+(heDes-he)/tau*WB/v,-maxD,maxD)}
 
 function laneClearFor(S,dir,strict){const off=(laneOf(S.M.off)+dir)*LANE;

@@ -15,5 +15,7 @@ async def main():
         d = await pg.evaluate("window.__RP2")
         open(os.path.join(ROOT, "props/rp2.json"), "w").write(d["json"])
         open(os.path.join(ROOT, "props/rp2_atlas.jpg"), "wb").write(base64.b64decode(d["jpg"].split(",", 1)[1]))
+        print(await pg.evaluate(open(os.path.join(HERE, "bake_rw.js")).read()))
+        for k, v in (await pg.evaluate("window.__RW")).items(): open(os.path.join(ROOT, f"props/{k}.json"), "w").write(__import__("json").dumps(v, separators=(",", ":")))
         print(f'rp2.json {len(d["json"]) // 1024} KB, atlas {os.path.getsize(os.path.join(ROOT, "props/rp2_atlas.jpg")) // 1024} KB', errs[:3]); await b.close()
 asyncio.run(main())
