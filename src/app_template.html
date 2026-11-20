@@ -3824,7 +3824,7 @@ function retailSites(){if(XSITES.some(S=>S.custom))return;
   XSITES.push({kind:"lot",custom:true,drive:true,x:(GAR.wEdge+GAR.x0+0.6)/2,y:GAR.cy+12,L:GAR.x0+0.6-GAR.wEdge,D:8,U:[1,0],N:[0,1],stalls:[]});
   XSITES.push({kind:"lot",custom:true,drive:true,x:(GAR.x1-0.6+GAR.eEdge)/2,y:GAR.cy-12,L:GAR.eEdge-GAR.x1+0.6,D:8,U:[1,0],N:[0,1],stalls:[]});
   for(const T of RETAIL_STN)XSITES.push({kind:"stn",custom:true,x:T.x,y:T.s*(RB0+15.5),L:40,D:30,U:[1,0],N:[0,T.s],name:T.name})}
-function groundAt(x,y){if(TUN.on&&TUN.g&&Math.abs(x-TUN.xc)<TUN.Wc+40&&y>=TUN.yc0&&y<=TUN.yc1&&!tunIn(x,y,0.3))return {h:hillZ(x,y),mu:MAP.offMu,kind:"grass"};   /* on the ridge or above the cut walls */
+function groundAt(x,y){if(typeof RWX_ON!=="undefined"&&RWX_ON.z){const g=rwXGround(x,y);if(g)return g}if(TUN.on&&TUN.g&&Math.abs(x-TUN.xc)<TUN.Wc+40&&y>=TUN.yc0&&y<=TUN.yc1&&!tunIn(x,y,0.3))return {h:hillZ(x,y),mu:MAP.offMu,kind:"grass"};   /* on the ridge or above the cut walls */
   if(TUN.on&&tunIn(x,y,0.3)){const g=groundAt0(x,y);if(g.kind==="road")return g;const zr=tunZr(y);return {h:zr,mu:Math.abs(x-TUN.xc)<TUN.tI?0.7:1.0,kind:Math.abs(x-TUN.xc)<TUN.tI?"grass":"pavement"}}if(inTC(x,y))return tcH(x,y);if(ORP.ready&&inOR(x,y))return orH(x,y,groundAt0(x,y));return groundAt0(x,y)}
 function groundAt0(x,y){
   {const S=XSITES.length&&inExtra(x,y,0);if(S)return S.kind==="stn"?G_PAD:G_LOT}
@@ -6369,6 +6369,7 @@ function updateTraffic(dt){try{sigSense(dt)}catch(e){}try{sfTick(dt)}catch(e){co
     if(c.kind==="bike"&&!c.jn){const home=bikeOff(c.e),W_=L.who,blk=W_&&W_!=="me"&&W_!=="ctrl"&&W_.kind!=="ped"&&L.gap<14&&(W_.kind==="parked"||W_.kind==="wreck"||W_.kind==="cone"||(W_.v||0)<0.5);
       if(blk&&!c.bpass){c.bwait=(c.bwait||0)+dt;const out=home+2.2;if(c.bwait>0.5&&bikeSide(c,out-c.off,-28,2,true))c.bpass=1}else if(!blk)c.bwait=0;
       if(c.bpass){c.offT=home+2.2;if(!blk&&!bikeSide(c,home-c.off,-4.5,11,false)){c.offT=home;c.bpass=0}}}
+    if(RW.xz)rwXSteer(c);
     advance(c,c.v*dt,P);
     if(!c.jn){const er=c.offT-c.off,lv=Math.min(c.passT>0?1.7:1.1,Math.max(0,c.v-0.4)*0.16+(c.v>0.4?0.12:0)),want=clamp(er*1.4,-lv,lv);   /* a car only drifts sideways while it rolls forward: no sliding across lanes while stopped at a light */c.offV=(c.offV||0)+clamp(want-(c.offV||0),-1.6*dt,1.6*dt);if(Math.abs(er)<0.02&&Math.abs(c.offV)<0.05){c.off=c.offT;c.offV=0}else c.off+=c.offV*dt;c.head=Math.atan2(c.offV,Math.max(c.v,1))*Math.min(1,c.v/3)}else c.offV=0
     // indicators for the turn ahead, lane changes on multi-lane roads
@@ -6789,6 +6790,8 @@ function rwPropsDraw(){if(!RW.pl){RW.pl=1;let i=0;const nx=()=>{if(i<RW_PROPS.le
   const e=CULL.eye,ex=e[0],ey=-e[2],night=clamp(1-(GT.D??1)*1.4,0,1),gz=(x,y)=>groundAt(x,y).h||0;
   // every cone and drum out there (road work, crash scenes, breakdowns): drawn here as the 3D model (crash-scene and breakdown cones used to be skipped, so they were invisible but still solid)
   for(const c of cars){if(c.kind!=="cone"||c.down||Math.abs(c.wx-ex)>180||Math.abs(c.wy-ey)>180)continue;const k=c.rwK||"rw_cone28",M=carMatrix(c.wx,c.wy,c.wh,c.wz||0,0,0);if(PROPS[k])propDraw(k,M,{head:0})}   // (until the model loads, coneInto draws a simple cone)
+  if(RW.xz){const Z=RW.xz;if(ex>Z.box[0]-600&&ex<Z.box[1]+600&&ey>Z.box[2]-600&&ey<Z.box[3]+600){for(const q of Z.props)if(PROPS[q.k])propDraw(q.k,carMatrix(q.x,q.y,q.h,gz(q.x,q.y),0,0),{head:0});
+      if(Z.mesh){gl.uniformMatrix4fv(U.uM,false,M4.id());gl.enable(gl.POLYGON_OFFSET_FILL);gl.polygonOffset(-1,-1);mat([0.09,0.09,0.095],null,0.2,30);draw(Z.mesh);gl.polygonOffset(0,0)}}}
   for(const z of RW.zones){if((z.x-ex)**2+(z.y-ey)**2>380*380)continue;for(const q of z.props||[])if(PROPS[q.k])propDraw(q.k,carMatrix(q.x,q.y,q.h,gz(q.x,q.y),0,0),{head:0});
     const m=z.mb;if(m&&PROPS[m.k]){const M=carMatrix(m.x,m.y,m.h,gz(m.x,m.y),0,0);propDraw(m.k,M,{head:0});const pi=Math.floor(performance.now()/2000)%2;
       if(st.mbMsg&&st.mbMsg.length)mbLed(m,M,st.mbMsg[pi%st.mbMsg.length],night);else{const pg=m.k+"_"+(1+pi);if(PROPS[pg])propDraw(pg,M,{glow:1.6+night})}}}
@@ -6855,7 +6858,50 @@ function rwTick(){if(!st.started)return;const day=GT.day||1,hr=(GT.min/60)%24,wo
     RW.zones.push({e,dir,s0,x:it[0].wx,y:it[0].wy,sign:p,label:"ROAD WORK",props:[{k:"rw_road_work",x:p[0],y:p[1],h:p[2]},side(s0-sg,"rw_lane_closed"),...crew],mb:side(s0+Lt,"rw_mb_roadwork")})}
   for(let k=0;k<1&&two.length;k++){const e=pick(two);if(RW.closed.has(e))continue;RW.closed.add(e);for(const dir of [1,-1]){const s0=rStart(e,dir)+12,it=[];for(let t=-1;t<=1;t+=1)it.push(evStatic("cone",e,dir,s0,t*LANE));RW.items.push(...it);
       const p=fpt(e,dir,s0,0),q=fpt(e,dir,s0-2,LANE*1.6),q2=fpt(e,dir,s0-6,-LANE*1.7);RW.zones.push({e,dir,s0,x:p[0],y:p[1],barrier:p,label:"ROAD CLOSED · DETOUR",props:[{k:rr()<0.5?"rw_detour_left":"rw_detour_right",x:q[0],y:q[1],h:q[2]}],mb:{k:"rw_mb_detour",x:q2[0],y:q2[1],h:q2[2]}})}}
+  try{if(RWX_TRY)rwXMake(rr)}catch(e){console.error(e)}
   try{if(NAV.dest&&NAV.place)navTo(NAV.place)}catch(e){}}
+/* v352: a freeway crossover work zone (the way US DOTs rebuild one side of an interstate: Iowa DOT 3E-3, MUTCD 6H): one carriageway is closed for
+   about a kilometre; its traffic merges into the left lane, crosses the median on a temporary paved crossover (gentle reverse curves), runs in the
+   other side's left lane with channelizer drums between the two directions, then crosses back. The open side keeps right. 55 mph through it all.
+   Positions are along the closed direction (dc); "off" is the usual lateral offset (negative = left). */
+var RWX_ON={z:false},RWX_TRY=(()=>{try{return /[?&]roadwork=crossover\b/.test(location.search)}catch(e){return false}})();   /* off until heavy traffic merges cleanly at the drum tapers */   /* groundAt runs before RW exists at start-up: it checks this var instead */
+function rwXMake(rr){RW.xz=null;RWX_ON.z=false;const C=EDGES.filter(e=>e.type==="xway"&&e.L>2400&&!e.ov&&!e.br);if(!C.length)return;const e=C[Math.floor(rr()*C.length)],dc=rr()<0.5?1:-1;
+  const Lm=320,Lx=330,Lw=900,span=250+Lm+80+2*Lx+Lw+300;
+  /* somewhere along it clear of the tunnel and of anything built over the road */
+  const okAt=s0=>{for(let s_=s0;s_<=s0+span;s_+=40){const p=eAt(e,dc>0?s_:e.L-s_);if(TUN.on&&Math.abs(p.x-TUN.xc)<TUN.Wc+60&&p.y>TUN.yc0-60&&p.y<TUN.yc1+60)return false}return true};
+  let base=-1;for(let t=0;t<12;t++){const s0=200+rr()*Math.max(0,e.L-span-400);if(okAt(s0)){base=s0;break}}if(base<0)return;
+  const sA=base,sX0=sA+Lm+80,sW0=sX0+Lx,sW1=sW0+Lw,sX1=sW1+Lx,sEnd=sX1+300;
+  const Z={e,dc,sA,Lm,Lx,sX0,sW0,sW1,sX1,sEnd,items:[],props:[]};RW.xz=Z;RWX_ON.z=true;
+  const sh=s_=>shiftOf(e,dc>0?s_:e.L-s_),own0=laneOff(e,0),far=s_=>-own0-2*sh(s_);   /* the other carriageway's left lane, in the closed side's terms */
+  const add=(k,s_,off)=>{const c=evStatic("cone",e,dc,s_,off);if(k)c.rwK=k;Z.items.push(c)};const add2=(k,s_,off)=>{const c=evStatic("cone",e,-dc,s_,off);if(k)c.rwK=k;Z.items.push(c)};
+  /* the closing taper: drums from the right edge across to the left lane line, then a line of them along it */
+  const n=e.n;for(let d=0;d<=Lm;d+=24){const f=d/Lm;add("rw_drum",sA+d,laneOff(e,n-1)+LANE/2-f*(n-1)*LANE)}
+  for(let s_=sA+Lm;s_<sW1+Lx;s_+=30)add("rw_drum",s_,own0+LANE/2+0.3);
+  /* the open side: its left lanes taper shut ahead of the shared stretch (its own direction runs the other way along the edge) */
+  {const so=e.L-sEnd-Lm;for(let d=0;d<=Lm;d+=24){const f=d/Lm;add2("rw_drum",so+d,laneOff(e,0)-LANE/2+f*(n-1)*LANE)}for(let q=so+Lm;q<e.L-sA;q+=30)add2("rw_drum",q,laneOff(e,n-1)-LANE/2-0.3)}
+  /* channelizers down the middle lane of the shared side, between the two directions */
+  for(let s_=sW0-40;s_<=sW1+40;s_+=18)add("rw_drum",s_,far(s_)+LANE);
+  RW.items.push(...Z.items);
+  /* the closed side: the crew paving it */
+  const mk=(s_,k)=>{const q=fpt(e,dc,s_,laneOff(e,1));Z.props.push({k,x:q[0],y:q[1],h:q[2]})};mk(sW0+300,"rwv_asphalt_paver");mk(sW0+318,"rwv_tandem_road_roller");mk(sW0+520,"rwv_dump_truck");mk(sW0+700,"rwv_wheel_loader");
+  {const q=fpt(e,dc,sA-500,laneOff(e,n-1)+LANE/2+3);Z.props.push({k:"rw_road_work",x:q[0],y:q[1],h:q[2]});const q2=fpt(e,dc,sA-150,laneOff(e,n-1)+LANE/2+3);Z.props.push({k:"rw_mb_roadwork",x:q2[0],y:q2[1],h:q2[2]})}
+  {const q=fpt(e,-dc,e.L-sEnd-400,laneOff(e,n-1)+LANE/2+3);Z.props.push({k:"rw_road_work",x:q[0],y:q[1],h:q[2]})}
+  /* the crossover pavement: two strips across the median along the crossing paths */
+  const B={P:[],N:[],I:[]};const strip=(s0_,s1_)=>{for(let s_=s0_;s_<s1_;s_+=6){const o0=rwXOff(Z,s_),o1=rwXOff(Z,s_+6);const a=fpt(e,dc,s_,o0-2.6),b=fpt(e,dc,s_,o0+2.6),c=fpt(e,dc,s_+6,o1-2.6),d=fpt(e,dc,s_+6,o1+2.6),z=(e.hz?ez(e,dc>0?s_:e.L-s_):0)+0.03;
+      const k=B.P.length/3;B.P.push(a[0],z,-a[1],b[0],z,-b[1],c[0],z,-c[1],d[0],z,-d[1]);B.N.push(0,1,0,0,1,0,0,1,0,0,1,0);B.I.push(k,k+1,k+2,k+1,k+3,k+2,k,k+2,k+1,k+1,k+2,k+3)}};
+  strip(sX0-10,sW0+10);strip(sW1-10,sX1+10);Z.mesh=B.P.length?meshFrom(B.P,B.N,B.I):null;Z.box=[Math.min(e.a.x,e.b.x)-60,Math.max(e.a.x,e.b.x)+60,Math.min(e.a.y,e.b.y)-60,Math.max(e.a.y,e.b.y)+60]}
+/* where a closed-side car runs: its own left lane, an S-curve over to the other side's left lane, along it, and back */
+function rwXOff(Z,s_){const e=Z.e,own0=laneOff(e,0),sh=q=>shiftOf(e,Z.dc>0?q:e.L-q),far=q=>-own0-2*sh(q),S=t=>t*t*(3-2*t);
+  if(s_<Z.sX0)return own0;if(s_<Z.sW0)return own0+(far(s_)-own0)*S((s_-Z.sX0)/Z.Lx);if(s_<Z.sW1)return far(s_);if(s_<Z.sX1)return far(s_)+(own0-far(s_))*S((s_-Z.sW1)/Z.Lx);return own0}
+/* every car on the zone's edge: the closed side follows the crossover, the open side keeps right; both at 55 mph or less */
+function rwXSteer(c){const Z=RW.xz;if(!Z||c.e!==Z.e||c.jn||c.kind!=="ai")return;const e=Z.e;
+  /* the signs start 1 km out: traffic moves over in good time (a car only drifts across at a lane's width every few seconds) */
+  if(c.dir===Z.dc){const s_=c.s;if(s_<Z.sA-1100||s_>Z.sEnd)return;c.v0=Math.min(c.v0,s_<Z.sA-500?29:24.6);
+    /* the drums close the other lanes and traffic merges the usual way (gap by gap); from the crossover on, the left-lane cars follow it */
+    if(s_>=Z.sX0&&laneIdx(c)===0){const o=rwXOff(Z,s_);c.off=o;c.offT=o;c.offV=0}}
+  else{const s_=e.L-c.s;if(s_<Z.sA-300||s_>Z.sEnd+1100)return;c.v0=Math.min(c.v0,s_>Z.sEnd+500?29:24.6)}}
+function rwXGround(x,y){const Z=RW&&RW.xz;if(!Z||!Z.mesh||x<Z.box[0]||x>Z.box[1]||y<Z.box[2]||y>Z.box[3])return null;const e=Z.e,pp=eProj(e,x,y);if(pp.u<0||pp.u>e.L)return null;
+  const s_=Z.dc>0?pp.u:e.L-pp.u;if(!(s_>Z.sX0-10&&s_<Z.sW0+10||s_>Z.sW1-10&&s_<Z.sX1+10))return null;const q=fpt(e,Z.dc,s_,rwXOff(Z,s_));if(Math.hypot(q[0]-x,q[1]-y)>2.8)return null;return {h:ez(e,pp.u),mu:1.1,kind:"road"}}
 function rwInto(ex,ey){for(const z of RW.zones){if((z.x-ex)**2+(z.y-ey)**2>350*350)continue;
     if(z.sign&&!PROPS.rw_road_work){const [x,y,h]=z.sign,g=groundAt(x,y).h||0;dBox("gateP",x,y,g,0.08,1.6,0.08,h);dBox("cone",x,y,g+1.25,0.9,0.9,0.05,h+0.785)}
     if(z.barrier){const [x,y,h]=z.barrier,g=groundAt(x,y).h||0;for(const o of [-2.4,0,2.4]){const bx=x-Math.sin(h)*o,by=y+Math.cos(h)*o;dBox("gateW",bx,by,g+0.55,2.1,0.25,0.06,h+Math.PI/2);dBox("cone",bx,by,g+0.85,2.1,0.12,0.07,h+Math.PI/2);dBox("gateP",bx,by,g,0.08,0.55,0.08,h)}}}
