@@ -57,11 +57,11 @@ It is a silent change: nothing about it goes in the changelog.
   Remaining: ~770 overlap samples / 5 min in very heavy traffic at the start of the drum taper.
 
 ## Next (asked for: "all of it")
-1. Kit merges on the old freeway: at each merge node on an `xway` edge, find which carriageway the ramp belongs to (the ramp is on its
-   right); if the freeway is within ~3° of straight over the piece length, place `fwy3g_exit_336` (ramp leaves) or `fwy3g_entrance_432`
-   (ramp joins) on that carriageway (origin on the centre line shifted 1.85 m right, like the carriageway straights) so its `ramp`
-   connector (local 36.4, 0, -336 / 0) lands on the old ramp where the ramp is 38.25 m from the centre line; drop the carriageway straights
-   whose midpoints fall inside the piece and the ramp straights before the connector. Curved stretches keep today's look.
+1. DONE v35.7: kit merges on the old freeway. The game reshapes each straight-freeway exit / entrance ramp to the kit piece
+   (`kitMerges`: hidden diagonal off the centre line, the kit's parallel lane and S-shaped split (`KMD`), a bend onto the old ramp; the
+   piece is cut shorter (k 0.42-1) where the ramp is short) and holds the ramp level with the freeway along it (`e.kmH`, zfx). `kitMrgOut`
+   lists the ones that fit (level or evenly graded), `tools/export_net.js` exports them as `M`, `oldmap.py` places them and cuts the
+   carriageway / ramp straights around them. 29 of 35 placed; the rest sit on uneven grades (cut, I-61 bridge).
 2. The I-38/I-61 interchange from a kit interchange piece (`ix01_full_cloverleaf`, `ix05_stack_four_level`, …): replace the old cloverleaf's
    edges in `buildNet2` with the kit piece's ramps (derive lane paths from the piece mesh or author them along its ramps), line I-38 and I-61
    up to its eight joints, rebuild AI routes / GPS there, keep `tfw.js` and `tai.js` clean.
