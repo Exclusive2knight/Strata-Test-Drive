@@ -1,0 +1,5 @@
+(async()=>{setTrim("camry25",true);st.started=true;resetCar({free:true,x:-2300+60,y:-1500+60,h:0});st.power=true;st.gear="P";car.vx=0;cars=[];spawnTraffic(170);
+ const F=EDGES.filter(e=>e.fly&&/^I-(38|61) [EWNS] to I-(38|61) [EWNS]$/.test(e.name)),seen=new Map(F.map(e=>[e,new Set()])),O=EDGES.filter(e=>e.type==="ramp"&&!e.fly&&F.some(f=>f.a===e.b||f.a===e.a)),so=new Map(O.map(e=>[e,new Set()]));let stuck=new Set(),over=0;
+ for(let k=0;k<1500;k++){SIMSTEP(0.1);for(const c of cars){if(c.kind!=="ai")continue;if(seen.has(c.e))seen.get(c.e).add(c);if(so.has(c.e))so.get(c.e).add(c);if(c.idle>40&&(seen.has(c.e)||so.has(c.e)))stuck.add(c.e.name+"@"+(c.s|0))}
+  if(k%10===0){const A=cars.filter(c=>c.kind==="ai"&&(seen.has(c.e)||so.has(c.e)));for(let i=0;i<A.length;i++)for(let j=i+1;j<A.length;j++){const a=A[i],b=A[j];if(Math.abs((a.wz||0)-(b.wz||0))<2&&obbSAT(a.wx,a.wy,a.wh,2.2,0.85,b.wx,b.wy,b.wh,2.2,0.85))over++}}}
+ return [...seen].map(([e,s])=>e.name+" (flyover): "+s.size).concat([...so].map(([e,s])=>e.name+" ("+(e.b&&F.some(f=>f.a===e.b)?"to split":"after split")+"): "+s.size)).join("\n")+"\nstuck "+[...stuck].join(", ")+"\noverlap samples "+over})()

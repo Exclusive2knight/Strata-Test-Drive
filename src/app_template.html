@@ -3225,16 +3225,42 @@ function buildNet2(){
   // ---- I-61's climb over I-38 (a smooth profile on each of its edges near the crossing)
   for(const e of EDGES)if(e.name==="I-61"&&Math.abs(e.a.x-ccx)<1&&Math.abs(e.b.x-ccx)<1&&Math.min(Math.abs(e.a.y-ccy),Math.abs(e.b.y-ccy))<500)e.zo=u=>zB(eAt(e,u).y-ccy);
   W2C.zB=zB;
-  if(KITOLD)kitMerges();
+  if(KITOLD){kitMerges();stackSplit()}
 }
+/* v362: in the stack each left-turn flyover used to leave the freeway 150 m after the right-turn exit, right through that exit's
+   deceleration lane and split: two exits on top of each other. Real stacks (and the design manuals: one exit, lanes added one at a time)
+   have ONE exit for both turns that splits once it is clear of the freeway. So the flyover now branches off the right-turn ramp where the kit
+   exit piece's lane ends (38 m out from the centre line): left a lane for the flyover, the right-turn ramp curving away to the right */
+function stackSplit(){
+  for(const f of EDGES.filter(e=>e.fly&&e.type==="ramp"&&/^I-(38|61) [EWNS] to I-(38|61) [EWNS]$/.test(e.name))){
+    const A=f.a;if(!A.E.some(q=>q.e.type==="xway"))continue;const pre=f.name.split(" to ")[0]+" to ";
+    const o=EDGES.find(e=>e!==f&&e.type==="ramp"&&!e.fly&&e.name.startsWith(pre)&&Math.hypot(e.a.x-A.x,e.a.y-A.y)<400&&KIT_MRG.some(k=>k.ch[0]===e));if(!o)continue;
+    const P=o.pts0,n0=o.a,fv=[P[2][0]-P[1][0],P[2][1]-P[1][1]],fl=Math.hypot(...fv);if(fl<1)continue;const F=[fv[0]/fl,fv[1]/fl];
+    const lat0=p=>(p[0]-n0.x)*-F[1]+(p[1]-n0.y)*F[0],sg=Math.sign(lat0(P[3]))||1,nrm=[-F[1]*sg,F[0]*sg],lat=p=>(p[0]-n0.x)*nrm[0]+(p[1]-n0.y)*nrm[1],al=p=>(p[0]-n0.x)*F[0]+(p[1]-n0.y)*F[1];
+    const iV=P.findIndex((p,i)=>i>1&&lat(p)>38);if(iV<0||iV>=P.length-1)continue;const V=P[iV].slice(0,2),bV=al(V);
+    /* the flyover's own line from where it ran alongside (its 5th point turns it across the freeways) */
+    const Q=f.pts0;if(Q.length<6)continue;const k4=4,L4=lat(Q[k4]);const sh=34.6-L4;
+    const M=[Math.round((V[0]+F[0]*60-nrm[0]*3.6)*100)/100,Math.round((V[1]+F[1]*60-nrm[1]*3.6)*100)/100,250];
+    const Q4=[Math.round((Q[k4][0]+nrm[0]*sh)*100)/100,Math.round((Q[k4][1]+nrm[1]*sh)*100)/100,Q[k4][2]||150];
+    const NQ=[V,M,Q4,...Q.slice(k4+1).map(p=>p.slice())];
+    const off=al(V)-al(f.pts0[0]);if(!(off>40))continue;   /* how much later the flyover now starts (its climb is kept where it was) */
+    /* split the right-turn ramp at V */
+    const Nv=N(V[0],V[1],{ctrl:"merge"}),B=o.b,rest=P.slice(iV).map(p=>p.slice());rest[0]=V.slice();
+    o.pts0=P.slice(0,iV+1).map(p=>p.slice());o.pts0[iV]=V.slice();{const G=geom(o.pts0);o.S=G.S;o.L=G.L}o.b=Nv;
+    B.E=B.E.filter(q=>q.e!==o);Nv.E.push({e:o,end:1});if(o.kmH)o.kmH=[0,o.L];
+    const o2=E("ramp",o.name,rest,{lim:o.lim,rank:o.rank});o2.kmH=[0,Math.min(o2.L,30)];
+    /* the flyover starts there */
+    A.E=A.E.filter(q=>q.e!==f);f.a=Nv;Nv.E.push({e:f,end:0});f.pts0=NQ.map(p=>p.slice());const L0=f.L;{const G=geom(NQ);f.S=G.S;f.L=G.L}
+    const z0=f.zo,dL=L0-f.L;if(z0)f.zo=function(u){return z0.call({L:this.L+dL},u+dL)}}}
 /* v357: under the kit roads a freeway exit or entrance is the kit's own merge piece (fwy3g_exit_336 / fwy3g_entrance_432, cut shorter
    where the ramp is short). The ramp's line is reshaped to the piece so traffic drives on its paint: the parallel lane beside the freeway,
    then the kit's S-shaped split out to 38.2 m from the centre line, then a bend onto the old ramp. KMD: the split, [m along, m from centre] */
 const KIT_MRG=[],KMD=[[0,23.55],[12,24.24],[24,25.14],[36,26.3],[48,27.67],[60,29.18],[72,30.75],[84,32.34],[96,33.85],[108,35.24],[120,36.44],[132,37.38],[144,37.98],[156,38.2]];
+const KMW=[];   /* why a ramp got no kit merge piece (debug) */
 function kitMerges(){const XW=EDGES.filter(e=>e.type==="xway");
   const offFw=(x,y)=>{let b=1e9;for(const f of XW){if(Math.min(Math.hypot(f.a.x-x,f.a.y-y),Math.hypot(f.b.x-x,f.b.y-y))>f.L+60)continue;const p=eProj(f,x,y);if(p.u<-0.5||p.u>f.L+0.5)continue;b=Math.min(b,p.d)}return b};
   for(const n of NODES){if(n.E.filter(q=>q.e.type==="xway").length<2)continue;
-    for(const q0 of n.E){if(q0.e.type!=="ramp"||!q0.e.pts0)continue;const exit=q0.end===0;
+    for(const q0 of n.E){if(q0.e.type!=="ramp"||!q0.e.pts0){KMW.push([q0.e.name,1]);continue};const exit=q0.end===0;
       /* the ramp outward from the freeway, through any plain joints, as one line */
       const ch=[];let q=q0,tot=0;for(;;){ch.push(q);tot+=q.e.L;const far=q.end===0?q.e.b:q.e.a;if(tot>320||far.E.length!==2||far.ctrl)break;const nx=far.E.find(o=>o.e!==q.e);if(!nx||nx.e.type!=="ramp"||!nx.e.pts0||(nx.end===0)!==exit)break;q=nx}
       const W=[],J=[0];for(const c of ch){let P=c.e.pts0.map(p=>p.slice());if(c.end===1)P.reverse();if(W.length)P.shift();for(const p of P)W.push(p);J.push(W.length-1)}
@@ -3242,30 +3268,30 @@ function kitMerges(){const XW=EDGES.filter(e=>e.type==="xway");
       const far3=W[Math.min(2,W.length-1)];if((far3[0]-n.x)*f[0]+(far3[1]-n.y)*f[1]<0)f=[-f[0],-f[1]];
       let lt=[-f[1],f[0]];if((far3[0]-n.x)*lt[0]+(far3[1]-n.y)*lt[1]<0)lt=[-lt[0],-lt[1]];
       /* right-hand traffic: the ramp is on the right of the carriageway it leaves or joins */
-      const tr=exit?f:[-f[0],-f[1]];if(Math.abs(tr[1]-lt[0])+Math.abs(-tr[0]-lt[1])>0.01)continue;
+      const tr=exit?f:[-f[0],-f[1]];if(Math.abs(tr[1]-lt[0])+Math.abs(-tr[0]-lt[1])>0.01){KMW.push([q0.e.name,2]);continue};
       const A=W.map(p=>[(p[0]-n.x)*f[0]+(p[1]-n.y)*f[1],(p[0]-n.x)*lt[0]+(p[1]-n.y)*lt[1]]);
       let j=0;for(let i=1;i<A.length&&A[i][1]<=26.5&&A[i][0]>A[i-1][0];i++)j=i;
-      if(j<1||A[j][1]<21.5||j+1>=A.length)continue;const Q=A[j+1];if(Q[1]<30)continue;
+      if(j<1||A[j][1]<21.5||j+1>=A.length){KMW.push([q0.e.name,3]);continue};const Q=A[j+1];if(Q[1]<30){KMW.push([q0.e.name,4]);continue};
       /* the split ends as far out as the bend onto the rest of the ramp allows (a longer split is a gentler S: traffic keeps its speed through it) */
       /* the bend onto the rest of the ramp: a corner (radius 50) far enough past the piece's end for the bend to fit, either way (a flyover alongside sits nearer) */
       const Qr=W[j+1][2]||0,Nx=A[j+2],gap=C_=>{let g=20;for(let it=0;it<3;it++){const an=Math.atan2(Q[1]-38.2,Q[0]-C_-g);g=Math.max(20,50*Math.tan(Math.abs(an)/2)+2)}return g},
         fits=C_=>{const g=gap(C_),ax=C_+g,an=Math.atan2(Q[1]-38.2,Q[0]-ax);if(Math.abs(an)>1.15||Q[0]-ax<10)return false;const tC=50*Math.tan(Math.abs(an)/2);if(tC>g-1)return false;
         let tQ=0;if(Nx&&Qr){const an2=Math.atan2(Nx[1]-Q[1],Nx[0]-Q[0]);tQ=Qr*Math.tan(Math.abs(wrapPi(an2-an))/2);if(tQ>Math.hypot(Nx[0]-Q[0],Nx[1]-Q[1])-1)return false}
         return Math.hypot(Q[0]-ax,Q[1]-38.2)>=tC+tQ+2};
-      let Cc=A[j][0]-25;if(!fits(Cc))continue;for(let c_=Cc+5;c_<=A[j][0]+80&&fits(c_);c_+=5)Cc=c_;
-      const k=clamp((Cc-40)/156,0.35,1),D0=Cc-156*k;if(D0<25)continue;const Cg=gap(Cc);
+      let Cc=A[j][0]-25;if(!fits(Cc)){KMW.push([q0.e.name,5]);continue};for(let c_=Cc+5;c_<=A[j][0]+80&&fits(c_);c_+=5)Cc=c_;
+      const k=clamp((Cc-40)/156,0.35,1),D0=Cc-156*k;if(D0<25){KMW.push([q0.e.name,6]);continue};const Cg=gap(Cc);
       const Lp=(exit?336:432)*k,s0=exit?Cc-Lp:Cc-Lp;   /* the piece runs along [Cc-Lp, Cc] from the node, either way */
       let ok=true;for(let a=s0-10;a<=Cc+25&&ok;a+=12)if(offFw(n.x+f[0]*a,n.y+f[1]*a)>0.35)ok=false;   /* the freeway runs straight beside it */
-      if(!ok)continue;
-      if(KIT_MRG.some(o=>o.f[0]*f[0]+o.f[1]*f[1]>0.99&&o.lt[0]*lt[0]+o.lt[1]*lt[1]>0.99&&Math.abs((n.x-o.nx)*lt[0]+(n.y-o.ny)*lt[1])<5&&(()=>{const d=(n.x-o.nx)*f[0]+(n.y-o.ny)*f[1];return d+Cc>o.s0-20&&d+s0<o.Cc+20})()))continue;   /* not over another one */
+      if(!ok){KMW.push([q0.e.name,7]);continue};
+      if(KIT_MRG.some(o=>o.f[0]*f[0]+o.f[1]*f[1]>0.99&&o.lt[0]*lt[0]+o.lt[1]*lt[1]>0.99&&Math.abs((n.x-o.nx)*lt[0]+(n.y-o.ny)*lt[1])<5&&(()=>{const d=(n.x-o.nx)*f[0]+(n.y-o.ny)*f[1];return d+Cc>o.s0-20&&d+s0<o.Cc+20})())){KMW.push([q0.e.name,8]);continue};   /* not over another one */
       /* the new line, in (along, across) from the node: hidden diagonal off the centre line (cars change onto it from the right lane), the split, a bend onto the old ramp */
       /* a plain joint in the replaced stretch moves to where the split starts (beside the lanes, not across them: traffic merges from there) */
-      const Vd=[Math.max(D0*0.6,D0-40),23.55],V=[[0,0],Vd],nj=J.filter(i=>i>0&&i<=j).length;if(nj>3)continue;
+      const Vd=[Math.max(D0*0.6,D0-40),23.55],V=[[0,0],Vd],nj=J.filter(i=>i>0&&i<=j).length;if(nj>3){KMW.push([q0.e.name,9]);continue};
       for(const [s,t] of KMD)V.push([D0+s*k,t]);V.push([Cc+Cg,38.2,50]);
       const keep=W.slice(j+1),Jn=[0];for(let i=1;i<=nj;i++)Jn.push(1+i);
       const W2=V.map(([a,t,r])=>{const p=[Math.round((n.x+f[0]*a+lt[0]*t)*100)/100,Math.round((n.y+f[1]*a+lt[1]*t)*100)/100];if(r)p.push(r);return p}).concat(keep);
       for(const i of J)if(i>j)Jn.push(i-(j+1)+V.length);
-      if(Jn.length!==J.length)continue;
+      if(Jn.length!==J.length){KMW.push([q0.e.name,10]);continue};
       ch.forEach((c,ci)=>{let P=W2.slice(Jn[ci],Jn[ci+1]+1).map(p=>p.slice());P[0]=P[0].slice(0,2);P[P.length-1]=P[P.length-1].slice(0,2);if(c.end===1)P.reverse();
         const far=c.end===0?c.e.b:c.e.a;if(ci<ch.length-1){const pe=W2[Jn[ci+1]];far.x=pe[0];far.y=pe[1]}
         c.e.pts0=P;const G=geom(P);c.e.S=G.S;c.e.L=G.L});
