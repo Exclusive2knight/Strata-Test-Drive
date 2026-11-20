@@ -12,7 +12,7 @@ SEG = 16.0          # metres per piece: short enough that a bent straight follow
 
 def head(a, b): return math.degrees(math.atan2(b[0] - a[0], b[1] - a[1])) % 360
 
-def follow(P, base, side=0.0, flat=(0, 0), dw=0.0):
+def follow(P, base, side=0.0, flat=(0, 0), dw=0.0, tag=""):
     """kit pieces along polyline P (x, y, z), each placed on its own sample point and tangent and bent to reach the next one
     (no chaining, so nothing drifts); side shifts the pieces right of the line (the freeway carriageways)"""
     if len(P) < 2: return
@@ -46,7 +46,8 @@ def follow(P, base, side=0.0, flat=(0, 0), dw=0.0):
         nm = f"{base}@{Lp:.3f}" + (f"~{R:.2f}" if R and abs(R) < 20000 else "") + (f"^{dz:.3f}" if abs(dz) > 0.005 else "")
         dd = L * (k - 1) / n
         if abs(dw) > 0.05: nm += f"%{dw:.2f}"                   # kerb moved out (or in) to the road's own kerb line
-        if dd < flat[0] or dd > L - flat[1] - SEG: nm += "!f"
+        if tag: nm += tag                                         # e.g. "!p": a flyover deck without the kit's own pier (the game builds the piers)
+        elif dd < flat[0] or dd > L - flat[1] - SEG: nm += "!f"
         K.start(nm, A[0], A[1], hc, A[2])
 
 def part(e):
@@ -175,6 +176,20 @@ for e in NET["E"]:
             for sub in mcut(P, "c"): follow(sub, base, side=1.85, flat=fl(sub, FL))
             R_ = P[::-1]
             for sub in mcut(R_, "c"): follow(sub, base, side=1.85, flat=(FL[1] if sub[0] == R_[0] else 0, FL[0] if sub[-1] == R_[-1] else 0))
+        elif e.get("fly") and e.get("G"):
+            # a flyover: where it is up in the air (over 2.5 m above the ground) it is the kit's flyover deck, no grass verges
+            EP, G = e["P"], e["G"]
+            gz = lambda q: G[min(range(len(EP)), key=lambda i: (EP[i][0] - q[0]) ** 2 + (EP[i][1] - q[1]) ** 2)]
+            for sub in mcut(P, "r"):
+                runs, cur, up0 = [], [], None
+                for q in sub:
+                    up = q[2] - gz(q) > 2.5
+                    if up0 is not None and up != up0: runs.append((up0, cur)); cur = [cur[-1]]
+                    cur.append(q); up0 = up
+                if len(cur) > 1: runs.append((up0, cur))
+                for up, r in runs:
+                    if up: follow(r, "ramp1_flyover_st48", tag="!p")
+                    else: follow(r, base)
         else:
             subs = mcut(P, "r")
             cut = len(subs) != 1 or len(subs[0]) != len(P)

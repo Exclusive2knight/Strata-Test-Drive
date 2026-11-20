@@ -64,6 +64,8 @@ class Kit:
         if "%" in name:                       # kerb moved sideways: same joints
             i = name.index("%"); rest = name[i + 1:]; tail = "!f" if rest.endswith("!f") else ""
             v = dict(self.piece(name[:i] + tail)); v["name"] = name; self.man[name] = v; return v
+        if name.endswith("!p"):            # flyover deck without its pier: same joints
+            v = dict(self.piece(name[:-2])); v["name"] = name; self.man[name] = v; return v
         if name.endswith("!f"):            # no kerb / sidewalk: same joints as the full piece
             v = dict(self.piece(name[:-2])); v["name"] = name; v["flat"] = True; self.man[name] = v; return v
         base, L = name.split("@"); R = 0.0; dz = 0.0
