@@ -13535,11 +13535,15 @@ function rectFree(k,x,y,a){const R=fpRect(k,x,y,a,0.05),f=W2_FP[k],r0=Math.hypot
    where the next pick doesn't fit (a cross street, a driveway, the park) a narrower one is tried before stepping on */
 /* v340: does a footprint (its corners) overlap the Fort St parking garage? Corner checks alone let a building bigger than the garage swallow it */
 function garHit(cs){const xs=cs.map(p=>p[0]),ys=cs.map(p=>p[1]);return Math.min(...xs)<GAR.x1+8&&Math.max(...xs)>GAR.x0-8&&Math.min(...ys)<GAR.y1+4&&Math.max(...ys)>GAR.y0-8}
-function streetWall(e,pickK,ok){const W=hwOf(e),walk=e.T.walk||0,k0=kerbTrim(e,0)+walk+0.6,k1=e.L-kerbTrim(e,1)-walk-0.6;if(k1-k0<10)return;
+const CORNERS={b:0,t:0};
+function streetWall(e,pickK,ok){const W=hwOf(e),walk=e.T.walk||0,
+    /* v365: start right at the corner (just past the cross street and its sidewalk) instead of a full kerb radius back; each building's corners and edge midpoints still have to clear the kerb as it sweeps round, so the corners fill up instead of being empty squares */
+    near=(n,end)=>{let c=0;for(const l of (n.legs||[]))if(l.e!==e)c=Math.max(c,hwOf(l.e)+(l.e.T.walk||0));return c>0?Math.min(kerbTrim(e,end),c-W*0+0.6):kerbTrim(e,end)},
+    k0=near(e.a,0)+walk+0.6,k1=e.L-near(e.b,1)-walk-0.6;if(k1-k0<10)return;
   const NARROW=/lk_Town_/.test(pickK(e,k0,1))?["lk_Town_MainSt_B_TanBrick_2F","lk_Town_Shop_Barber_2F","lk_Town_Shop_IceCream_1F"]:["lk_walkup","lk_brown","lk_market"];
   for(const sd of [1,-1]){let u=k0;while(u<k1-10){let put=false;const first=pickK(e,u,sd);
       for(const k of [first,...NARROW.filter(n=>n!==first)]){if(!W2_FP[k])continue;const f=W2_FP[k],w=f[1]-f[0];if(u+w>k1)continue;const uc=u+w/2,back=W+walk+0.3+f[3],p=ePt(e,uc,sd*back),rp=ePt(e,uc,0),a=Math.atan2(rp[1]-p[1],rp[0]-p[0]);
-        const cx=p[0]+Math.cos(a)*(-(f[3]+f[2])/2)*0,cs=fpRect(k,p[0],p[1],a,0);if(!cs.every(c=>ok(c[0],c[1],e)))continue;if(garHit(cs))continue;if(!rectFree(k,p[0],p[1],a))continue;void cx;
+        const cx=p[0]+Math.cos(a)*(-(f[3]+f[2])/2)*0,cs=fpRect(k,p[0],p[1],a,0);if(!cs.every(c=>ok(c[0],c[1],e)))continue;if(!cs.every((c,i)=>{const d=cs[(i+1)%4];return ok((c[0]+d[0])/2,(c[1]+d[1])/2,e)})||!ok((cs[0][0]+cs[2][0])/2,(cs[0][1]+cs[2][1])/2,e))continue;if(garHit(cs))continue;if(!rectFree(k,p[0],p[1],a))continue;void cx;
         w2Put(k,p[0],p[1],a);u+=w+0.2;put=true;break}
       if(!put)u+=2}}}
 
@@ -13707,7 +13711,26 @@ if(!rectFree(k,x,y,fa))return false;w2Put(k,x,y,fa,0);return true};
   if(W2){const c0=main?[-925,0]:[(X0+X1)/2,(Y0+Y1)/2],cR=main?330:220;let nS=0;
     /* street walls first: every street in the block, towers in the core (up to 10), offices and glass round them, walk-ups, brownstones, markets and shop rows further out */
     const pk=(e,u,sd)=>{const p=ePt(e,u,sd*20),cd=Math.hypot(p[0]-c0[0],p[1]-c0[1])/cR;if(main&&cd<0.85&&r()<0.5){const q=LK_SKY.filter(k=>!LK.used[k]);if(q.length)return pick(q)}if(main&&cd>0.5&&cd<1.6&&r()<0.12){const q=LK_LMK.filter(k=>!LK.used[k]);if(q.length)return q[0]}if(!main)return pick(LK_TOWN);if(cd<1.0)return pick(r()<0.7?LK_MID:LK_LOW);if(cd<1.5&&r()<0.3)return pick(LK_MID);return pick(LK_LOW)};   /* v333 zoning: towers and mid-rises only in downtown Westport; the other blocks stay 2-4 storeys */
-    for(const e of EDGES){if(!e.T.walk||e.type==="res")continue;const m=eAt(e,e.L/2);if(m.x<X0||m.x>X1||m.y<Y0||m.y>Y1)continue;streetWall(e,pk,okD)}}
+    for(const e of EDGES){if(!e.T.walk||e.type==="res")continue;const m=eAt(e,e.L/2);if(m.x<X0||m.x>X1||m.y<Y0||m.y>Y1)continue;streetWall(e,pk,okD)}
+    /* v365: the corners. The street walls stop short of each junction, so every downtown corner was an empty square of concrete.
+       Now each corner between two square-on streets gets a corner building (front on one street, its side on the back of the other
+       street's sidewalk), the biggest one that fits; where none fits, a little corner plaza with trees */
+    {const CAND=[...new Set([...LK_LOW,...LK_TOWN,"lk_Town_MainSt_B_TanBrick_2F","lk_Town_Shop_Barber_2F","lk_Town_Shop_IceCream_1F",...(main?["lk_office","lk_glass","lk_apts"]:[])])].filter(k=>W2_FP[k]).sort((a,b)=>(W2_FP[b][1]-W2_FP[b][0])*(W2_FP[b][3]-W2_FP[b][2])-(W2_FP[a][1]-W2_FP[a][0])*(W2_FP[a][3]-W2_FP[a][2]));
+     for(const n of NODES){if(!n.legs||n.legs.length<2||n.x<X0||n.x>X1||n.y<Y0||n.y>Y1)continue;const L=n.legs.filter(l=>l.e.T.walk&&l.e.type!=="res"&&!/xway|ramp|rbt/.test(l.e.type)).sort((a,b)=>a.h-b.h);if(L.length<2)continue;
+      for(let i=0;i<L.length;i++){const A=L[i],Bq=L[(i+1)%L.length];if(L.length===2&&i===1)break;let gap=Bq.h-A.h;if(gap<=0)gap+=2*Math.PI;if(gap<Math.PI*0.42||gap>Math.PI*0.58)continue;
+        const ua=[Math.cos(A.h),Math.sin(A.h)],ub=[Math.cos(Bq.h),Math.sin(Bq.h)],dA=hwOf(A.e)+(A.e.T.walk||0)+0.3,dB=hwOf(Bq.e)+(Bq.e.T.walk||0)+0.3;let put=false;
+        for(const [F,G,dF,dG] of (r()<0.5?[[A,Bq,dA,dB],[Bq,A,dB,dA]]:[[Bq,A,dB,dA],[A,Bq,dA,dB]])){if(put)break;const uf=F===A?ua:ub,ug=F===A?ub:ua,a=Math.atan2(-ug[1],-ug[0]),lx=[-Math.sin(a),Math.cos(a)],pos=lx[0]*uf[0]+lx[1]*uf[1]>0;
+          /* the kerb sweeps round the corner on a wide radius, so a square-cornered building steps back off the corner (a little corner plaza in front) until it clears the walk */
+          for(const k of CAND){if(put)break;const f=W2_FP[k];for(const st_ of [0,1.5,3,4.5,6,8,10]){const along=(pos?dG-f[0]:dG+f[1])+st_*0.6,back=dF+f[3]+st_*0.25,x=n.x+uf[0]*along+ug[0]*back,y=n.y+uf[1]*along+ug[1]*back,cs=fpRect(k,x,y,a,0);
+            if(!cs.every(c=>okD(c[0],c[1])))continue;if(garHit(cs)||!rectFree(k,x,y,a))break;w2Put(k,x,y,a);put=true;CORNERS.b++;
+            const cx=n.x+(ua[0]+ub[0])*0.5*(dA+dB)*0.5+(ua[0]+ub[0])*2.5,cy=n.y+(ua[1]+ub[1])*0.5*(dA+dB)*0.5+(ua[1]+ub[1])*2.5;void cx;void cy;break}}}
+        /* whatever concrete is left on the corner becomes a small plaza: trees in planters and benches, never on the walk or inside a building */
+        {const inB=(x,y)=>W2P.some(o=>{const g=W2_FP[o.k];if(!g||Math.hypot(o.x-x,o.y-y)>Math.hypot(Math.max(-g[0],g[1]),Math.max(-g[2],g[3]))+2)return false;const c=Math.cos(o.a),s_=Math.sin(o.a),dx=x-o.x,dy=y-o.y,lz=dx*c+dy*s_,lx=-dx*s_+dy*c;return lx>g[0]-1.6&&lx<g[1]+1.6&&lz>g[2]-1.6&&lz<g[3]+1.6});
+         let np=0;const cAng=Math.atan2(ua[1]+ub[1],ua[0]+ub[0]);
+         for(let t1=2.5;t1<30&&np<7;t1+=5.5)for(let t2=2.5;t2<30&&np<7;t2+=5.5){const x=n.x+ua[0]*(dB+t1)+ub[0]*(dA+t2),y=n.y+ua[1]*(dB+t1)+ub[1]*(dA+t2);
+           if(!clear(x,y,5.4)||!okD(x,y)||inB(x,y))continue;np++;CORNERS.t++;
+           if((np&1)===1){B(furn,x,y,0,0.5,1.8,1.8,cAng);if(W2_FP.t_maple_street)w2Put(r()<0.6?"t_maple_street":"t_ornamental_tree",x,y,r()*6.28,0.45);else treeAt(x,y,0.5,true);collAdd({t:"b",x,y,h:cAng,hl:0.95,hw:0.95,z0:-0.3,z1:0.6,what:"a planter"});collAdd({tree:1,t:"c",x,y,r:0.35})}
+           else{const a=cAng+Math.PI/2;B(furn,x,y,0.42,0.06,1.8,0.5,a);B(furn,x-Math.cos(cAng)*0.25,y-Math.sin(cAng)*0.25,0.45,0.45,1.8,0.06,a);for(const k of [-0.8,0.8])B(furn,x+Math.cos(a)*k,y+Math.sin(a)*k,0,0.42,0.06,0.45,a);collAdd({t:"b",x,y,h:a,hl:0.9,hw:0.3,z0:-0.3,z1:1,what:"a bench"})}}}}}}}
   for(let gx=X0+14;gx<X1-10;gx+=29)for(let gy=Y0+14;gy<Y1-10;gy+=29){
     const w=16+r()*9,d=16+r()*9,x=gx+(r()-0.5)*3,y=gy+(r()-0.5)*3,rad=Math.hypot(w,d)/2;
     if(x>PARKB[0]-6-rad&&x<PARKB[1]+6+rad&&y>PARKB[2]-6-rad&&y<PARKB[3]+6+rad)continue;if(x>GAR.x0-6-rad&&x<GAR.x1+6+rad&&y>GAR.y0-6-rad&&y<GAR.y1+6+rad)continue;if(!clear(x,y,5.5+rad))continue;
