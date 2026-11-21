@@ -1400,8 +1400,21 @@ html body.chatOn #ui2 .u2left .dk,html body.chatOn #ui2 #u2mm{transform:translat
 <script data-boot>(function(){var p=0;window.__bootP=0;var t=setInterval(function(){if(window.__bootReal){clearInterval(t);return}p+=(0.7-p)*0.025;window.__bootP=p;var a=document.getElementById("bootArc"),n=document.getElementById("bootNeedle"),c=document.getElementById("bootPct");if(a)a.setAttribute("stroke-dasharray",(p*100).toFixed(1)+" 100");if(n)n.style.setProperty("--a",(-135+p*270)+"deg");if(c)c.textContent=String(Math.round(p*100))},120)})()</script>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 366 · GM collision alert and interior fixes</h2></div>
+    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 369 · Real water, smoother ramps</h2></div>
     <div class="nb"><ul>
+      <li>💧 <b>Water that acts like water.</b> Rain and melting snow now leave water behind, and it drains and dries over several minutes instead of vanishing the moment the rain stops.
+        <ul><li><b>Puddles form where they really would:</b> in the gutter around the drain grates, in dips, in potholes and in worn wheel ruts. Some drains are blocked, so their puddle spreads out into the lane.</li>
+        <li><b>Gutter streams:</b> while it rains or the snow melts, a thin stream runs along the gutters, downhill, into the grates.</li>
+        <li><b>Black ice:</b> if it drops below freezing, the leftover puddles freeze over. Watch for black ice the morning after.</li>
+        <li>Hit a deep puddle fast and that side of the car can still aquaplane.</li></ul></li>
+      <li>🛣️ <b>Smoother ramps and flyovers.</b> We measured every ramp, flyover and merge on the map and fixed what was off:
+        <ul><li>The ramps at Maple Rd, Woodward Ave, County Rd 30, Harbor Rd, Main St and Kestrel Rd had a hidden ledge partway up or down that jolted the car. Each one is now a single smooth slope, and the steepest ramp went from 41% down to 9%.</li>
+        <li>The I-61 to I-38 ramps no longer start in mid-air and drop back down. Where ramps split or join, they now meet at the same height.</li>
+        <li>The I-61 to I-38 flyovers now rise off the freeway gradually instead of hitting a steep bit halfway up.</li></ul></li>
+      <li>🪟 <b>Head-up displays at real size.</b> The windshield display now sits low in front of you, just above the hood, like a real one. It's about 40% of its old size, scaled so it's still easy to read. Toyota, Lexus, BMW and Mercedes displays are a bit bigger, and the augmented-reality ones the biggest.</li>
+      <li>🖥️ <b>Ford Expedition and Chevy Traverse screens.</b> The Expedition and Expedition MAX now have the real 2025 dash: the long display across the top shows your gauges, and SYNC is on the touchscreen below it. In the Traverse, the gauges and the big center screen now each show their own content.</li>
+    </ul>
+    <h4 class="old">Version 36.6 · GM collision alert and interior fixes</h4><ul>
       <li>🔺 <b>GM collision alert.</b> In every Chevrolet, GMC, Buick and Cadillac, a collision alert now flashes three red triangles on the lower windshield, like the real thing. It works whether or not the car has a head-up display.</li>
       <li>🪑 <b>Interiors checked from the driver's seat.</b> We sat in all of the newest cars and fixed the ones that were off:
         <ul><li><b>BMW iX3:</b> the center screen was blank. Maps, media and the rest now show on it.</li>
@@ -20149,7 +20162,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=368;
+const APP_VER="173",BUILD_VER=369;
 // shown as season.update: build 345 is v34.5, 350 will be v35.0
 const verStr=n=>{n=+n;return n>=300?Math.floor(n/10)+"."+n%10:String(n)},VER_S=verStr(BUILD_VER);
 try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+VER_S;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+VER_S)}catch(e){}   /* BUILD_VER: bumped to make open copies reload without resetting saves */
