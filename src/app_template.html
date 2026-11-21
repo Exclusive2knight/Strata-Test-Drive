@@ -3490,7 +3490,14 @@ function auxBuild(n){for(const l of n.legs){if(l.major)continue;const e=l.e;
         const gap=Math.abs(pp.t)-(LANE/2+e.side)-(o.e.m/2+o.e.n*LANE+o.e.side);
         if(gap>4.5){if(G.length>=2){const [ua,wa]=G[G.length-1],dir_=Math.sign(ua-G[G.length-2][0])||1;for(let k=1;k<=4;k++)G.push([ua+dir_*k*wa*0.9,wa*(1-k/4)])}break}   /* the grass gore begins in a point, not a square edge */
         if(gap>0){gs=Math.sign(pp.t);G.push([pp.u,gap+0.5])}}
-      if(G.length>=2){G.sort((a,b)=>a[0]-b[0]);(o.e.aux=o.e.aux||[]).push({u0:G[0][0],u1:G[G.length-1][0],sg:gs,S:G,n,l,gore:true})}}}}}
+      if(G.length>=2){G.sort((a,b)=>a[0]-b[0]);(o.e.aux=o.e.aux||[]).push({u0:G[0][0],u1:G[G.length-1][0],sg:gs,S:G,n,l,gore:true})}}}
+    /* v369: the merging lane doesn't stop dead at the merge point: it carries on past it and tapers out over about 100 m (where two ramps join, the added
+       lane used to end in a square edge right at the join) */
+    for(const o of n.legs){if(!o.major||!o.e.aux)continue;const a=o.e.aux.find(q=>q.n===n&&q.l===l&&!q.gore&&!q.taper);if(!a)continue;const atN=o.end===0?a.u0<5:a.u1>o.e.L-5;if(!atN)continue;
+      const wN=o.end===0?a.S[0][1]:a.S[a.S.length-1][1];if(!(wN>0.5))continue;
+      for(const o2 of n.legs){if(!o2.major||o2===o)continue;const e2=o2.e;e2.aux=(e2.aux||[]).filter(q=>!(q.n===n&&q.l===l&&q.taper));const Lt=Math.min(e2.L*0.9,Math.max(90,12*(e2.lim||45)*0.3048*0.6)),S=[];
+        for(let k=0;k<=12;k++){const f=k/12,d=f*Lt,w=wN*(1-f*f*(3-2*f));S.push([o2.end===0?d:e2.L-d,w])}S.sort((x,y)=>x[0]-y[0]);
+        e2.aux.push({u0:S[0][0],u1:S[S.length-1][0],sg:o.end!==o2.end?a.sg:-a.sg,S,n,l,taper:true})}}}}
 for(const n of NODES){if(n.ctrl==="merge")auxBuild(n)}
 if(W2)for(const n of NODES){if(n.legs.length!==2||n.kind!=="cont")continue;const [A,B]=n.legs,wa=mAt(A.e,A.end?A.e.L:0)/2+A.e.n*LANE+A.e.side,wb=mAt(B.e,B.end?B.e.L:0)/2+B.e.n*LANE+B.e.side;   /* v350: the median width at the node itself (a tapered median is closed there) */if(Math.abs(wa-wb)<1)continue;
   const nr=wa<wb?A:B,wd=nr===A?B:A,d=Math.abs(wa-wb),e=nr.e,S_=Math.max(25,Math.max(e.lim||30,wd.e.lim||30)),L=Math.min(Math.max(110,12*S_*0.3048*(nr.e.ow||nr.e.type==="ramp"?0.7:0.5)),e.L*0.85),S=[];   /* v334: a lane is added or dropped over a real taper (about 12 ft x speed, MUTCD), not a sudden step */for(let k=0;k<=10;k++){const q=k/10,w=d*(1-q*q*(3-2*q));S.push(nr.end===0?[q*L,w]:[e.L-q*L,w])}if(nr.end===1)S.reverse();
@@ -3677,10 +3684,21 @@ for(const n of NODES)if(n.pr||n.xo)gAdd(GRID.n,n.x,n.y,(n.pr||n.xo.len)+2,n);
 for(const e of EDGES){if(e.type!=="ramp")continue;const n=Math.ceil(e.L/2)+1,F=new Float32Array(2*n);let any=false;
   for(let i=0;i<n;i++){const u=Math.min(i*2,e.L),p=ePt(e,u,0);let bw=0,bz=0;
     for(const o of gAt(GRID.e,p[0],p[1])){if(o.type!=="xway")continue;const q=eProj(o,p[0],p[1]);if(q.u<0||q.u>o.L)continue;const outer=o.T.m/2+o.n*LANE+(o.T.shR||0),w=1-smooth01(outer+LANE*0.6,outer+LANE*0.6+24,Math.abs(q.t));if(w<=bw)continue;const zo=ez0(o,q.u),w2=w*(1-smooth01(0.9,1.6,Math.abs(zo-ez0(e,u))));if(w2<=bw)continue;bw=w2;bz=zo}
-    if(e.fly)bw*=1-smooth01(170,200,u);if(e.zfxIn==="end")bw*=smooth01(e.L-130,e.L-100,u);if(e.zfxIn==="start")bw*=1-smooth01(100,130,u);
-    if(e.kmH){const d=u<e.kmH[0]?e.kmH[0]-u:u>e.kmH[1]?u-e.kmH[1]:0,w=1-smooth01(0,40,d);if(w>bw){let bq=null;for(const o of gAt(GRID.e,p[0],p[1])){if(o.type!=="xway")continue;const q=eProj(o,p[0],p[1]);if(q.u<0||q.u>o.L||Math.abs(q.t)>45)continue;if(!bq||Math.abs(q.t)<bq.t)bq={t:Math.abs(q.t),z:ez0(o,q.u)}}if(bq){bw=w;bz=bq.z}}}   /* v357: level with the freeway along a kit merge piece */   /* eased, so the hand-over between the two heights is never a step */   /* a flyover only matches the freeway along its deceleration lane: after that it climbs away on its own profile */
+    if(e.fly)bw*=1-smooth01(60,200,u);   /* v369: a flyover eases off the freeway's height gradually (it used to hold it to 170 m and then catch up at 12%) */if(e.zfxIn==="end")bw*=smooth01(e.L-130,e.L-100,u);if(e.zfxIn==="start")bw*=1-smooth01(100,130,u);
+    if(e.kmH){const d=u<e.kmH[0]?e.kmH[0]-u:u>e.kmH[1]?u-e.kmH[1]:0,w=1-smooth01(0,40,d);if(w>bw){let bq=null;for(const o of gAt(GRID.e,p[0],p[1])){if(o.type!=="xway")continue;const q=eProj(o,p[0],p[1]);if(q.u<0||q.u>o.L||Math.abs(q.t)>45)continue;if(!bq||Math.abs(q.t)<bq.t)bq={t:Math.abs(q.t),z:ez0(o,q.u)}}if(bq){const wq=w*(1-smooth01(0.4,0.9,Math.abs(bq.z-ez0(e,u))));if(wq>bw){bw=wq;bz=bq.z}}}}   /* v357: level with the freeway along a kit merge piece */   /* eased, so the hand-over between the two heights is never a step */   /* a flyover only matches the freeway along its deceleration lane: after that it climbs away on its own profile */
     F[2*i]=bw;F[2*i+1]=bz;if(bw>0)any=true}
   if(any)e.zfx=F}
+/* v369: every ramp's height is made one smooth, continuous profile. Ramps used to borrow the freeway's height only while the two were within about a metre,
+   so where a ramp climbed out of (or down into) the sunken stretch the borrowing switched off within 4 m and left a hidden ledge of up to 1.6 m (Maple Rd,
+   Woodward, County Rd 30, Harbor Rd, Main St, Kestrel Rd); and ramps meeting at a split didn't start at the same height. Now the ends meet their junction,
+   and the grade never changes faster than a real vertical curve (about 1.5% every 2 m) */
+{const R=EDGES.filter(e=>e.type==="ramp"),Z=new Map();for(const e of R){const n=Math.ceil(e.L/2)+1,a=new Float64Array(n);for(let i=0;i<n;i++)a[i]=ez(e,Math.min(i*2,e.L));Z.set(e,a)}
+  const tgt=new Map();for(const nd of NODES){const L=(nd.legs||[]).filter(l=>l.e);const rl=L.filter(l=>l.e.type==="ramp");if(!rl.length)continue;const ot=L.filter(l=>l.e.type!=="ramp");
+    let t;if(ot.length)t=ot.map(l=>ez(l.e,l.end?l.e.L:0)).reduce((a,b)=>a+b,0)/ot.length;else{if(rl.length<2)continue;t=rl.map(l=>ez0(l.e,l.end?l.e.L:0)).reduce((a,b)=>a+b,0)/rl.length}tgt.set(nd,t)}   /* where only ramps meet (a split away from the freeway) they meet at their own ground-level height */
+  for(const e of R){const a=Z.get(e),n=a.length;
+    for(const [nd,end] of [[e.a,0],[e.b,1]]){if(!tgt.has(nd))continue;const t=tgt.get(nd),d0=t-(end?a[n-1]:a[0]);if(Math.abs(d0)<0.005)continue;for(let i=0;i<n;i++){const dist=end?(n-1-i)*2:i*2;a[i]+=d0*(1-smooth01(0,40,dist))}}
+    const a0=a[0],a1=a[n-1];for(let it=0;it<600;it++){let mv=0;for(let i=1;i<n-1;i++){const d2=a[i-1]-2*a[i]+a[i+1];if(Math.abs(d2)>0.03){a[i]+=0.45*d2;mv++}}a[0]=a0;a[n-1]=a1;if(!mv)break}
+    const F=new Float32Array(2*n);for(let i=0;i<n;i++){F[2*i]=1;F[2*i+1]=a[i]}e.zfx=F}}
 // a ramp that climbs out of (or down into) a cut leaves the freeway's level well before it's clear of the lanes in plan: from there it's its own road (drawn, and
 // solid), and the speed-change pavement beside the freeway stops, so there's no hidden ramp surface standing above the lanes (the invisible bumps)
 if(W2)for(const n of NODES){if(n.ctrl!=="merge")continue;let ch=false;const M=n.legs.filter(o=>o.major);
