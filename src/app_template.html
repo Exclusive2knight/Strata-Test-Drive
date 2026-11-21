@@ -6831,7 +6831,7 @@ function weatherTick(dt){
   if(wxOn()&&WX.next==="snow"&&ambF()>36)WX.next="rain";else if(wxOn()&&st.tempF!=null&&st.tempF!=="auto"&&WX.next==="rain"&&ambF()<30)WX.next="snow";   // too warm to snow: it rains; set it below freezing and rain turns to snow
   if(WX.next!==WX.cur){WX.w=Math.max(0,WX.w-dt/10);if(WX.w<=0.001)WX.cur=WX.next}
   else WX.w=WX.cur==="clear"?Math.max(0,WX.w-dt/10):Math.min(1,WX.w+dt/14);
-  try{wxWheels()}catch(e){}
+  try{wtrTick(dt)}catch(e){}try{wxWheels()}catch(e){}
   try{wxRealTick(dt)}catch(e){}try{eqTick(dt);snmTick(dt);plowAiTick(dt)}catch(e){console.error(e)}
   const sl=wxOn()?snowHere(car.px,car.py):0,surf=wxOn()?(sl>0.3?"snow":WXR.wet>0.3||(WXR.snow>0.1&&snmSaltAt(car.px,car.py)>0.2)?"wet":"dry"):WX.cur==="rain"&&WX.w>0.35?"wet":WX.cur==="snow"&&WX.w>0.45?"snow":"dry";
   if(st.surface!==surf&&!(TUN.g&&tunAt(car.px,car.py)&&Math.abs(car.px-TUN.xc)<TUN.Wc&&car.py>TUN.y0+30&&car.py<TUN.y1-30))st.surface=surf;else if(TUN.g&&car.py>TUN.y0+30&&car.py<TUN.y1-30&&Math.abs(car.px-TUN.xc)<TUN.Wc)st.surface="dry";   /* dry deep inside the tunnel */
@@ -6986,12 +6986,37 @@ var PLOWT=0;
 // puddles: fixed spots on the paved roads; in rain they fill up and you can aquaplane through them at speed;
 // in snow they're frozen into ice patches, and bridges and overpasses freeze first (black ice)
 const PUD={grid:null,t:0,seen:{}};
-function pudBuild(){const G_=new Map();let n=0;for(const e of EDGES){if(/dirt|lane/.test(e.type)||e.L<80)continue;let h=(e.a.x*73856093^e.b.y*19349663^e.L*83492791)>>>0;const rr=()=>{h=(h*1103515245+12345)>>>0;return h/4294967296};
-    for(let u=40;u<e.L-40;u+=55){if(rr()>0.22)continue;const sd=rr()<0.5?-1:1,k=Math.floor(rr()*e.n),t=sd*((e.m||0)/2+(k+0.5)*LANE+(rr()<0.45?LANE*0.35:0)+(rr()-0.5)*0.8),p=ePt(e,u,t),r=1.1+rr()*1.6,z=e.hz?ez(e,u):0;
-      const key=Math.floor(p[0]/25)+","+Math.floor(p[1]/25);let L=G_.get(key);if(!L)G_.set(key,L=[]);L.push({x:p[0],y:p[1],z,r,h:p[2]});n++}}PUD.grid=G_;PUD.n=n}
-function pudAt(x,y){if(!PUD.grid)return null;const cx=Math.floor(x/25),cy=Math.floor(y/25);for(let i=-1;i<=1;i++)for(let j=-1;j<=1;j++){const L=PUD.grid.get((cx+i)+","+(cy+j));if(!L)continue;for(const q of L)if((q.x-x)**2+(q.y-y)**2<q.r*q.r)return q}return null}
+/* v369: water that behaves like water. Rain and melting snow fill it up; it drains and dries over several minutes afterwards (it used to vanish the moment
+   the rain stopped); below freezing what's left turns to ice (black ice the morning after). It collects where real water does: in the gutter round each
+   drain grate (some drains are blocked and the pond spreads into the lane), in the dips, in potholes, and in the odd worn wheel rut. While it rains or the
+   snow melts, a thin stream runs along each gutter, downhill, into the grates */
+const WTR={lvl:0,flow:0,melt:0,ps:0,ice:false};
+function wtrTick(dt){const R=WXR,cur=WX.cur,w=WX.w,rain=cur==="rain"?w:0;
+  if(!wxOn()){WTR.lvl=rain;WTR.flow=rain;WTR.melt=0;WTR.ice=cur==="snow"&&w>0.55;return}
+  const ds=WTR.ps-R.snow;WTR.ps=R.snow;const melt=ds>0&&dt>0?Math.min(2,ds/dt*400):0;WTR.melt+=(melt-WTR.melt)*Math.min(1,dt/8);
+  const fr=ambF()<31,inflow=rain/45+Math.min(1,WTR.melt)/90,out=fr?0:(st.night?1/900:1/420)*(0.35+WTR.lvl);
+  WTR.lvl=clamp(WTR.lvl+dt*(inflow-out),0,1);
+  const fw=clamp(rain*0.9+Math.min(1,WTR.melt)*0.8+WTR.lvl*0.15,0,1)*(fr?0:1);WTR.flow+=(fw-WTR.flow)*Math.min(1,dt/(fw>WTR.flow?6:45));
+  if(WTR.melt>0.05)R.wet=Math.max(R.wet,Math.min(1,0.35+WTR.melt*0.6));   // meltwater keeps the roads wet
+  WTR.ice=(fr&&WTR.lvl>0.04)||(cur==="snow"&&w>0.55)}
+function pudScale(){return Math.sqrt(WTR.lvl)}
+function pudBuild(){const G_=new Map(),GR=new Map();let n=0;const put=(M,q)=>{const key=Math.floor(q.x/25)+","+Math.floor(q.y/25);let L=M.get(key);if(!L)M.set(key,L=[]);L.push(q)};
+  for(const e of EDGES){if(/dirt|lane/.test(e.type)||e.L<40)continue;let h=(e.a.x*73856093^e.b.y*19349663^e.L*83492791)>>>0;const rr=()=>{h=(h*1103515245+12345)>>>0;return h/4294967296};const hw=hwOf(e),zOf=u=>e.hz?ez(e,u):0;
+    // ponds round the drains (the grates bumpMesh draws), a few blocked ones spreading into the lane, and the streams that feed them
+    if(e.T&&e.T.kerb&&(e.T.z==="c"||e.type==="art"||e.type==="ave")&&!e.br&&!e.ov){const a=kerbTrim(e,0)+4,b=e.L-kerbTrim(e,1)-4;if(b-a>=12){const U=[a,b];for(let u=a+80;u<b-40;u+=80)U.push(u);
+      for(const u of U)for(const sd of [1,-1]){if(e.ow&&sd>0)continue;const blk=rr()<0.22,r=blk?1.6+rr()*1.2:0.75+rr()*0.5,tc=sd*(hw-0.75-(blk?r*0.55:r*0.4)),q=ePt(e,u+(rr()-0.5)*1.5,tc);
+        put(G_,{x:q[0],y:q[1],z:zOf(u),r,h:q[2],k:blk?"blocked":"drain"});n++;
+        const zu=zOf(Math.max(0,u-24)),zd=zOf(Math.min(e.L,u+24)),dz=zd-zu;const g={e,u,sd,tt:sd*(hw-0.62),from:Math.abs(dz)<0.06?0:dz<0?1:-1};const gp=ePt(e,u,g.tt);g.x=gp[0];g.y=gp[1];put(GR,g)}}}
+    // dips: the low point of a sag
+    if(e.hz){for(let u=30;u<e.L-30;u+=6){const z=ez(e,u);if(ez(e,u-6)>z&&ez(e,u+6)>=z&&ez(e,u-30)-z>0.15&&ez(e,u+30)-z>0.15)for(const sd of (e.ow?[-1]:[1,-1])){const r=1.6+rr()*1.4,q=ePt(e,u,sd*(hw-(e.T.kerb?0.75:0.9)-r*0.4));put(G_,{x:q[0],y:q[1],z,r,h:q[2],k:"sag"});n++}}}
+    // worn wheel ruts: now and then, in a wheel path
+    for(let u=40;u<e.L-40;u+=55){if(rr()>0.07)continue;const sd=rr()<0.5?-1:1,k=Math.floor(rr()*e.n),t=sd*((e.m||0)/2+(k+0.5)*LANE+(rr()<0.5?-0.9:0.9)),p=ePt(e,u,t);put(G_,{x:p[0],y:p[1],z:zOf(u),r:0.9+rr()*1.0,h:p[2],k:"rut"});n++}}
+  // potholes fill up
+  for(const H of BUMPS.holes){const p=ePt(H.e,H.u,H.t);put(G_,{x:p[0],y:p[1],z:(H.e.hz?ez(H.e,H.u):0)-H.dp*0.6,r:H.r*1.05,h:p[2],k:"hole"});n++}
+  PUD.grid=G_;PUD.gr=GR;PUD.n=n}
+function pudAt(x,y){if(!PUD.grid)return null;const sc=pudScale();if(sc<0.05)return null;const cx=Math.floor(x/25),cy=Math.floor(y/25);for(let i=-1;i<=1;i++)for(let j=-1;j<=1;j++){const L=PUD.grid.get((cx+i)+","+(cy+j));if(!L)continue;for(const q of L){const rq=q.r*sc;if((q.x-x)**2+(q.y-y)**2<rq*rq)return q}}return null}
 function onDeckAt(x,y){for(const e of gAt(GRID.e,x,y)){if(!e.br&&!e.ov)continue;const p=eProj(e,x,y);if(Math.abs(p.t)<e.W+1&&(e.br?Math.abs(p.u-e.br.uc)<e.br.half+20:overDeck(e,p.u)))return true}return false}
-function wxWheels(){const rain=WX.cur==="rain"&&WX.w>0.4,snow=WX.cur==="snow"&&WX.w>0.55,hi=summitIce();car.wxMu=car.wxMu||[1,1,1,1];if(TUN.g&&!st.walk&&Math.abs(car.px-TUN.xc)<TUN.Wc&&car.py>TUN.y0+20&&car.py<TUN.y1-20){car.wxMu.fill(1);car.aqua=0;return}if(hi&&!st.walk){car.wxMu.fill(hi);car.aqua=0;const now=performance.now();if(now-(PUD.seen.s||0)>20000){PUD.seen.s=now;toast(hi<0.4?"🧊 Ice on the summit road: chains or winter tyres, and go gently":"❄️ Frost on the mountain this early: careful on the bends")}return}if(!rain&&!snow||st.walk){car.wxMu.fill(1);car.aqua=0;return}if(!PUD.grid)pudBuild();
+function wxWheels(){const rain=WTR.lvl>0.3&&!WTR.ice,snow=WTR.ice,hi=summitIce();car.wxMu=car.wxMu||[1,1,1,1];if(TUN.g&&!st.walk&&Math.abs(car.px-TUN.xc)<TUN.Wc&&car.py>TUN.y0+20&&car.py<TUN.y1-20){car.wxMu.fill(1);car.aqua=0;return}if(hi&&!st.walk){car.wxMu.fill(hi);car.aqua=0;const now=performance.now();if(now-(PUD.seen.s||0)>20000){PUD.seen.s=now;toast(hi<0.4?"🧊 Ice on the summit road: chains or winter tyres, and go gently":"❄️ Frost on the mountain this early: careful on the bends")}return}if(!rain&&!snow||st.walk){car.wxMu.fill(1);car.aqua=0;return}if(!PUD.grid)pudBuild();
   const c=Math.cos(car.psi),s_=Math.sin(car.psi),v=Math.abs(car.vx);let aq=0,ice=0;
   for(let i=0;i<4;i++){const [x,y]=WPOS[i],wx=car.px+c*x-s_*y,wy=car.py+s_*x+c*y,q=pudAt(wx,wy);let m=1;
     if(rain&&q){m=v>17?Math.max(0.1,1-(v-17)/9*WX.w):0.88;if(m<0.6)aq++}
@@ -7007,7 +7032,7 @@ const DYN={b:{},buf:{}};
 const SKIN=[[0.80,0.60,0.48],[0.67,0.48,0.36],[0.50,0.34,0.24],[0.32,0.21,0.14]],SHIRT=[[0.62,0.1,0.08],[0.08,0.2,0.45],[0.85,0.83,0.8],[0.12,0.35,0.2],[0.75,0.55,0.12],[0.25,0.25,0.27],[0.45,0.2,0.4],[0.1,0.42,0.48],[0.55,0.32,0.22],[0.06,0.07,0.09]];
 const KO={list:[],on:false,u:new Float32Array(40)};const TREEP=new Map();
 const DMAT={hair:[[0.05,0.04,0.035]],pants:[[0.07,0.08,0.11]],bike:[[0.1,0.1,0.11]],deer:[[0.33,0.22,0.13]],cone:[[0.95,0.33,0.04],[0.18,0.06,0]],coneW:[[0.9,0.9,0.88]],me:[[0.04,0.55,0.55]],
-  rain:[[0.7,0.75,0.82],null,0,1,0.32],puddle:[[0.22,0.25,0.3],null,2.6,160,0.78],icep:[[0.78,0.86,0.93],null,1.6,110,0.7],snow:[[0.95,0.96,0.98],null,0,1,0.85]};
+  rain:[[0.7,0.75,0.82],null,0,1,0.32],puddle:[[0.13,0.17,0.23],null,3.4,240,0.9],gutter:[[0.14,0.18,0.24],null,3.2,220,0.82],flowHi:[[0.86,0.9,0.95],null,3,220,0.7],icep:[[0.78,0.86,0.93],null,1.6,110,0.7],snow:[[0.95,0.96,0.98],null,0,1,0.85]};
 SKIN.forEach((c,i)=>DMAT["skin"+i]=[c]);SHIRT.forEach((c,i)=>DMAT["shirt"+i]=[c]);
 [[0.11,0.17,0.3],[0.05,0.05,0.06],[0.52,0.45,0.33],[0.3,0.31,0.33]].forEach((c,i)=>DMAT["pants"+i]=[c,null,0.1,8]);[[0.04,0.035,0.03],[0.25,0.15,0.08],[0.62,0.5,0.28],[0.55,0.55,0.55]].forEach((c,i)=>DMAT["hair"+i]=[c,null,0.25,20]);
 [[0.06,0.06,0.07],[0.85,0.85,0.83]].forEach((c,i)=>DMAT["shoe"+i]=[c]);DMAT.bag=[[0.2,0.12,0.07],null,0.3,20];DMAT.gateW=[[0.92,0.92,0.9]];DMAT.gdoor=[[0.88,0.87,0.84],null,0.3,20];DMAT.forsale=[[0.85,0.12,0.1],null,0.2,20];if(!DMAT.post)DMAT.post=[[0.9,0.9,0.9]];DMAT.gateR=[[0.85,0.06,0.05]];DMAT.gateP=[[0.25,0.27,0.3],null,0.3,20];
@@ -19189,8 +19214,16 @@ function dynBuild(eye,cm){if(dynFrame===GFX.frame)return;dynFrame=GFX.frame;CHAR
   if(st.walk&&!FOOT.inH&&!UBER.ride&&!MPW.ride){const W=st.walk;if(!charQueue(PLAYER_MK,W.x,W.y,W.z,W.h,Math.abs(W.v||0),0))personInto(W.x,W.y,W.z,W.h,W.ph,{skin:1,shirt:7,pants:0,hair:1,sc:1,v:Math.abs(W.v)},"walk")}
   // precipitation around the camera
   // puddles (rain) and ice patches (snow) on the road near you
-  if(WX.w>0.3&&(WX.cur==="rain"||WX.cur==="snow")){if(!PUD.grid)pudBuild();const icy=WX.cur==="snow",cx=Math.floor(ex/25),cy=Math.floor(ey/25);for(let i=-5;i<=5;i++)for(let j=-5;j<=5;j++){const L=PUD.grid.get((cx+i)+","+(cy+j));if(!L)continue;
-    for(const q of L){const d=q.r*1.5*Math.min(1,WX.w*1.3);dBox(icy?"icep":"puddle",q.x,q.y,q.z+0.012,d,0.008,d*0.8,q.h);dBox(icy?"icep":"puddle",q.x,q.y,q.z+0.013,d*0.8,0.008,d*1.05,q.h+0.785)}}}
+  if(WTR.lvl>0.04||WTR.flow>0.04){if(!PUD.grid)pudBuild();const icy=WTR.ice,sc=pudScale(),cx=Math.floor(ex/25),cy=Math.floor(ey/25),tn=performance.now()/1000;
+    if(sc>0.12)for(let i=-5;i<=5;i++)for(let j=-5;j<=5;j++){const L=PUD.grid.get((cx+i)+","+(cy+j));if(!L)continue;
+      for(const q of L){const d=q.r*1.45*sc,m=icy?"icep":"puddle",el=q.k==="drain"||q.k==="blocked"||q.k==="sag"?1.5:1;   /* gutter ponds are long and thin along the kerb */
+        for(let k=0;k<4;k++){const a=q.h+k*0.393,f=k%2?0.86:1;dBox(m,q.x,q.y,q.z+0.03+k*0.0008,d*el*f*(k===2?0.8:1),0.008,d*0.8*f,a*(el>1?0:1)+(el>1?q.h+(k-1.5)*0.12:0))}   /* overlapping rotated slabs: a rounded, uneven pond */}}
+    // streams along the gutters, flowing downhill into each grate
+    if(WTR.flow>0.04&&!icy&&PUD.gr){const fw=WTR.flow,wd=0.16+0.3*fw;for(let i=-4;i<=4;i++)for(let j=-4;j<=4;j++){const L=PUD.gr.get((cx+i)+","+(cy+j));if(!L)continue;
+      for(const g of L){if((g.x-ex)**2+(g.y-ey)**2>95*95)continue;const e=g.e;
+        for(const side of [-1,1]){if(g.from&&side!==g.from)continue;const run=g.from?34:22;
+          for(let k=0;k<run;k+=3){const u0=g.u+side*(k+1.5);if(u0<1||u0>e.L-1)continue;const q=ePt(e,u0,g.tt),z=(e.hz?ez(e,u0):0)+0.03;dBox("gutter",q[0],q[1],z,3.05,0.006,wd*(1-k/run*0.45),q[2])}
+          for(let k=0;k<4;k++){const ph=((tn*(0.5+fw*0.7)+k*run/4)%run),u0=g.u+side*(run-ph);if(u0<1||u0>e.L-1)continue;const q=ePt(e,u0,g.tt),z=(e.hz?ez(e,u0):0)+0.034;dBox("flowHi",q[0],q[1],z,0.45,0.004,0.06,q[2])}}}}}}
   if(WX.w>0.03&&(WX.cur==="rain"||WX.cur==="snow")){const snow=WX.cur==="snow",N=Math.floor((snow?900:1100)*WX.w*(G().trees?1:0.5)*(1+WXR.storm*0.7)),SLX=snow?0:clamp(WXR.wind[0]*0.03,-0.5,0.5),SLZ=snow?0:clamp(-WXR.wind[1]*0.03,-0.5,0.5),B=dB(snow?"snow":"rain"),t=performance.now()/1000,
       cy=Math.cos(look.yaw+car.camYaw||0),sy=Math.sin(look.yaw+car.camYaw||0),rx=-sy,rz=-cy;let k=0;
     for(let i=0;i<N;i++){const a=(i*0.618034)%1,b=(i*0.754877)%1,c=(i*0.569840)%1,sp=snow?1.3+0.6*b:14+5*c;
