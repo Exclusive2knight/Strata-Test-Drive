@@ -7,7 +7,9 @@ async def main():
     b=await p.chromium.launch(args=["--use-gl=angle","--use-angle=swiftshader","--enable-unsafe-swiftshader"])
     pg=await b.new_page(viewport={"width":1000,"height":560});errs=[];pg.on("pageerror",lambda e:errs.append(str(e)))
     await pg.goto("http://127.0.0.1:8765/dev.html"+os.environ.get("Q",""),wait_until="domcontentloaded",timeout=120000);await pg.wait_for_function("document.getElementById('boot').hidden",timeout=120000)
-    await pg.evaluate("document.getElementById('maint').hidden=true");await pg.click("#newsGo");await pg.evaluate("st.cfgStep='color';st.cfgTab='fin'");await pg.click("#go");await pg.wait_for_timeout(800)
+    await pg.evaluate("document.getElementById('maint').hidden=true");await pg.click("#newsGo");await pg.evaluate("st.cfgStep='color';st.cfgTab='fin'");await pg.evaluate("window.KIT_SLICE=400");await pg.click("#go");await pg.wait_for_timeout(800)
+    try:await pg.wait_for_function("typeof KITOLD==='undefined'||!KITOLD||KIT.ok",timeout=240000)   # the kit roads (built a slice at a time) before any shot
+    except Exception:print("kit roads did not load")
     await pg.add_style_tag(content="#u2msg,.toast,#toast,#hud,#spawnPop{display:none!important}")
     for n,pos,lk,cam,ex in SH:
       x,y,h=pos.split(",");yw,pt,ds=lk.split(",")
