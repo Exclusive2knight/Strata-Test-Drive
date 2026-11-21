@@ -1400,8 +1400,28 @@ html body.chatOn #ui2 .u2left .dk,html body.chatOn #ui2 #u2mm{transform:translat
 <script data-boot>(function(){var p=0;window.__bootP=0;var t=setInterval(function(){if(window.__bootReal){clearInterval(t);return}p+=(0.7-p)*0.025;window.__bootP=p;var a=document.getElementById("bootArc"),n=document.getElementById("bootNeedle"),c=document.getElementById("bootPct");if(a)a.setAttribute("stroke-dasharray",(p*100).toFixed(1)+" 100");if(n)n.style.setProperty("--a",(-135+p*270)+"deg");if(c)c.textContent=String(Math.round(p*100))},120)})()</script>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 364 · Roads fixed</h2></div>
+    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 365 · Real head-up displays, real streets</h2></div>
     <div class="nb"><ul>
+      <li>🪟 <b>Every brand's own head-up display.</b> The windshield display now looks and works like the real one in your car:
+        <ul><li><b>Chevrolet, GMC, Buick, Cadillac:</b> GM's four views (Speed, Audio/Phone, Navigation, Performance with a rev bar, gear and shift light). The car-ahead icon is green, turns amber when you tailgate, and a <b>Collision Alert flashes red across the bottom of the windshield</b>.</li>
+        <li><b>Ford and Lincoln:</b> speed, limit, cruise speed and distance, lane lines that turn blue when BlueCruise is driving, and a flashing red warning bar.</li>
+        <li><b>Jeep, Ram, Chrysler, Dodge:</b> Standard view (limit, speed and directions side by side) or Advanced (adds driver assists and your gear). Collision warnings say BRAKE!</li>
+        <li><b>Toyota, Lexus, Subaru, Honda, Acura, Nissan, Mazda:</b> each brand's cruise and lane-keeping symbols and a red BRAKE! box. Toyota and Lexus add Tachometer and Eco views, Honda and Acura a Tachometer view.</li>
+        <li><b>Hyundai, Kia, Genesis:</b> Smart Cruise distance bars, the green Lane Following Assist wheel, blind-spot car icons and a red collision warning.</li>
+        <li><b>Audi, Mercedes, BMW, Volvo:</b> a flashing red car symbol when you're about to hit something.</li>
+        <li><b>Augmented reality</b> on the Audi Q6 and Q4 e-tron, Kia EV6 and EV9, and some Genesis and Mercedes EQ models: a bigger display that draws arrows on the road up to your next turn, marks the car you're following on cruise, and shows a lane line when you drift.</li></ul>
+        Switch views in Settings › Head-Up Display view.</li>
+      <li>🛠️ <b>Build a car: every option now really works.</b> We checked all 4,857 packages and options across every trim. 119 were charged for but did nothing: automatic parking on 50 models (Lexus RX, Mercedes, Cadillac LYRIQ, Toyota Highlander and more), matrix headlights on Lincoln, head-up displays in some packages and one blind-spot option. They all work now, and Mercedes gets its own Active Parking Assist screen.</li>
+      <li>🚗 <b>Cars sit at their real ride height</b> from the moment they appear, instead of dropping and bouncing. A new car also starts at its normal height, not the last car's.</li>
+      <li>🎛️ <b>New HUD buttons.</b> Mode is now a round button right above the power button, and Terrain sits above it. Tap one and its list pops up over the dash; pick an option and it folds back down. The dash sits at the bottom of the screen.</li>
+      <li>🛑 <b>Speed humps</b> on longer neighborhood streets, with yellow bars, SPEED HUMP and 15 MPH signs before them, and a bump you really feel.</li>
+      <li>〰️ <b>Rumble strips</b> along the edges of country roads. Drift onto them and the car shakes and buzzes.</li>
+      <li>🕳️ <b>Realistic potholes</b> with broken edges, steep sides, a wet bottom and cracks around them.</li>
+      <li>🧱 <b>Fewer sewer grates.</b> No more grate painted every few feet: drains now sit at the corners and every 80 m or so.</li>
+      <li>🏙️ <b>Downtown corners filled in.</b> Buildings now run right up to the corner, and the leftover space becomes a little plaza with trees in planters and benches.</li>
+      <li>🚦 <b>Traffic pulls up to the stop line</b> instead of stopping well short of it.</li>
+    </ul>
+    <h4 class="old">Version 36.4 · Roads fixed</h4><ul>
       <li>🛣️ <b>The new roads are back.</b> In the last update the detailed roads (with their lane lines, crosswalks and stop lines) sank under the old plain black road, so you saw dark, unmarked road everywhere. They're on top again.</li>
       <li>💬 <b>Chat box moved to the top right</b>, and opening it no longer pops up the keyboard. Tap the box when you want to type.</li>
     </ul>
@@ -20064,7 +20084,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=364;
+const APP_VER="173",BUILD_VER=365;
 // shown as season.update: build 345 is v34.5, 350 will be v35.0
 const verStr=n=>{n=+n;return n>=300?Math.floor(n/10)+"."+n%10:String(n)},VER_S=verStr(BUILD_VER);
 try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+VER_S;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+VER_S)}catch(e){}   /* BUILD_VER: bumped to make open copies reload without resetting saves */
