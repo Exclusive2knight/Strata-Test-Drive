@@ -11900,6 +11900,9 @@ function drawHudProj(){if(!HUDP.tex)hudTex();HUDP.g.setTransform(2,0,0,2,0,0);co
   const gear=(x,y)=>{g.fillStyle=c;g.font=`700 22px ${hf}`;g.textAlign="center";const gn=st.gear==="D"&&T.ice&&car.hyb&&car.hyb.gear?String(car.hyb.gear):st.gear;g.fillText(gn,x,y)};
   const tach=(x,y,w)=>{const r=(car.hyb&&car.hyb.rpm)||0,red_=T.redline||6500,f=clamp(r/7000,0,1);for(let i=0;i<20;i++){const on=i/20<f;g.fillStyle=on?(i/20>red_/7000-0.08?red:c):"rgba(255,255,255,.12)";g.fillRect(x-w/2+i*w/20,y-(4+i*0.7),w/20-2,4+i*0.7)}
     g.fillStyle=c;g.font=F(11);g.textAlign="center";g.fillText(T.ice||T.hybrid?`${Math.round(r/100)*100} RPM`:"",x,y+14);if(T.ice&&r>red_-600&&fl){g.fillStyle=red;g.fillRect(x-w/2,y-24,w,3)}};
+  /* GM's Collision Alert: three red triangles flashing on the lower windshield, on every GM car (with or without a head-up display) */
+  const gmTri=()=>{g.fillStyle=red;for(let i=-1;i<=1;i++){const x=W/2+i*70,y=H-12;g.beginPath();g.moveTo(x-26,y);g.lineTo(x+26,y);g.lineTo(x,y-42);g.closePath();g.fill()}};
+  if(!hasHUD()||!st.hudOn){if(alert&&fl&&fam==="gm")gmTri();gl.bindTexture(gl.TEXTURE_2D,HUDP.tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,HUDP.cv);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);return}
   const bsm=()=>{if(sys.bsmL){carIco(40,170,20,amb);g.fillStyle=amb;g.font=F(18);g.fillText("◀",14,176)}if(sys.bsmR){carIco(W-40,170,20,amb);g.fillStyle=amb;g.font=F(18);g.fillText("▶",W-14,176)}};
   /* augmented reality: chevrons on the road up to the turn, a bar under the car you are following */
   if(HB.ar&&!alert){if(G&&G.d<220&&G.node&&M&&M.e){const tc=G.t==="L"?-1:G.t==="R"||G.t==="X"?1:0,to=Math.min(G.d,M.L-M.s);g.strokeStyle=ac;g.lineWidth=5;g.lineCap="round";
@@ -11915,7 +11918,7 @@ function drawHudProj(){if(!HUDP.tex)hudTex();HUDP.g.setTransform(2,0,0,2,0,0);co
       if(view==="Navigation"){if(!nav(W/2+200,92,false))heading(W/2+200,96)}
       if(view==="Audio / Phone"){const R_=RADIO[au.station||0];g.fillStyle=c;g.font=F(13);g.textAlign="center";g.fillText(SCR.radioOn&&R_?(R_.name||"Radio"):"Audio off",W/2+196,96)}}
     else{tach(W/2,40,300);gear(W/2+130,104);if(T.ice&&car.hyb&&(car.hyb.rpm||0)>(T.redline||6500)-500){g.fillStyle=red;g.font=F(14);g.fillText("SHIFT",W/2-130,104)}}
-    if(alert&&fl){g.fillStyle=red;g.fillRect(0,H-46,W,40);carIco(W/2,H-14,40,"#000");g.fillStyle="#000";g.font="900 26px system-ui";g.fillText("✱",W/2+28,H-24)}}
+    if(alert&&fl)gmTri()}
   else if(fam==="ford"){speed(W/2,100,72);limit(W/2-130,96);accBox(W/2+130,82);if(lk)lanes(W/2,150,58,pil?"#3d9bff":"rgba(70,227,124,.8)");if(view!=="Minimal")nav(W/2+212,88,false);
     if(alert&&fl){g.fillStyle=red;g.fillRect(16,H-30,W-32,20);g.fillStyle="#fff";g.font=F(14);g.fillText("BRAKE",W/2,H-15)}}
   else if(fam==="stl"){if(view==="Standard"){limit(W/2-150,98);speed(W/2,100,76);if(!nav(W/2+150,96,true)){}}else{limit(W/2-190,92,0.85);speed(W/2-40,100,68);nav(W/2+190,90,false);accBox(W/2+90,74);gear(W/2-40,160);if(lk)lanes(W/2+90,150,30,grn)}
@@ -19377,7 +19380,7 @@ function render(dt){
     if(CLU_BL&&SCN.cluQuad){const O=M4.p(cm,CLU_BL);gl.bindTexture(gl.TEXTURE_2D,CLU.tex);gl.uniform3fv(U.uSO,O);gl.uniform3fv(U.uSU,sub(M4.p(cm,CLU_BR),O));gl.uniform3fv(U.uSV,sub(M4.p(cm,CLU_TL),O));draw(SCN.cluQuad)}
     if(PANO.on){const O=M4.p(cm,VEH.pano.bl);gl.bindTexture(gl.TEXTURE_2D,PANO.tex);gl.uniform3fv(U.uSO,O);gl.uniform3fv(U.uSU,sub(M4.p(cm,VEH.pano.br),O));gl.uniform3fv(U.uSV,sub(M4.p(cm,VEH.pano.tl),O));draw(PANO.mesh)}
     for(const o of Object.values(XS)){if(!o.on)continue;const O=M4.p(cm,o.q.bl);gl.bindTexture(gl.TEXTURE_2D,o.tex);gl.uniform3fv(U.uSO,O);gl.uniform3fv(U.uSU,sub(M4.p(cm,o.q.br),O));gl.uniform3fv(U.uSV,sub(M4.p(cm,o.q.tl),O));draw(o.mesh)}}
-  if(!cam2&&st.cam===1&&!st.walk&&st.started&&hasHUD()&&st.hudOn&&!SCR.focus&&!(SCR.fz>0.05)&&$("screen").hidden){const Q=hudQuad();if(GFX.frame%3===0||!HUDP.tex)drawHudProj();gl.uniformMatrix4fv(U.uM,false,cm);gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,HUDP.tex);
+  if(!cam2&&st.cam===1&&!st.walk&&st.started&&(hasHUD()&&st.hudOn||hudBrand().fam==="gm"&&(sys.fcw||sys.aebState==="braking"||sys.aebState==="partial"))&&!SCR.focus&&!(SCR.fz>0.05)&&$("screen").hidden){const Q=hudQuad();if(GFX.frame%3===0||!HUDP.tex)drawHudProj();gl.uniformMatrix4fv(U.uM,false,cm);gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,HUDP.tex);
     const O=M4.p(cm,Q.BL);gl.uniform3fv(U.uSO,O);gl.uniform3fv(U.uSU,sub(M4.p(cm,Q.BR),O));gl.uniform3fv(U.uSV,sub(M4.p(cm,Q.TL),O));
     gl.enable(gl.BLEND);gl.blendFunc(gl.ONE,gl.ONE);gl.disable(gl.DEPTH_TEST);gl.depthMask(false);gl.disable(gl.CULL_FACE);mat([0.85,0,0],null,0,1,1,5);draw(Q.mesh);
     gl.enable(gl.DEPTH_TEST);gl.depthMask(true);gl.disable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.enable(gl.CULL_FACE)}
