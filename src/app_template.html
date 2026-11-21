@@ -3839,12 +3839,14 @@ function genBumps(){let sd=7;const r=()=>(sd=(sd*16807)%2147483647)/2147483647,k
     if(!dirt){const nh=Math.round(e.L/170*kb*(e.type==="xway"?0.5:1)*(0.6+r()*0.8));
       for(let k=0;k<nh;k++){const kind=r();BUMPS.heave.push({e,u:u0+r()*span,len:kind<0.6?3+r()*5:0.7+r()*0.8,h:(kind<0.6?(0.02+r()*0.05)*(r()<0.25?-1:1):-(0.01+r()*0.015))*(kb>=10?1.8:1),w:hwR})}
       if(e.T.z==="c"){const nm=Math.round(e.L/90*Math.min(2,kb));for(let k=0;k<nm;k++){const dir=r()<0.5?1:-1;BUMPS.man.push({e,u:u0+r()*span,t:dir*(-(e.m/2+(0.5+r()*0.3)*LANE)),r:0.33,dp:0.008+0.008*Math.min(3,kb)})}}}}
-  for(const e of EDGES)if(e.type==="res"&&e.L>180&&r()<0.35)BUMPS.speed.push({e,u:e.L/2});
+  /* v364: speed humps the US way (ITE: 12-14 ft long, 3-3.5 in high, every 300-500 ft on residential streets, a SPEED HUMP sign and 15 MPH plaque before them) */
+  for(const e of EDGES){if(e.br||e.ov||e.hz&&e.tp)continue;const res=e.type==="res",st_=e.type==="st";if(!(res&&e.L>160&&r()<0.6||st_&&e.L>200&&r()<0.2))continue;
+    const a=(e.r0||0)+40,b=e.L-(e.r1||0)-40;if(b-a<20)continue;const n=Math.max(1,Math.floor((b-a)/120));for(let k=0;k<n;k++)BUMPS.speed.push({e,u:a+(b-a)*(k+0.5)/n,len:3.9,h:0.08})}
   for(const k of ["holes","speed","heave","man"])for(const b of BUMPS[k]){let E=BUMPS.byE.get(b.e);if(!E)BUMPS.byE.set(b.e,E={holes:[],speed:[],heave:[],man:[]});E[k].push(b)}}
 genBumps();
 let RB_HOLE=0;   // how much of the last road height came from a pothole (the suspension can soften that)
 function roadBumps(e,u,t){let h=0;RB_HOLE=0;const E=BUMPS.byE.get(e);
-  if(E){for(const b of E.speed){const d=u-b.u;if(Math.abs(d)<0.5)h+=0.075*Math.pow(Math.cos(Math.PI*d),2)}
+  if(E){for(const b of E.speed){const d=u-b.u,L2=(b.len||1)/2;if(Math.abs(d)<L2)h+=(b.h||0.075)*Math.pow(Math.cos(Math.PI*d/(2*L2)),2)}
     for(const b of E.heave){const d=Math.abs(u-b.u);if(d<b.len/2)h+=b.h*Math.pow(Math.cos(Math.PI*d/b.len),2)}
     for(const b of E.man){if(Math.abs(b.u-u)<0.4&&Math.hypot(b.u-u,b.t-t)<b.r){h-=b.dp;RB_HOLE-=b.dp*0.5}}
     for(const b of E.holes)if(Math.abs(b.u-u)<1.2){const d=Math.hypot(b.u-u,b.t-t);if(d<b.r){const q=b.dp*Math.min(1,1.6*(1-Math.pow(d/b.r,4)));h-=q;RB_HOLE-=q}}}
@@ -4024,7 +4026,7 @@ function groundAt0(x,y){
   for(const e of gAt(GRID.e,x,y)){const p=eProj(e,x,y);if(p.u<e.p0-0.5||p.u>e.L-e.p1+0.5)continue;
     if(e.gap&&p.u>e.gap[0]&&p.u<e.gap[1]){if(Math.abs(p.t)>hwOf(e)+(e.T.walk||0)+0.5)continue;const hh=dbLeafH(e,p.u);if(hh!==null)pick({h:hh,mu:0.95,kind:"road"});continue}
     const mm=mAt(e,p.u),a=Math.abs(p.t),m2=mm/2,outer=m2+e.n*LANE+e.side+auxW(e,p.u,p.t),inner=mm>0.8?m2-e.shL-(e.bay?bayW(e,p.u,p.t<0?1:-1):0):-1;
-    if(a<=outer&&a>=inner){const rum=e.T.rumble&&(Math.abs(a-(m2+e.n*LANE+0.5))<0.2||Math.abs(a-(m2-0.6))<0.2)&&(p.u%0.6)<0.3;
+    if(a<=outer&&a>=inner){const rum=(e.T.rumble||e.type==="road"&&!e.T.kerb)&&(Math.abs(a-(m2+e.n*LANE+0.5))<0.2||Math.abs(a-(m2-0.6))<0.2)&&(p.u%0.6)<0.3;
       {const hb=roadBumps(e,p.u,p.t)+(e.br&&e.br.style?brJank(e,p.u,p.t):0);if(e.T.dirt){const fd=e.ford&&Math.abs(p.u-e.ford.uc)<e.ford.half;pick({h:(e.hz||e.ford?ez(e,p.u):0)+hb+dirtH(e,p.u,p.t),mu:fd?0.5:0.74,kind:fd?"ford":"dirt",hole:RB_HOLE});continue}
         pick({h:(e.hz?ez(e,p.u):0)+hb+(rum?0.006:0),mu:1.15,kind:"road",rum,hole:RB_HOLE,deck:overDeck(e,p.u)});continue}}
     if(inner>0&&a<inner&&(e.br&&onBridge(e,p.u)||e.ov&&onOver(e,p.u))){pick({h:ez(e,p.u),mu:1.0,kind:"pavement",deck:overDeck(e,p.u)});continue}     // bridge deck between the carriageways
@@ -7158,7 +7160,7 @@ function rwPropsDraw0(){if(!RW.pl){RW.pl=1;let i=0;const nx=()=>{if(i<RW_PROPS.l
   for(const z of RW.zones){if((z.x-ex)**2+(z.y-ey)**2>380*380)continue;for(const q of z.props||[])if(PROPS[q.k])propDraw(q.k,carMatrix(q.x,q.y,q.h,gz(q.x,q.y),0,0),{head:0});
     const m=z.mb;if(m&&PROPS[m.k]){const M=carMatrix(m.x,m.y,m.h,gz(m.x,m.y),0,0);propDraw(m.k,M,{head:0});const pi=Math.floor(performance.now()/2000)%2;
       if(st.mbMsg&&st.mbMsg.length)mbLed(m,M,st.mbMsg[pi%st.mbMsg.length],night);else{const pg=m.k+"_"+(1+pi);if(PROPS[pg])propDraw(pg,M,{glow:1.6+night})}}}
-  try{rw2Draw(ex,ey,night)}catch(er){console.error(er)}
+  try{rw2Draw(ex,ey,night)}catch(er){console.error(er)}try{rdDraw(night)}catch(er){console.error(er)}
   bbDraw(ex,ey,night);slDraw(ex,ey,night);try{chgDraw(ex,ey,night)}catch(e){}try{emoDraw()}catch(e){}}
 // billboards: big ones along the freeway, smaller ones on the main streets, set back on open ground
 const BB={list:null};
@@ -7275,6 +7277,15 @@ const WZ_DEF={
   stop:{s:"oct",w:0.46,h:0.46,p:(g,W,H)=>{g.fillStyle=WZC.wht;g.fillRect(0,0,W,H);g.fillStyle=WZC.red;g.beginPath();for(let i=0;i<8;i++){const a=Math.PI/8+i*Math.PI/4,r=W*0.47/Math.cos(Math.PI/8);g.lineTo(W/2+Math.cos(a)*r*0.92,H/2+Math.sin(a)*r*0.92)}g.fill();sgTxt(g,"STOP",W/2,H/2,H*0.3,W*0.8,WZC.wht,800)}},
   slow:{s:"dia",w:0.46,h:0.46,p:wzDia(["SLOW"])},sigbox:{s:"rect",w:0.42,h:1.15,p:(g,W,H)=>{g.fillStyle="#1a1a18";g.fillRect(0,0,W,H);g.fillStyle="#0b0b0b";for(const y of [0.2,0.5,0.8]){g.beginPath();g.arc(W/2,H*y,W*0.36,0,7);g.fill()}}},
   waitred:{s:"rect",w:0.75,h:0.9,p:wzRect(WZC.wht,WZC.blk,[["WAIT",0.22],["ON",0.18],["RED",0.22]],{ls:0.27})}};
+Object.assign(WZ_DEF,{hump:{s:"dia",w:0.9,h:0.9,p:(g,W,H)=>{g.fillStyle=WZC.blk;g.fillRect(0,0,W,H);const b=W*0.035;g.fillStyle="#f6c800";g.beginPath();g.moveTo(W/2,b*1.5);g.lineTo(W-b*1.5,H/2);g.lineTo(W/2,H-b*1.5);g.lineTo(b*1.5,H/2);g.closePath();g.fill();sgTxt(g,"SPEED",W/2,H*0.43,H*0.12,W*0.5,WZC.blk,800);sgTxt(g,"HUMP",W/2,H*0.58,H*0.12,W*0.5,WZC.blk,800)}},
+  mph15:{s:"rect",w:0.6,h:0.45,p:(g,W,H)=>{g.fillStyle="#f6c800";g.fillRect(0,0,W,H);g.strokeStyle=WZC.blk;g.lineWidth=W*0.04;g.strokeRect(W*0.04,H*0.05,W*0.92,H*0.9);sgTxt(g,"15 MPH",W/2,H/2,H*0.4,W*0.85,WZC.blk,800)}}});
+/* v364: SPEED HUMP signs (with a 15 MPH plaque) before the first hump each way on a street; built once, drawn with the road work signs */
+const RD={sg:null,built:false};
+function rdSignsBuild(){RD.built=true;const Z={signs:[]};const by=new Map();for(const b of BUMPS.speed){if(!by.has(b.e))by.set(b.e,[]);by.get(b.e).push(b.u)}
+  for(const [e,U] of by){U.sort((a,b)=>a-b);wzSign(Z,e,1,U[0]-30,"hump",{k2:"mph15",out:0.9});wzSign(Z,e,-1,e.L-U[U.length-1]-30,"hump",{k2:"mph15",out:0.9})}
+  const keepWz=RW.wz;RW.wz=[Z];const keepSg=WZ.sg,keepPad=WZ.pad;try{wzSignsBuild();RD.sg=WZ.sg}finally{RW.wz=keepWz;WZ.sg=keepSg;WZ.pad=keepPad}}
+function rdDraw(night){if(!RD.built)try{rdSignsBuild()}catch(e){console.error(e)}if(!RD.sg)return;gl.uniformMatrix4fv(U.uM,false,M4.id());const lit=night>0.3&&!st.headless;
+  if(RD.sg.face){gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,sgAtlas());mat([1,1,1],lit?[0.55,0,0]:[0.04,0,0],0.25,24,1,6);draw(RD.sg.face)}mat([0.53,0.55,0.57],null,0.55,34);if(RD.sg.plate)draw(RD.sg.plate)}
 const WZF={};
 function wzFace(k){if(WZF[k])return WZF[k];const D=WZ_DEF[k];if(!D)return null;return WZF[k]={s:D.s,w:D.w,h:D.h,face:sgFace("wz_"+k,D.w,D.h,D.p,180)}}
 /* a sign on the right of the road at s (facing the traffic on dir), on a post (or a portable stand when it's only up for a day) */
@@ -12960,17 +12971,31 @@ function terrainMesh(){CUTO.clear();try{TUN.zrA=null;TUN.g=false;tunGeo()}catch(
         const fx=(q[0]-X0)/(X1-X0)*N,fy=(q[1]-Y0)/(Y1-Y0)*NY,i=Math.floor(fx),j=Math.floor(fy);if(i<0||j<0||i>=N||j>=NY)continue;
         for(const [di,dj] of [[0,0],[1,0],[0,1],[1,1]]){const k=(j+dj)*(N+1)+i+di;if(TERR.h[k]>rz-0.15){TERR.h[k]=rz-0.15;P[k*3+1]=rz-0.15;fixed++}}}}}if(!fixed)break}
   for(let j=0;j<NY;j++)for(let i=0;i<N;i++){if(TUN.g&&tunHole(X0+(X1-X0)*i/N,X0+(X1-X0)*(i+1)/N,Y0+(Y1-Y0)*j/NY,Y0+(Y1-Y0)*(j+1)/NY))continue;const a=j*(N+1)+i;I.push(a,a+1,a+N+1,a+1,a+N+2,a+N+1)}return meshFrom(P,Nn,I)}
-function bumpMesh(){const B={P:[],N:[],I:[]},H={P:[],N:[],I:[]};
-  for(const b of BUMPS.speed){const p=ePt(b.e,b.u,0);boxInto(B,p[0],0.035,-p[1],0.9,0.07,hwOf(b.e)*2-0.4,p[2])}
+function bumpMesh(){const B={P:[],N:[],I:[]},H={P:[],N:[],I:[]},BY={P:[],N:[],I:[]},W_={P:[],N:[],I:[]},F_={P:[],N:[],I:[]},Ck={P:[],N:[],I:[]},Gb={P:[],N:[],I:[]},Gr={P:[],N:[],I:[]},Ru={P:[],N:[],I:[]};
+  /* a surface patch following u (along) and t (across) with a height function: used for the humps */
+  const patch=(M,e,u0,u1,t0,t1,hf,nu,nt)=>{const k0=M.P.length/3;for(let i=0;i<=nu;i++){const u=u0+(u1-u0)*i/nu;for(let j=0;j<=nt;j++){const tt=t0+(t1-t0)*j/nt,q=ePt(e,u,tt),z=(e.hz?ez(e,u):0)+hf(u);M.P.push(q[0],z,-q[1]);M.N.push(0,1,0)}}
+    for(let i=0;i<nu;i++)for(let j=0;j<nt;j++){const a=k0+i*(nt+1)+j,b=a+nt+1;M.I.push(a,b,a+1,a+1,b,b+1,a,a+1,b,a+1,b+1,b)}};
+  for(const b of BUMPS.speed){const L2=(b.len||1)/2,hw=hwOf(b.e)-0.3,hf=u=>0.006+(b.h||0.075)*Math.pow(Math.cos(Math.PI*(u-b.u)/(2*L2)),2);patch(B,b.e,b.u-L2,b.u+L2,-hw,hw,hf,8,2);
+    for(let t0=-hw+0.4;t0<hw-0.3;t0+=1.4)patch(BY,b.e,b.u-L2*0.55,b.u+L2*0.55,t0,t0+0.3,u=>hf(u)+0.004,6,1)}   /* yellow bars on the hump */
+  /* drain grates in the gutter: by each corner before the crosswalk, and every ~80 m along kerbed city streets */
+  {for(const e of EDGES){if(!e.T||!e.T.kerb||e.T.z!=="c"&&e.type!=="art"&&e.type!=="ave"||e.br||e.ov)continue;const hw=hwOf(e),a=kerbTrim(e,0)+4,b=e.L-kerbTrim(e,1)-4;if(b-a<12)continue;const U=[a,b];for(let u=a+80;u<b-40;u+=80)U.push(u);
+      for(const u of U)for(const sd of [1,-1]){if(e.ow&&sd>0)continue;const tt=sd*(hw-0.32),q=ePt(e,u,tt),z=(e.hz?ez(e,u):0)+0.009,hh=eAt(e,u).h;boxInto(Gb,q[0],z,-q[1],0.95,0.004,0.5,hh);
+        for(let k=-3;k<=3;k++){const qq=ePt(e,u+k*0.12,tt);boxInto(Gr,qq[0],z+0.003,-qq[1],0.05,0.004,0.42,hh)}}}}
+  /* rumble strips on the shoulders of the country highways (the freeways have them in their surface) */
+  for(const e of EDGES){if(e.type!=="road"||e.T.kerb||e.br||e.ov)continue;const a=(e.r0||0)+30,b=e.L-(e.r1||0)-30;if(b-a<30)continue;const o=e.n*LANE+0.5;
+    for(const sd of [1,-1]){let prev=null;for(let u=a;u<=b;u=Math.min(b,u+6)){const z=(e.hz?ez(e,u):0)+0.007,p=ePt(e,u,sd*(o-0.2)),q=ePt(e,u,sd*(o+0.2)),k=Ru.P.length/3;Ru.P.push(p[0],z,-p[1],q[0],z,-q[1]);Ru.N.push(0,1,0,0,1,0);if(prev!==null)Ru.I.push(prev,k,prev+1,prev+1,k,k+1,prev,prev+1,k,prev+1,k+1,k);prev=k;if(u>=b)break}}}
   const Rm={P:[],N:[],I:[]};
   const disc=(M,b,sc,y)=>{const z=y+(b.e.hz?ez(b.e,b.u):0),c=ePt(b.e,b.u,b.t),k0=M.P.length/3;M.P.push(c[0],z,-c[1]);M.N.push(0,1,0);const n=b.sh.length;
     for(let i=0;i<n;i++){const a=i/n*Math.PI*2,rr=b.r*sc*b.sh[i],q=ePt(b.e,b.u+Math.cos(a)*rr,b.t+Math.sin(a)*rr*0.85);M.P.push(q[0],z,-q[1]);M.N.push(0,1,0)}
     for(let i=0;i<n;i++)M.I.push(k0,k0+1+((i+1)%n),k0+1+i)};
-  for(const b of BUMPS.holes){disc(Rm,b,1.18,0.003);disc(H,b,0.92,0.005)}
+  /* v364: potholes that look like potholes: a ring of broken, lighter asphalt, the hole's rough wall, a dark wet floor, cracks running out of it */
+  for(const b of BUMPS.holes){disc(Rm,b,1.22,0.003);disc(W_,b,0.95,0.0045);disc(H,b,0.72,0.006);disc(F_,b,0.42,0.0068);
+    const z=(b.e.hz?ez(b.e,b.u):0)+0.0042,nc=2+(b.sh[0]*5|0)%3;for(let k=0;k<nc;k++){const a=b.sh[k+1]*7+k*2.1,len=b.r*(1.2+b.sh[k+3]*1.6);let u=b.u,tt=b.t,prev=null;
+      for(let s=0;s<=4;s++){const ang=a+(b.sh[(k+s)%11]-0.95)*1.2,r0=b.r*1.1+len*s/4,uu=b.u+Math.cos(ang)*r0,t2=b.t+Math.sin(ang)*r0*0.85,w=0.035*(1-s/5)+0.01,p=ePt(b.e,uu,t2-w),q=ePt(b.e,uu,t2+w),k1=Ck.P.length/3;Ck.P.push(p[0],z,-p[1],q[0],z,-q[1]);Ck.N.push(0,1,0,0,1,0);if(prev!==null)Ck.I.push(prev,k1,prev+1,prev+1,k1,k1+1,prev,prev+1,k1,prev+1,k1+1,k1);prev=k1}}}
   const Mh={P:[],N:[],I:[]},Hv={P:[],N:[],I:[]};
   for(const b of BUMPS.man){const c=ePt(b.e,b.u,b.t);discInto(Mh,c[0],c[1],b.r,(b.e.hz?ez(b.e,b.u):0)+0.006,16)}
   for(const b of BUMPS.heave){if(b.len>2)continue;const c=ePt(b.e,b.u,0);boxInto(Hv,c[0],(b.e.hz?ez(b.e,b.u):0)+0.0035,-c[1],b.len,0.003,2*b.w-0.4,c[2])}   // patched trenches show as darker asphalt
-  return {speed:meshFrom(B.P,B.N,B.I),holes:meshFrom(H.P,H.N,H.I),rim:meshFrom(Rm.P,Rm.N,Rm.I),man:meshFrom(Mh.P,Mh.N,Mh.I),cut:meshFrom(Hv.P,Hv.N,Hv.I)}}
+  return {speedY:meshFrom(BY.P,BY.N,BY.I),wall:meshFrom(W_.P,W_.N,W_.I),floor:meshFrom(F_.P,F_.N,F_.I),crack:meshFrom(Ck.P,Ck.N,Ck.I),grate:meshFrom(Gb.P,Gb.N,Gb.I),grateB:meshFrom(Gr.P,Gr.N,Gr.I),rumble:meshFrom(Ru.P,Ru.N,Ru.I),speed:meshFrom(B.P,B.N,B.I),holes:meshFrom(H.P,H.N,H.I),rim:meshFrom(Rm.P,Rm.N,Rm.I),man:meshFrom(Mh.P,Mh.N,Mh.I),cut:meshFrom(Hv.P,Hv.N,Hv.I)}}
 // ends of an edge: where its lane lines stop (junction box), and where kerbs / sidewalks stop (side streets cut through them)
 function kerbTrim(e,end){const n=end===0?e.a:e.b,r=end===0?e.r0:e.r1;if(r>0)return r;if(n.kind==="x"&&n.ctrl==="minor"){let t=0;for(const l of n.legs)if(!l.major)t=Math.max(t,hwOf(l.e)+3);return t}
   if(n.ctrl==="merge"&&(e.T.walk||e.T.kerb)){const k=end?"_kt1":"_kt0";if(e[k]===undefined)e[k]=splitTrim(e,end,n);return e[k]}return 0}
@@ -19144,7 +19169,7 @@ function render(dt){
   gl.polygonOffset(2,2);if(SCN.tun&&rkTex()){const cf=gl.isEnabled(gl.CULL_FACE);gl.disable(gl.CULL_FACE);mat([1,1,1],null,0.08,14,1,10);draw(SCN.tun);if(SCN.tunC){mat([0.5,0.49,0.47],null,0.05,10,1,0);draw(SCN.tunC);if(SCN.tunF){mat([0.62,0.61,0.58],null,0.06,12,1,0);draw(SCN.tunF)}if(SCN.tunD){mat([0.06,0.065,0.07],null,0.2,30,1,0);draw(SCN.tunD)}if(SCN.tunE){const nk=night?1.6:0.7;mat([0.25,0.3,0.25],[0.1*nk,0.9*nk,0.3*nk],0.1,20,1,0);draw(SCN.tunE)}if(SCN.tunW){const nk=night?2.2:0.4;mat([0.8,0.8,0.75],[nk,nk*0.95,nk*0.8],0.1,20,1,0);draw(SCN.tunW)}if(SCN.tunS&&TUN.tex){gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,TUN.tex);mat([1,1,1],null,0.1,20,1,6);draw(SCN.tunS);RK.ok&&gl.bindTexture(gl.TEXTURE_2D,RK.tex)}}if(cf)gl.enable(gl.CULL_FACE)}if(SCN.rk&&rkTex()){const cf=gl.isEnabled(gl.CULL_FACE);gl.disable(gl.CULL_FACE);mat([1,1,1],null,0.08,14,1,10);(KITOLD&&KIT.m||draw(SCN.rk));if(cf)gl.enable(gl.CULL_FACE)}else for(const k of (KITOLD&&KIT.m?[]:SCN.kerbs)){mat([0.32,0.32,0.30],null,0.05,10,1,2);draw(k)}
   if(SCN.rbI){mat([0.34,0.34,0.32],null,0.05,10,1,2);draw(SCN.rbI.k);gl.polygonOffset(1,1);mat(st.surface==="snow"?[0.8,0.82,0.86]:[0.11,0.23,0.07],null,0.02,8,1,1);draw(SCN.rbI.g);gl.polygonOffset(2,2)}
   gl.polygonOffset(0,0);mat([0.78,0.78,0.75],night?[0.012,0.012,0.012]:null,0.1,10);if(!KD){draw(SCN.xlines);draw(SCN.zebra)}draw(SCN.stall);mat([0.9,0.9,0.85],night?[0.5,0.5,0.45]:null,0.8,60);draw(SCN.rpm);
-  gl.disable(gl.CULL_FACE);mat([0.11,0.105,0.1],null,0.05,8);draw(SCN.bumps.rim);mat([0.018,0.017,0.016],null,0.3,30);draw(SCN.bumps.holes);mat([0.07,0.068,0.065],null,0.6,40);draw(SCN.bumps.man);mat([0.045,0.046,0.05],null,0.3,30);draw(SCN.bumps.cut);mat([0.75,0.6,0.08],night?[0.03,0.02,0]:null,0.3,20);draw(SCN.bumps.speed);
+  gl.disable(gl.CULL_FACE);mat([0.11,0.105,0.1],null,0.05,8);draw(SCN.bumps.rim);if(SCN.bumps.wall){mat([0.055,0.052,0.05],null,0.2,20);draw(SCN.bumps.wall);mat([0.06,0.058,0.055],null,0.1,10);draw(SCN.bumps.crack)}mat([0.022,0.021,0.02],null,0.3,30);draw(SCN.bumps.holes);if(SCN.bumps.floor){const wet=st.surface==="wet";mat(wet?[0.03,0.035,0.04]:[0.012,0.011,0.01],null,wet?2.5:0.4,wet?120:30);draw(SCN.bumps.floor)}if(SCN.bumps.grate){mat([0.02,0.02,0.022],null,0.3,20);draw(SCN.bumps.grate);mat([0.2,0.19,0.18],null,0.8,50);draw(SCN.bumps.grateB);mat([0.14,0.14,0.145],null,0.1,10);draw(SCN.bumps.rumble)}mat([0.07,0.068,0.065],null,0.6,40);draw(SCN.bumps.man);mat([0.045,0.046,0.05],null,0.3,30);draw(SCN.bumps.cut);mat([0.09,0.09,0.095],null,0.2,20);draw(SCN.bumps.speed);if(SCN.bumps.speedY){mat([0.8,0.62,0.1],night?[0.03,0.02,0]:null,0.3,20);draw(SCN.bumps.speedY)}
   if(SCN.bikeL&&st.surface!=="snow"){mat([0.13,0.4,0.2],null,0.15,15,1,2);(KITOLD&&KIT.m||draw(SCN.bikeL))}
   if(KITOLD){gl.enable(gl.POLYGON_OFFSET_FILL);kitDraw();gl.polygonOffset(0,0)}if(RP2_ON&&!KITW)rp2Draw()
   if(!KD&&!(KITOLD&&KIT.m)){for(const l of SCN.lines){mat([0.75,0.75,0.72],night?[0.012,0.012,0.012]:null,0.1,10);draw(l)}mat([0.78,0.56,0.08],night?[0.012,0.008,0]:null,0.1,10);draw(SCN.ylines)}
