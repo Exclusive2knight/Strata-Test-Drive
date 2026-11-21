@@ -11951,8 +11951,12 @@ function hudGlass(E,D){let best=null;try{const d=MODELS[(TRIMS[st.trim].mesh||TR
   for(const [g,s0,cnt] of ob.g){if(g!=="strata_glass")continue;for(let t=s0;t<s0+cnt;t+=3){const a=I[t]*3,b=I[t+1]*3,c=I[t+2]*3,A=[P[a]/1000,P[a+1]/1000,P[a+2]/1000],e1=[P[b]/1000-A[0],P[b+1]/1000-A[1],P[b+2]/1000-A[2]],e2=[P[c]/1000-A[0],P[c+1]/1000-A[1],P[c+2]/1000-A[2]];
     const pv=cross(D,e2),det=dot(e1,pv);if(Math.abs(det)<1e-9)continue;const iv=1/det,tv=[E[0]-A[0],E[1]-A[1],E[2]-A[2]],u=dot(tv,pv)*iv;if(u<0||u>1)continue;const qv=cross(tv,e1),v=dot(D,qv)*iv;if(v<0||u+v>1)continue;const tt=dot(e2,qv)*iv;
     if(tt>0.3&&tt<2.2&&(!best||tt<best.t))best={t:tt,n:norm(cross(e1,e2))}}}}}catch(e){}return best}
-function hudQuad(){const AR=hudBrand().ar,hk=TRIMS[st.trim].model+"|"+VEH.eye.join(",")+AR;if(HUDP.hk===hk&&HUDP.mesh)return HUDP;HUDP.hk=hk;const E=[VEH.eye[0],VEH.eye[1]+0.12,VEH.eye[2]];HUDP.E=E;let D=norm([0,-0.17,-2.4]),G=null;for(let dy=-0.17;dy<0.5&&!G;dy+=0.02){D=norm([0,dy,-2.4]);G=hudGlass(E,D)}if(G){D=norm([0,D[1]*2.4/Math.abs(D[2])+0.05,-2.4]);G=hudGlass(E,D)||G}let c,U=[1,0,0],V=[0,1,0],w=AR?0.52:0.33,h=AR?0.2:0.12;   /* an augmented-reality HUD throws a much bigger picture (Audi: about 88 in across, seemingly up to 200 m ahead) */
-  if(G){const k=G.t/Math.hypot(0.17,2.4),n=G.n;c=[E[0]+D[0]*(G.t-0.006),E[1]+D[1]*(G.t-0.006),E[2]+D[2]*(G.t-0.006)];U=norm([1-n[0]*n[0],-n[0]*n[1],-n[0]*n[2]]);V=norm(cross(n,U));if(V[1]<0)V=V.map(x=>-x);w*=k*1.3;h*=k*1.3}
+function hudQuad(){const AR=hudBrand().ar,hk=TRIMS[st.trim].model+"|"+VEH.eye.join(",")+AR;if(HUDP.hk===hk&&HUDP.mesh)return HUDP;HUDP.hk=hk;const E=[VEH.eye[0],VEH.eye[1]+0.12,VEH.eye[2]];HUDP.E=E;let D=norm([0,-0.17,-2.4]),G=null;for(let dy=-0.17;dy<0.5&&!G;dy+=0.02){D=norm([0,dy,-2.4]);G=hudGlass(E,D)}if(G){D=norm([0,D[1]*2.4/Math.abs(D[2])+(AR?0.02:0.05),-2.4]);G=hudGlass(E,D)||G}/* v368: real sizes. A windshield HUD covers only about 6 x 2.2 degrees of your view, straight ahead of the driver and about 4-5 degrees below eye level
+     (Toyota/Lexus 10-inch, BMW and Mercedes about 8 x 3); an augmented-reality HUD about 10 x 4 degrees, sitting a little lower so it lies over the road ahead
+     (Audi: a 70-inch picture about 10 m away). It used to fill about 20 x 7 degrees */
+  const FOV={gm:[6,2.2],ford:[6,2.2],stl:[6.5,2.4],toy:[8,3],honda:[6,2.2],hk:[7,2.6],audi:[7,2.6],mb:[8,3],bmw:[8,3],volvo:[6,2.2],nis:[6,2.2],mazda:[5.5,2],gen:[7,2.6]}[hudBrand().fam]||[6.5,2.4],fv=AR?[10,4]:FOV,SC=2,tn=d=>Math.tan(d*SC*Math.PI/360)*2.4;   /* SC: the game camera shows about 100 degrees across, a phone photo from the driver's seat about 65, so the HUD is scaled to take the same share of the view as it does in a real photo */
+  let c,U=[1,0,0],V=[0,1,0],w=tn(fv[0]),h=tn(fv[1]);
+  if(G){const k=G.t/Math.hypot(0.17,2.4),n=G.n;c=[E[0]+D[0]*(G.t-0.006),E[1]+D[1]*(G.t-0.006),E[2]+D[2]*(G.t-0.006)];U=norm([1-n[0]*n[0],-n[0]*n[1],-n[0]*n[2]]);V=norm(cross(n,U));if(V[1]<0)V=V.map(x=>-x);w*=k;h*=k}
   else c=[E[0],E[1]-0.17,E[2]-2.4];
   const P=(su,sv)=>[c[0]+U[0]*w*su+V[0]*h*sv,c[1]+U[1]*w*su+V[1]*h*sv,c[2]+U[2]*w*su+V[2]*h*sv];HUDP.BL=P(-1,-1);HUDP.BR=P(1,-1);HUDP.TL=P(-1,1);const TR=P(1,1);
   HUDP.mesh=meshFrom([...HUDP.BL,...HUDP.BR,...TR,...HUDP.TL],[0,0,1,0,0,1,0,0,1,0,0,1],[0,1,2,0,2,3]);HUDP.veh=VEH;HUDP.onGlass=!!G;return HUDP}
@@ -20094,7 +20098,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="173",BUILD_VER=367;
+const APP_VER="173",BUILD_VER=368;
 // shown as season.update: build 345 is v34.5, 350 will be v35.0
 const verStr=n=>{n=+n;return n>=300?Math.floor(n/10)+"."+n%10:String(n)},VER_S=verStr(BUILD_VER);
 try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+VER_S;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+VER_S)}catch(e){}   /* BUILD_VER: bumped to make open copies reload without resetting saves */
