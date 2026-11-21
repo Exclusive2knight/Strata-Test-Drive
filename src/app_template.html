@@ -4201,8 +4201,9 @@ const OPT_PKGS={
   esc_phev:[{id:"php",name:"PHEV Premium Package",price:4530,items:"360-degree camera with split view, Active Park Assist 2.0, head-up display, B&O sound, LED headlamps, 12.3-inch cluster, leather seats, reverse brake assist, wireless charging",adds:["tech","autopark","rAeb"],hud:1},ESC_TOW],
   ty_lrrwd:[{id:"tow",name:"Tow Hitch",price:1000,items:"Rated to tow 3,500 lb, Trailer Mode",adds:[]}],ty_lrawd:[{id:"tow",name:"Tow Hitch",price:1000,items:"Rated to tow 3,500 lb, Trailer Mode",adds:[]}],ty_perf:[{id:"tow",name:"Tow Hitch",price:1000,items:"Rated to tow 3,500 lb, Trailer Mode",adds:[]}]};
 const optSel=()=>((st.opk||{})[st.trim])||{};
-const pkgAdds=f=>(OPT_PKGS[st.trim]||[]).some(p=>optSel()[p.id]&&p.adds.includes(f));
-const pkgHud=()=>(OPT_PKGS[st.trim]||[]).some(p=>optSel()[p.id]&&p.hud);
+/* v365: a feature is switched on by any package that lists it (its adds or its feature list) and by the build's own standalone options and accessories (a "Side Blind Zone Alert" option or a Super Cruise option used to be charged for and then not work) */
+const pkgAdds=f=>(OPT_PKGS[st.trim]||[]).some(p=>optSel()[p.id]&&(p.adds.includes(f)||(p.feats||[]).includes(f)))||(typeof bdOf==="function"&&!!bdOf(st.trim)&&(()=>{const s=bdSel(st.trim);return s.op.some(o=>o[5].includes(f)||bdAdds(o[5]).includes(f))||s.ac.some(a=>(a[4]||[]).includes(f)||bdAdds(a[4]||[]).includes(f))})());
+const pkgHud=()=>(OPT_PKGS[st.trim]||[]).some(p=>optSel()[p.id]&&(p.hud||p.adds.includes("hud")||(p.feats||[]).includes("hud")));
 // traction / stability control buttons as each maker really does them. tc: 0 on, 1 relaxed (more slip allowed), 2 off. esc: 0 on, 1 sport (later, softer), 2 off.
 // Each press of the button (T, or the TCS toggle) goes to the next stage; in the real cars the second stage is a long press of the same button.
 // BMW Uneven Road Surface warning: fleet data marks potholes, speed bumps, sewer covers, dips and railway tracks, and the car shows them
@@ -20244,6 +20245,7 @@ const PKS_SYS={
   volvo_ppa:{name:"Park Pilot Assist",th:"volvo",auto:"full",types:["par","perp","exit"]},
   lucid_ap:{name:"Auto Park",th:"lucid",auto:"full",types:["par","perp","exit"]},
   lr_pa:{name:"Park Assist",th:"landrover",auto:"steer",types:["par","perp","exit"]},
+  mb_apa:{name:"Active Parking Assist",th:"mercedes",auto:"full",types:["par","perp","exit"]},
   strata:{name:"Strata Park",th:"strata",auto:"full",types:["par","perp","exit"],fict:true}};
 // model -> system (only for trims that have the hardware: the trim's own "autopark" flag decides that)
 const PKS_MAP={model3:"tsl_ap",modely:"tsl_ap",modely_l:"tsl_ap",models_:"tsl_ap",modelx:"tsl_ap",tsl_model3l:"tsl_ap",tsl_modelyl:"tsl_ap",tsl_models20:"tsl_ap",tsl_modelx20:"tsl_ap",tsl_cybertruck:"tsl_ap",tsl_roadster:"tsl_ap",
@@ -20264,7 +20266,10 @@ const PKS_NONE={Honda:"Parking Sensors and the multi-view camera",Acura:"Parking
   Hyundai:"Parking Distance Warning and Surround View Monitor",Kia:"Parking Distance Warning and Surround View Monitor",Genesis:"Parking Distance Warning and Surround View Monitor",Toyota:"Panoramic View Monitor and Parking Assist sonar",Lexus:"Panoramic View Monitor and Parking Support Brake",
   Chevrolet:"rear park assist and HD Surround Vision",Buick:"rear park assist and HD Surround Vision",GMC:"rear park assist and HD Surround Vision",Ford:"the 360-degree camera and parking sensors",Volvo:"Park Assist sensors and the 360° camera",Mercedes:"PARKTRONIC and the 360° camera",Rivian:"Park Assist sensors and the surround cameras",Dodge:"ParkSense sensors and the surround camera"};
 function pkSys(){const T=TRIMS[st.trim];if(!T)return null;if(!T.real)return PKS_SYS.strata;if((T.no||[]).includes("autopark")&&!pkgAdds("autopark"))return null;const k=PKS_MAP[T.model];if(k)return PKS_SYS[k];
-  return /^(fus_|mon_|aureon|wk_|city_)/.test(T.model||"")||/Concept|Work Trucks/.test(T.group||"")?PKS_SYS.strata:null}
+  if(/^(fus_|mon_|aureon|wk_|city_)/.test(T.model||"")||/Concept|Work Trucks/.test(T.group||""))return PKS_SYS.strata;
+  /* v365: a car whose build includes automatic parking (standard or bought) but whose model wasn't listed gets its maker's own system (it used to be sold and then do nothing) */
+  if(pkgAdds("autopark")||ownF("autopark")){const b=PKS_BRAND[brandOfK(st.trim)];if(b)return PKS_SYS[b]}return null}
+const PKS_BRAND={Lexus:"lex_ap",Toyota:"toy_ap",Subaru:"toy_ap",Lincoln:"lin_apa2",Ford:"ford_apa2",Cadillac:"cad_eapa",Jeep:"stl_apa",Ram:"stl_apa",Chrysler:"stl_apa",Dodge:"stl_apa",Hyundai:"hy_rspa2",Kia:"kia_rspa2",Genesis:"gen_rspa2",Buick:"gm_apab",Chevrolet:"gm_apab",GMC:"gmc_apab",Volvo:"volvo_ppa",Audi:"audi_pap",BMW:"bmw_pap",Porsche:"por_apa",Volkswagen:"vw_pap","Mercedes-Benz":"mb_apa","Mercedes-Maybach":"mb_apa","Land Rover":"lr_pa",Lucid:"lucid_ap"};
 // each maker's look: background, panel, accent, text, the words it uses, and its chimes
 const PKS_TH={
   tesla:{bg:"#101112",pn:"#1d1f22",ac:"#3e6ae1",tx:"#f2f2f2",sub:"#9ea3a8",r:12,lay:"viz",o:{par:"Parallel",perp:"Perpendicular",exit:"Pull out"},search:"Autopark: Searching…",found:"Tap the blue P to park",start:"Start Autopark",act:"Autopark Active",snd:[[880,.07],[1320,.1]]},
@@ -20288,6 +20293,7 @@ const PKS_TH={
   volvo:{bg:"#f3f2ef",pn:"#e4e2dc",ac:"#284e80",tx:"#1b1b1b",sub:"#5b5b5b",r:16,lay:"viz",o:{par:"Parallel",perp:"Perpendicular",exit:"Exit"},search:"Looking for spaces",found:"Select a space",start:"Park",act:"Park Pilot Assist",snd:[[784,.09],[1047,.11]]},
   lucid:{bg:"#0d0d0d",pn:"#1c1c1c",ac:"#d9c7a3",tx:"#f2f0ec",sub:"#9e9a92",r:20,lay:"viz",o:{par:"Parallel",perp:"Perpendicular",exit:"Auto Park Out"},search:"Searching for spaces",found:"Select a space",start:"Auto Park",act:"Auto Park",snd:[[880,.08],[1320,.1]]},
   landrover:{bg:"#0c0d0d",pn:"#1d2020",ac:"#5f9a7a",tx:"#eef1ef",sub:"#9ba39e",r:4,lay:"list",o:{par:"Parallel",perp:"Perpendicular",exit:"Park Exit"},search:"Searching for a space",found:"Space found: stop",start:"Engage reverse",act:"Park Assist",snd:[[1047,.08],[1397,.1]]},
+  mercedes:{bg:"#000000",pn:"#16181c",ac:"#00adef",tx:"#f2f4f7",sub:"#9aa3ad",r:10,lay:"viz",o:{par:"Parallel",perp:"Perpendicular",exit:"Exit parking space"},search:"Searching for a space",found:"Space found: stop",start:"Engage reverse",act:"Park Assist",snd:[[1047,.08],[1397,.1]]},
   strata:{bg:"#0a1013",pn:"#16323f",ac:"#1d5fd1",tx:"#e6eef0",sub:"#9fb4b7",r:10,lay:"tiles",o:{par:"Parallel park",perp:"Perpendicular park",exit:"Park exit"},search:"Searching for Parking Space…",found:"Space found",start:"Park",act:"Parking Assist Active",snd:[[880,.08],[1175,.12]]}};
 const pkTh=()=>{const S=pkSys();return PKS_TH[S?S.th:"strata"]||PKS_TH.strata};
 function pkChime(i){try{const s=pkTh().snd||[[880,.08],[1175,.12]];beep(s[i][0],s[i][1],"sine",.2)}catch(e){}}
