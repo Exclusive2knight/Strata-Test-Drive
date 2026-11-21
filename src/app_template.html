@@ -4073,6 +4073,8 @@ const COLL={g:new Map(),gN:new Map(),C:25}, BLD_LIST=[];   // gN: the same grid 
 const COLL_KEEP=[];function collReset(){COLL.g=new Map();COLL.gN=new Map();BLD_LIST.length=0;for(const o of COLL_KEEP)collAdd(o)}
 function collAdd(o){const Rr=o.t==="c"?o.r:Math.hypot(o.hl,o.hw),C=COLL.C;for(let i=Math.floor((o.x-Rr)/C);i<=Math.floor((o.x+Rr)/C);i++)for(let j=Math.floor((o.y-Rr)/C);j<=Math.floor((o.y+Rr)/C);j++){const k=i*100003+j;let a=COLL.g.get(k);if(!a)COLL.g.set(k,a=[]);a.push(o);if(!o.tree){let b=COLL.gN.get(k);if(!b)COLL.gN.set(k,b=[]);b.push(o)}}}
 function collDel(o){const Rr=o.t==="c"?o.r:Math.hypot(o.hl,o.hw),C=COLL.C;for(let i=Math.floor((o.x-Rr)/C);i<=Math.floor((o.x+Rr)/C);i++)for(let j=Math.floor((o.y-Rr)/C);j<=Math.floor((o.y+Rr)/C);j++){const k=i*100003+j;for(const G of [COLL.g,COLL.gN]){const a=G.get(k);if(a){const n=a.indexOf(o);if(n>=0)a.splice(n,1)}}}}
+/* v362: the height range of a collider that has none: from the ground it stands on to about the top of what it is */
+function collZr(o){if(!o.zr){let g=Math.max(hillZ(o.x,o.y),typeof embZ==="function"?embZ(o.x,o.y):-1e9);try{const cz=cutZ(o.x,o.y);if(cz<1e8)g=Math.min(g,cz)}catch(e){}   /* (down in a freeway cut: its floor) */o.zr=[g,g+(o.t==="c"?(o.r<=0.11?3.5:o.r<0.3?10:12):14)]}return o.zr}
 function collNear(x,y){return (COLL.nt?COLL.gN:COLL.g).get(Math.floor(x/COLL.C)*100003+Math.floor(y/COLL.C))||[]}
 
 // ======================================================================= trims & modes
@@ -6081,7 +6083,7 @@ function checkCollision(){
   // fixed obstacles near the car
   const seen=new Set();
   for(const ox of [-3,3])for(const oy of [-3,3])for(const o of collNear(car.px+ox,car.py+oy)){if(seen.has(o)||o.gone)continue;seen.add(o);
-    if(o.z1!==undefined&&(car.zb<o.z0-0.6||car.zb>o.z1))continue;
+    if(o.z1!==undefined){if(car.zb<o.z0-0.6||car.zb>o.z1)continue}else{const zr=collZr(o);if(car.zb<zr[0]-3.5||car.zb>zr[1])continue}   /* v362: no height given: it stands on the ground; a car on a bridge high above it (or under a deck it stands on) can't touch it */
     if(o.t==="c"){const c=Math.cos(car.psi),s=Math.sin(car.psi),dx=o.x-car.px,dy=o.y-car.py,lx=dx*c+dy*s,ly=-dx*s+dy*c,qx=clamp(lx,-BODY_HL,BODY_HL),qy=clamp(ly,-BODY_HW,BODY_HW);
       const ex=lx-qx,ey=ly-qy,dist=Math.hypot(ex,ey);if(dist>=o.r||dist<1e-6)continue;const nl=[ex/dist,ey/dist],n=[nl[0]*c-nl[1]*s,nl[0]*s+nl[1]*c],cp=[car.px+qx*c-qy*s,car.py+qx*s+qy*c];sys.hitCp=cp;sys.hitCpT=performance.now();
       if(!o.what&&!(o.r>0.17&&o.r<0.28)){const sp=Math.hypot(car.vx,car.vy),kd=o.r<=0.11?"sign":o.r<=0.17?"pole":"tree",need={sign:2.5,pole:8,tree:12.5}[kd];
@@ -8614,14 +8616,18 @@ function vizDraw(g,x,y,w,h,big){const M=me(),T=TRIMS[st.trim],dark=VZ.dk?true:is
   // sky / ground with distance fog
   {const hy=cy-Fc*sa/ca,gr=g.createLinearGradient(0,Math.max(y,hy-h*0.05),0,y+h);gr.addColorStop(0,rgb(pal.bg));gr.addColorStop(0.18,rgb(mix(pal.bg,pal.gnd,0.55)));gr.addColorStop(1,rgb(pal.gnd));g.fillStyle=gr;g.fillRect(x,y,w,h)}
   // roads: kerb/sidewalk band, asphalt, then lines — each as one filled path per colour
-  const edges=[];for(const e of EDGES){if(Math.min(Math.hypot(e.a.x-car.px,e.a.y-car.py),Math.hypot(e.b.x-car.px,e.b.y-car.py))>e.L+140)continue;
+  const edges=[],vzHi=[],vzLo=[];for(const e of EDGES){if(Math.min(Math.hypot(e.a.x-car.px,e.a.y-car.py),Math.hypot(e.b.x-car.px,e.b.y-car.py))>e.L+140)continue;
     if(!e._vz){const a=[];for(let u=0;u<=e.L+0.01;u+=Math.min(3,e.L/2)){const p=eAt(e,u);a.push({x:p.x,y:p.y,nx:-Math.sin(p.h),ny:Math.cos(p.h),u,z:e.hz?ez(e,u):null})}e._vz=a}
-    const pts=[];let any=false;for(const s of e._vz){const [f,l]=Fr(s.x,s.y),z=(s.z===null?zc:s.z)-zc,ok=f>-16&&f<135&&Math.abs(l)<90&&Math.abs(z)<4;pts.push({s,f,l,z,ok,nf:s.nx*cc+s.ny*ss,nl:-s.nx*ss+s.ny*cc});any=any||ok}if(any)edges.push([e,pts])}
+    const pts=[];let any=false;for(const s of e._vz){const [f,l]=Fr(s.x,s.y),z=(s.z===null?0:s.z)-zc,xy=f>-16&&f<135&&Math.abs(l)<90,ok=xy&&Math.abs(z)<4;pts.push({s,f,l,z,ok,nf:s.nx*cc+s.ny*ss,nl:-s.nx*ss+s.ny*cc});any=any||ok;
+      /* v362: bridges over you and roads down below, each at its own height (they used to vanish, or roads below were drawn flat at your level) */
+      const k=pts.length-1;if(k>0){const A=pts[k-1],B=pts[k],zz=(A.z+B.z)/2;if((xy||A.f>-16&&A.f<135&&Math.abs(A.l)<90)&&Math.abs(zz)>=3&&Math.abs(zz)<40)(zz>0?vzHi:vzLo).push(zz>0?[e,{...A,z:Math.min(A.z,5.5)},{...B,z:Math.min(B.z,5.5)}]:[e,A,B])}}if(any)edges.push([e,pts])}
   const band=(t0,t1,fill,dash)=>{for(const [e,pts] of edges){const tt0=typeof t0==="function"?t0(e):t0,tt1=typeof t1==="function"?t1(e):t1;if(tt0===null)continue;
     for(let i=0;i+1<pts.length;i++){const A=pts[i],Bp=pts[i+1];if(!A.ok&&!Bp.ok)continue;if(dash&&Math.floor(A.s.u/dash)%2)continue;
       const c=(P,t)=>Pj(P.f+P.nf*t,P.l+P.nl*t,P.z);const p1=c(A,tt0),p2=c(Bp,tt0),p3=c(Bp,tt1),p4=c(A,tt1);if(!p1||!p2||!p3||!p4)continue;
       g.moveTo(p1[0],p1[1]);g.lineTo(p2[0],p2[1]);g.lineTo(p3[0],p3[1]);g.lineTo(p4[0],p4[1]);g.closePath()}}};
   const hwA=e=>e.ow?-e.m/2+0.4:hwOf(e),hwB=e=>e.ow?-(e.m/2+e.n*LANE)-0.4:-hwOf(e);
+  const segs=(L,t0,t1)=>{for(const [e,A,Bp] of L){const a0=t0(e),a1=t1(e),q=(P,tq)=>Pj(P.f+P.nf*tq,P.l+P.nl*tq,P.z);const p1=q(A,a0),p2=q(Bp,a0),p3=q(Bp,a1),p4=q(A,a1);if(!p1||!p2||!p3||!p4)continue;g.moveTo(p1[0],p1[1]);g.lineTo(p2[0],p2[1]);g.lineTo(p3[0],p3[1]);g.lineTo(p4[0],p4[1]);g.closePath()}};
+  if(vzLo.length){g.fillStyle=rgb(mix(pal.road,pal.gnd,0.55));g.beginPath();segs(vzLo,hwA,hwB);g.fill()}   /* roads down below a bridge you're on: dimmed, at their own height */
   g.fillStyle=rgb(pal.side);g.beginPath();band(e=>hwA(e)+2.2,e=>hwB(e)-2.2);g.fill();
   g.fillStyle=rgb(pal.road);g.beginPath();band(hwA,hwB);g.fill();
   // lane lines: white edges, white dashes between lanes, double yellow down the middle of two-way roads
@@ -8635,6 +8641,9 @@ function vizDraw(g,x,y,w,h,big){const M=me(),T=TRIMS[st.trim],dark=VZ.dk?true:is
   for(const [e] of edges)for(const dir of [1,-1]){if(e.ow&&dir<0)continue;const n=endNode(e,dir);if(!n||!(n.ctrl==="signal"||n.ctrl==="allstop"||n.ctrl==="minor"))continue;const L_=arrLeg(e,dir);if(n.ctrl==="minor"&&(!L_||L_.major||n.rbt))continue;
     const s=e.L-rEnd(e,dir)-1.5;const q=[];for(const [o0,ds] of [[laneOff(e,0)-LANE/2,0],[laneOff(e,e.n-1)+LANE/2,0],[laneOff(e,e.n-1)+LANE/2,0.45],[laneOff(e,0)-LANE/2,0.45]]){const p=fpt(e,dir,s+ds,o0),[f,l]=Fr(p[0],p[1]);q.push(f>-10&&f<120?Pj(f,l,(e.hz?ez(e,dir>0?s:e.L-s):zc)-zc):null)}
     if(q.every(Boolean)){g.moveTo(q[0][0],q[0][1]);for(let i=1;i<4;i++)g.lineTo(q[i][0],q[i][1]);g.closePath();if(n.ctrl==="signal")stops.push([e,dir,s,n,L_])}}g.fill();
+  /* bridges and flyovers over you: a grey deck with its edges, up at its real height, drawn over the road under it */
+  if(vzHi.length){g.globalAlpha=0.88;g.fillStyle=rgb(mix(pal.side,pal.bg,0.25));g.beginPath();segs(vzHi,e=>hwA(e)+0.6,e=>hwB(e)-0.6);g.fill();
+    g.fillStyle=rgb(mix(pal.side,[0,0,0],0.25));g.beginPath();segs(vzHi,e=>hwA(e)+0.6,e=>hwA(e)-0.2);segs(vzHi,e=>hwB(e)+0.2,e=>hwB(e)-0.6);g.fill();g.globalAlpha=1}
   const ap=sys.pilotState==="active"||sys.pilotState==="changing"||sys.pilotState==="waiting",fsdA=ap&&fsdOwned()&&isTesla();
   // Autosteer / lane centring: your lane's lines in blue; lane keeping assist steering you back: green
   const tes=isTesla(),lkaOn=!tes&&sys.lkaState==="nudge",lkaRdy=!tes&&sys.lkaState==="ready";
@@ -11582,6 +11591,7 @@ function aebStatic(sp){const r=car.r||0,k=r/Math.max(sp,1),turn=Math.abs(r)>0.12
   const pk=[];for(const o of parked){const dx=o.wx-car.px,dy=o.wy-car.py;if(dx*dx+dy*dy<(L+6)*(L+6)&&Math.abs((o.wz||0)-zb)<2.5)pk.push(o)}
   const hitAt=(ax,ay,ps,o)=>{if(o.wx!==undefined)return obbSAT(ax,ay,ps,hl,hw,o.wx,o.wy,o.wh,(o.len||CARLEN)/2,(o.wid||1.9)/2);
     if(o.z1!==undefined&&(zb<o.z0-0.6||zb>o.z1||o.z1<zb+0.3))return false;
+    if(o.z1===undefined&&o.x!==undefined){const zr=collZr(o);if(zb<zr[0]-3.5||zb>zr[1])return false}   /* v362: things on the ground under a bridge you're on (or up on a deck you're under): not in your way */
     if(o.t==="c"){if(o.r<0.12)return false;const dx=o.x-ax,dy=o.y-ay,c=Math.cos(ps),s_=Math.sin(ps);return Math.abs(dx*c+dy*s_)<hl+o.r&&Math.abs(-dx*s_+dy*c)<hw+o.r}
     return obbSAT(ax,ay,ps,hl,hw,o.x,o.y,o.h||0,o.hl,o.hw)};
   /* v361: on the crossover's path (or in the open side's lane), its barrier runs alongside: the swept arc of an S-bend would cross it, the road doesn't */
@@ -22598,7 +22608,10 @@ const LOADING={};
 function loadModel(k){if(MODELS[k])return Promise.resolve(MODELS[k]);
   // a copy that doesn't carry every model file (the Claude artifact) falls back to the public repo through jsDelivr
   const get=u=>fetch(u).then(r=>{if(!r.ok)throw new Error(r.status);return r.json()});
-  const qv="?v="+BUILD_VER,kf=(EMV_MDL&&EMV_MDL[k])||k;if(!LOADING[k])LOADING[k]=get("models/"+kf+".json"+qv).catch(e=>{if(/github\.io$/.test(location.hostname))throw e;return get("https://cdn.jsdelivr.net/gh/Exclusive2knight/Strata-Test-Drive@/*ASSET_REF*/main/models/"+kf+".json"+qv)}).then(d=>{MODELS[k]=d;return d}).catch(e=>{delete LOADING[k];throw e});return LOADING[k]}
+  const qv="?v="+BUILD_VER,kf=(EMV_MDL&&EMV_MDL[k])||k;if(!LOADING[k])LOADING[k]=get("models/"+kf+".json"+qv).catch(e=>{if(/github\.io$/.test(location.hostname))throw e;return get("https://cdn.jsdelivr.net/gh/Exclusive2knight/Strata-Test-Drive@/*ASSET_REF*/main/models/"+kf+".json"+qv)}).then(d=>{const fx=MODEL_FIX[k];if(fx&&d.meta)Object.assign(d.meta,fx);MODELS[k]=d;return d}).catch(e=>{delete LOADING[k];throw e});return LOADING[k]}
+/* v362: model data fixes. The Model 3 (2021 and 2026) files put the side mirrors 14 cm too low and 40 cm too far back, so the mirror image sat on the door
+   panel instead of the mirror glass: the glass measured off the mesh (housing 0.88-1.11 m out, 1.03-1.16 m up, its back face 0.92 m ahead of the eye line) */
+const MODEL_FIX={model3:{mirror:[1.0,1.1,-1.0],mirG:{c:[1.0,1.095,-0.925],hw:0.085,hh:0.05}},tsl_model3l:{mirror:[1.0,1.1,-1.0],mirG:{c:[1.0,1.095,-0.925],hw:0.085,hh:0.05}}};
 // ---- the parking garage model: the uploaded Two_Bay_Dual_Helix_Garage at full detail (277k triangles), loaded in the background.
 // Stored per material as centimetre positions in garage coordinates (x along, y up, z across = GAR local X, height, Z)
 const GARM={g:null,loading:false};
