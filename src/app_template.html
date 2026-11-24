@@ -20949,14 +20949,14 @@ function xrDraw(cm,pass,ey,tg){const L=XR.layer,P=XR.pose;if(!L||!P)return false
   gl.bindFramebuffer(gl.FRAMEBUFFER,null);return true}
 function frame(now){if(XR.on&&!XR.inFrame){requestAnimationFrame(frame);return}   // in VR the headset drives the frames
   if(!XR.inFrame){const c=fpsCap();if(c&&now-last<1000/c-2){requestAnimationFrame(frame);return}}gfxTick(Math.min(0.1,(now-last)/1000));
-  const dt=Math.min(0.067,(now-last)/1000);last=now;
+  const dt=Math.min(0.1,(now-last)/1000);last=now;   // down to 10 fps the game still runs in real time (it used to slow down below 15 fps)
   if(!XR.inFrame)requestAnimationFrame(frame);   // schedule the next frame first, so one bad frame can never freeze the game
   if(RPL.on){try{rplFrame(dt)}catch(e){console.error(e);rplStop()}render(dt);hud(dt);return}
   if(PM.on){try{pmTick(dt);gtTick(0)}catch(e){}render(dt);if(PM.want)pmShotNow();try{pmPost()}catch(e){}return}   // photo mode: the world holds still
   if(st.started){controls(dt);assist(dt);updateTraffic(dt);updatePark(dt);enforcePkgs();weatherTick(dt);try{hapTick(dt)}catch(e){}try{hoseTick()}catch(e){}if(st.power===false&&SPOT.ctl&&!SPOT.paused){try{SPOT.ctl.pause()}catch(e){}SPOT.paused=true}try{navTick(dt)}catch(e){console.error(e)}if(!!car.swayOff!==!!sys.swayWas){sys.swayWas=!!car.swayOff;carMsg(car.swayOff?"Front sway bar disconnected: more wheel travel for the trail":"Front sway bar reconnected")}
     if(sys.hillDemo){sys.hillT+=dt;if(sys.hillT>6){sys.hillT=0;st.leveling=!st.leveling;toast(st.leveling?"Active levelling ON: beam hugs the ground":"Active levelling OFF: beam fixed to the body")}if(!car.offroad&&Math.abs(car.vx)>3)sys.hillDemo=false}
     if(sys.aim!=null){sys.levT=(sys.levT||0)+dt;if(sys.levT>5){sys.levT=0;st.leveling=!st.leveling;toast(st.leveling?"Levelling ON: beam back down on the road":"Levelling OFF: the loaded car aims the beam high")}
-      if(Math.hypot(car.px-sys.aim.x,car.py-sys.aim.y)>40){sys.aim=null;car.cargo=0;st.leveling=true}}acc+=dt;const h=1/G().hz;if(acc>0.05)acc=0.05;   // a slow frame never makes the next one slower catching up (no death spiral)
+      if(Math.hypot(car.px-sys.aim.x,car.py-sys.aim.y)>40){sys.aim=null;car.cargo=0;st.leveling=true}}acc+=dt;if(acc>0.1)acc=0.1;let h=1/G().hz;if(acc>h*30)h=acc/30;   // at most 30 physics steps a frame: on a slow frame each step gets longer (never past 1/300 s) instead of the car going in slow motion, and no death spiral
   while(acc>=h){physics(h);acc-=h}if(car.crashed>0)car.crashed-=dt;try{updateAudio()}catch(e){console.error(e)}}
   shopTick();homeTick(dt);if(st.walk){footTick(dt);openHouseTick()}else if(sys.flashT>0)sys.flashT-=dt;gtTick(dt);phTick();revChime(dt);beltTick(dt);econTick(dt);usedTick(dt);testTick(dt);ui2Tick();trainTick(dt);meterTick(dt);brTick(dt);gateTick(dt);w2LifeTick(dt);mpTick(dt);netTick(dt);teslaTrip(dt);launchTick(dt);
   try{hudMapTick(dt)}catch(e){}try{gigTick(dt)}catch(e){}try{copTick(dt)}catch(e){console.error(e)}if(DALE.p.length||DALE.pools.length||DALE.dead>0||DALE.shake>0||DALE.fire)try{daleTick(dt)}catch(e){}try{if(st.started)stkTick(dt)}catch(e){}if(st.started&&st.power===true&&!st.walk&&Math.abs(car.vx)>1)sys.tripT=(sys.tripT||0)+dt;if(sys.roaT>0)sys.roaT-=dt;
