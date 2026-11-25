@@ -1424,14 +1424,22 @@ html body.chatOn #ui2 .u2left .dk,html body.chatOn #ui2 #u2mm{transform:translat
 <script data-boot>(function(){var p=0;window.__bootP=0;var t=setInterval(function(){if(window.__bootReal){clearInterval(t);return}p+=(0.7-p)*0.025;window.__bootP=p;var a=document.getElementById("bootArc"),n=document.getElementById("bootNeedle"),c=document.getElementById("bootPct");if(a)a.setAttribute("stroke-dasharray",(p*100).toFixed(1)+" 100");if(n)n.style.setProperty("--a",(-135+p*270)+"deg");if(c)c.textContent=String(Math.round(p*100))},120)})()</script>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 372 · Super Cruise and phone fixes</h2></div>
+    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 37.3 · Kestrel roundabout, Honda gauges, gentler parking brakes</h2></div>
     <div class="nb"><ul>
+      <li>⛰️ <b>No more gridlock at the Kestrel roundabout.</b> Where County Rd 3, Kestrel Pass and Ridge Rd meet at the bottom of Mount Kestrel, County Rd 3 and Kestrel Pass joined the ring almost on top of each other, so drivers waiting on one road blocked the other. All three roads backed up and the queue on Kestrel Pass piled into itself, with cars ending up on top of each other. County Rd 3 now swings in from the south-west so each road has its own entrance, and traffic keeps moving.</li>
+      <li>🚗 <b>Drivers don't brake for oncoming cars on tight bends.</b> On sharp curves (like the first bend of Kestrel Pass), traffic used to brake for cars coming the other way in their own lane, because the bend lined them up. Now only a car that's actually in your lane (like someone overtaking) counts.</li>
+      <li>🅿️ <b>Gentler rear braking when backing up.</b> Rear Cross-Traffic Braking now only stops you when you'd actually be in the crossing car's path when it gets there; a car going by on the far side of the road just gets the beep. The rear auto brake (Parking Support Brake and the like) waits until about a second before contact (about half a metre at walking pace) instead of stopping you a car length early, and no longer reacts to things you'd back past.</li>
+      <li>🔧 <b>Honda Ridgeline and Odyssey gauges.</b> The digital cluster was floating in front of the real gauges. Now it's a 7-inch screen on the left with the real analog speedometer on the right, like the actual 2025 trucks and vans.</li>
+      <li>🔧 <b>Civic driver's view.</b> A stray piece of the interior hung in front of the driver's eyes in the Civic sedan and hatchback (and their hybrids), blocking most of the windshield. It's gone.</li>
+      <li>🔧 <b>2010 Acura MDX screen.</b> The centre screen showed the gauge cluster instead of the map. It shows the map again, and the real analog gauges stay as they are.</li>
+    </ul>
+    <h4 class="old">Version 37.2 · Super Cruise and phone fixes</h4><ul>
       <li>🛣️ <b>Super Cruise (and the other hands-free systems) stop hogging the left lane.</b> After passing, the car now moves back to the right as soon as there's a safe gap, instead of waiting for the right lane to be completely empty for 20 seconds. It still stays left if the car ahead in the right lane is slower, so it doesn't pass the same car twice.</li>
       <li>↔️ <b>Quicker lane changes.</b> When you signal, the car moves over after 2 seconds of blinking (was 3) and crosses in about 3 seconds (was 4.5), like the real systems.</li>
       <li>📱 <b>Status screen scrolls on phones.</b> It refreshed twice a second and jumped back to the top every time, so you couldn't scroll down. Now it keeps your place and waits while your finger is on it.</li>
       <li>🔄 <b>Swipe to turn the car in Build a car.</b> Drag left and right on the car (not the panel) to spin it around, up and down to tilt the view. Before, only the ⟲ ⟳ buttons worked.</li>
     </ul>
-    <h4 class="old">Version 371 · Vehicle status, quieter pop-ups</h4><ul>
+    <h4 class="old">Version 37.1 · Vehicle status, quieter pop-ups</h4><ul>
       <li>🔧 <b>Vehicle status screen.</b> Tap <b>Status</b> on the left (under Phone) any time to see what's wrong with your car: damage to each side on a top-down picture, smashed lamps, bent wheels and flats, engine health, coolant and transmission temperature, the radiator, power cuts, and worn tires, brakes and oil. A red ! on the button means something needs fixing.
         <ul><li><b>What happened:</b> every hit (what you hit, how fast, and what it broke), overheat, breakdown and repair is listed with the time, so after a police chase you can look back and see exactly what went wrong.</li>
         <li><b>Recent messages:</b> the last pop-ups are there too, so you can read one you missed.</li>
@@ -3256,7 +3264,7 @@ function buildNet2(){
   mkR("road","Maple Rd",[[1000,-1910],[1000,-2400],[1000,-3300]],{lim:55});
   mkR("road","County Rd 3",[[-3600,-3060],[-3600,-2400],[-3600,-2100],[-3600,-1910]],{lim:55});
   mkR("art","County Rd 3",[[-3600,-1910],[-3600,-1590],[-3600,-1410],[-3600,-1090]],{lim:45});
-  mkR("road","County Rd 3",[[-3600,-1090],[-3600,0],[-3600,1000],[-4100,1800,300],[-4252,3050]],{lim:50});
+  mkR("road","County Rd 3",[[-3600,-1090],[-3600,0],[-3600,1000],[-4100,1800,300],[-4330,2880,160],[-4252,3050]],{lim:50});   // v37.3: swings in from the south-south-west for the last 190 m, so its mouth on the Kestrel roundabout is 70° round from Kestrel Pass (39° before: the two overlapped and the three roads gridlocked)
   // Halden Pkwy: a divided boulevard with real left-turn bays cut into the median at its four lights (the signal test road)
   for(const x of [-4400,-4130,-3870,-3600])N(x,-2100,{ctrl:"signal"});
   mkR("road","County Rd 1",[[-4400,-3300],[-4400,-2400],[-4400,-2100],[-4400,0]],{lim:55});
@@ -6345,6 +6353,10 @@ function obCells(OB,x,y){if(!OB.grid)return [OB];const gx=Math.floor(x/90),gy=Ma
 function pathGap(c,pts,OB){let gap=Infinity,vL=0,who=null;
   for(const CL of obCells(OB,c.wx,c.wy))for(const o of CL){if(o.o===c)continue;const dx=o.x-c.wx,dy=o.y-c.wy;if(dx*dx+dy*dy>8100)continue;if(o.z!==undefined&&Math.abs(o.z-(c.wz||0))>3)continue;
     if(c.ghostT>0&&o.o!=="me"&&Math.abs(wrapPi(o.h-c.wh))>0.8)continue;
+    /* v37.3: an oncoming car in its own lane is not in my way, even when the bend makes my path line up with it (on tight mountain bends, like
+       Kestrel Pass above the roundabout, drivers braked for every oncoming car and the queue rode up into itself). Anyone overtaking, or out of
+       their lane, still counts */
+    {const O=o.o;if(O&&O.kind==="ai"&&!c.jn&&!O.jn&&O.e===c.e&&O.dir!==c.dir&&!c.ovt&&!O.ovt&&Math.abs(c.off-c.offT||0)<1.2&&Math.abs(O.off-O.offT||0)<1.2&&!(c.e.n===1&&(c.offT||0)<-1)&&!(O.e.n===1&&(O.offT||0)<-1))continue}
     let bd=o.t2||4.84,bi=-1;for(let q=0;q<pts.length;q++){const ex=o.x-pts[q][0],ey=o.y-pts[q][1],d=ex*ex+ey*ey;if(d<bd){bd=d;bi=q}}
     // FSD: something right on our nose still counts (it used to be skipped, so the car crept into it)
     if(bi<0)continue;let al=pts[bi][2];if(al<1.2){if(c.kind!=="fsd"&&o.o!=="me")continue;   /* you, right on its nose: it must not creep into you */const fx=(o.x-c.wx)*Math.cos(c.wh)+(o.y-c.wy)*Math.sin(c.wh);if(fx<0.5)continue;al=Math.max(al,fx)}const g=al-(c.len||CARLEN)/2-(o.l2!=null?o.l2:((o.o&&o.o.len)||CARLEN)/2);
@@ -12226,15 +12238,19 @@ function assist(dt){
   sys.rAebBrake=0;
   if(st.gear!=="R"){sys.rAebOv=false;sys.rAebRel=false}else if(inp.thr<0.05){sys.rAebOv=false;if(st.clock-(sys.rAebT??-99)<6)sys.rAebRel=true}else if(sys.rAebRel&&Math.abs(sp)<0.3&&inp.thr>0.25){sys.rAebOv=true;sys.rAebRel=false}   // stopped once: press the accelerator again and it lets you back up
   if(st.rAeb&&st.gear==="R"&&sp<-0.3&&!sys.rAebOv&&!(st.clock-(sys.hitClk??-99)<4)){const c_=Math.cos(car.psi),s_=Math.sin(car.psi);const RL=S.list.map(t=>t.o);for(const o of parked)if(Math.abs(o.wx-car.px)<16&&Math.abs(o.wy-car.py)<16&&Math.abs((o.wz||0)-(car.zb||0))<2)RL.push(o);for(const o of RL){if(!o||o.kind==="cone"||o.wx===undefined)continue;const dx=o.wx-car.px,dy=o.wy-car.py,lx=dx*c_+dy*s_,ly=-dx*s_+dy*c_,hl=(o.len||CARLEN)/2;
-    if(lx>-BODY_HL||Math.abs(ly)>BODY_HW+(o.vru?0.6:1.0))continue;const dh_=(o.wh||0)-car.psi,g=-lx-BODY_HL-(o.vru?0.3:hl*Math.abs(Math.cos(dh_))+((o.wid||1.9)/2)*Math.abs(Math.sin(dh_))),vo=(o.v||0)*Math.cos((o.wh||0)-car.psi),close=-sp+vo;
-    if(g>0.15&&close>0.2&&(g/close<1.5||g<1.6)){if(!sys.rAebWas){beep(1200,.15,"square",.25);toast("Rear auto brake")}sys.rAebBrake=1;sys.rAebT=st.clock;sys.rAebRel=false}}}
+    /* v37.3: only what the car would actually touch: the object's own width counts, 25 cm of margin (was a full metre past the side of the car, so things you'd back
+       past set it off) */
+    const dh0=(o.wh||0)-car.psi,ow_=o.vru?0.3:((o.wid||1.9)/2)*Math.abs(Math.cos(dh0))+hl*Math.abs(Math.sin(dh0));if(lx>-BODY_HL||Math.abs(ly)-ow_>BODY_HW+0.25)continue;const dh_=dh0,g=-lx-BODY_HL-(o.vru?0.3:hl*Math.abs(Math.cos(dh_))+((o.wid||1.9)/2)*Math.abs(Math.sin(dh_))),vo=(o.v||0)*Math.cos((o.wh||0)-car.psi),close=-sp+vo;
+    /* v37.3: brakes about a second before contact, or when it's half a metre away and still closing (was 1.5 s, or anything within 1.6 m: it stopped you
+       a car length short of things at walking pace) */
+    if(g>0.1&&close>0.2&&(g/close<0.95||g<0.5)){if(!sys.rAebWas){beep(1200,.15,"square",.25);toast("Rear auto brake")}sys.rAebBrake=1;sys.rAebT=st.clock;sys.rAebRel=false}}}
   // ---- rear cross traffic alert: cars crossing behind you while you back out; cars with rear auto brake also brake for them
   sys.rcta=0;
-  if(st.rcta!==false&&has("bsm")&&st.gear==="R"&&sp<3){const c=Math.cos(car.psi),s=Math.sin(car.psi),rx=car.px+c*(VEH.tail?-VEH.tail[2]:-2.4),ry=car.py+s*(VEH.tail?-VEH.tail[2]:-2.4);let best=99;
+  if(st.rcta!==false&&has("bsm")&&st.gear==="R"&&sp<3){const c=Math.cos(car.psi),s=Math.sin(car.psi),rx=car.px+c*(VEH.tail?-VEH.tail[2]:-2.4),ry=car.py+s*(VEH.tail?-VEH.tail[2]:-2.4);let best=99,bBack=99;
     for(const o of cars){if(o.wx===undefined||o.kind==="cone"||o.kind==="wreck"||(o.v||0)<1.2)continue;const dx=o.wx-rx,dy=o.wy-ry,back=-(dx*c+dy*s),lat=-dx*s+dy*c;if(back<-1.5||back>14||Math.abs(lat)>32||Math.abs(lat)<1)continue;
-      const ovx=Math.cos(o.wh)*o.v,ovy=Math.sin(o.wh)*o.v,vlat=-ovx*s+ovy*c;if(lat*vlat>=0)continue;const ttc=(Math.abs(lat)-1.2)/Math.abs(vlat);if(ttc<3.5&&ttc<best){best=ttc;sys.rcta=lat>0?-1:1}}
+      const ovx=Math.cos(o.wh)*o.v,ovy=Math.sin(o.wh)*o.v,vlat=-ovx*s+ovy*c;if(lat*vlat>=0)continue;const ttc=(Math.abs(lat)-1.2)/Math.abs(vlat);if(ttc<3.5&&ttc<best){best=ttc;bBack=back;sys.rcta=lat>0?-1:1}}
     if(sys.rcta){sys.rctaT=(sys.rctaT||0)-(1/60);if(!(sys.rctaT>0)){beep(1050,.12,"square",.22);setTimeout(()=>beep(1050,.12,"square",.22),160);sys.rctaT=0.9;if(!sys.rctaWas)toast(`Rear cross traffic from the ${sys.rcta<0?"left":"right"}`)}
-      if(best<1.3&&st.rAeb&&has("rAeb")&&sp<-0.2){if(!sys.rAebWas)toast("Rear cross traffic braking");sys.rAebBrake=1}}}
+      if(best<1.3&&bBack<5&&st.rAeb&&has("rAeb")&&sp<-0.2&&Math.max(0,bBack-1.1)/Math.max(-sp,0.2)<best+0.6){if(!sys.rAebWas)toast("Rear cross traffic braking");sys.rAebBrake=1}}}   /* v37.3: brakes only when you'd be in its lane when it gets there (it used to brake for anything up to 14 m back, so a car on the far side of the road stopped you the moment you moved) */
   sys.rctaWas=!!sys.rcta;
   sys.rAebWas=sys.rAebBrake>0;
   // ---- blind spot monitoring (adjacent lanes, beside and closing fast from behind)
@@ -20276,7 +20292,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="174",BUILD_VER=372;
+const APP_VER="175",BUILD_VER=373;
 // shown as season.update: build 345 is v34.5, 350 will be v35.0
 const verStr=n=>{n=+n;return n>=300?Math.floor(n/10)+"."+n%10:String(n)},VER_S=verStr(BUILD_VER);
 try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+VER_S;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+VER_S)}catch(e){}   /* BUILD_VER: bumped to make open copies reload without resetting saves */
