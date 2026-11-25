@@ -1191,7 +1191,7 @@ html body.ui2 #ui2 #u2prs button{background:transparent!important;border:0!impor
 #u2stat{position:relative}#u2stB{position:absolute;top:2px;right:6px;min-width:16px;height:16px;border-radius:8px;background:#ff453a;color:#fff;font:800 10px/16px system-ui;text-align:center;font-style:normal}#u2stB[hidden]{display:none}
 #vstat{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.5);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);padding:max(10px,env(safe-area-inset-top)) 10px 10px}
 #vstat[hidden]{display:none}
-#vstat .vsC{width:min(880px,100%);max-height:100%;overflow:auto;-webkit-overflow-scrolling:touch;background:var(--card,#141a21);color:var(--tx,#e8eef3);border:1px solid var(--brd,#2a3440);border-radius:22px;box-shadow:0 20px 60px rgba(0,0,0,.5);padding:16px 18px;font:400 13px var(--hf,system-ui)}
+#vstat .vsC{width:min(880px,100%);max-height:100%;overflow:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;overscroll-behavior:contain;background:var(--card,#141a21);color:var(--tx,#e8eef3);border:1px solid var(--brd,#2a3440);border-radius:22px;box-shadow:0 20px 60px rgba(0,0,0,.5);padding:16px 18px;font:400 13px var(--hf,system-ui)}
 #vstat header{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}#vstat header small{color:var(--sub,#8b9aa8);text-transform:uppercase;letter-spacing:.08em;font-size:10px}#vstat h2{margin:2px 0 8px;font-size:19px}
 #vstat header button,#vstat [data-vclr]{all:unset;cursor:pointer;width:34px;height:34px;border-radius:17px;background:var(--chip,#222b35);display:flex;align-items:center;justify-content:center;font-size:15px}
 #vstat [data-vclr]{width:auto;height:auto;padding:3px 10px;font-size:11px;margin-left:8px;display:inline-flex;color:var(--sub,#8b9aa8)}
@@ -1424,8 +1424,14 @@ html body.chatOn #ui2 .u2left .dk,html body.chatOn #ui2 #u2mm{transform:translat
 <script data-boot>(function(){var p=0;window.__bootP=0;var t=setInterval(function(){if(window.__bootReal){clearInterval(t);return}p+=(0.7-p)*0.025;window.__bootP=p;var a=document.getElementById("bootArc"),n=document.getElementById("bootNeedle"),c=document.getElementById("bootPct");if(a)a.setAttribute("stroke-dasharray",(p*100).toFixed(1)+" 100");if(n)n.style.setProperty("--a",(-135+p*270)+"deg");if(c)c.textContent=String(Math.round(p*100))},120)})()</script>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 371 · Vehicle status, quieter pop-ups</h2></div>
+    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 372 · Super Cruise and phone fixes</h2></div>
     <div class="nb"><ul>
+      <li>🛣️ <b>Super Cruise (and the other hands-free systems) stop hogging the left lane.</b> After passing, the car now moves back to the right as soon as there's a safe gap, instead of waiting for the right lane to be completely empty for 20 seconds. It still stays left if the car ahead in the right lane is slower, so it doesn't pass the same car twice.</li>
+      <li>↔️ <b>Quicker lane changes.</b> When you signal, the car moves over after 2 seconds of blinking (was 3) and crosses in about 3 seconds (was 4.5), like the real systems.</li>
+      <li>📱 <b>Status screen scrolls on phones.</b> It refreshed twice a second and jumped back to the top every time, so you couldn't scroll down. Now it keeps your place and waits while your finger is on it.</li>
+      <li>🔄 <b>Swipe to turn the car in Build a car.</b> Drag left and right on the car (not the panel) to spin it around, up and down to tilt the view. Before, only the ⟲ ⟳ buttons worked.</li>
+    </ul>
+    <h4 class="old">Version 371 · Vehicle status, quieter pop-ups</h4><ul>
       <li>🔧 <b>Vehicle status screen.</b> Tap <b>Status</b> on the left (under Phone) any time to see what's wrong with your car: damage to each side on a top-down picture, smashed lamps, bent wheels and flats, engine health, coolant and transmission temperature, the radiator, power cuts, and worn tires, brakes and oil. A red ! on the button means something needs fixing.
         <ul><li><b>What happened:</b> every hit (what you hit, how fast, and what it broke), overheat, breakdown and repair is listed with the time, so after a police chase you can look back and see exactly what went wrong.</li>
         <li><b>Recent messages:</b> the last pop-ups are there too, so you can read one you missed.</li>
@@ -12291,15 +12297,18 @@ function assist(dt){
       if(laneClearFor(S,dir,true)){sys.pilotLC={target:(lane+dir)*LANE,dir};logResult("Pilot moved over for the work zone")}else waiting=true}}
     if(!RX&&!sys.pilotLC&&st.autoLC&&st.acc){   // pass slower traffic, then move back right
       const slow=lead&&gap<90&&lead.v<st.accSet-2.2&&lead.v>3&&!(M.sStop!==undefined&&M.sStop-M.s<150); sys.slowT=slow?(sys.slowT||0)+dt:0;   // not a queue at a light
-      const rightFree=lane>M.lo&&S.list.every(t=>Math.abs(t.off-(lane-1)*LANE)>2.2||t.ds<-35||t.ds>110); sys.rightT=rightFree?(sys.rightT||0)+dt:0;
+      /* v37.1: back to the right as soon as there's a safe gap there (the same check as any lane change), unless the car ahead in that lane is slower
+         than your set speed and you'd only have to pass it again. It used to want 35 m behind to 110 m ahead empty for 15-20 s, so on a busy road it sat in the left lane. */
+      const rOff=(lane-1)*LANE,rSlow=S.list.some(t=>Math.abs(t.off-rOff)<=2.2&&t.ds>0&&t.ds<90&&car.vx+t.vRel<st.accSet-2.2),
+        rightFree=lane>M.lo&&laneClearFor(S,-1,true)&&!rSlow; sys.rightT=rightFree?(sys.rightT||0)+dt:0;
       if(sys.slowT>5&&lane<M.hi&&laneClearFor(S,1,true)&&!st.signal){st.signal=-1;st.signalT=0;sys.slowT=0;toast("Pilot: passing slower traffic")}
-      else if(sys.rightT>(sys.rightNeed||(sys.rightNeed=15+Math.random()*5))&&!st.signal&&!(lead&&gap<60)){sys.rightNeed=0;st.signal=1;st.signalT=0;sys.rightT=0;toast("Pilot: moving back to the right lane")}
+      else if(sys.rightT>(sys.rightNeed||(sys.rightNeed=6+Math.random()*3))&&!st.signal&&!(lead&&gap<30)){sys.rightNeed=0;st.signal=1;st.signalT=0;sys.rightT=0;toast("Pilot: moving back to the right lane")}
     }
-    if(st.signal&&!st.hazard&&!sys.pilotLC&&!TRIMS[st.trim].noSigLC&&st.signalT<3){waiting=true}   // signal on for a few seconds first
+    if(st.signal&&!st.hazard&&!sys.pilotLC&&!TRIMS[st.trim].noSigLC&&st.signalT<2){waiting=true}   // signal on for 2 s first (more than the 3 blinks the law asks for)
     else if(st.signal&&!st.hazard&&!sys.pilotLC&&!TRIMS[st.trim].noSigLC){const dir=st.signal===-1?1:-1, tl=lane+dir;
       if(tl<M.lo||tl>M.hi){st.signal=0}else if(laneClearFor(S,dir,true)){sys.pilotLC={target:tl*LANE,dir};logResult(`Pilot changed lanes to the ${dir>0?"left":"right"}`)}
       else waiting=true}
-    if(sys.pilotLC){sys.pilotState="changing";sys.pilotDelta=pathDelta(M,he,sys.pilotLC.target,0.05,1.1,0.55,0.6);
+    if(sys.pilotLC){sys.pilotState="changing";sys.pilotDelta=pathDelta(M,he,sys.pilotLC.target,0.05,1.5,0.75,0.55);   /* v37.1: about 3 s across, like the real systems (was 4.5 s) */
       if(Math.abs(M.off-sys.pilotLC.target)<0.25&&Math.abs(he)<0.02){sys.pilotLC=null;st.signal=0}}
     else{sys.pilotState=waiting?"waiting":"active";sys.pilotDelta=RX&&RX.off!=null?pathDelta(M,he,RX.off,0.09+WB*Math.abs(M.k),1.0,0.6,0.5,RX.ff):pathDelta(M,he,lane*LANE,0.07+WB*Math.abs(M.k),0.8,0.5,0.5)}
   }
@@ -20267,7 +20276,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="174",BUILD_VER=371;
+const APP_VER="174",BUILD_VER=372;
 // shown as season.update: build 345 is v34.5, 350 will be v35.0
 const verStr=n=>{n=+n;return n>=300?Math.floor(n/10)+"."+n%10:String(n)},VER_S=verStr(BUILD_VER);
 try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+VER_S;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+VER_S)}catch(e){}   /* BUILD_VER: bumped to make open copies reload without resetting saves */
@@ -22761,7 +22770,7 @@ function vstState(){const T=TRIMS[st.trim]||{},D=car.dmg||{f:0,r:0,l:0,rt:0,whee
   const score=Math.round(100*clamp(1-body*0.45-wheels*0.35-(D.rad||F.rad?0.15:0)-(F.eng?0.2:0)-(F.flat>=0?0.1:0)-wear*0.15-lamps*0.02,0,1));
   return {T,D,F,w,ice,ev,body,wheels,lamps,wear,issues,score}}
 function vstBadge(){const b=$("u2stB");if(!b)return;const S=vstState(),show=S.issues.some(i=>i.sev>=2)||S.score<90;if(b.hidden===show)b.hidden=!show}
-function vstOpen(){VST.open=true;let el=$("vstat");if(!el){el=document.createElement("div");el.id="vstat";el.addEventListener("click",e=>{if(e.target===el||e.target.closest("[data-vx]"))vstClose();const c=e.target.closest("[data-vclr]");if(c){VST.log=[];vstSave();vstRender()}});document.body.appendChild(el)}el.hidden=false;vstRender()}
+function vstOpen(){VST.open=true;let el=$("vstat");if(!el){el=document.createElement("div");el.id="vstat";el.addEventListener("scroll",()=>{el._sT=performance.now()},true);el.addEventListener("pointerdown",()=>{el._tch=true},true);for(const ev of ["pointerup","pointercancel"])el.addEventListener(ev,()=>{el._tch=false;setTimeout(()=>{if(VST.open)vstRender()},400)},true);el.addEventListener("click",e=>{if(e.target===el||e.target.closest("[data-vx]"))vstClose();const c=e.target.closest("[data-vclr]");if(c){VST.log=[];vstSave();vstRender()}});document.body.appendChild(el)}el.hidden=false;vstRender()}
 function vstClose(){VST.open=false;const el=$("vstat");if(el)el.hidden=true}
 function vstRender(){const el=$("vstat");if(!el||el.hidden)return;const S=vstState(),{T,D,F,ice,ev}=S,E=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
   const col=x=>x<0.05?"#3fd08a":x<0.3?"#f2c94c":x<0.6?"#ff9f43":"#ff5252";
@@ -22781,7 +22790,7 @@ function vstRender(){const el=$("vstat");if(!el||el.hidden)return;const S=vstSta
   const hist=VST.log.slice(0,25).map(x=>`<li class="${x.k}"><time>Day ${x.d} · ${E(x.tm)}</time>${E(x.x)}${x.car&&x.car!==T.short?` <small>(${E(x.car)})</small>`:""}</li>`).join("")||`<li class="ok">Nothing yet. Every hit, breakdown and overheat shows up here.</li>`;
   const msgs=NST.hist.slice(0,15).map(h=>`<li class="${h.minor?"mn":""}"><time>${new Date(h.t).toLocaleTimeString([],{hour:"numeric",minute:"2-digit"})}</time>${E(h.m)}</li>`).join("")||`<li class="mn">No messages yet</li>`;
   const tone=S.issues.some(i=>i.sev>=2)?"bad":S.issues.length?"warn":"ok";
-  el.innerHTML=`<div class="vsC" role="dialog" aria-label="Vehicle status"><header><div><small>Vehicle status</small><h2>${E(T.name||"Your car")}</h2></div><button data-vx aria-label="Close">✕</button></header>
+  const _h=`<div class="vsC" role="dialog" aria-label="Vehicle status"><header><div><small>Vehicle status</small><h2>${E(T.name||"Your car")}</h2></div><button data-vx aria-label="Close">✕</button></header>
     <div class="vsTop ${tone}"><div class="vsS"><b>${S.score}%</b><small>condition</small></div><ul>${S.issues.length?S.issues.map(i=>`<li class="s${i.sev}">${E(i.txt)}</li>`).join(""):"<li class='s0'>Everything's working normally</li>"}</ul></div>
     <div class="vsG">
       <section><h3>Body</h3>${svg}<div class="vsl">${row("Front",`${Math.round(D.f*100)}%`,col(D.f))}${row("Rear",`${Math.round(D.r*100)}%`,col(D.r))}${row("Left side",`${Math.round(D.l*100)}%`,col(D.l))}${row("Right side",`${Math.round(D.rt*100)}%`,col(D.rt))}${row("Lamps",S.lamps?`${S.lamps} smashed`:"All working",S.lamps?"#ff9f43":"")}</div></section>
@@ -22794,7 +22803,10 @@ function vstRender(){const el=$("vstat");if(!el||el.hidden)return;const S=vstSta
         ${w?row("Tire tread",w.tyre>1?"Bald":`${Math.max(0,Math.round((1-w.tyre)*100))}% left`,w.tyre>1?"#ff5252":w.tyre>0.8?"#ff9f43":"")+row("Brake pads",w.brake>1?"Worn out":`${Math.max(0,Math.round((1-w.brake)*100))}% left`,w.brake>1?"#ff5252":w.brake>0.8?"#ff9f43":"")+row("12V battery",w.bat>0.9?"Old":"OK",w.bat>0.9?"#ff9f43":""):""}</section>
       <section class="wide"><h3>What happened <button data-vclr>Clear</button></h3><ol class="vsh">${hist}</ol></section>
       <section class="wide"><h3>Recent messages</h3><ol class="vsh">${msgs}</ol></section>
-    </div><p class="vsf">To fix it: drive to a repair shop (your phone's Maps app finds one), or Settings › Spawn › Reset car for body damage. Breakdowns need a shop.</p></div>`}
+    </div><p class="vsf">To fix it: drive to a repair shop (your phone's Maps app finds one), or Settings › Spawn › Reset car for body damage. Breakdowns need a shop.</p></div>`;
+  /* v37.1: it refreshes twice a second; rebuilding it every time threw you back to the top and killed a scroll on phones. Now it only redraws when
+     something changed, never while your finger is on it, and keeps your place */
+  if(_h===el._h||el._tch||performance.now()-(el._sT||0)<1200)return;const o=el.querySelector(".vsC"),sc=o?o.scrollTop:0;el.innerHTML=_h;el._h=_h;const n=el.querySelector(".vsC");if(n)n.scrollTop=sc}
 (function(){const b=$("u2stat");if(b)b.addEventListener("click",()=>VST.open?vstClose():vstOpen())})();
 addEventListener("keydown",e=>{if(e.key==="Escape"&&VST.open)vstClose()});
 // ---- power: low octane in a car that needs premium, and the overheating limp mode
@@ -23568,6 +23580,11 @@ function bpPreview(on){let p=$("bpPv");if(!p){p=document.createElement("div");p.
     p.addEventListener("click",e=>{const b=e.target.closest("[data-pv]");if(!b)return;bpPv(b.dataset.pv,b)})}
   p.hidden=!on;if(!on&&document.body.classList.contains("bpFull"))document.body.classList.remove("bpFull")}
 const BP_LIGHT=[["☀︎ Day",12*60,false],["🌅 Sunset",19.5*60,false],["🌙 Night",22.5*60,true]];
+/* v37.1: swipe the car on the build screen (the open area over the 3D view, not the panel) to turn it around, like the ⟲ ⟳ buttons; up and down tilts the view.
+   The build screen sits on top of the game view, so the game's own drag never got these touches. */
+{const S_=$("start");let d=null;if(S_){S_.addEventListener("pointerdown",e=>{if(e.target!==S_||(e.pointerType==="mouse"&&e.button!==0))return;d={id:e.pointerId,x:e.clientX,y:e.clientY};look.drag=true;try{S_.setPointerCapture(e.pointerId)}catch(_){}});
+  S_.addEventListener("pointermove",e=>{if(!d||e.pointerId!==d.id)return;const dx=e.clientX-d.x,dy=e.clientY-d.y;d.x=e.clientX;d.y=e.clientY;look.yaw=wrapPi(look.yaw-dx*0.009);look.pitch=clamp(look.pitch+dy*0.005,-0.45,0.75)});
+  const up=e=>{if(d&&e.pointerId===d.id){d=null;look.drag=false}};S_.addEventListener("pointerup",up);S_.addEventListener("pointercancel",up)}}
 function bpPv(a,b){const ease=(y,p,d)=>{look.yaw=y;if(p!=null)look.pitch=p;if(d!=null)look.dist=clamp(d,3.5,22)};if(a!=="cab"&&st.cam===1&&BP.cab){st.cam=BP.cab0||0;BP.cab=false}
   if(a==="l")look.yaw-=0.5;else if(a==="r")look.yaw+=0.5;else if(a==="in")look.dist=clamp(look.dist*0.82,3.5,22);else if(a==="out")look.dist=clamp(look.dist*1.2,3.5,22);
   else if(a==="front")ease(Math.PI,-0.08,(VEH&&VEH.camD)||7.2);else if(a==="side")ease(Math.PI/2,-0.06,((VEH&&VEH.camD)||7.2)*1.05);else if(a==="rear")ease(0,-0.1,(VEH&&VEH.camD)||7.2);else if(a==="wheel")ease(Math.PI*0.72,0.02,4.2);
