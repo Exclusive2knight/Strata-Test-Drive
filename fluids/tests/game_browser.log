@@ -1,0 +1,2 @@
+FLUIDS {'available': True, 'metrics': {'physicsMs': 4, 'readbackMs': 0, 'gpuMs': 0, 'quality': 'Low', 'memoryBytes': 281600, 'volume': {'input': 0, 'field': 0, 'particles': 0, 'drained': 0, 'evaporated': 0, 'error': 0}, 'particles': 0}, 'buttons': 1}
+ERRORS []

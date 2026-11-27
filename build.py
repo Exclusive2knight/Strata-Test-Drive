@@ -21,6 +21,9 @@ if _os.path.exists("props/kitold.json"):
     _kj = json.load(open("props/kitold.json")).get("kj", [])
     _j = [round(v, 2) for q in _kj for v in q]
     html = html.replace("/*KIT_J*/[]", json.dumps(_j, separators=(",", ":")))
+fluid_modules=["core.js","mesh_sdf.js","gpu.js","flip.js","renderer.js","runtime.js"]
+html=html.replace("/*FLUID_RUNTIME*/", "\n".join(open(os.path.join(here,"fluids",name)).read() for name in fluid_modules))
+html=html.replace("/*FLUID_INTEGRATION*/", open(os.path.join(here,"fluids","integration.js")).read())
 html = html.replace("@/*ASSET_REF*/main/", "@" + (ref or "main") + "/")
 html = html.replace("<title>Mission Strata</title>", '<title>Mission Strata</title><meta name="description" content="Mission Strata: a realistic driving simulator in your browser with real cars, drive modes, suspension, a city, freeway and traffic.">', 1)
 out = os.path.join(here, "dev.html"); open(out, "w").write(html)

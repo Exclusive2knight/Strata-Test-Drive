@@ -1,0 +1,67 @@
+{
+  "available": true,
+  "metrics": {
+    "physicsMs": 2.1999999997206032,
+    "readbackMs": 0,
+    "gpuMs": 33.38544,
+    "quality": "Low",
+    "memoryBytes": 2048000,
+    "volume": {
+      "input": 0.5237599999953463,
+      "field": 0.5237490738299246,
+      "particles": 0,
+      "drained": 0,
+      "evaporated": 1.092617007911915e-05,
+      "error": 8.89242517688708e-12
+    },
+    "particles": 0
+  },
+  "ledger": {
+    "input": 0.5237599999953463,
+    "field": 0.5237490738299246,
+    "particles": 0,
+    "drained": 0,
+    "evaporated": 1.092617007911915e-05,
+    "error": 8.89242517688708e-12
+  },
+  "gpuFloat": false,
+  "vehicle": {
+    "wheels": [
+      {
+        "depth": 0.017297442451620838,
+        "grip": 0.3,
+        "wet": 1,
+        "type": "oil",
+        "temperature": 20
+      },
+      {
+        "depth": 0.01363501414873168,
+        "grip": 0.3,
+        "wet": 1,
+        "type": "oil",
+        "temperature": 20
+      },
+      {
+        "depth": 0.018532318652122518,
+        "grip": 0.3,
+        "wet": 1,
+        "type": "oil",
+        "temperature": 20
+      },
+      {
+        "depth": 0.014793452384594325,
+        "grip": 0.3,
+        "wet": 1,
+        "type": "oil",
+        "temperature": 20
+      }
+    ],
+    "drag": 0,
+    "buoyancy": 0,
+    "flood": 0,
+    "stalled": false,
+    "wet": 1,
+    "grime": 0
+  },
+  "errors": []
+}

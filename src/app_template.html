@@ -4178,7 +4178,7 @@ function retailSites(){if(XSITES.some(S=>S.custom))return;
   XSITES.push({kind:"lot",custom:true,drive:true,x:(GAR.wEdge+GAR.x0+0.6)/2,y:GAR.cy+12,L:GAR.x0+0.6-GAR.wEdge,D:8,U:[1,0],N:[0,1],stalls:[]});
   XSITES.push({kind:"lot",custom:true,drive:true,x:(GAR.x1-0.6+GAR.eEdge)/2,y:GAR.cy-12,L:GAR.eEdge-GAR.x1+0.6,D:8,U:[1,0],N:[0,1],stalls:[]});
   for(const T of RETAIL_STN)XSITES.push({kind:"stn",custom:true,x:T.x,y:T.s*(RB0+15.5),L:40,D:30,U:[1,0],N:[0,T.s],name:T.name})}
-function groundAt(x,y){if(SITE_ON){const g=siteGround(x,y);if(g)return g}if(typeof RWX_ON!=="undefined"&&RWX_ON.z){const g=rwXGround(x,y);if(g)return g}if(TUN.on&&TUN.g&&Math.abs(x-TUN.xc)<TUN.Wc+40&&y>=TUN.yc0&&y<=TUN.yc1&&!tunIn(x,y,0.3))return {h:hillZ(x,y),mu:MAP.offMu,kind:"grass"};   /* on the ridge or above the cut walls */
+function fluidBaseGroundAt(x,y){if(SITE_ON){const g=siteGround(x,y);if(g)return g}if(typeof RWX_ON!=="undefined"&&RWX_ON.z){const g=rwXGround(x,y);if(g)return g}if(TUN.on&&TUN.g&&Math.abs(x-TUN.xc)<TUN.Wc+40&&y>=TUN.yc0&&y<=TUN.yc1&&!tunIn(x,y,0.3))return {h:hillZ(x,y),mu:MAP.offMu,kind:"grass"};   /* on the ridge or above the cut walls */
   if(TUN.on&&tunIn(x,y,0.3)){const g=groundAt0(x,y);if(g.kind==="road")return g;const zr=tunZr(y);return {h:zr,mu:Math.abs(x-TUN.xc)<TUN.tI?0.7:1.0,kind:Math.abs(x-TUN.xc)<TUN.tI?"grass":"pavement"}}if(inTC(x,y))return tcH(x,y);if(ORP.ready&&inOR(x,y))return orH(x,y,groundAt0(x,y));return groundAt0(x,y)}
 function groundAt0(x,y){
   {const S=XSITES.length&&inExtra(x,y,0);if(S)return S.kind==="stn"?G_PAD:G_LOT}
@@ -5588,6 +5588,7 @@ function rockContact(i,gx,gy,gh,cps,sps,dt,G0){const R=(MODELS[(TRIMS[st.trim].m
 function physics(dt){if(TOWH.ride){towRide(dt);return}
   const T=TRIMS[st.trim], md=LC.st==="go"?MODES[2]:(()=>{const m=MD(),tr=terr();if(tr)m.gamma*=tr.gm;return m})(), D=DRIVES[st.trim], m=T.mass+(car.cargo||0)*0.6+(TRL.on?TRL.mass*0.8:0), g=9.81, Iz=m*1.5*1.5, L=WB, ice=D.layout==="ice";
   const gC=groundAt(car.px,car.py); car.offroad=gC.kind==="grass"; const SF={dry:1,wet:0.72,snow:0.3}[st.surface]||1, mu=1.15*SF;
+  if(car.fluid){car.vx-=car.fluid.drag/m*dt;car.vzb=(car.vzb||0)+car.fluid.buoyancy/m*dt;}
   const vx=car.vx, sp=Math.abs(vx), dirG=st.gear==="R"?-1:1;
   // ---- steering: finer near the centre, a little less lock at speed, rate-limited like a real rack
   const stI=sys.steerOv!=null?sys.steerOv:inp.steer,sIn=Math.sign(stI)*(0.35*Math.abs(stI)+0.65*stI*stI);
@@ -5649,7 +5650,7 @@ function physics(dt){if(TOWH.ride){towRide(dt);return}
   car.thd+=(Mp/(ms*1.9))*dt; car.th+=car.thd*dt; car.phid+=(Mr/(ms*0.36))*dt; car.phi+=car.phid*dt;
   car.fz=fz;
   // ---- driver requests
-  let thr=st.power===false||st.power==="acc"||car.disabled?0:Math.max(Math.pow(inp.thr,st.thrK||1),sys.cruiseThr,sys.accThr,sys.crawlT||0);if(car.dmg&&car.dmg.f>0.35)thr*=1-0.6*(car.dmg.f-0.35)/0.65;if(car.dmg&&car.dmg.rad)thr=Math.min(thr,0.55);if(LC.st==="ready"&&ice&&D.turbo)car.hyb.boost=1; if(thr>0.02&&md.gamma!==1)thr=Math.pow(thr,md.gamma);if(md.snow&&Math.abs(car.vx)<4)thr*=0.65;if(md.cap)thr=Math.min(thr,md.cap);
+  let thr=st.power===false||st.power==="acc"||car.disabled||car.fluid?.stalled?0:Math.max(Math.pow(inp.thr,st.thrK||1),sys.cruiseThr,sys.accThr,sys.crawlT||0);if(car.dmg&&car.dmg.f>0.35)thr*=1-0.6*(car.dmg.f-0.35)/0.65;if(car.dmg&&car.dmg.rad)thr=Math.min(thr,0.55);if(LC.st==="ready"&&ice&&D.turbo)car.hyb.boost=1; if(thr>0.02&&md.gamma!==1)thr=Math.pow(thr,md.gamma);if(md.snow&&Math.abs(car.vx)<4)thr*=0.65;if(md.cap)thr=Math.min(thr,md.cap);
   const TM=T.terrain&&!T.terrSync?terrM(T):"";{const cap=teslaCap();if(cap){const vm=cap/2.237;thr=Math.min(thr,clamp((vm-Math.abs(car.vx))*0.6,0,1))}}if(TM==="Snow"&&thr>0.02)thr=Math.pow(thr,1.5);else if(TM==="Rock"&&thr>0.02)thr=Math.min(thr,0.55);else if(TM==="Sport"&&thr>0.02)thr=Math.pow(thr,0.8);
   const liftOff=Math.max(inp.thr,sys.cruiseThr,sys.accThr)<0.02;
   const onePedal=!ice&&st.regen===3&&liftOff&&st.gear==="D"&&Math.abs(car.vx)<3?0.08+0.3*(1-Math.abs(car.vx)/3):0;   // one-pedal: eases to a stop and holds
@@ -5765,7 +5766,7 @@ function physics(dt){if(TOWH.ride){towRide(dt);return}
     const vxw=car.vx-car.r*y, vyw=car.vy+car.r*x, vl=vxw*cd+vyw*sd, vs=-vxw*sd+vyw*cd;
     const aT=Math.atan2(vs,Math.abs(vl)+0.3); car.alpha[i]+=(aT-car.alpha[i])*Math.min(1,(Math.abs(vl)+0.8)*dt/0.35);
     const vref=Math.max(Math.abs(vl),4), kap=clamp((car.w[i]*WR-vl)/vref,-1.5,1.5); car.kap[i]=kap;
-    const TY=TYRES[st.tyre||"allseason"].k,tmu=tireMu(i),kd_=car.gnd[i].kind,loose_=kd_==="grass"||kd_==="dirt"||kd_==="mud"||kd_==="sand",TMn=terrNow(),modeK=kd_==="rock"?(/Rock/i.test(TMn)?1.15:/Off.?Road|Trail|Baja|Mogul/i.test(TMn)?1.08:1):kd_==="mud"?(/Mud/i.test(TMn)?1.22:/Off.?Road|Trail|Baja/i.test(TMn)?1.08:1):kd_==="sand"?(/Sand/i.test(TMn)?1.18:/Off.?Road|Baja/i.test(TMn)?1.08:1):kd_==="snow"?(/Snow|Slippery/i.test(TMn)?1.2:1):1,muW=tmu*(car.wxMu?car.wxMu[i]:1)*camberGrip(i,car.alpha[i],kap)*offSurf(i,kd_,kap,dt)*modeK*(WEAR.grip||1)*(TY[kd_==="snow"?"snow":loose_?"grass":(st.surface||"dry")]||1)*(st.tyre==="sport"&&T.gripK?T.gripK:1)*(car.gnd[i].mu||1.15)*(car.gnd[i].kind==="dirt"&&st.surface!=="dry"?0.85:SF)*(loose_?(T.offGrip||1)*(T.terrain&&!T.terrSync&&/Mud|Rock/.test(st.terrainM||"")?1.15:1)*(st.lockers&&T.lockers?1.15:1):1)*(st.surface==="snow"&&T.terrain&&!T.terrSync&&st.terrainM==="Snow"?1.12:1), f=tyre(kap,car.alpha[i],fz[i],muW), f2=tyre(kap+0.002,car.alpha[i],fz[i],muW);
+    const TY=TYRES[st.tyre||"allseason"].k,tmu=tireMu(i)*(car.fluid?.wheels?.[i]?.grip??1),kd_=car.gnd[i].kind,loose_=kd_==="grass"||kd_==="dirt"||kd_==="mud"||kd_==="sand",TMn=terrNow(),modeK=kd_==="rock"?(/Rock/i.test(TMn)?1.15:/Off.?Road|Trail|Baja|Mogul/i.test(TMn)?1.08:1):kd_==="mud"?(/Mud/i.test(TMn)?1.22:/Off.?Road|Trail|Baja/i.test(TMn)?1.08:1):kd_==="sand"?(/Sand/i.test(TMn)?1.18:/Off.?Road|Baja/i.test(TMn)?1.08:1):kd_==="snow"?(/Snow|Slippery/i.test(TMn)?1.2:1):1,muW=tmu*(car.wxMu?car.wxMu[i]:1)*camberGrip(i,car.alpha[i],kap)*offSurf(i,kd_,kap,dt)*modeK*(WEAR.grip||1)*(TY[kd_==="snow"?"snow":loose_?"grass":(st.surface||"dry")]||1)*(st.tyre==="sport"&&T.gripK?T.gripK:1)*(car.gnd[i].mu||1.15)*(car.gnd[i].kind==="dirt"&&st.surface!=="dry"?0.85:SF)*(loose_?(T.offGrip||1)*(T.terrain&&!T.terrSync&&/Mud|Rock/.test(st.terrainM||"")?1.15:1)*(st.lockers&&T.lockers?1.15:1):1)*(st.surface==="snow"&&T.terrain&&!T.terrSync&&st.terrainM==="Snow"?1.12:1), f=tyre(kap,car.alpha[i],fz[i],muW), f2=tyre(kap+0.002,car.alpha[i],fz[i],muW);
     // motor torque with a 30 ms response, then the wheel spin equation (semi-implicit so it stays stable)
     const tgt=ice?want[i]*(want[i]>0?car.tcsF[i]:1)*escCut*(dirG<0&&want[i]*dirG>0?clamp((11-sp)/2.5,0,1):1)/* reverse (engine): full torque through the reverse gear, tops out around 20-25 mph */:thr*want[i]*car.tcsF[i]*tvMul[i]*escCut*dirG*revK - (driven[i]?(regen/nDriven+blendT)*Math.sign(car.w[i]):0);
     car.tq[i]+=(tgt-car.tq[i])*Math.min(1,dt/0.03);
@@ -12716,6 +12717,7 @@ precision highp float;
 precision mediump float;
 #endif
 varying vec3 vW,vN,vL,vC;varying float vDent;uniform vec2 uTy;uniform vec3 uC,uE,uSun,uSunC,uAmb,uEye,uFog,uTP;uniform vec4 uTn,uTn2;uniform vec3 uLP[3];uniform vec3 uLD[3];uniform float uLI[3];uniform vec2 uLC[3];uniform vec4 uMask[6];uniform vec4 uSL[6];uniform float uHigh;uniform float uSp,uSh,uA,uFD,uPat,uTail;uniform vec4 uLm,uLs,uLg,uLw;
+uniform sampler2D uFluidWetMap;uniform vec4 uFluidRect,uFluidCar;uniform float uFluidWet;
 uniform vec2 uShC,uShF,uWX;uniform float uNt;uniform sampler2D uSnT;uniform vec3 uSnO;uniform vec4 uKO[10];uniform float uKOn;uniform float uBackOn;uniform sampler2D uTex;uniform vec3 uSO,uSU,uSV;
 float h(vec2 p){return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453);}
 float n2(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}
@@ -12791,6 +12793,7 @@ void main(){
   if(uLm.x>1.5&&uLm.w>0.5){base=mix(base,vec3(0.55,0.3,0.05),reg);lE=mix(lE,vec3(0.0),reg);}   // amber lens part of the taillight
   lE=mix(lE,bl*shine,reg*act);
   if(uLw.x>-0.5){float q=uLw.y>0.5?1.0-f:f;lE*=step(q,uLw.x);lE+=(uLm.x<1.5?vec3(1.4,1.4,1.3):vec3(1.2,0.03,0.02))*uLw.z*step(q,uLw.x)*zone;}}
+ vec2 fu=(vW.xz-uFluidRect.xy)/max(uFluidRect.z,.01);if(uFluidRect.z>0.&&min(fu.x,fu.y)>=0.&&max(fu.x,fu.y)<=1.){vec4 fw=texture2D(uFluidWetMap,fu);float fh=uFluidRect.w-16.+fw.r*32.;float wet=fw.g*smoothstep(.3,.7,N.y)*(1.-smoothstep(.06,.18,abs(vW.y-fh)));base*=1.-.4*wet;sp+=pow(max(dot(N,H),0.),90.)*wet*.5;}if(distance(vW.xz,uFluidCar.xz)<2.8&&vW.y>uFluidCar.y+.2&&vW.y<uFluidCar.y+2.1){base*=1.-.12*uFluidWet;base=mix(base,vec3(.19,.13,.08),uFluidCar.w*(1.-smoothstep(.3,1.4,vW.y-uFluidCar.y)));}
  vec3 col=base*L+vec3(sp)+lE+em+gls*vec3(0.06,0.08,0.1)*(1.0-uNt);
  float f=1.0-exp(-uFD*length(uEye-vW));col=mix(col,uFog,clamp(f,0.0,1.0));
 #ifdef LITE
@@ -12804,6 +12807,7 @@ function mkProg(lite){const p=gl.createProgram();gl.attachShader(p,sh(gl.VERTEX_
 let prog;try{prog=mkProg(GFX_LITE)}catch(e){console.warn("full shader failed, using the light one",e);prog=mkProg(true)}gl.useProgram(prog);
 const U={};["uM","uVP","uC","uE","uSun","uSunC","uAmb","uEye","uFog","uTP","uHigh","uSp","uSh","uA","uFD","uPat","uTail","uShC","uShF","uNt","uBackOn","uTex","uSO","uSU","uSV","uTy","uKOn","uDentOn","uFl","uFlD","uLm","uLs","uLg","uLw","uWX","uGr","uSnT","uSnO","uTn","uTn2"].forEach(n=>U[n]=gl.getUniformLocation(prog,n));U.uDent=gl.getUniformLocation(prog,"uDent");U.uKO=gl.getUniformLocation(prog,"uKO");
 ["uLP","uLD","uLI","uLC","uMask","uSL"].forEach(n=>U[n]=gl.getUniformLocation(prog,n+"[0]"));
+["uFluidWetMap","uFluidRect","uFluidCar","uFluidWet"].forEach(n=>U[n]=gl.getUniformLocation(prog,n));
 const aP=gl.getAttribLocation(prog,"aP"), aN=gl.getAttribLocation(prog,"aN"), aC=gl.getAttribLocation(prog,"aC");if(aC>=0){gl.disableVertexAttribArray(aC);gl.vertexAttrib3f(aC,1,1,1)}
 gl.enable(gl.DEPTH_TEST);
 function b64(s,T){const bin=atob(s),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return new T(u.buffer)}
@@ -14589,7 +14593,7 @@ function postSize(w,h){if(POST.w===w&&POST.h===h&&POST.fbo)return POST.good;
   POST.tA=postTex(POST.qw,POST.qh,true);POST.fA=postFbo(POST.tA);POST.tB=postTex(POST.qw,POST.qh,true);POST.fB=postFbo(POST.tB);
   gl.bindFramebuffer(gl.FRAMEBUFFER,null);POST.good=good;if(!good)console.warn("post-processing off: framebuffer incomplete");return good}
 // which effects are on right now (from the graphics settings)
-function postWant(){const g=G();if(!POST.ok||(XR&&XR.on))return null;const f={fxaa:g.aa!=="off",ao:!!g.ao,bloom:!!g.bloom,rays:!!g.rays,dof:!!g.dof,mb:g.mb|0,mbMe:!!g.mbMe};if(g.aa==="msaa"&&!f.ao&&!f.bloom&&!f.rays&&!f.dof&&!f.mb)return null;return f}
+function postWant(){const g=G();if(!POST.ok||(XR&&XR.on))return null;const f={fxaa:g.aa!=="off",ao:!!g.ao,bloom:!!g.bloom,rays:!!g.rays,dof:!!g.dof,mb:g.mb|0,mbMe:!!g.mbMe};if(g.aa==="msaa"&&!f.ao&&!f.bloom&&!f.rays&&!f.dof&&!f.mb&&!fluidRuntime?.enabled)return null;return f}
 /* v338: clouds. A sky pass drawn behind the world: a layer of cloud about 1.6 km up, shaped from a baked tileable noise texture (four octaves), lit
    from the sun's side and shaded on the far side, drifting with the wind. Cover follows the weather: scattered fair-weather cloud when it's clear,
    thickening to a grey overcast for rain, snow and storms. Settings > World > Clouds turns it off (a plain sky, like before) */
@@ -19473,6 +19477,8 @@ function gtTick(dt){if(st.night!==GT.lastN){GT.min=st.night?22*60:10*60;GT.lastN
   const h=GT.min/60,el=Math.sin((h-6.6)/12.8*Math.PI);GT.el=el;GT.D=clamp(el*3.2+0.22,0,1);
   const n=GT.D<0.3;if(n!==GT.lastN){st.night=n;GT.lastN=n;}}
 function gtClock(){const h=Math.floor(GT.min/60),m=Math.floor(GT.min%60);return `${h%12||12}:${String(m).padStart(2,"0")} ${h<12?"am":"pm"}`}
+/*FLUID_RUNTIME*/
+/*FLUID_INTEGRATION*/
 function render(dt){
   const dpr=Math.max(0.5,(G().res>1?Math.min(3,G().res*Math.max(1,(window.devicePixelRatio||1)*0.75)):Math.min(window.devicePixelRatio||1,G().res))*(G().res>1?Math.max(0.85,GFX.dyn):GFX.dyn))   /* v334: 150% / 200% now really render sharper than the screen (they used to be capped at the screen's own pixel density) */, _es=elSize(cv),_cap=Math.min(1,Math.sqrt((matchMedia("(pointer:coarse)").matches?2.6e6:9e6)/Math.max(1,_es[0]*_es[1]*dpr*dpr))), W=Math.floor(_es[0]*dpr*_cap), H=Math.floor(_es[1]*dpr*_cap);   /* v337: at most ~2.6 megapixels on phones (turning a phone round used to run the GPU out of memory and the browser reloaded the tab) */
   if(cv.width!==W||cv.height!==H){cv.width=W;cv.height=H}
@@ -19540,6 +19546,7 @@ function render(dt){
     const lo=hlOn(),pk=!lo&&st.park&&st.power!==false,bk=car.brake>0.05||inp.brk>0.05&&st.power!==false,fl=sys.flashT>0&&((sys.flashT*6|0)%2===0),so=((st.signal||st.hazard)&&st.blink)||fl,AM=[2.2,1.0,0.08],OF=[0,0,0];
     const litM={head:lo?[1.6,1.6,1.5]:[0.35,0.36,0.38],tail:bk?[1.4,0.04,0.02]:(lo||pk?[0.45,0.01,0.01]:OF),sigL:so&&(fl||st.hazard||st.signal===-1)?AM:OF,sigR:so&&(fl||st.hazard||st.signal===1)?AM:OF,rev:st.gear==="R"?[1.4,1.4,1.4]:OF};{const pw=st.power!==false,aL=pw&&(st.hazard||st.signal===-1)||fl,aR=pw&&(st.hazard||st.signal===1)||fl;litM.act=[aL,aR];litM.on=[aL&&(st.blink||fl),aR&&(st.blink||fl)];litM.ph=fl?1:blinkPh();litM.fog=st.fog&&pw}
     gl.uniform3fv(U.uTP,M4.p(cm,VEH.tail));gl.uniform1f(U.uTail,bk?1:(lo||pk?0.25:0));dentOn(true);TREAD_OK=false;WHL_ME=true;drawCar(cm,myPaint(),litM,car.spin,car.dF,car.dR,false,car.height-tuneLow(),false,car.defl.map(d=>d));drawCar(cm,myPaint(),litM,car.spin,car.dF,car.dR,true,car.height-tuneLow(),false);WHL_ME=false;dentOn(false);gl.depthMask(true);gl.disable(gl.BLEND);return}
+  fluidPrepareWet();
   gl.disable(gl.CULL_FACE);gl.uniformMatrix4fv(U.uM,false,M4.id());
   // layered flat surfaces: push lower layers back in depth so the road and paint never flicker at distance
   gl.enable(gl.POLYGON_OFFSET_FILL);
@@ -19715,7 +19722,7 @@ function render(dt){
   if((st.cam===1||dogShow()||RSC.open)&&GFX.frame%G().scrEvery===0){drawScreen(dt*G().scrEvery);if(RSC.open)try{rsDraw()}catch(e){}if(VEH.xs&&(GFX.frame/G().scrEvery|0)%2===0)xsDraw();if(PANO.on&&(PANO.style!=="lin"||(GFX.frame/G().scrEvery|0)%2===1))panoDraw()}
   if(!(XR.on&&XR.inFrame&&xrDraw(cm,pass,eye,tgt))){const PB=postBegin(W,H,skyS);pass(VP,eye,tgt,false);
     if(PB){const dc=Math.hypot(eye[0]-cm[12],eye[1]-cm[13],eye[2]-cm[14]),inCar=st.cam===1&&!st.walk;
-      postEnd({VP,eye,fov,near:PM.on?0.08:st.cam===1?0.06:0.3,far:4800,focus:inCar?40:Math.max(20,dc),meCut:st.walk?0:inCar?3:dc+(VEH.len||4.8)*0.6+0.5,night,sun:POST.sun||[0,1,0],rayK:clamp(D_*1.4-0.2,0,1)*(1-ww*0.8),dt})}}
+      const fluidOldScene=fluidBeforePost(VP,eye,W,H);postEnd({VP,eye,fov,near:PM.on?0.08:st.cam===1?0.06:0.3,far:4800,focus:inCar?40:Math.max(20,dc),meCut:st.walk?0:inCar?3:dc+(VEH.len||4.8)*0.6+0.5,night,sun:POST.sun||[0,1,0],rayK:clamp(D_*1.4-0.2,0,1)*(1-ww*0.8),dt});fluidAfterPost(fluidOldScene)}}
 }
 
 // ======================================================================= HUD
@@ -21176,7 +21183,7 @@ function frame(now){if(XR.on&&!XR.inFrame){requestAnimationFrame(frame);return} 
     if(sys.hillDemo){sys.hillT+=dt;if(sys.hillT>6){sys.hillT=0;st.leveling=!st.leveling;toast(st.leveling?"Active levelling ON: beam hugs the ground":"Active levelling OFF: beam fixed to the body")}if(!car.offroad&&Math.abs(car.vx)>3)sys.hillDemo=false}
     if(sys.aim!=null){sys.levT=(sys.levT||0)+dt;if(sys.levT>5){sys.levT=0;st.leveling=!st.leveling;toast(st.leveling?"Levelling ON: beam back down on the road":"Levelling OFF: the loaded car aims the beam high")}
       if(Math.hypot(car.px-sys.aim.x,car.py-sys.aim.y)>40){sys.aim=null;car.cargo=0;st.leveling=true}}acc+=dt;if(acc>0.1)acc=0.1;let h=1/G().hz;if(acc>h*30)h=acc/30;   // at most 30 physics steps a frame: on a slow frame each step gets longer (never past 1/300 s) instead of the car going in slow motion, and no death spiral
-  while(acc>=h){physics(h);acc-=h}if(car.crashed>0)car.crashed-=dt;try{updateAudio()}catch(e){console.error(e)}}
+  fluidTick(dt);while(acc>=h){physics(h);acc-=h}if(car.crashed>0)car.crashed-=dt;try{updateAudio()}catch(e){console.error(e)}}
   shopTick();homeTick(dt);if(st.walk){footTick(dt);openHouseTick()}else if(sys.flashT>0)sys.flashT-=dt;gtTick(dt);phTick();revChime(dt);beltTick(dt);econTick(dt);usedTick(dt);testTick(dt);ui2Tick();trainTick(dt);meterTick(dt);brTick(dt);gateTick(dt);w2LifeTick(dt);mpTick(dt);netTick(dt);teslaTrip(dt);launchTick(dt);
   try{hudMapTick(dt)}catch(e){}try{gigTick(dt)}catch(e){}try{copTick(dt)}catch(e){console.error(e)}if(DALE.p.length||DALE.pools.length||DALE.dead>0||DALE.shake>0||DALE.fire)try{daleTick(dt)}catch(e){}try{if(st.started)stkTick(dt)}catch(e){}if(st.started&&st.power===true&&!st.walk&&Math.abs(car.vx)>1)sys.tripT=(sys.tripT||0)+dt;if(sys.roaT>0)sys.roaT-=dt;
   try{rplRec(dt)}catch(e){}try{achTick(dt)}catch(e){}render(dt);if(PHOTO.want)photoGrab();hud(dt);

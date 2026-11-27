@@ -1,0 +1,7 @@
+127.0.0.1 - - [27/Nov/2026 07:47:21] "GET /fluids/tests/compile.html HTTP/1.1" 200 -
+127.0.0.1 - - [27/Nov/2026 07:47:21] "GET /fluids/core.js HTTP/1.1" 200 -
+127.0.0.1 - - [27/Nov/2026 07:47:21] "GET /fluids/gpu.js HTTP/1.1" 200 -
+127.0.0.1 - - [27/Nov/2026 07:47:21] "GET /fluids/flip.js HTTP/1.1" 200 -
+127.0.0.1 - - [27/Nov/2026 07:47:21] "GET /fluids/renderer.js HTTP/1.1" 200 -
+127.0.0.1 - - [27/Nov/2026 07:47:21] "GET /fluids/runtime.js HTTP/1.1" 200 -
+{"pass": true, "float": true, "blend": true, "timer": true, "renderer": "WebKit WebGL", "programs": ["advect", "force", "curl", "confinement", "divergence", "pressure", "project", "density", "normalize", "particleVelocity", "particlePosition"], "error": 0}
