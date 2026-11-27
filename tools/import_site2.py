@@ -129,7 +129,7 @@ for P, I, nowall, NV in phys:
                     f = s / ns; x = A[0] + (B[0] - A[0]) * f; z = A[2] + (B[2] - A[2]) * f
                     ii, jj = int((x - X0) / CELL), int((z - Z0) / CELL)
                     if 0 <= ii < GW and 0 <= jj < GH: vert.append((jj, ii, yl, yh))
-LAY = 4; D = np.full((LAY, GH, GW), -32768, np.int16)
+LAY = 6; D = np.full((LAY, GH, GW), -32768, np.int16)   # the lowest six floors (a tower's room floors above them are not driveable)
 for j in range(GH):
     for i in range(GW):
         H = sorted(hs[j][i])
@@ -140,7 +140,7 @@ for j in range(GH):
         for v in cand:
             if fl and v - fl[-1] <= 0.35: fl[-1] = v
             else: fl.append(v)
-        for L_, v in enumerate(fl[-LAY:]): D[L_, j, i] = int(round(v * 100))
+        for L_, v in enumerate(fl[:LAY]): D[L_, j, i] = int(round(v * 100))
 # walls: upright things over a floor, and the edges of underground floors
 wall = {}   # (j,i) -> list of (y0,y1)
 for j, i, yl, yh in vert:
