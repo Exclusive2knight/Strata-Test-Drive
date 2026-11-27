@@ -831,6 +831,8 @@ body.ui2.sbOpen.pc #sensorBox{bottom:150px}
 #ph2 .pkB{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;width:100%;max-width:230px;align-items:center}#ph2 .pkCall{aspect-ratio:1;border:0;border-radius:50%;background:#34c759;color:#fff;font-size:24px}#ph2 .pkDel{border:0;background:none;color:inherit;font-size:20px;opacity:.7}
 #ph2 .callS.ivr{padding-top:24px}#ph2 .callS.ivr .end{margin-bottom:22px}#ph2 .hotT{margin:8px 14px 4px;padding:8px 10px;border-radius:12px;background:rgba(0,0,0,.35);font-size:11px;line-height:1.35;max-height:34%;overflow:auto}#ph2 .hotT p{margin:0 0 6px}
 @media (max-height:440px){#ph2{height:94vh;right:calc(env(safe-area-inset-right,0px) + 54px)}#ph2 .pX{left:-42px}}
+/* v37.5: the phone's width is set from its height instead of aspect-ratio (Safari let wide app content and the page-swipe animation stretch it) */
+#ph2{--phh:min(88vh,640px);height:var(--phh);width:calc(var(--phh)*9/19.5);min-width:0;max-width:calc(var(--phh)*9/19.5);aspect-ratio:auto}#ph2.fold:not(.unf){width:calc(var(--phh)*9/21);max-width:calc(var(--phh)*9/21)}#ph2.fold.unf{--phh:min(78vh,560px);width:calc(var(--phh)*7/7.6);max-width:calc(var(--phh)*7/7.6)}@media (max-height:440px){#ph2{--phh:94vh}}#ph2 .pScr,#ph2 .pScr>*{min-width:0;max-width:100%}#ph2 .pScr{contain:layout paint}
 @media (max-height:440px){#ph2 .wRow,#ph2 .wCal{display:none}#ph2 .wCar{padding:6px 10px;border-radius:14px}#ph2 .wBtns{margin-top:3px}#ph2 .wBtns button{padding:4px 0;font-size:12px}#ph2 .dots{display:none}}
 
 body.onfoot #ui2 .u2mid,body.onfoot #ui2 #u2start,body.onfoot #ui2 #u2arrows,body.onfoot #pedals,body.onfoot #ui2 .u2row,body.onfoot #ui2 #u2msg,body.onfoot #ui2 .u2right,body.onfoot #ui2 #u2gearpop,body.onfoot.sbOpen #sensorBox{display:none!important}
@@ -3093,7 +3095,7 @@ function w2WaterD(x,y,m=200){let d=1e9;for(const B of W2_WATER){const b=B.bb;if(
 // Westport (downtown, the river, the parking garage), Fairhaven (the second city, shops, suburbs), Millbrook (an old small town by a lake),
 // Mount Kestrel (switchbacks and a pass road), farmland, and two interstates: I-38 east-west and I-61 north-south, crossing at a cloverleaf.
 // Cross streets ride over the freeways on raised bridges, so the ramps really climb up to them.
-const W2C={ICX:[[-2300,-1500,950],[-3500,-3450,700]],MT:[-3300,2500],FH:[2600,0],MB:[1750,2450],CL:[-2300,-1500],CLH:8,SD:{cuts:[[-3850,-3350],[-1250,-370],[370,1250],[2350,2850]],y:-1500,H:7,full:190}};
+const W2C={ICX:[[-2300,-1500,950],[-3500,-3450,700]],MT:[-3300,2500],FH:[2600,0],MB:[1750,2450],CL:[-2300,-1500],CLH:8,SD:{cuts:[[-3850,-3350],[-1250,-370],[370,1250],[2350,2850],[3450,3950]],y:-1500,H:7,full:190}};
 // ---- Strata Metro Airport, south of County Rd 40: the owner's model (its X runs east, its Z runs south, ground at 0), placed at (cx, cy).
 // TX/TH/TB: the road tunnel under taxiway T (approach ramps to TX+-TH, the taxiway bridge TX+-TB), TZ the inbound / outbound roads through it
 const APT={cx:1000,cy:-5000,X0:-2500,X1:2500,Z0:-1450,Z1:1150,z:0,TX:-840,TH:195,TB:14,TZ:[470,250],TW:9.5,m:null,busy:false,pave:null,coll:false};
@@ -3152,7 +3154,7 @@ function buildNet2(){
     E("ramp",I.name+" exit",[I.P(-d*L,0),I.P(-d*(L-80),sg*20.6),I.P(-d*(L-150),sg*23.75),I.P(-d*uP,sg*24.1,90),I.P(-d*uS,sg*Ta*0.5,90),I.P(-d*30,Tt,40),I.P(0,Tt)]);
     E("ramp",I.name+" entrance",[I.P(0,Tt),I.P(d*30,Tt,40),I.P(d*uS,sg*Ta*0.5,90),I.P(d*uP,sg*24.1,90),I.P(d*(L-150),sg*23.75),I.P(d*(L-80),sg*20.6),I.P(d*L,0)])}};
   const icN=(I,u)=>I.P(u*I.Ld,0);
-  const I38=[mkIC([-3600,-1500],[1,0],420,90,"County Rd 3",1),mkIC([-1000,-1500],[1,0],420,90,"Woodward Ave",1),mkIC([1000,-1500],[1,0],420,90,"Maple Rd",1),mkIC([2600,-1500],[1,0],420,90,"Fairhaven Blvd",1)];
+  const I38=[mkIC([-3600,-1500],[1,0],420,90,"County Rd 3",1),mkIC([-1000,-1500],[1,0],420,90,"Woodward Ave",1),mkIC([1000,-1500],[1,0],420,90,"Maple Rd",1),mkIC([2600,-1500],[1,0],420,90,"Fairhaven Blvd",1),mkIC([3700,-1500],[1,0],360,90,"Harbor Point Blvd",1)];   /* v37.5: Harbor Point Blvd into the new downtown */
   const I61=[mkIC([-2300,0],[0,1],420,150,"Main St"),mkIC([-2300,1500],[0,1],420,150,"Kestrel Rd")];
   // ---- the cloverleaf: I-61 rides over I-38 on a bridge. In each quarter a loop ramp (left turns) and an outer ramp (right turns).
   // Loops leave 50 m past the bridge and join 85 m before it; the outer ramps leave 700 m out and join 730 m out
@@ -3168,7 +3170,7 @@ function buildNet2(){
   // two exits on the loop: County Rd 30 out west, and Harbor Rd up north off the Millbrook roundabout (narrower diamonds: the map edge is close)
   const ILW=mkIC([-4650,-2400],[0,1],400,110,"County Rd 30"),ILN=mkIC([1900,3450],[-1,0],400,110,"Harbor Rd");
   mkR("xway","I-38",[[-2300,-2850],[-2300,-3450,450],[-3050,-3450],[-3550,-3450],[-3950,-3450],[-4100,-3450],[-4650,-3450,450],icN(ILW,-1),icN(ILW,1),[-4650,-1500,420],icN(I38[0],-1),[-3290,ccy],icN(I38[0],1),nA(-CLD.dOM),nA(-CLD.dOX),[ccx-620,ccy],nA(-CLD.dF),nA(CLD.dF),nA(CLD.dOX),nA(CLD.dOM),
-    icN(I38[1],-1),icN(I38[1],1),icN(I38[2],-1),icN(I38[2],1),icN(I38[3],-1),icN(I38[3],1),[4100,-1500]]);
+    icN(I38[1],-1),icN(I38[1],1),icN(I38[2],-1),icN(I38[2],1),icN(I38[3],-1),icN(I38[3],1),icN(I38[4],-1),icN(I38[4],1),[4100,-1500]]);
   mkR("xway","I-61",[[4100,-1500],[4700,-1500,300],[4650,3450,450],icN(ILN,-1),icN(ILN,1),[-2300,3450,380],[-2300,2600]]);
   mkR("xway","I-61",[[-2300,-2850],nB(-CLD.dJ-230),nB(-CLD.dOM),nB(-CLD.dOX),nB(-CLD.dF),nB(-CLD.dM),nB(-CLD.dX),nB(CLD.dX),nB(CLD.dM),nB(CLD.dF),nB(CLD.dOX),nB(CLD.dOM),nB(CLD.dJ+230),
     icN(I61[0],-1),icN(I61[0],1),icN(I61[1],-1),icN(I61[1],1),[-2300,2600]]);
@@ -3189,7 +3191,7 @@ function buildNet2(){
       E("ramp",A+" entrance",[P(xs[3],t),P(xs[3]+d*55,sg*62,60),P(-cx-d*150,sg*23.75,90),P(-cx-d*80,sg*20.6),P(-cx,0)],{zo:u=>-cut*(0.5*smooth01(35,190,u)+0.5*clamp((u-35)/155,0,1)),zfxIn:"end"});   /* level until clear of the service drive, then about 6% down */
       E("ramp",B+" exit",[P(cx,0),P(cx+d*80,sg*20.6),P(cx+d*150,sg*23.75,90),P(xs[4]-d*55,sg*62,60),P(xs[4],t)],{zo:function(u){const a=this.L-190,b=this.L-35;return -cut*(1-(0.5*smooth01(a,b,u)+0.5*clamp((u-a)/(b-a),0,1)))},zfxIn:"start"})}}
   // the outlying interchanges (County Rd 3, Fairhaven Blvd): the same thing for one cross street on its own, the freeway sunk only under it
-  for(const I of [I38[0],I38[3]])for(const d of [1,-1]){const sg=-d,t=sg*90,cx=I.c[0],Y=I.c[1],P=(x,tt,r)=>{const q=[x,Math.round((Y+tt)*100)/100];if(r)q.push(r);return q},a=cx-d*420,b=cx+d*420;
+  for(const I of [I38[0],I38[3],I38[4]])for(const d of [1,-1]){const sg=-d,t=sg*90,cx=I.c[0],Y=I.c[1],P=(x,tt,r)=>{const q=[x,Math.round((Y+tt)*100)/100];if(r)q.push(r);return q},a=cx-d*I.Ld,b=cx+d*I.Ld;
     if(I===I38[0]&&d<0){   /* westbound County Rd 3: the exit comes off the collector-distributor road (built with the stack), not off I-38 itself */
       mkR("ramp",I.name+" exit",[[-3140,Y+45],P(-3215,sg*48,60),P(a+d*150,sg*60,90),P(a+d*230,t,60),P(a+d*270,t)])}
     else mkR("ramp",I.name+" exit",[P(a,0),P(a+d*80,sg*20.6),P(a+d*150,sg*23.75,90),P(a+d*230,t,60),P(a+d*270,t)]);
@@ -3263,9 +3265,10 @@ function buildNet2(){
   {const X=-3500,Y=-3450,C=14.7,Sn=[X+C,Y-300],Ss=[X-C,Y-300],Rl=70,o=24.1+2*Rl,dM=85,W=(a,b,r)=>{const q=[X-a,Y+b];if(r)q.push(r);return q},
       up=(u,a,b)=>0.5*smooth01(a,b,u)+0.5*clamp((u-a)/(b-a),0,1);
     for(const x of [X+450,X-50,X-450,X-600])N(x,Y,{ctrl:"merge"});N(...Sn,{ctrl:"merge"});N(...Ss,{ctrl:"merge"});
-    /* I-138 itself: two one-way carriageways, 2 lanes each, a 22 m grass median; they meet the end of the freeway at a signal on John D. Dingell Dr */
-    rd("xway","I-138",[[-2300,-4500],[-2420,-4500+C,0],[X+C,-4500+C,600-C],Sn],{n:2,m:-2*LANE,ow:1,lim:65});
-    N(-2240,-4500,{ctrl:"merge",minT:"xway"});rd("xway","I-138",[Ss,[X-C,-4500-C,600+C],[-2420,-4500-C,0],[-2240,-4500]],{n:2,m:-2*LANE,ow:1,lim:65});
+    /* I-138 itself: two one-way carriageways, 2 lanes each, a 22 m grass median; they meet the end of the freeway at a signal on John D. Dingell Dr.
+       v37.5: they close up over 450 m (it was 120 m: their two roadways crossed in an X where they met) */
+    rd("xway","I-138",[[-2300,-4500],[-2760,-4500+C,0],[X+C,-4500+C,600-C],Sn],{n:2,m:-2*LANE,ow:1,lim:65});
+    N(-2240,-4500,{ctrl:"merge",minT:"xway"});rd("xway","I-138",[Ss,[X-C,-4500-C,600+C],[-2700,-4500-C,0],[-2240,-4500]],{n:2,m:-2*LANE,ow:1,lim:65});
     rd("blvd","I-138",[[-2300,-4500],[-2240,-4500],[-1800,-4500]],{lim:45});   /* "freeway ends": a short boulevard to the signal at John D. Dingell Dr, just north of McNamara Terminal */
     E("ramp","I-138 N to I-38 W",[Sn,[X+24,Y-220],[X+26,Y-150],[X+26.1,Y-26.1,110],[X+300,Y-23.75],[X+370,Y-20.6],[X+450,Y]],{lim:45});
     E("ramp","I-38 W to I-138 S",[[X-450,Y],[X-370,Y-20.6],[X-300,Y-23.75],[X-26.1,Y-26.1,110],[X-26,Y-150],[X-24,Y-220],Ss],{lim:45});
@@ -3326,7 +3329,20 @@ function buildNet2(){
   mkR("blvd","Halden Pkwy",[[-4400,-2100],[-4265,-2100],[-4130,-2100],[-4000,-2100],[-3870,-2100],[-3735,-2100],[-3600,-2100]],{lim:45});
   mkR("col","Signal St",[[-4130,-2400],[-4130,-2100]],{lim:35});mkR("col","Arrow St",[[-3870,-2400],[-3870,-2100]],{lim:35});
   mkR("road","County Rd 11",[[4500,-3300],[4500,-2400],[4500,0]],{lim:55});
-  mkR("road","County Rd 9",[[4000,-3300],[4000,-2400],[4000,0],[4000,1500,300],[3300,2300,300],[2750,2700]],{lim:55});
+  /* v37.5: County Rd 9 now runs up Harbor Point Blvd over I-38 and through the new downtown (its old crossing sat in the new interchange) */
+  mkR("road","County Rd 9",[[4000,-3300],[4000,-2400]],{lim:55});rd("road","County Rd 9",[[4000,-2400],[3700,-2080,0],[3700,-1590]],{lim:50});
+  mkR("road","County Rd 9",[[4000,-200],[4000,0],[4000,1500,300],[3300,2300,300],[2750,2700]],{lim:55});
+  // ---- Harbor Point: the new downtown east of Fairhaven, 9 x 7 blocks of 150 m, mostly towers. The Harbor Crest Hotel fills the double block
+  // between Clipper St and Harbor Point Blvd above Capitol Ave (Dock St stops at it); the Exchange Plaza garage is under the block at Ferry St and Exchange St
+  {const HX=[3100,3250,3400,3550,3700,3850,4000,4150,4300],HY=[-1100,-950,-800,-650,-500,-350,-200];
+    const HXN=["Atlantic Ave","Beacon St","Clipper St","Dock St","Harbor Point Blvd","Ferry St","Lighthouse Ave","Mariner St","Anchor St"],HYN=["Water St","Bay St","Exchange St","Pier Ave","Capitol Ave","Crest St","Lake St"];
+    const av=x=>x===3400||x===3700||x===4000,ay=y=>y===-950||y===-650||y===-350;
+    for(const x of HX)for(const y of HY)if(!(x===3550&&y>-500&&y<-350))N(x,y,{ctrl:av(x)||ay(y)?"signal":"allstop"});
+    HY.forEach((y,j)=>mkR(ay(y)?"ave":"st",HYN[j],HX.map(x=>[x,y]),{lim:30}));
+    HX.forEach((x,i)=>{if(x===3550){mkR("st",HXN[i],HY.filter(y=>y<=-500).map(y=>[x,y]),{lim:30});mkR("st",HXN[i],HY.filter(y=>y>=-350).map(y=>[x,y]),{lim:30})}else mkR(av(x)?"ave":"st",HXN[i],HY.map(y=>[x,y]),{lim:30})});
+    mkR("art","Harbor Point Blvd",[[3700,-1590],[3700,-1410],[3700,-1100]],{lim:40});
+    mkR("ave","Pier Ave",[[2600,-650],[3100,-650]],{lim:35});
+    mkR("ave","Clipper St",[[3400,-200],[3400,0]],{lim:30})}
   mkR("road","County Rd 30",[ILW.P(0,ILW.T(1)),ILW.P(0,ILW.T(-1)),[-4400,-2400],[-4130,-2400],[-3870,-2400],[-3600,-2400],[-1000,-2400],[1000,-2400],[2600,-2400],[3300,-2400],[4000,-2400],[4500,-2400]],{lim:55});
   /* County Rd 40 bends north round the I-138 / I-38 trumpet (its ramps reach y -3150) instead of crossing the ramps at grade */
   mkR("road","County Rd 40",[[-4400,-3300],[-4080,-3300,160],[-3930,-3060,160],[-3600,-3060],[-3270,-3060,160],[-3120,-3300,160],[-1800,-3300],[-1000,-3300],[-300,-3300],[1000,-3300],[2600,-3300],[3300,-3300],[3700,-3300],[4000,-3300],[4500,-3300]],{lim:55});
@@ -3372,8 +3388,8 @@ function buildNet2(){
   for(const x of FX)for(const y of FY)N(x,y,{ctrl:y===0||x===2600?"signal":"allstop"});
   FY.forEach((y,j)=>mkR(y===0?"ave":"st",FYN[j],FX.map(x=>[x,y]),{lim:25}));
   FX.forEach((x,i)=>mkR(x===2600?"ave":"st",FXN[i],FY.map(y=>[x,y]),{lim:25}));
-  mkR("road","Route 20",[[2900,0],[4000,0],[4500,0]],{lim:50});
-  mkR("art","Fairhaven Blvd",[[2600,-300],[2600,-1090],[2600,-1410],[2600,-1590],[2600,-1910]],{lim:40});
+  mkR("road","Route 20",[[2900,0],[3400,0],[4000,0],[4500,0]],{lim:50});N(3400,0,{ctrl:"allstop"});
+  mkR("art","Fairhaven Blvd",[[2600,-300],[2600,-650],[2600,-1090],[2600,-1410],[2600,-1590],[2600,-1910]],{lim:40});N(2600,-650,{ctrl:"signal"});
   mkR("road","County Rd 22",[[2600,-1910],[2600,-2400],[2600,-3300]],{lim:55});
   // Oakridge: an oval loop, a winding spine, cul-de-sacs off three sides
   {const O=ovalLoop("Oakridge Dr",2800,900,430,270);rd("res","Laurel St",[O.S,[2740,780,0],[2800,900],[2860,1040,0],O.N]);
@@ -3849,7 +3865,7 @@ function roadDist(x,y,m){let best=m+1;for(const e of edgesNear(x,y,m+6)){const p
   return best}
 
 // ---- places: downtown (flat, concrete), the subdivisions (flat lawns), the rest rolling countryside
-const FLAT=W2?[[-1720,-280,-570,570,"city"],[2230,2970,-370,370,"city"],[120,1010,380,1120,"sub"],[120,1080,-990,-380,"sub"],[2160,3440,520,1370,"sub"],[1520,2160,2230,2720,"sub"],[-1790,-1150,860,1360,"gated"]]
+const FLAT=W2?[[-1720,-280,-570,570,"city"],[2230,2970,-370,370,"city"],[3020,4380,-1180,-120,"city","hp"],[120,1010,380,1120,"sub"],[120,1080,-990,-380,"sub"],[2160,3440,520,1370,"sub"],[1520,2160,2230,2720,"sub"],[-1790,-1150,860,1360,"gated"]]
   :[[-1420,-430,-420,420,"city"],[580,1620,180,1020,"sub"],[580,1620,-1020,-180,"sub"],[-200,1250,-120,120,"blvd"]];
 /* the kit world: downtown is the city; every cluster of residential streets is a subdivision (the builders fill it with houses) */
 if(KITW&&KITMAP){FLAT.length=0;FLAT.push([-440,440,-440,440,"city"]);const B=[];
@@ -4263,6 +4279,7 @@ if(W2){const sOn=(ax,ay,bx,by,u,dir=1)=>{const e=ePick(ax,ay,bx,by);if(!e)return
   for(const k in STARTS)delete STARTS[k];
   const st_=(k,name,desc,p,o)=>STARTS[k]=Object.assign({name,desc},p,o||{});
   st_("city","Downtown Westport","Main St · a signal every block, the parking garage on Cass Ave, the Clearwater River at the east end",sOn(-1600,0,-1450,0,35));
+  st_("harbor","Harbor Point","The new downtown of towers: the Harbor Crest Hotel on Capitol Ave, the Exchange Plaza garage under Ferry St",sOn(3550,-650,3700,-650,40));
   st_("hwy","I-38","Interstate, 65 mph, 3 lanes each way: cross streets bridge over it and the ramps climb up to them, a stack interchange with I-61",sOn(-580,-1500,580,-1500,150));
   st_("i61","I-61 northbound","Northbound on I-61 towards the four-level stack with I-38",sOn(-2300,-3300,-2300,-2230,200));
   st_("shops","Commerce Pkwy shops","Between Westport and Fairhaven: Fresh Market, Tread Center tires, Bean & Brew with fast chargers, Fuel Stop",sOn(1000,0,1700,0,425,-1));
@@ -6283,7 +6300,7 @@ function dynEnd(o){const D=o.dyn;o.dyn=null;const i=CRASHB.indexOf(o);if(i>=0)CR
 function bodyOf(o){if(o.wx===undefined)return null;if(o.dyn)return {x:o.wx,y:o.wy,h:o.wh,vx:o.dyn.vx,vy:o.dyn.vy};const v=o.v||0;return {x:o.wx,y:o.wy,h:o.wh,vx:Math.cos(o.wh)*v,vy:Math.sin(o.wh)*v}}
 
 const CCN={list:null,n:0,x:0,y:0};
-function checkCollision(){
+function checkCollision(){try{semiHit()}catch(e){}
   // other vehicles
   // broad phase: the cars within 40 m are gathered every 16 steps (there can be 2,000+ parked cars), the exact tests run on those
   if(!CCN.list||++CCN.n>=16||Math.abs(car.px-CCN.x)>8||Math.abs(car.py-CCN.y)>8){CCN.n=0;CCN.x=car.px;CCN.y=car.py;const A=[];for(const L_ of [cars,parked])for(const o of L_)if(o.wx!==undefined&&Math.abs(o.wx-car.px)<40&&Math.abs(o.wy-car.py)<40)A.push(o);CCN.list=A}
@@ -6291,10 +6308,11 @@ function checkCollision(){
     const ohl=o.kind==="bike"?0.9:o.kind==="cone"?0.2:o.len?o.len/2-0.05:2.35,ohw=o.kind==="bike"?0.3:o.kind==="cone"?0.2:o.wid?o.wid/2-0.05:0.95;if(o.down)continue;
     const H=obbSAT(car.px,car.py,car.psi,BODY_HL,BODY_HW,b.x,b.y,b.h,ohl,ohw);if(!H||!H.n)continue;
     const p1=supportPt(car.px,car.py,car.psi,BODY_HL,BODY_HW,H.n[0],H.n[1]),p2=supportPt(b.x,b.y,b.h,ohl,ohw,-H.n[0],-H.n[1]),cp=[(p1[0]+p2[0])/2,(p1[1]+p2[1])/2];
-    sys.hitCp=cp;sys.hitCpT=performance.now();const mB=mdlMass(o),mO=o.kind==="parked"||o.kind==="wreck"?mB*1.6:o.kind==="bike"?95:o.kind==="cone"?4:mB, R=hitResponse(H.n,H.d,cp,[b.vx,b.vy],mO,0.25);
+    sys.hitCp=cp;sys.hitCpT=performance.now();const mB=mdlMass(o),mO=o.semi?1e7:o.kind==="parked"||o.kind==="wreck"?mB*1.6:o.kind==="bike"?95:o.kind==="cone"?4:mB, R=hitResponse(H.n,H.d,cp,[b.vx,b.vy],mO,0.25);
     // the other car: shoved along the normal, gets the impulse, stops with its hazards on
     if(o.kind==="remote"){crashFx(R.v,"another player");if(MP.room===NETROOM&&R.v>0.8){const now=performance.now();if(!o.hitT||now-o.hitT>300){o.hitT=now;netSend("H",{to:o.peer,dv:[+(R.j*H.n[0]/mO).toFixed(2),+(R.j*H.n[1]/mO).toFixed(2)],v:+R.v.toFixed(1)})}}continue}
     if(o.kind==="cop"&&o.leaving||o.kind==="towed")continue;
+    if(o.semi){crashFx(R.v,"a semi truck");continue}
     if(o.kind==="cop"){const pu=H.d*(1-R.share);o.wx+=H.n[0]*pu;o.wy+=H.n[1]*pu;o.v=Math.max(0,o.v*0.75);crashFx(R.v,"a police car");if(R.v>2&&COP.stars<3)copOffense(Math.max(2,COP.stars),"Ramming a police car");continue}
     if(o.mdl==="city_police"&&R.v>1.5)setTimeout(()=>copOffense(2,"Hitting a police car"),0);
     // a real hit: the other car becomes a body that takes the impulse and the spin from where it was hit
@@ -6350,7 +6368,7 @@ function splitLane(n,inL,pick,nl,cur){if(n.ctrl!=="merge")return undefined;const
   /* a wide split (three or more lanes into two roads of two or more): the middle lane(s) can go either way, like a real option lane */
   const opt=nl>=3&&pick.e.n>=2,lo=L?(opt?1:nl-1):0,hi=L?nl-1:(opt?nl-2:0);if(cur==null||!isFinite(cur))return L?nl-1:0;return clamp(Math.round(cur),lo,hi)}
 function planMove(c,prefer){const n=endNode(c.e,c.dir),inL=arrLeg(c.e,c.dir);c.mv=null;c.inBay=false;c.stopDone=false;c.stopT=0;c.waitT=0;c.goC=0;c.goYellow=false;c.runRed=undefined;c.needLane=null;if(!inL)return;
-  let ms=movesFrom(n,inL);if(RW.closed.size){const ok=ms.filter(m=>!RW.closed.has(m.e));if(ok.length)ms=ok}if(c.kind==="bike"){const all=ms;ms=ms.filter(m=>m.t!=="U"&&(BIKE_T.has(m.e.type)||m.e.type==="rbt")||m.e.type==="blvd"&&m.t==="S");if(!ms.length)ms=all.filter(m=>!/xway|ramp/.test(m.e.type))}/* cyclists ride round roundabouts and turning circles too, and turn back at a dead end */if(!ms.length)return;let pick=prefer?ms.find(m=>m.t===prefer):null;if(!pick&&c.route){const Q=c.route,nk=c.e===Q.dest.e&&c.dir===Q.dest.dir&&c.s>Q.dest.s+3?Q.loop:Q.next.get(skey(c.e,c.dir));if(nk!=null)pick=ms.find(m=>skey(m.e,m.dir)===nk)||null}
+  let ms=movesFrom(n,inL);if(RW.closed.size){const ok=ms.filter(m=>!RW.closed.has(m.e));if(ok.length)ms=ok}if(c.kind==="bike"){const all=ms;ms=ms.filter(m=>m.t!=="U"&&(BIKE_T.has(m.e.type)||m.e.type==="rbt")||m.e.type==="blvd"&&m.t==="S");if(!ms.length)ms=all.filter(m=>!/xway|ramp/.test(m.e.type))}/* cyclists ride round roundabouts and turning circles too, and turn back at a dead end */if(c.semi){const big=ms.filter(m=>SEMI.BIG.test(m.e.type)&&m.t!=="U");if(big.length)ms=big}if(!ms.length)return;let pick=prefer?ms.find(m=>m.t===prefer):null;if(!pick&&c.route){const Q=c.route,nk=c.e===Q.dest.e&&c.dir===Q.dest.dir&&c.s>Q.dest.s+3?Q.loop:Q.next.get(skey(c.e,c.dir));if(nk!=null)pick=ms.find(m=>skey(m.e,m.dir)===nk)||null}
   // a roundabout: go round at most a couple of exits, then take one (nobody does laps)
   if(n.rbt){if(!inL.major)c.rbN=0;else{c.rbN=(c.rbN||0)+1;if(!pick&&!c.route&&c.rbN>=3)pick=ms.find(m=>m.t==="R")||null}}
   /* v38: a driver on an unfamiliar route now and then misses the turn: they take another way and their route (a next-step map over every road) gets them back */
@@ -6404,7 +6422,7 @@ const aiLatG=c=>{const P=c.pers;if(!P)return 0.28;if(P.lg)return P.lg;return P.r
    a work zone) is passed by easing over up to 1.2 m inside the lane instead of stopping behind it, when nobody is alongside on that side */
 function aiNudge(c,pts,OB){if(window.NONUDGE)return;if(c.offT!==c.nudOT)c.nud=0;const base=c.offT-(c.nud||0);let want=0;
   if(!c.jn&&!c.ovt&&!c.emv&&!c.dyn&&pts.length>2&&c.e&&(c.e.type==="xway"||c.e.type==="ramp"||c.e.type==="sd")){   /* freeways, ramps and service drives only: on tight town streets it scraped parked and queued cars */const hw=(c.wid||1.9)/2,nd=c.nud||0;let push=0,bad=false;const side=[];
-    for(const CL of obCells(OB,c.wx,c.wy))for(const o of CL){if(o.o===c)continue;const dx=o.x-c.wx,dy=o.y-c.wy;if(dx*dx+dy*dy>2025)continue;if(o.z!==undefined&&Math.abs(o.z-(c.wz||0))>3)continue;
+    for(const CL of obCells(OB,c.wx,c.wy))for(const o of CL){if(o.o===c||o.o&&o.o.semiOf===c)continue;const dx=o.x-c.wx,dy=o.y-c.wy;if(dx*dx+dy*dy>2025)continue;if(o.z!==undefined&&Math.abs(o.z-(c.wz||0))>3)continue;
       let bd=1e9,bi=-1;for(let q=0;q<pts.length;q++){const ex=o.x-pts[q][0],ey=o.y-pts[q][1],d=ex*ex+ey*ey;if(d<bd){bd=d;bi=q}}if(bi<0)continue;
       const h=pts[bi][4],lat=-(o.x-pts[bi][0])*Math.sin(h)+(o.y-pts[bi][1])*Math.cos(h)+nd,al=pts[bi][2],O=o.o,ped=O&&O.kind==="ped";
       if(al>-12&&al<16&&Math.abs(lat)>1.6&&Math.abs(lat)<5)side.push(lat);   /* alongside: blocks easing over that way */
@@ -6417,7 +6435,7 @@ function aiNudge(c,pts,OB){if(window.NONUDGE)return;if(c.offT!==c.nudOT)c.nud=0;
 function obGrid(OB){const G=new Map();for(const o of OB){const k=Math.floor(o.x/90)*65536+Math.floor(o.y/90);let L=G.get(k);if(!L)G.set(k,L=[]);L.push(o)}OB.grid=G}
 function obCells(OB,x,y){if(!OB.grid)return [OB];const gx=Math.floor(x/90),gy=Math.floor(y/90),R=[];for(let i=-1;i<=1;i++)for(let j=-1;j<=1;j++){const L=OB.grid.get((gx+i)*65536+gy+j);if(L)R.push(L)}return R}
 function pathGap(c,pts,OB){let gap=Infinity,vL=0,who=null;
-  for(const CL of obCells(OB,c.wx,c.wy))for(const o of CL){if(o.o===c)continue;const dx=o.x-c.wx,dy=o.y-c.wy;if(dx*dx+dy*dy>8100)continue;if(o.z!==undefined&&Math.abs(o.z-(c.wz||0))>3)continue;
+  for(const CL of obCells(OB,c.wx,c.wy))for(const o of CL){if(o.o===c||o.o&&o.o.semiOf===c)continue;const dx=o.x-c.wx,dy=o.y-c.wy;if(dx*dx+dy*dy>8100)continue;if(o.z!==undefined&&Math.abs(o.z-(c.wz||0))>3)continue;
     if(c.ghostT>0&&o.o!=="me"&&Math.abs(wrapPi(o.h-c.wh))>0.8)continue;
     /* v37.3: an oncoming car in its own lane is not in my way, even when the bend makes my path line up with it (on tight mountain bends, like
        Kestrel Pass above the roundabout, drivers braked for every oncoming car and the queue rode up into itself). Anyone overtaking, or out of
@@ -6847,7 +6865,7 @@ function aiSeparate(dt){const A=[];for(const c of cars){if((c.kind!=="ai"&&c.kin
     const ca=Math.cos(a.wh),sa=Math.sin(a.wh),ahead=(b.wx-a.wx)*ca+(b.wy-a.wy)*sa;if(ahead<0&&b.kind==="ai")continue;   // the pair is handled once, by the car behind
     a.v=Math.min(a.v,Math.max(0,(b.v||0)*Math.max(0,Math.cos((b.wh||0)-a.wh))-0.5));a.sepT=1.2;
     if(a.s!==undefined&&!a.jn){a.s=Math.max(0,a.s-Math.min(0.6,H.d+0.05));try{carPose(a)}catch(e){}}else{a.wx-=ca*Math.min(0.4,H.d+0.05);a.wy-=sa*Math.min(0.4,H.d+0.05)}}}}}
-function aiCollide(dt){AIC.cool-=dt;if(AIC.cool>0||st.aiWreck===false)return;const A=[];for(const c of cars){if(c.kind!=="ai"||c.emv||c.wx===undefined)continue;if(Math.abs(c.wx-car.px)>450||Math.abs(c.wy-car.py)>450)continue;A.push(c)}
+function aiCollide(dt){AIC.cool-=dt;if(AIC.cool>0||st.aiWreck===false)return;const A=[];for(const c of cars){if(c.kind!=="ai"||c.emv||c.semi||c.wx===undefined)continue;if(Math.abs(c.wx-car.px)>450||Math.abs(c.wy-car.py)>450)continue;A.push(c)}
   if(EV.list.filter(v=>v.pair&&v.phase>0).length>=2)return;
   for(let i=0;i<A.length;i++){const a=A[i];for(let j=i+1;j<A.length;j++){const b=A[j];const dx=b.wx-a.wx,dy=b.wy-a.wy;if(dx*dx+dy*dy>36||Math.abs((a.wz||0)-(b.wz||0))>1.5)continue;
     const H=obbSAT(a.wx,a.wy,a.wh,(a.len||CARLEN)/2-0.15,(a.wid||1.9)/2-0.1,b.wx,b.wy,b.wh,(b.len||CARLEN)/2-0.15,(b.wid||1.9)/2-0.1);if(!H||H.d<0.3)continue;
@@ -6870,7 +6888,7 @@ function updateTraffic(dt){try{tmTick(dt)}catch(e){console.error(e)}try{gpkTick(
   const OB=[];for(const o of cars)if(o.wx!==undefined){OB.push({x:o.wx,y:o.wy,z:o.wz||0,h:o.wh,v:o.v||0,o,t2:o.kind==="cone"?1.56:o.kind==="bike"?2.25:4.84});if(o.jn&&o.kind==="ai"&&!o.semi)for(const k of [-1.6,1.6])OB.push({x:o.wx+Math.cos(o.wh)*k,y:o.wy+Math.sin(o.wh)*k,z:o.wz||0,h:o.wh,v:o.v||0,o,t2:3.6})}   /* v38: a car turning or merging in front sticks its nose and tail out sideways, so its front and back count too (a car on the major road ran into a merging car whose centre was just outside its path) */for(const o of parked)if(!o.fixed){const b=o._ob||(o._ob={o,v:0});b.x=o.wx;b.y=o.wy;b.z=o.wz||0;b.h=o.wh;OB.push(b)}
   for(const p of peds)OB.push({x:p.wx,y:p.wy,z:p.wz||0,h:p.wh,v:p.v||0,o:p,t2:4.4});for(const d of EV.crit)OB.push({x:d.wx,y:d.wy,z:d.wz||0,h:d.wh,v:d.v,o:d,t2:4.4});
   if(!TOWH.ride)OB.push({x:car.px,y:car.py,z:car.zb||0,h:car.psi,v:car.vx,o:"me"});for(const k of [-1.75,1.75])OB.push({x:car.px+Math.cos(car.psi)*k,y:car.py+Math.sin(car.psi)*k,z:car.zb||0,h:car.psi,v:car.vx,o:"me",t2:3.6});
-  if(TRL.on&&!st.walk){const K=TRL.on,H=trlHitch(),dx=H[0]-TRL.ax,dy=H[1]-TRL.ay,d=Math.hypot(dx,dy)||1,ux=dx/d,uy=dy/d,back=K.back??1.8,tot=d+back,w2=Math.pow((K.w||2)/2+0.9,2);for(let q=0;q<=tot;q+=1.6){const px=H[0]-ux*q,py=H[1]-uy*q;OB.push({x:px,y:py,z:car.zb||0,h:TRL.h,v:car.vx,o:TRL_OB,t2:w2})}}if(st.walk)OB.push({x:st.walk.x,y:st.walk.y,h:st.walk.h,v:st.walk.v,o:"me",t2:4.4});
+  if(TRL.on&&!st.walk){const K=TRL.on,H=trlHitch(),dx=H[0]-TRL.ax,dy=H[1]-TRL.ay,d=Math.hypot(dx,dy)||1,ux=dx/d,uy=dy/d,back=K.back??1.8,tot=d+back,w2=Math.pow((K.w||2)/2+0.9,2);for(let q=0;q<=tot;q+=1.6){const px=H[0]-ux*q,py=H[1]-uy*q;OB.push({x:px,y:py,z:car.zb||0,h:TRL.h,v:car.vx,o:TRL_OB,t2:w2})}}semiOB(OB);if(st.walk)OB.push({x:st.walk.x,y:st.walk.y,h:st.walk.h,v:st.walk.v,o:"me",t2:4.4});
   obGrid(OB);   // a 90 m grid, so each car only checks what is around it (thousands of parked cars otherwise)
   try{dynTick(dt)}catch(e){console.error(e)}
   for(const c of cars){
@@ -7783,8 +7801,8 @@ function startEvent(type){const M=me();let made=null;if(st.aiWreck===false&&(typ
     const a=evStatic("wreck",A.e,A.dir,A.s,ln,{haz:true,head:0.4}),b=evStatic("wreck",A.e,A.dir,A.s+5.6,ln+0.7,{haz:true,head:-0.6});
     const cs=[-14,-20,-26].map(d=>evStatic("cone",A.e,A.dir,A.s+d,ln+(d+26)*0.06));made={type,label:"Crash",x:a.wx,y:a.wy,t:170,items:[a,b,...cs]}}
   else if(type==="aicrash"){   // two traffic cars ahead of you: the front one brakes hard and the one behind isn't looking
-    let pair=null;for(const L_ of cars){if(L_.kind!=="ai"||L_.jn||L_.v<8||L_.mdl&&L_.mdl.startsWith("city_"))continue;const d=Math.hypot(L_.wx-car.px,L_.wy-car.py);if(d<70||d>420)continue;
-      for(const F of cars){if(F===L_||F.kind!=="ai"||F.jn||F.e!==L_.e||F.dir!==L_.dir||laneIdx(F)!==laneIdx(L_))continue;const g=L_.s-F.s;if(g>10&&g<45&&F.v>8){pair=[L_,F];break}}if(pair)break}
+    let pair=null;for(const L_ of cars){if(L_.kind!=="ai"||L_.jn||L_.v<8||L_.semi||L_.mdl&&L_.mdl.startsWith("city_"))continue;const d=Math.hypot(L_.wx-car.px,L_.wy-car.py);if(d<70||d>420)continue;
+      for(const F of cars){if(F===L_||F.kind!=="ai"||F.jn||F.semi||F.e!==L_.e||F.dir!==L_.dir||laneIdx(F)!==laneIdx(L_))continue;const g=L_.s-F.s;if(g>10&&g<45&&F.v>8){pair=[L_,F];break}}if(pair)break}
     if(!pair)return null;const [L_,F]=pair;L_.hardT=3.2;F.distractT=6;made={type,label:"Crash",x:L_.wx,y:L_.wy,t:240,items:[],pair,phase:0,pt:0,quiet:true}}
   else if(type==="breakdown"){const A=aheadOnRoad(M,240+rnd()*260);if(!fits(A)||A.e.side<1.2)return null;const lo=loOf(A.e.n);
     const a=evStatic("wreck",A.e,A.dir,A.s,lo*LANE-LANE/2-A.e.side/2-0.35,{haz:true,bd:true}),tri=evStatic("cone",A.e,A.dir,A.s-22,lo*LANE-LANE/2-0.4);made={type,label:"Broken-down car",x:a.wx,y:a.wy,t:150,items:[a,tri]}}
@@ -8078,7 +8096,7 @@ function meterSetup(){METER.spaces.length=0;METER.nop=[];if(!W2)return;let sd_=9
     for(const sd of [1,-1]){let red=0;for(let u=u0;u+6.4<=u1;u+=6.4){const c=ePt(e,u+3.2,sd*off),mt=ePt(e,u+(sd>0?0.6:5.8),sd*(W+e.T.park+0.55)),en=ePt(e,u+6.4,sd*off);
       const S={e,sd,u0:u,u1:u+6.4,off:sd*off,x:c[0],y:c[1],h:c[2],mx:mt[0],my:mt[1],ex:en[0],ey:en[1]};
       if(red<=0&&rnd()<0.07)red=2+Math.floor(rnd()*3);   // a red-kerb stretch, 2-4 spaces long
-      if(red>0||noParkHere(c[0],c[1])||noParkHere(mt[0],mt[1])){const k=ePt(e,u+3.2,sd*(W+e.T.park-0.12));S.kx=k[0];S.ky=k[1];S.first=!e.nop.length||e.nop[e.nop.length-1].u1!==u||e.nop[e.nop.length-1].sd!==sd;if(red>0)red--;METER.nop.push(S);e.nop.push(S);continue}
+      if(red>0||noParkHere(c[0],c[1])||noParkHere(mt[0],mt[1])||siteIn(c[0],c[1],9)){const k=ePt(e,u+3.2,sd*(W+e.T.park-0.12));S.kx=k[0];S.ky=k[1];S.first=!e.nop.length||e.nop[e.nop.length-1].u1!==u||e.nop[e.nop.length-1].sd!==sd;if(red>0)red--;METER.nop.push(S);e.nop.push(S);continue}
       METER.spaces.push(S);e.mtr.push(S)}}}}
 function noParkAt(x,y){for(const e of gAt(GRID.e,x,y)){if(!e.nop)continue;const p=eProj(e,x,y);for(const S of e.nop)if(p.u>=S.u0&&p.u<=S.u1&&Math.abs(p.t-S.off)<1.7)return S}return null}
 function meterAt(x,y){for(const e of gAt(GRID.e,x,y)){if(!e.mtr)continue;const p=eProj(e,x,y);for(const S of e.mtr)if(p.u>=S.u0-0.6&&p.u<=S.u1+0.6&&Math.abs(p.t-S.off)<1.7)return S}return null}
@@ -8177,7 +8195,7 @@ function roboTick(dt){let nr=0;for(const c of cars)if(c.robo)nr++;if(!MODELS.tsl
     if(c.tStop>0){c.tStop-=dt;c.haz=true;if(c.tStop<=0){c.haz=false;c.stopIn=250+Math.random()*350;c.rider=c.rider?null:{skin:Math.floor(Math.random()*3),shirt:Math.floor(Math.random()*6)}}}
     else if(!c.jn&&laneIdx(c)===0&&!/xway|ramp/.test(c.e.type)){c.stopIn-=c.v*dt;if(c.stopIn<=0&&c.s>25&&c.s<c.e.L-40){c.tStop=7+Math.random()*5;c.offT=laneOff(c.e,0)-0.6}}
     else if(!c.jn&&laneIdx(c)>0&&!c.lcPending&&laneSafe(c,laneIdx(c)-1)){c.lcTarget=laneIdx(c)-1;c.lcPending=1.5;c.sig=1}}}
-function busTick(dt){try{roboTick(dt)}catch(e){}const h=hourNow(),on=h>=7&&h<9.5||h>=14.5&&h<16.5;let n=0;for(const c of cars)if(c.bus)n++;
+function busTick(dt){try{roboTick(dt)}catch(e){}try{semiTick(dt)}catch(e){console.error(e)}try{siteTick()}catch(e){}const h=hourNow(),on=h>=7&&h<9.5||h>=14.5&&h<16.5;let n=0;for(const c of cars)if(c.bus)n++;
   if(on&&!MODELS.city_schoolbus&&!W2L.busLoad){W2L.busLoad=1;try{loadModel("city_schoolbus").catch(()=>{})}catch(e){}}
   if(on&&n<2&&st.started&&MODELS.city_schoolbus){W2L.busT-=dt;if(W2L.busT<=0){W2L.busT=25;const p=randomSpot(150,700);if(p&&/res|col|st/.test(p.e.type)&&p.e.n===1){const c=newCar(p.e,p.dir,p.s,0),m=MODELS.city_schoolbus.meta;c.bus=true;c.mdl="city_schoolbus";c.len=m.length;c.wid=m.width;c.paint="yellow";c.v0=Math.min(c.v0,11);c.stopIn=40+Math.random()*100;cars.push(c)}}}
   if(!on)for(const c of cars)if(c.bus&&!c.flash&&Math.hypot(c.wx-car.px,c.wy-car.py)>400)c.bus=false;   // done for the day: just a bus
@@ -9582,7 +9600,7 @@ function sigCancel(){if(!st.signal||st.hazard||!sys.userSig||st.sigAutoOff){sys.
   if(sys.sigPk>0.3&&s<0.08&&Math.abs(car.vx)>0.5){st.signal=0;sys.userSig=false;sys.sigPk=0;try{beep(900,0.03,"square",0.05)}catch(e){}}}
 // the J card on clusters that don't have their own spot for it: a panel in the middle, in the brand's colour ("Standard" hides it)
 function cluNative(){const b=brandS();if(!cluAnalog()&&(isAudiNew()||(isFordDE()&&b==="Ford")||isHondaG()))return true;return isTesla()||(b==="Toyota"&&modelOf()==="toy_rav4_26")||b==="Lucid"||/^Mercedes/.test(b)||(b==="BMW"&&isPano())||(isVolvo()&&volKind()!=="ex90")}
-function cluSlot(){if(cluNative()||st.power!==true)return;const V=cluView();if(V[0]==="off"||(V[0]==="map"&&!cluAnalog()))return;const g=CLU.g,W=CLU.W,H=CLU.H,TH=scrTheme&&scrTheme()||{},acc=TH.acc||"#5fd0ff",wide=V[0]==="map",x=W*(wide?0.27:0.34),y=H*0.14,w=W*(wide?0.46:0.32),h=H*0.7;
+function cluSlot(){if(cluNative()||st.power!==true||cadUlt())return;const V=cluView();if(V[0]==="off"||(V[0]==="map"&&!cluAnalog()))return;const g=CLU.g,W=CLU.W,H=CLU.H,TH=scrTheme&&scrTheme()||{},acc=TH.acc||"#5fd0ff",wide=V[0]==="map",x=W*(wide?0.27:0.34),y=H*0.14,w=W*(wide?0.46:0.32),h=H*0.7;
   g.save();g.fillStyle="#06090d";rr2(g,x,y,w,h,12);g.fill();g.strokeStyle=acc+"88";g.lineWidth=1.2;rr2(g,x,y,w,h,12);g.stroke();
   cluCard(g,x+2,y+2,w-4,h-4,{ink:"#eef2f6",sub:"#8e9aa6",acc,line:"#2a323c",card:"#151b22",good:"#7fe0b0",warn:"#ff5a3a",F:CF2});
   g.fillStyle="#eef2f6";g.font=CF2(12,600);g.textAlign="right";g.textBaseline="middle";g.fillText(`${Math.round(spdUnit(Math.abs(car.vx)))} ${st.units==="mph"?"mph":"km/h"}`,x+w-10,y+14);g.restore()}
@@ -13350,7 +13368,7 @@ function terrainMesh(){CUTO.clear();try{TUN.zrA=null;TUN.g=false;tunGeo()}catch(
       for(const f of [-1,-0.5,0,0.5,1]){const t=f*Math.max(0.5,hw);if(e.m>0&&Math.abs(t)<e.m/2-0.5)continue;const q=ePt(e,u,t);if(terrDrawn(q[0],q[1])<=rz-0.02)continue;
         const fx=(q[0]-X0)/(X1-X0)*N,fy=(q[1]-Y0)/(Y1-Y0)*NY,i=Math.floor(fx),j=Math.floor(fy);if(i<0||j<0||i>=N||j>=NY)continue;
         for(const [di,dj] of [[0,0],[1,0],[0,1],[1,1]]){const k=(j+dj)*(N+1)+i+di;if(TERR.h[k]>rz-0.15){TERR.h[k]=rz-0.15;P[k*3+1]=rz-0.15;fixed++}}}}}if(!fixed)break}
-  for(let j=0;j<NY;j++)for(let i=0;i<N;i++){if(TUN.g&&tunHole(X0+(X1-X0)*i/N,X0+(X1-X0)*(i+1)/N,Y0+(Y1-Y0)*j/NY,Y0+(Y1-Y0)*(j+1)/NY))continue;const a=j*(N+1)+i;I.push(a,a+1,a+N+1,a+1,a+N+2,a+N+1)}return meshFrom(P,Nn,I)}
+  for(let j=0;j<NY;j++)for(let i=0;i<N;i++){if(TUN.g&&tunHole(X0+(X1-X0)*i/N,X0+(X1-X0)*(i+1)/N,Y0+(Y1-Y0)*j/NY,Y0+(Y1-Y0)*(j+1)/NY))continue;if(siteHole(X0+(X1-X0)*i/N,X0+(X1-X0)*(i+1)/N,Y0+(Y1-Y0)*j/NY,Y0+(Y1-Y0)*(j+1)/NY))continue;const a=j*(N+1)+i;I.push(a,a+1,a+N+1,a+1,a+N+2,a+N+1)}return meshFrom(P,Nn,I)}
 function bumpMesh(){const B={P:[],N:[],I:[]},H={P:[],N:[],I:[]},BY={P:[],N:[],I:[]},W_={P:[],N:[],I:[]},F_={P:[],N:[],I:[]},Ck={P:[],N:[],I:[]},Gb={P:[],N:[],I:[]},Gr={P:[],N:[],I:[]},Ru={P:[],N:[],I:[]};
   /* a surface patch following u (along) and t (across) with a height function: used for the humps */
   const patch=(M,e,u0,u1,t0,t1,hf,nu,nt)=>{const k0=M.P.length/3;for(let i=0;i<=nu;i++){const u=u0+(u1-u0)*i/nu;for(let j=0;j<=nt;j++){const tt=t0+(t1-t0)*j/nt,q=ePt(e,u,tt),z=(e.hz?ez(e,u):0)+hf(u);M.P.push(q[0],z,-q[1]);M.N.push(0,1,0)}}
@@ -14075,7 +14093,9 @@ function worldScenery(){CUTO.clear();W2P.length=0;LKP.length=0;LK.sky=0;LK.used=
         txbAdd(p[0],p[1],z+2.05,0.75,1.15,p[2],(x,W,H)=>{x.fillStyle="#fff";x.fillRect(0,0,W,H);x.strokeStyle="#111";x.lineWidth=W*0.03;x.strokeRect(W*0.03,W*0.03,W-W*0.06,H-W*0.06);x.fillStyle="#c6f000";x.fillRect(W*0.08,H*0.05,W*0.84,H*0.24);x.fillStyle="#111";x.textAlign="center";x.textBaseline="middle";
           x.font=`800 ${W*0.17}px Inter,system-ui,sans-serif`;x.fillText("SCHOOL",W/2,H*0.17);x.font=`700 ${W*0.11}px Inter,system-ui,sans-serif`;x.fillText("SPEED",W/2,H*0.37);x.fillText("LIMIT",W/2,H*0.47);x.font=`800 ${W*0.3}px Inter,system-ui,sans-serif`;x.fillText("20",W/2,H*0.65);x.font=`700 ${W*0.09}px Inter,system-ui,sans-serif`;x.fillText("WHEN",W/2,H*0.83);x.fillText("FLASHING",W/2,H*0.92)},240,256);
         const fx=Math.cos(p[2]),fy=Math.sin(p[2]),rx=Math.sin(p[2]),ry=-Math.cos(p[2]);for(const sd of [-1,1]){B(post,p[0]+rx*sd*0.24+fx*0.03,p[1]+ry*sd*0.24+fy*0.03,z+2.72,0.2,0.2,0.08,p[2]);SIGH.push({t:"sch",x:p[0]+rx*sd*0.24-fx*0.06,y:p[1]+ry*sd*0.24-fy*0.06,h:p[2],z:z+2.82,ph:sd})}}}}
-  for(const CB of FLAT){if(CB[4]!=="city")continue;const [X0,X1,Y0,Y1]=CB,main=CB===CITY_BOX;B(plate,(X0+X1)/2,(Y0+Y1)/2,-0.05,0.04,X1-X0,Y1-Y0);
+  for(const CB of FLAT){if(CB[4]!=="city")continue;const [X0,X1,Y0,Y1]=CB,main=CB===CITY_BOX,hp=CB[5]==="hp";{let R=[[X0,X1,Y0,Y1]];for(const S of SITES)for(const Hr of S.ground?[[S.x0,S.x1,S.z0,S.z1]]:S.holes){const a=S.cx+Hr[0],b=S.cx+Hr[1],c=S.cy-Hr[3],d=S.cy-Hr[2],R2=[];for(const [x0,x1,y0,y1] of R){if(b<=x0||a>=x1||d<=y0||c>=y1){R2.push([x0,x1,y0,y1]);continue}   /* v37.5: the slab stops round the hotel (it has its own ground) and over the garage's ramp openings */
+      if(a>x0)R2.push([x0,a,y0,y1]);if(b<x1)R2.push([b,x1,y0,y1]);const ma=Math.max(a,x0),mb=Math.min(b,x1);if(c>y0)R2.push([ma,mb,y0,c]);if(d<y1)R2.push([ma,mb,d,y1])}R=R2}
+    for(const [x0,x1,y0,y1] of R)B(plate,(x0+x1)/2,(y0+y1)/2,-0.05,0.04,x1-x0,y1-y0)}
   const PARKB=[-1140,-1010,160,290];  {const g=M_();B(g,(PARKB[0]+PARKB[1])/2,(PARKB[2]+PARKB[3])/2,-0.03,0.03,PARKB[1]-PARKB[0],PARKB[3]-PARKB[2]);green.P.push(...g.P);const k0=green.P.length/3-g.P.length/3;green.N.push(...g.N);green.I.push(...g.I.map(i=>i+k0))}
   if(main)for(let n=0;n<30;n++){const x=PARKB[0]+6+r()*(PARKB[1]-PARKB[0]-12),y=PARKB[2]+6+r()*(PARKB[3]-PARKB[2]-12);treeAt(x,y,0,true);collAdd({tree:1,t:"c",x,y,r:0.35})}
   const core=main?[-925,0]:[(X0+X1)/2,(Y0+Y1)/2],big=main?1:0.25,coreR=main?330:220;
@@ -14086,13 +14106,13 @@ function worldScenery(){CUTO.clear();W2P.length=0;LKP.length=0;LK.sky=0;LK.used=
     LK_LMK=["lk_City_GrandTheater","lk_City_ClassicalBank","lk_City_OldHotel_14F","lk_City_StoneChurch","lk_City_PoliceStation","lk_City_FireStation","lk_City_PostOffice","lk_City_ConeyDiner"],   /* one of each skyscraper and landmark, downtown Westport only */
     pick=A=>A[Math.floor(r()*A.length)];
   const lkFace=(x,y)=>{let fa=(r()*4|0)*Math.PI/2,fd=1e9;for(const e of edgesNear(x,y,70)){if(e.n<1)continue;const q=eProj(e,x,y);if(q.u<0||q.u>e.L||Math.abs(q.t)>=fd)continue;fd=Math.abs(q.t);const p=ePt(e,q.u,0),to=Math.atan2(p[1]-y,p[0]-x);fa=[p[2]+Math.PI/2,p[2]-Math.PI/2].sort((A,B)=>Math.abs(wrapPi(A-to))-Math.abs(wrapPi(B-to)))[0]}return fa};
-  const okD=(cx,cy)=>roadDist(cx,cy,6)>4.7&&!nearBr(cx,cy)&&!inExtra(cx,cy,2)&&!(cx>GAR.x0-8&&cx<GAR.x1+8&&cy>GAR.y0-8&&cy<GAR.y1+4)&&!(cx>PARKB[0]-3&&cx<PARKB[1]+3&&cy>PARKB[2]-3&&cy<PARKB[3]+3)&&cx>X0+1&&cx<X1-1&&cy>Y0+1&&cy<Y1-1&&riverD(cx,cy)>RIVER.w/2+8;
+  const okD=(cx,cy)=>roadDist(cx,cy,6)>4.7&&!siteIn(cx,cy,5)&&!nearBr(cx,cy)&&!inExtra(cx,cy,2)&&!(cx>GAR.x0-8&&cx<GAR.x1+8&&cy>GAR.y0-8&&cy<GAR.y1+4)&&!(cx>PARKB[0]-3&&cx<PARKB[1]+3&&cy>PARKB[2]-3&&cy<PARKB[3]+3)&&cx>X0+1&&cx<X1-1&&cy>Y0+1&&cy<Y1-1&&riverD(cx,cy)>RIVER.w/2+8;
   const lkTry=(k,x,y)=>{if(!W2)return false;const fa=lkFace(x,y),fr=fpRect(k,x,y,fa,0);if(!fr.every(([cx,cy])=>okD(cx,cy)))return false;
     {const xs=fr.map(p=>p[0]),ys=fr.map(p=>p[1]);if(Math.min(...xs)<GAR.x1+8&&Math.max(...xs)>GAR.x0-8&&Math.min(...ys)<GAR.y1+4&&Math.max(...ys)>GAR.y0-8)return false}   /* v340: a footprint bigger than the garage used to pass with all its corners outside it, and the parking garage ended up inside a 222 m tower */
 if(!rectFree(k,x,y,fa))return false;w2Put(k,x,y,fa,0);return true};
-  if(W2){const c0=main?[-925,0]:[(X0+X1)/2,(Y0+Y1)/2],cR=main?330:220;let nS=0;
+  if(W2){const c0=main?[-925,0]:hp?[3700,-650]:[(X0+X1)/2,(Y0+Y1)/2],cR=main?330:hp?470:220;let nS=0;
     /* street walls first: every street in the block, towers in the core (up to 10), offices and glass round them, walk-ups, brownstones, markets and shop rows further out */
-    const pk=(e,u,sd)=>{const p=ePt(e,u,sd*20),cd=Math.hypot(p[0]-c0[0],p[1]-c0[1])/cR;if(main&&cd<0.85&&r()<0.5){const q=LK_SKY.filter(k=>!LK.used[k]);if(q.length)return pick(q)}if(main&&cd>0.5&&cd<1.6&&r()<0.12){const q=LK_LMK.filter(k=>!LK.used[k]);if(q.length)return q[0]}if(!main)return pick(LK_TOWN);if(cd<1.0)return pick(r()<0.7?LK_MID:LK_LOW);if(cd<1.5&&r()<0.3)return pick(LK_MID);return pick(LK_LOW)};   /* v333 zoning: towers and mid-rises only in downtown Westport; the other blocks stay 2-4 storeys */
+    const pk=(e,u,sd)=>{const p=ePt(e,u,sd*20),cd=Math.hypot(p[0]-c0[0],p[1]-c0[1])/cR;if(hp)return cd<1.35&&r()<0.78?pick(LK_SKY):r()<0.75?pick(LK_MID):pick(LK_LOW);   /* v37.5: Harbor Point is towers */if(main&&cd<0.85&&r()<0.5){const q=LK_SKY.filter(k=>!LK.used[k]);if(q.length)return pick(q)}if(main&&cd>0.5&&cd<1.6&&r()<0.12){const q=LK_LMK.filter(k=>!LK.used[k]);if(q.length)return q[0]}if(!main)return pick(LK_TOWN);if(cd<1.0)return pick(r()<0.7?LK_MID:LK_LOW);if(cd<1.5&&r()<0.3)return pick(LK_MID);return pick(LK_LOW)};   /* v333 zoning: towers and mid-rises only in downtown Westport; the other blocks stay 2-4 storeys */
     for(const e of EDGES){if(!e.T.walk||e.type==="res")continue;const m=eAt(e,e.L/2);if(m.x<X0||m.x>X1||m.y<Y0||m.y>Y1)continue;streetWall(e,pk,okD)}
     /* v365: the corners. The street walls stop short of each junction, so every downtown corner was an empty square of concrete.
        Now each corner between two square-on streets gets a corner building (front on one street, its side on the back of the other
@@ -14118,7 +14138,7 @@ if(!rectFree(k,x,y,fa))return false;w2Put(k,x,y,fa,0);return true};
     if(x>PARKB[0]-6-rad&&x<PARKB[1]+6+rad&&y>PARKB[2]-6-rad&&y<PARKB[3]+6+rad)continue;if(x>GAR.x0-6-rad&&x<GAR.x1+6+rad&&y>GAR.y0-6-rad&&y<GAR.y1+6+rad)continue;if(!clear(x,y,5.5+rad))continue;
     if(W2&&(riverD(x,y)<RIVER.w/2+rad+12||!w2Free(x,y,rad+1)))continue;
     const cd=Math.hypot(x-core[0],y-core[1]),tall=cd<coreR,h=tall?(16*big+r()*26*Math.max(big,0.4)+Math.pow(1-cd/coreR,1.4)*r()*130*big):(8+r()*20*Math.max(big,0.5)),mi=Math.floor(r()*5);
-    if(W2){const cand=!main?[pick(LK_TOWN),pick(LK_TOWN),"lk_walkup"]:h>34?[pick(LK_MID),pick(LK_LOW)]:[pick(LK_LOW),pick(LK_LOW),"lk_walkup"];for(const k of cand)if(lkTry(k,x,y))break;continue}
+    if(W2){const cand=hp?[pick(LK_SKY),pick(LK_SKY),pick(LK_MID)]:!main?[pick(LK_TOWN),pick(LK_TOWN),"lk_walkup"]:h>34?[pick(LK_MID),pick(LK_LOW)]:[pick(LK_LOW),pick(LK_LOW),"lk_walkup"];for(const k of cand)if(lkTry(k,x,y))break;continue}
     if(h>48){B(bld[mi],x,y,0,15,w,d);B(bld[(mi+2)%5],x,y,15,h-15,w*0.72,d*0.72);B(roofs,x,y,h,2.5,w*0.3,d*0.3)}else{B(bld[mi],x,y,0,h,w,d);B(roofs,x,y,h,0.6,w*0.92,d*0.92)}
     collAdd({t:"b",x,y,h:0,hl:w/2,hw:d/2});BLD_LIST.push([x,y,w/2,d/2])}}
   // ---- along every road: lamps, street trees, houses in the subdivisions, trees in the boulevard medians
@@ -18183,7 +18203,11 @@ function phApp(k){const T=TRIMS[st.trim],H=car.hyb;if(k==="store")return phStore
     <div class="grid2">${[["lock","Lock"],["unlock","Unlock"],["start","Remote start"],["climate",sys.climate?"Climate off":"Climate on"],["honk","Horn & lights"],["trunk",T.tesla?"Trunk":"Liftgate"]].map(([v,n])=>`<button data-a="fob" data-v="${v}">${n}</button>`).join("")}</div>`}
   if(k==="maps")return phMapsApp();
   if(k==="music"){const on=SCR.radioOn,i=au.station||0,R=RADIO[i];return phHdr(PHONE.os==="ios"?"Music":"Music")+`<div class="np"><div class="art" style="background:linear-gradient(135deg,hsl(${i*67},70%,55%),hsl(${i*67+60},70%,35%))">♫</div><b>${SCR.adBreak?"📻 Ad: "+SCR.adBreak:R.tracks?R.tracks[(Math.floor(GT.min/4))%R.tracks.length]:R.name}</b><span>${R.name} · ${R.genre||""}</span><div class="ctl"><button data-a="mprev">⏮</button><button data-a="mplay">${on?"⏸":"▶"}</button><button data-a="mnext">⏭</button></div><small>${st.phoneConn?"Playing through the car":"Playing on the phone speaker"}</small></div><div class="list">${RADIO.map((r,j)=>`<button class="li" data-a="mst" data-v="${j}"><span>${r.name}<small>${r.genre||""}</small></span>${j===i&&on?"<b>♫</b>":""}</button>`).join("")}</div>`}
-  if(k==="phone"){const C=[["Mom","👩"],["Northline Bank","🏦"],[`${(T.group||"").split(" ")[0]} Dealer`,"🚗"],["Roadside Assistance","🛻"],["Pizza Place","🍕"]];return phHdr("Phone")+`<div class="list">${C.map(([n,e])=>`<button class="li" data-a="call" data-v="${n}"><span>${e} ${n}<small>mobile</small></span><b>✆</b></button>`).join("")}</div>`}
+  if(k==="phone"){const C=[["Mom","👩"],["Northline Bank","🏦"],[`${(T.group||"").split(" ")[0]} Dealer`,"🚗"],["Roadside Assistance","🛻"],["Pizza Place","🍕"]],kp=PHONE.pTab==="k";
+    const tabs=`<div class="pkTabs"><button data-a="ptab" data-v="c" class="${kp?"":"on"}">Contacts</button><button data-a="ptab" data-v="k" class="${kp?"on":""}">Keypad</button></div>`;
+    if(kp){const D=PHONE.dial||"",K=[["1",""],["2","ABC"],["3","DEF"],["4","GHI"],["5","JKL"],["6","MNO"],["7","PQRS"],["8","TUV"],["9","WXYZ"],["*",""],["0","+"],["#",""]];
+      return phHdr("Phone")+tabs+`<div class="pk"><div class="pkNum">${D.replace(/^(\d{3})(\d{1,4})$/,"$1-$2").replace(/^(\d)(\d{3})(\d{3})(\d{1,4})$/,"$1 $2 $3-$4")||"&nbsp;"}</div><div class="pkG">${K.map(([d,l])=>`<button data-a="pk" data-v="${d}"><b>${d}</b><small>${l}</small></button>`).join("")}</div><div class="pkB"><span></span><button class="pkCall" data-a="pdial">✆</button><button class="pkDel" data-a="pdel">⌫</button></div></div>`}
+    return phHdr("Phone")+tabs+`<div class="list">${C.map(([n,e])=>`<button class="li" data-a="call" data-v="${n}"><span>${e} ${n}<small>mobile</small></span><b>✆</b></button>`).join("")}</div>`}
   if(k==="msgs"){BANK.msgs.forEach(m=>m.unread=false);return phHdr("Messages")+`<div class="list">${BANK.msgs.slice(0,30).map(m=>`<div class="li msg"><span><b>${m.from}</b>${m.text}<small>Day ${m.day} · ${m.t}</small></span></div>`).join("")||"<div class='li'>No messages</div>"}</div>`}
   if(k==="weather")return phHdr("Weather")+`<div class="wx"><small>Westport</small><b>68°</b><span>${WX.cur==="rain"?"Rain":WX.cur==="snow"?"Snow":WX.cur==="fog"?"Fog":st.night?"Clear night":"Sunny"}</span><div class="hrs">${[0,1,2,3,4,5].map(i=>{const h=(Math.floor(GT.min/60)+i)%24;return `<span>${h%12||12}${h<12?"a":"p"}<br>${h>=7&&h<19?"☀":"☾"}<br>${66+Math.round(Math.sin((h-8)/24*6.28)*6)}°</span>`}).join("")}</div></div>`;
   if(k==="clock")return phHdr("Clock")+`<div class="wx"><b>${gtClock()}</b><span>Day ${GT.day||1}</span><small>1 hour in the game = 1 minute in real life</small><div class="chips"><button data-a="tskip" data-v="6">Skip to 6 am</button><button data-a="tskip" data-v="12">Noon</button><button data-a="tskip" data-v="19.5">Sunset</button><button data-a="tskip" data-v="23">Night</button></div></div>`;
@@ -18193,7 +18217,11 @@ function phApp(k){const T=TRIMS[st.trim],H=car.hyb;if(k==="store")return phStore
     <label class="tog li"><span>Bluetooth · ${T.short||T.name}<small>${st.phoneConn?"Connected":"Not connected"}${projKind()?` · ${PHONE.os==="ios"?"CarPlay":"Android Auto"}`:""}</small></span><button data-a="bt" class="${st.phoneConn?"on":""}"><i></i></button></label>
     <div class="li"><span>Wallpaper</span></div><div class="chips">${PH_WALLS.map((w,i)=>`<button data-a="wall" data-v="${i}" style="background:${w[PHONE.os==="ios"?0:1]};color:#fff">${i+1}</button>`).join("")}</div></div>`;
   return phHdr(k)}
-function phCall(){const c=PHONE.call,s=Math.floor((performance.now()-PHONE.t0)/1000);return `<div class="callS"><small>${s<3?"calling…":`${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`}</small><b>${c}</b><span>${st.phoneConn?"Audio: car speakers":"Audio: phone"}</span><button class="end" data-a="hang">✆</button></div>`}
+function phCall(){const c=PHONE.call,s=Math.floor((performance.now()-PHONE.t0)/1000),hot=c==="Sim Fleet Safety Line"&&HOT.on,dead=PHONE.dead_;
+  const ivr=hot?`<div class="hotT">${HOT.lines.slice(-2).map(t=>`<p>${t}</p>`).join("")}</div><div class="pkG sm">${["1","2","3","4","5","6","7","8","9","*","0","#"].map(d=>`<button data-a="hk" data-v="${d}"><b>${d}</b></button>`).join("")}</div>`:dead?`<div class="hotT"><p>${dead}</p></div>`:"";
+  return `<div class="callS${hot||dead?" ivr":""}"><small>${s<3&&!dead?"calling…":dead?"call failed":`${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`}</small><b>${c}</b><span>${st.phoneConn?"Audio: car speakers":"Audio: phone"}</span>${ivr}<button class="end" data-a="hang">✆</button></div>`}
+/* the numbers you can dial on the keypad */
+const PH_NUM={"5550100":"Sim Fleet Safety Line","18005550100":"Sim Fleet Safety Line","911":"911"};
 function phAct(a,v,el){const T=TRIMS[st.trim];tick(1);if(a==="nx"){nxAct(v);return}if(a==="stget"){phStoreGet(v);return}if(a==="stdel"){PH_INST=PH_INST.filter(x=>x!==v);phSaveApps();toast(`${phAppName(v)} removed`);phRender(true);return}if(a==="ubreq"){ubRequest(+v);return}if(a==="rentgo"){rentGo(+v);return}if(a==="rentret"){rentReturn();return}if(a==="ubcancel"){ubCancel();return}if(a==="ubskip"){ubSkip();return}if(a==="ubrate"){UBER.ph=null;UBER.c=null;toast(`Thanks! You rated ${UBER.driver?UBER.driver.name:"your driver"} ${v} stars`);phRender(true);return}if(a==="mq"){PHONE.mq="";phRender(true);return}if(a==="mc"){PHONE.mc=PHONE.mc===v?null:v;PHONE.mq="";phRender(true);return}if(a==="navplace"){PHONE.mq="";PHONE.mc=null;const p=(PHONE._pl||[])[+v];if(p){navTo(p);toast("Navigating to "+p.name)}phRender(true);return}if(a==="phbuy"){if(phModel())return;phBuy(v);return}if(a==="newph"){const m=phModel();if(m){const back=Math.round(m[3]/2);ECON.cash+=back;try{bankTx(`Sold phone: ${m[1]}`,back);bankSave();econSave()}catch(e){}toast(`Sold your ${m[1]} for ${money(back)}`);PHONE.model=null;PHONE.app=null;phSave();phRender(true)}return}if(a==="fold"){PHONE.unf=!PHONE.unf;phSave();phRender(true);return}if(!phModel()&&a!=="close")return;if(a&&a.startsWith("gg")&&ggAct(a,v))return;if(a==="lotTab"){PHONE.sub=v;phRender(true);return}if(a==="lotS"){lotScratch(+v);phRender(true);return}if(a==="lotM"||a==="lotM5"){for(let i=0;i<(a==="lotM5"?5:1);i++)lotBuyMega();phRender(true);return}if(a&&a.startsWith("v_")){valetAct(a);phRender(true);return}if(a==="tpfix"){sfTireFix();phRender(true);return}
   if(a==="stkb"||a==="stks"){const [k,n]=v.split(":");if(+n>0)stkTrade(k,a==="stkb"?+n:-n);phRender(true);return}
   if(a.startsWith("gig")){if(a==="gigsvc"){if(GIG.job)toast("Finish or cancel your job first");else{GIG.svc=v;GIG.offer=null;GIG.nextT=1.5;gigSave()}}else if(a==="gigon"){GIG.online=!GIG.online;GIG.nextT=1.5;if(!GIG.online)GIG.offer=null;toast(GIG.online?`You're online for ${GIG_SVC[GIG.svc].name}`:"You're offline")}else if(a==="gigyes")gigAccept();else if(a==="gigno"){GIG.offer=null;GIG.nextT=3}else if(a==="gignav")gigNav();else if(a==="gigcancel"){GIG.rating=Math.max(1,GIG.rating-0.05);gigEnd("Job cancelled")}phRender(true);return}
@@ -18209,7 +18237,15 @@ function phAct(a,v,el){const T=TRIMS[st.trim];tick(1);if(a==="nx"){nxAct(v);retu
   else if(a==="nav"){if(NAV.dest)navTo(null)}else if(a==="navto"){navTo(Object.values(STARTS)[+v]);toast("Route set: follow the blue line")}else if(a==="navnear"){const px=car.px,py=car.py;let t=null;if(v==="gas"){const S=stations().sort((a,b)=>Math.hypot(a.x-px,a.y-py)-Math.hypot(b.x-px,b.y-py))[0];if(S)t={x:S.x,y:S.y,h:0,name:"Gas station"}}else{const R_=RETAIL.find(r=>r.type==="tire");if(R_)t={x:R_.ac,y:R_.S.y,h:0,name:R_.name}}if(t){navTo(t);toast("Route set: follow the blue line")}}
   else if(a==="mplay"){if(SCR.radioOn){SCR.radioOn=false;if(typeof radioVol==="function")radioVol()}else radioPlay(au.station||0)}else if(a==="mnext"){au.station=((au.station||0)+1)%RADIO.length;radioPlay(au.station)}else if(a==="mprev"){au.station=((au.station||0)+RADIO.length-1)%RADIO.length;radioPlay(au.station)}else if(a==="mst"){au.station=+v;radioPlay(au.station)}
   else if(a==="call"){PHONE.call=v;PHONE.t0=performance.now();if(v==="Roadside Assistance")setTimeout(()=>{if(PHONE.call==="Roadside Assistance"){PHONE.call=null;phRender(true);if(!st.walk){resetNearest();const H=car.hyb,T=TRIMS[st.trim];let x="";if(H.tank&&H.fuel<7.6){H.fuel=7.6;x=" They left you 2 gallons of gas."}if(!T.ice&&!T.hybrid&&H.soc<0.12){H.soc=0.12;x=" Their truck gave your battery a quick boost."}toast("Roadside assistance: your car's back on the road."+x)}else toast("Roadside assistance: the truck is on its way to your car")}},3500);if(v==="Northline Bank")setTimeout(()=>{if(PHONE.call==="Northline Bank"){toast(`Northline: your score is ${BANK.score}. You can borrow up to ${money(bankMax())}${bankPastDue()?" once you pay what's past due":""}.`)}},2500)}
-  else if(a==="hang"){PHONE.call=null}
+  else if(a==="hang"){PHONE.call=null;PHONE.dead_=null;PHONE.dial="";HOT.on=false;try{speechSynthesis.cancel()}catch(e){}}
+  else if(a==="ptab"){PHONE.pTab=v}
+  else if(a==="pk"){PHONE.dial=((PHONE.dial||"")+v).slice(0,15)}
+  else if(a==="pdel"){PHONE.dial=(PHONE.dial||"").slice(0,-1)}
+  else if(a==="hk"){hotKey(v)}
+  else if(a==="pdial"){const d=(PHONE.dial||"").replace(/\D/g,"");if(!d)return;const who=PH_NUM[d]||PH_NUM[d.replace(/^1/,"")];PHONE.t0=performance.now();PHONE.dead_=null;
+    if(who==="911"){PHONE.call="911";setTimeout(()=>{if(PHONE.call==="911"){PHONE.dead_="This is a driving game: in real life, 911 is for emergencies only.";phRender(true)}},2500)}
+    else if(who){PHONE.call=who;if(who==="Sim Fleet Safety Line")hotStart()}
+    else{PHONE.call=d.replace(/^(\d{3})(\d{4})$/,"$1-$2").replace(/^1?(\d{3})(\d{3})(\d{4})$/,"($1) $2-$3");setTimeout(()=>{if(PHONE.call&&!PH_NUM[d]){PHONE.dead_="The number you have dialed is not in service. Please check the number and try again.";phRender(true)}},3000)}}
   else if(a==="tskip"){GT.min=+v*60;st.night=GT.min/60<6||GT.min/60>=20;GT.lastN=st.night}
   else if(a==="os"){PHONE.os=v;phSave();if(st.phoneConn){SCR.proj=!!projKind();PJ.page=projKind()==="cp"?"dash":"home"}toast(`Switched to the ${PHONE.name()}`)}
   else if(a==="bt"){phoneConnect(!st.phoneConn)}else if(a==="wall"){PHONE.wall=+v;phSave()}
@@ -19554,7 +19590,7 @@ function render(dt){
   car.camYaw=wrapPi(car.camYaw+wrapPi(velYaw-car.camYaw)*(1-Math.exp(-dt*4.5)));
   const cf=st.cam===0?[Math.cos(car.camYaw),0,-Math.sin(car.camYaw)]:fwd;
   const cy=Math.cos(look.yaw),sy=Math.sin(look.yaw), fl=[cf[0]*cy+cf[2]*sy,0,-cf[0]*sy+cf[2]*cy];   // forward turned by the look yaw
-  const inGar=inGarage(car.px,car.py)&&!st.walk;
+  const inGar=(inGarage(car.px,car.py)||W2&&(car.zb||0)<-1.5&&!!siteIn(car.px,car.py,2))&&!st.walk;   /* v37.5: the low chase camera under the Harbor Point garages too */
   if(st.walk&&st.started){const W=st.walk;const inH=insideHouse(W.x,W.y,W.z),yaw=(W.cyBase===undefined?W.h:W.cyBase)+look.yaw,el=inH?clamp(0.12+look.pitch,0.02,0.5):clamp(0.3+look.pitch,0.05,1.2),dd=UBER.ride||MPW.ride?Math.max(6.5,look.dist):inH?0.9:Math.min(look.dist,4.2)*0.8;const wp=[W.x,W.z+1.0,-W.y],f2=[Math.cos(yaw),0,-Math.sin(yaw)];
     let dd2=dd;if(!inH){const hx=W.x,hy=W.y;for(let t=0.4;t<=dd;t+=0.25){const qx=hx-Math.cos(yaw)*t*Math.cos(el),qy=hy-Math.sin(yaw)*t*Math.cos(el),qz=W.z+1.5+t*Math.sin(el);let hitW=false;
       for(const o of collNear(qx,qy)){if(o.z1!==undefined&&(qz<o.z0||qz>o.z1))continue;if(o.t==="c"?Math.hypot(qx-o.x,qy-o.y)<o.r+0.2:(()=>{const c=Math.cos(o.h),s=Math.sin(o.h),dx=qx-o.x,dy=qy-o.y;return Math.abs(dx*c+dy*s)<o.hl+0.2&&Math.abs(-dx*s+dy*c)<o.hw+0.2})()){hitW=true;break}}
@@ -19636,6 +19672,7 @@ function render(dt){
   if(SCN.w2p)w2pDraw(night);if(W2&&LKP.length&&(!SCN.lk||LK.n!==LKP.length))lkLoad();if(SCN.lk)try{lkDraw(night)}catch(e){}
   if(W2)try{aptDraw(night)}catch(e){console.error(e)}
   if(W2)try{mallDraw(night)}catch(e){console.error(e)}
+  if(W2)try{siteDraw(night)}catch(e){console.error(e)}
   SCN.bld.forEach((m,i)=>{mat([[0.46,0.43,0.38],[0.24,0.27,0.31],[0.58,0.55,0.5],[0.34,0.27,0.22],[0.17,0.2,0.23]][i],null,0.35,40,1,4);draw(m)});
   mat([0.25,0.25,0.26],null,0.2,20);draw(SCN.roofs);mat([0.62,0.55,0.45],null,0.1,10);draw(SCN.house);if(SHELL.mesh){const cf=gl.isEnabled(gl.CULL_FACE);gl.disable(gl.CULL_FACE);mat([1,1,1],null,0.25,24);draw(SHELL.mesh);if(cf)gl.enable(gl.CULL_FACE)}else if(SHELL.sites.length)shellLoad();if(SCN.xm){const X_=SCN.xm;mat([0.9,0.9,0.92],null,0.3,20);draw(X_.canopy);mat([0.55,0.57,0.6],null,0.4,30);draw(X_.pillar);mat([0.15,0.17,0.2],null,0.5,30);draw(X_.pump);mat([0.95,0.95,0.9],[1.6,1.6,1.4],0,1);draw(X_.glow);mat([0.75,0.72,0.66],null,0.1,10);draw(X_.shop);mat([0.2,0.3,0.36],night?[0.9,0.8,0.5]:null,1.2,80);draw(X_.win);mat([0.8,0.12,0.1],null,0.3,20);draw(X_.sign)}if(SCN.sm){const px_=st.walk?st.walk.x:car.px,py_=st.walk?st.walk.y:car.py,nearS=STORES.some(S=>Math.hypot(S.x-px_,S.y-py_)<170);
     gl.enable(gl.POLYGON_OFFSET_FILL);const OFF={asph:[6,6],walk:[6,6],drive:[5,5],tile:[3,3],epoxy:[3,3],grass:[4,4],paint:[-1,-1],blue:[0,0],ev:[0,0]};
@@ -19695,12 +19732,13 @@ function render(dt){
   const view=norm(sub(tgt,eye)); const drawn=[];
   dynBuild(eye,cm);
   const vis=[],visL=CULL.sec?300:Math.min(1400,CULL.maxD);for(const L_ of [cars,parked])for(const c of L_){if(c.wx===undefined||Math.abs(c.wx-eye[0])>visL||Math.abs(c.wy+eye[2])>visL||c.kind==="bike"||c.kind==="cone"||c.kind==="xing")continue;const pos=[c.wx,(c.wz||0)+0.6,-c.wy];const d=sub(pos,eye);const dist=Math.hypot(d[0],d[1],d[2]);
-    if(dist>1400||(dot(d,view)<-8&&dist>12))continue;if(dist>12&&!sphVis(pos[0],pos[1],pos[2],3.5,CULL.sec?300:Math.min(900,CULL.maxD)))continue;vis.push([dist,c])}
+    if(dist>1400||(dot(d,view)<-8&&dist>12))continue;if(dist>12&&!sphVis(pos[0],pos[1],pos[2],c.semi?15:3.5,CULL.sec?300:Math.min(900,CULL.maxD)))continue;vis.push([dist,c])}
   // only the nearest few get the full model (fewer still in the camera and mirror views); the rest are simple boxes
   vis.sort((a,b)=>a[0]-b[0]);const capFull=cam2?4:(G().fullCars||10),lodD=cam2?G().lod*0.5:G().lod;let nFull=0;
   for(const [dist,c] of vis){
     const om=aiMat(c);const sOn=(c.sig||c.haz)&&st.blink;
     const fl=c.flashT>0&&(c.flashT%0.55)>0.25,rmt=c.kind==="remote",lc={head:rmt?(c.li===2?[4.2,4.2,3.9]:c.li?[1.2,1.2,1.1]:[0.3,0.3,0.32]):fl?[4.2,4.2,3.9]:aiL&&c.kind!=="parked"?[1.7,1.7,1.6]:c.kind==="parked"?[0.06,0.06,0.07]:[0.3,0.3,0.32],tail:c.kind==="parked"?OFF:c.brk||c.v<0.1?[1.3,0.04,0.02]:(aiL?[0.4,0.01,0.01]:OFF),sigL:sOn&&(c.haz||c.sig<0)?AMB:OFF,sigR:sOn&&(c.haz||c.sig>0)?AMB:OFF};{const aL=!!(c.haz||c.sig<0),aR=!!(c.haz||c.sig>0);lc.act=[aL,aR];lc.on=[aL&&st.blink,aR&&st.blink];lc.ph=blinkPh()}
+    if(c.semi&&semiDraw(c,lc,aiL))continue;
     if(dist<lodD&&nFull<capFull&&(c.mdl===undefined||KITS[c.mdl]||nFull<2)){nFull++;EQC=c;kitNext=kitOf(trafficModel(c));CAR_FAR=dist>(cam2?10:18);drawCar(om,paintRGB(c.paint),lc,[c.spin,c.spin,c.spin,c.spin],c.kind==="remote"?(c.steer||0):aiSteer(c),0,false,0,true);CAR_FAR=false;drawn.push([om,c])}else drawProxy(om,paintRGB(c.paint),c.brk,dist,aiL&&c.kind!=="parked")}pxFlush();
   /* other cars' headlights light the road in front of them at night: two soft additive pools per car (nearest 14 only) */
   {const nt=clamp(1-(GT.D??(night?0:1))*1.4,0,1);if(aiL&&nt>0.25&&!cam2){let k=0;bind(SCN.box);gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE);gl.depthMask(false);gl.enable(gl.POLYGON_OFFSET_FILL);gl.polygonOffset(-2,-4);
@@ -20368,7 +20406,7 @@ function nearestRoadSpot(px,py,psi,zc){let best=null;
   let sAlong=dir>0?best.u:e.L-best.u;const lo0=dir>0?(e.r0||0):(e.r1||0),hi0=e.L-(dir>0?(e.r1||0):(e.r0||0)),lo=Math.min(lo0+4,e.L/2),hi=Math.max(hi0-4,e.L/2),clear=s_=>{const q=fpt(e,dir,s_,laneOff(e,0));return !cars.some(c=>c.wx!==undefined&&Math.hypot(c.wx-q[0],c.wy-q[1])<9)&&!parked.some(o=>o.wx!==undefined&&o.kind!=="xing"&&Math.hypot(o.wx-q[0],o.wy-q[1])<5)};
   for(let k=0;k<24&&!clear(sAlong);k++){const t=sAlong+(k%2?-1:1)*Math.ceil((k+1)/2)*6;if(t>lo&&t<hi){if(clear(t)){sAlong=t;break}}}
   sAlong=clamp(sAlong,lo,hi);const p=fpt(e,dir,sAlong,laneOff(e,0)),u=dir>0?sAlong:e.L-sAlong;return {x:p[0],y:p[1],h:p[2],z:e.hz?ez(e,clamp(u,0,e.L)):0,free:true}}
-function resetNearest(){if(st.walk)return;COP.flat=false;const g=st.gear;try{const here=(inTC(car.px,car.py)||inGarage(car.px,car.py))?{free:true,x:car.px,y:car.py,h:car.psi,z:car.zb||0}:null,S=here||nearestRoadSpot(car.px,car.py,car.psi,car.zb||0);if(!S)throw 0;cars=cars.filter(c=>c.kind!=="wreck");resetCar(S);RF=null;RFkey=""}catch(e){resetPos();return}try{dmgReset()}catch(e){}DENTS.list=[];dentsSync();st.gear=g==="R"?"D":g;car.vx=0;toast(inTC(car.px,car.py)||inGarage(car.px,car.py)?"Car fixed up, right here (fuel and charge stay as they were)":"Car fixed up on the nearest road (fuel and charge stay as they were)")}
+function resetNearest(){if(st.walk)return;COP.flat=false;const g=st.gear;try{const here=(inTC(car.px,car.py)||inGarage(car.px,car.py)||W2&&siteIn(car.px,car.py,2))?{free:true,x:car.px,y:car.py,h:car.psi,z:car.zb||0}:null,S=here||nearestRoadSpot(car.px,car.py,car.psi,car.zb||0);if(!S)throw 0;cars=cars.filter(c=>c.kind!=="wreck");resetCar(S);RF=null;RFkey=""}catch(e){resetPos();return}try{dmgReset()}catch(e){}DENTS.list=[];dentsSync();st.gear=g==="R"?"D":g;car.vx=0;toast(inTC(car.px,car.py)||inGarage(car.px,car.py)?"Car fixed up, right here (fuel and charge stay as they were)":"Car fixed up on the nearest road (fuel and charge stay as they were)")}
 function resetPos(){closeDrawer();setMap(st.map||"city");car.vx=0;st.gear="P";toast("Car put back at the start point")}
 TABS.spawn=()=>`<div class="grid2"><button class="opt" data-a="codes"><b>🎁 Redeem a code</b><small>Limited-time codes for money and boosts</small></button><button class="opt" data-a="resetPos"><b>↺ Reset car position</b><small>Back on the road at this start point</small></button><button class="opt" data-a="emvAmb"><b>🚑 Send an ambulance</b><small>Comes up behind you with lights and siren. Pull over!</small></button><button class="opt" data-a="emvFire"><b>🚒 Send a fire truck</b><small>Comes up behind you with lights and siren. Pull over!</small></button><button class="opt" data-a="redoCar"><b>Redo your car</b><small>Back to the builder with everything reset</small></button><button class="opt" data-a="spawnAnother"><b>＋ Spawn another car</b><small>Parks this car here and opens the builder for a new one</small></button>${opt(`data-a="policeOff"`,st.police===false,"🚫 Turn off police","No cops anywhere: no patrol cars, tickets or chases")}${trlCanTow()?`<button class="opt ${TRL.kind==="utility"&&TRL.on?"on":""}" data-a="trl:utility"><b>🔗 Utility trailer</b><small>1,200 lb open trailer</small></button><button class="opt ${TRL.kind==="camper"&&TRL.on?"on":""}" data-a="trl:camper"><b>🏕 Travel camper</b><small>5,000 lb: you will feel it</small></button><button class="opt ${TRL.kind==="boat"&&TRL.on?"on":""}" data-a="trl:boat"><b>🚤 Boat on a trailer</b><small>3,500 lb</small></button>${TRL.on?`<button class="opt" data-a="trl:off"><b>Unhitch the trailer</b><small>${TRL.on.name}</small></button>`:""}${TRL.on&&TRL.kind!=="tow"?`<button class="opt" data-sfa="drop"><b>⬇ Drop the trailer here</b><small>Leave it parked, then back up to it to hitch up again</small></button>`:""}${TRL.parked&&!TRL.on&&sfName("hitch")==="Pro Trailer Hitch Assist"?`<button class="opt" data-sfa="autohitch"><b>🔗 Pro Trailer Hitch Assist</b><small>Backs your truck up to the coupler by itself</small></button>`:""}`:""}<button class="opt" data-a="spawnCop"><b>🚓 Spawn a police car</b><small>A patrol car joins traffic just behind you. Speed past it and see what happens</small></button><button class="opt" data-a="spawnChase"><b>🚨 Start a police chase</b><small>Two stars: cruisers come after you right away</small></button><button class="opt" data-a="fleetSwitch"><b>⇄ Switch car (T)</b><small>${st.fleet.length?`${st.fleet.length+1} cars: jump into the next one`:"Spawn another car first"}</small></button></div>`+ALLS().filter(p=>secOf(p)==="spawn").join("").replace("<h3>Go to","<h3>Spawn at")+TABS.traffic();
 function slSet(k,n){const H=car.hyb,T=TRIMS[st.trim];if(k==="fuel")H.fuel=H.tank*n;else if(k==="chg"){if(T.plug)H.pb=n;else H.soc=socRaw(n)}}

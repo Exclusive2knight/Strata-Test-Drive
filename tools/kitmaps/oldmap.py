@@ -21,9 +21,8 @@ def follow(P, base, side=0.0, flat=(0, 0), dw=0.0, tag="", one=False):
     L = D[-1]
     if L < 1: return
     hilly = max(p[2] for p in P) - min(p[2] for p in P) > 0.5
-    n = 1 if one else max(1, round(L / (SEG if hilly else 32.0))); pts = []      # short pieces only where the road climbs (fewer pieces, faster frames)
-    for k in range(n + 1):
-        d = L * k / n; i = 0
+    def at(d):
+        d = min(L, max(0.0, d)); i = 0
         while i < len(D) - 2 and D[i + 1] < d: i += 1
         f = (d - D[i]) / max(1e-9, D[i + 1] - D[i])
         return [P[i][j] + (P[i + 1][j] - P[i][j]) * min(1, max(0, f)) for j in range(3)]
