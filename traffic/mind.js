@@ -188,7 +188,7 @@ const Traffic={
   get_driver(id){const c=cars.find(c=>c.id===id);return c?tmSnap(c):null},
   force_event(id,ev,o){const c=cars.find(c=>c.id===id);if(c){if(!c.mind)tmInit(c);tmEvent(c,ev,o);tmMind(c,c.mind);tmApply(c,c.mind);return true}return false},
   /* deterministic runs (config): one seed for the traffic dice, the drivers' minds and everything else that rolls dice in the sim */
-  seed(s){TM.seed=s;seedR=(s%2147483646)+1;TM.t=0;if(!TM.mr0)TM.mr0=Math.random;Math.random=tmRng(s*7919+13)},unseed(){if(TM.mr0)Math.random=TM.mr0},
+  seed(s){TM.seed=s;TM.det=true;TM.mdl0=Object.keys(MODELS).filter(k=>MODELS[k]&&MODELS[k].objects&&!LAZY_ALL.has(k)).sort();TM.new0=[];   /* only the built-in models: the on-demand ones arrive at different times */seedR=(s%2147483646)+1;TM.t=0;if(!TM.mr0)TM.mr0=Math.random;Math.random=tmRng(s*7919+13);try{TM.brain0=JSON.stringify(BRAIN);Object.assign(BRAIN,{gapK:1,stopWait:6,pedPat:45,pedGapK:1})}catch(e){}},unseed(){TM.det=false;if(TM.mr0)Math.random=TM.mr0},
   on(n,f){(TM.ev[n]=TM.ev[n]||[]).push(f)},off(n,f){TM.ev[n]=(TM.ev[n]||[]).filter(g=>g!==f)},
   scenario(k){const S=TM_SCEN[k];if(!S)return false;this.set_time_of_day(S.hour);GT.day=S.day||GT.day;this.set_weather(S.weather);this.set_population(S.mix||null);this.set_density("all",S.density);if(S.cars){TM.want=Math.round(S.cars/Math.max(0.3,todMul()));const n=cars.filter(c=>c.kind==="ai").length;if(tmWant()>n)spawnTraffic(tmWant()-n)}TM.accidents=!!S.accidents;return S},
   stats(){const A=cars.filter(c=>c.kind==="ai"),by={};for(const c of A){const k=c.e&&c.e.type||"?";(by[k]=by[k]||[]).push(c.v)}const avg={};for(const k in by)avg[k]=+(by[k].reduce((a,v)=>a+v,0)/by[k].length*2.237).toFixed(1);
