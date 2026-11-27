@@ -21,6 +21,7 @@ if _os.path.exists("props/kitold.json"):
     _kj = json.load(open("props/kitold.json")).get("kj", [])
     _j = [round(v, 2) for q in _kj for v in q]
     html = html.replace("/*KIT_J*/[]", json.dumps(_j, separators=(",", ":")))
+html=html.replace("/*TRAFFIC_MIND*/", open(os.path.join(here,"traffic","mind.js")).read()+"\n"+open(os.path.join(here,"traffic","park.js")).read())
 fluid_modules=["core.js","mesh_sdf.js","gpu.js","flip.js","renderer.js","runtime.js"]
 html=html.replace("/*FLUID_RUNTIME*/", "\n".join(open(os.path.join(here,"fluids",name)).read() for name in fluid_modules))
 html=html.replace("/*FLUID_INTEGRATION*/", open(os.path.join(here,"fluids","integration.js")).read())

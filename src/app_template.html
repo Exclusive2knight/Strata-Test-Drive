@@ -3307,9 +3307,12 @@ function buildNet2(){
   mkR("art","County Rd 3",[[-3600,-1910],[-3600,-1590],[-3600,-1410],[-3600,-1090]],{lim:45});
   mkR("road","County Rd 3",[[-3600,-1090],[-3600,0],[-3600,1000],[-4100,1800,300],[-4330,2880,160],[-4252,3050]],{lim:50});   // v37.3: swings in from the south-south-west for the last 190 m, so its mouth on the Kestrel roundabout is 70° round from Kestrel Pass (39° before: the two overlapped and the three roads gridlocked)
   // Halden Pkwy: a divided boulevard with real left-turn bays cut into the median at its four lights (the signal test road)
-  for(const x of [-4400,-4130,-3870,-3600])N(x,-2100,{ctrl:"signal"});
+  /* v38: Michigan lefts at Signal St and Arrow St: no left turns at those two lights; go through, U-turn at the next crossover in the median
+     (with its own turn bay, so nobody waits in the through lanes) and come back to turn right. Side-street drivers turn right, then U-turn */
+  for(const x of [-4400,-4130,-3870,-3600])N(x,-2100,{ctrl:"signal",noLeft:x===-4130||x===-3870});
+  for(const x of [-4265,-4000,-3735])N(x,-2100,{kind:"xo"});
   mkR("road","County Rd 1",[[-4400,-3300],[-4400,-2400],[-4400,-2100],[-4400,0]],{lim:55});
-  mkR("blvd","Halden Pkwy",[[-4400,-2100],[-4130,-2100],[-3870,-2100],[-3600,-2100]],{lim:45});
+  mkR("blvd","Halden Pkwy",[[-4400,-2100],[-4265,-2100],[-4130,-2100],[-4000,-2100],[-3870,-2100],[-3735,-2100],[-3600,-2100]],{lim:45});
   mkR("col","Signal St",[[-4130,-2400],[-4130,-2100]],{lim:35});mkR("col","Arrow St",[[-3870,-2400],[-3870,-2100]],{lim:35});
   mkR("road","County Rd 11",[[4500,-3300],[4500,-2400],[4500,0]],{lim:55});
   /* v37.5: County Rd 9 now runs up Harbor Point Blvd over I-38 and through the new downtown (its old crossing sat in the new interchange) */
@@ -3589,11 +3592,15 @@ function analyseNet(){
     const big=Math.max(r0,r1)>=5;n.cyc={g:[r0>=r1?(big?30:22):(big?18:18),r1>r0?(big?30:22):(big?18:18)],Y:big?4.2:3.6,AR:big?2:1.5};
     if(r0===r1)n.cyc.g=[20,20];
     // protected left turns: where a phase has roads with two or more lanes each way, both directions get a leading green arrow (7 s, then 3 s yellow arrow) before their through green
-    n.cyc.L=[0,1].map(g=>n.legs.some(l=>l.grp===g&&l.e.n>=2)?7:0);n.cyc.YL=3;
+    n.cyc.L=[0,1].map(g=>n.legs.some(l=>l.grp===g&&l.e.n>=2)?7:0);n.cyc.YL=3;if(n.noLeft)n.cyc.L=[0,0];   /* a Michigan-left light has no left turns, so no arrows */
     for(const l of n.legs){const e=l.e;if(e.ow&&l.end!==1)continue;const dir=l.end===1?1:-1;
+      if(n.noLeft)continue;
       if(e.type==="blvd"&&e.m>=8&&!e.tp&&e.L>220){const len=70,tap=30;e.bay=e.bay||{};e.bay[dir]=dir>0?{t0:e.L-l.r-len-tap,f0:e.L-l.r-len,len,tap}:{t0:l.r+len+tap,f0:l.r+len,len,tap};l.bay=true;continue}   // a left-turn bay cut into the median
       if(n.cyc.L[l.grp]&&e.n>=2)l.ltl=true}   // no bay: the left lane on these approaches is a left-turn-only lane
     const C=n.cyc.g[0]+n.cyc.g[1]+2*(n.cyc.Y+n.cyc.AR)+n.cyc.L.reduce((a,v)=>a+(v?v+n.cyc.YL:0),0);n.cyc.C=C;n.cyc.off=((-(n.x+n.y)/(big?17:12))%C+C)%C}
+  /* v38: a U-turn bay in the median before each Michigan-left crossover (up to 70 m plus a 20 m taper, ending 40 m from the light behind) */
+  for(const n of NODES)if(n.kind==="xo")for(const l of n.legs){const e=l.e;if(e.type!=="blvd"||e.m<8||e.ow||e.tp)continue;const dir=l.end===1?1:-1,len=Math.min(70,e.L-(l.r||0)-20-40),tap=20;if(len<35)continue;
+    e.bay=e.bay||{};e.bay[dir]=dir>0?{t0:e.L-(l.r||0)-len-tap,f0:e.L-(l.r||0)-len,len,tap}:{t0:(l.r||0)+len+tap,f0:(l.r||0)+len,len,tap};l.bay=true}
 }
 analyseNet();
 // extra pavement beside the freeway where a ramp leaves or joins (the gore and the speed-change lane), so the ramp meets the shoulder
@@ -3624,7 +3631,7 @@ if(W2)for(const n of NODES){if(n.legs.length!==2||n.kind!=="cont")continue;const
   for(const sg of [1,-1])(e.aux=e.aux||[]).push({u0:S[0][0],u1:S[S.length-1][0],sg,S:S.map(p=>p.slice()),drop:true});n.drop=true}
 // a phase: [leading left arrow][yellow arrow][through green (lefts flash yellow: turn when clear)][yellow][all red], then the other phase
 function sigPh(n,grp,t){const c=n.cyc,x=((t+c.off)%c.C+c.C)%c.C,L=c.L||[0,0],ph=g=>(L[g]?L[g]+c.YL:0)+c.g[g]+c.Y+c.AR,S=grp===0?0:ph(0),lg=L[grp]?L[grp]:0,yl=lg?c.YL:0,ts=S+lg+yl,te=ts+c.g[grp];return {x,S,lg,yl,ts,te,ye:te+c.Y}}
-function sigState(n,grp,t){const P=sigPh(n,grp,t);return P.x>=P.ts&&P.x<P.te?"green":P.x>=P.te&&P.x<P.ye?"yellow":"red"}
+function sigState(n,grp,t){if(n.sigOv)return n.sigOv;const P=sigPh(n,grp,t);return P.x>=P.ts&&P.x<P.te?"green":P.x>=P.te&&P.x<P.ye?"yellow":"red"}
 function sigLeft(n,grp,t){const P=sigPh(n,grp,t);if(!P.lg){const s_=sigState(n,grp,t);return s_==="green"?"fya":s_}
   return P.x>=P.S&&P.x<P.S+P.lg?"green":P.x>=P.S+P.lg&&P.x<P.ts?"yellow":P.x>=P.ts&&P.x<P.te?"fya":P.x>=P.te&&P.x<P.ye?"yellow":"red"}
 const legOf=(n,e,end)=>n.legs.find(l=>l.e===e&&l.end===end);
@@ -3644,7 +3651,7 @@ function movesFrom(n,inL){const out=[],hIn=wrapPi(inL.h+Math.PI);
 const PATHS=new Map();
 function mvPath(n,inE,inDir,mv,i,j){const key=inE.i+":"+inDir+">"+mv.e.i+":"+mv.dir+":"+i+":"+j+mv.t;let P=PATHS.get(key);if(P)return P;
   let s0=inE.L-rEnd(inE,inDir),s1=rStart(mv.e,mv.dir);const hw=e=>e.m/2+e.n*LANE+e.side;
-  if(mv.t==="U"){const Rr=(Math.abs(laneOff(inE,i)+shiftOf(inE,inDir>0?inE.L:0))+Math.abs(laneOff(mv.e,j)+shiftOf(mv.e,inDir>0?inE.L:0)))/2;s0=inE.L-Rr*0.5;s1=Rr*0.5}
+  if(mv.t==="U"){const Rr=(Math.abs(laneOff(inE,i)+shiftOf(inE,inDir>0?inE.L:0))+Math.abs(laneOff(mv.e,j)+shiftOf(mv.e,inDir>0?inE.L:0)))/2,f=n.kind==="xo"?1.0:0.5;s0=inE.L-Rr*f;s1=Rr*f}   /* v38: at a Michigan-left crossover the turn is centred on the gap in the median (it used to bulge out past it, over the other way's U-turn bay) */
   else if(n.kind==="x"){if(rEnd(inE,inDir)===0&&mv.t!=="S")s0=inE.L-(hw(mv.e)+6);if(rStart(mv.e,mv.dir)===0&&mv.t!=="S")s1=hw(inE)+6}
   const A=fpt(inE,inDir,s0,laneOff(inE,i)),B=fpt(mv.e,mv.dir,s1,laneOff(mv.e,j)),ch=Math.hypot(B[0]-A[0],B[1]-A[1]),th=Math.abs(wrapPi(B[2]-A[2]));
   const k=ch*(th<0.05?1/3:(2/3)*Math.tan(th/4)/Math.sin(th/2));
@@ -6350,19 +6357,25 @@ function planMove(c,prefer){const n=endNode(c.e,c.dir),inL=arrLeg(c.e,c.dir);c.m
   let ms=movesFrom(n,inL);if(RW.closed.size){const ok=ms.filter(m=>!RW.closed.has(m.e));if(ok.length)ms=ok}if(c.kind==="bike"){const all=ms;ms=ms.filter(m=>m.t!=="U"&&(BIKE_T.has(m.e.type)||m.e.type==="rbt")||m.e.type==="blvd"&&m.t==="S");if(!ms.length)ms=all.filter(m=>!/xway|ramp/.test(m.e.type))}/* cyclists ride round roundabouts and turning circles too, and turn back at a dead end */if(c.semi){const big=ms.filter(m=>SEMI.BIG.test(m.e.type)&&m.t!=="U");if(big.length)ms=big}if(!ms.length)return;let pick=prefer?ms.find(m=>m.t===prefer):null;if(!pick&&c.route){const Q=c.route,nk=c.e===Q.dest.e&&c.dir===Q.dest.dir&&c.s>Q.dest.s+3?Q.loop:Q.next.get(skey(c.e,c.dir));if(nk!=null)pick=ms.find(m=>skey(m.e,m.dir)===nk)||null}
   // a roundabout: go round at most a couple of exits, then take one (nobody does laps)
   if(n.rbt){if(!inL.major)c.rbN=0;else{c.rbN=(c.rbN||0)+1;if(!pick&&!c.route&&c.rbN>=3)pick=ms.find(m=>m.t==="R")||null}}
+  /* v38: a driver on an unfamiliar route now and then misses the turn: they take another way and their route (a next-step map over every road) gets them back */
+  if(pick&&c.route&&c.mind&&c.mind.lost&&ms.length>1&&c.mind.R()<(TM.lostP??0.08)){const alt=ms.filter(m=>m!==pick&&m.t!=="U"&&!/xway/.test(m.e.type));if(alt.length){pick=alt[Math.floor(c.mind.R()*alt.length)];try{tmEvent(c,"missed")}catch(e){}c.mind.missed=(c.mind.missed||0)+1}}
   if(!pick){const W=c.kind==="bike"?{S:5,R:2.5,L:0.8,U:0}:n.rbt&&inL.major?{S:1.3,R:1.8,L:0,U:0}:{S:6,R:1.8,L:1.4,U:0.05};let tot=0;for(const m of ms)tot+=W[m.t];let x=rnd()*tot;for(const m of ms){x-=W[m.t];if(x<=0){pick=m;break}}pick=pick||ms[0]}
   if(pick.e.type==="rbt"&&c.e.type!=="rbt"&&pick.e.n>1){let k=0;if(c.route){let ee=pick.e,dd=pick.dir;for(let g=0;g<12;g++){const nk=c.route.next.get(skey(ee,dd));if(nk==null)break;const e2=EDGES[nk>>1];if(e2.type!=="rbt")break;k++;ee=e2;dd=nk&1?1:-1}}c.rbLane=c.route?(k>=1?1:0):(rnd()<0.4?1:0)}
   c.avoidL=inL.ltl&&pick.t!=="L"&&pick.t!=="U"?c.e.n-1:null;  c.mv=pick;c.mvNode=n;c.mvLeg=inL;c.lanePinned=false;{const sl=splitLane(n,inL,pick,c.e.n,(()=>{try{return laneIdx(c)}catch(e){return null}})());c.needLane=c.e.type==="rbt"&&pick.e.type!=="rbt"?null:sl!==undefined?sl:pick.t==="R"?0:(pick.t==="L"||pick.t==="U")?c.e.n-1:null}
+  /* v38: straight on through a light onto a short block where the route turns or U-turns: get into the right lane before the light (no room after it) */
+  if(c.needLane===null&&pick.t==="S"&&c.route&&pick.e.L<220&&pick.e.n===c.e.n&&c.e.n>1){const k2=c.route.next.get(skey(pick.e,pick.dir)),L2=arrLeg(pick.e,pick.dir);if(k2!=null&&L2){const n2=endNode(pick.e,pick.dir),e2=EDGES[k2>>1],d2=k2&1?1:-1,m2=movesFrom(n2,L2).find(m=>m.e===e2&&m.dir===d2);if(m2&&m2.t!=="S")c.needLane=m2.t==="R"?0:c.e.n-1}}
   if(c.needLane===null&&pick.e.n<c.e.n&&pick.t==="S"&&n.drop)c.needLane=c.e.n-1;   // right lane ends: merge left before the join
   if(c.needLane===null&&pick.e.n<c.e.n&&pick.t==="S"&&n.ctrl!=="merge"){const th=wrapPi(pick.o.h-(inL.h+Math.PI));if(Math.abs(th)>0.12)c.needLane=th>0?c.e.n-1:0}
   if(c.needLane===null&&pick.e.n<c.e.n&&pick.t==="S")c.needLane=c.e.n-1}   /* v334: any lane drop going straight on (a 4-lane avenue narrowing to a 2-lane road): merge in good time instead of squeezing over in the junction */
 function outLane(c,i){const m=c.mv,nO=m.e.n,nI=c.e.n;if(m.e.type==="rbt"&&c.e.type!=="rbt"&&nO>1)return Math.min(nO-1,c.rbLane||0);   // into a two-lane roundabout: outer lane for the first exit, inner lane to go further round
-  if(m.t==="R")return 0;if(c.mvNode&&c.mvNode.ctrl==="merge"&&c.mvLeg&&!c.mvLeg.major)return 0;/* a ramp joins the right-hand lane, not the fast lane */if(m.t==="L"||m.t==="U")return nO-1;return nO>nI?i+(nO-nI):Math.max(0,i-(nI-nO))}
+  /* v38: turning right onto a boulevard to U-turn at the next Michigan-left crossover: swing wide into the left lane (no room to weave across three lanes) */
+  if(m.t==="R"&&c.route&&nO>1&&m.e.L<200){const k2=c.route.next.get(skey(m.e,m.dir));if(k2!=null&&EDGES[k2>>1]===m.e&&endNode(m.e,m.dir).kind==="xo")return nO-1}
+  if(m.t==="R")return 0;if(c.mvNode&&c.mvNode.ctrl==="merge"&&c.mvLeg&&!c.mvLeg.major)return 0;/* a ramp joins the right-hand lane, not the fast lane */if(m.t==="U"&&c.mvNode&&c.mvNode.kind==="xo")return 0;/* v38: a Michigan-left U-turn swings out to the kerb lane (the wide median leaves room), ready for the right turn at the light */if(m.t==="L"||m.t==="U")return nO-1;return nO>nI?i+(nO-nI):Math.max(0,i-(nI-nO))}
 function mvP(c){const i=laneIdx(c);return mvPath(c.mvNode,c.e,c.dir,c.mv,i,outLane(c,i))}
 function newCar(e,dir,s,i,kind){const vf=0.92+rnd()*0.16,off=laneOff(e,i);
   const c={id:++CAR_ID,kind:kind||"ai",e,dir,s,off,offT:off,vf,v0:e.lim/2.23694*vf,v:e.lim/2.23694*vf*0.8,paint:TRAFFIC_PAINTS[Math.floor(rnd()*TRAFFIC_PAINTS.length)],sig:0,lcT:2+rnd()*6,spin:0,head:0,jn:null,idle:0};
   planMove(c);carPose(c);return c}
-function freeSpot(e,dir,s,i,gap){for(const o of cars){if(o.jn||o.e!==e||o.dir!==dir)continue;if(laneIdx(o)===i&&Math.abs(o.s-s)<gap)return false}return true}
+function freeSpot(e,dir,s,i,gap){for(const o of cars){if(o.jn||o.e!==e||o.dir!==dir)continue;if((laneIdx(o)===i||Math.abs(o.off-laneOff(e,i))<2.6)&&Math.abs(o.s-s)<gap)return false}return true}   /* v38: a car halfway through a lane change still blocks the lane it is leaving */
 // the new world is big: pick from the roads near you (the list is redone when you have moved 150 m)
 const NEAR_E={x:1e9,y:1e9,d:0,E:[],W:[]};
 function plX(){return st.walk?st.walk.x:car.px}function plY(){return st.walk?st.walk.y:car.py}
@@ -6371,7 +6384,7 @@ function nearEdges(maxD){if(Math.hypot(plX()-NEAR_E.x,plY()-NEAR_E.y)<150&&NEAR_
 function randomSpot(minD,maxD){const NE=W2?nearEdges(maxD):{E:EDGES,W:EW};if(!NE.E.length)return null;
   for(let k=0;k<80;k++){const x=rnd()*NE.W[NE.W.length-1];let a=0,b=NE.W.length-1;while(a<b){const m=(a+b)>>1;if(NE.W[m]<x)a=m+1;else b=m}const e=NE.E[a];
     if(RW.closed.size&&RW.closed.has(e))continue;const dir=e.ow||rnd()<0.5?1:-1,s0=rStart(e,dir)+4,s1=e.L-rEnd(e,dir)-12;if(s1<=s0)continue;const s=s0+rnd()*(s1-s0),i=Math.floor(rnd()*e.n);
-    const p=fpt(e,dir,s,laneOff(e,i)),d=Math.hypot(p[0]-plX(),p[1]-plY());if(d<minD||d>maxD)continue;if(!freeSpot(e,dir,s,i,30))continue;return {e,dir,s,i}}
+    const p=fpt(e,dir,s,laneOff(e,i)),d=Math.hypot(p[0]-plX(),p[1]-plY());if(d<minD||d>maxD)continue;if(!freeSpot(e,dir,s,i,30))continue;if(cars.some(o=>o.wx!==undefined&&(o.wx-p[0])**2+(o.wy-p[1])**2<196))continue;   /* v38: nobody (in a junction either) within 14 m */return {e,dir,s,i}}
   return null}
 function spawnTraffic(n){for(let k=0;k<n;k++){const p=poolSpot(60)||randomSpot(45,900);if(p&&!rwShut(p.e,p.dir,p.s,p.i))cars.push(newCar(p.e,p.dir,p.s,p.i))}st.trafficN=cars.filter(c=>c.kind==="ai").length}
 function spawnOncoming(){}
@@ -6635,9 +6648,9 @@ function exitClear(c){const m=c.mv,sMin=rStart(m.e,m.dir),one=m.e.n<2;let myJ=nu
     if(o.jn&&o.jn.mv.e===m.e&&o.jn.mv.dir===m.dir&&o.jn.inLeg!==c.mvLeg){if(myJ===null){const i=laneIdx(c);myJ=outLane(c,i)}if(one||o.jn.j===myJ)return false}
     if(!o.jn&&o.e===m.e&&o.dir===m.dir&&o.s<sMin+6&&(one||laneIdx(o)===(myJ??(myJ=outLane(c,laneIdx(c))))))return false}
   return true}
-function gapClear(c,n,L,mv){   // a gap in the traffic you have to cross or join
-  if(mv.t==="R"){const O=oppLeg(n,mv.o);return !O||!approaching(n,O,withinFor(O.e),c)}
-  for(const l of n.legs)if(l!==L&&(l.major||n.ctrl!=="minor")&&approaching(n,l,withinFor(l.e),c))return false;return true}
+function gapClear(c,n,L,mv){   // a gap in the traffic you have to cross or join (v38: scaled by the driver's own gap acceptance)
+  const gk=c&&c.pers&&c.pers.gap||1;if(mv.t==="R"){const O=oppLeg(n,mv.o);return !O||!approaching(n,O,withinFor(O.e)*gk,c)}
+  for(const l of n.legs)if(l!==L&&(l.major||n.ctrl!=="minor")&&approaching(n,l,withinFor(l.e)*gk,c))return false;return true}
 // joining the freeway from a ramp: is the right lane clear beside and just behind the merge point?
 function mergeClear(c,n,mv){const e=mv.e,dir=mv.dir,inc=n.legs.find(l=>l.major&&l.e!==e&&(l.end===1?1:-1)===dir&&l.e.type===e.type)||null,v=Math.max(c.v,8);const add=!!inc&&e.n>(inc.e.n||1);
   // the freeway coming up to the merge, back through short pieces between closely spaced ramps (up to 160 m): edge -> distance from its end to the merge
@@ -6648,7 +6661,8 @@ function mergeClear(c,n,mv){const e=mv.e,dir=mv.dir,inc=n.legs.find(l=>l.major&&
     else if(!o.jn&&up.has(o.e)&&o.dir===up.get(o.e).dir&&(laneIdx(o)===0||e.type==="sd"))d=up.get(o.e).acc+o.e.L-o.s;   /* a ramp onto a service drive joins across both its lanes */   // still coming: d > 0
     else if(o.jn&&o.jn.n!==n)continue
     if(d===null)continue;if(add&&d>14)continue;   /* a lane is added for this ramp (a two-lane collector after two one-lane ramps): it only waits for a car right at the joining point */const tA=d/Math.max(o.v,1),tMe=(c.mv&&c.mvNode===n?Math.max(0,(mvP(c).s0-c.s)/v):0)+40/v;
-    if(d>-14&&d<20+o.v*1.2&&Math.abs(tA-tMe)<2.4)return false}
+    if(d>-14&&d<20+o.v*1.2&&Math.abs(tA-tMe)<2.4)return false
+    if(!add&&d>-8&&d<12&&(o.v>0.5||d<5.5))return false}   /* v38: in a slow queue too: nobody rolling up to (or level with) the merge point; a car already stopped behind it lets us in */
   const M=me();if(!st.walk&&(M.e===e||up.has(M.e)&&M.dir===up.get(M.e).dir)&&(M.e!==e||M.dir===dir)&&laneOf(M.off)-loOf(M.n)===0){const d=M.e===e?-M.s:up.get(M.e).acc+M.L-M.s;if(d>-14&&d<20+car.vx*1.2)return false}
   return true}
 function jnConflict(c,Pc){const n=c.jn?c.jn.n:c.mvNode;if(!n)return null;const P=c.jn?c.jn.P:Pc,d0=c.jn?c.jn.d:-(Pc.s0-c.s);let best=null;
@@ -6658,21 +6672,23 @@ function jnConflict(c,Pc){const n=c.jn?c.jn.n:c.mvNode;if(!n)return null;const P
     if(tc>to+0.35||(Math.abs(tc-to)<=0.35&&(c.id||0)>(o.id||0))){const g=Math.max(0.3,hit[0]-4.2);if(!best||g<best.gap)best={gap:g,v:0,who:o}}}
   return best}
 // distance to the merge point along the freeway lane: positive before it, negative after it
+/* v38: every merge (an exit ramp onto a service drive too, not just freeway merges): the car on the through road keeps its place against the merging car */
 function mergeLead(c){let n=null,me=null,lane0=false;
   if(c.jn&&c.jn.n.ctrl==="merge"&&!c.jn.inLeg.major){n=c.jn.n;me=(c.jn.P?c.jn.P.L:0)-c.jn.d;lane0=true}
-  else if(!c.jn&&c.mv&&c.mvNode.ctrl==="merge"&&c.mvLeg.major&&laneIdx(c)===0&&c.e.type==="xway"){n=c.mvNode;me=c.e.L-c.s;lane0=true}
+  else if(!c.jn&&c.mv&&c.mvNode.ctrl==="merge"&&c.mvLeg.major&&(laneIdx(c)===0||c.e.type==="sd")&&c.e.type===c.mv.e.type){n=c.mvNode;me=c.e.L-c.s;lane0=true}
   if(!n||me>90)return null;let best=null;
   for(const o of cars){if(o===c||o.kind!=="ai"&&o.kind!=="fsd")continue;let d=null;
-    if(o.jn&&o.jn.n===n&&o.jn.mv.e.type==="xway"&&o.jn.mv.dir===(c.jn?c.jn.mv.dir:c.mv.dir)){d=(o.jn.P?o.jn.P.L:0)-o.jn.d;if((!o.jn.inLeg.major)===!!(c.jn&&!c.jn.inLeg.major))continue}
-    else if(!o.jn&&o.mv&&o.mvNode===n&&o.mvLeg.major&&o.e.type==="xway"&&laneIdx(o)===0&&c.jn)d=o.e.L-o.s;
-    else if(!o.jn&&o.e.type==="xway"&&laneIdx(o)===0&&startNode(o.e,o.dir)===n&&o.e===(c.jn?c.jn.mv.e:c.mv.e))d=-o.s;
+    if(o.jn&&o.jn.n===n&&o.jn.mv.e===(c.jn?c.jn.mv.e:c.mv.e)&&o.jn.mv.dir===(c.jn?c.jn.mv.dir:c.mv.dir)){d=(o.jn.P?o.jn.P.L:0)-o.jn.d;if((!o.jn.inLeg.major)===!!(c.jn&&!c.jn.inLeg.major))continue}
+    else if(c.jn&&!o.jn&&o.mv&&o.mvNode===n&&o.mvLeg.major&&o.mv.e===c.jn.mv.e&&(laneIdx(o)===0||o.e.type==="sd"))d=o.e.L-o.s;
+    else if(!o.jn&&(laneIdx(o)===0||o.e.type==="sd")&&startNode(o.e,o.dir)===n&&o.e===(c.jn?c.jn.mv.e:c.mv.e))d=-o.s;
     if(d===null)continue;const sep=me-d;if(sep>-1&&sep<60){const g=sep-CARLEN-1.5;if(!best||g<best.gap)best={gap:Math.max(0.3,g),v:o.v,who:o}}}
+
   return best}
 function ctrlGap(c,dStop,dt){const dg=c.e?dbGateDs(c.e,c.dir,c.s,c.v):Infinity;const r=ctrlGap0(c,dStop,dt);return Math.min(r,dg)}
 function ctrlGap0(c,dStop,dt){const n=c.mvNode,mv=c.mv,L=c.mvLeg;if(!mv)return dStop+2;if(dStop>75)return Infinity;
   const at=Math.max(0,dStop-0.15),stopped=(c.v<0.3||c.pers&&c.pers.reck&&c.v<2.6&&n.ctrl!=="signal")&&dStop<(c.kind==="fsd"?5:4);   /* reckless drivers roll their stop signs */   // FSD keeps a little more room to the line
   const fullStop=()=>{if(stopped){c.stopT+=dt;if(c.stopT>0.8){c.stopDone=true;c.arrT=st.clock}}};
-  if(c.waitT>25)return Infinity;           // nobody waits forever
+  if(c.waitT>25&&!c.inBay)return Infinity;           // nobody waits forever (v38: except in a turn bay, out of everyone's way: there they wait for a real gap)
   switch(n.ctrl){
     case "signal":{const S=sigState(n,L.grp,st.clock);
       if(mv.t==="L"&&n.cyc.L&&n.cyc.L[L.grp]){const SL=sigLeft(n,L.grp,st.clock);   // protected left: go on the green arrow (no need to yield), stop on red; on the flashing yellow arrow yield as usual
@@ -6688,7 +6704,18 @@ function ctrlGap0(c,dStop,dt){const n=c.mvNode,mv=c.mv,L=c.mvLeg;if(!mv)return d
     case "minor":{if(L.major){if(mv.t==="L"&&!oppClear(c,n,L))return at;return Infinity}
       if(!c.stopDone&&!n.rbt){fullStop();return at}if(n.rbt&&dStop>14)return Math.max(at,dStop*0.6);if(c.goC>0){c.goC-=dt;return Infinity}c.waitT+=dt;if(boxConf(n,c)||!gapClear(c,n,L,mv)||n.rbt&&!rbClear(c,n)||!exitClear(c))return at;c.goC=n.rbt?1.2:2.5;if(c.kind==="ai"&&!n.rbt)brainLearn("stop",c.waitT);return Infinity}
     case "merge":{if(L.major)return Infinity;if(mergeClear(c,n,mv)){c.waitT=0;return Infinity}if(stopped)c.waitT+=dt;return at}
-    default:if(mv.t==="U"){const O=oppLeg(n,L);if(O&&approaching(n,O,withinFor(O.e),c)){if(stopped)c.waitT+=dt;return at}}return Infinity}}
+    default:if(mv.t==="S"&&n.kind==="xo"&&!exitClear(c)){if(stopped)c.waitT+=dt;return at}   /* v38: keep the crossover clear (don't stop across it in a queue) */
+      if(mv.t==="U"&&n.kind==="xo"){const O=oppLeg(n,L),at2=Math.max(0,dStop-2),st2=c.v<0.3&&dStop<6;if(O&&xoBusy(c,n,O)){if(st2)c.waitT+=dt;return at2}return Infinity}   /* wait 8 m short of the crossover, clear of the other way's U-turns */
+      if(mv.t==="U"){const O=oppLeg(n,L);if(O&&approaching(n,O,withinFor(O.e),c)){if(stopped)c.waitT+=dt;return at}}return Infinity}}
+/* v38: a Michigan-left crossover: go when the oncoming traffic is far enough away in time (the gap this driver accepts, from time to arrival,
+   not a fixed distance), ignoring anyone waiting to U-turn the other way at the same crossover (two of them used to wait for each other for ever) */
+function xoBusy(c,n,O){return !!xoBusy0(c,n,O)}   /* xoBusy0 says why: "jn" someone in the crossover, "just" someone just through where we would come out, "near"/"gap" oncoming too close, "me" you */
+function xoBusy0(c,n,O){const dir=O.end===1?1:-1,e=O.e;let PL=36;try{PL=mvP(c).L}catch(e_){}const need=Math.max(3.2+1.6*((c.pers&&c.pers.gap)||1),PL/6.5+0.6+0.6*((c.pers&&c.pers.gap)||1))*(c.v<1?1.1:1)*(c.waitT>40?0.85:1);   /* (a long wait makes anyone a little bolder) */   /* long enough to get all the way round */
+  const mv=c.mv;for(const o of cars){if(o===c)continue;
+    if(o.jn){if(o.jn.n===n&&(o.jn.inLeg===O&&o.jn.mv.t!=="U"||o.jn.mv.t==="U"&&!(o.jn.inLeg!==c.mvLeg&&o.jn.d>o.jn.P.L*0.6)))return "jn";continue}   /* oncoming traffic going through the crossover right now, or someone still in their own U-turn */
+    if(mv&&o.e===mv.e&&o.dir===mv.dir&&o.s<22)return "just";   /* someone just through, right where we would come out */
+    if(o.e!==e||o.dir!==dir)continue;if(o.mv&&o.mv.t==="U"&&o.mvNode===n)continue;const d=e.L-o.s;if(d<-3)continue;if(d<12)return "near";if(o.v>0.8&&d/o.v<need)return "gap"}
+  const M=me();if(M&&M.e===e&&M.dir===dir){const d=M.L-M.s;if(d>-3&&(d<12||car.vx>0.8&&d/car.vx<need))return "me"}return ""}
 function advance(c,ds,P){
   if(c.jn&&!c.jn.P)c.jn=null;   // a junction move that lost its path (car swapped or re-spawned mid-turn): just carry on along the road
   if(c.jn){c.jn.d+=ds;if(c.jn.d>=(c.jn.P?c.jn.P.L:0)){const over=c.jn.d-(c.jn.P?c.jn.P.L:0),m=c.jn.mv;c.e=m.e;c.dir=m.dir;c.s=c.jn.P.s1+over;c.off=c.offT=laneOff(c.e,c.jn.j);if(c.kind==="bike")c.offT=bikeOff(c.e);c.jn=null;c.sig=0;planMove(c)}return}
@@ -6701,7 +6728,7 @@ function laneGaps(c,i){const off=laneOff(c.e,i);let lg=Infinity,fg=Infinity,fv=0
   for(const o of cars){if(o===c||o.jn||o.e!==c.e||o.dir!==c.dir)continue;if(Math.abs(o.off-off)>2.2&&Math.abs(o.offT-off)>0.5)continue;const d=o.s-c.s;if(d>0){const g=d-rb(o)-rf(c);if(g<lg)lg=g}else{const g=-d-rb(c)-rf(o);if(g<fg){fg=g;fv=o.v}}}
   const M=me();if(c.kind!=="fsd"&&M.e===c.e&&M.dir===c.dir&&Math.abs(M.off-off)<2.2){const d=M.s-c.s;if(d>0){const g=d-CARLEN/2-rf(c);if(g<lg)lg=g}else{const g=-d-rb(c)-CARLEN/2;if(g<fg){fg=g;fv=car.vx}}}
   return {lg,fg,fv}}
-function laneSafe(c,i){if(i<0||i>=c.e.n)return false;const g=laneGaps(c,i);return g.lg>Math.max(14,c.v*0.9)&&g.fg>Math.max(10,(g.fv-c.v)*3+8)}
+function laneSafe(c,i){if(i<0||i>=c.e.n)return false;const g=laneGaps(c,i),k=c.pers&&c.pers.gap||1;return g.lg>Math.max(14,c.v*0.9)*k&&g.fg>Math.max(10,(g.fv-c.v)*3+8)*k}
 // ---- how AI drivers react to you: the horn hurries them up, a slow driver ahead gets high beams and is passed
 // (aggressive drivers go round you quickly), and a tailgater can get brake-checked
 function aiVsPlayer(c,L,dt){if(st.walk||!st.started)return null;const dx=c.wx-car.px,dy=c.wy-car.py;if(Math.abs(dx)>70||Math.abs(dy)>70){c.tgT=0;c.slowT=0;return null}
@@ -6752,7 +6779,7 @@ function aiSeen(x,y,z){if(!CULL.pl)return Math.hypot(x-plX(),y-plY())<60;return 
 function rwShut(e,dir,s,i){if(RW.wz)for(const W of RW.wz){if(W.e!==e)continue;if(W.t==="flagger"&&s>W.stop[dir]-15&&s<W.end[dir]+5)return true;if((W.t==="trench"||W.t==="bridge"||W.t==="pothole")&&dir===W.dir&&i===0&&s>(W.sw0||W.s0||W.s)-60&&s<(W.sw1||W.s1||W.s)+20)return true;if(W.t==="exitclose")return true}const Z=RW.xz;if(!Z||e!==Z.e)return false;if(dir===Z.dc)return i<e.n-1&&s>=Z.sA&&s<=Z.sEnd;return i>0&&s>=e.L-Z.sEnd-Z.Lm&&s<=e.L-Z.sA}
 function poolSpot(minD,ok){const R=aiR();for(let k=0;k<16;k++){const p=randomSpot(minD??140,R-40);if(!p)continue;if(ok&&!ok(p))continue;if(rwShut(p.e,p.dir,p.s,p.i))continue;{const cap=Math.max(2,Math.floor(/curb/.test(p.e.type)?p.e.L/50:p.e.L*Math.max(1,p.e.n)/(p.e.type==="aw"?45:28)));let n=0;for(const c of cars)if(c.e===p.e&&c.kind==="ai")n++;if(n>=cap)continue}   /* no more cars on one road than fit with room between them (the airport curbs fill up fast when it's the only road near you) */const q=fpt(p.e,p.dir,p.s,laneOff(p.e,p.i)),d=Math.hypot(q[0]-plX(),q[1]-plY());
     if(d<R*0.8&&aiSeen(q[0],q[1],p.e.hz?ez(p.e,p.dir>0?p.s:p.e.L-p.s):0))continue;const ah=(q[0]-plX())*Math.cos(car.psi)+(q[1]-plY())*Math.sin(car.psi);if(ah<0&&k<10&&rnd()<0.55)continue;return p}return null}
-function poolKeep(c){return c.ub||c.robo||c.emv||c.bus||c.plow||c.transit||c.towing||c.errand||c.pullH||c.pullCop||c.pullTg||(typeof GIG!=="undefined"&&GIG.job&&GIG.job.towCar===c)}
+function poolKeep(c){return c.tmKeep||c.ub||c.robo||c.emv||c.bus||c.plow||c.transit||c.towing||c.errand||c.pullH||c.pullCop||c.pullTg||(typeof GIG!=="undefined"&&GIG.job&&GIG.job.towCar===c)}
 // AI cars get the same suspension as the cars you drive: the suspension of their own model (passive coils, adaptive, magnetic or air),
 // four corner springs and dampers, anti-roll bars, the real mass, and road bumps and potholes under each wheel
 const AI_TRIM={};function aiTrimOf(mdl){if(AI_TRIM[mdl]===undefined){AI_TRIM[mdl]=Object.keys(TRIMS).find(k=>TRIMS[k].model===mdl)||null}return AI_TRIM[mdl]}
@@ -6829,7 +6856,7 @@ function aiCollide(dt){AIC.cool-=dt;if(AIC.cool>0||st.aiWreck===false)return;con
   for(let i=0;i<A.length;i++){const a=A[i];for(let j=i+1;j<A.length;j++){const b=A[j];const dx=b.wx-a.wx,dy=b.wy-a.wy;if(dx*dx+dy*dy>36||Math.abs((a.wz||0)-(b.wz||0))>1.5)continue;
     const H=obbSAT(a.wx,a.wy,a.wh,(a.len||CARLEN)/2-0.15,(a.wid||1.9)/2-0.1,b.wx,b.wy,b.wh,(b.len||CARLEN)/2-0.15,(b.wid||1.9)/2-0.1);if(!H||H.d<0.3)continue;
     const rv=Math.hypot(a.v*Math.cos(a.wh)-b.v*Math.cos(b.wh),a.v*Math.sin(a.wh)-b.v*Math.sin(b.wh));if(rv<3.5||a.rwZ||b.rwZ)continue;   /* (not in the crossover zone's merge: a wreck there shuts the only lane left) */
-    const L_=a.s!==undefined&&b.e===a.e&&b.s<a.s?a:b,F=L_===a?b:a;EV.list.push({type:"aicrash",label:"Crash",x:a.wx,y:a.wy,t:240,items:[],pair:[L_,F],phase:0,pt:0,quiet:false,real:true});AIC.cool=25;return}}}
+    const L_=a.s!==undefined&&b.e===a.e&&b.s<a.s?a:b,F=L_===a?b:a;EV.list.push({type:"aicrash",label:"Crash",x:a.wx,y:a.wy,t:240,items:[],pair:[L_,F],phase:0,pt:0,quiet:false,real:true});AIC.cool=25;try{tmEvent(a,"crash");tmEvent(b,"crash")}catch(e){}return}}}
 // signal sensors (the cameras on the mast arms): a light changes early for a car waiting on red when nobody is coming the other way,
 // and rests on green while no one is waiting on the cross street. Done by sliding the signal's cycle offset, so every driver sees the same light.
 const SENSE={t:0};
@@ -6842,9 +6869,9 @@ function sigSense(dt){SENSE.t+=dt;if(SENSE.t<0.25)return;const st_=SENSE.t;SENSE
     for(const A of [0,1]){const B=1-A,P=sigPh(n,A,t);if(x<P.ts||x>=P.te)continue;
       if(dem[B]&&!dem[A]&&x>=P.ts+7&&x<P.te-0.5)c.off=((P.te-t)%c.C+c.C)%c.C;            // gap out: end this green now so the waiting car gets its turn
       else if(!dem[B]&&x>=P.te-0.8)c.off-=st_;}}}                                         // rest in green: nobody waiting across, so hold it
-function updateTraffic(dt){try{rw2Tick(dt)}catch(e){console.error(e)}try{sigSense(dt)}catch(e){}try{sfTick(dt)}catch(e){console.error(e)}try{aiCollide(dt)}catch(e){}try{aiSeparate(dt)}catch(e){}try{nwzTick()}catch(e){console.error(e)}
+function updateTraffic(dt){try{tmTick(dt)}catch(e){console.error(e)}try{gpkTick(dt)}catch(e){console.error(e)}try{rw2Tick(dt)}catch(e){console.error(e)}try{sigSense(dt)}catch(e){}try{sfTick(dt)}catch(e){console.error(e)}try{aiCollide(dt)}catch(e){}try{aiSeparate(dt)}catch(e){}try{nwzTick()}catch(e){console.error(e)}
   st.clock=(st.clock||0)+dt;
-  const OB=[];for(const o of cars)if(o.wx!==undefined)OB.push({x:o.wx,y:o.wy,z:o.wz||0,h:o.wh,v:o.v||0,o,t2:o.kind==="cone"?1.56:o.kind==="bike"?2.25:4.84});for(const o of parked)if(!o.fixed){const b=o._ob||(o._ob={o,v:0});b.x=o.wx;b.y=o.wy;b.z=o.wz||0;b.h=o.wh;OB.push(b)}
+  const OB=[];for(const o of cars)if(o.wx!==undefined){OB.push({x:o.wx,y:o.wy,z:o.wz||0,h:o.wh,v:o.v||0,o,t2:o.kind==="cone"?1.56:o.kind==="bike"?2.25:4.84});if(o.jn&&o.kind==="ai"&&!o.semi)for(const k of [-1.6,1.6])OB.push({x:o.wx+Math.cos(o.wh)*k,y:o.wy+Math.sin(o.wh)*k,z:o.wz||0,h:o.wh,v:o.v||0,o,t2:3.6})}   /* v38: a car turning or merging in front sticks its nose and tail out sideways, so its front and back count too (a car on the major road ran into a merging car whose centre was just outside its path) */for(const o of parked)if(!o.fixed){const b=o._ob||(o._ob={o,v:0});b.x=o.wx;b.y=o.wy;b.z=o.wz||0;b.h=o.wh;OB.push(b)}
   for(const p of peds)OB.push({x:p.wx,y:p.wy,z:p.wz||0,h:p.wh,v:p.v||0,o:p,t2:4.4});for(const d of EV.crit)OB.push({x:d.wx,y:d.wy,z:d.wz||0,h:d.wh,v:d.v,o:d,t2:4.4});
   if(!TOWH.ride)OB.push({x:car.px,y:car.py,z:car.zb||0,h:car.psi,v:car.vx,o:"me"});for(const k of [-1.75,1.75])OB.push({x:car.px+Math.cos(car.psi)*k,y:car.py+Math.sin(car.psi)*k,z:car.zb||0,h:car.psi,v:car.vx,o:"me",t2:3.6});
   if(TRL.on&&!st.walk){const K=TRL.on,H=trlHitch(),dx=H[0]-TRL.ax,dy=H[1]-TRL.ay,d=Math.hypot(dx,dy)||1,ux=dx/d,uy=dy/d,back=K.back??1.8,tot=d+back,w2=Math.pow((K.w||2)/2+0.9,2);for(let q=0;q<=tot;q+=1.6){const px=H[0]-ux*q,py=H[1]-uy*q;OB.push({x:px,y:py,z:car.zb||0,h:TRL.h,v:car.vx,o:TRL_OB,t2:w2})}}semiOB(OB);if(st.walk)OB.push({x:st.walk.x,y:st.walk.y,h:st.walk.h,v:st.walk.v,o:"me",t2:4.4});
@@ -6880,7 +6907,7 @@ function updateTraffic(dt){try{rw2Tick(dt)}catch(e){console.error(e)}try{sigSens
     // courtesy: you signal into my lane just ahead of me, so I open a gap and let you in
     if(c.kind==="ai"&&!c.jn&&st.signal&&!st.walk){const M=me();if(M.e===c.e&&M.dir===c.dir){const pl=laneOf(M.off)-loOf(c.e.n),tl=pl+(st.signal===-1?1:-1),d=M.s-c.s;
       // only when you're moving and ahead of it, and only drivers who feel like it (most calm ones, few aggressive ones): they ease off the gas, they don't stop
-      if(laneIdx(c)===tl&&d>5&&d<35&&car.vx>3){if(c.yieldSig!==sys.sigN){c.yieldSig=sys.sigN;const k=c.pers&&c.pers.k;c.yieldOK=rnd()<(k==="calm"?0.85:k==="brisk"?0.4:k==="aggr"?0.1:0.65)}
+      if(laneIdx(c)===tl&&d>5&&d<35&&car.vx>3){if(c.yieldSig!==sys.sigN){c.yieldSig=sys.sigN;const k=c.pers&&c.pers.k;c.yieldOK=rnd()<(c.pers&&c.pers.polite!=null?0.08+0.88*c.pers.polite:k==="calm"?0.85:k==="brisk"?0.4:k==="aggr"?0.1:0.65)}
         if(c.yieldOK){c.v0=Math.min(c.v0,Math.max(car.vx*0.9,c.v-1.5));if(!c.yieldT&&!c.bub)emoB(c,"nice",1.8);c.yieldT=1}}}}
     // move over: slow down passing a stopped car with its hazards on, or change lanes away from it
     if(c.kind==="ai"&&!c.jn){for(const o of cars){if(o===c||o.e!==c.e||o.dir!==c.dir||!(o.haz&&(o.v||0)<0.5))continue;const d=o.s-c.s;if(d>0&&d<70){c.v0*=0.75;break}}}
@@ -6921,6 +6948,9 @@ function updateTraffic(dt){try{rw2Tick(dt)}catch(e){console.error(e)}try{sigSens
     if(c.kind==="ai"&&!c.jn&&!c.inBay&&c.mv&&(c.mv.t==="L"||c.mv.t==="U")&&c.e.bay&&c.e.bay[c.dir]&&laneIdx(c)===c.e.n-1&&!c.lcPending){const B=c.e.bay[c.dir];if(dStop<B.len+B.tap*0.35&&dStop>8){c.inBay=true;c.offT=laneOff(c.e,c.e.n);c.sig=-1}}   // into the left-turn bay
     if(c.kind==="ai"&&!c.jn&&c.e.n>1&&!c.inBay&&!c.rwZ){const li=laneIdx(c);   /* (in the crossover zone rwXSteer picks the lanes) */
       if(c.lcPending){c.lcPending-=dt;if(c.lcPending<=0&&c.v<2.5&&dStop<40)c.lcPending=0.3;if(c.lcPending<=0){c.lcPending=0;if(laneSafe(c,c.lcTarget))c.offT=laneOff(c.e,c.lcTarget);else c.sig=0}}
+      /* v38: halfway into a lane change and someone is now alongside in that lane (they moved over too, or caught up): go back to your own lane */
+      else if(Math.abs(c.offT-c.off)>0.6&&!c.inBay){const tgt=c.offT,dirO=Math.sign(c.offT-c.off);for(const o of cars){if(o===c||o.jn||o.e!==c.e||o.dir!==c.dir)continue;const d=o.s-c.s,lon=(c.len||CARLEN)/2+(o.len||CARLEN)/2+0.8;if(Math.abs(d)>lon)continue;
+          if(Math.abs(o.off-tgt)<1.9&&Math.abs(o.off-c.off)<3.4&&Math.sign(o.off-c.off)===dirO){c.offT=laneOff(c.e,clamp(Math.round(c.off/LANE-dirO*0.5)-loOf(c.e.n),0,c.e.n-1));c.sig=0;c.lcCool=3;break}}}
       else if(Math.abs(c.offT-c.off)<0.05){c.lcT-=dt;if(c.lcCool>0)c.lcCool-=dt;
         if(c.needLane!==null&&li!==c.needLane&&dStop<35&&!c.lanePinned){const was=c.mv&&c.mv.t;planMove(c,"S");if(!c.mv)planMove(c,was);c.lanePinned=true}       // missed the lane: go straight on instead
         const W_=L.who,blocked=W_&&W_!=="me"&&W_!=="ctrl"&&L.gap<90&&(W_.kind==="wreck"||W_.kind==="cone"||((W_.v||0)<0.3&&(W_.haz||(W_.idle||0)>6)&&!(W_.cg<1e6)&&W_.lw!=="ctrl"&&!W_.jn));
@@ -6937,7 +6967,7 @@ function updateTraffic(dt){try{rw2Tick(dt)}catch(e){console.error(e)}try{sigSens
     if(!isFinite(c.wx)||!isFinite(c.wy)||!isFinite(c.v))c.dead=true}
   /* v337 gridlock breaker: a dense downtown grid can lock up (every block's exit full, so nobody may enter the next box). A car that hasn't moved
      for 75 s and is out of your sight is quietly taken away; the traffic pool puts a new one somewhere else, which frees the loop */
-  if((TRF_GLT=(typeof TRF_GLT==="number"?TRF_GLT:0)+dt)>2){TRF_GLT=0;const ch=Math.cos(car.psi),sh=Math.sin(car.psi);for(const c of cars){if(c.kind!=="ai"||!(c.idle>75)||c.wx===undefined)continue;const dx=c.wx-car.px,dy=c.wy-car.py,d=Math.hypot(dx,dy),ahead=(dx*ch+dy*sh)/Math.max(1,d);if(d>160||d>45&&ahead<0.3)c.dead=true}}
+  if((TRF_GLT=(typeof TRF_GLT==="number"?TRF_GLT:0)+dt)>2){TRF_GLT=0;const ch=Math.cos(car.psi),sh=Math.sin(car.psi);for(const c of cars){if(c.kind!=="ai"||!(c.idle>(c.inBay?240:75))||c.wx===undefined)continue;const dx=c.wx-car.px,dy=c.wy-car.py,d=Math.hypot(dx,dy),ahead=(dx*ch+dy*sh)/Math.max(1,d);if(d>160||d>45&&ahead<0.3)c.dead=true}}
   if(cars.some(c=>c.dead))cars=cars.filter(c=>!c.dead);   // a car whose numbers went bad is quietly removed
   // keep traffic around you: cars far behind you and out of sight (or stuck for ages) are moved to a new spot you can't see
   respT-=dt;if(respT<=0){respT=1;
@@ -7727,7 +7757,7 @@ function rwXSteer(c,dt=0.016){const Z=RW.xz;c.rwZ=false;if(!Z||c.e!==Z.e||c.jn||
   if((d>=18||c.v<1)&&need(1)){go();return}             /* (or waiting at the end of the lane, once a gap is made) */                     /* the merge area: any gap that works at this speed (a car needs ~20 m of rolling to get across) */
   /* no gap: ask the car level with or just behind us in that lane to let us in (once each: they take turns) */
   if(d<220){let best=null;for(const o of cars){if(o===c||o.e!==e||o.dir!==c.dir||o.jn||laneIdx(o)!==j||Math.abs(o.off-laneOff(e,j))>1.2)continue;const ds=c.s-o.s;if(ds<5||ds>(14+o.v*o.v/7)*BX.zip)continue;   /* (far enough back to stop comfortably) */if(!best||ds<c.s-best.s)best=o}
-    if(best&&!(best.zipT>0)&&!(best.zipCool>0)){best.zipFor=c;best.zipT=6;best.zipCool=14}}
+    if(best&&!(best.zipT>0)&&!(best.zipCool>0)){if(best.pers&&best.pers.polite!=null&&rnd()>0.1+0.88*best.pers.polite){best.zipCool=3}else{best.zipFor=c;best.zipT=6;best.zipCool=14;if(c.mind)try{tmEvent(c,"letin")}catch(e){}}}}
   if(!fsd&&d<45)c.v0=Math.min(c.v0,Math.max(0,(d-20)*0.5))}  /* the end of the lane: wait, with room to get across once the gap opens */
 /* the plan for a car on the zone's freeway: its speed, the lane it must reach (and where its own lane is closed), or the crossover path to follow */
 function rwXPlan(Z,dir,s,i){const e=Z.e,n=e.n;
@@ -7784,7 +7814,7 @@ function jamMul(c){if(c.sbT>0||c.tStop>0||c.sbHold||c.pullH)return 0.002;   // a
   if(EV.crz&&EV.crz.length&&!c.emv){for(const v of EV.crz){const d=Math.hypot(c.wx-v.x,c.wy-v.y);if(d<220){const fw=c.e.type==="xway";return Math.min(1,(fw?0.38:0.62)+(1-(fw?0.38:0.62))*Math.max(0,d-60)/160)*jamMul0(c)}}}
   return jamMul0(c)*(NX.az.length?nxAIMul(c):1)}
 function jamMul0(c){  if(!JAM.zones.length||c.e.type!=="xway")return 1;for(const z of JAM.zones)if(z.e===c.e&&z.dir===c.dir&&c.s>z.s0-60&&c.s<z.s1){const k=c.s<z.s0?(z.s0-c.s)/60:c.s>z.s1-80?(c.s-(z.s1-80))/80:0;return z.m+(1-z.m)*clamp(k,0,1)}return 1}
-function trafTOD(dt){try{jamTick(TOD.t>0?0:2.5)}catch(e){}TOD.t-=dt;if(TOD.t>0||!st.started||mpGuest())return;TOD.t=2.5;const M_=me(),onFw=M_&&M_.e&&(M_.e.type==="xway"||M_.e.type==="ramp"),want=Math.round(G().traffic*todMul()*(onFw?1.4:1)*brainTrafMul(onFw))+(TOD.add||0),ai=cars.filter(c=>c.kind==="ai");   // cars you added stay on top of the normal amount
+function trafTOD(dt){try{jamTick(TOD.t>0?0:2.5)}catch(e){}TOD.t-=dt;if(TOD.t>0||!st.started||mpGuest())return;TOD.t=2.5;const M_=me(),onFw=M_&&M_.e&&(M_.e.type==="xway"||M_.e.type==="ramp"),want=(typeof tmWant==="function"&&tmWant()!=null?tmWant():Math.round(G().traffic*todMul()*(onFw?1.4:1)*brainTrafMul(onFw)))+(TOD.add||0),ai=cars.filter(c=>c.kind==="ai");   // cars you added stay on top of the normal amount
   if(ai.length<want){for(let k=0;k<Math.min(3,want-ai.length);k++){const p=poolSpot(160);if(p)cars.push(newCar(p.e,p.dir,p.s,p.i))}}
   else if(ai.length>want+2){let n=Math.min(3,ai.length-want);for(const c of ai){if(n<=0)break;const d=Math.hypot(c.wx-car.px,c.wy-car.py),ahead=(c.wx-car.px)*Math.cos(car.psi)+(c.wy-car.py)*Math.sin(car.psi);if(!poolKeep(c)&&!aiSeen(c.wx,c.wy,c.wz)&&(d>300||d>140&&ahead<0)){const k=cars.indexOf(c);if(k>=0){cars.splice(k,1);n--}}}}
   st.trafficN=cars.filter(c=>c.kind==="ai").length}
@@ -13451,6 +13481,11 @@ function buildWorld(){retailSites();placeExtras();
       if(l.ltl||l.bay){const hi=loOf(e.n)+e.n-(l.bay?0:1);for(const d of [7,24]){const p=fpt(e,dir,e.L-l.r-d,hi*LANE),z=(e.hz?ez(e,uAt(l.r+d)):0)+0.014,c_=Math.cos(p[2]),s_=Math.sin(p[2]),G=(f,lt)=>[p[0]+c_*f-s_*lt,p[1]+s_*f+c_*lt];   // white turn arrow, curving left
           for(const P of [[[0,-0.15],[2.9,-0.15],[2.9,0.15],[0,0.15]],[[2.55,0.15],[2.9,0.15],[2.9,0.85],[2.55,0.85]],[[2.25,0.85],[3.2,0.85],[2.72,1.55]]]){const k=stopL.P.length/3;for(const [f,lt] of P){const w=G(f,lt);stopL.P.push(w[0],z,-w[1]);stopL.N.push(0,1,0)}for(let i=1;i<P.length-1;i++)stopL.I.push(k,k+i+1,k+i,k,k+i,k+i+1)}}}
       if(n.ctrl!=="minor"&&e.T.z==="c"&&!e.T.rumble)for(let t=-W+0.5;t<W-0.3;t+=1.2){if(e.m>0&&Math.abs(t)<m2)continue;stripInto(zebra,e,t,t+0.6,0.011,Math.min(uAt(l.r-0.4),uAt(l.r-3.4)),Math.max(uAt(l.r-0.4),uAt(l.r-3.4)))}}}
+  /* v38: the Michigan-left crossovers and their U-turn bays, paved over the kit's grass median (the kit boulevard has a solid median) */
+  {const X=M_();let any=false;for(const n of NODES)if(n.xo){quadInto(X,n.x,n.y,n.xo.h,n.xo.len,n.xo.w,(n.z||0)+0.21);any=true}
+    for(const e of EDGES){if(!e.bay)continue;const M2=u=>mAt(e,u)/2;for(const dir of [1,-1]){const B=e.bay[dir],nd=dir>0?e.b:e.a;if(!B||nd.kind!=="xo")continue;any=true;
+      stripInto(X,e,u=>dir*-(M2(u)-e.shL+0.05),u=>dir*-(M2(u)-e.shL-bayW(e,u,dir)),0.21,dir>0?B.t0:0,dir>0?e.L:B.t0)}}
+    SCN.xoPave=any?mfC(X):null}
   RKE=null;RKY=0;SCN.roadZ=[["c",mfC(road.c)],["h",mfC(road.h)],["d",mf(road.d)]];SCN.wear=[["c",mf(wear.c)],["h",mf(wear.h)],["d",mf(wear.d)]];SCN.lines=[mf(white)];SCN.ylines=mf(yellow);SCN.kerbs=[mf(kerb)];SCN.walk=mfC(walk);
   SCN.rumble=[mf(rumble)];SCN.bikeL=mf(bikeL);SCN.zebraB=zebra;SCN.stopLB=stopL;SCN.greenB=green;
   SCN.ground=terrainMesh();try{SCN.groundFar=terrainFar()}catch(e){console.error(e)}SCN.bumps=bumpMesh();SCN.tc=tcMesh();if(!W2||W2C.orp){try{orBuild()}catch(e){console.error(e)}setTimeout(()=>{try{SCN.or=orMesh()}catch(e){console.error(e)}},2500)}   // v173: the off-road park mesh builds after the game is up (faster loading)
@@ -19477,6 +19512,7 @@ function gtTick(dt){if(st.night!==GT.lastN){GT.min=st.night?22*60:10*60;GT.lastN
   const h=GT.min/60,el=Math.sin((h-6.6)/12.8*Math.PI);GT.el=el;GT.D=clamp(el*3.2+0.22,0,1);
   const n=GT.D<0.3;if(n!==GT.lastN){st.night=n;GT.lastN=n;}}
 function gtClock(){const h=Math.floor(GT.min/60),m=Math.floor(GT.min%60);return `${h%12||12}:${String(m).padStart(2,"0")} ${h<12?"am":"pm"}`}
+/*TRAFFIC_MIND*/
 /*FLUID_RUNTIME*/
 /*FLUID_INTEGRATION*/
 function render(dt){
@@ -19562,6 +19598,7 @@ function render(dt){
    /* under the kit roads the generated surface sits 4 cm lower, so it never shows through over the brow of a hill */
    if(KITOLD&&KIT.m)gl.uniformMatrix4fv(U.uM,false,M4.T(0,-0.04,0));
    const RKon=rkTex();for(const [c,m1] of SCN.roadZ){if(RKon&&c!=="d"){mat(snow?[1.25,1.27,1.3]:wet?[0.6,0.6,0.63]:[1,1,1],null,sp_,sh_,1,10);draw(m1);continue}const col=snow?[0.42,0.43,0.45]:c==="d"?(wet?[0.16,0.12,0.08]:[0.3,0.25,0.18]):wet?[0.045,0.047,0.052]:c==="c"?[0.112,0.112,0.116]:[0.068,0.07,0.076];mat(col,null,c==="d"?0.05:sp_,c==="d"?8:sh_,1,c==="d"?1:2);draw(m1)}
+   if(SCN.xoPave){if(KITOLD&&KIT.m)mat(wet?[0.2,0.2,0.21]:snow?[0.5,0.5,0.52]:[0.36,0.36,0.35],null,sp_,sh_,1,2);else if(RKon)mat(snow?[1.25,1.27,1.3]:wet?[0.6,0.6,0.63]:[1,1,1],null,sp_,sh_,1,10);else mat(snow?[0.42,0.43,0.45]:wet?[0.045,0.047,0.052]:[0.068,0.07,0.076],null,sp_,sh_,1,2);draw(SCN.xoPave)}
    gl.polygonOffset(3,3);if(!snow&&!(KITOLD&&KIT.m))for(const [c,m] of SCN.wear){if(RKon&&c!=="d")continue;mat(c==="d"?(wet?[0.12,0.09,0.06]:[0.23,0.19,0.14]):wet?[0.035,0.037,0.042]:c==="c"?[0.088,0.088,0.092]:[0.056,0.058,0.064],null,c==="d"?0.05:wet?2:0.5,c==="d"?8:wet?110:40,1,c==="d"?1:2);draw(m)}
    if(!snow){mat([0.05,0.05,0.055],null,0.3,30,1,2);draw(SCN.patchD);mat([0.15,0.15,0.155],null,0.15,20,1,2);draw(SCN.patchL);mat([0.03,0.03,0.032],null,0.6,50);draw(SCN.crack);
      if(!RKon){mat([0.16,0.16,0.165],null,0.2,20,1,2);for(const m of SCN.rumble)draw(m)}}}
