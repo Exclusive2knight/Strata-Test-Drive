@@ -1,0 +1,7 @@
+{
+  "pass": true,
+  "particles": 4096,
+  "volumeM3": 0.020000000000000205,
+  "renderer": "depth, thickness, bilateral normals, refraction/Fresnel",
+  "errors": []
+}

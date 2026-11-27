@@ -1,0 +1,21 @@
+{
+  "pass": true,
+  "float": true,
+  "blend": true,
+  "timer": true,
+  "renderer": "WebKit WebGL",
+  "programs": [
+    "advect",
+    "force",
+    "curl",
+    "confinement",
+    "divergence",
+    "pressure",
+    "project",
+    "density",
+    "normalize",
+    "particleVelocity",
+    "particlePosition"
+  ],
+  "error": 0
+}

@@ -1,0 +1,401 @@
+{
+  "errors": [],
+  "scenes": [
+    {
+      "scene": 1,
+      "frames": [
+        {
+          "time": 1.0000000000000013,
+          "particles": 168,
+          "ledger": {
+            "input": 0.5000000000000067,
+            "field": 0.49849734705293136,
+            "particles": 0.001499782110245799,
+            "drained": 0,
+            "evaporated": 2.87083682341425e-06,
+            "error": 1.221245327087656e-14
+          },
+          "error": 0
+        },
+        {
+          "time": 1.9999999999999978,
+          "particles": 96,
+          "ledger": {
+            "input": 0.5000000000000067,
+            "field": 0.4989917636732309,
+            "particles": 0.0010021794806825512,
+            "drained": 0,
+            "evaporated": 6.05684608921593e-06,
+            "error": 7.993605777301021e-15
+          },
+          "error": 0
+        },
+        {
+          "time": 2.9999999999999942,
+          "particles": 246,
+          "ledger": {
+            "input": 0.5000000000000067,
+            "field": 0.49601833254590855,
+            "particles": 0.003972198536696305,
+            "drained": 0,
+            "evaporated": 9.46891739955841e-06,
+            "error": 4.440892098500567e-15
+          },
+          "error": 0
+        }
+      ]
+    },
+    {
+      "scene": 2,
+      "frames": [
+        {
+          "time": 1.0000000000000013,
+          "particles": 180,
+          "ledger": {
+            "input": 0.00640000000003428,
+            "field": 0.005377131015186973,
+            "particles": 0,
+            "drained": 0.0010113489848122903,
+            "evaporated": 1.1519999999975078e-05,
+            "error": 5.47535649629403e-12
+          },
+          "error": 0
+        },
+        {
+          "time": 1.9999999999999978,
+          "particles": 180,
+          "ledger": {
+            "input": 0.012800000000076207,
+            "field": 0.010702938709438566,
+            "particles": 0,
+            "drained": 0.0020740212905667253,
+            "evaporated": 2.3040000000302556e-05,
+            "error": 5.516691704116523e-12
+          },
+          "error": 0
+        },
+        {
+          "time": 2.9999999999999942,
+          "particles": 180,
+          "ledger": {
+            "input": 0.019199999999641847,
+            "field": 0.015965378996971643,
+            "particles": 0,
+            "drained": 0.003200061003024841,
+            "evaporated": 3.4560000000900275e-05,
+            "error": 1.85176310053116e-11
+          },
+          "error": 0
+        }
+      ]
+    },
+    {
+      "scene": 3,
+      "frames": [
+        {
+          "time": 1.0000000000000013,
+          "particles": 188,
+          "ledger": {
+            "input": 0,
+            "field": 0,
+            "particles": 0,
+            "drained": 0,
+            "evaporated": 0,
+            "error": 0
+          },
+          "error": 0
+        },
+        {
+          "time": 1.9999999999999978,
+          "particles": 248,
+          "ledger": {
+            "input": 0,
+            "field": 0,
+            "particles": 0,
+            "drained": 0,
+            "evaporated": 0,
+            "error": 0
+          },
+          "error": 0
+        },
+        {
+          "time": 2.9999999999999942,
+          "particles": 308,
+          "ledger": {
+            "input": 0,
+            "field": 0,
+            "particles": 0,
+            "drained": 0,
+            "evaporated": 0,
+            "error": 0
+          },
+          "error": 0
+        }
+      ]
+    },
+    {
+      "scene": 4,
+      "frames": [
+        {
+          "time": 1.0000000000000013,
+          "particles": 0,
+          "ledger": {
+            "input": 0,
+            "field": 0,
+            "particles": 0,
+            "drained": 0,
+            "evaporated": 0,
+            "error": 0
+          },
+          "error": 0
+        },
+        {
+          "time": 1.9999999999999978,
+          "particles": 0,
+          "ledger": {
+            "input": 0,
+            "field": 0,
+            "particles": 0,
+            "drained": 0,
+            "evaporated": 0,
+            "error": 0
+          },
+          "error": 0
+        },
+        {
+          "time": 2.9999999999999942,
+          "particles": 0,
+          "ledger": {
+            "input": 0,
+            "field": 0,
+            "particles": 0,
+            "drained": 0,
+            "evaporated": 0,
+            "error": 0
+          },
+          "error": 0
+        }
+      ]
+    },
+    {
+      "scene": 5,
+      "frames": [
+        {
+          "time": 1.0000000000000013,
+          "particles": 159,
+          "ledger": {
+            "input": 0,
+            "field": 0,
+            "particles": 0,
+            "drained": 0,
+            "evaporated": 0,
+            "error": 0
+          },
+          "error": 0
+        },
+        {
+          "time": 1.9999999999999978,
+          "particles": 319,
+          "ledger": {
+            "input": 0,
+            "field": 0,
+            "particles": 0,
+            "drained": 0,
+            "evaporated": 0,
+            "error": 0
+          },
+          "error": 0
+        },
+        {
+          "time": 2.9999999999999942,
+          "particles": 479,
+          "ledger": {
+            "input": 0,
+            "field": 0,
+            "particles": 0,
+            "drained": 0,
+            "evaporated": 0,
+            "error": 0
+          },
+          "error": 0
+        }
+      ]
+    },
+    {
+      "scene": 6,
+      "frames": [
+        {
+          "time": 1.0000000000000013,
+          "particles": 269,
+          "ledger": {
+            "input": 0,
+            "field": 0,
+            "particles": 0,
+            "drained": 0,
+            "evaporated": 0,
+            "error": 0
+          },
+          "error": 0
+        },
+        {
+          "time": 1.9999999999999978,
+          "particles": 429,
+          "ledger": {
+            "input": 0,
+            "field": 0,
+            "particles": 0,
+            "drained": 0,
+            "evaporated": 0,
+            "error": 0
+          },
+          "error": 0
+        },
+        {
+          "time": 2.9999999999999942,
+          "particles": 591,
+          "ledger": {
+            "input": 0,
+            "field": 0,
+            "particles": 0,
+            "drained": 0,
+            "evaporated": 0,
+            "error": 0
+          },
+          "error": 0
+        }
+      ]
+    },
+    {
+      "scene": 7,
+      "frames": [
+        {
+          "time": 1.0000000000000013,
+          "particles": 332,
+          "ledger": {
+            "input": 0,
+            "field": 0,
+            "particles": 0,
+            "drained": 0,
+            "evaporated": 0,
+            "error": 0
+          },
+          "error": 0
+        },
+        {
+          "time": 1.9999999999999978,
+          "particles": 634,
+          "ledger": {
+            "input": 0,
+            "field": 0,
+            "particles": 0,
+            "drained": 0,
+            "evaporated": 0,
+            "error": 0
+          },
+          "error": 0
+        },
+        {
+          "time": 2.9999999999999942,
+          "particles": 931,
+          "ledger": {
+            "input": 0,
+            "field": 0,
+            "particles": 0,
+            "drained": 0,
+            "evaporated": 0,
+            "error": 0
+          },
+          "error": 0
+        }
+      ]
+    },
+    {
+      "scene": 8,
+      "frames": [
+        {
+          "time": 1.0000000000000013,
+          "particles": 128,
+          "ledger": {
+            "input": 0,
+            "field": 0,
+            "particles": 0,
+            "drained": 0,
+            "evaporated": 0,
+            "error": 0
+          },
+          "error": 0
+        },
+        {
+          "time": 1.9999999999999978,
+          "particles": 128,
+          "ledger": {
+            "input": 0,
+            "field": 0,
+            "particles": 0,
+            "drained": 0,
+            "evaporated": 0,
+            "error": 0
+          },
+          "error": 0
+        },
+        {
+          "time": 2.9999999999999942,
+          "particles": 128,
+          "ledger": {
+            "input": 0,
+            "field": 0,
+            "particles": 0,
+            "drained": 0,
+            "evaporated": 0,
+            "error": 0
+          },
+          "error": 0
+        }
+      ]
+    },
+    {
+      "scene": 9,
+      "frames": [
+        {
+          "time": 1.0000000000000013,
+          "particles": 957,
+          "ledger": {
+            "input": 0.5000000000000067,
+            "field": 0.49851516685268266,
+            "particles": 0.00148196232901215,
+            "drained": 0,
+            "evaporated": 2.8708183054935143e-06,
+            "error": 1.2656542480726616e-14
+          },
+          "error": 0
+        },
+        {
+          "time": 1.9999999999999978,
+          "particles": 1402,
+          "ledger": {
+            "input": 0.5000000000000067,
+            "field": 0.49901592225014024,
+            "particles": 0.0009780207020481126,
+            "drained": 0,
+            "evaporated": 6.0570478149062115e-06,
+            "error": 6.883382752675879e-15
+          },
+          "error": 0
+        },
+        {
+          "time": 2.9999999999999942,
+          "particles": 2077,
+          "ledger": {
+            "input": 0.5000000000000067,
+            "field": 0.496018222723411,
+            "particles": 0.003972308335856546,
+            "drained": 0,
+            "evaporated": 9.468940737060648e-06,
+            "error": 3.996802888650511e-15
+          },
+          "error": 0
+        }
+      ]
+    }
+  ]
+}

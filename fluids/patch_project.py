@@ -1,0 +1,22 @@
+from pathlib import Path
+R=Path(__file__).resolve().parents[1];p=R/'src/app_template.html';s=p.read_text()
+assert '/*FLUID_RUNTIME*/'not in s,'Already patched'
+s=s.replace('/*GARAGE_REALISM_RUNTIME*/','/*GARAGE_REALISM_RUNTIME*/\n/*FLUID_RUNTIME*/')
+s=s.replace('function groundAt(x,y){','function fluidBaseGroundAt(x,y){',1)
+s=s.replace('function render(dt){','/*FLUID_INTEGRATION*/\nfunction render(dt){',1)
+s=s.replace('while(acc>=h){physics(h);acc-=h}', 'fluidTick(dt);while(acc>=h){physics(h);acc-=h}',1)
+s=s.replace('const TY=TYRES[st.tyre||"allseason"].k,tmu=tireMu(i)', 'const TY=TYRES[st.tyre||"allseason"].k,tmu=tireMu(i)*(car.fluid?.wheels?.[i]?.grip??1)',1)
+s=s.replace('let thr=st.power===false||st.power==="acc"||car.disabled?0:', 'let thr=st.power===false||st.power==="acc"||car.disabled||car.fluid?.stalled?0:',1)
+s=s.replace('const vx=car.vx, sp=Math.abs(vx), dirG=', 'if(car.fluid){car.vx-=car.fluid.drag/m*dt;car.vzb=(car.vzb||0)+car.fluid.buoyancy/m*dt;}\n  const vx=car.vx, sp=Math.abs(vx), dirG=',1)
+s=s.replace('uniform vec2 uShC,uShF,uWX;', 'uniform sampler2D uFluidWetMap;uniform vec4 uFluidRect,uFluidCar;uniform float uFluidWet;\nuniform vec2 uShC,uShF,uWX;',1)
+s=s.replace('vec3 base=uC*vC; float alpha=uA;', 'vec3 base=uC*vC; float alpha=uA;',1)
+s=s.replace('vec3 col=base*L+vec3(sp)+lE+em+gls*vec3(0.06,0.08,0.1)*(1.0-uNt);', '''vec2 fu=(vW.xz-uFluidRect.xy)/max(uFluidRect.z,.01);if(uFluidRect.z>0.&&min(fu.x,fu.y)>=0.&&max(fu.x,fu.y)<=1.){vec4 fw=texture2D(uFluidWetMap,fu);float fh=uFluidRect.w-16.+fw.r*32.;float wet=fw.g*smoothstep(.3,.7,N.y)*(1.-smoothstep(.06,.18,abs(vW.y-fh)));base*=1.-.4*wet;sp+=pow(max(dot(N,H),0.),90.)*wet*.5;}if(distance(vW.xz,uFluidCar.xz)<2.8&&vW.y>uFluidCar.y+.2&&vW.y<uFluidCar.y+2.1){base*=1.-.12*uFluidWet;base=mix(base,vec3(.19,.13,.08),uFluidCar.w*(1.-smoothstep(.3,1.4,vW.y-uFluidCar.y)));}
+ vec3 col=base*L+vec3(sp)+lE+em+gls*vec3(0.06,0.08,0.1)*(1.0-uNt);''',1)
+s=s.replace('const aP=gl.getAttribLocation(prog,"aP")', '["uFluidWetMap","uFluidRect","uFluidCar","uFluidWet"].forEach(n=>U[n]=gl.getUniformLocation(prog,n));\nconst aP=gl.getAttribLocation(prog,"aP")',1)
+s=s.replace('gl.disable(gl.CULL_FACE);gl.uniformMatrix4fv(U.uM,false,M4.id());\n  // layered', 'fluidPrepareWet();\n  gl.disable(gl.CULL_FACE);gl.uniformMatrix4fv(U.uM,false,M4.id());\n  // layered',1)
+s=s.replace('if(g.aa==="msaa"&&!f.ao&&!f.bloom&&!f.rays&&!f.dof&&!f.mb)return null;', 'if(g.aa==="msaa"&&!f.ao&&!f.bloom&&!f.rays&&!f.dof&&!f.mb&&!fluidRuntime?.enabled)return null;',1)
+s=s.replace('postEnd({VP,eye,fov,', 'const fluidOldScene=fluidBeforePost(VP,eye,W,H);postEnd({VP,eye,fov,',1)
+s=s.replace('rayK:clamp(D_*1.4-0.2,0,1)*(1-ww*0.8),dt})}}','rayK:clamp(D_*1.4-0.2,0,1)*(1-ww*0.8),dt});fluidAfterPost(fluidOldScene)}}',1)
+p.write_text(s)
+p=R/'build.py';s=p.read_text();at='html = html.replace("/*GARAGE_REALISM_RUNTIME*/", open(os.path.join(here,"garage_realism","runtime.js")).read())';assert at in s;s=s.replace(at,at+'\nfluid_modules=["core.js","gpu.js","flip.js","renderer.js","runtime.js"]\nhtml=html.replace("/*FLUID_RUNTIME*/", "\\n".join(open(os.path.join(here,"fluids",name)).read() for name in fluid_modules))\nhtml=html.replace("/*FLUID_INTEGRATION*/", open(os.path.join(here,"fluids","integration.js")).read())');p.write_text(s)
+print('Patched source, tyre physics, post-processing and build integration')

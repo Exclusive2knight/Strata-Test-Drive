@@ -2,7 +2,7 @@
    beside your path; rear cross traffic braking should brake for a car about to cross right behind you, not one on the far side of the road */
 (async()=>{const out=[];setTrim("camry_se",true);st.rAeb=true;st.rcta=true;
 const E2=EDGES.filter(e=>!/xway|ramp|dirt|lot|drive/.test(e.type)&&e.n===1&&e.L>400).sort((a,b)=>b.L-a.L)[0];
-const start=()=>{const P=fpt(E2,1,E2.L*0.3,0);resetCar({x:P[0],y:P[1],h:P[2]});cars=[];parked.length=0;st.power=true;sys.epb=false;st.gear="R";inp.thrT=0;inp.brkT=0;sys.rAebOv=false;sys.rAebRel=false;sys.hitClk=-99};
+const start=()=>{const P=fpt(E2,1,E2.L*0.3,0);resetCar({x:P[0],y:P[1],h:P[2]});cars=[];parked.length=0;st.power=true;sys.epb=false;st.gear="R";inp.thrT=0;inp.brkT=0;sys.rAebOv=false;sys.rAebRel=false;sys.hitClk=-99;sys.rctbOn=false;sys.rctbSide=null;sys.rctbHold=0};
 // back up at a fixed speed (moving the car by hand) until the brake comes on; returns the gap then
 const rev=(v,fn)=>{let firstGap=null,t=0;for(;t<25;t+=0.02){car.vx=-v;car.px-=Math.cos(car.psi)*v*0.02;car.py-=Math.sin(car.psi)*v*0.02;if(fn)fn();inp.thr=0.3;assist(0.02);if(sys.rAebBrake){firstGap=true;break}}return t};
 for(const [v,side] of [[0.6,0],[1.5,0],[2.8,0],[1.0,2.6],[1.0,1.9]]){start();const c=Math.cos(car.psi),s=Math.sin(car.psi);
