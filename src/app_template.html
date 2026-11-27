@@ -208,6 +208,9 @@ body.uihide #nstack,body.photoMode #nstack,body.pmOn #nstack{display:none!import
 #tsr{display:flex;flex-direction:column;align-items:center;justify-content:center;width:32px;height:42px;margin-left:8px;background:#f4f4f0;color:#111;border-radius:4px;box-shadow:inset 0 0 0 2px #111;align-self:center}
 #tsr small{font-size:6px;line-height:1.05;text-align:center;font-weight:800}#tsr b{font-family:var(--f-hud);font-size:16px;line-height:1}#tsr.over{outline:2px solid #ffb340;outline-offset:1px}
 body.focus #dock,body.focus #sensorBox,body.focus #cluster,body.focus #controls,body.focus #toast,body.focus #alert{visibility:hidden}
+/* v37.4: a zoomed-in car screen or cluster gets the whole view: the side panel, minimap and pop-ups no longer sit on top of it (Cadillac's 33-inch display showed a second copy of the game's UI). The Screen/Road button stays so you can get out */
+body.focus .u2left .dk>*:not(#u2scr),body.focus #u2mm,body.focus #nstack{visibility:hidden}
+body.focus .u2left .dk{background:none!important;border-color:transparent!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
 #vrBtn{position:fixed;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 210px);z-index:7;background:rgba(8,14,16,.85);color:#e6eef0;border:1px solid var(--line);border-radius:12px;padding:8px 14px;font-weight:700}
 #scrBtn{position:fixed;left:12px;top:calc(env(safe-area-inset-top,0px) + 100px);background:rgba(8,14,16,.85);color:#e6eef0;border:1px solid var(--line);border-radius:12px;padding:8px 16px;font-weight:600;z-index:6}
 #paBtn{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;align-items:center;gap:8px;background:#1d5fd1;color:#fff;border:0;border-radius:14px;padding:8px 14px;z-index:6}
@@ -1424,8 +1427,11 @@ html body.chatOn #ui2 .u2left .dk,html body.chatOn #ui2 #u2mm{transform:translat
 <script data-boot>(function(){var p=0;window.__bootP=0;var t=setInterval(function(){if(window.__bootReal){clearInterval(t);return}p+=(0.7-p)*0.025;window.__bootP=p;var a=document.getElementById("bootArc"),n=document.getElementById("bootNeedle"),c=document.getElementById("bootPct");if(a)a.setAttribute("stroke-dasharray",(p*100).toFixed(1)+" 100");if(n)n.style.setProperty("--a",(-135+p*270)+"deg");if(c)c.textContent=String(Math.round(p*100))},120)})()</script>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 37.3 · Kestrel roundabout, Honda gauges, gentler parking brakes</h2></div>
+    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 37.4 · Zoomed screens without the clutter</h2></div>
     <div class="nb"><ul>
+      <li>🖥️ <b>No more double UI on zoomed-in screens.</b> When you zoomed into a car's cluster (like Cadillac's 33-inch curved display) or centre screen, the game's own side panel, minimap and pop-ups stayed on top, so you saw two sets of menus at once. Now the car's screen gets the whole view, and the Road button stays so you can zoom back out.</li>
+    </ul>
+    <h4 class="old">Version 37.3 · Kestrel roundabout, Honda gauges, gentler parking brakes</h4><ul>
       <li>⛰️ <b>No more gridlock at the Kestrel roundabout.</b> Where County Rd 3, Kestrel Pass and Ridge Rd meet at the bottom of Mount Kestrel, County Rd 3 and Kestrel Pass joined the ring almost on top of each other, so drivers waiting on one road blocked the other. All three roads backed up and the queue on Kestrel Pass piled into itself, with cars ending up on top of each other. County Rd 3 now swings in from the south-west so each road has its own entrance, and traffic keeps moving.</li>
       <li>🚗 <b>Drivers don't brake for oncoming cars on tight bends.</b> On sharp curves (like the first bend of Kestrel Pass), traffic used to brake for cars coming the other way in their own lane, because the bend lined them up. Now only a car that's actually in your lane (like someone overtaking) counts.</li>
       <li>🅿️ <b>Gentler rear braking when backing up.</b> Rear Cross-Traffic Braking now only stops you when you'd actually be in the crossing car's path when it gets there; a car going by on the far side of the road just gets the beep. The rear auto brake (Parking Support Brake and the like) waits until about a second before contact (about half a metre at walking pace) instead of stopping you a car length early, and no longer reacts to things you'd back past.</li>
@@ -8414,7 +8420,7 @@ function ui2Init(){{const u=$("ui2");u.addEventListener("pointerdown",e=>{const 
   on("u2menu",()=>openDrawer());on("u2acct",()=>acctOpen());on("u2help",()=>document.body.classList.toggle("help"));on("u2photo",()=>pmOpen());on("u2more",()=>openDrawer());
   on("u2car",()=>{closeDrawer();st.site="garage";openBuilder()});on("u2home",()=>{st.tab="spawn";openDrawer()});on("u2tests",()=>{st.tab="tests";openDrawer()});on("u2shop",()=>act("redoCar"));
   on("u2key",()=>fobPress(st.locked?"unlock":"lock"));on("u2phone",()=>{FOOT.phone=!FOOT.phone;if(!st.walk){toast(st.phoneConn?"Phone connected":"Phone in your pocket: connect it with the Bluetooth button")}renderPhone()});
-  on("u2bt",()=>phoneConnect(!st.phoneConn));on("u2scr",()=>{SCR.focus=!SCR.focus;tick(1)});on("u2rs",()=>rsOpen(!RSC.open));on("rsX",()=>rsOpen(false));on("rsWake",()=>{st.power=true;tick(1)});on("u2dock",()=>{const m=!document.body.classList.contains("dkHide");document.body.classList.toggle("dkHide",m);try{localStorage.setItem("mstrata.dkhide",m?"1":"")}catch(e){}});
+  on("u2bt",()=>phoneConnect(!st.phoneConn));on("u2scr",()=>{if(SCR.focusClu){SCR.focusClu=false}else SCR.focus=!SCR.focus;tick(1)});on("u2rs",()=>rsOpen(!RSC.open));on("rsX",()=>rsOpen(false));on("rsWake",()=>{st.power=true;tick(1)});on("u2dock",()=>{const m=!document.body.classList.contains("dkHide");document.body.classList.toggle("dkHide",m);try{localStorage.setItem("mstrata.dkhide",m?"1":"")}catch(e){}});
   try{if(localStorage.getItem("mstrata.dkhide"))document.body.classList.add("dkHide")}catch(e){}
   on("u2cam",()=>{st.cam=st.cam===1?0:1;$("screen").hidden=true;SCR.focus=false});on("u2belt",()=>{st.belt=!st.belt;beep(st.belt?1400:700,.05,"square",.1);toast(st.belt?"Seatbelt fastened":"Seatbelt unfastened")});
   on("u2haz",()=>act("hazard"));on("u2rc",()=>{const o=document.body.classList.toggle("rcOpen");try{localStorage.setItem("mstrata.rc",o?"1":"")}catch(e){}});try{if(localStorage.getItem("mstrata.rc"))document.body.classList.add("rcOpen")}catch(e){}on("u2sl",()=>act("sigL"));on("u2sr",()=>act("sigR"));on("u2lights",()=>act("lights"));on("u2high",()=>act("high"));on("u2epb",()=>act("epb"));on("u2fs",()=>fsToggle());{// the cluster screen: arrows on PC, swipe left / right on touch (no tap-to-open panel any more)
@@ -8437,7 +8443,7 @@ function dockTick(){const D={};const k=$("u2key");if(!k)return;const lk=!!st.loc
   const b=$("u2bt"),con=!!st.phoneConn;if(b.dataset.s!==String(con)){b.dataset.s=String(con);b.classList.toggle("blu",con);$("u2btL").textContent=con?"Linked":"Pair"}
   const n=(BANK.msgs||[]).filter(m=>m.unread).length,pb=$("u2phB");if(pb.dataset.n!==String(n)){pb.dataset.n=String(n);pb.textContent=n>9?"9+":String(n);pb.hidden=!n}$("u2phone").classList.toggle("on",!!FOOT.phone||!!PHONE.open);
   {const rb=$("u2rs"),rshow=!(st.cam===1&&!st.walk)&&!!TRIMS[st.trim];if(rb&&rb.hidden===rshow)rb.hidden=!rshow;if(rb)rb.classList.toggle("on",!!RSC.open);if(RSC.open&&st.cam===1&&!st.walk)rsOpen(false)}
-  const sc=$("u2scr"),show=st.cam===1&&!st.walk&&st.started;if(sc.hidden===show)sc.hidden=!show;if(show){const t=SCR.focus?"Road":"Screen";if($("u2scrL").textContent!==t)$("u2scrL").textContent=t;sc.classList.toggle("on",!!SCR.focus)}}
+  {const fz=!!((SCR.focus||SCR.focusClu)&&st.cam===1);if(document.body.classList.contains("focus")!==fz)document.body.classList.toggle("focus",fz)}const sc=$("u2scr"),show=st.cam===1&&!st.walk&&st.started;if(sc.hidden===show)sc.hidden=!show;if(show){const t=SCR.focus||SCR.focusClu?"Road":"Screen";if($("u2scrL").textContent!==t)$("u2scrL").textContent=t;sc.classList.toggle("on",!!(SCR.focus||SCR.focusClu))}}
 function ui2Tick(){if(!document.body.classList.contains("ui2")||GFX.frame%4)return;try{dockTick()}catch(e){}{const L=$("u2lim");if(L){const on=!!sys.limit&&!st.walk;if(L.hidden===on){L.hidden=!on;L.parentNode.classList.toggle("haslim",on)}if(on){const t=String(st.units==="mph"?sys.limit:Math.round(sys.limit*1.609/5)*5);if(L.lastChild.textContent!==t)L.lastChild.textContent=t;L.classList.toggle("over",!!sys.over)}}}document.body.classList.toggle("incab",st.cam===1&&!st.walk);document.body.classList.toggle("onfoot",!!st.walk);const T=TRIMS[st.trim],H=car.hyb,v=Math.abs(car.vx),set=(id,t)=>{const el=$(id);if(el&&el.textContent!==t)el.textContent=t},tog=(id,c,on)=>{const el=$(id);if(el)el.classList.toggle(c,!!on)};
   set("u2cash",Math.floor(ECON.cash).toLocaleString());const now=gDate(),hh=now.getHours();set("u2clock",gtClock());
   set("u2l0",String(ECON.lvl));set("u2l1",String(ECON.lvl+1));set("u2xpt",`${ECON.xp}/${xpNeed(ECON.lvl)}`);$("u2xpf").style.width=(ECON.xp/xpNeed(ECON.lvl)*100).toFixed(1)+"%";
@@ -19753,7 +19759,7 @@ function hud(dt){
   const me_=$("msg");me_.textContent=msg;me_.className=mc;
   $("brake").classList.toggle("pulse",car.abs&&inp.brk>0.05);
   const ts=$("tsr");$("tss").hidden=!(sys.stopSign&&sys.stopSign.d<60);ts.hidden=!sys.limit;if(sys.limit){ts.lastChild.textContent=sys.limit;ts.classList.toggle("over",!!sys.over)}
-  const sb=$("scrBtn");sb.hidden=st.cam!==1;sb.textContent=SCR.focus?"Back to the road":"Screen";document.body.classList.toggle("focus",SCR.focus&&st.cam===1);
+  const sb=$("scrBtn");sb.hidden=st.cam!==1;sb.textContent=SCR.focus?"Back to the road":"Screen";document.body.classList.toggle("focus",(SCR.focus||SCR.focusClu)&&st.cam===1);
   $("dAcc").classList.toggle("on",st.acc);$("dPilot").classList.toggle("on",st.pilot);{const ps_=TRIMS[st.trim].pilotShort||"PILOT";if($("dPilot").textContent!==ps_)$("dPilot").textContent=ps_}
   $("cluster").style.borderColor=st.pilot?(sys.pilotState==="active"||sys.pilotState==="changing"?"rgba(85,214,140,.8)":"rgba(114,182,255,.7)"):""; $("dSigL").classList.toggle("on",st.signal===-1||st.hazard); $("dSigR").classList.toggle("on",st.signal===1||st.hazard);
   $("dCam").textContent=["CAM","IN","TOP","WHL"][st.cam];
@@ -20292,7 +20298,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="175",BUILD_VER=373;
+const APP_VER="176",BUILD_VER=374;
 // shown as season.update: build 345 is v34.5, 350 will be v35.0
 const verStr=n=>{n=+n;return n>=300?Math.floor(n/10)+"."+n%10:String(n)},VER_S=verStr(BUILD_VER);
 try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+VER_S;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+VER_S)}catch(e){}   /* BUILD_VER: bumped to make open copies reload without resetting saves */
