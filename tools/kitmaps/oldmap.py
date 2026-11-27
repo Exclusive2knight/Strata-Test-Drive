@@ -21,16 +21,19 @@ def follow(P, base, side=0.0, flat=(0, 0), dw=0.0, tag="", one=False):
     L = D[-1]
     if L < 1: return
     hilly = max(p[2] for p in P) - min(p[2] for p in P) > 0.5
-    n = 1 if one else max(1, round(L / (SEG if hilly else 32.0))); pts = []      # short pieces only where the road climbs (fewer pieces, faster frames)
-    for k in range(n + 1):
-        d = L * k / n; i = 0
+    def at(d):
+        d = min(L, max(0.0, d)); i = 0
         while i < len(D) - 2 and D[i + 1] < d: i += 1
         f = (d - D[i]) / max(1e-9, D[i + 1] - D[i])
-        pts.append([P[i][j] + (P[i + 1][j] - P[i][j]) * min(1, max(0, f)) for j in range(3)])
-    tan = []
-    for k in range(len(pts)):
-        a_, b_ = pts[max(0, k - 1)], pts[min(len(pts) - 1, k + 1)]
-        tan.append(head(a_, b_))
+        return [P[i][j] + (P[i + 1][j] - P[i][j]) * min(1, max(0, f)) for j in range(3)]
+    # v37.5: on curves the pieces get shorter (at most 4 degrees of turn each) and every piece starts on the road's own tangent there,
+    # so a bent piece ends nearly on the next one's heading (32 m pieces on a 60 m ramp loop met at 20-40 degree kinks: the choppy ramps)
+    turn = 0.0
+    for i in range(1, len(P) - 1):
+        if D[i] - D[i - 1] < 0.05 or D[i + 1] - D[i] < 0.05: continue
+        turn += abs((head(P[i], P[i + 1]) - head(P[i - 1], P[i]) + 540) % 360 - 180)
+    n = 1 if one else max(1, round(L / (SEG if hilly else 32.0)), min(int(L / 2.5), math.ceil(turn / 4.0))); pts = [at(L * k / n) for k in range(n + 1)]      # short pieces only where the road climbs or turns
+    tan = [head(at(L * k / n - 2.0), at(L * k / n + 2.0)) if 0 < k < n else head(at(0), at(min(L, 3.0))) if k == 0 else head(at(max(0, L - 3.0)), at(L)) for k in range(n + 1)]
     sh = lambda p, h: (p[0] + side * math.cos(math.radians(h)), p[1] - side * math.sin(math.radians(h)), p[2])
     for k in range(1, len(pts)):
         A = sh(pts[k - 1], tan[k - 1]); B = sh(pts[k], tan[k]); hc = tan[k - 1]
