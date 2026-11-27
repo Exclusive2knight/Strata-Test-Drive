@@ -89,7 +89,7 @@ function gpkPick(c,minK){const d=c.mind,R=()=>d?d.R():Math.random();const L=garS
 function gpkSet(c,ph,P,rev){const G=c.gpk;G.ph=ph;G.seg={path:P,rev:!!rev,i:0,tight:ph==="in"};G.i=0;G.wait=0;G.look=ph==="back"?1+((c.mind&&c.mind.R())||Math.random())*1.4:0}
 function gpkLog(c,msg){try{if(c.mind)tmLog(c.mind,msg)}catch(e){}}
 /* a new arrival at the entry lane (only when nobody is right there) */
-function gpkSpawn(){const P=gpkW([GPK_SPAWN])[0];if(cars.some(o=>o.wx!==undefined&&Math.hypot(o.wx-P[0],o.wy-P[1])<7.5))return null;
+function gpkSpawn(){const P=gpkW([GPK_SPAWN])[0];if(cars.some(o=>o.wx!==undefined&&Math.hypot(o.wx-P[0],o.wy-P[1])<7.5))return null;if(!GPK.test&&aiSeen(P[0],P[1],0))return null;   /* never pops up in front of you */
   const f=findFrame(P[0],P[1],0,null);const c=newCar(f.e,f.dir,f.s,0);trafficModel(c);for(let k=0;k<8&&((c.len||0)>5.2||c.mdl==="city_police");k++){c.mdl=undefined;c.len=undefined;c.wid=undefined;trafficModel(c)}   /* cars and small SUVs: the long trucks and vans do not fit the 5 m spaces */
   Object.assign(c,{kind:"errand",fixed:true,wx:P[0],wy:P[1],wh:0,wz:0,v:2,spin:0,sig:0,head:0,haz:false});
   try{tmInit(c)}catch(e){}c.tmKeep=1;const d=c.mind,R=()=>d?d.R():Math.random();
