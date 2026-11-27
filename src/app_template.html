@@ -2926,7 +2926,9 @@ html #boot .bcopy{margin-top:2px;text-align:center}
 <script>
 /*MESH_DATA*/
 </script>
-<script>
+<script>/* v38: classList.toggle(name, undefined) flips the class instead of turning it off; every "force" passed in this game means on/off, so an undefined one is "off" (the HUD, notifications and the left dock flickered) */
+{const T_=DOMTokenList.prototype.toggle;DOMTokenList.prototype.toggle=function(k,f){return arguments.length>1?T_.call(this,k,!!f):T_.call(this,k)}}
+
 "use strict";
 // ---- account saves load here, before anything else reads the saved game: the page that asked for them may have written its own copy while closing
 const ACCT_SKIP=new Set(["strata.ver","strata.reloadFor","strata.gfx","strata.gfxov","strata.lite","strata.uiFull","strata.kThr","mstrata.lowend","mstrata.dkmin","mstrata.uiz","mstrata.uihide","mstrata.uilook","mstrata.hudtheme","mstrata.photos"]);
@@ -12337,13 +12339,24 @@ function assist(dt){
     /* v37.3: brakes about a second before contact, or when it's half a metre away and still closing (was 1.5 s, or anything within 1.6 m: it stopped you
        a car length short of things at walking pace) */
     if(g>0.1&&close>0.2&&(g/close<0.95||g<0.5)){if(!sys.rAebWas){beep(1200,.15,"square",.25);toast("Rear auto brake")}sys.rAebBrake=1;sys.rAebT=st.clock;sys.rAebRel=false}}}
-  // ---- rear cross traffic alert: cars crossing behind you while you back out; cars with rear auto brake also brake for them
-  sys.rcta=0;
-  if(st.rcta!==false&&has("bsm")&&st.gear==="R"&&sp<3){const c=Math.cos(car.psi),s=Math.sin(car.psi),rx=car.px+c*(VEH.tail?-VEH.tail[2]:-2.4),ry=car.py+s*(VEH.tail?-VEH.tail[2]:-2.4);let best=99,bBack=99;
-    for(const o of cars){if(o.wx===undefined||o.kind==="cone"||o.kind==="wreck"||(o.v||0)<1.2)continue;const dx=o.wx-rx,dy=o.wy-ry,back=-(dx*c+dy*s),lat=-dx*s+dy*c;if(back<-1.5||back>14||Math.abs(lat)>32||Math.abs(lat)<1)continue;
-      const ovx=Math.cos(o.wh)*o.v,ovy=Math.sin(o.wh)*o.v,vlat=-ovx*s+ovy*c;if(lat*vlat>=0)continue;const ttc=(Math.abs(lat)-1.2)/Math.abs(vlat);if(ttc<3.5&&ttc<best){best=ttc;bBack=back;sys.rcta=lat>0?-1:1}}
-    if(sys.rcta){sys.rctaT=(sys.rctaT||0)-(1/60);if(!(sys.rctaT>0)){beep(1050,.12,"square",.22);setTimeout(()=>beep(1050,.12,"square",.22),160);sys.rctaT=0.9;if(!sys.rctaWas)toast(`Rear cross traffic from the ${sys.rcta<0?"left":"right"}`)}
-      if(best<1.3&&bBack<5&&st.rAeb&&has("rAeb")&&sp<-0.2&&Math.max(0,bBack-1.1)/Math.max(-sp,0.2)<best+0.6){if(!sys.rAebWas)toast("Rear cross traffic braking");sys.rAebBrake=1}}}   /* v37.3: brakes only when you'd be in its lane when it gets there (it used to brake for anything up to 14 m back, so a car on the far side of the road stopped you the moment you moved) */
+  // ---- rear cross traffic alert and braking, like the real systems (Hyundai/Kia RCCA, Toyota RCTA, GM rear cross traffic braking):
+  // works in R below 5 mph; warns for a car coming in from the left or right faster than 3 mph and within about 25 m of the corner of
+  // your bumper that will reach your path within ~3 s; brakes only if you'd actually meet it (it is about to cross the strip right behind you,
+  // and you are moving back into it); brakes once per side per time you're in R, holds you about 2 s after you stop, and lets go if you press
+  // the brake or the accelerator firmly (v38: it used to keep warning for cars far down the road and grab the brakes on and off)
+  sys.rcta=0;if(st.gear!=="R"){sys.rctbSide=null;sys.rctbHold=0;sys.rctbOn=false}
+  if(st.rcta!==false&&has("bsm")&&st.gear==="R"&&Math.abs(sp)<2.24){const c=Math.cos(car.psi),s=Math.sin(car.psi),tail=VEH.tail?VEH.tail[2]:2.4,rx=car.px-c*tail,ry=car.py-s*tail,hw=BODY_HW;let best=99,bSide=0,bHit=false;
+    for(const o of cars){if(o.wx===undefined||o.kind==="cone"||o.kind==="wreck"||o.kind==="parked"||(o.v||0)<1.35)continue;if(o.wz!==undefined&&Math.abs(o.wz-(car.zb||0))>2.5)continue;   /* (not a car on another floor of a garage) */
+      const dx=o.wx-rx,dy=o.wy-ry,back=-(dx*c+dy*s),lat=-dx*s+dy*c;if(back<-1.5||back>12)continue;const dist=Math.hypot(back,Math.abs(lat)-hw);if(dist>25||Math.abs(lat)<hw)continue;
+      const ovx=Math.cos(o.wh)*o.v,ovy=Math.sin(o.wh)*o.v,vlat=-ovx*s+ovy*c,vback=-(ovx*c+ovy*s);if(lat*vlat>=0||Math.abs(vlat)<1.2)continue;   /* coming across, toward the line behind you */
+      const ol=(o.len||CARLEN)/2,ttc=Math.max(0,Math.abs(lat)-hw-ol)/Math.abs(vlat);if(ttc>3.2)continue;
+      /* where it will be (how far behind your bumper) when it crosses your line, and where you will be by then */
+      const backAt=back+vback*ttc,meBack=Math.max(0,-sp)*ttc,hit=Math.abs(backAt-meBack)<(o.wid||1.9)/2+1.2&&backAt<4.5&&ttc<1.6;
+      if(ttc<best){best=ttc;bSide=lat>0?-1:1;bHit=hit}}
+    if(bSide){sys.rcta=bSide;sys.rctaT=(sys.rctaT||0)-(1/60);if(!(sys.rctaT>0)){beep(1050,.12,"square",.22);setTimeout(()=>beep(1050,.12,"square",.22),160);sys.rctaT=best<1.6?0.5:1.0;if(!sys.rctaWas)toast(`Rear cross traffic from the ${bSide<0?"left":"right"}`)}
+      if(bHit&&st.rAeb&&has("rAeb")&&sp<-0.15&&!sys.rctbOn&&sys.rctbSide!==bSide){sys.rctbOn=true;sys.rctbSide=bSide;sys.rctbHold=0;toast("Rear cross traffic braking")}}}
+  if(sys.rctbOn){sys.rAebBrake=Math.max(sys.rAebBrake,Math.abs(sp)>0.3?0.85:1);if(Math.abs(sp)<0.15)sys.rctbHold+=1/60;
+    if(sys.rctbHold>2||inp.thr>0.6||inp.brk>0.7||st.gear!=="R")sys.rctbOn=false}
   sys.rctaWas=!!sys.rcta;
   sys.rAebWas=sys.rAebBrake>0;
   // ---- blind spot monitoring (adjacent lanes, beside and closing fast from behind)
@@ -13256,6 +13269,27 @@ function stripInto(B,e,t0,t1,y,u0,u1){if(u1-u0<0.05)return;if(e.gap&&u1>e.gap[0]
   us.forEach((u,q)=>{const a=ePt(e,u,T0(u)),b=ePt(e,u,T1(u)),yy=y+(e.hz?ez(e,u):0);const yo=B.C&&B.kind===undefined?RKY:0;B.P.push(a[0],yy+yo,-a[1],b[0],yy+yo,-b[1]);B.N.push(0,1,0,0,1,0);if(B.C){const z=B.kind!==undefined?B.kind*10000+200:RKE?RKE(u):200,v=u/12;B.C.push(T0(u),v,z,T1(u),v,z)}if(q>0)B.I.push(k-2,k-1,k,k-1,k+1,k);k+=2})}
 let RKE=null,RKY=0;   /* road kit: the current edge's texture code (kind, lanes, half median) for stripInto */
 function dashInto(B,e,t,w,y,u0,u1,per,on){for(let u=u0+((-u0%per)+per)%per;u<u1;u+=per)stripInto(B,e,t-w/2,t+w/2,y,u,Math.min(u+on,u1))}
+/* v38: an intersection the road kit has no piece for: the paved area is exactly the roads meeting there plus curved kerb returns at the
+   corners (each corner a curve that leaves one road's kerb line and joins the next one's tangentially, like a real kerb radius), with the
+   kerb and the corner of sidewalk around it, instead of a dark disc that stuck out past the roads */
+function junPolyInto(J,n){const c=[n.x,n.y],z=(n.z||0)+0.03,L=n.legs.map(l=>{const h=l.h,u=[Math.cos(h),Math.sin(h)],nl=[-u[1],u[0]],hw=hwOf(l.e),R=Math.max(n.pr||0,(l.r||0)+1)+0.6;
+    return {h,u,nl,hw,R,walk:l.e.T&&l.e.T.walk||0,lt:[c[0]+u[0]*R+nl[0]*hw,c[1]+u[1]*R+nl[1]*hw],rt:[c[0]+u[0]*R-nl[0]*hw,c[1]+u[1]*R-nl[1]*hw]}}).sort((a,b)=>a.h-b.h);
+  const poly=[],corners=[];
+  for(let i=0;i<L.length;i++){const A=L[i],B=L[(i+1)%L.length];poly.push(A.rt,A.lt);let gap=B.h-A.h;if(i===L.length-1)gap+=Math.PI*2;
+    /* where the two kerb lines meet: the corner of a sharp-cornered junction; the kerb return is a smooth curve inside it */
+    const P=A.lt,Q=B.rt,d1=[-A.u[0],-A.u[1]],d2=[-B.u[0],-B.u[1]],den=d1[0]*d2[1]-d1[1]*d2[0];let pts=null;
+    if(gap>0.25&&gap<Math.PI-0.2&&Math.abs(den)>1e-3){const t=((Q[0]-P[0])*d2[1]-(Q[1]-P[1])*d2[0])/den,s2=((Q[0]-P[0])*d1[1]-(Q[1]-P[1])*d1[0])/den;
+      if(t>0&&s2>0){const X=[P[0]+d1[0]*t,P[1]+d1[1]*t];pts=[];for(let k=1;k<12;k++){const f=k/12,g=1-f;pts.push([g*g*P[0]+2*g*f*X[0]+f*f*Q[0],g*g*P[1]+2*g*f*X[1]+f*f*Q[1]])}}}
+    if(!pts&&gap<Math.PI+0.3){pts=[];for(let k=1;k<6;k++)pts.push([P[0]+(Q[0]-P[0])*k/6,P[1]+(Q[1]-P[1])*k/6])}   /* a straight kerb across the side of a T */
+    const cv=[P,...(pts||[]),Q];for(let k=1;k<cv.length-1;k++)poly.push(cv[k]);if(pts&&gap<Math.PI-0.2)corners.push({cv,walk:Math.max(A.walk,B.walk)})}   /* kerbs round the real corners (the roads' own kerbs carry on along the straight sides) */
+  /* the paved surface: a fan from the middle */
+  {const B=J.p,k0=B.P.length/3;B.P.push(c[0],z,-c[1]);B.N.push(0,1,0);if(B.C)B.C.push(c[0],c[1]/12,(B.jk||4)*10000+200);
+    for(const q of poly){B.P.push(q[0],z,-q[1]);B.N.push(0,1,0);if(B.C)B.C.push(q[0],q[1]/12,(B.jk||4)*10000+200)}
+    for(let i=0;i<poly.length;i++){const a=k0+1+i,b=k0+1+(i+1)%poly.length;B.I.push(k0,b,a,k0,a,b)}}
+  /* kerbs and the sidewalk corner along each kerb return (outward = away from the middle) */
+  for(const C of corners){const cv=C.cv;if(cv.length<3)continue;const band=(B,o0,o1,h0,h1)=>{const k0=B.P.length/3;for(const q of cv){const dx=q[0]-c[0],dy=q[1]-c[1],dl=Math.hypot(dx,dy)||1,ox=dx/dl,oy=dy/dl;
+        B.P.push(q[0]+ox*o0,z+h0,-(q[1]+oy*o0),q[0]+ox*o1,z+h1,-(q[1]+oy*o1));B.N.push(0,1,0,0,1,0)}for(let i=0;i<cv.length-1;i++){const a=k0+i*2;B.I.push(a,a+1,a+2,a+1,a+3,a+2,a,a+2,a+1,a+1,a+2,a+3)}};
+    band(J.k,0,0.35,0.13,0.13);band(J.k,0,0.001,0,0.13);if(C.walk)band(J.w,0.35,0.35+C.walk,0.13,0.13)}}
 function discInto(B,x,y,r,yy,seg=28){const k=B.P.length/3;B.P.push(x,yy,-y);B.N.push(0,1,0);if(B.C)B.C.push(x,y/12,(B.jk||4)*10000+200);for(let i=0;i<=seg;i++){const a=i/seg*Math.PI*2,px=x+Math.cos(a)*r,py=y+Math.sin(a)*r;B.P.push(px,yy,-py);B.N.push(0,1,0);if(B.C)B.C.push(px,py/12,(B.jk||4)*10000+200);if(i>0)B.I.push(k,k+i,k+i+1)}}
 function quadInto(B,x,y,h,len,w,yy){const c=Math.cos(h),s=Math.sin(h),k=B.P.length/3;for(const [a,b] of [[-1,-1],[1,-1],[1,1],[-1,1]]){const px=x+c*a*len/2-s*b*w/2,py=y+s*a*len/2+c*b*w/2;B.P.push(px,yy,-py);B.N.push(0,1,0);if(B.C)B.C.push(px,py/12,(B.jk||4)*10000+200)}B.I.push(k,k+1,k+2,k,k+2,k+3)}
 // a flat polygon prism standing upright, facing heading h (stop signs)
@@ -13419,6 +13453,7 @@ const HOUSE_MATS=["sofa","pillow","rug","wood","plant","pot","tv","art","white",
 const SCN_TMP={};      // signal heads: lamp positions for drawing the lit lenses each frame
 function buildWorld(){retailSites();placeExtras();
   const M_=()=>({P:[],N:[],I:[]}),mf=m=>meshFrom(m.P,m.N,m.I);
+  const JN={p:M_(),k:M_(),w:M_()};
   const road={c:M_(),h:M_(),d:M_()},wear={c:M_(),h:M_(),d:M_()},bikeL=M_(),white=M_(),yellow=M_(),kerb=M_(),walk=M_(),rumble=M_(),zebra=M_(),stopL=M_(),green=M_();
   road.c.C=[];road.h.C=[];road.c.jk=4;road.h.jk=7;walk.C=[];walk.kind=5;const mfC=m=>meshFrom(m.P,m.N,m.I,m.C&&m.C.length===m.P.length?m.C:undefined);
   for(const e of EDGES){const R=road[e.T.col],u0=e.p0,u1=e.L-e.p1,nL=e.n*LANE,sd=e.side,tp=!!e.tp;
@@ -13471,7 +13506,7 @@ function buildWorld(){retailSites();placeExtras();
     if(tp)stripInto(yellow,e,0.08,0.2,0.012,l0,e.tp[0]),stripInto(yellow,e,-0.08,-0.2,0.012,l0,e.tp[0])}
   // junctions: paved box, stop lines, crosswalks downtown and in the subdivisions
   for(const n of NODES){const col=n.legs.some(l=>l.e.T.col==="h")&&!n.legs.some(l=>l.e.T.col==="c")?"h":"c";
-    if(n.pr&&!kitJ(n))discInto(road[col],n.x,n.y,n.pr,n.z+0.008);   /* a kit intersection brings its own surface and kerbs */
+    if(n.pr&&!kitJ(n)){if(n.rbt||n.legs.length<2)discInto(road[col],n.x,n.y,n.pr,n.z+0.008);else junPolyInto(JN,n)}   /* a kit intersection brings its own surface and kerbs (v38: the others get a real one: see junPolyInto) */
     if(n.xo){quadInto(road.h,n.x,n.y,n.xo.h,n.xo.len,n.xo.w,n.z+0.008)}
     if(n.kind!=="x"||n.ctrl==="merge"||kitJ(n))continue;   /* a kit intersection paints its own crosswalks and stop lines */
     for(const l of n.legs){if(l.r<=0)continue;const e=l.e,dir=l.end===1?1:-1,L=e.L,m2=mAt(e,l.end===0?0:e.L)/2,W=m2+e.n*LANE;
@@ -13486,6 +13521,7 @@ function buildWorld(){retailSites();placeExtras();
     for(const e of EDGES){if(!e.bay)continue;const M2=u=>mAt(e,u)/2;for(const dir of [1,-1]){const B=e.bay[dir],nd=dir>0?e.b:e.a;if(!B||nd.kind!=="xo")continue;any=true;
       stripInto(X,e,u=>dir*-(M2(u)-e.shL+0.05),u=>dir*-(M2(u)-e.shL-bayW(e,u,dir)),0.21,dir>0?B.t0:0,dir>0?e.L:B.t0)}}
     SCN.xoPave=any?mfC(X):null}
+  SCN.junP=JN.p.P.length?mfC(JN.p):null;SCN.junK=JN.k.P.length?mf(JN.k):null;SCN.junW=JN.w.P.length?mf(JN.w):null;
   RKE=null;RKY=0;SCN.roadZ=[["c",mfC(road.c)],["h",mfC(road.h)],["d",mf(road.d)]];SCN.wear=[["c",mf(wear.c)],["h",mf(wear.h)],["d",mf(wear.d)]];SCN.lines=[mf(white)];SCN.ylines=mf(yellow);SCN.kerbs=[mf(kerb)];SCN.walk=mfC(walk);
   SCN.rumble=[mf(rumble)];SCN.bikeL=mf(bikeL);SCN.zebraB=zebra;SCN.stopLB=stopL;SCN.greenB=green;
   SCN.ground=terrainMesh();try{SCN.groundFar=terrainFar()}catch(e){console.error(e)}SCN.bumps=bumpMesh();SCN.tc=tcMesh();if(!W2||W2C.orp){try{orBuild()}catch(e){console.error(e)}setTimeout(()=>{try{SCN.or=orMesh()}catch(e){console.error(e)}},2500)}   // v173: the off-road park mesh builds after the game is up (faster loading)
@@ -14165,8 +14201,15 @@ if(!rectFree(k,x,y,fa))return false;w2Put(k,x,y,fa,0);return true};
           SIGH.push({t:"ped",x:px-fx*0.135,y:py-fy*0.135,h:ph,z:pz,n,g:l.grp})}}
       else if(n.rbt&&!l.major&&n.rbt.cul){}
       else if(n.rbt&&!l.major){const s=e.L-l.r-2.4,p=fpt(e,dir,s,sideO-0.9),gz=SZ(p[0],p[1]);sgPut({x:p[0],y:p[1],z:gz,f:p[2]+Math.PI,plates:[{shape:"tri",w:0.9,h:0.78,cy:2.1+0.39,face:sgFace("yield",0.9,0.78,SG_PAINT.yield)}]})}
-      else if(n.ctrl==="allstop"||(n.ctrl==="minor"&&!l.major)){const s=e.L-l.r-1.4,p=fpt(e,dir,s,sideO-0.9),gz=W2?(e.hz?ez(e,dir>0?s:e.L-s):0):0;
-         const pl=[{shape:"oct",w:0.76,h:0.76,cy:2.1+0.38,face:sgFace("stop",0.76,0.76,SG_PAINT.stop)}];if(n.ctrl==="allstop")pl.push({shape:"rect",w:0.46,h:0.15,cy:1.97,face:sgFace("allway",0.46,0.15,SG_PAINT.allway)});sgPut({x:p[0],y:p[1],z:gz,f:p[2]+Math.PI,plates:pl})}}}
+      else if(n.ctrl==="allstop"||(n.ctrl==="minor"&&!l.major)){
+         /* v38, placed like the MUTCD says: on the right of the approach, about 2 ft past the kerb face, level with where you stop (just behind the
+            stop line, at least 4 ft before the crosswalk) and never out in the cross road (approaches with no setback put it 1.4 m from the middle of the
+            junction); a second one on the left where the approach has two or more lanes your way and something to stand on (a median or a one-way's left kerb) */
+         const cross=Math.max(0,...n.legs.filter(o=>o!==l).map(o=>hwOf(o.e)*Math.abs(Math.sin(o.h-l.h)))),dS0=Math.max(l.r,cross+1.2)+1.4,onRd=q=>[...edgesNear(q[0],q[1],30)].some(f=>f!==e&&(()=>{const pr=eProj(f,q[0],q[1]);return pr.u>0.3&&pr.u<f.L-0.3&&Math.abs(pr.t)<hwOf(f)+0.3})());let dS=dS0;for(let k=0;k<12&&onRd(fpt(e,dir,Math.max(2,e.L-dS),sideO-0.95));k++)dS+=1;   /* (still standing in the cross road: step back along the kerb) */
+         const s=Math.max(2,e.L-dS),p=fpt(e,dir,s,sideO-0.95),gz=W2?(e.hz?ez(e,dir>0?s:e.L-s):0):0;
+         const pl=[{shape:"oct",w:0.76,h:0.76,cy:2.1+0.38,face:sgFace("stop",0.76,0.76,SG_PAINT.stop)}];if(n.ctrl==="allstop")pl.push({shape:"rect",w:0.46,h:0.15,cy:1.97,face:sgFace("allway",0.46,0.15,SG_PAINT.allway)});sgPut({x:p[0],y:p[1],z:gz,f:p[2]+Math.PI,plates:pl});
+         const myLanes=e.ow?e.n:e.n,leftSide=e.ow?-(sideO-0.95):(e.m>2.5?(-(e.m/2)+1.0)*(dir>0?1:1):null);
+         if(myLanes>=2&&leftSide!==null){const q=fpt(e,dir,s,e.ow?-sideO+0.95:dir*0+(-(mAt(e,dir>0?s:e.L-s)/2)+1.0)*-1),gq=W2?(e.hz?ez(e,dir>0?s:e.L-s):0):0;sgPut({x:q[0],y:q[1],z:gq,f:q[2]+Math.PI,plates:pl})}}}}
   // ---- where a parking lot's driveway meets the street: a white stop bar across the exit lane and a STOP sign on the right as you leave
   for(const S of XSITES){if(!S.ex||!S.N||!S.U)continue;   /* the fast-food driveways (the shopping strips paint their own) */
     const N=S.N,dx=-N[0],dy=-N[1],rx=dy,ry=-dx,half=S.L/2,c=[S.x-N[0]*(S.D/2-1.1),S.y-N[1]*(S.D/2-1.1)],lw=Math.min(half-0.3,4.2);if(lw<1.5)continue;
@@ -14553,7 +14596,7 @@ function setMap(k){const S=STARTS[k]||STARTS.city;st.map=k;sys.pa=null;resetCar(
 
 // ======================================================================= centre screen: a live UI drawn on a canvas, mapped onto the 3D dash screen
 // Tap it in the interior view (or press "Screen" to lean in). Pages: Map · Camera · Energy · Media · Controls.
-const SCR={W:680,H:400,page:"map",prevPage:"map",cam:"rear",focus:false,fz:0,hits:[],t:0,info:null,quad:null,scale:1.2,radioOn:false};
+const SCR={focusClu:false,W:680,H:400,page:"map",prevPage:"map",cam:"rear",focus:false,fz:0,hits:[],t:0,info:null,quad:null,scale:1.2,radioOn:false};
 let SS=2;SCR.cv=document.createElement("canvas");SCR.cv.width=SCR.W*SS;SCR.cv.height=SCR.H*SS;SCR.g=SCR.cv.getContext("2d");
 SCR.camCv=document.createElement("canvas");SCR.camCv.width=480;SCR.camCv.height=288;SCR.camG=SCR.camCv.getContext("2d");SCR.camCv2=document.createElement("canvas");SCR.camCv2.width=480;SCR.camCv2.height=288;SCR.camG2=SCR.camCv2.getContext("2d");SCR.camCv3=document.createElement("canvas");SCR.camCv3.width=480;SCR.camCv3.height=288;SCR.camG3=SCR.camCv3.getContext("2d");
 SCR.tex=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,SCR.tex);
@@ -19598,6 +19641,8 @@ function render(dt){
    /* under the kit roads the generated surface sits 4 cm lower, so it never shows through over the brow of a hill */
    if(KITOLD&&KIT.m)gl.uniformMatrix4fv(U.uM,false,M4.T(0,-0.04,0));
    const RKon=rkTex();for(const [c,m1] of SCN.roadZ){if(RKon&&c!=="d"){mat(snow?[1.25,1.27,1.3]:wet?[0.6,0.6,0.63]:[1,1,1],null,sp_,sh_,1,10);draw(m1);continue}const col=snow?[0.42,0.43,0.45]:c==="d"?(wet?[0.16,0.12,0.08]:[0.3,0.25,0.18]):wet?[0.045,0.047,0.052]:c==="c"?[0.112,0.112,0.116]:[0.068,0.07,0.076];mat(col,null,c==="d"?0.05:sp_,c==="d"?8:sh_,1,c==="d"?1:2);draw(m1)}
+   if(SCN.junP){if(KITOLD&&KIT.m)mat(wet?[0.2,0.2,0.21]:snow?[0.5,0.5,0.52]:[0.36,0.36,0.35],null,sp_,sh_,1,2);else if(RKon)mat(snow?[1.25,1.27,1.3]:wet?[0.6,0.6,0.63]:[1,1,1],null,sp_,sh_,1,10);else mat(snow?[0.42,0.43,0.45]:wet?[0.045,0.047,0.052]:[0.068,0.07,0.076],null,sp_,sh_,1,2);draw(SCN.junP);
+     mat([0.78,0.78,0.76],null,0.05,10,1,2);if(SCN.junK)draw(SCN.junK);mat([0.7,0.7,0.68],null,0.05,10,1,2);if(SCN.junW)draw(SCN.junW)}
    if(SCN.xoPave){if(KITOLD&&KIT.m)mat(wet?[0.2,0.2,0.21]:snow?[0.5,0.5,0.52]:[0.36,0.36,0.35],null,sp_,sh_,1,2);else if(RKon)mat(snow?[1.25,1.27,1.3]:wet?[0.6,0.6,0.63]:[1,1,1],null,sp_,sh_,1,10);else mat(snow?[0.42,0.43,0.45]:wet?[0.045,0.047,0.052]:[0.068,0.07,0.076],null,sp_,sh_,1,2);draw(SCN.xoPave)}
    gl.polygonOffset(3,3);if(!snow&&!(KITOLD&&KIT.m))for(const [c,m] of SCN.wear){if(RKon&&c!=="d")continue;mat(c==="d"?(wet?[0.12,0.09,0.06]:[0.23,0.19,0.14]):wet?[0.035,0.037,0.042]:c==="c"?[0.088,0.088,0.092]:[0.056,0.058,0.064],null,c==="d"?0.05:wet?2:0.5,c==="d"?8:wet?110:40,1,c==="d"?1:2);draw(m)}
    if(!snow){mat([0.05,0.05,0.055],null,0.3,30,1,2);draw(SCN.patchD);mat([0.15,0.15,0.155],null,0.15,20,1,2);draw(SCN.patchL);mat([0.03,0.03,0.032],null,0.6,50);draw(SCN.crack);
@@ -19879,7 +19924,7 @@ function hud(dt){
   const me_=$("msg");me_.textContent=msg;me_.className=mc;
   $("brake").classList.toggle("pulse",car.abs&&inp.brk>0.05);
   const ts=$("tsr");$("tss").hidden=!(sys.stopSign&&sys.stopSign.d<60);ts.hidden=!sys.limit;if(sys.limit){ts.lastChild.textContent=sys.limit;ts.classList.toggle("over",!!sys.over)}
-  const sb=$("scrBtn");sb.hidden=st.cam!==1;sb.textContent=SCR.focus?"Back to the road":"Screen";document.body.classList.toggle("focus",(SCR.focus||SCR.focusClu)&&st.cam===1);
+  const sb=$("scrBtn");sb.hidden=st.cam!==1;sb.textContent=SCR.focus?"Back to the road":"Screen";document.body.classList.toggle("focus",!!((SCR.focus||SCR.focusClu)&&st.cam===1));   /* v38: always a real true/false (undefined flips the class every frame: the HUD, toasts and mini map flickered) */
   $("dAcc").classList.toggle("on",st.acc);$("dPilot").classList.toggle("on",st.pilot);{const ps_=TRIMS[st.trim].pilotShort||"PILOT";if($("dPilot").textContent!==ps_)$("dPilot").textContent=ps_}
   $("cluster").style.borderColor=st.pilot?(sys.pilotState==="active"||sys.pilotState==="changing"?"rgba(85,214,140,.8)":"rgba(114,182,255,.7)"):""; $("dSigL").classList.toggle("on",st.signal===-1||st.hazard); $("dSigR").classList.toggle("on",st.signal===1||st.hazard);
   $("dCam").textContent=["CAM","IN","TOP","WHL"][st.cam];
