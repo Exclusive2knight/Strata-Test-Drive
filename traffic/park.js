@@ -84,7 +84,7 @@ function gpkFree(t,me){if(GPK.res.has(gpkKey(t))&&!(me&&me.gpk.key===gpkKey(t)))
 function gpkPick(c,minK){const d=c.mind,R=()=>d?d.R():Math.random();const L=garStalls().filter(t=>t.k>=(minK||0)&&gpkFree(t,c));if(!L.length)return null;
   const sc=t=>t.k*10+(24-Math.abs(t.x-GAR.cx))*0.12+R()*5;L.sort((a,b)=>sc(a)-sc(b));
   for(const t of L.slice(0,18)){const P=gpkPlanIn(c,t);if(!P||!gpkRouteOut(t.bay,t.k,t.x-GAR.cx))continue;const U=gpkRouteIn(t,P.start);if(!U)continue;if(!c.gpk.seg||c.gpk.ph==="ticket")return t;
-    const W=gpkW(U);let best=9,bi=0;for(let i=0;i<W.length;i++){const dd=Math.hypot(W[i][0]-c.wx,W[i][1]-c.wy);if(dd<best){best=dd;bi=i}}if(best<1.6&&Math.abs(gpkZ(W[bi][0],W[bi][1],c.wz+0.5)-c.wz)<1)return t}
+    const W=gpkW(U);let best=9;for(let i=0;i<W.length;i++){const dd=Math.hypot(W[i][0]-c.wx,W[i][1]-c.wy);if(dd<best&&gpkPathZ(W,i,c))best=dd}if(best<1.6)return t}   /* (only a way that passes where the car is, on its floor) */
   return null}
 function gpkSet(c,ph,P,rev){const G=c.gpk;G.ph=ph;G.seg={path:P,rev:!!rev,i:0,tight:ph==="in"};G.i=0;G.wait=0;G.look=ph==="back"?1+((c.mind&&c.mind.R())||Math.random())*1.4:0}
 function gpkLog(c,msg){try{if(c.mind)tmLog(c.mind,msg)}catch(e){}}
@@ -106,6 +106,18 @@ function gpkClear(c,rev,ign){if(c.gpk.ph==="in"&&c.gpk.stall&&Math.hypot(c.gpk.s
   const S=[[c.wx,c.wy,c.wh]];{let acc=0;const fx=Math.cos(c.wh)*(rev?-1:1),fy=Math.sin(c.wh)*(rev?-1:1);for(let k=Math.max(1,(sg.i||0)+1);k<P.length&&acc<look;k++){const a=P[k-1],b=P[k],d=Math.hypot(b[0]-a[0],b[1]-a[1]);if(d<0.02)continue;
       const h=b.length>2?b[2]:Math.atan2(b[1]-a[1],b[0]-a[0])+(rev?Math.PI:0),n=Math.max(1,Math.ceil(d/0.8));for(let q=1;q<=n&&acc<look;q++){const x=a[0]+(b[0]-a[0])*q/n,y=a[1]+(b[1]-a[1])*q/n;if((x-c.wx)*fx+(y-c.wy)*fy<0.2)continue;acc+=d/n;S.push([x,y,h])}}}
   if(!G.zone&&/^(queue|up|down|out)$/.test(G.ph)){const z=gpkRegAhead(c,S,rev);if(z){G.bw='reg'+(z.gpk.reg?'['+z.gpk.reg.x0.toFixed(0)+','+z.gpk.reg.x1.toFixed(0)+']':'')+' S'+S.length;return z}}G.bw='body S'+S.length;
+  /* coming out of a crossover onto an aisle: wait inside the crossover, fully clear of the aisle, until the mouth of the aisle is free
+     (nobody coming along it near the crossover, nobody shuffling into a space right there) */
+  {const L0=gpkL(c.wx,c.wy),hz=Math.sin(c.wh)*(rev?-1:1);if(!G.mv&&Math.abs(L0[0])<3.5&&Math.abs(L0[1])<7.6&&Math.abs(L0[1])>2.5&&Math.sign(hz)===Math.sign(L0[1])&&Math.abs(hz)>0.5){const sd=Math.sign(L0[1]);
+    for(const o of cars){if(o===c||!o.gpk||o.gpk.ph==="park"||o.gpk.ph==="leave0"||Math.abs((o.wz||0)-(c.wz||0))>1.6)continue;const Lo=gpkL(o.wx,o.wy);if(Math.abs(Lo[1]-12*sd)<3.2&&Math.abs(Lo[0])<9)return o;
+      const R=o.gpk.reg;if(R&&R.bay===sd&&Math.abs(R.z-(c.wz||0))<1.7&&R.x0<6&&R.x1>-6&&(o.gpk.zone||o.gpk.ph==="up"))return o}}}
+  /* single file: in the one-way aisles and the exit lane, anyone ahead of us (along the way we face) within a car length and a bit stops us,
+     whatever the path samples say (two cars merging onto the same lane used to see each other only when it was too late); side by side, the
+     one with the higher number waits, so two can never wait for each other */
+  if(!G.mv&&/^(queue|up|down|out|pay)$/.test(G.ph)){const fx=Math.cos(c.wh)*(rev?-1:1),fy=Math.sin(c.wh)*(rev?-1:1),reach=(c.len||CARLEN)+1.4+Math.abs(c.v)*0.9;
+    for(const o of cars){if(o===c||!o.gpk||o.gpk.ph==="park"||o.gpk.ph==="leave0"||o.wx===undefined||Math.abs((o.wz||0)-(c.wz||0))>1.6)continue;const dx=o.wx-c.wx,dy=o.wy-c.wy,lon=dx*fx+dy*fy,lat=Math.abs(-dx*fy+dy*fx);
+      const og=o.gpk,parking=og.zone||og.claimWait>0||og.ph==="up"&&og.seg&&og.seg.path&&og.seg.i>og.seg.path.length-14;   /* someone about to shuffle into a space: leave them room to back up */
+      if(lat<2.1&&(lon>0.4&&lon<reach+(parking?5.5:0)||Math.abs(lon)<=0.4&&c.id>o.id))return o}}
   const box=function(x,y,h,l,w,z){{if(Math.abs((z||0)-(c.wz||0))>1.6)return false;if((x-c.wx)**2+(y-c.wy)**2>(look+8)**2)return false;
     const st_=arguments[6];for(let q=S.length>1?1:0;q<S.length;q++){const p=S[q];if(st_?obbSAT(p[0],p[1],p[2],half,hw-0.04,x,y,h,l,w):obbSAT(p[0],p[1],p[2],half+0.08,hw,x,y,h,l,w))return true}return false}};
   for(const o of cars){if(o===c||o===ign||o.wx===undefined||o.kind==="cone")continue;if(G.mv&&o.gpk&&(o.gpk.ph==="park"||o.gpk.ph==="leave0"))continue;if(box(o.wx,o.wy,o.wh,(o.len||CARLEN)/2,(o.wid||1.9)/2,o.wz,!!(o.gpk&&(o.gpk.ph==="park"||o.gpk.ph==="leave0"))))return o}
@@ -153,7 +165,7 @@ function gpkStep(c,dt){const G=c.gpk;G.t+=dt;const S=GPK.stats;if(G.noBack>0){G.
     /* right up against someone shuffling in or out: back up a few metres to give them room */
     /* head to head with another car in the aisle: the one going down (or, both the same, the later one) backs up for the other */
     const mutual=blk.gpk&&blk.gpk.blkBy&&String(blk.gpk.blkBy).startsWith(c.id+":")&&!blk.gpk.zone&&(blk.gpk.noBack&&!G.noBack||!blk.gpk.noBack&&(G.ph==="down"&&blk.gpk.ph!=="down"||G.ph===blk.gpk.ph&&c.id>blk.id||G.ph==="out"));   /* (if they could not back up, we do) */
-    if((blk.gpk&&(blk.gpk.zone||blk.gpk.claimWait>2)||mutual)&&!G.zone&&!G.seg.rev&&G.wait>2&&!G.resume&&!G.noBack&&/^(up|down|queue|out)$/.test(G.ph)){const ux=Math.cos(c.wh),uy=Math.sin(c.wh),B=[[c.wx,c.wy]];for(let d=0.5;d<=(mutual?8:4);d+=0.5)B.push([c.wx-ux*d,c.wy-uy*d]);
+    if(false&&(blk.gpk&&(blk.gpk.zone||blk.gpk.claimWait>2)||mutual)&&!G.zone&&!G.seg.rev&&G.wait>2&&!G.resume&&!G.noBack&&/^(up|down|queue|out)$/.test(G.ph)){   /* (v38: no backing up in the one-way aisles: it only ever backed into the next car) */const ux=Math.cos(c.wh),uy=Math.sin(c.wh),B=[[c.wx,c.wy]];for(let d=0.5;d<=(mutual?8:4);d+=0.5)B.push([c.wx-ux*d,c.wy-uy*d]);
       G.resume={ph:G.ph,path:G.seg.path,i:G.seg.i||0};G.seg={path:B,rev:true,i:0};G.wait=0;G.look=0.5;gpkLog(c,"backed up to give a car room");return}
     /* backing up for someone and there's a car behind: stop backing and wait where we are */
     if(G.resume&&G.seg.rev&&G.wait>1.5){const R_=G.resume;G.resume=null;let i0=R_.i,b=1e9;for(let i=Math.max(0,R_.i-40);i<Math.min(R_.path.length,R_.i+12);i++){const d=Math.hypot(R_.path[i][0]-c.wx,R_.path[i][1]-c.wy);if(d<b){b=d;i0=i}}   /* (near where we left it: the thread passes the same spot on other floors) */gpkSet(c,R_.ph,R_.path.slice(i0));G.noBack=1;return}
@@ -162,7 +174,7 @@ function gpkStep(c,dt){const G=c.gpk;G.t+=dt;const S=GPK.stats;if(G.noBack>0){G.
   if(G.mv&&(G.ph==="in"||G.ph==="back")){if(!gpkReplay(c,dt))return;G.mv=null;
     if(G.ph==="in"){G.ph="park";G.zone=0;G.reg=null;c.v=0;S.park++;if(G.crooked)S.crooked++;c.sig=0;gpkLog(c,`parked on level ${G.stall.k+1}`);try{tmEvent(c,"parked")}catch(e){}}
     else{G.zone=0;G.reg=null;gpkRelease(c);gpkSet(c,"down",G.down);G.look=0.6}return}
-  const done=lotFollow(c,G.seg,dt);G.i=G.seg.i||0;gpkPose(c);c.spin+=(G.seg.rev?-1:1)*(c.v||0)/0.36*dt;
+  let done=lotFollow(c,G.seg,dt);if(done&&(G.seg.i||0)<G.seg.path.length-4){done=false}   /* (the path passes over its own end point a floor higher or lower: only the real end counts) */G.i=G.seg.i||0;gpkPose(c);c.spin+=(G.seg.rev?-1:1)*(c.v||0)/0.36*dt;
   if(G.ph==="up"&&G.stall){const L=gpkL(c.wx,c.wy),Xt=G.stall.x-GAR.cx;c.sig=Math.abs(L[0]-Xt)<14&&Math.abs(L[1]-12*G.stall.bay)<3?(G.stall.uy*G.stall.bay>0?1:-1)*(G.dir>0?1:-1)*(G.stall.bay>0?-1:1):0}
   if(!done)return;c.v=Math.min(c.v,0.8);
   if(G.resume&&G.seg.rev){const R_=G.resume;G.resume=null;let i0=R_.i,b=1e9;for(let i=Math.max(0,R_.i-40);i<Math.min(R_.path.length,R_.i+12);i++){const d=Math.hypot(R_.path[i][0]-c.wx,R_.path[i][1]-c.wy);if(d<b){b=d;i0=i}}   /* (near where we left it: the thread passes the same spot on other floors) */gpkSet(c,R_.ph,R_.path.slice(i0));G.look=3;return}
@@ -170,9 +182,11 @@ function gpkStep(c,dt){const G=c.gpk;G.t+=dt;const S=GPK.stats;if(G.noBack>0){G.
   else if(G.ph==="up"){if(!gpkZoneFree(c)){c.v=0;G.claimWait=(G.claimWait||0)+dt;G.seg.i=Math.max(0,G.seg.path.length-2);return}G.claimWait=0;G.zone=1;gpkTurnIn(c)}
   else if(G.ph==="down"){G.ph="pay";c.v=0;G.wait=2+Math.random()*3}
   else if(G.ph==="out"){gpkToRoad(c)}}
+/* is path point i on the floor the car is on? (walk the path's heights from the street, so a point on another floor at the same spot is told apart) */
+function gpkPathZ(W,i,c){if(!W._z){let z=0;W._z=W.map(p=>z=gpkZ(p[0],p[1],z+0.6))}return Math.abs(W._z[i]-(c.wz||0))<1.2}
 function gpkTake(c,t,keepPath,P){const G=c.gpk;if(G.key)GPK.res.delete(G.key);G.stall=t;G.key=gpkKey(t);GPK.res.add(G.key);
   if(!P)P=gpkPlanIn(c,t);G.plan=P;G.reg=P?gpkRegion(t,P):null;G.dir=gpkFlow(t.bay,t.k);const U=P?gpkRouteIn(t,P.start):null;if(!U){G.ph="gone";G.why="no route";return}const W=gpkW(U);
-  let i0=0;{let best=1e9;for(let i=0;i<W.length;i++){const d=Math.hypot(W[i][0]-c.wx,W[i][1]-c.wy);if(d<best&&(d>6||Math.abs(gpkZ(W[i][0],W[i][1],(c.wz||0)+0.5)-(c.wz||0))<1.2)){best=d;i0=i}}}   /* the nearest point on this floor */
+  let i0=0;{let best=1e9;const zr=(c.wz||0)+0.5;for(let i=0;i<W.length;i++){const d=Math.hypot(W[i][0]-c.wx,W[i][1]-c.wy);if(d<best&&gpkPathZ(W,i,c)){best=d;i0=i}}}   /* the nearest point on this floor */
   gpkSet(c,"up",W.slice(i0))}
 /* the way into this space for this car, arriving along the aisle the way the thread runs (null: it can't be done from here) */
 function gpkPlanIn(c,t){const dir=gpkFlow(t.bay,t.k),G=c.gpk;const P=gpkPlan(t,c.len||CARLEN,c.wid||1.9,G.latErr,G.crooked,dir>0?0:Math.PI,c);return P?gpkRev(P):null}

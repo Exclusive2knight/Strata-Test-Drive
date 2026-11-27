@@ -32,7 +32,8 @@ def follow(P, base, side=0.0, flat=(0, 0), dw=0.0, tag="", one=False):
     for i in range(1, len(P) - 1):
         if D[i] - D[i - 1] < 0.05 or D[i + 1] - D[i] < 0.05: continue
         turn += abs((head(P[i], P[i + 1]) - head(P[i - 1], P[i]) + 540) % 360 - 180)
-    n = 1 if one else max(1, round(L / (SEG if hilly else 32.0)), min(int(L / 2.5), math.ceil(turn / 4.0))); pts = [at(L * k / n) for k in range(n + 1)]      # short pieces only where the road climbs or turns
+    curvy = base.startswith(("ramp", "svc"))   # v38: ramps and service drives: shorter pieces, at most 1.5 degrees of turn each (the 4-degree joints showed as kinks and a stepped verge)
+    n = 1 if one else max(1, round(L / (SEG if hilly or curvy else 32.0)), min(int(L / 2.5), math.ceil(turn / (1.5 if curvy else 2.5)))); pts = [at(L * k / n) for k in range(n + 1)]      # short pieces only where the road climbs or turns
     tan = [head(at(L * k / n - 2.0), at(L * k / n + 2.0)) if 0 < k < n else head(at(0), at(min(L, 3.0))) if k == 0 else head(at(max(0, L - 3.0)), at(L)) for k in range(n + 1)]
     sh = lambda p, h: (p[0] + side * math.cos(math.radians(h)), p[1] - side * math.sin(math.radians(h)), p[2])
     for k in range(1, len(pts)):
