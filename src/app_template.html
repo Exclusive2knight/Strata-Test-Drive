@@ -9499,7 +9499,7 @@ function sigCancel(){if(!st.signal||st.hazard||!sys.userSig||st.sigAutoOff){sys.
   if(sys.sigPk>0.3&&s<0.08&&Math.abs(car.vx)>0.5){st.signal=0;sys.userSig=false;sys.sigPk=0;try{beep(900,0.03,"square",0.05)}catch(e){}}}
 // the J card on clusters that don't have their own spot for it: a panel in the middle, in the brand's colour ("Standard" hides it)
 function cluNative(){const b=brandS();if(!cluAnalog()&&(isAudiNew()||(isFordDE()&&b==="Ford")||isHondaG()))return true;return isTesla()||(b==="Toyota"&&modelOf()==="toy_rav4_26")||b==="Lucid"||/^Mercedes/.test(b)||(b==="BMW"&&isPano())||(isVolvo()&&volKind()!=="ex90")}
-function cluSlot(){if(cluNative()||st.power!==true)return;const V=cluView();if(V[0]==="off"||(V[0]==="map"&&!cluAnalog()))return;const g=CLU.g,W=CLU.W,H=CLU.H,TH=scrTheme&&scrTheme()||{},acc=TH.acc||"#5fd0ff",wide=V[0]==="map",x=W*(wide?0.27:0.34),y=H*0.14,w=W*(wide?0.46:0.32),h=H*0.7;
+function cluSlot(){if(cluNative()||st.power!==true||cadUlt())return;const V=cluView();if(V[0]==="off"||(V[0]==="map"&&!cluAnalog()))return;const g=CLU.g,W=CLU.W,H=CLU.H,TH=scrTheme&&scrTheme()||{},acc=TH.acc||"#5fd0ff",wide=V[0]==="map",x=W*(wide?0.27:0.34),y=H*0.14,w=W*(wide?0.46:0.32),h=H*0.7;
   g.save();g.fillStyle="#06090d";rr2(g,x,y,w,h,12);g.fill();g.strokeStyle=acc+"88";g.lineWidth=1.2;rr2(g,x,y,w,h,12);g.stroke();
   cluCard(g,x+2,y+2,w-4,h-4,{ink:"#eef2f6",sub:"#8e9aa6",acc,line:"#2a323c",card:"#151b22",good:"#7fe0b0",warn:"#ff5a3a",F:CF2});
   g.fillStyle="#eef2f6";g.font=CF2(12,600);g.textAlign="right";g.textBaseline="middle";g.fillText(`${Math.round(spdUnit(Math.abs(car.vx)))} ${st.units==="mph"?"mph":"km/h"}`,x+w-10,y+14);g.restore()}
