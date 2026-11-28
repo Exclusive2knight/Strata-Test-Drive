@@ -3075,7 +3075,7 @@ function eProj(e,px,py){let best=null,bd=Infinity;const S=e.S,n=S.length;
   return best||{u:0,t:0,h:S[0]?S[0].h||0:0,k:0,d:1e9}}   // a broken (NaN) position never makes callers crash on a null
 // lanes: compatible "off" numbering per carriageway, lane k centred at k*LANE, k = lo..hi (3 lanes: -1 0 1, 2 lanes: 0 1, 1 lane: 0)
 const loOf=n=>-Math.floor((n-1)/2);
-const mAt=(e,u)=>e.tp?e.m*smooth01(e.tp[0],e.tp[1],u):e.m;     // median width here (tapers open after a junction)
+const mAt=(e,u)=>e.tp?e.m*((e.tp[2]||0)+(1-(e.tp[2]||0))*smooth01(e.tp[0],e.tp[1],u)):e.m;   /* (tp[2]: the median it keeps at the narrow end, as a share of the full one) */     // median width here (tapers open after a junction)
 const shiftOf=(e,u=e.L/2)=>-(mAt(e,u)/2+(e.n-0.5)*LANE)-loOf(e.n)*LANE;      // travel-frame sideways position of off = 0
 const tpSlope=(e,u)=>e.tp?(shiftOf(e,u+0.5)-shiftOf(e,u-0.5)):0;     // lanes drifting sideways where the median tapers
 function fpt(e,dir,s,off){const u=dir>0?s:e.L-s,t=dir*(off+shiftOf(e,u)),p=ePt(e,u,t);if(dir<0)p[2]+=Math.PI;if(e.tp)p[2]+=Math.atan(dir*tpSlope(e,u));return p}
@@ -3297,7 +3297,7 @@ function buildNet2(){
   mkR("blvd","Main St",[[-1525,0],...DX.slice(1).flatMap((x,i)=>i<DX.length-2?[[x,0],[(x+DX[i+2])/2,0]]:[[x,0]])],{lim:35});
   DX.forEach((x,i)=>mkR(x===-1000||x===-850?"ave":"st",DXN[i],DY.map(y=>[x,y])));
   // Main St west to I-61 (it becomes Grand River Ave), east over the Clearwater River (it becomes Commerce Pkwy to Fairhaven)
-  mkR("blvd","Main St",[[-1890,0],[-1675,0]],{lim:35,tp:[5,150]});mkR("blvd","Main St",[[-1675,0],[-1600,0]],{lim:35});   /* v38.1: the boulevard starts here: the median opens over 150 m from Grand River Ave */
+  mkR("blvd","Main St",[[-1890,0],[-1675,0]],{lim:35,tp:[5,150,0.3]});mkR("blvd","Main St",[[-1675,0],[-1600,0]],{lim:35});   /* v38.1: the boulevard starts here: the median opens over 150 m from Grand River Ave */
   mkR("art","Grand River Ave",[[-1890,0],[-2150,0],[-2450,0],[-2710,0]]);
   /* v349: a six-lane boulevard past the Somerset Collection mall. v350: at each end the median closes up over 150 m (built from the outer end
      inward so the taper sits at the start of the edge) and the outer lanes drop over a proper taper, so the two-lane road widens into it smoothly */
@@ -3310,7 +3310,7 @@ function buildNet2(){
   mkR("art","Lafayette Ave",[[-400,300],[100,300]],{lim:35});
   for(const y of [-300,0,300])N(100,y,{ctrl:"signal"});
   mkR("blvd","Commerce Pkwy",[[100,0],[300,0],[500,0],[750,0],[1000,0],[1200,0],[1700,0]],{lim:45});
-  mkR("blvd","Commerce Pkwy",[[2300,0],[1700,0]],{lim:45,tp:[5,150]});
+  mkR("blvd","Commerce Pkwy",[[2300,0],[1700,0]],{lim:45,tp:[30,180,0.3]});
   for(const x of [500,1000,1700])N(x,0,{ctrl:"signal"});
   // Woodward Ave: south to I-38 and on into the farmland as County Rd 15; north to Kestrel Rd
   mkR("art","Woodward Ave",[[-1000,-450],[-1000,-1090],[-1000,-1410],[-1000,-1590],[-1000,-1910]],{lim:45});
@@ -13337,6 +13337,7 @@ function junPolyInto(J,n){const c=[n.x,n.y],z=(n.z||0)+0.03,L=n.legs.map(l=>{con
       if(t>0&&s2>0){const X=[P[0]+d1[0]*t,P[1]+d1[1]*t];pts=[];for(let k=1;k<12;k++){const f=k/12,g=1-f;pts.push([g*g*P[0]+2*g*f*X[0]+f*f*Q[0],g*g*P[1]+2*g*f*X[1]+f*f*Q[1]])}}}
     if(!pts&&gap<Math.PI+0.3){pts=[];for(let k=1;k<6;k++)pts.push([P[0]+(Q[0]-P[0])*k/6,P[1]+(Q[1]-P[1])*k/6])}   /* a straight kerb across the side of a T */
     const cv=[P,...(pts||[]),Q];for(let k=1;k<cv.length-1;k++)poly.push(cv[k]);if(pts&&gap<Math.PI-0.2)corners.push({cv,walk:Math.max(A.walk,B.walk)})}   /* kerbs round the real corners (the roads' own kerbs carry on along the straight sides) */
+  n.jpoly=poly;   /* (kept for the kerb tests) */
   /* the paved surface: a fan from the middle */
   {const B=J.p,k0=B.P.length/3;B.P.push(c[0],z,-c[1]);B.N.push(0,1,0);if(B.C)B.C.push(c[0],c[1]/12,(B.jk||4)*10000+200);
     for(const q of poly){B.P.push(q[0],z,-q[1]);B.N.push(0,1,0);if(B.C)B.C.push(q[0],q[1]/12,(B.jk||4)*10000+200)}
