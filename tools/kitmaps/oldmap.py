@@ -306,6 +306,33 @@ for e in NET["E"]:
             if end == 0: e["u0"] = max(e.get("u0", 0), RRCUT[(e["i"], 0)])
             else: e["u1"] = min(e.get("u1", e["L"]), e["L"] - RRCUT[(e["i"], 1)])
 
+# v38.1: a boulevard whose median opens or closes (tp): the kit has no taper piece, so where the median is wider than 5.5 m each carriageway
+# is a one-way three-lane piece following its own lanes out from the median, and where it is narrower the six-lane divided road with the
+# narrow planted median (city6d). The game keeps a median of tp[2] x the full width at the narrow end, so the two meet without a jog
+def taper_blvd(e, P, FL):
+    tp = e["tp"]; mn = tp[2] if len(tp) > 2 else 0.0; L = e["L"]
+    sm = lambda a, b, x: (lambda t: t * t * (3 - 2 * t))(min(1, max(0, (x - a) / (b - a))))
+    mAt = lambda u: e["m"] * (mn + (1 - mn) * sm(tp[0], tp[1], u))
+    D = [0.0]
+    for i in range(1, len(P)): D.append(D[-1] + math.hypot(P[i][0] - P[i - 1][0], P[i][1] - P[i - 1][1]))
+    k = (e["P"] and sum(math.hypot(e["P"][i][0] - e["P"][i - 1][0], e["P"][i][1] - e["P"][i - 1][1]) for i in range(1, len(e["P"])))) / max(1e-9, L)
+    full = e["P"][0]; d0 = math.hypot(P[0][0] - full[0], P[0][1] - full[1])   # how far along the edge the visible stretch starts
+    U = [(d0 + d) / max(1e-9, k) for d in D]
+    def off(i, t):
+        a = P[max(0, i - 1)]; b = P[min(len(P) - 1, i + 1)]; h = math.atan2(b[1] - a[1], b[0] - a[0])
+        return [P[i][0] - math.sin(h) * t, P[i][1] + math.cos(h) * t, P[i][2]]
+    runs, cur, w0 = [], [], None
+    for i in range(len(P)):
+        wide = mAt(U[i]) > 5.5
+        if w0 is not None and wide != w0: runs.append((w0, cur)); cur = [cur[-1]]
+        cur.append(i); w0 = wide
+    if len(cur) > 1: runs.append((w0, cur))
+    for wide, I in runs:
+        if not wide: follow([P[i] for i in I], "city6d_st96"); continue
+        R = [off(i, -(mAt(U[i]) / 2 + 5.4)) for i in I]           # this way: right of the centre line, beyond the median
+        Lf = [off(i, mAt(U[i]) / 2 + 5.4) for i in I][::-1]       # and the other way, followed in its own direction
+        follow(R, "svc3_st96", tag="!l"); follow(Lf, "svc3_st96", tag="!l")   # the median side keeps its kerb, not the service drive's sidewalk
+
 for e in NET["E"]:
     base = BASE.get(e["t"])
     if not base: continue
@@ -344,5 +371,7 @@ for e in NET["E"]:
     elif e["t"] == "xway":
         follow(P, base, side=1.85, flat=FL)              # this direction: lanes from 11 m right of the centre line
         follow(P[::-1], base, side=1.85, flat=FL[::-1])  # and the other way
+    elif e["t"] == "blvd" and e.get("tp"):
+        taper_blvd(e, P, FL)
     else:
         follow(P, base, flat=FL, dw=(e["hw"] - EDGE[base]) if base in EDGE else 0.0)
