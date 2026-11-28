@@ -3731,7 +3731,7 @@ function pathAt(P,d){const c=P.cum;if(P.L<1e-3)return [P.pts[0][0],P.pts[0][1],P
 // ---- height: steep hills (Lake Rd and Oak St climb over two of them), the Rouge River and its five bridges. Roads stay level across; junctions stay flat
 const HILLS=[[-930,-720,26,140],[-80,640,24,130],[-2050,700,28,200],[2000,-850,22,180],[-400,-1450,18,160],
   [1500,-1560,24,170],[-1550,-1600,26,160],[-700,1380,20,140],[2230,650,20,150],[1700,1430,16,140],[-2280,1150,22,170],[2300,-1250,18,150]];
-function hillZ(x,y){if(KITW)return 0;let z=0;for(const h of (W2?HILLS2:HILLS)){const dx=x-h[0],dy=y-h[1],d2=dx*dx+dy*dy,s2=h[3]*h[3];if(d2<12*s2)z+=h[2]*Math.exp(-d2/s2)}if(W2){const w=aptW(x,y);if(w>0)z+=(APT.z-z)*w;const wm=mallW(x,y);if(wm>0)z+=(MALL.z-z)*wm}return z}
+function hillZ(x,y){if(KITW)return 0;let z=0;for(const h of (W2?HILLS2:HILLS)){const dx=x-h[0],dy=y-h[1],d2=dx*dx+dy*dy,s2=h[3]*h[3];if(d2<12*s2)z+=h[2]*Math.exp(-d2/s2)}if(W2){const w=aptW(x,y);if(w>0)z+=(APT.z-z)*w;const wm=mallW(x,y);if(wm>0)z+=(MALL.z-z)*wm;const wt=tcW(x,y);if(wt>0)z+=(-0.1-z)*wt}return z}
 const RIVER={x:150,w:44,water:-1.5};const riverX=y=>RIVER.x+25*Math.sin(y/400),riverD=W2?((x,y)=>w2WaterD(x,y)+RIVER.w/2):((x,y)=>Math.abs(x-riverX(y)));   // in the new world: distance from the nearest water, offset so that < RIVER.w/2 is in the water
 function riverCut(x,y){const d=riverD(x,y);return d<RIVER.w/2+14?-3.4*(1-smooth01(RIVER.w/2-6,RIVER.w/2+14,d)):0}
 const BRIDGE_H=5.2,BRIDGE_RAMP=125,BRIDGE_HALF=RIVER.w/2+8;
@@ -4105,25 +4105,38 @@ function dirtH(e,u,t){const a=Math.abs(t),rut=-0.035*(Math.exp(-Math.pow((a-1.0)
 const TC={x0:-2110,x1:-1790,y0:-1350,y1:-560,dw:[-2147,-2110,-958,-942]};
 const TCL=[-2080,-2040,-2000,-1960,-1813];   // lane 4 (east side) is the off-road course   // lane centres, 7 m wide, driven north to south
 const TCS=[   // [lane, y0, y1, name, what it tests]
+  // lane 0, ride: the surfaces you feel through the seat
   [0,-1280,-1200,"Whoops","9 cm sine waves every 8 m: body control and rebound damping"],[0,-1180,-1100,"Washboard","2 cm ripples every 0.6 m: high-frequency harshness"],
   [0,-1080,-1000,"Belgian blocks","Cobbles: constant shake through the seat and wheel"],[0,-980,-900,"Pothole field","8-15 cm potholes: impacts and wheel control"],
   [0,-880,-800,"Frost heaves","8 cm heaves over 5 m: float and pitch"],[0,-780,-700,"Expansion joints","Sharp 1 cm steps every 1.2 m: impact harshness"],
+  [0,-680,-590,"Single-wheel bumps","8 cm bumps under one side at a time: does the other side feel it? (solid axles do)"],
+  // lane 1, wheel travel and impacts
   [1,-1280,-1180,"Articulation","22 cm humps left and right, staggered: axle twist and wheel travel"],[1,-1160,-1060,"Speed humps","7.5 cm hump, 10 cm table, 15 cm speed bump: take them at 15 mph"],
   [1,-1040,-960,"Curb drop","A 15 cm step up and back down on the right: one-wheel impact"],[1,-940,-860,"Rough road","Random 5 cm bumps everywhere: ride comfort"],
-  [1,-840,-700,"Gravel","Loose gravel with ruts and washboard: traction and ABS"],
-  [2,-1300,-1180,"10% hill","5 m up and down at 10%: hill start and hill hold"],[2,-1160,-1060,"20% hill","4 m up and down at 20%"],[2,-1040,-940,"30% ramp","3 m at 30%: off-road climb, try Downhill Assist"],[2,-920,-820,"40% hill","12 m tall at 40%: the big one. AWD and a run-up help; try hill start assist and Downhill Assist on the way down"],
-  [3,-1300,-1150,"Brake strip","Brake hard from 60 mph between the cones"],
+  [1,-840,-740,"Gravel","Loose gravel with ruts and washboard: traction and ABS"],[1,-720,-590,"Twist ditches","25 cm diagonal ditches: each one lifts opposite corners. Watch the wheels"],
+  // lane 2, hill grades: the steepness people quote, each with real vertical curves at the top and bottom
+  [2,-1330,-1210,"5% grade","2.5 m up at 5%: a steep city street. Hill start"],[2,-1195,-1095,"10% grade","4 m up at 10%: a steep mountain road. Hill hold"],[2,-1080,-1005,"15% grade","4.5 m at 15%: a steep driveway"],
+  [2,-990,-920,"20% grade","5 m at 20%: about the steepest street in San Francisco"],[2,-905,-850,"30% grade","6 m at 30%: off-road climb, watch the approach angle"],
+  [2,-835,-770,"40% grade","8 m at 40%: AWD and a run-up help; try Downhill Assist on the way down"],[2,-755,-715,"60% grade","6 m at 60% (31°): the off-road test hill. Low range, crawl"],
+  // lane 3, braking and body roll
+  [3,-1300,-1150,"Brake strip","Brake hard from 60 mph between the cones"],[3,-1130,-1060,"Side slope","15% then 25% side tilt: body roll and how far the springs lean"],
+  [3,-910,-800,"Pitch bumps","Long 10 cm swells every 12 m: dive, squat and pitch control"],[3,-780,-690,"Chatter bumps","4 cm bumps every 1.5 m at random: damper speed and grip over bumps"],
   // off-road course: try each with the matching terrain mode
   [4,-1330,-1240,"Rock crawl","Boulders up to 50 cm: Rock mode, crawl slowly and pick your line"],[4,-1220,-1140,"Mud pit","Deep, sticky mud: Mud mode and keep your momentum"],
   [4,-1120,-1040,"Deep snow","Deep snow drags at the tyres: Snow mode and gentle throttle"],[4,-1020,-950,"Sand","Soft sand dunes: Sand mode, don't stop halfway"],
   [4,-930,-850,"Moguls","40 cm bumps left and right: wheels lift, traction control and lockers earn their keep"]];
 const TC_SKID={x:-1880,y:-1000,R:40};const TC_SIGNS=[];
 // the new world: the same course, moved to the flat farmland between County Rd 1 and County Rd 3, south of I-38 (in off County Rd 1)
-if(W2){const dx=-2190,dy=-995;Object.assign(TC,{x0:TC.x0+dx,x1:TC.x1+dx,y0:TC.y0+dy,y1:TC.y1+dy,dw:[-4396,TC.x0+dx,-950+dy-8,-950+dy+8]});for(let i=0;i<TCL.length;i++)TCL[i]+=dx;
+// v40: it's back, on flat farmland east of County Rd 9 (north-east of Rosedale), with a driveway in from the county road
+if(W2){const dx=6350,dy=2555;Object.assign(TC,{x0:TC.x0+dx,x1:TC.x1+dx,y0:TC.y0+dy,y1:TC.y1+dy,dw:[3984,TC.x0+dx,1434,1450]});for(let i=0;i<TCL.length;i++)TCL[i]+=dx;
   for(const S of TCS){S[1]+=dy;S[2]+=dy}TC_SKID.x+=dx;TC_SKID.y+=dy}
 // the proving ground is closed for now (the owner has new plans for it): the whole course is moved far outside the world, so the hills there are plain ground again
-const TC_OFF=W2,SL_FW=true;let RAIL_M=0;if(TC_OFF){const k=2e5;TC.x0+=k;TC.x1+=k;TC.dw=[TC.dw[0]+k,TC.dw[1]+k,TC.dw[2],TC.dw[3]];for(let i=0;i<TCL.length;i++)TCL[i]+=k;TC_SKID.x+=k}
+const TC_OFF=false,SL_FW=true;let RAIL_M=0;if(TC_OFF){const k=2e5;TC.x0+=k;TC.x1+=k;TC.dw=[TC.dw[0]+k,TC.dw[1]+k,TC.dw[2],TC.dw[3]];for(let i=0;i<TCL.length;i++)TCL[i]+=k;TC_SKID.x+=k}
 const inTC=(x,y,m=0)=>x>TC.x0-m&&x<TC.x1+m&&y>TC.y0-m&&y<TC.y1+m||x>TC.dw[0]-m&&x<TC.dw[1]+m&&y>TC.dw[2]-m&&y<TC.dw[3]+m;
+/* the land round the course is graded flat to the pad, easing back to the hills over 120 m */
+var TC_READY=false;   /* (the land is only graded once the course exists: terrain is asked for earlier, while the world is laid out) */
+function tcW(x,y){if(!W2||!TC_READY)return 0;const bx=(a0,a1,b0,b1)=>Math.hypot(Math.max(a0-x,x-a1,0),Math.max(b0-y,y-b1,0));const d=Math.min(bx(TC.x0,TC.x1,TC.y0,TC.y1),bx(TC.dw[0]+14,TC.dw[1],TC.dw[2],TC.dw[3]));return d>=120?0:1-smooth01(0,120,d)}
+TC_READY=!TC_OFF;
 const ORP={x0:-2392,x1:-2160,y0:-1450,y1:-905,
   trail:[[-2160,-921],[-2185,-921],[-2215,-928],[-2245,-945],[-2252,-985],[-2252,-1105],[-2262,-1140],[-2295,-1160],[-2300,-1185],[-2300,-1228],[-2290,-1262],[-2255,-1285],[-2222,-1300],[-2205,-1335],[-2230,-1380],[-2290,-1395],[-2335,-1385],[-2350,-1330],[-2350,-1275],[-2345,-1215],[-2342,-1160],[-2340,-1110],[-2340,-1050],[-2320,-985],[-2280,-955],[-2245,-945]],
   bog:{x:-2300,y:-1206,a:24,b:11,h:0},hill:{x:-2350,y:-1330,H:8,R:40},lot:{x0:-2205,x1:-2160,y0:-935,y1:-907},feats:[],grid:new Map(),zones:[],ready:false};
@@ -4163,7 +4176,9 @@ function tcSignsDraw(){const e=CULL.eye;if(!TC_SIGNS.length||Math.hypot(e[0]-(TC
   gl.activeTexture(gl.TEXTURE0);gl.uniformMatrix4fv(U.uM,false,M4.id());
   TC_TEX.forEach((T,i)=>{const g=TC_SIGNS[i];if(Math.hypot(e[0]-g.x,-e[2]-g.y)>140)return;gl.bindTexture(gl.TEXTURE_2D,T.t);gl.uniform3fv(U.uSO,T.O);gl.uniform3fv(U.uSU,T.U);gl.uniform3fv(U.uSV,T.V);mat([0.95,0,0],null,0,1,1,5);draw(T.m)})}
 // hill profile with real vertical curves: the grade eases in and out over T metres at every break, like a built test hill
-function tcHill(nm,v){const pc=parseInt(nm),g=pc/100,H={10:5,20:4,30:3,40:12}[pc]||4,run=H/g,top=pc===40?14:10,T=pc===30?2.2:pc===40?4.5:3;v-=T/2;   // start the curve at the section edge (no lip)
+/* grade hills: [rise m, top flat m] by grade; the vertical curve at each break gets longer as the grade gets steeper, so the steep ones don't scrape */
+const TC_GR={5:[2.5,10],10:[4,10],15:[4.5,10],20:[5,10],30:[6,10],40:[8,14],60:[6,12]};
+function tcHill(nm,v){const pc=parseInt(nm),g=pc/100,G=TC_GR[pc]||[4,10],H=G[0],run=H/g,top=G[1],T=clamp(2+10*g,2.5,6.4);v-=T/2;   // start the curve at the section edge (no lip)
   const I=(a)=>{const t=(v-a)/T;return t<=0?0:t>=1?T/2+(v-a-T):T*(t*t*t-t*t*t*t/2)};
   return Math.max(0,g*(I(-T/2)-I(run-T/2)-I(run+top-T/2)+I(2*run+top-T/2)))}
 function tcSec(x,y){for(const S of TCS){if(Math.abs(x-TCL[S[0]])<3.5&&y>=S[1]&&y<=S[2])return S}return null}
@@ -4180,7 +4195,12 @@ function tcH(x,y){const S=tcSec(x,y);if(!S)return {h:0,mu:1.05,kind:"pad"};const
     case "Curb drop":return {h:lx>0&&v>10&&v<50?0.15:0,mu:1.0,kind:"pad"};
     case "Rough road":return {h:0.025*(Math.sin(v*1.7+lx*0.9)*Math.sin(v*0.83-lx*1.4)+0.6*Math.sin(v*3.1+lx*2.3)*Math.cos(v*0.37)),mu:1.0,kind:"pad"};
     case "Gravel":return {h:dirtH({i:3,W:3.5},v,lx),mu:0.74,kind:"dirt"};
-    case "10% hill":case "20% hill":case "30% ramp":case "40% hill":return {h:tcHill(S[3],v),mu:1.05,kind:"pad"};
+    case "5% grade":case "10% grade":case "15% grade":case "20% grade":case "30% grade":case "40% grade":case "60% grade":return {h:tcHill(S[3],v),mu:1.05,kind:"pad"};
+    case "Single-wheel bumps":{const k=v%12,side=lx>0?1:-1,on=(Math.floor(v/12)%2===0)===(side<0)&&Math.abs(lx)>0.25;return {h:on&&k<1.6?0.08*Math.pow(Math.sin(Math.PI*k/1.6),2):0,mu:1.05,kind:"pad"}}
+    case "Twist ditches":{const e=Math.min(v,L-v);let h=0;for(const c of [25,55,85,115]){const a=(v-c)+lx*(((c/30)|0)%2?0.9:-0.9);if(Math.abs(a)<2.2)h=Math.min(h,-0.25*Math.pow(Math.cos(Math.PI*a/4.4),2))}return {h:h*smooth01(0,6,e),mu:1.0,kind:"pad"}}
+    case "Side slope":{const s_=v<L/2?0.15:0.25,e=Math.min(v,L-v);return {h:Math.max(0,s_*(lx+3.5))*smooth01(2,10,e),mu:1.05,kind:"pad"}}
+    case "Pitch bumps":{const k=v%12;return {h:k<6?0.1*Math.pow(Math.sin(Math.PI*k/6),2):0,mu:1.05,kind:"pad"}}
+    case "Chatter bumps":{const i=Math.floor(v/1.5),k=v-i*1.5-0.4*tcHash(i,3);return {h:k>0&&k<0.35&&tcHash(i,7)>0.25?0.04*Math.sin(Math.PI*k/0.35):0,mu:1.0,kind:"pad"}}
     case "Rock crawl":{let h=0;const gi0=Math.floor(v/1.3),gj0=Math.floor((lx+4)/1.3);for(let gi=gi0-1;gi<=gi0+1;gi++)for(let gj=gj0-1;gj<=gj0+1;gj++){if(tcHash(gi+11,gj+5)<0.35)continue;
         const cy=(gi+0.5)*1.3+(tcHash(gi,gj+9)-0.5)*0.6,cx=(gj+0.5)*1.3-4+(tcHash(gj+2,gi)-0.5)*0.6,rr=0.45+0.4*tcHash(gi+1,gj+3),hh=0.12+0.38*tcHash(gi+7,gj+1),d=Math.hypot(v-cy,lx-cx);if(d<rr)h=Math.max(h,hh*Math.sqrt(1-(d/rr)*(d/rr)))}
       const e=Math.min(v,L-v);return {h:h*Math.min(1,e/4),mu:1.1,kind:"rock"}}
@@ -4193,7 +4213,7 @@ function tcWhere(x,y){const S=tcSec(x,y);if(S)return S;if(Math.hypot(x-TC_SKID.x
 // ---- ground under a tyre: road (with bumps, rumble strips), kerbs, sidewalks, and grass with less grip off the road
 function smooth01(a,b,x){const t=clamp((x-a)/(b-a),0,1);return t*t*(3-2*t)}
 function terrainH(x,y,d){const D=Math.max(d,dfAt(x,y)),f=smooth01(45,80,D)*(1+2.6*smooth01(80,230,D)),hills=MAP.hills?(1.4*Math.sin(x*0.021+1)*Math.cos(y*0.017)+0.7*Math.sin(x*0.047+y*0.039)):0;
-  const k=1-cityW(x,y),z=hillZ(x,y)+riverCut(x,y)+k*(f*hills+Math.min(1,d/1.5)*MAP.lumps*(Math.sin(x*2.3+Math.cos(y*1.7))+Math.sin(y*2.9+x*0.7)));if(W2){const w=aptW(x,y);if(w>0)return z+(APT.z-z)*w;const wm=mallW(x,y);if(wm>0)return z+(MALL.z-z)*wm}return z}
+  const k=1-cityW(x,y),z=hillZ(x,y)+riverCut(x,y)+k*(f*hills+Math.min(1,d/1.5)*MAP.lumps*(Math.sin(x*2.3+Math.cos(y*1.7))+Math.sin(y*2.9+x*0.7)));if(W2){const w=aptW(x,y);if(w>0)return z+(APT.z-z)*w;const wm=mallW(x,y);if(wm>0)return z+(MALL.z-z)*wm;const wt=tcW(x,y);if(wt>0)return z+(-0.1-z)*wt}return z}
 // the new world: ground near a road is cut or filled to meet it (embankments up to raised roads, benches cut into the mountain).
 // Bridge decks and the freeway cut are left to embZ and cutZ
 function w2Blend(x,y,base){let sw=0,sz=0,A=0,under=1e9;
@@ -4349,7 +4369,7 @@ if(W2){const sOn=(ax,ay,bx,by,u,dir=1)=>{const e=ePick(ax,ay,bx,by);if(!e)return
   st_("county","County Rd 30","55 mph through the farmland, over the river and over I-61",sOn(-1000,-2400,1000,-2400,300));
   st_("bridge","Clearwater River","Main St over the river bridge",sOn(-330,0,-60,0,20));
   if(W2C.orp)st_("offroad","Kestrel Off-Road Park","On Mount Kestrel's lower slopes: a trail loop with a rock garden, ledges, a mud bog, logs, an off-camber section and a steep climb. Bring a 4x4",{x:-2182+W2C.orp[0],y:-921+W2C.orp[1],h:Math.PI,free:true});
-  st_("proving","Proving ground","Suspension test course off County Rd 1: whoops, washboard, cobbles, potholes, humps, articulation, hills up to 40%, gravel, rock crawl, mud, snow, sand, skidpad",{x:TCL[0],y:TC.y0+30,h:Math.PI/2,free:true});
+  st_("proving","Proving ground","Suspension test course off County Rd 9: whoops, cobbles, potholes, single-wheel bumps, articulation, twist ditches, side slope, hill grades from 5% to 60%, skidpad, off-road course",{x:TCL[0],y:TC.y0+30,h:Math.PI/2,free:true});
   if(TC_OFF)delete STARTS.proving;
   {const p=PAD.e?fpt(PAD.e,PAD.dir,PAD.s0-90,0):[0,0,0];st_("station","Service plaza","Gas pumps and fast chargers beside I-38 between Maple Rd and Fairhaven",{x:p[0],y:p[1],h:p[2]})}
   /* v332: more places to start from, so you don't have to drive across the map first */
@@ -13898,8 +13918,11 @@ function tcMesh(){const collAdd=o=>{COLL_KEEP.push(o);collAddRaw(o)};COLL_KEEP.l
     // a board at the start of each section: post plus a coloured panel
     const bx=xc-5.2,by=S[1]-3;for(const sx of [-1.05,1.05]){boxInto(out.post,bx+sx,1.2,-by,0.1,2.4,0.1,0);collAdd({t:"c",x:bx+sx,y:by,r:0.08})}boxInto(out.board,bx,2.2,-by,2.6,1.3,0.06,0);
     TC_SIGNS.push({x:bx,y:by-0.035,z:2.2,w:2.5,h:1.2,S});
+    if(nm==="Side slope"){const L=S[2]-S[1],Q=(m,ps,n)=>{const k=m.P.length/3;for(const [x,y,z] of ps){m.P.push(x,z,-y);m.N.push(n[0],n[1],n[2])}m.I.push(k,k+1,k+2,k,k+2,k+3)},x=xc+3.5;
+      for(let v=0;v<L;v+=1){const ya=S[1]+v,yb=S[1]+Math.min(L,v+1),za=tcH(x-0.01,ya).h,zb=tcH(x-0.01,yb).h;if(za<0.01&&zb<0.01)continue;Q(out.sec,[[x,ya,za],[x,yb,zb],[x,yb,0],[x,ya,0]],[1,0,0]);
+        Q(out.rail,[[x+0.12,ya,za+0.55],[x+0.12,yb,zb+0.55],[x+0.12,yb,zb+0.78],[x+0.12,ya,za+0.78]],[-1,0,0]);if(v%2===0&&za>0.2){boxInto(out.rail,x+0.16,za+0.4,-ya,0.1,0.8,0.1,0);collAdd({t:"b",x:x+0.15,y:ya+1,h:Math.PI/2,hl:1.05,hw:0.08,z0:Math.min(za,zb)-0.4,z1:Math.max(za,zb)+0.85,what:"the guard rail"})}}}
     // hills: solid sides down to the pad, and a guard rail along both edges (posts every 2 m) so you can't drive off the top
-    if(/hill|ramp/.test(nm)){const L=S[2]-S[1],Q=(m,ps,n)=>{const k=m.P.length/3;for(const [x,y,z] of ps){m.P.push(x,z,-y);m.N.push(n[0],n[1],n[2])}m.I.push(k,k+1,k+2,k,k+2,k+3)};
+    if(/grade/.test(nm)){const L=S[2]-S[1],Q=(m,ps,n)=>{const k=m.P.length/3;for(const [x,y,z] of ps){m.P.push(x,z,-y);m.N.push(n[0],n[1],n[2])}m.I.push(k,k+1,k+2,k,k+2,k+3)};
       for(let v=0;v<L;v+=1){const za=tcHill(nm,v),zb=tcHill(nm,Math.min(L,v+1)),ya=S[1]+v,yb=S[1]+Math.min(L,v+1);if(za<0.01&&zb<0.01)continue;
         for(const sd of [-1,1]){const x=xc+sd*3.5;Q(out.sec,[[x,ya,za],[x,yb,zb],[x,yb,0],[x,ya,0]],[sd,0,0]);const xr=xc+sd*3.62;
           Q(out.rail,[[xr,ya,za+0.55],[xr,yb,zb+0.55],[xr,yb,zb+0.78],[xr,ya,za+0.78]],[-sd,0,0]);Q(out.rail,[[xr+sd*0.02,ya,za+0.55],[xr+sd*0.02,yb,zb+0.55],[xr+sd*0.02,yb,zb+0.78],[xr+sd*0.02,ya,za+0.78]],[sd,0,0])}}
@@ -13909,7 +13932,9 @@ function tcMesh(){const collAdd=o=>{COLL_KEEP.push(o);collAddRaw(o)};COLL_KEEP.l
   for(const xc of TCL)for(const sd of [-3.6,3.6])boxInto(out.paint,xc+sd,0.006,-(TC.y0+TC.y1)/2,0.15,0.004,TC.y1-TC.y0-20,0);
   // skidpad: painted circle, brake strip cones
   for(let a=0;a<64;a++){const t0=a/64*Math.PI*2,R=TC_SKID.R,x=TC_SKID.x+Math.cos(t0)*R,y=TC_SKID.y+Math.sin(t0)*R;boxInto(out.paint,x,0.006,-y,0.2,0.004,R*Math.PI*2/64+0.05,-t0)}
-  for(let y=-1300;y<=-1150;y+=15)for(const sd of [-3.2,3.2]){const x=TCL[3]+sd;boxInto(out.dark,x,0.35,-y,0.35,0.7,0.35,0);collAdd({t:"c",x,y,r:0.18})}
+  {const BS=TCS.find(S=>S[3]==="Brake strip");if(BS)for(let y=BS[1];y<=BS[2];y+=15)for(const sd of [-3.2,3.2]){const x=TCL[3]+sd;boxInto(out.dark,x,0.35,-y,0.35,0.7,0.35,0);collAdd({t:"c",x,y,r:0.18})}}
+  /* a board at the county road: Proving ground, this way */
+  {const x=TC.dw[0]+18,y=TC.dw[2]-4;for(const sx of [-1.4,1.4]){boxInto(out.post,x+sx,1.4,-y,0.12,2.8,0.12,0);collAdd({t:"c",x:x+sx,y,r:0.09})}boxInto(out.board,x,2.4,-y,3.4,1.6,0.06,0);TC_SIGNS.push({x,y:y-0.035,z:2.4,w:3.3,h:1.5,S:[9,0,0,"Proving ground","Ride, wheel travel, hill grades from 5% to 60%, skidpad and off-road course"]})}
   const r={};for(const k in out)r[k]=meshFrom(out[k].P,out[k].N,out[k].I);return r}
 // the shopping strips: lots, buildings and interiors (called from worldScenery)
 function retailInto(SM,lamp,treeAt){let sd=91;const r=()=>(sd=(sd*16807)%2147483647)/2147483647;
