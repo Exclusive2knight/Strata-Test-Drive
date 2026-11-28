@@ -3943,9 +3943,13 @@ function sgAlloc(w,h){w+=8;h+=8;const A=SGN.A;for(const r of SGN.sh){if(r.h>=h&&
 function sgFace(key,wm,hm,paint,pxM){let f=SGN.faces.get(key);if(f)return f;const k=pxM||SGN.pxM,W=Math.max(16,Math.round(wm*k)),H=Math.max(16,Math.round(hm*k));let a=sgAlloc(W,H);
   if(!a){f=SGN.faces.get("__blank")||{key:"__blank",x:0,y:0,W:16,H:16,paint:()=>{}};SGN.faces.set(key,f);if(!SGN.warned){SGN.warned=1;console.warn("sign atlas full")}return f}   /* full: plain grey (never recurse) */
   f={key,x:a.x,y:a.y,W,H,paint};SGN.faces.set(key,f);SGN.dirty=true;return f}
+/* phones and the low graphics tiers: the two 4096-wide atlases (road kit, signs) go up at half size: 3/4 less graphics memory (about 65 MB),
+   which is what was getting iPhones' tabs reloaded. UVs are 0-1, so nothing else changes */
+function texSmall(img){try{const w=img.width||img.naturalWidth,h=img.height||img.naturalHeight,q=GFX.q==="auto"?GFX.eff:GFX.q;if(!(IOS||q==="low"||q==="lowest")||Math.max(w,h)<4096)return img;
+  const c=document.createElement("canvas");c.width=w>>1;c.height=h>>1;c.getContext("2d").drawImage(img,0,0,c.width,c.height);return c}catch(e){return img}}
 function sgAtlas(){if(!SGN.dirty&&SGN.tex)return SGN.tex;const A=SGN.A,AH=SGN.AH,c=document.createElement("canvas");c.width=A;c.height=AH;const g=c.getContext("2d");g.fillStyle="#888";g.fillRect(0,0,A,AH);
   for(const f of SGN.faces.values()){if(!f.paint)continue;g.save();g.translate(f.x,f.y);g.beginPath();g.rect(-3,-3,f.W+6,f.H+6);g.clip();try{f.paint(g,f.W,f.H)}catch(e){console.warn("sign face",f.key,e)}g.restore()}
-  const t=SGN.tex||gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,c);
+  const t=SGN.tex||gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,texSmall(c));
   gl.generateMipmap(gl.TEXTURE_2D);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
   try{const ext=gl.getExtension("EXT_texture_filter_anisotropic");if(ext)gl.texParameterf(gl.TEXTURE_2D,ext.TEXTURE_MAX_ANISOTROPY_EXT,Math.min(4,gl.getParameter(ext.MAX_TEXTURE_MAX_ANISOTROPY_EXT)))}catch(e){}
   SGN.tex=t;SGN.dirty=false;c.width=c.height=0;return t}   /* v340: let the 32 MB canvas go once it is on the GPU */
@@ -13008,7 +13012,7 @@ if(!/^(127\.|localhost$)/.test(location.hostname)){addEventListener("contextmenu
 /* v361: iPhone / iPad Safari drops the WebGL context when the page uses too much graphics memory. Save, step the graphics down one
    tier for this device, and reload on our own (once a minute at most, so a device that can't cope doesn't loop) */
 cv.addEventListener("webglcontextlost",e=>{e.preventDefault();let n=0,last=0;try{const o=JSON.parse(localStorage.getItem("strata.glLost")||"{}");n=(+o.n||0)+1;last=+o.reload||0}catch(_){}
-  const again=Date.now()-last<60000;try{localStorage.setItem("strata.glLost",JSON.stringify({n,t:Date.now(),reload:again?last:Date.now()}));const q=localStorage.getItem("strata.gfx");const D={ultra:"high",high:"medium",medium:"low",low:"lowest"};if(q&&D[q])localStorage.setItem("strata.gfx",D[q])}catch(_){}
+  const again=Date.now()-last<60000;try{localStorage.setItem("strata.glLost",JSON.stringify({n,t:Date.now(),reload:again?last:Date.now()}));const q0=localStorage.getItem("strata.gfx"),q=!q0||q0==="auto"?GFX.eff:q0;const D={ultra:"high",high:"medium",medium:"low",low:"lowest"};if(q&&D[q])localStorage.setItem("strata.gfx",D[q])}catch(_){}
   for(const f of ["econSave","bankSave","garageSave","ownSave","achSave","phSave","stkSave","mktSave"])try{window[f]&&window[f]()}catch(_){}
   try{toast(again?"The graphics ran out of memory again. Pick Lowest in Settings → Graphics, then reload.":"This device ran out of graphics memory. Reloading with lighter graphics…")}catch(_){}
   if(!again)setTimeout(()=>location.reload(),1800)});
@@ -13500,7 +13504,7 @@ function kitLoad(){if(!(KITW&&KITMAP||KITOLD)||KIT.busy||KIT.ok||st.headless)ret
     if(pi<PL.length){setTimeout(step,0);return}
     C.push(0,0,2);P.push(0,-50,0);Nn.push(0,1,0);   /* one value over 1 keeps the UVs as floats */
     KIT.m=meshFrom(P,Nn,I,C);
-    if(img){const tx=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,tx);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,img);gl.generateMipmap(gl.TEXTURE_2D);
+    if(img){const tx=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,tx);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,texSmall(img));gl.generateMipmap(gl.TEXTURE_2D);
       gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.REPEAT);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
       try{const ext=gl.getExtension("EXT_texture_filter_anisotropic");if(ext)gl.texParameterf(gl.TEXTURE_2D,ext.TEXTURE_MAX_ANISOTROPY_EXT,Math.min(8,gl.getParameter(ext.MAX_TEXTURE_MAX_ANISOTROPY_EXT)))}catch(e){}KIT.tex=tx}
     KIT.ok=true;KIT.busy=false};step()}).catch(e=>{console.warn("road kit",e);KIT.busy=false;if(++KIT.fail<4)setTimeout(kitLoad,4000*KIT.fail)})}
@@ -13519,7 +13523,7 @@ function rp2Load(){if(!RP2_ON||RP2.busy||RP2.ok||st.headless)return;RP2.busy=tru
         const nx=n[k]/127,nz=-n[k+2]/127;Nn.push(nx*c+nz*sn,n[k+1]/127,-(-nx*sn+nz*c));const q=k/3*2;C.push(t[q]/10000,t[q+1]/10000,0)}
       for(const v of d.i)I.push(v+b)}
     C.push(0,0,2);P.push(0,-50,0);Nn.push(0,1,0);RP2.m=meshFrom(P,Nn,I,C);
-    if(img){const tx=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,tx);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,img);gl.generateMipmap(gl.TEXTURE_2D);
+    if(img){const tx=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,tx);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,texSmall(img));gl.generateMipmap(gl.TEXTURE_2D);
       gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
       try{const ext=gl.getExtension("EXT_texture_filter_anisotropic");if(ext)gl.texParameterf(gl.TEXTURE_2D,ext.TEXTURE_MAX_ANISOTROPY_EXT,Math.min(8,gl.getParameter(ext.MAX_TEXTURE_MAX_ANISOTROPY_EXT)))}catch(e){}RP2.tex=tx}
     for(const o of J.coll||[]){const c={...o,what:"the sign gantry"};COLL_KEEP.push(c);collAdd(c)}
