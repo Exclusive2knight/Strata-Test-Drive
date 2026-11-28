@@ -3058,7 +3058,8 @@ const KITW=(()=>{try{return /[?&]world=kit\b/.test(location.search)}catch(e){ret
 /* v352: the old map's roads rebuilt in road-kit pieces (on by default; ?roads=old for the generated look): every road is followed by kit straights cut to
    length, graded and bent to its curve (props/kitold.json, made by tools/kitmaps/oldmap.py); the road graph, junction surfaces and places stay */
 const KIT_NET=/*KIT_NET*/null;   /* v40: regions planned piece by piece from the road kit (tools/kitmaps/knet.py): {nodes, edges, legs: [x, y, heading out, stop bar]} */
-const KIT_J=/*KIT_J*/[];   /* the old map's junctions that got a kit intersection piece: [x, y, leg reach, ...] (spliced in at build from props/kitold.json) */
+const KIT_J=/*KIT_J*/[];
+function kitLeg(n,l){if(!KITOLD||!KIT_NET)return null;const hh=((90-l.h*180/Math.PI)%360+360)%360;for(const q of KIT_NET.legs)if(Math.abs(q[0]-n.x)<1&&Math.abs(q[1]-n.y)<1&&Math.abs(((q[2]-hh+540)%360)-180)<8)return q;return null}   /* this leg of a planned kit junction: [x, y, heading, stop bar, pole x, pole y] */   /* the old map's junctions that got a kit intersection piece: [x, y, leg reach, ...] (spliced in at build from props/kitold.json) */
 const kitJ=n=>{if(!KITOLD)return 0;for(let i=0;i<KIT_J.length;i+=3)if(Math.abs(KIT_J[i]-n.x)<1.5&&Math.abs(KIT_J[i+1]-n.y)<1.5)return KIT_J[i+2];return 0};   /* how far its legs reach (its stop lines sit just inside) */
 /* v361: iPhone / iPad (iPadOS reports itself as a Mac with a touch screen) */
 const IOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1;
@@ -3635,7 +3636,7 @@ function analyseNet(){
       else for(const o of n.legs){if(o===l)continue;const sn=Math.abs(Math.sin(o.h-l.h));if(sn<0.3)continue;if(n.ctrl==="minor"&&!o.major)continue;
         r=Math.max(r,Math.min(hw(o.e)/sn,2*hw(o.e))+(n.ctrl==="minor"?0.8:2.6))}}
     {const kd=n.kind==="x"&&typeof kitJ==="function"?kitJ(n):0;if(kd)r=Math.max(r,kd-1.2)}
-    if(KITOLD&&KIT_NET&&n.kind==="x"){const hh=((90-l.h*180/Math.PI)%360+360)%360;for(const q of KIT_NET.legs)if(Math.abs(q[0]-n.x)<1&&Math.abs(q[1]-n.y)<1&&Math.abs(((q[2]-hh+540)%360)-180)<8){r=q[3];break}}   /* v40: a planned kit junction: exactly at its stop bar */   /* a kit intersection: traffic waits at its painted stop line */
+    if(n.kind==="x"){const q=kitLeg(n,l);if(q)r=q[3]}   /* v40: a planned kit junction: exactly at its stop bar */   /* a kit intersection: traffic waits at its painted stop line */
     l.r=r;if(l.end===0)l.e.r0=r;else l.e.r1=r}
   for(const e of EDGES){e.p0=0;e.p1=0}
   for(const n of NODES){n.pr=0;
@@ -14456,7 +14457,7 @@ if(!rectFree(k,x,y,fa))return false;w2Put(k,x,y,fa,0);return true};
   sgReset();
   for(const n of NODES){if(n.kind!=="x")continue;const rX=Math.max(...n.legs.map(l=>l.r));
     for(const l of n.legs){if(l.e.n<1||l.e.ow&&l.end!==1)continue;const e=l.e,dir=l.end===1?1:-1,lo=loOf(e.n),hi=lo+e.n-1,sideO=lo*LANE-LANE/2-e.side;
-      if(n.ctrl==="signal"){const sF=e.L+rX+1.5,p=offRoad(fpt(e,dir,sF,sideO-1.2),fpt(e,dir,sF,sideO-1.2)[2]),ph=p[2],fx=Math.cos(ph),fy=Math.sin(ph),gz=Math.max(SZ(p[0],p[1]),n.z||0);
+      if(n.ctrl==="signal"){const KL=kitLeg(n,l),hb=l.h+Math.PI,sF=KL&&KL.length>4?e.L+(KL[4]-n.x)*Math.cos(hb)+(KL[5]-n.y)*Math.sin(hb):e.L+rX+1.5,p=KL&&KL.length>4?[KL[4],KL[5],fpt(e,dir,sF,0)[2]]:offRoad(fpt(e,dir,sF,sideO-1.2),fpt(e,dir,sF,sideO-1.2)[2]),ph=p[2],fx=Math.cos(ph),fy=Math.sin(ph),gz=Math.max(SZ(p[0],p[1]),n.z||0);
         // galvanised steel pole on a base plate, a tapered mast arm reaching out over the lanes
         const span=W2&&!inCity(p[0],p[1])&&Math.max(...n.legs.map(l2=>l2.rank))<5;   // country crossroads: the heads hang from a steel cable strung between two wooden-look poles
         let wire=null;

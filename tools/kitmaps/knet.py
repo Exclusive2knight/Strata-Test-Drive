@@ -116,7 +116,7 @@ class Net:
         if not best: self.fail.append(("no piece", n["id"], [(r["name"], r["prof"], round(h)) for r, _, h in D])); return None
         _, pc, rot, M = best
         out = K.start(pc, n["x"], n["y"], rot, n["z"])
-        n["pc"] = pc; n["legs"] = {}
+        n["pc"] = pc; n["rot"] = rot; n["legs"] = {}
         for k, c in M.items(): n["legs"][k] = (out[c["name"]], c["profile"], math.hypot(c["pos"][0], c["pos"][2]))
         return pc
 
@@ -193,7 +193,11 @@ class Net:
             N.append([n["x"], n["y"], n["ctrl"], None])
             for (ri, end), (c, prof, reach) in (n.get("legs") or {}).items():
                 st = (stops.get(n.get("pc"), {}) or {}).get(c["name"])
-                LEGS.append([n["x"], n["y"], round((c["h"]) % 360, 1), round(st if st else reach - 1.2, 2)])
+                leg = [n["x"], n["y"], round((c["h"]) % 360, 1), round(st if st else reach - 1.2, 2)]
+                pr = next((q for q in self.K.piece(n["pc"])["connectors"] if q["name"] == "prop_signal_" + c["name"][4:]), None)
+                if pr and "rot" in n:     # the kit's signal pole for traffic coming in on this leg (far right corner)
+                    px, py = self.K.tw(pr["pos"][0], pr["pos"][2], n["x"], n["y"], n["rot"]); leg += [round(px, 2), round(py, 2)]
+                LEGS.append(leg)
         done = set()
         for r in self.roads:
             if r["outside"] or r["i"] in done: continue
