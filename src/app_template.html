@@ -4485,7 +4485,7 @@ function resetCar(a,lane){car.sink=null;car.clog=null;sys.aim=null;sys.limitS=nu
   else if(a&&typeof a==="object"){const f=findFrame(a.x,a.y,a.h,null,a.z!==undefined?a.z:"any");/* a start point is found at its own height, not wherever you were (resetting from up on a bridge used to drop you on a random road) */p=fpt(f.e,f.dir,f.s,(a.k??f.lo)*LANE);RF=null}
   else if(typeof a==="number"){const M=me();p=fpt(M.e,M.dir,clamp(a,0,M.L),(lane??M.lo)*LANE)}
   else p=[car.px,car.py,car.psi];
-  Object.assign(car,{px:p[0],py:p[1],psi:p[2],vx:0,vy:0,r:0,ax:0,ay:0,dF:0,dR:0,crashed:0,disabled:false});sys.airbagT=0;if(typeof dmgReset==="function"&&typeof DENTS!=="undefined")dmgReset();else car.dmg={f:0,r:0,l:0,rt:0,wheel:[0,0,0,0],lamp:[1,1,1,1],rad:0};try{if(typeof SAFE==="object"){SAFE.tp=[35,35,35,35];SAFE.leak=[0,0,0,0];SAFE.flatD=[0,0,0,0];SAFE.shred=[0,0,0,0];SAFE.spiked=0}}catch(e){}faultApply();car.muEst=1.15;car.tcsI=[0,0,0,0];car.tcsF=[1,1,1,1];car.w=[0,0,0,0];car.kap=[0,0,0,0];GREF=a&&a.z!==undefined?a.z:0;car.zInit=groundAt(p[0],p[1]).h;car.zb=car.zInit;car.zw=null;RF=null;RFkey="";const M=me();sys.limit=M.mph;
+  Object.assign(car,{px:p[0],py:p[1],psi:p[2],vx:0,vy:0,r:0,ax:0,ay:0,dF:0,dR:0,crashed:0,disabled:false});sys.airbagT=0;if(typeof dmgReset==="function"&&typeof DENTS!=="undefined")dmgReset();else car.dmg={f:0,r:0,l:0,rt:0,wheel:[0,0,0,0],lamp:[1,1,1,1],rad:0};try{if(typeof SAFE==="object"){SAFE.tp=[35,35,35,35];SAFE.leak=[0,0,0,0];SAFE.flatD=[0,0,0,0];SAFE.shred=[0,0,0,0];SAFE.spiked=0}}catch(e){}faultApply();car.muEst=1.15;car.tcsI=[0,0,0,0];car.tcsF=[1,1,1,1];car.w=[0,0,0,0];car.kap=[0,0,0,0];car.cEff=null;car.rough=0;car.hAir=null;car.hFil=null;GREF=a&&a.z!==undefined?a.z:0;car.zInit=groundAt(p[0],p[1]).h;car.zb=car.zInit;car.zw=null;RF=null;RFkey="";const M=me();sys.limit=M.mph;
   // big trucks: if the body overlaps a parked car or a post, slide it toward the middle of the road until it's clear
   if(!(a&&a.free)){const hit=()=>parked.some(o=>o.wx!==undefined&&o.kind!=="xing"&&Math.abs((o.wz||0)-(car.zb||0))<1.5&&obbSAT(car.px,car.py,car.psi,BODY_HL+0.2,BODY_HW+0.15,o.wx,o.wy,o.wh,2.35,0.95))||collNear(car.px,car.py).some(o=>o.t==="c"&&Math.hypot(o.x-car.px,o.y-car.py)<o.r+BODY_HW+0.1);
     for(let i=0;i<12&&hit();i++){car.px+=-Math.sin(car.psi)*0.3;car.py+=Math.cos(car.psi)*0.3}RFkey=""}
@@ -5678,42 +5678,75 @@ function physics(dt){if(TOWH.ride){towRide(dt);return}
   const SUT=susT(),kS0=kS.slice();if(SUT)for(let i=0;i<4;i++)kS[i]*=i<2?SUT.kf:SUT.kr;
   const cS=kS.map((k,i)=>2*zeta*Math.sqrt(k*Fs0[i]/g)*(SUT?(i<2?SUT.df:SUT.dr):1)), KT=260000, CT=350;
   const offTer=!!st.terr||/offroad|rock|mud|sand|trail/.test(MD().type||"");let KARB=[38000,24000];
-  if(SP){const y2=(TRACK/2)*(TRACK/2),Ks=2*y2*(kS0[0]+kS0[2]),Kt=ms*g*SP.hR/(SP.grad*Math.PI/180*(1+MD().esc*0.06)),Ka=Math.max(0,Kt-Ks)*(SP.arbOn?1:0);   // sport modes stiffen a little
-    KARB=[Ka*SP.split/(4*y2),Ka*(1-SP.split)/(4*y2)];if(SP.disc&&offTer&&Math.abs(car.vx)<9)KARB[0]=0}if(SUT){KARB[0]*=SUT.af;KARB[1]*=SUT.ar}car.swayOff=!!(SP&&SP.disc&&!KARB[0]);
+  const AR_=susArch(),s2=[0,1].map(a=>AR_.solid[a]?AR_.sTrack[a]*AR_.sTrack[a]:1);   /* a solid axle's springs sit inboard, so they and its bar resist roll over a narrower track */
+  if(SP){const y2=(TRACK/2)*(TRACK/2),Ks=2*y2*(kS0[0]*s2[0]+kS0[2]*s2[1]),Kt=ms*g*SP.hR/(SP.grad*Math.PI/180*(1+MD().esc*0.06)),Ka=Math.max(0,Kt-Ks)*(SP.arbOn?1:0);   // sport modes stiffen a little
+    KARB=[Ka*SP.split/(4*y2*s2[0]),Ka*(1-SP.split)/(4*y2*s2[1])];if(SP.disc&&offTer&&Math.abs(car.vx)<9)KARB[0]=0}if(SUT){KARB[0]*=SUT.af;KARB[1]*=SUT.ar}car.swayOff=!!(SP&&SP.disc&&!KARB[0]);
   const TB=(SP?[SP.tb[0],SP.tb[0],SP.tb[1],SP.tb[1]]:[0.085,0.085,0.085,0.085]).map(b=>SUT&&SUT.drop>0?Math.max(0.03,b-SUT.drop/1000*0.8):b),TD=SP?[SP.td[0],SP.td[0],SP.td[1],SP.td[1]]:[0.11,0.11,0.11,0.11];
   if(!car.zw){const h0=car.zInit||0,cps0=Math.cos(car.psi),sps0=Math.sin(car.psi),cg0=car.cargo||0;car.vzw=[0,0,0,0];car.vzb=0;car.thd=car.phid=0;
     /* v365: every car starts already settled at its real ride height: each tyre squashed by its own share of the weight on the ground under it, and the springs at their loaded length (cars used to drop 2-5 cm and bounce when they appeared) */
     car.zw=Fs0.map((f,i)=>{const [x,y]=WPOS[i],G=groundAt(car.px+x*cps0-y*sps0,car.py+x*sps0+y*cps0);let gh=G.h-tireDrop(i);if(!isFinite(gh)||Math.abs(gh-h0)>0.6)gh=h0;return gh-(f+MWv[i]*g+cg0*g/4)/KT});
     const tgt=car.zw.map((z,i)=>z-cg0*g/4/kS[i]);let zb=tgt.reduce((a,b)=>a+b,0)/4,th=0,ph=0;
     for(let it=0;it<4;it++){let sx=0,sxx=0,sy=0,syy=0;for(let i=0;i<4;i++){const [x,y]=WPOS[i],r=tgt[i]-zb;sx+=x*r;sxx+=x*x;sy+=y*r;syy+=y*y}th=-sx/Math.max(1e-6,sxx);ph=sy/Math.max(1e-6,syy);let r0=0;for(let i=0;i<4;i++){const [x,y]=WPOS[i];r0+=tgt[i]-(zb-x*th+y*ph)}zb+=r0/4}
+    {const AR0=susArch();let h0=0;try{h0=AR0.air[0]?airTargetH():0}catch(e){}car.hAir=[AR0.air[0]?h0:0,AR0.air[1]?h0:0];car.hFil=car.hAir.slice();zb+=(car.hAir[0]*B+car.hAir[1]*A)/L;th-=(car.hAir[0]-car.hAir[1])/L}   /* (an air car starts at its chosen height) */
     car.zb=zb;car.th=clamp(th,-0.15,0.15);car.phi=clamp(ph,-0.15,0.15)}
-  const fz=[0,0,0,0], Fsp=[0,0,0,0], cps=Math.cos(car.psi), sps=Math.sin(car.psi);
-  car.gnd=car.gnd||[{},{},{},{}];
-  for(let i=0;i<4;i++){const [x,y]=WPOS[i];
-    const zc=car.zb-x*car.th+y*car.phi, vzc=car.vzb-x*car.thd+y*car.phid;
-    let dl=car.zw[i]-zc, dv=car.vzw[i]-vzc;                                   // + = compressed
+  /* v39 suspension overhaul: each architecture behaves as itself. A solid axle is one rigid beam (a bump under one wheel tilts it and moves
+     the other wheel, its springs sit inboard of the wheels and the tyres stay square to it), a torsion beam couples its wheels partly,
+     independent corners move alone; camber and toe change through the travel; links carry part of the brake dive and acceleration squat
+     (anti-dive / anti-squat); dampers have separate compression and rebound; semi-active dampers can only resist motion, a fully active
+     system can push; air springs stiffen as they compress and their height is set by the compressor, so the car really rises and lowers */
+  try{airTick(dt)}catch(e){}
+  car.tongueW=TRL.on&&!st.walk?(TRL.on.semi?0.2:TRL.kind==="tow"?0.08:0.11)*TRL.mass*9.81:0;car.tongueX=TRL.on&&TRL.on.semi?-B+0.05:-((VEH&&VEH.tail?VEH.tail[2]:BODY_HL)+0.35);   /* a trailer's tongue (or a fifth wheel's kingpin) presses down on the back of the car */
+  const AR=susArch(),hA=car.hAir||(car.hAir=[0,0]),fz=[0,0,0,0], Fsp=[0,0,0,0], Ft=[0,0,0,0], cps=Math.cos(car.psi), sps=Math.sin(car.psi);
+  car.gnd=car.gnd||[{},{},{},{}];car.camb=car.camb||[0,0,0,0];car.dmpF=car.dmpF||[0,0,0,0];car.sprF=car.sprF||[0,0,0,0];if(!car.cEff||car.cEff.length!==4)car.cEff=cS.slice();
+  /* damper control: passive dampers keep their valving; adaptive and magnetic ones pick a target from speed, steering and body roll, braking
+     and acceleration, how rough the road is and the drive mode, and get there at their own speed (magnetorheological fluid in ~5 ms, valves in ~60 ms) */
+  const aLat=Math.abs(car.ay||0),aLon=Math.abs(car.ax||0),rough=car.rough||0;
+  for(let i=0;i<4;i++){let tgt=cS[i];if(AR.ctrl){tgt*=1+0.004*Math.max(0,sp-20)+0.9*Math.min(1,aLat/7)+(i<2?0.7:0.5)*Math.min(1,aLon/6);tgt*=1-0.3*Math.min(1,rough/0.6)}
+    car.cEff[i]+=(tgt-car.cEff[i])*Math.min(1,dt/AR.tau)}
+  /* links: the brake dive and acceleration squat the springs don't see (front anti-dive, rear anti-lift under braking; anti-squat at the driven axle) */
+  const dW=ms*(-(car.ax||0))*HCGB/L,jF=dW>0?AR.antiDive*dW/2:(AR.fwd?AR.antiSquatF:0)*dW/2,jR=dW>0?-AR.antiLift*dW/2:-(AR.fwd?0:AR.antiSquat)*dW/2,J=[jF,jF,jR,jR];
+  const ysOf=i=>{const a=i<2?0:1;return AR.solid[a]?WPOS[i][1]*AR.sTrack[a]:WPOS[i][1]};
+  for(let i=0;i<4;i++){const [x,y]=WPOS[i],a=i<2?0:1,ys=ysOf(i);
+    const zc=car.zb-x*car.th+ys*car.phi, vzc=car.vzb-x*car.thd+ys*car.phid;
+    /* where the spring meets the axle: on a solid axle that's inboard of the wheel, part-way along the beam */
+    let zwS=car.zw[i],vwS=car.vzw[i];if(AR.solid[a]){const q=i^1,mz=(car.zw[i]+car.zw[q])/2,mv=(car.vzw[i]+car.vzw[q])/2;zwS=mz+(car.zw[i]-mz)*AR.sTrack[a];vwS=mv+(car.vzw[i]-mv)*AR.sTrack[a]}
+    let dl=zwS-zc, dv=vwS-vzc;                                   // + = compressed (geometric: the air spring's height offset doesn't move the bump stops)
     // damper character: frequency-selective valves soften on sharp hits, spool valves (DSSV) are digressive,
     // internal-bypass shocks stiffen deep in their stroke, leaf springs add interleaf friction
-    let c=cS[i];if(SUSP_OF[st.trim]==="freq"&&Math.abs(dv)>0.6)c*=0.65;let Fd=c*dv;if(SU.dig&&Math.abs(dv)>0.25)Fd=Math.sign(dv)*c*(0.25+(Math.abs(dv)-0.25)*0.5);
+    let c=car.cEff[i];if(SUSP_OF[st.trim]==="freq"&&Math.abs(dv)>0.6)c*=0.65;let Fd=c*dv*(dv>0?AR.cComp:AR.cReb);if(SU.dig&&Math.abs(dv)>0.25)Fd=Math.sign(dv)*c*(dv>0?AR.cComp:AR.cReb)*(0.25+(Math.abs(dv)-0.25)*0.5);
     if(SU.pos&&dl>0)Fd*=1+2.5*Math.pow(dl/TB[i],2);if(SP&&SP.leaf&&i>1)Fd+=Math.sign(dv)*Math.min(SP.leaf,Math.abs(dv)*30000);
-    let F=Fs0[i]+kS[i]*dl+Fd;
-    if(SU.sky)F-=0.4*SU.sky*cS[i]*vzc;                                           // magnetic and active dampers: skyhook control keeps the body still
-    if(dl>TB[i])F+=420000*(dl-TB[i])*(dv<0?0.3:1)+(dv>0?26000:4000)*dv;           // bump stop at the end of this car's real wheel travel: a rubber jounce bumper soaks up the hit, it doesn't spring the car back up
-    if(dl<-TD[i])F+=420000*(dl+TD[i]);                                          // droop limit
-    Fsp[i]=F; car.defl[i]=dl;
+    /* the spring: air springs are progressive (a smaller volume when squeezed), leaf packs bring in their helper leaves deep in the stroke */
+    const x_=dl+hA[a];let kE=kS[i];if(AR.air[a])kE*=clamp(1+AR.prog*x_/Math.max(0.05,TB[i]),0.55,2.6);let Fk=kE*x_;if(AR.helper[a]&&dl>0.35*TB[i])Fk+=kS[i]*0.9*(dl-0.35*TB[i]);
+    let F=Fs0[i]+Fk+Fd;
+    if(SU.sky){let Fsky=-0.4*SU.sky*cS[i]*vzc;if(!SU.act&&Math.sign(Fsky)!==Math.sign(dv||1e-9))Fsky=0;F+=Fsky;Fd+=Fsky}   // skyhook: a semi-active damper can only resist (it can't push); a fully active one can
+    if(dl>TB[i]){const o=dl-TB[i];const Fb=360000*o+2.4e6*o*o;F+=Fb*(dv<0?0.3:1)+(dv>0?26000:4000)*dv;if(dv>0.9&&o>0.006&&!(car.bsT>performance.now())){car.bsT=performance.now()+400;try{susSnd("stop",Math.min(1,dv/2.5))}catch(e){}}}   // progressive jounce bumper at the end of this car's wheel travel
+    if(dl<-TD[i])F+=420000*(dl+TD[i]);                                          // droop limit (the shock's own length)
+    F+=J[i];Fsp[i]=F; car.defl[i]=dl;car.dmpF[i]=Fd;car.sprF[i]=Fs0[i]+Fk;
     // tyre on the ground (road bumps, potholes, terrain)
     const gx=car.px+x*cps-y*sps, gy=car.py+x*sps+y*cps, G=groundAt(gx,gy); car.gnd[i]=G;
     let gh=G.h-tireDrop(i);if(G.hole){gh-=G.hole*SU.mit;potholeHit(i,G.hole*(1-SU.mit),SU)}else if(car.inHole)car.inHole[i]=false;
     if(G.kind==="rock"||(ORP.ready&&inOR(gx,gy)))gh=rockContact(i,gx,gy,gh,cps,sps,dt,G);else{if(car.rk)car.rk[i]=null;
       /* the tyre is round: it meets a kerb, a step or a lip with the front of its tread before the axle gets there, so it rolls up over it instead of popping up at once */
       if(Math.abs(car.vx)>0.3){const R=car.wR||(car.wR=(MODELS[(TRIMS[st.trim].mesh||TRIMS[st.trim].model)]||{}).wheelR||0.36),sg=car.vx>0?0.62:-0.62,G2=groundAt(gx+cps*sg*R,gy+sps*sg*R),g2=G2.h-tireDrop(i)-R*(1-Math.sqrt(1-sg*sg));if(g2>gh&&g2-gh<R*0.7)gh=g2}}
-    const pen=gh-car.zw[i]; let ft=pen>0?KT*pen+CT*(-car.vzw[i]):0; ft=Math.max(ft,0); fz[i]=ft;
-    car.vzw[i]+=((ft-F-MWv[i]*g)/MWv[i])*dt; car.zw[i]+=car.vzw[i]*dt}
-  // anti-roll bars resist the left/right difference on each axle
-  for(let a=0;a<2;a++){const d=(car.defl[2*a]-car.defl[2*a+1])*KARB[a];Fsp[2*a]+=d;Fsp[2*a+1]-=d;car.vzw[2*a]-=d/MWv[2*a]*dt;car.vzw[2*a+1]+=d/MWv[2*a+1]*dt}
-  const sumF=Fsp.reduce((a,b)=>a+b,0), cg=car.cargo||0;
-  car.vzb+=((sumF-(ms+cg)*g)/ms)*dt; car.zb+=car.vzb*dt;
-  let Mp=-ms*car.ax*HCGB-cg*g*1.3, Mr=ms*car.ay*(SP?SP.hR:0.45)*(1-(SP?SP.act:0)); for(let i=0;i<4;i++){Mp-=Fsp[i]*WPOS[i][0];Mr+=Fsp[i]*WPOS[i][1]}
+    const pen=gh-car.zw[i]; let ft=pen>0?KT*pen+CT*(-car.vzw[i]):0; ft=Math.max(ft,0); fz[i]=ft;Ft[i]=ft;
+    car.rough=(car.rough||0)*0.995+Math.abs(car.vzw[i])*0.005*0.25}
+  /* the wheels move: on their own (independent), as one beam (solid axle) or partly tied together (torsion beam) */
+  for(let a=0;a<2;a++){const L_=2*a,R_=2*a+1,Mw=MWv[L_]+MWv[R_],aL=(Ft[L_]-Fsp[L_]-MWv[L_]*g)/MWv[L_],aR=(Ft[R_]-Fsp[R_]-MWv[R_]*g)/MWv[R_];   /* (the spring and the links both push the wheel down: Fsp)*/
+    if(AR.solid[a]){const t=TRACK,s_=AR.sTrack[a]*t,I=Mw*Math.pow(AR.rg*t,2),aH=(Ft[L_]+Ft[R_]-Fsp[L_]-Fsp[R_]-Mw*g)/Mw,aT=((Ft[L_]-Ft[R_])*t/2-(Fsp[L_]-Fsp[R_])*s_/2)/I;
+      const vz=(car.vzw[L_]+car.vzw[R_])/2+aH*dt,vt=(car.vzw[L_]-car.vzw[R_])/t+aT*dt;car.vzw[L_]=vz+vt*t/2;car.vzw[R_]=vz-vt*t/2}
+    else{let dL=aL*dt,dR=aR*dt;if(AR.tb[a]){const m_=(dL+dR)/2;dL=dL+(m_-dL)*AR.tb[a];dR=dR+(m_-dR)*AR.tb[a]}car.vzw[L_]+=dL;car.vzw[R_]+=dR}
+    car.zw[L_]+=car.vzw[L_]*dt;car.zw[R_]+=car.vzw[R_]*dt}
+  /* anti-roll: bars resist the left/right difference on each axle; active bars (48 V and hydraulic) mostly let go off-road for articulation;
+     hydraulic interconnected roll control (Rivian, the Monarch) resists roll but not warp, so the axles can cross-articulate freely */
+  {const K_=KARB.slice();if(AR.activeBar&&offTer&&sp<12){K_[0]*=0.2;K_[1]*=0.2}
+    if(AR.hirc){const r=((car.defl[0]-car.defl[1])+(car.defl[2]-car.defl[3]))/2,K=(K_[0]+K_[1]);for(let a=0;a<2;a++){const d=r*K*(a?0.45:0.55);Fsp[2*a]+=d;Fsp[2*a+1]-=d;car.vzw[2*a]-=d/MWv[2*a]*dt;car.vzw[2*a+1]+=d/MWv[2*a+1]*dt}}
+    else for(let a=0;a<2;a++){const d=(car.defl[2*a]-car.defl[2*a+1])*(K_[a]+(AR.tb[a]?AR.tbK:0));Fsp[2*a]+=d;Fsp[2*a+1]-=d;car.vzw[2*a]-=d/MWv[2*a]*dt;car.vzw[2*a+1]+=d/MWv[2*a+1]*dt}}
+  /* camber relative to the road (deg, negative = top of the tyre leaning in): the body's roll and the linkage's camber gain on an independent
+     corner, half of that on a torsion beam, the beam's own tilt (square to the road) on a solid axle */
+  for(let i=0;i<4;i++){const a=i<2?0:1,sy=WPOS[i][1]>0?1:-1,rollD=car.phi*57.3;car.camb[i]=AR.solid[a]?AR.cam0[a]:AR.cam0[a]+(-sy*rollD-AR.cg[a]*car.defl[i])*(AR.tb[a]?0.5:1)}
+  const sumF=Fsp.reduce((a,b)=>a+b,0), cg=car.cargo||0,tW=car.tongueW||0;
+  car.vzb+=((sumF-(ms+cg)*g-tW)/ms)*dt; car.zb+=car.vzb*dt;
+  let Mp=-ms*car.ax*HCGB-cg*g*1.3+tW*(car.tongueX||-B-1.1), Mr=ms*car.ay*(SP?SP.hR:0.45)*(1-(SP?SP.act:0)*(AR.activeBar&&offTer?0.2:1)); for(let i=0;i<4;i++){Mp-=Fsp[i]*WPOS[i][0];Mr+=Fsp[i]*ysOf(i)}
   car.thd+=(Mp/(ms*1.9))*dt; car.th+=car.thd*dt; car.phid+=(Mr/(ms*0.36))*dt; car.phi+=car.phid*dt;
   car.fz=fz;
   // ---- driver requests
@@ -5825,6 +5858,8 @@ function physics(dt){if(TOWH.ride){towRide(dt);return}
   const btK=car.hyb.btK??1;let regen=(!ice&&!gearN&&liftOff&&brakeIn<0.05+onePedal&&sp>0.5)?[0,0.045,0.095,0.2][st.regen]*m*g*WR*(st.regen===3?Math.min(1,sp/2.5):1)*btK:0;
   sys.smartR=0;if(regen>0||(!ice&&!gearN&&liftOff&&brakeIn<0.05&&sp>2)){if(smartRegenOn()&&sys.lead&&sys.gap<70){const cl=sp-Math.max(0,sys.lead.v||0);if(cl>0.3){const req=clamp(cl*cl/(2*Math.max(3,sys.gap-11))*1.3,0,2.6);if(req*m*WR>regen){regen=req*m*WR*btK;sys.smartR=req}}}}   // lift-off regen: Off / Low / Standard / One-pedal
   const driven=D.layout==="wheel"||ice?[1,1,1,1]:[D.T[0]>0?1:0,D.T[0]>0?1:0,D.T[1]>0?1:0,D.T[1]>0?1:0], nDriven=driven.reduce((a,b)=>a+b,0);
+  /* bump steer and roll steer: each corner's toe changes as it moves through its travel (rear multi-links toe in on bump for stability) */
+  {const AR=susArch();for(let i=0;i<4;i++){const a=i<2?0:1;if(AR.solid[a])continue;del[i]+=-(WPOS[i][1]>0?1:-1)*AR.toe[a]*8*(car.defl[i]||0)}}
   // ---- tyres and wheels
   let FX=0,FY=0,MZ=0; car.abs=false; let sq=0, Pw=0; const regMax=T.phev?80e3:T.hybrid?45e3:150e3;
   const blendF=(!ice&&!gearN&&brakeIn>0.04&&sp>1.2&&!car.absWas)?Math.min(brakeIn*m*g*0.95,regMax*btK/Math.max(sp,1),0.24*m*g*btK):0,blendT=nDriven?blendF*WR/nDriven:0;car.blendF=blendF;
@@ -5833,7 +5868,7 @@ function physics(dt){if(TOWH.ride){towRide(dt);return}
     const vxw=car.vx-car.r*y, vyw=car.vy+car.r*x, vl=vxw*cd+vyw*sd, vs=-vxw*sd+vyw*cd;
     const aT=Math.atan2(vs,Math.abs(vl)+0.3); car.alpha[i]+=(aT-car.alpha[i])*Math.min(1,(Math.abs(vl)+0.8)*dt/0.35);
     const vref=Math.max(Math.abs(vl),4), kap=clamp((car.w[i]*WR-vl)/vref,-1.5,1.5); car.kap[i]=kap;
-    const TY=TYRES[st.tyre||"allseason"].k,tmu=tireMu(i),kd_=car.gnd[i].kind,loose_=kd_==="grass"||kd_==="dirt"||kd_==="mud"||kd_==="sand",TMn=terrNow(),modeK=kd_==="rock"?(/Rock/i.test(TMn)?1.15:/Off.?Road|Trail|Baja|Mogul/i.test(TMn)?1.08:1):kd_==="mud"?(/Mud/i.test(TMn)?1.22:/Off.?Road|Trail|Baja/i.test(TMn)?1.08:1):kd_==="sand"?(/Sand/i.test(TMn)?1.18:/Off.?Road|Baja/i.test(TMn)?1.08:1):kd_==="snow"?(/Snow|Slippery/i.test(TMn)?1.2:1):1,muW=tmu*(car.wxMu?car.wxMu[i]:1)*camberGrip(i,car.alpha[i],kap)*offSurf(i,kd_,kap,dt)*modeK*(WEAR.grip||1)*(TY[kd_==="snow"?"snow":loose_?"grass":(st.surface||"dry")]||1)*(st.tyre==="sport"&&T.gripK?T.gripK:1)*(car.gnd[i].mu||1.15)*(car.gnd[i].kind==="dirt"&&st.surface!=="dry"?0.85:SF)*(loose_?(T.offGrip||1)*(T.terrain&&!T.terrSync&&/Mud|Rock/.test(st.terrainM||"")?1.15:1)*(st.lockers&&T.lockers?1.15:1):1)*(st.surface==="snow"&&T.terrain&&!T.terrSync&&st.terrainM==="Snow"?1.12:1), f=tyre(kap,car.alpha[i],fz[i],muW), f2=tyre(kap+0.002,car.alpha[i],fz[i],muW);
+    const TY=TYRES[st.tyre||"allseason"].k,tmu=tireMu(i),kd_=car.gnd[i].kind,loose_=kd_==="grass"||kd_==="dirt"||kd_==="mud"||kd_==="sand",TMn=terrNow(),modeK=kd_==="rock"?(/Rock/i.test(TMn)?1.15:/Off.?Road|Trail|Baja|Mogul/i.test(TMn)?1.08:1):kd_==="mud"?(/Mud/i.test(TMn)?1.22:/Off.?Road|Trail|Baja/i.test(TMn)?1.08:1):kd_==="sand"?(/Sand/i.test(TMn)?1.18:/Off.?Road|Baja/i.test(TMn)?1.08:1):kd_==="snow"?(/Snow|Slippery/i.test(TMn)?1.2:1):1,muW=tmu*(car.wxMu?car.wxMu[i]:1)*camberGrip(i,car.alpha[i],kap)*camDyn(i)*offSurf(i,kd_,kap,dt)*modeK*(WEAR.grip||1)*(TY[kd_==="snow"?"snow":loose_?"grass":(st.surface||"dry")]||1)*(st.tyre==="sport"&&T.gripK?T.gripK:1)*(car.gnd[i].mu||1.15)*(car.gnd[i].kind==="dirt"&&st.surface!=="dry"?0.85:SF)*(loose_?(T.offGrip||1)*(T.terrain&&!T.terrSync&&/Mud|Rock/.test(st.terrainM||"")?1.15:1)*(st.lockers&&T.lockers?1.15:1):1)*(st.surface==="snow"&&T.terrain&&!T.terrSync&&st.terrainM==="Snow"?1.12:1), f=tyre(kap,car.alpha[i],fz[i],muW), f2=tyre(kap+0.002,car.alpha[i],fz[i],muW);
     // motor torque with a 30 ms response, then the wheel spin equation (semi-implicit so it stays stable)
     const tgt=ice?want[i]*(want[i]>0?car.tcsF[i]:1)*escCut*(dirG<0&&want[i]*dirG>0?clamp((11-sp)/2.5,0,1):1)/* reverse (engine): full torque through the reverse gear, tops out around 20-25 mph */:thr*want[i]*car.tcsF[i]*tvMul[i]*escCut*dirG*revK - (driven[i]?(regen/nDriven+blendT)*Math.sign(car.w[i]):0);
     car.tq[i]+=(tgt-car.tq[i])*Math.min(1,dt/0.03);
@@ -12023,12 +12058,55 @@ function susDerive(k){const r=SUSR[k],T=TRIMS[k];if(!r||!T)return null;const [fr
   const tall=m>2100||/solid/.test(rr)||tune==="offroad",grad=(SUS_GRAD[tune]||4.4)+(hd?0.8:0)+(tall&&tune!=="offroad"?0.5:0),hR=tall?0.62:0.47,split=arb==="front_only"?0.88:/solid/.test(rr)?0.68:0.6;
   return {f,mw,karb,grad:arb==="active"?1.2:grad,hR,split,arbOn:arb!=="none",disc:arb==="disconnect",act:arb==="active"?0.7:0,leaf:spring==="leaf_rear"&&/solid/.test(rr)?350*m/2500:0,airLevel:spring==="air"||spring==="air_rear",
     tb:tv.map(t=>Math.max(0.06,t*0.55)),td:tv.map(t=>Math.max(0.07,t*0.45)),ride:ride?ride.map(x=>x/1000):null,ground,tune,fr,rr}}
+/* v39: what each suspension architecture does, derived once per car from its researched layout (SUSR) and damper system:
+   solid: one rigid beam per axle (springs at sTrack x the wheel track, the beam's roll radius of gyration rg x track: most of an axle's mass is the
+   centre section); tb: how much a torsion beam ties its wheels together; camber gain (deg per metre of bump) and static camber; anti-dive /
+   anti-lift / anti-squat (share of the load transfer the links carry); damper compression/rebound split; control (adaptive, magnetic, active)
+   and how fast it reacts; air springs (progressive, height set by the compressor); active anti-roll; hydraulic interconnected roll control.
+   Values are engineering estimates for each layout (see docs/SUSPENSION.md), not factory measurements */
+const ARCH_GEO={macpherson:{cg:12,cam0:-0.6,ad:0.15,as:0.12,mr:0.95,toe:0.004},double_wishbone:{cg:32,cam0:-0.5,ad:0.3,as:0.25,mr:0.68,toe:0.002},multilink:{cg:26,cam0:-1.0,ad:0.25,as:0.45,mr:0.75,toe:-0.01},
+  independent:{cg:22,cam0:-0.8,ad:0.2,as:0.3,mr:0.8,toe:0},torsion_beam:{cg:6,cam0:-1.2,ad:0,as:0.15,mr:0.85,toe:-0.004},solid_axle:{cg:0,cam0:0,ad:0.25,as:0.6,mr:0.95,toe:0},
+  solid_axle_coil:{cg:0,cam0:0,ad:0.2,as:0.75,mr:0.9,toe:0},solid_axle_leaf:{cg:0,cam0:0,ad:0.15,as:0.45,mr:1.0,toe:0},solid_axle_air:{cg:0,cam0:0,ad:0.2,as:0.7,mr:0.9,toe:0}};
+function susArchOf(k){const T=TRIMS[k],r=SUSR[k],SPk=T&&T.sus;if(!T||!SPk)return null;if(SPk._ar)return SPk._ar;const fr=r?r[0]:"macpherson",rr=r?r[1]:"multilink",spring=r?r[2]:"coil",damper=r?r[3]:"passive",dname=r?r[4]:"",arb=r?r[5]:"front_rear";
+  const gF=ARCH_GEO[fr]||ARCH_GEO.independent,gR=ARCH_GEO[rr]||ARCH_GEO.independent,isS=x=>/solid/.test(x),D=DRIVES[k]||{},fwd=D.bias?D.bias[1]<0.05:!!(D.T&&D.T[1]===0&&D.T[0]>0),sk=SUSP_OF[k]||"passive",SUk=SUSP[sk]||SUSP.passive;
+  const leafR=/leaf/.test(rr)||spring==="leaf_rear",air=[spring==="air",spring==="air"||spring==="air_rear"];
+  const ar={k,fr,rr,spring,damper,dname,solid:[isS(fr),isS(rr)],sTrack:[isS(fr)?0.76:1,isS(rr)?(leafR?0.86:0.74):1],rg:0.3,tb:[0,rr==="torsion_beam"?0.3:0],tbK:rr==="torsion_beam"?9000*(T.mass||1500)/1500:0,
+    air,prog:spring==="air"||spring==="air_rear"?0.9:0,helper:[false,leafR&&(T.mass||0)>2200],ctrl:!!SUk.adapt,tau:/magnetic|airmag/.test(sk)?0.006:sk==="active"?0.004:SUk.adapt?0.06:0.02,
+    cComp:sk==="dssv"?0.85:0.8,cReb:sk==="dssv"?1.15:1.2,antiDive:gF.ad,antiLift:gR.ad*0.6,antiSquat:gR.as,antiSquatF:gF.as*0.6,fwd,activeBar:arb==="active",hirc:/hydraulic (roll|interconnect)|interconnected/i.test(dname),
+    cam0:[gF.cam0,gR.cam0],cg:[gF.cg,gR.cg],toe:[gF.toe,gR.toe],mr:[gF.mr,gR.mr],sk};
+  return SPk._ar=ar}
+function susArch(){return susArchOf(st.trim)||{solid:[false,false],sTrack:[1,1],rg:0.3,tb:[0,0],tbK:0,air:[false,false],prog:0,helper:[false,false],ctrl:false,tau:0.02,cComp:0.8,cReb:1.2,antiDive:0.2,antiLift:0.1,antiSquat:0.3,antiSquatF:0.1,fwd:false,activeBar:false,hirc:false,cam0:[-0.6,-1],cg:[15,20],toe:[0,0],mr:[0.9,0.8]}}
+/* v39: the air springs' height, set by the compressor: each axle's air spring is pumped up (about 12 mm/s) or vented (about 20 mm/s) until
+   the body sits at the chosen height, so the car really rises and sinks on its suspension, more travel up when it's raised and less when
+   lowered. It also levels the car under load (cargo, a trailer's tongue) within what the springs can do. Rear-only air springs just level.
+   Jack mode stops it moving at all */
+function airTargetH(){const T=TRIMS[st.trim];let t=0;try{const a=airTarget();if(a!=null)t=a}catch(e){}if(st.rideH!=null&&T.sus&&T.sus.ride)t=st.rideH;if(T.sus&&T.sus.ride)t=clamp(t,T.sus.ride[0],T.sus.ride[1]);return t}
+function airTick(dt){const AR=susArch(),T=TRIMS[st.trim],H=car.hAir||(car.hAir=[0,0]);if(!AR.air[0]&&!AR.air[1]){H[0]=H[1]=0;car.airSt="";return}
+  if(OWN.airJack){car.airSt="jack";return}const tg=AR.air[0]?airTargetH():0;car.airTgt=tg;car.hFil=car.hFil||[0,0];let up=false,dn=false;
+  for(let a=0;a<2;a++){if(!AR.air[a])continue;const e=-((car.defl[2*a]||0)+(car.defl[2*a+1]||0))/2;car.hFil[a]+=(e-car.hFil[a])*Math.min(1,dt/1.2);const err=tg-car.hFil[a];
+    const lim=T.sus&&T.sus.ride?[T.sus.ride[0]-0.03,T.sus.ride[1]+0.08]:[-0.05,0.1];
+    if(err>0.004){H[a]=Math.min(lim[1],H[a]+Math.min(err*1.5,0.012)*dt);up=true}else if(err<-0.004){H[a]=Math.max(lim[0],H[a]-Math.min(-err*1.5,0.02)*dt);dn=true}}
+  const s_=up?"up":dn?"down":"";if(s_!==car.airSt){if(s_==="down")try{susSnd("hiss",0.5)}catch(e){}car.airSt=s_}if(up)try{susSnd("comp",0.35,dt)}catch(e){}}
+/* suspension sounds: a muffled clunk when a bump stop is hit, the air compressor's hum while it raises the car, the vent hiss when it lowers.
+   Quiet inside (luxury cars quieter still) */
+function susSnd(k,v,dt){const c=au.ctx;if(!c||!au.noiseB||st.walk&&k!=="comp")return;const T=TRIMS[st.trim],q=(st.cam===1?0.5:1)*((PRICE[st.trim]||0)>70000?0.6:1),t=c.currentTime;
+  if(k==="stop"){noiseBurst(t,0.18,0.25*v*q,"lowpass",140);noiseBurst(t,0.06,0.12*v*q,"bandpass",420)}
+  else if(k==="hiss")noiseBurst(t,0.9,0.05*q,"highpass",2600);
+  else if(k==="comp"){car.compT=(car.compT||0)+(dt||0.016);if(car.compT<0.12)return;car.compT=0;noiseBurst(t,0.14,0.022*q,"bandpass",210)}}
 function susApply(){for(const k of Object.keys(SUSR)){const T=TRIMS[k],r=SUSR[k];if(!T)continue;const [fr,rr,spring,damper,dname,arb,ride]=r;
   const key=damper==="adaptive"?(spring==="air"?"air":"adaptive"):damper==="magnetic"?(spring==="air"?"airmag":"magnetic"):damper==="passive"?(r[9]==="offroad"||r[9]==="sport"?"tuned":"passive"):damper;
   SUSP_OF[k]=SUSP[key]?key:"passive";T.sus=susDerive(k);T.height=!!ride;
   SUSP_NAME[k]=`${dname} · ${SUS_LBL[fr]||fr} front, ${SUS_LBL[rr]||rr} rear${spring==="air"?" · air springs":spring==="air_rear"?" · rear air springs":spring==="torsion_bar"?" · torsion bars":""}${arb==="disconnect"?" · front sway bar disconnect":arb==="active"?" · active anti-roll":""}`}}
 Object.assign(DMODES,{"k4s_lx": {"m": [["Normal", "normal", "Default balanced everyday mode."], ["Eco", "eco", "Softer throttle and earlier upshifts to save fuel."], ["Sport", "sport", "Sharper throttle, later shifts and heavier steering."]], "t": [], "s": ["passive", "MacPherson strut front, torsion beam rear", false]}, "k4s_lxs": {"m": [["Normal", "normal", "Default balanced everyday mode."], ["Eco", "eco", "Softer throttle and earlier upshifts to save fuel."], ["Sport", "sport", "Sharper throttle, later shifts and heavier steering."]], "t": [], "s": ["passive", "MacPherson strut front, torsion beam rear", false]}, "k4s_ex": {"m": [["Normal", "normal", "Default balanced everyday mode."], ["Eco", "eco", "Softer throttle and earlier upshifts to save fuel."], ["Sport", "sport", "Sharper throttle, later shifts and heavier steering."]], "t": [], "s": ["passive", "MacPherson strut front, torsion beam rear", false]}, "k4s_gtl": {"m": [["Normal", "normal", "Default balanced everyday mode."], ["Eco", "eco", "Softer throttle and earlier upshifts to save fuel."], ["Sport", "sport", "Sharper throttle, later shifts and heavier steering."]], "t": [], "s": ["passive", "MacPherson strut front, torsion beam rear", false]}, "k4s_gtlt": {"m": [["Normal", "normal", "Default balanced everyday mode."], ["Eco", "eco", "Softer throttle and earlier upshifts to save fuel."], ["Sport", "sport", "Sharper throttle, later shifts and heavier steering."]], "t": [], "s": ["passive", "MacPherson strut front, multi-link rear", false]}, "k5_lxs": {"m": [["Normal", "normal", "Default balanced everyday mode."], ["Eco", "eco", "Softer throttle and earlier upshifts to save fuel."], ["Sport", "sport", "Sharper throttle, later shifts and heavier steering."], ["Smart", "normal", "Picks Eco, Normal or Sport by itself from how you drive."]], "t": [], "s": ["passive", "MacPherson strut front, multi-link rear", false]}, "k5_gtl": {"m": [["Normal", "normal", "Default balanced everyday mode."], ["Eco", "eco", "Softer throttle and earlier upshifts to save fuel."], ["Sport", "sport", "Sharper throttle, later shifts and heavier steering."], ["Smart", "normal", "Picks Eco, Normal or Sport by itself from how you drive."]], "t": [], "s": ["passive", "MacPherson strut front, multi-link rear", false]}, "k5_gtl_awd": {"m": [["Normal", "normal", "Default balanced everyday mode."], ["Eco", "eco", "Softer throttle and earlier upshifts to save fuel."], ["Sport", "sport", "Sharper throttle, later shifts and heavier steering."], ["Smart", "normal", "Picks Eco, Normal or Sport by itself from how you drive."], ["Snow", "snow", "Gentle starts and AWD locked toward a 50:50 split for slippery roads."]], "t": [], "s": ["passive", "MacPherson strut front, multi-link rear", false]}, "k5_gt": {"m": [["Normal", "normal", "Default balanced everyday mode."], ["Eco", "eco", "Softer throttle and earlier upshifts to save fuel."], ["Sport", "sport", "Sharper throttle, later shifts and heavier steering."], ["Smart", "normal", "Picks Eco, Normal or Sport by itself from how you drive."], ["Custom", "custom", "Pick your own steering, engine and transmission settings."]], "t": [], "s": ["passive", "MacPherson strut front, multi-link rear", false]}, "k5_ex": {"m": [["Normal", "normal", "Default balanced everyday mode."], ["Eco", "eco", "Softer throttle and earlier upshifts to save fuel."], ["Sport", "sport", "Sharper throttle, later shifts and heavier steering."], ["Smart", "normal", "Picks Eco, Normal or Sport by itself from how you drive."]], "t": [], "s": ["passive", "MacPherson strut front, multi-link rear", false]}});Object.assign(SUSR,{"k4s_lx": ["macpherson", "torsion_beam", "coil", "passive", "Passive dampers; coupled torsion beam rear", "front_only", null, 140, [150, 140], "balanced"], "k4s_lxs": ["macpherson", "torsion_beam", "coil", "passive", "Passive dampers; coupled torsion beam rear", "front_only", null, 140, [150, 140], "balanced"], "k4s_ex": ["macpherson", "torsion_beam", "coil", "passive", "Passive dampers; coupled torsion beam rear", "front_only", null, 140, [150, 140], "balanced"], "k4s_gtl": ["macpherson", "torsion_beam", "coil", "passive", "Passive dampers; coupled torsion beam rear", "front_only", null, 140, [150, 140], "balanced"], "k4s_gtlt": ["macpherson", "multilink", "coil", "passive", "Sport-tuned passive dampers; multi-link rear", "front_rear", null, 140, [145, 140], "balanced"], "k5_lxs": ["macpherson", "multilink", "coil", "passive", "Passive dampers; multi-link rear", "front_rear", null, 135, [150, 140], "comfort"], "k5_gtl": ["macpherson", "multilink", "coil", "passive", "Passive dampers; multi-link rear", "front_rear", null, 135, [150, 140], "comfort"], "k5_gtl_awd": ["macpherson", "multilink", "coil", "passive", "Passive dampers; multi-link rear", "front_rear", null, 135, [150, 140], "comfort"], "k5_gt": ["macpherson", "multilink", "coil", "passive", "Sport-tuned passive dampers; multi-link rear", "front_rear", null, 140, [145, 140], "balanced"], "k5_ex": ["macpherson", "multilink", "coil", "passive", "Passive dampers; multi-link rear", "front_rear", null, 135, [150, 140], "comfort"]});
 for(const k of ["dodge_charger_sp_rt2","dodge_charger_sp_sp2","dodge_charger_sp_rt4","dodge_charger_sp_sp4","dodge_charger_dt_rt2","dodge_charger_dt_sp2","dodge_charger_dt_rt4","dodge_charger_dt_sp4"])if(DMODES.dodge_durango_srt392&&!DMODES[k])DMODES[k]=DMODES.dodge_durango_srt392;
+/* v39 suspension research (dodge.com Charger performance page; Stellantis media "Segment Disruptor: All-new Dodge Hornet"): the 2025 Charger has a
+   multilink front and an independent integral-link rear, with Dual-Valve Adaptive Damping on the Scat Pack; the Hornet has MacPherson struts in front,
+   a 3-link Chapman strut rear and Koni FSD frequency-selective dampers (adaptive dual-stage valves only with the Track Pack) */
+for(const k of ["dodge_charger_sp_rt2","dodge_charger_sp_rt4","dodge_charger_dt_rt2","dodge_charger_dt_rt4"])if(!SUSR[k])SUSR[k]=["multilink","multilink","coil","passive","Multilink front, integral-link rear, passive dampers","front_rear",null,130,[140,155],"firm"];
+for(const k of ["dodge_charger_sp_sp2","dodge_charger_sp_sp4","dodge_charger_dt_sp2","dodge_charger_dt_sp4"])if(!SUSR[k])SUSR[k]=["multilink","multilink","coil","adaptive","Dual-Valve Adaptive Damping System (Scat Pack)","front_rear",null,130,[140,155],"sport"];
+for(const k of ["dodge_hornet_gt","dodge_hornet_gtp","dodge_hornet_rt"])if(!SUSR[k])SUSR[k]=["macpherson","macpherson","coil","freq","Koni FSD frequency-selective dampers, MacPherson front, 3-link Chapman strut rear","front_rear",null,160,[150,160],"firm"];
+for(const [n,o] of [["bmw19_40i","bmw_x5_40i"],["bmw19_50i","bmw_x5_m60i"]])if(!SUSR[n]&&SUSR[o])SUSR[n]=SUSR[o].slice();
+for(const k of ["rav4_19","rav4h_le","rav4g_adv"])if(SUSR[k]&&SUSR[k][1]==="double_wishbone")SUSR[k][1]="multilink";   /* the 2019 RAV4's rear is a trailing-arm multi-link (Toyota calls it "double wishbone") */
 // evasive steering: the brands and models that really offer it (Toyota/Lexus Emergency Steering Assist with TSS 2.5+/3.0 and LSS+ 3.0,
 // Ford and Lincoln Co-Pilot360 Evasive Steering Assist, BMW Evasion Aid, Mercedes Evasive Steering Assist, Audi pre sense evasive steering assist,
 // Volvo City Safety steering support)
@@ -19655,7 +19733,7 @@ function render(dt){
   const night=st.night, wk=WX.cur, ww=WX.w, wsky=night?{rain:[0.005,0.006,0.008],snow:[0.012,0.013,0.016],fog:[0.01,0.011,0.013]}[wk]:{rain:[0.33,0.36,0.40],snow:[0.62,0.65,0.70],fog:[0.62,0.64,0.66]}[wk];
   const D_=GT.D??(night?0:1),tw=Math.max(0,1-Math.abs(D_-0.42)*3.2)*0.55,sky=[0.004,0.006,0.012].map((v,i)=>lerp(lerp(v,[0.42,0.60,0.78][i],D_),[0.62,0.36,0.24][i]*Math.max(0.25,D_),tw)).map((v,i)=>wsky?lerp(v,wsky[i]*(night?1:Math.max(0.2,D_)),ww):v), skyS=sky.map(v=>Math.pow(v,0.4545));
   gl.clearColor(skyS[0],skyS[1],skyS[2],1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
-  const T=TRIMS[st.trim]; let hT=T.height?(st.rideH!=null?st.rideH:MD().height)+(st.mode===0&&car.vx>30?-0.015:0):0;if(T.sus&&T.sus.ride)hT=clamp(hT,T.sus.ride[0],T.sus.ride[1]);{let aT=null;try{aT=airTarget()}catch(e){}if(aT!=null)hT=aT}if(fusOn("arrive")&&st.gear==="P"&&T.sus&&T.sus.ride)hT=T.sus.ride[0];
+  const T=TRIMS[st.trim]; let hT=T.height&&!(susArch().air[0])?(st.rideH!=null?st.rideH:MD().height)+(st.mode===0&&car.vx>30?-0.015:0):0;   /* (with air springs the height is physical: the compressor lifts the body on its springs) */if(T.sus&&T.sus.ride)hT=clamp(hT,T.sus.ride[0],T.sus.ride[1]);{let aT=null;try{aT=susArch().air[0]?null:airTarget()}catch(e){}if(aT!=null)hT=aT}if(fusOn("arrive")&&st.gear==="P"&&T.sus&&T.sus.ride)hT=T.sus.ride[0];
   if(car.hSnap){car.height=hT;car.hSnap=0}else car.height+=clamp(hT-car.height,-0.01*dt,0.01*dt);   /* v365: a new car starts at its own ride height instead of creeping there from the last car's */
   car.pitch=-car.th; car.roll=-car.phi;   // body pitch and roll come from the suspension model
   let cm=(RDS.flipA?chain(carMatrix(car.px,car.py,car.psi,car.height+car.zb-tuneLow()+(RDS.flipZ||0)+0.65,car.pitch,car.roll+RDS.flipA),M4.T(0,-0.65,0)):carMatrix(car.px,car.py,car.psi,car.height+car.zb-tuneLow(),car.pitch*(tuneCur().low?0.8:1),car.roll*(tuneCur().low?0.7:1)));if(VEH.cgOff)cm=chain(cm,M4.T(0,0,VEH.cgOff));   // model origin sits mid-wheelbase, the physics centre of mass is ahead of it
@@ -23438,7 +23516,18 @@ function airLv(k=st.trim){const r=SUSR[k];if(!r||r[2]!=="air")return null;const 
   if(b==="Ram")return {sys:"Active-Level air suspension",L:[["Entry/Exit",-0.051,"park"],["Aero",-0.015,"hwy"],["Normal",0],["Off-Road 1",0.03,40],["Off-Road 2",0.051,20]]};
   if(b==="Jeep")return {sys:"Quadra-Lift air suspension",L:[["Park",-0.041,"park"],["Aero",-0.015,"hwy"],["Normal",0],["Off-Road 1",0.033,40],["Off-Road 2",0.058,20]]};
   if(/^(Chevrolet|GMC|Cadillac)$/.test(b)&&/Tahoe|Suburban|Yukon|Escalade|Silverado|Sierra/.test(g))return {sys:"Air Ride Adaptive Suspension",L:[["Entry/Exit",-0.051,"park"],["Aero",-0.019,"hwy"],["Normal",0],["Off-Road",0.025,30],["Max",0.051,15]]};
-  if(b==="Rivian")return {sys:"Rivian air suspension",L:[["Kneel",-0.075,"park"],["Low",-0.04,"hwy"],["Standard",0],["High",0.05,40],["Max",0.091,15]]};return null}
+  if(b==="Rivian")return {sys:"Rivian air suspension",L:[["Kneel",-0.075,"park"],["Low",-0.04,"hwy"],["Standard",0],["High",0.05,40],["Max",0.091,15]]};
+  /* v39: every other car with air springs, in its maker's words; heights within the range researched for that car (SUSR ride) */
+  const R_=r[6]?r[6].map(v=>v/1000):[-0.025,0.04],lo=R_[0],hi=R_[1],cl=v=>clamp(v,lo,hi),cyb=/Cybertruck/.test(g);
+  if(b==="Mercedes-Benz"||b==="Mercedes-AMG"||b==="Maybach")return {sys:/E-ACTIVE/i.test(r[4])?"E-ACTIVE BODY CONTROL":"AIRMATIC",L:[["Lowered",cl(-0.015),"park"],["Lowered (highway)",cl(-0.015),"hwy"],["Normal",0],["Raised",cl(0.025),75],["Off-road",cl(hi),40]]};
+  if(b==="BMW"||b==="Rolls-Royce")return {sys:b==="BMW"?"Two-axle air suspension":"Magic Carpet Ride air suspension",L:[["Loading",cl(-0.04),"park"],["Sport (lowered)",cl(-0.02),"hwy"],["Comfort",0],["Raised +20 mm",cl(0.02),50],["Raised +40 mm",cl(0.04),22]]};
+  if(b==="Audi")return {sys:"Adaptive air suspension",L:[["Loading",cl(-0.055),"park"],["Dynamic (lowered)",cl(-0.015),"hwy"],["Comfort",0],["Lift/offroad",cl(0.035),50],["Max lift",cl(hi),22]]};
+  if(b==="Porsche")return {sys:"Adaptive air suspension (PASM)",L:[["Loading level",cl(-0.03),"park"],["Low",cl(-0.02),"hwy"],["Normal",0],["High",cl(0.03),50],["Lift",cl(hi),25]]};
+  if(b==="Land Rover"||b==="Range Rover")return {sys:"Electronic Air Suspension",L:[["Access height",cl(-0.05),"park"],["Low (highway)",cl(-0.015),"hwy"],["Normal",0],["Off-road height",cl(0.075),30],["Extended",cl(hi),20]]};
+  if(b==="Tesla")return cyb?{sys:"Adaptive air suspension",L:[["Low",cl(-0.05),"park"],["Medium (highway)",cl(-0.02),"hwy"],["Medium",0],["High",cl(0.05),45],["Extract",cl(hi),12]]}:{sys:"Smart Air Suspension",L:[["Low",cl(-0.025),"park"],["Low (highway)",cl(-0.02),"hwy"],["Standard",0],["High",cl(0.025),35],["Very High",cl(hi),22]]};
+  if(b==="Lexus"||b==="Toyota")return {sys:"Active Height Control",L:[["Lo",cl(-0.03),"park"],["Lo (highway)",cl(-0.015),"hwy"],["N",0],["Hi",cl(0.03),18],["Hi 2",cl(hi),12]]};
+  if(b==="Lucid")return {sys:"Air suspension",L:[["Access",cl(-0.03),"park"],["Low",cl(-0.015),"hwy"],["Normal",0],["High",cl(0.03),45],["Max",cl(hi),25]]};
+  return {sys:"Air suspension",L:[["Access",cl(-0.03),"park"],["Low (highway)",cl(-0.015),"hwy"],["Normal",0],["High",cl(0.03),45],["Max",cl(hi),25]]}}
 function airTarget(){const A=airLv();if(!A)return null;const sel=OWN.air[st.trim]??2,L=A.L,mph=Math.abs(car.vx)*2.237;let i=sel;
   if(typeof L[i][2]==="number"&&mph>L[i][2]){if(!(OWN.airW>performance.now())){OWN.airW=performance.now()+15000;carMsg(`${A.sys}: ${L[i][0]} only works below ${L[i][2]} mph · lowering to Normal`)}i=2}
   if(i===2&&mph>55)i=1;if(i===2&&st.gear==="P"&&(st.walk||st.power===false))i=0;OWN.airNow=L[i][0];return L[i][1]}
@@ -23619,6 +23708,8 @@ const SUS_LAB={drop:"Ride height",kf:"Front springs",kr:"Rear springs",df:"Front
 // the setup the physics uses: null on stock suspension
 function susT(){const t=tuneCur();return t&&t.co?{...SUS_DEF,...(t.sus||{})}:null}
 // tyre grip from camber: more negative camber grips harder in corners, a little less in a straight line (and wears the inner edge)
+/* v39: the tyre's camber against the road as the car rolls and the suspension moves: leaning into the turn helps, leaning out costs grip */
+function camDyn(i){const c=car.camb&&car.camb[i];if(!c)return 1;const ay=car.ay||0;if(Math.abs(ay)<0.3)return 1;const b=c*(WPOS[i][1]>0?1:-1)*Math.sign(ay);return 1+0.012*clamp(b,-6,4)*Math.min(1,Math.abs(ay)/4)}
 function camberGrip(i,alpha,kap){const S=susT();if(!S)return tuneCur().low?1.04:1;const cam=i<2?S.cf:S.cr,a=Math.abs(alpha||0),k=Math.abs(kap||0),w=a/(a+2.5*k+0.02),opt=i<2?2.6:1.8;
   const lat=1+0.028*Math.min(cam,opt)-0.02*Math.max(0,cam-opt),lon=1-0.011*cam;return (1+(S.drop>0?Math.min(S.drop,40)*0.0008:0))*(lat*w+lon*(1-w))}
 // what the setup does, for the read-outs: ride frequency, roll in a 0.8 g corner, handling balance

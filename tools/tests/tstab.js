@@ -1,4 +1,4 @@
-(async()=>{const o=[];const reset=(x,y,h)=>{car.zw=null;car.th=car.phi=car.thd=car.phid=0;car.vzb=0;resetCar({free:true,x,y,h});car.zw=null;car.vx=0};
+(async()=>{const o=[];const reset=(x,y,h)=>{car.zw=null;car.th=car.phi=car.thd=car.phid=0;car.vzb=0;resetCar({free:true,x,y,h});car.zw=null;car.vx=0;inp.steer=0;inp.steerT=0;inp.thrT=0};
 for(const k of ["camry25","q5_prest","escalade","ford_ranger_rap","ty_perf","chv_silverado_hd_wt"]){if(!TRIMS[k])continue;try{if(!MODELS[TRIMS[k].model])await loadModel(TRIMS[k].model)}catch(e){}
  for(const use of [false,true]){setTrim(k,true);const sv=TRIMS[k].sus;if(!use)TRIMS[k].sus=null;cars=[];st.power=true;st.started=true;sys.epb=false;st.gear="P";
   reset(TC_SKID.x,TC_SKID.y+30,0);let mx=0;SIM(2,(t)=>{if(t>0.5)mx=Math.max(mx,Math.abs(car.phi||0),Math.abs(car.th||0))});const still=mx;
