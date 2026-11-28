@@ -123,9 +123,18 @@ class Net:
     # ---- roads
     def fill(self, r):
         K = self.K; A = self.nodes[r["a"]]; B = self.nodes.get(r["b"])
-        if (r["i"], 0) not in A.get("legs", {}): return
+        hasA = (r["i"], 0) in A.get("legs", {}); hasB = bool(B) and (r["i"], 1) in B.get("legs", {})
+        if not r["outside"] and not (hasA and hasB):
+            # one end's junction got no kit piece: the road stays the old map's, with the lane changes off the kit junction at the other end
+            r["fallback"] = True; r["fbEnd"] = 0 if hasA else 1 if hasB else None
+            if not hasA and hasB:
+                cb, pb, lb = B["legs"][(r["i"], 1)]; cur = cb; ch = chain(pb, r["prof"]) or []
+                for nm, x, y, L in ch: cur = K.add(nm, cur)["out"]
+                r["trimB"] = lb + sum(c[3] for c in ch); return
+            if not hasA: return
+        if not hasA: return
         ca, pa, la = A["legs"][(r["i"], 0)]
-        if r["outside"] or not B or (r["i"], 1) not in B.get("legs", {}):
+        if r["outside"] or r.get("fallback"):
             # leaves the region: only the lane change back to the road's own profile, the rest is the old map's straights
             cur = ca; ch = chain(pa, r["prof"]) or []
             for nm, x, y, L in ch: cur = K.add(nm, cur)["out"]
@@ -200,7 +209,7 @@ class Net:
                 LEGS.append(leg)
         done = set()
         for r in self.roads:
-            if r["outside"] or r["i"] in done: continue
+            if r["outside"] or r.get("fallback") or r["i"] in done: continue
             # a road round a kit corner piece is one edge with a rounded corner ([x, y, R])
             chainR = [r]; a = self.nodes[r["a"]]; b = self.nodes[r["b"]]
             pts = [[a["x"], a["y"]]]
