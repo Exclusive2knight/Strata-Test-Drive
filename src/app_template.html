@@ -1443,8 +1443,14 @@ html body.chatOn #ui2 .u2left .dk,html body.chatOn #ui2 #u2mm{transform:translat
 <script data-boot>(function(){var p=0;window.__bootP=0;var t=setInterval(function(){if(window.__bootReal){clearInterval(t);return}p+=(0.7-p)*0.025;window.__bootP=p;var a=document.getElementById("bootArc"),n=document.getElementById("bootNeedle"),c=document.getElementById("bootPct");if(a)a.setAttribute("stroke-dasharray",(p*100).toFixed(1)+" 100");if(n)n.style.setProperty("--a",(-135+p*270)+"deg");if(c)c.textContent=String(Math.round(p*100))},120)})()</script>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 38 · Harbor Point, living traffic, semi trucks</h2></div>
+    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 38.1 · Fixes for Harbor Point and the garages</h2></div>
     <div class="nb"><ul>
+      <li>🧭 <b>New places in Navigation.</b> Harbor Point, Downtown Westport, the Harbor Crest Hotel &amp; Casino and the Exchange Plaza Garage are now in the Maps app and the search, so you can get directions to them (type "casino" or "valet" to find the hotel).</li>
+      <li>🅿️ <b>No more falling through garage floors.</b> In the Exchange Plaza garage and the hotel's basement levels, driving to the edge of a floor or the helix ramp could drop you through to the level below or into the ground. The edges now hold you like a kerb.</li>
+      <li>🚗 <b>Bumping a garage driver works properly.</b> In the Fort St garage, a car you nudged used to stay stuck inside yours and shudder. Now it's pushed clear, stops, and then carries on to its space.</li>
+      <li>🌳 <b>Trees out of the road.</b> A row of trees stood down the middle of John D. Dingell Dr (a road with no median), with streetlights in the lanes, and a couple of trees stood in roundabout lanes. They're gone.</li>
+    </ul>
+    <h4 class="old">Version 38 · Harbor Point, living traffic, semi trucks</h4><ul>
       <li>🧠 <b>Traffic drivers are people now.</b> Every AI driver has a personality (patience, aggression, caution, courtesy, attention and more), an age and experience, a reason for the trip (commuting, school run, shopping, a lost tourist...) and a mood that changes as they drive. Late commuters speed and take smaller gaps, tired drivers drift in the lane, novices brake early, nervous drivers hang back, and someone cut off gets angry, honks, tailgates for a bit, then calms down. Polite drivers let you merge and zipper at lane drops; rude ones don't.</li>
       <li>👀 <b>They remember you.</b> Tailgate someone and they get angry at you and honk; drive nicely and you get a thank-you wave. They only see what's in front of them and in their mirrors, so they can miss you in their blind spot. Stop-and-go waves now form on their own in heavy traffic, without any fake slowdowns.</li>
       <li>🔎 <b>See inside their heads:</b> press F7 for mood colours over every car, click one for its name, traits, mood history, what it can see and why it's doing what it's doing, plus a stress map of the city.</li>
@@ -4315,7 +4321,10 @@ if(W2){const sOn=(ax,ay,bx,by,u,dir=1)=>{const e=ePick(ax,ay,bx,by);if(!e)return
 
 const COLL={g:new Map(),gN:new Map(),C:25}, BLD_LIST=[];   // gN: the same grid without trees (used when trees are turned off)
 const COLL_KEEP=[];function collReset(){COLL.g=new Map();COLL.gN=new Map();BLD_LIST.length=0;for(const o of COLL_KEEP)collAdd(o)}
-function collAdd(o){const Rr=o.t==="c"?o.r:Math.hypot(o.hl,o.hw),C=COLL.C;for(let i=Math.floor((o.x-Rr)/C);i<=Math.floor((o.x+Rr)/C);i++)for(let j=Math.floor((o.y-Rr)/C);j<=Math.floor((o.y+Rr)/C);j++){const k=i*100003+j;let a=COLL.g.get(k);if(!a)COLL.g.set(k,a=[]);a.push(o);if(!o.tree){let b=COLL.gN.get(k);if(!b)COLL.gN.set(k,b=[]);b.push(o)}}}
+/* v38.1: no tree stands in a road (a few were planted down the middle of roads with no median, or in roundabout rings). Checked where the
+   tree is planted, after its random size is drawn, so the rest of the world comes out the same */
+function treeOnRoad(x,y){if(typeof GRID==="undefined"||!GRID.e)return false;for(const e of edgesNear(x,y,30)){const p=eProj(e,x,y);if(!p||p.u<-1||p.u>e.L+1)continue;const at=Math.abs(p.t),m2=(e.m||0)/2;if(at<hwOf(e)+0.4&&!(m2>=1.5&&at<m2-1))return true}return false}
+function collAdd(o){if(o.tree&&treeOnRoad(o.x,o.y))return;const Rr=o.t==="c"?o.r:Math.hypot(o.hl,o.hw),C=COLL.C;for(let i=Math.floor((o.x-Rr)/C);i<=Math.floor((o.x+Rr)/C);i++)for(let j=Math.floor((o.y-Rr)/C);j<=Math.floor((o.y+Rr)/C);j++){const k=i*100003+j;let a=COLL.g.get(k);if(!a)COLL.g.set(k,a=[]);a.push(o);if(!o.tree){let b=COLL.gN.get(k);if(!b)COLL.gN.set(k,b=[]);b.push(o)}}}
 function collDel(o){const Rr=o.t==="c"?o.r:Math.hypot(o.hl,o.hw),C=COLL.C;for(let i=Math.floor((o.x-Rr)/C);i<=Math.floor((o.x+Rr)/C);i++)for(let j=Math.floor((o.y-Rr)/C);j<=Math.floor((o.y+Rr)/C);j++){const k=i*100003+j;for(const G of [COLL.g,COLL.gN]){const a=G.get(k);if(a){const n=a.indexOf(o);if(n>=0)a.splice(n,1)}}}}
 /* v362: the height range of a collider that has none: from the ground it stands on to about the top of what it is */
 function collZr(o){if(!o.zr){let g=Math.max(hillZ(o.x,o.y),typeof embZ==="function"?embZ(o.x,o.y):-1e9);try{const cz=cutZ(o.x,o.y);if(cz<1e8)g=Math.min(g,cz)}catch(e){}   /* (down in a freeway cut: its floor) */o.zr=[g,g+(o.t==="c"?(o.r<=0.11?3.5:o.r<0.3?10:12):14)]}return o.zr}
@@ -6287,6 +6296,7 @@ function dynLean(o,D,dt){const c=Math.cos(o.wh),s=Math.sin(o.wh),z=D.z,G=[[1.4,0
   const air=z>dynGround(o.wx,o.wy,z)+0.05,wantP=air?D.pitch+0.25*dt:Math.atan((G[0]-G[1])/2.8),wantR=air?D.roll:Math.atan((G[2]-G[3])/1.6),k=Math.min(1,dt*6);D.pitch+=(wantP-D.pitch)*k;D.roll+=(wantR-D.roll)*k}
 function dynEnd(o){const D=o.dyn;o.dyn=null;const i=CRASHB.indexOf(o);if(i>=0)CRASHB.splice(i,1);o.v=0;
   if(o.kind==="parked"){o.fixed=true;o.wz=D.z;return}
+  if(o.gpk){o.v=0;o.wz=D.z;o.haz=false;return}   /* a garage driver gathers itself and carries on with its own route */
   const ci=cars.indexOf(o);if(ci<0)return;let f=null;try{f=findFrame(o.wx,o.wy,o.wh,null,D.z)}catch(e){}
   const lanePos=f&&f.e&&!f.e.ov===!o.e?.ov?f:null;
   if(f&&f.e&&Math.abs(Math.cos(o.wh-(f.h??o.wh)))>0.85&&Math.abs(f.off-(f.lo??0)*LANE)<LANE*2.2&&Math.abs((f.e.hz?ez(f.e,f.dir>0?f.s:f.e.L-f.s):0)-D.z)<1){o.e=f.e;o.dir=f.dir;o.s=f.s;o.off=f.off;o.offT=f.off;o.jn=null;o.stunned=st.aiWreck===false?1.5:6;o.wp=0;o.wr=0;try{planMove(o)}catch(e){}return}
@@ -6318,6 +6328,7 @@ function checkCollision(){try{semiHit()}catch(e){}
       if(R.v>2.5&&(o.kind==="ai"||o.kind==="parked"||o.kind==="errand")&&!sys.hnr){let w=o.kind==="ai";if(!w)for(const p of peds)if(Math.hypot(p.wx-car.px,p.wy-car.py)<40){w=true;break}if(!w)for(const k of cars)if(k!==o&&k.wx!==undefined&&Math.hypot(k.wx-car.px,k.wy-car.py)<45){w=true;break}sys.hnr={x:car.px,y:car.py,t:st.clock,stopT:0,wit:w}}
       if(dynStart(o,J*H.n[0]/m,J*H.n[1]/m,(rx*J*H.n[1]-ry*J*H.n[0])/(m*DYN_I)*(o.dyn?0.35:1))){crashFx(R.v,{parked:"a parked car",ai:"traffic",wreck:"a crashed car"}[o.kind]||"another car");continue}}
     const push=H.d*(1-R.share), dvx=R.j*H.n[0]/mO, dvy=R.j*H.n[1]/mO, tx=Math.cos(o.wh), ty=Math.sin(o.wh), along=dvx*tx+dvy*ty, lat=-dvx*ty+dvy*tx;
+    if(o.gpk){o.wx+=H.n[0]*push;o.wy+=H.n[1]*push;o.v=0;o.stunned=Math.max(o.stunned||0,1.5);crashFx(R.v,"another car");continue}   /* a garage driver: pushed out of you and stops (it has no lane to slide along) */
     if(o.jn)o.jn.d=Math.max(0,o.jn.d+(H.n[0]*tx+H.n[1]*ty)*push);
     else{o.s+=(H.n[0]*tx+H.n[1]*ty)*push;o.off+=(-H.n[0]*ty+H.n[1]*tx)*push;if(o.kind!=="parked")o.offT=o.off}
     if(o.kind!=="parked")o.v=Math.max(0,o.v+along);
@@ -8651,6 +8662,11 @@ function navPlaces(){const L=[],add=(name,sub,x,y,h,ic)=>{if(x==null||!isFinite(
   add("Rosedale","Neighborhood",STARTS.suburb.x,STARTS.suburb.y,STARTS.suburb.h,"🏘️");
   if(W2){for(const k of ["mountain","millbrook","fairhaven","oakridge"])if(STARTS[k])add(STARTS[k].name,STARTS[k].nav||"",STARTS[k].x,STARTS[k].y,STARTS[k].h,STARTS[k].ic||"📍")}
   if(W2)try{w2NavPlaces(add)}catch(e){}
+  /* v38 places: Harbor Point, the Harbor Crest Hotel (valet and casino) and the Exchange Plaza garage */
+  if(W2)try{if(STARTS.harbor)add("Harbor Point","City · the new downtown of towers",STARTS.harbor.x,STARTS.harbor.y,STARTS.harbor.h,"🏙️");
+    if(STARTS.city)add("Downtown Westport","City · Main St",STARTS.city.x,STARTS.city.y,STARTS.city.h,"🏙️");
+    {const [x,y]=hvW(HV.stand[0],HV.stand[1]);add("Harbor Crest Hotel & Casino","Hotel · valet, casino with slots, blackjack and roulette · Capitol Ave",x,y,0,"🏨");L[L.length-1].kw="casino valet hotel"}
+    {const S=SITES.find(q=>q.k==="ugarage");if(S)add("Exchange Plaza Garage","Underground parking · entrance on Exchange St",S.cx+38.5,S.cy-75,0,"🅿️")}}catch(e){}
   if(W2)try{const NM={b_corner_cafe:["Corner Café","Café","☕"],b_clothing_boutique:["Boutique","Clothing","👗"],b_electronics_store:["Electronics store","Electronics","📱"],b_neighborhood_market:["Corner market","Groceries","🛒"],b_pharmacy:["Pharmacy","Pharmacy","💊"],b_bakery:["Bakery","Bakery","🥐"],b_restaurant:["Restaurant","Restaurant","🍽️"],b_auto_parts_shop:["Auto parts","Auto parts","🔩"],lk_market:["Corner market","Groceries","🛒"],lk_strip:["Shops","Shopping","🛍️"]};
     const seen=new Set();for(const o of W2P){const n=NM[o.k];if(!n||!inCity(o.x,o.y))continue;const f=navSnap({x:o.x,y:o.y,h:0}),nm=`${n[0]} · ${f?f.e.name:"downtown"}`;if(seen.has(nm))continue;seen.add(nm);add(nm,`${o.x>1000?"Fairhaven":"Westport"} downtown · street parking`,o.x,o.y,0,n[2])}}catch(e){}
   return L.sort((a,b)=>a.d-b.d)}
@@ -13989,7 +14005,7 @@ function worldScenery(){CUTO.clear();W2P.length=0;LKP.length=0;LK.sky=0;LK.used=
   if(typeof W2_RB!=="undefined"&&W2)for(const b of W2_RB)if(!b.cul&&b.R>=20){SL.list.push({k:"sl_double",x:b.x,y:b.y,z:hillZ(b.x,b.y),h:(b.x*0.013+b.y*0.007)%Math.PI});collAdd({t:"c",x:b.x,y:b.y,r:0.2,what:"a streetlight"})}   // a double-arm light on each big roundabout's island
   const B=(m,x,y,z0,h,w,d,a)=>boxInto(m,x,z0+h/2,-y,w,h,d,a||0);
   const TE=(m,e,dir,s,o,z0,h,ls,lo)=>{const p=fpt(e,dir,s,o),zz=e.hz?ez(e,dir>0?s:e.L-s):0;boxInto(m,p[0],z0+zz+h/2,-p[1],ls,h,lo,p[2]);return p};
-  const treeAt=(x,y,hb,big)=>{const hgt=(big?7:5)+r()*(big?9:3.5),rad=(big?2:1.5)+r()*(big?2:1.1),seg=7,z=-y;TREEP.set(Math.round(x*2)+","+Math.round(y*2),{h:hgt,r:rad,g:hb});
+  const treeAt=(x,y,hb,big)=>{const hgt=(big?7:5)+r()*(big?9:3.5),rad=(big?2:1.5)+r()*(big?2:1.1),seg=7,z=-y;if(treeOnRoad(x,y))return;TREEP.set(Math.round(x*2)+","+Math.round(y*2),{h:hgt,r:rad,g:hb});
     for(let i=0;i<seg;i++){const a0=i/seg*Math.PI*2,a1=(i+1)/seg*Math.PI*2,c0=[Math.cos(a0),Math.sin(a0)],c1=[Math.cos(a1),Math.sin(a1)];
       const b=tree.P.length/3;tree.P.push(x,hgt+hb,z,x+c0[0]*rad,hgt*0.28+hb,z+c0[1]*rad,x+c1[0]*rad,hgt*0.28+hb,z+c1[1]*rad);
       tree.N.push(...norm([(c0[0]+c1[0])/2,0.5,(c0[1]+c1[1])/2]),...norm([c0[0],0.5,c0[1]]),...norm([c1[0],0.5,c1[1]]));tree.I.push(b,b+2,b+1)}
@@ -14149,7 +14165,7 @@ if(!rectFree(k,x,y,fa))return false;w2Put(k,x,y,fa,0);return true};
     if(e.type==="xway"&&!e.br&&!e.ow){for(let u=k0+30;u<k1-30;u+=64){const p=ePt(e,u,0);if(nearBr(p[0],p[1])||e.tp&&u<e.tp[1]+10)continue;let tl=false;try{tl=TOLL.e===e&&Math.abs(u-TOLL.s)<90}catch(_){}if(tl)continue;
         let hit=false;for(const o of gAt(GRID.e,p[0],p[1])){if(o===e)continue;const q=eProj(o,p[0],p[1]);if(q.u>0&&q.u<o.L&&Math.abs(q.t)<hwOf(o)+6){hit=true;break}}if(hit)continue;   /* not under or beside another road (overpasses, ramps) */
         SL.list.push({k:"sl_double",x:p[0],y:p[1],z:SZ(p[0],p[1]),h:p[2]+Math.PI/2});collAdd({t:"c",x:p[0],y:p[1],r:0.2,what:"a streetlight"})}}
-    if(e.type==="blvd"){const k0m=e.tp?e.tp[1]:k0;for(let u=k0m+10;u<k1-4;u+=50){if(nearBr(...ePt(e,u,0)))continue;const p=ePt(e,u,0);SL.list.push({k:"sl_double",x:p[0],y:p[1],z:0,h:p[2]+Math.PI/2});collAdd({t:"c",x:p[0],y:p[1],r:0.18,what:"a streetlight"})}
+    if(e.type==="blvd"){const k0m=e.tp?e.tp[1]:k0;for(let u=k0m+10;u<k1-4;u+=50){if(nearBr(...ePt(e,u,0))||(e.m||0)<1.5)continue;   /* (no median: no lights down the middle) */const p=ePt(e,u,0);SL.list.push({k:"sl_double",x:p[0],y:p[1],z:0,h:p[2]+Math.PI/2});collAdd({t:"c",x:p[0],y:p[1],r:0.18,what:"a streetlight"})}
       for(let u=k0m+30;u<k1-10;u+=25){const p=ePt(e,u,(r()-0.5)*3);if(nearBr(p[0],p[1]))continue;treeAt(p[0],p[1],0,true);collAdd({tree:1,t:"c",x:p[0],y:p[1],r:0.35})}
       for(let u=k0+20;u<k1;u+=60)for(const sd of [1,-1]){const p=ePt(e,u,sd*(W+T.walk+1.5));if(clear(p[0],p[1],1.5)){treeAt(p[0],p[1],SZ(p[0],p[1]),false);collAdd({tree:1,t:"c",x:p[0],y:p[1],r:0.3})}}}
     if(e.type==="res"||e.type==="col"){
@@ -18134,7 +18150,7 @@ function phMapsApp(){const G=NAV.g,dist=m=>m<160?`${Math.max(50,Math.round(m*3.2
   cv=`<canvas id="phMap" data-fit="1" style="position:absolute;inset:0;width:100%;height:100%;display:block"></canvas>`,
   sh="box-shadow:0 1px 5px rgba(0,0,0,.28)";
   if(!NAV.dest){const L=mapsList();PHONE._pl=L;
-    const CH=[["gas","⛽","Gas",p=>p.ic==="⛽"],["chg","⚡","Charging",p=>/charg/i.test(p.sub+p.name)],["food","🍔","Food",p=>/Restaurant|Café|Grocery/i.test(p.sub)],["shop","🛍️","Shops",p=>/store|Tires/i.test(p.sub)],["park","🅿️","Parking",p=>p.ic==="🅿️"||/Valet/.test(p.name)],["go","🏞️","Places",p=>/⛰️|🏁|🏘️|🏠|🫧/.test(p.ic)||(!p.st&&/Neighborhood|Town|City|Trail/i.test(p.sub))]],
+    const CH=[["gas","⛽","Gas",p=>p.ic==="⛽"],["chg","⚡","Charging",p=>/charg/i.test(p.sub+p.name)],["food","🍔","Food",p=>/Restaurant|Café|Grocery/i.test(p.sub)],["shop","🛍️","Shops",p=>/store|Tires/i.test(p.sub)],["park","🅿️","Parking",p=>p.ic==="🅿️"||/Valet/.test(p.name)],["go","🏞️","Places",p=>/⛰️|🏁|🏘️|🏠|🫧|🏙️|🏨/.test(p.ic)||(!p.st&&/Neighborhood|Town|City|Trail/i.test(p.sub))]],
       q=(PHONE.mq||"").trim().toLowerCase(),C=CH.find(c=>c[0]===PHONE.mc),
       vis=p=>q?(p.name+" "+p.sub).toLowerCase().includes(q):C?(!p.st&&C[3](p)):!p.st,
       open=!!(q||C),shown=L.filter(vis).length;
@@ -18158,7 +18174,7 @@ function phMapsApp(){const G=NAV.g,dist=m=>m<160?`${Math.max(50,Math.round(m*3.2
 function mapsList(){const L=navPlaces().sort((a,b)=>a.d-b.d),seen=new Map();
   for(const e of EDGES){if(!e.name||/ramp|^\s*$/i.test(e.name)||e.type==="ramp")continue;try{const P=fpt(e,1,e.L/2,0),d=Math.hypot(P[0]-car.px,P[1]-car.py),o=seen.get(e.name);if(!o||d<o.d)seen.set(e.name,{name:e.name,sub:"Street",x:P[0],y:P[1],h:0,ic:"🛣️",d,st:1})}catch(_){}}
   for(const v of [...seen.values()].sort((a,b)=>a.name.localeCompare(b.name)))L.push(v);return L}
-const MAPS_CH=[["gas","⛽","Gas",p=>p.ic==="⛽"],["chg","⚡","Charging",p=>/charg/i.test(p.sub+p.name)],["food","🍔","Food",p=>/Restaurant|Café|Grocery/i.test(p.sub)],["shop","🛍️","Shops",p=>/store|Tires/i.test(p.sub)],["park","🅿️","Parking",p=>p.ic==="🅿️"||/Valet/.test(p.name)],["go","🏞️","Places",p=>/⛰️|🏁|🏘️|🏠|🫧/.test(p.ic)||(!p.st&&/Neighborhood|Town|City|Trail/i.test(p.sub))]];
+const MAPS_CH=[["gas","⛽","Gas",p=>p.ic==="⛽"],["chg","⚡","Charging",p=>/charg/i.test(p.sub+p.name)],["food","🍔","Food",p=>/Restaurant|Café|Grocery/i.test(p.sub)],["shop","🛍️","Shops",p=>/store|Tires/i.test(p.sub)],["park","🅿️","Parking",p=>p.ic==="🅿️"||/Valet/.test(p.name)],["go","🏞️","Places",p=>/⛰️|🏁|🏘️|🏠|🫧|🏙️|🏨/.test(p.ic)||(!p.st&&/Neighborhood|Town|City|Trail/i.test(p.sub))]];
 function carSearchOpen(chip){let el=$("cmS");if(!el){el=document.createElement("div");el.id="cmS";document.body.appendChild(el);
     el.addEventListener("keydown",e=>{e.stopPropagation();if(e.key==="Escape")carSearchClose();if(e.key==="Enter"){const f=[...el.querySelectorAll(".cmR")].find(x=>!x.hidden);if(f)f.click()}});el.addEventListener("keyup",e=>e.stopPropagation());el.addEventListener("pointerdown",e=>e.stopPropagation());
     el.addEventListener("click",e=>{if(e.target===el)return carSearchClose();const b=e.target.closest("[data-c]");if(b){carSearchOpen(b.dataset.c===el._c?null:b.dataset.c);return}const r=e.target.closest(".cmR");if(r){const p=el._L[+r.dataset.i];carSearchClose();if(p){if(!nxCarPicked(p)){navTo(p);toast("Route set: "+p.name)}SCR.page="map"}}else if(e.target.closest(".cmX"))carSearchClose()})}
@@ -20473,7 +20489,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="178",BUILD_VER=381;
+const APP_VER="178",BUILD_VER=382;
 // shown as season.update: build 345 is v34.5, 350 will be v35.0
 const verStr=n=>{n=+n;return n>=300?Math.floor(n/10)+"."+n%10:String(n)},VER_S=verStr(BUILD_VER);
 try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+VER_S;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+VER_S)}catch(e){}   /* BUILD_VER: bumped to make open copies reload without resetting saves */
@@ -22271,7 +22287,8 @@ function mallDraw(night){if(!MALL.m){if(!MALL.busy&&(MALL.fail||0)<3&&Math.hypot
 var SITE_ON=false;
 function siteGround(x,y){for(const S of SITES){const g=S.g;if(!g)continue;const X=x-S.cx,Z=S.cy-y,fi=(X-g.x0)/g.s,fj=(Z-g.z0)/g.s,i=Math.floor(fi),j=Math.floor(fj);if(i<0||j<0||i>=g.w||j>=g.h)continue;
   const ref=GREF-S.z,W_=g.w,H_=g.h,D=g.d;let best=null,bd=1e9,any=false;for(let L=0;L<g.L;L++){const v=D[(L*H_+j)*W_+i];if(v===-32768)continue;any=true;const h=v/100;if(h>ref+1.2)continue;const dd=h<=ref+0.75?ref-h:(h-ref)*4+3;if(dd<bd){bd=dd;best=h}}
-  if(best===null){if(any&&ref<-1)return {h:S.z+ref-0.5,mu:1.0,kind:"pad",site:S};continue}   /* nothing at your level (a floor only far above): keep your height, the walls stop you */
+  if(best!==null&&ref<-1&&best<ref-1.0)best=null;   /* underground there is nowhere to drop more than a metre (the floors join by ramps): the edge of a helix or a floor is a kerb, not a cliff */
+  if(best===null){if(ref<-1){let nb=null,nd=1e9;for(let r=1;r<=8&&nb===null;r++)for(let dj=-r;dj<=r;dj++)for(let di=-r;di<=r;di++){if(Math.max(Math.abs(di),Math.abs(dj))!==r)continue;const ii=i+di,jj=j+dj;if(ii<0||jj<0||ii>=W_||jj>=H_)continue;for(let L=0;L<g.L;L++){const v=D[(L*H_+jj)*W_+ii];if(v===-32768)continue;const h=v/100,q=Math.abs(h-ref);if(h<=ref+1.2&&h>=ref-1.0&&q<nd){nd=q;nb=h}}}return {h:S.z+(nb??ref),mu:1.0,kind:"pad",site:S}}continue}   /* underground with no floor at your level (a gap between floor cells, or past the edge of a floor): keep your height, the walls stop you. (It used to sink you 0.5 m a step, which fell for ever) */
   /* smooth between cell centres on the same floor */
   const ax=fi-0.5,az=fj-0.5,i0=Math.floor(ax),j0=Math.floor(az),tx=ax-i0,tz=az-j0;let sum=0,wt=0;
   for(const [di,dj,w] of [[0,0,(1-tx)*(1-tz)],[1,0,tx*(1-tz)],[0,1,(1-tx)*tz],[1,1,tx*tz]]){const ii=i0+di,jj=j0+dj;let hv=best;if(ii>=0&&jj>=0&&ii<W_&&jj<H_){let bb=0.45;for(let L=0;L<g.L;L++){const v=D[(L*H_+jj)*W_+ii];if(v===-32768)continue;const h=v/100;if(Math.abs(h-best)<bb){bb=Math.abs(h-best);hv=h}}}sum+=hv*w;wt+=w}
