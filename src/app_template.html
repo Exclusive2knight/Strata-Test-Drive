@@ -11988,12 +11988,12 @@ function walkUpdate(dt){const W=st.walk;if(UBER.ride||MPW.ride){W.v=0;return}if(
   const boxHit=(nx,ny,x,y,h,hl,hw)=>{const c=Math.cos(h),s=Math.sin(h),dx=nx-x,dy=ny-y;return Math.abs(dx*c+dy*s)<hl&&Math.abs(-dx*s+dy*c)<hw};
   const blocked=(nx,ny)=>{if(boxHit(nx,ny,car.px,car.py,car.psi,BODY_HL+0.3,BODY_HW+0.3)&&W.z<(car.zb||0)+1.5)return true;
     for(const L of [cars,parked])for(const o of L){if(o.wx===undefined||o.kind==="cone"||o.kind==="xing"||Math.abs(o.wx-nx)>7||Math.abs(o.wy-ny)>7||Math.abs((o.wz||0)-W.z)>1.6)continue;if(boxHit(nx,ny,o.wx,o.wy,o.wh||0,o.kind==="bike"?1.0:2.45,o.kind==="bike"?0.45:1.05))return true}
-    {GREF=W.z+0.4;const gz2=groundAt(nx,ny).h,g0=groundAt(W.x,W.y).h;GREF=car.zb||0;if(gz2>Math.max(W.z,g0)+0.55&&!W.air)return true}   // a wall or a ledge too high to step up
+    {GREF=(W.air&&W.gz0!==undefined?Math.min(W.z,W.gz0+0.3):W.z)+0.4;const gz2=groundAt(nx,ny).h,g0=groundAt(W.x,W.y).h;GREF=car.zb||0;if(gz2>Math.max(W.z,g0)+0.55&&!W.air)return true}   // a wall or a ledge too high to step up
     for(const o of collNear(nx,ny)){if(o.z1!==undefined&&(W.z<o.z0-0.6||W.z>o.z1))continue;if(o.t==="c"){if(Math.hypot(nx-o.x,ny-o.y)<o.r+0.3)return true}
       else{const c=Math.cos(o.h),s=Math.sin(o.h),dx=nx-o.x,dy=ny-o.y;if(Math.abs(dx*c+dy*s)<o.hl+0.3&&Math.abs(-dx*s+dy*c)<o.hw+0.3)return true}}return false};
   let nx=W.x+vx*dt,ny=W.y+vy*dt;
   if(!blocked(W.x,W.y)&&blocked(nx,ny)){if(!blocked(nx,W.y))ny=W.y;else if(!blocked(W.x,ny))nx=W.x;else{nx=W.x;ny=W.y}}   // slide along walls
-  W.x=nx;W.y=ny;GREF=W.z+0.4;const gz=groundAt(W.x,W.y).h;GREF=car.zb||0;
+  W.x=nx;W.y=ny;GREF=(W.air&&W.gz0!==undefined?Math.min(W.z,W.gz0+0.3):W.z)+0.4;const gz=groundAt(W.x,W.y).h;GREF=car.zb||0;if(!W.air)W.gz0=gz;   /* mid-jump the floor is looked up from where you took off, so you land back on it */
   // jumping and falling
   const onGround=W.z<=gz+0.02||(!W.air&&W.vz<=0&&W.z<=gz+0.4);if(onGround){W.z=gz;W.vz=0;if(FOOT.jump){W.vz=5.6;W.air=true;beep(520,.05,"sine",.08)}}else{W.vz-=18*dt}
   W.z+=W.vz*dt;if(W.z<gz){W.z=gz;W.vz=0;if(W.air){W.air=false}}FOOT.jump=false;W.ph+=W.v*dt*3.2;
@@ -22558,12 +22558,21 @@ function mallDraw(night){if(!MALL.m){if(!MALL.busy&&(MALL.fail||0)<3&&Math.hypot
 var SITE_ON=false;
 function siteGround(x,y){for(const S of SITES){const g=S.g;if(!g)continue;const X=x-S.cx,Z=S.cy-y,fi=(X-g.x0)/g.s,fj=(Z-g.z0)/g.s,i=Math.floor(fi),j=Math.floor(fj);if(i<0||j<0||i>=g.w||j>=g.h)continue;
   const ref=GREF-S.z,W_=g.w,H_=g.h,D=g.d;let best=null,bd=1e9,any=false;for(let L=0;L<g.L;L++){const v=D[(L*H_+j)*W_+i];if(v===-32768)continue;any=true;const h=v/100;if(h>ref+1.2)continue;const dd=h<=ref+0.75?ref-h:(h-ref)*4+3;if(dd<bd){bd=dd;best=h}}
-  if(best!==null&&ref<-1&&best<ref-1.0)best=null;   /* underground there is nowhere to drop more than a metre (the floors join by ramps): the edge of a helix or a floor is a kerb, not a cliff */
+  if(best!==null&&ref<-1&&best<ref-2.0)best=null;   /* (2 m, not 1: a jump or a bump lifts you a metre off your floor, and it must still be your floor; the next floor down is 3.6 m) */   /* underground there is nowhere to drop more than a metre (the floors join by ramps): the edge of a helix or a floor is a kerb, not a cliff */
   if(best===null){if(ref<-1){let nb=null,nd=1e9;for(let r=1;r<=8&&nb===null;r++)for(let dj=-r;dj<=r;dj++)for(let di=-r;di<=r;di++){if(Math.max(Math.abs(di),Math.abs(dj))!==r)continue;const ii=i+di,jj=j+dj;if(ii<0||jj<0||ii>=W_||jj>=H_)continue;for(let L=0;L<g.L;L++){const v=D[(L*H_+jj)*W_+ii];if(v===-32768)continue;const h=v/100,q=Math.abs(h-ref);if(h<=ref+1.2&&h>=ref-1.0&&q<nd){nd=q;nb=h}}}return {h:S.z+(nb??ref),mu:1.0,kind:"pad",site:S}}continue}   /* underground with no floor at your level (a gap between floor cells, or past the edge of a floor): keep your height, the walls stop you. (It used to sink you 0.5 m a step, which fell for ever) */
   /* smooth between cell centres on the same floor */
   const ax=fi-0.5,az=fj-0.5,i0=Math.floor(ax),j0=Math.floor(az),tx=ax-i0,tz=az-j0;let sum=0,wt=0;
   for(const [di,dj,w] of [[0,0,(1-tx)*(1-tz)],[1,0,tx*(1-tz)],[0,1,(1-tx)*tz],[1,1,tx*tz]]){const ii=i0+di,jj=j0+dj;let hv=best;if(ii>=0&&jj>=0&&ii<W_&&jj<H_){let bb=0.45;for(let L=0;L<g.L;L++){const v=D[(L*H_+jj)*W_+ii];if(v===-32768)continue;const h=v/100;if(Math.abs(h-best)<bb){bb=Math.abs(h-best);hv=h}}}sum+=hv*w;wt+=w}
   return {h:S.z+sum/wt,mu:1.0,kind:"pad",site:S}}return null}
+/* v40: the imported wall boxes are whole storeys (floor-0.85 to floor+2.8), so a wall under a ramp, or round the helix's shaft, stuck up through
+   the ramp or the floor above it: invisible walls halfway down the hotel's middle ramp and beside the helix. Where a floor or ramp runs right
+   through a wall at the same height on both sides, the wall is cut off just under it (or dropped when nothing's left) */
+function siteWallsClip(g,walls){const lay=(i,j)=>{const r=[];if(i<0||j<0||i>=g.w||j>=g.h)return r;for(let L=0;L<g.L;L++){const v=g.d[(L*g.h+j)*g.w+i];if(v!==-32768)r.push(v/100)}return r},
+    near=(i,j,h)=>lay(i,j).some(v=>Math.abs(v-h)<0.8),out=[];
+  for(const w of walls){const [X0,X1,Z0,Z1,Y0,Y1]=w,i0=Math.floor((X0-g.x0)/g.s+0.5),i1=Math.floor((X1-g.x0)/g.s-0.5),j0=Math.floor((Z0-g.z0)/g.s+0.5),j1=Math.floor((Z1-g.z0)/g.s-0.5);let cut=null;
+    for(let i=i0;i<=i1;i++)for(let j=j0;j<=j1;j++)for(const h of lay(i,j)){if(!(h>Y0+1.1&&h<Y1-0.2))continue;if((near(i0-1,j,h)&&near(i1+1,j,h))||(near(i,j0-1,h)&&near(i,j1+1,h)))cut=cut===null?h:Math.min(cut,h)}
+    if(cut===null){out.push(w);continue}if(cut-0.1-Y0>=0.3)out.push([X0,X1,Z0,Z1,Y0,cut-0.1])}
+  return out}
 function siteLoad(S){if(S.busy||S.m)return;S.busy=true;
   txFetch("props/site/"+S.k+".json").then(d=>{const L=[],ox=S.cx,oz=-S.cy;S.tex=d.tex.map(t=>txTex(t.u,t.clamp));
     for(const [mi,chs] of Object.entries(d.m)){const M=d.mats[+mi],G_={m:M,chunks:[],dd:/floor|asphalt|concrete|paint|stripe|line|marking|carpet/i.test(M.n)?700:2400};
@@ -22575,7 +22584,7 @@ function siteLoad(S){if(S.busy||S.m)return;S.busy=true;
       L.push(G_)}
     L.sort((a,b)=>(a.m.a==="BLEND"&&a.m.t<0)-(b.m.a==="BLEND"&&b.m.t<0));
     const g=d.grid;S.g={x0:g.x0,z0:g.z0,s:g.s,w:g.w,h:g.h,L:g.L,d:b64(g.d,Int16Array)};SITE_ON=true;
-    if(!S.coll){S.coll=true;for(const [X0,X1,Z0,Z1,Y0,Y1] of d.walls){const o={t:"b",x:S.cx+(X0+X1)/2,y:S.cy-(Z0+Z1)/2,h:0,hl:(X1-X0)/2,hw:(Z1-Z0)/2,z0:S.z+Y0,z1:S.z+Y1,what:"a wall"};collAdd(o);COLL_KEEP.push(o)}}
+    if(!S.coll){S.coll=true;for(const [X0,X1,Z0,Z1,Y0,Y1] of siteWallsClip(S.g,d.walls)){const o={t:"b",x:S.cx+(X0+X1)/2,y:S.cy-(Z0+Z1)/2,h:0,hl:(X1-X0)/2,hw:(Z1-Z0)/2,z0:S.z+Y0,z1:S.z+Y1,what:"a wall"};collAdd(o);COLL_KEEP.push(o)}}
     S.m=L;S.busy=false;if(S.park)try{siteParked(S)}catch(e){console.error(e)}}).catch(e=>{S.busy=false;S.fail=(S.fail||0)+1;console.warn("site",S.k,e)})}
 /* the garage's stalls (from the pack's inventory): about half of them taken */
 function siteParked(S){if(S.parked)return;S.parked=true;const L=S.stalls||[];for(const [lv,X,Z,hd] of L){if(Math.random()>0.55)continue;const x=S.cx+X,y=S.cy-Z;GREF=S.z+(lv===2?-7.2:-3.6)+0.5;const g=groundAt(x,y);GREF=car.zb||0;
