@@ -12605,7 +12605,7 @@ function assist(dt){
   if(cmd>0&&sp<0.3&&sys.aebState!=="held"){sys.aebStill=(sys.aebStill||0)+dt;if(sys.aebStill>1){cmd=0;sys.aebArm=false;sys.aebState=aebOn?"ready":sys.aebState}}else sys.aebStill=0;
   sys.aebBrake=cmd;sys.aebPart=stage===2;
   if(!st.aeb||!has("aeb")){sys.aebBrake=0;sys.aebState="off"}else if(st.aebAuto===false){sys.aebBrake=0;sys.aebState="ready"}
-  {if(isTesla()&&sys.fcw){const now=performance.now();if(!sys.fcwSndT||now-sys.fcwSndT>700){sys.fcwSndT=now;playS("ts_fcw",0.6)}}else{const b=brandS(),lin=b==="Lincoln",gm=GMB.has(b),kia=b==="Kia",bmw=b==="BMW",ford=b==="Ford",toy=b==="Toyota"||b==="Lexus",kSolid=kia&&(sys.aebState==="braking"||sys.aebBrake>0.3);if(sys.fcw&&(lin||gm||kia||bmw||ford||toy)){const now=performance.now();if(!sys.fcwSndT||now-sys.fcwSndT>(lin?2300:kia?(kSolid?1850:1300):bmw?600:ford?1000:toy?1690:950)){sys.fcwSndT=now;if(!playS(lin?"lin_hard":kia?(kSolid?"kia_aeb_solid":"kia_aeb"):bmw?"bmw_aeb":ford?"ford_aeb":toy?"toy_aeb":"gm_aeb",0.7))beep(2300,.08,"square",.18)}}else{if(!sys.fcw)sys.fcwSndT=0;if(sys.fcw&&(performance.now()%220)<dt*1000*1.2)beep(2400,.07,"square",.2)}}}
+  {if(isTesla()&&sys.fcw){const now=performance.now();if(!sys.fcwSndT||now-sys.fcwSndT>700){sys.fcwSndT=now;playS("ts_fcw",0.6)}}else{const b=brandS(),h23=hon23(),k27=kia27();if(sys.fcw&&(h23||k27)){const now=performance.now();if(!sys.fcwSndT||now-sys.fcwSndT>(h23?2600:1250)){sys.fcwSndT=now;if(!playS(h23?"honda_fcw":"kia27_fcw",0.7))beep(2300,.08,"square",.18)}}else{const lin=b==="Lincoln",gm=GMB.has(b),kia=b==="Kia",bmw=b==="BMW",ford=b==="Ford",toy=b==="Toyota"||b==="Lexus",kSolid=kia&&(sys.aebState==="braking"||sys.aebBrake>0.3);if(sys.fcw&&(lin||gm||kia||bmw||ford||toy)){const now=performance.now();if(!sys.fcwSndT||now-sys.fcwSndT>(lin?2300:kia?(kSolid?1850:1300):bmw?600:ford?1000:toy?1690:950)){sys.fcwSndT=now;if(!playS(lin?"lin_hard":kia?(kSolid?"kia_aeb_solid":"kia_aeb"):bmw?"bmw_aeb":ford?"ford_aeb":toy?"toy_aeb":"gm_aeb",0.7))beep(2300,.08,"square",.18)}}else{if(!sys.fcw)sys.fcwSndT=0;if(sys.fcw&&(performance.now()%220)<dt*1000*1.2)beep(2400,.07,"square",.2)}}}}
   // ---- traffic lights ahead: ACC / Pilot stop for them quietly; running a red is logged
   sys.red=null;sys.redWarn=false;
   {const n=M.node;if(n&&n.ctrl==="signal"&&M.s<M.L){const leg=arrLeg(M.e,M.dir),d=M.sStop-M.s,ls=sigState(n,leg.grp,st.clock||0);
@@ -12658,7 +12658,7 @@ function assist(dt){
   sys.bsmL=bl; sys.bsmR=br;
   const sigSide=st.signal===-1?1:st.signal===1?-1:0;   // ISO side: + = left
   const lcw=(sigSide>0&&bl)||(sigSide<0&&br);
-  if(lcw&&!sys.lcwWas&&!(brandS()==="Kia"&&playS("kia_bsm",0.6))){beep(1100,.12,"square",.22);setTimeout(()=>beep(1100,.12,"square",.22),160)}
+  if(lcw&&!sys.lcwWas&&!(hon23()&&playS("honda_bsm",0.6))&&!(brandS()==="Kia"&&playS("kia_bsm",0.6))){beep(1100,.12,"square",.22);setTimeout(()=>beep(1100,.12,"square",.22),160)}
   sys.lcw=lcw; sys.lcwWas=lcw;
   // ---- emergency lane keeping: drifting toward an occupied lane gets steered back, even with the signal on
   const e=M.off-laneOf(M.off)*LANE; sys.e=e;
@@ -12945,10 +12945,13 @@ function toyRevBeep(dt){const on=st.started&&st.power!==false&&st.gear==="R";if(
 // ---- real brand sounds: welcome chimes, Lincoln's warning chimes and GM's chimes, beeps and indicator click
 const CHIME={Ford:"ch_ford",Toyota:"ch_toyota",Lexus:"ch_lexus",Jeep:"ch_stell",Chrysler:"ch_stell",Ram:"ch_stell",Dodge:"ch_dodge",Lincoln:"ch_lincoln",Kia:"ch_kia",Hyundai:"ch_kia","Mercedes-Benz":"ch_mb",BMW:"ch_bmw",Nissan:"ch_nissan",Infiniti:"ch_nissan"};
 const GMB=new Set(["Chevrolet","Buick","GMC","Cadillac"]);
+/* v40: model year of the current car (from its name, e.g. "2027 Kia K4 GT-Line"); the 2023+ Hondas and the 2027 Kias have their own recorded chimes */
+const trimYr=()=>{const T=TRIMS[st.trim];const m=/\b(19|20)\d\d\b/.exec((T&&(T.name||""))+" "+(T&&T.group||""));return m?+m[0]:0};
+const hon23=()=>brandS()==="Honda"&&trimYr()>=2023,kia27=()=>brandS()==="Kia"&&trimYr()>=2027;
 const brandS=()=>{const b=(TRIMS[st.trim]&&TRIMS[st.trim].group||"").split(" ")[0];return b==="Infiniti"?"Nissan":b};   // Infiniti InTouch is Nissan's system with Infiniti trim
-function brandPreload(){if(!au.ctx)return;const b=brandS();if(CHIME[b])sfxLoad(CHIME[b]);if(b==="Lincoln")["lin_hard","lin_soft","lin_nc"].forEach(sfxLoad);if(b==="BMW")sfxLoad("bmw_aeb");if(b==="Ford")sfxLoad("ford_aeb");if(b==="Kia")["kia_bsm","kia_aeb","kia_aeb_solid","kia_ldw","kia_notify","kia_rev"].forEach(sfxLoad);if(b==="Toyota"||b==="Lexus")["toy_aeb"].forEach(sfxLoad);if(b==="Rivian")["riv_lock","riv_belt","riv_tick","riv_nav","riv_rct"].forEach(sfxLoad);if(isRav19())["rav19_start","rav19_tick_on","rav19_tick_off","rav19_belt_slow","rav19_belt_fast"].forEach(sfxLoad);if(GMB.has(b))["gm_aeb","gm_pdc1","gm_rct","gm_scstop","gm_chime","gm_notify","gm_tick"].forEach(sfxLoad)}
+function brandPreload(){if(!au.ctx)return;const b=brandS();if(CHIME[b])sfxLoad(CHIME[b]);if(hon23())["honda_start","honda_fcw","honda_bsm","honda_alert"].forEach(sfxLoad);if(kia27())["kia27_start","kia27_fcw","kia27_alert"].forEach(sfxLoad);if(b==="Lincoln")["lin_hard","lin_soft","lin_nc"].forEach(sfxLoad);if(b==="BMW")sfxLoad("bmw_aeb");if(b==="Ford")sfxLoad("ford_aeb");if(b==="Kia")["kia_bsm","kia_aeb","kia_aeb_solid","kia_ldw","kia_notify","kia_rev"].forEach(sfxLoad);if(b==="Toyota"||b==="Lexus")["toy_aeb"].forEach(sfxLoad);if(b==="Rivian")["riv_lock","riv_belt","riv_tick","riv_nav","riv_rct"].forEach(sfxLoad);if(isRav19())["rav19_start","rav19_tick_on","rav19_tick_off","rav19_belt_slow","rav19_belt_fast"].forEach(sfxLoad);if(GMB.has(b))["gm_aeb","gm_pdc1","gm_rct","gm_scstop","gm_chime","gm_notify","gm_tick"].forEach(sfxLoad)}
 function playS(k,vol,rate){const c=au.ctx;if(!c||!k)return false;const b=sfxLoad(k);if(!b)return false;const s_=c.createBufferSource(),g=c.createGain();s_.buffer=b;if(rate)s_.playbackRate.value=rate;g.gain.value=vol*(st.cam===1&&!st.walk?1:0.5);s_.connect(g);g.connect(au.master);s_.start();return true}
-function welcomeChime(){const k=isRav19()?"rav19_start":CHIME[brandS()];if(!k||isRav19()&&st.power!==true)return;brandPreload();let n=0;const tr=()=>{if(playS(k,0.55))return;if(++n<15)setTimeout(tr,200)};setTimeout(tr,300)}
+function welcomeChime(){const k=isRav19()?"rav19_start":hon23()?"honda_start":kia27()?"kia27_start":CHIME[brandS()];if(!k||isRav19()&&st.power!==true)return;brandPreload();let n=0;const tr=()=>{if(playS(k,0.55))return;if(++n<15)setTimeout(tr,200)};setTimeout(tr,300)}
 function startSound(vol){const c=au.ctx;if(!c)return false;const b=sfxLoad("start");if(!b)return false;const s_=c.createBufferSource(),g=c.createGain();s_.buffer=b;g.gain.value=vol;s_.connect(g);g.connect(au.master);s_.start();au.duckT=c.currentTime+2.2;return true}
 // the 2019 RAV4's own engine: a recording of the real 2.5 L looped and pitched with the revs (laid over a quieter synthesised note that carries the load)
 function rav19Eng(t,k,rpm,L,inside){if(!k&&!au.r19)return;const b=sfxLoad("rav19_eng");if(!b)return;
@@ -13011,6 +13014,8 @@ const CH_ALIAS={Lexus:"Toyota",Acura:"Honda",Lincoln:"Ford",Mini:"BMW","Mercedes
 function bChime(kind){const now=performance.now();if(now-(bChime.t||0)<(kind==="alert"?350:700))return;bChime.t=now;const b0=brandS(),b=CH_ALIAS[b0]||b0;
   if(isTesla())return tsS(kind==="info"?"speed":kind==="alert"?"alert":"ldw",0.55)||beep(980,.1,"sine",.2);
   if(GMB.has(b0)&&playS(kind==="info"?"gm_notify":"gm_chime",0.55))return;
+  if(hon23()&&playS("honda_alert",0.55))return;
+  if(kia27()&&playS("kia27_alert",0.55))return;
   if(b==="Kia"&&playS(kind==="info"?"kia_notify":"kia_ldw",0.55))return;
   if(b0==="Lincoln"&&playS(kind==="alert"?"lin_hard":"lin_soft",0.55))return;
   if(b0==="Rivian"&&playS("riv_nav",0.55))return;
