@@ -1457,8 +1457,21 @@ html body.chatOn #ui2 .u2left .dk,html body.chatOn #ui2 #u2mm{transform:translat
 <script data-boot>(function(){var p=0;window.__bootP=0;var t=setInterval(function(){if(window.__bootReal){clearInterval(t);return}p+=(0.7-p)*0.025;window.__bootP=p;var a=document.getElementById("bootArc"),n=document.getElementById("bootNeedle"),c=document.getElementById("bootPct");if(a)a.setAttribute("stroke-dasharray",(p*100).toFixed(1)+" 100");if(n)n.style.setProperty("--a",(-135+p*270)+"deg");if(c)c.textContent=String(Math.round(p*100))},120)})()</script>
 <div id="news">
   <div class="nc">
-    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 39 · Michigan lefts downtown, semi trailers, hotel valet</h2></div>
+    <div class="nh"><small>What's new</small><h2 id="newsVer">Version 40 · Downtown built from real road pieces, new suspension, proving ground</h2></div>
     <div class="nb"><ul>
+      <li>🛣️ <b>Downtown's roads are rebuilt piece by piece.</b> Every street, intersection and lane change downtown is now a real road section that fits the next one exactly: proper intersections with curb returns, crosswalks and stop bars, and roads that widen and narrow with real tapers instead of jumping in width.</li>
+      <li>🚦 <b>Main St is a proper Michigan-left boulevard.</b> It now crosses every other street (1st St, 3rd St, Woodward Ave, Park Ave and River St), and each block between has a real median U-turn with its own turn lane. The grass median runs right up to the stop bar. 2nd St, Griswold St, Cass Ave and Brush St now end at Fort St and Congress St.</li>
+      <li>↰ <b>Turn lanes where streets meet Main St.</b> The cross streets open up into five lanes with a left-turn lane before Main St, then taper back down after it.</li>
+      <li>🚥 <b>Traffic lights stand on the right corners.</b> At the rebuilt intersections the signal poles are on the far right corner of each approach with the mast arm over its lanes.</li>
+      <li>🛞 <b>New suspension.</b> Trucks and SUVs with a solid rear axle now move the whole axle together (hit a bump with one wheel and the other side feels it), cars with a torsion-beam rear behave like it, and dampers react differently to compression and rebound. Adaptive and magnetic dampers firm up as you push and soften on rough roads. Air suspension really changes ride height now: you'll hear the compressor and the valves, and the body rises or lowers over a few seconds.</li>
+      <li>🏁 <b>The proving ground is back,</b> off County Rd 9 (Spawn › Proving ground). It's built for suspension now: whoops, washboard, cobbles, potholes, single-wheel bumps, twist ditches, a side slope, pitch and chatter bumps, a skidpad and the off-road course, plus a row of grade hills from 5% up to 60%.</li>
+      <li>🗺️ <b>Round minimap, full-screen map.</b> The minimap is now a circle at the bottom left (above the steering arrows on phones). Tap it for a full-screen map: drag to move, pinch or scroll to zoom, tap any spot or place, then Navigate there or Spawn there.</li>
+      <li>📱 <b>Fewer restarts on phones.</b> iPhones and iPads (and Low graphics) use about 65 MB less graphics memory, and if the graphics still run out the game now lowers the setting instead of reloading over and over.</li>
+      <li>🅿️ <b>Underground fixes.</b> Jumping or bumping in the underground garages no longer pops you up onto the floor above, and the invisible walls on the Exchange Plaza spiral ramp and halfway down the hotel's middle ramp are gone.</li>
+      <li>🌉 <b>The Main St bridge no longer launches you.</b> Its west end started 2 m up, so driving onto it from downtown threw the car into the air. The approach now climbs up to it.</li>
+      <li>💡 <b>No more floating lights</b> on the freeway and boulevard medians: they stand on the road again.</li>
+    </ul>
+    <h4 class="old">Version 39 · Michigan lefts downtown, semi trailers, hotel valet</h4><ul>
       <li>🛣️ <b>Main St is a Michigan-left boulevard.</b> From Grand River Ave through downtown and out along Commerce Pkwy to Fairhaven, Main St now has three lanes each way and a wide grass median, like Woodward or Telegraph. You can't turn left at its lights (from 1st St to Maple Rd): go through, swing into the U-turn lane, U-turn through the gap in the median and come back to turn right. From a side street, turn right, then U-turn. AI traffic does the same.</li>
       <li>🚦 <b>The right lights for Michigan lefts.</b> Those lights now have plain red-yellow-green heads over every lane and just two phases, with no left-turn arrows (there's no left turn to give an arrow to). Each approach has a NO LEFT TURN sign on the corner and in the median, a green LEFT TURNS / USE U-TURN AHEAD sign before the light, and a U-TURN ONLY sign where each U-turn lane opens. Halden Pkwy's Michigan lefts got the same fix, and you can now actually see their median gaps and U-turn lanes (the grass median used to be drawn right over them).</li>
       <li>🧱 <b>Intersections look like real asphalt</b> instead of flat grey, and the ends of the boulevards (where the median opens and closes, here and on Grand River Ave by the mall) curve in smoothly instead of leaving cars driving on the grass.</li>
@@ -3808,6 +3821,8 @@ for(const e of EDGES){if(W2){let a=null;for(let u=0;u<=e.L+2;u+=2){const p=eAt(e
       if(e.T.dirt)e.ford={uc,half:(u-a.u)/2+2};    // a low-water crossing: the gravel dips through the creek
       else{e.br={uc,half,H:a.B.bh,rp:a.B.rp};e.br.style=e.name==="Old Mill Rd"?"covered":e.name==="Ridge Rd"?"truss":e.name==="Mill St"?"stone":null}break}}continue}
   let prev=null;for(let u=0;u<=e.L;u+=2){const p=eAt(e,u),sg=Math.sign(p.x-riverX(p.y));if(prev!==null&&sg!==prev){e.br={uc:u-1,half:BRIDGE_HALF,H:BRIDGE_H,rp:BRIDGE_RAMP};break}prev=sg}}
+/* v40: a bridge whose approach ramp would start before its own road does (a crossover node sits just short of the river) jumped 2.2 m at that node and threw cars in the air: the ramps get steeper instead */
+for(const e of EDGES)if(e.br){const r=Math.min(e.br.rp,e.br.uc-e.br.half-2,e.L-e.br.uc-e.br.half-2);if(r<e.br.rp)e.br.rp=Math.max(20,r)}
 if(W2){const e=EDGES.find(e=>e.name==="Jefferson Ave"&&e.br);if(e){e.gap=[e.br.uc-13,e.br.uc+13];const c=eAt(e,e.br.uc);W2C.db={e,cx:c.x,cy:c.y}}}   // the Jefferson Ave drawbridge: two 13 m leaves over the river
 function ez(e,u){const z=ez0(e,u);const F=e.zfx;if(!F)return z;const f=clamp(u,0,e.L)/2,i=Math.min(F.length/2-2,Math.floor(f)),a=f-i,w=F[2*i]*(1-a)+F[2*i+2]*a;if(w<=0)return z;const zx=F[2*i+1]*(1-a)+F[2*i+3]*a;return z+(zx-z)*w}
 function ez0(e,u){let z;if(e.zp){const f=clamp(u,0,e.L)/4,i=Math.min(e.zp.length-2,Math.floor(f)),a=f-i;z=e.zp[i]*(1-a)+e.zp[i+1]*a}else{const p=eAt(e,clamp(u,0,e.L));z=hillZ(p.x,p.y)}
@@ -20765,7 +20780,7 @@ function gfxDetect(){const mem=navigator.deviceMemory||4,cores=navigator.hardwar
   if(!touch&&(/Intel/i.test(gpu)||/Radeon\(TM\) Graphics|Radeon Graphics|Vega \d|Radeon 6\d0M|Radeon 7\d0M|Radeon 8\d0M/i.test(gpu)))return "medium";
   if(touch){if(/Apple GPU|Apple M|Adreno \(TM\) (6[4-9]|[7-9])\d\d|Mali-G(7[1-9]|[89]\d|7\d\d)|Xclipse|Immortalis/i.test(gpu))return "high";return mem>=4?"medium":"low"}if(touch)return cores>=6?"medium":"low";return cores>=6?"high":"medium"}
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.opt,.pedal,[role=button]");if(!b)return;if(hapLvl()===2){HAP.busy=0;haptic(10,0.36)}},{capture:true,passive:true});
-const APP_VER="179",BUILD_VER=390;
+const APP_VER="180",BUILD_VER=400;
 // shown as season.update: build 345 is v34.5, 350 will be v35.0
 const verStr=n=>{n=+n;return n>=300?Math.floor(n/10)+"."+n%10:String(n)},VER_S=verStr(BUILD_VER);
 try{const bv=document.getElementById("bootVer");if(bv)bv.textContent="v"+VER_S;const nv=document.getElementById("newsVer");if(nv)nv.textContent=nv.textContent.replace(/^Version \d+/,"Version "+VER_S)}catch(e){}   /* BUILD_VER: bumped to make open copies reload without resetting saves */
