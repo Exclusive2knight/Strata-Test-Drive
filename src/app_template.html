@@ -12452,8 +12452,11 @@ function assist(dt){
       if(sys.slowT>5&&lane<M.hi&&laneClearFor(S,1,true)&&!st.signal){st.signal=-1;st.signalT=0;sys.slowT=0;toast("Pilot: passing slower traffic")}
       else if(sys.rightT>(sys.rightNeed||(sys.rightNeed=6+Math.random()*3))&&!st.signal&&!(lead&&gap<30)){sys.rightNeed=0;st.signal=1;st.signalT=0;sys.rightT=0;toast("Pilot: moving back to the right lane")}
     }
-    if(st.signal&&!st.hazard&&!sys.pilotLC&&!TRIMS[st.trim].noSigLC&&st.signalT<2){waiting=true}   // signal on for 2 s first (more than the 3 blinks the law asks for)
-    else if(st.signal&&!st.hazard&&!sys.pilotLC&&!TRIMS[st.trim].noSigLC){const dir=st.signal===-1?1:-1, tl=lane+dir;
+    /* issue #189: a system with automatic lane change (Super Cruise, BlueCruise, Pilot Assist...) changes lanes on the signal even when the
+       car's plain lane centring can't (noSigLC). Before, it put its own blinker on to pass and then never moved over. */
+    const sigLC=!TRIMS[st.trim].noSigLC||st.autoLC;
+    if(st.signal&&!st.hazard&&!sys.pilotLC&&sigLC&&st.signalT<2){waiting=true}   // signal on for 2 s first (more than the 3 blinks the law asks for)
+    else if(st.signal&&!st.hazard&&!sys.pilotLC&&sigLC){const dir=st.signal===-1?1:-1, tl=lane+dir;
       if(tl<M.lo||tl>M.hi){st.signal=0}else if(laneClearFor(S,dir,true)){sys.pilotLC={target:tl*LANE,dir};logResult(`Pilot changed lanes to the ${dir>0?"left":"right"}`)}
       else waiting=true}
     if(sys.pilotLC){sys.pilotState="changing";sys.pilotDelta=pathDelta(M,he,sys.pilotLC.target,0.05,1.5,0.75,0.55);   /* v37.1: about 3 s across, like the real systems (was 4.5 s) */
