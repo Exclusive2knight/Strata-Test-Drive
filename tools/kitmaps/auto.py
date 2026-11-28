@@ -15,7 +15,7 @@ def auto_region(name, box, ctrl_over=None, prof_over=None):
     J = {}
     for i, L in deg.items():
         n = NN[i]
-        if not inB(n["x"], n["y"]) or len(L) < 3 or n["k"] != "x" or n["c"] in ("merge",): continue
+        if not inB(n["x"], n["y"]) or len(L) < 3 or n["k"] != "x" or n["c"] in ("merge",) or (round(n["x"]), round(n["y"])) in PLANNED: continue
         if any(e["t"] not in KP for e in L): continue
         hs = []
         for e in L:
@@ -57,6 +57,7 @@ def auto_region(name, box, ctrl_over=None, prof_over=None):
 
 auto_region("Harbor Point", [3090, 4310, -1110, -190])
 auto_region("Fairhaven", [2290, 2910, -310, 310])
+auto_region("Map", [-1e6, 1e6, -1e6, 1e6])       # everything else: suburbs, towns, county crossroads
 
 # every region's graph in one: nodes, edges, legs, and the boxes whose old roads the game drops
 # drop: the old roads these replace (by their end points; downtown's are never built)
