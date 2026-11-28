@@ -1,0 +1,103 @@
+{
+ "id": "toy_tundra_lim",
+ "trim": "2026 Toyota Tundra Limited CrewMax 4x4",
+ "class": "pickup",
+ "curb_weight_lb": {
+  "value": 5510,
+  "tag": "estimated for this class",
+  "source": "game data (model-level mass)",
+  "url": "",
+  "note": "not yet researched for this trim"
+ },
+ "front_curb_lb": {
+  "value": 3086,
+  "tag": "estimated for this class",
+  "source": "",
+  "url": "",
+  "note": "front share 56% for this class / layout"
+ },
+ "rear_curb_lb": {
+  "value": 2424,
+  "tag": "estimated for this class",
+  "source": "",
+  "url": "",
+  "note": ""
+ },
+ "gvwr_lb": {
+  "value": 7210,
+  "tag": "estimated for this class",
+  "source": "",
+  "url": "",
+  "note": "curb + 1700 lb typical pickup payload"
+ },
+ "front_gawr_lb": {
+  "value": 4360,
+  "tag": "estimated for this class",
+  "source": "",
+  "url": "",
+  "note": "front share of GVWR + 8% margin (typical)"
+ },
+ "rear_gawr_lb": {
+  "value": 4050,
+  "tag": "estimated for this class",
+  "source": "",
+  "url": "",
+  "note": "rear share of GVWR + 8% margin, load sits rearward (typical)"
+ },
+ "payload_lb": {
+  "value": 1700,
+  "tag": "typical",
+  "source": "",
+  "url": "",
+  "note": "typical pickup payload"
+ },
+ "tow_lb": {
+  "value": 11000,
+  "tag": "typical",
+  "source": "",
+  "url": "",
+  "note": "typical pickup tow rating"
+ },
+ "gcwr_lb": {
+  "value": 18210,
+  "tag": "estimated for this class",
+  "source": "",
+  "url": "",
+  "note": "GVWR + tow rating (typical relation)"
+ },
+ "tongue_lb": {
+  "value": 1100,
+  "tag": "typical",
+  "source": "",
+  "url": "",
+  "note": "10% of the tow rating (typical tongue limit)"
+ },
+ "tank_gal": {
+  "value": 32.0,
+  "tag": "estimated for this class",
+  "source": "game data",
+  "url": "",
+  "note": ""
+ },
+ "battery_lb": {
+  "value": 0,
+  "tag": "typical",
+  "source": "",
+  "url": "",
+  "note": "about 13 lb per kWh for a pack (pack-level energy density ~170 Wh/kg); hybrid packs ~70-110 lb"
+ },
+ "cg_height_in": {
+  "value": 30.0,
+  "tag": "typical",
+  "source": "",
+  "url": "",
+  "note": "typical pickup"
+ },
+ "fuel_type": {
+  "value": "gasoline",
+  "tag": "typical",
+  "source": "",
+  "url": "",
+  "note": ""
+ }
+}

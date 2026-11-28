@@ -1,0 +1,46 @@
+[
+ {"match": "^honda_civic_type_r_tr$", "fields": {
+  "curb_weight_lb": [3188, "from manufacturer", "Honda Information Center (American Honda)", "https://www.hondainfocenter.com/2026/Civic-Type-R/Feature-Guide/Civic-Type-R-Specifications/", "2026 Civic Type R, 6MT, only trim"],
+  "front_curb_lb": [1977, "from manufacturer", "Honda Information Center (American Honda)", "https://www.hondainfocenter.com/2026/Civic-Type-R/Feature-Guide/Civic-Type-R-Specifications/", "62% of 3,188 lb (Honda lists 62/38)"],
+  "rear_curb_lb": [1211, "from manufacturer", "Honda Information Center (American Honda)", "https://www.hondainfocenter.com/2026/Civic-Type-R/Feature-Guide/Civic-Type-R-Specifications/", "38% of 3,188 lb"],
+  "tank_gal": [12.4, "from manufacturer", "Honda Information Center (American Honda)", "https://www.hondainfocenter.com/2026/Civic-Type-R/Feature-Guide/Civic-Type-R-Specifications/", ""],
+  "tow_lb": [0, "from manufacturer", "Honda Information Center (American Honda)", "https://www.hondainfocenter.com/2026/Civic-Type-R/Feature-Guide/Civic-Type-R-Specifications/", "no towing rating listed; Honda does not rate the Type R to tow"],
+  "tire": ["265/30ZR19 93Y", "from manufacturer", "Honda Information Center (American Honda)", "https://www.hondainfocenter.com/2026/Civic-Type-R/Feature-Guide/Civic-Type-R-Specifications/", "Michelin Pilot Sport 4S"]}},
+ {"match": "^toy_rav4_26_lim$", "fields": {
+  "curb_weight_lb": [3920, "from third-party source", "player-verified reference value", "", "2026 RAV4 Limited hybrid AWD. Sources disagree: KBB 3,800 lb, Cars.com 3,847 lb (base). Primary = the verified 3,920 lb"],
+  "conflict": "curb_weight_lb: verified 3,920 (primary) / Cars.com 3,847 https://www.cars.com/research/toyota-rav4-2026/specs/481719 / KBB 3,800 https://www.kbb.com/toyota/rav4-hybrid/2026/specs",
+  "tank_gal": [14.5, "from third-party source", "KBB", "https://www.kbb.com/toyota/rav4-hybrid/2026/specs", ""],
+  "tow_lb": [3500, "from third-party source", "Cars.com", "https://www.cars.com/research/toyota-rav4-2026/specs/481719", "KBB lists 1,750 lb for every hybrid trim; Toyota press release lists 3,500 lb for AWD grades above LE"]}},
+ {"match": "^toy_rav4_26_(le|xle|xlep|wood|se|gr)$", "fields": {
+  "tank_gal": [14.5, "from third-party source", "KBB", "https://www.kbb.com/toyota/rav4-hybrid/2026/specs", ""]}},
+ {"match": "^toy_rav4_26_le$", "fields": {"curb_weight_lb": [3690, "from third-party source", "KBB", "https://www.kbb.com/toyota/rav4-hybrid/2026/specs", "2026 RAV4 Hybrid LE"], "tow_lb": [1750, "from manufacturer", "Toyota Pressroom", "https://pressroom.toyota.com/?p=110151", "LE AWD"]}},
+ {"match": "^toy_rav4_26_(xle|xlep|wood|se)$", "fields": {"curb_weight_lb": [3775, "from third-party source", "KBB", "https://www.kbb.com/toyota/rav4-hybrid/2026/specs", "XLE, XLE Premium, SE, Woodland all list 3,775 lb"], "tow_lb": [3500, "from manufacturer", "Toyota Pressroom", "https://pressroom.toyota.com/?p=110151", "XLE Premium, SE, Woodland AWD"]}},
+ {"match": "^toy_rav4_26_gr$", "fields": {"curb_weight_lb": [3775, "estimated for this class", "sibling: 2026 RAV4 Hybrid XSE (KBB 3,775 lb)", "https://www.kbb.com/toyota/rav4-hybrid/2026/specs", "not found for the hybrid GR Sport; KBB lists GR Sport only as a plug-in"]}},
+ {"match": "^toy_rav4_26_ph", "fields": {"tank_gal": [14.5, "from third-party source", "KBB", "https://www.kbb.com/toyota/rav4-plug-in-hybrid/2026/specs", ""], "battery_kwh": [22.7, "from third-party source", "KBB", "https://www.kbb.com/toyota/rav4-plug-in-hybrid/2026/specs", ""]}},
+ {"match": "^toy_rav4_26_phse$", "fields": {"curb_weight_lb": [4435, "from third-party source", "KBB", "https://www.kbb.com/toyota/rav4-plug-in-hybrid/2026/specs", "2026 RAV4 Plug-in Hybrid SE"]}},
+ {"match": "^toy_rav4_26_phxse$", "fields": {"curb_weight_lb": [4540, "from third-party source", "KBB", "https://www.kbb.com/toyota/rav4-plug-in-hybrid/2026/specs", "2026 RAV4 Plug-in Hybrid XSE"]}},
+ {"match": "^toy_rav4_26_phgr$", "fields": {"curb_weight_lb": [4430, "from third-party source", "KBB", "https://www.kbb.com/toyota/rav4-plug-in-hybrid/2026/specs", "2026 RAV4 Plug-in Hybrid GR Sport"]}},
+ {"match": "^(camry_le|camry_se|camry_xle|camry25)$", "fields": {"tank_gal": [13.0, "from manufacturer", "Toyota (toyota.com compare)", "https://www.toyota.com/camry/compare", ""], "battery_lb": [70, "estimated for this class", "", "", "251.6 V, 4.0 Ah lithium-ion pack (~1 kWh) per Toyota product information; weight not published, ~70 lb typical for a 1 kWh hybrid pack"], "tow_lb": [0, "from third-party source", "Cars.com", "https://www.cars.com/research/toyota-camry-2025/specs/453142/", "no towing rating listed"]}},
+ {"match": "^camry_le$", "fields": {"curb_weight_lb": [3450, "from manufacturer", "Toyota (toyota.com compare)", "https://www.toyota.com/camry/compare", "2025 Camry LE hybrid FWD"], "tire": ["205/65R16", "from manufacturer", "Toyota", "https://www.toyota.com/camry/compare", ""]}},
+ {"match": "^camry_se$", "fields": {"curb_weight_lb": [3494, "from third-party source", "Toyota 2025 Camry Product Information (copy hosted by PriusChat)", "https://attachments.priuschat.com/attachment-files/2024/04/249677_2025_Toyota_Camry_Product_Information.pdf", "SE FWD"]}},
+ {"match": "^camry_xle$", "fields": {"curb_weight_lb": [3649, "from third-party source", "Toyota 2025 Camry Product Information (copy hosted by PriusChat)", "https://attachments.priuschat.com/attachment-files/2024/04/249677_2025_Toyota_Camry_Product_Information.pdf", "XLE AWD"]}},
+ {"match": "^camry25$", "fields": {"curb_weight_lb": [3682, "from third-party source", "Toyota 2025 Camry Product Information (copy hosted by PriusChat)", "https://attachments.priuschat.com/attachment-files/2024/04/249677_2025_Toyota_Camry_Product_Information.pdf", "XSE AWD"]}},
+ {"match": "^chv_silverado_1500_lt$", "fields": {
+  "curb_weight_lb": [4594, "from third-party source", "Cars.com", "https://www.cars.com/research/chevrolet-silverado_1500-2026/specs/474887/", "2026 Silverado 1500 LT 2WD Double Cab 147 in, 2.7L TurboMax"],
+  "front_curb_lb": [2682, "from third-party source", "Cars.com", "https://www.cars.com/research/chevrolet-silverado_1500-2026/specs/474887/", ""],
+  "rear_curb_lb": [1912, "from third-party source", "Cars.com", "https://www.cars.com/research/chevrolet-silverado_1500-2026/specs/474887/", ""],
+  "gvwr_lb": [6800, "from third-party source", "Cars.com", "https://www.cars.com/research/chevrolet-silverado_1500-2026/specs/474887/", ""],
+  "payload_lb": [2206, "from third-party source", "Cars.com", "https://www.cars.com/research/chevrolet-silverado_1500-2026/specs/474887/", ""],
+  "tow_lb": [13300, "from third-party source", "Cars.com", "https://www.cars.com/research/chevrolet-silverado_1500-2026/specs/474887/", ""],
+  "gcwr_lb": [14500, "from third-party source", "Cars.com", "https://www.cars.com/research/chevrolet-silverado_1500-2026/specs/474887/", ""],
+  "tank_gal": [24, "from third-party source", "Cars.com", "https://www.cars.com/research/chevrolet-silverado_1500-2026/specs/474887/", ""],
+  "tire": ["255/70R17", "from third-party source", "Cars.com", "https://www.cars.com/research/chevrolet-silverado_1500-2026/specs/474887/", ""]}},
+ {"match": "^f150_(xlt|lariat|tremor|plat|pb)$", "fields": {
+  "tow_lb": [13500, "from manufacturer", "Ford 2026 F-150 spec sheet", "https://www.fromtheroad.ford.com/content/dam/fordmediasite/us/en/library/2026/specs/2026_Ford_F150_Specs.pdf", "3.5L EcoBoost 4x4 max conventional towing with Max Tow package (2026 spec; game trim is 2025)"],
+  "payload_lb": [2175, "from manufacturer", "Ford 2026 F-150 spec sheet", "https://www.fromtheroad.ford.com/content/dam/fordmediasite/us/en/library/2026/specs/2026_Ford_F150_Specs.pdf", "3.5L EcoBoost 4x4 maximum payload"],
+  "tank_gal": [36, "from manufacturer", "Ford 2026 F-150 spec sheet", "https://www.fromtheroad.ford.com/content/dam/fordmediasite/us/en/library/2026/specs/2026_Ford_F150_Specs.pdf", "3.5L EcoBoost, SuperCrew"]}},
+ {"match": "^f150_pb$", "fields": {
+  "tow_lb": [11600, "from manufacturer", "Ford 2026 F-150 spec sheet", "https://www.fromtheroad.ford.com/content/dam/fordmediasite/us/en/library/2026/specs/2026_Ford_F150_Specs.pdf", "PowerBoost 4x4 max towing"],
+  "payload_lb": [1740, "from manufacturer", "Ford 2026 F-150 spec sheet", "https://www.fromtheroad.ford.com/content/dam/fordmediasite/us/en/library/2026/specs/2026_Ford_F150_Specs.pdf", "PowerBoost 4x4 max payload"],
+  "tank_gal": [30.6, "from manufacturer", "Ford 2026 F-150 spec sheet", "https://www.fromtheroad.ford.com/content/dam/fordmediasite/us/en/library/2026/specs/2026_Ford_F150_Specs.pdf", "PowerBoost"]}}
+]

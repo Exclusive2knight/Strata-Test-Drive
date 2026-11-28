@@ -23,6 +23,8 @@ if _os.path.exists("props/kitold.json"):
     html = html.replace("/*KIT_J*/[]", json.dumps(_j, separators=(",", ":")))
     _kn = json.load(open("props/kitold.json")).get("knet")
     html = html.replace("/*KIT_NET*/null", json.dumps(_kn, separators=(",", ":")) if _kn else "null")
+if _os.path.exists("props/weights.json"):
+    html = html.replace("/*WEIGHTS*/{}", open("props/weights.json").read())
 html=html.replace("/*TRAFFIC_MIND*/", open(os.path.join(here,"traffic","mind.js")).read()+"\n"+open(os.path.join(here,"traffic","park.js")).read())
 html = html.replace("@/*ASSET_REF*/main/", "@" + (ref or "main") + "/")
 html = html.replace("<title>Mission Strata</title>", '<title>Mission Strata</title><meta name="description" content="Mission Strata: a realistic driving simulator in your browser with real cars, drive modes, suspension, a city, freeway and traffic.">', 1)

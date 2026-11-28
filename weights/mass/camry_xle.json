@@ -1,0 +1,103 @@
+{
+ "id": "camry_xle",
+ "trim": "2025 Toyota Camry XLE AWD",
+ "class": "car",
+ "curb_weight_lb": {
+  "value": 3649,
+  "tag": "from third-party source",
+  "source": "Toyota 2025 Camry Product Information (copy hosted by PriusChat)",
+  "url": "https://attachments.priuschat.com/attachment-files/2024/04/249677_2025_Toyota_Camry_Product_Information.pdf",
+  "note": "XLE AWD"
+ },
+ "front_curb_lb": {
+  "value": 2189,
+  "tag": "estimated for this class",
+  "source": "",
+  "url": "",
+  "note": "front share 60% for this class / layout"
+ },
+ "rear_curb_lb": {
+  "value": 1460,
+  "tag": "estimated for this class",
+  "source": "",
+  "url": "",
+  "note": ""
+ },
+ "gvwr_lb": {
+  "value": 4680,
+  "tag": "estimated for this class",
+  "source": "",
+  "url": "",
+  "note": "curb + 950 lb typical car payload"
+ },
+ "front_gawr_lb": {
+  "value": 3030,
+  "tag": "estimated for this class",
+  "source": "",
+  "url": "",
+  "note": "front share of GVWR + 8% margin (typical)"
+ },
+ "rear_gawr_lb": {
+  "value": 2530,
+  "tag": "estimated for this class",
+  "source": "",
+  "url": "",
+  "note": "rear share of GVWR + 8% margin, load sits rearward (typical)"
+ },
+ "payload_lb": {
+  "value": 950,
+  "tag": "typical",
+  "source": "",
+  "url": "",
+  "note": "typical car payload"
+ },
+ "tow_lb": {
+  "value": 0,
+  "tag": "from third-party source",
+  "source": "Cars.com",
+  "url": "https://www.cars.com/research/toyota-camry-2025/specs/453142/",
+  "note": "no towing rating listed"
+ },
+ "gcwr_lb": {
+  "value": 5680,
+  "tag": "estimated for this class",
+  "source": "",
+  "url": "",
+  "note": "GVWR + tow rating (typical relation)"
+ },
+ "tongue_lb": {
+  "value": 100,
+  "tag": "typical",
+  "source": "",
+  "url": "",
+  "note": "10% of the tow rating (typical tongue limit)"
+ },
+ "tank_gal": {
+  "value": 13.0,
+  "tag": "from manufacturer",
+  "source": "Toyota (toyota.com compare)",
+  "url": "https://www.toyota.com/camry/compare",
+  "note": ""
+ },
+ "battery_lb": {
+  "value": 70,
+  "tag": "estimated for this class",
+  "source": "",
+  "url": "",
+  "note": "251.6 V, 4.0 Ah lithium-ion pack (~1 kWh) per Toyota product information; weight not published, ~70 lb typical for a 1 kWh hybrid pack"
+ },
+ "cg_height_in": {
+  "value": 21.0,
+  "tag": "typical",
+  "source": "",
+  "url": "",
+  "note": "typical car"
+ },
+ "fuel_type": {
+  "value": "gasoline",
+  "tag": "typical",
+  "source": "",
+  "url": "",
+  "note": ""
+ }
+}

@@ -1,0 +1,103 @@
+{
+ "id": "f150_tremor",
+ "trim": "2025 Ford F-150 Tremor SuperCrew 4x4",
+ "class": "pickup",
+ "curb_weight_lb": {
+  "value": 5400,
+  "tag": "estimated for this class",
+  "source": "game data (model-level mass)",
+  "url": "",
+  "note": "not yet researched for this trim"
+ },
+ "front_curb_lb": {
+  "value": 3024,
+  "tag": "estimated for this class",
+  "source": "",
+  "url": "",
+  "note": "front share 56% for this class / layout"
+ },
+ "rear_curb_lb": {
+  "value": 2376,
+  "tag": "estimated for this class",
+  "source": "",
+  "url": "",
+  "note": ""
+ },
+ "gvwr_lb": {
+  "value": 7575,
+  "tag": "estimated for this class",
+  "source": "",
+  "url": "",
+  "note": "curb + researched payload"
+ },
+ "front_gawr_lb": {
+  "value": 4290,
+  "tag": "estimated for this class",
+  "source": "",
+  "url": "",
+  "note": "front share of GVWR + 8% margin (typical)"
+ },
+ "rear_gawr_lb": {
+  "value": 3990,
+  "tag": "estimated for this class",
+  "source": "",
+  "url": "",
+  "note": "rear share of GVWR + 8% margin, load sits rearward (typical)"
+ },
+ "payload_lb": {
+  "value": 2175,
+  "tag": "from manufacturer",
+  "source": "Ford 2026 F-150 spec sheet",
+  "url": "https://www.fromtheroad.ford.com/content/dam/fordmediasite/us/en/library/2026/specs/2026_Ford_F150_Specs.pdf",
+  "note": "3.5L EcoBoost 4x4 maximum payload"
+ },
+ "tow_lb": {
+  "value": 13500,
+  "tag": "from manufacturer",
+  "source": "Ford 2026 F-150 spec sheet",
+  "url": "https://www.fromtheroad.ford.com/content/dam/fordmediasite/us/en/library/2026/specs/2026_Ford_F150_Specs.pdf",
+  "note": "3.5L EcoBoost 4x4 max conventional towing with Max Tow package (2026 spec; game trim is 2025)"
+ },
+ "gcwr_lb": {
+  "value": 18100,
+  "tag": "estimated for this class",
+  "source": "",
+  "url": "",
+  "note": "GVWR + tow rating (typical relation)"
+ },
+ "tongue_lb": {
+  "value": 1100,
+  "tag": "typical",
+  "source": "",
+  "url": "",
+  "note": "10% of the tow rating (typical tongue limit)"
+ },
+ "tank_gal": {
+  "value": 36,
+  "tag": "from manufacturer",
+  "source": "Ford 2026 F-150 spec sheet",
+  "url": "https://www.fromtheroad.ford.com/content/dam/fordmediasite/us/en/library/2026/specs/2026_Ford_F150_Specs.pdf",
+  "note": "3.5L EcoBoost, SuperCrew"
+ },
+ "battery_lb": {
+  "value": 0,
+  "tag": "typical",
+  "source": "",
+  "url": "",
+  "note": "about 13 lb per kWh for a pack (pack-level energy density ~170 Wh/kg); hybrid packs ~70-110 lb"
+ },
+ "cg_height_in": {
+  "value": 30.0,
+  "tag": "typical",
+  "source": "",
+  "url": "",
+  "note": "typical pickup"
+ },
+ "fuel_type": {
+  "value": "gasoline",
+  "tag": "typical",
+  "source": "",
+  "url": "",
+  "note": ""
+ }
+}

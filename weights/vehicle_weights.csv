@@ -1,0 +1,1095 @@
+id,trim,curb_weight_lb,front_curb_lb,rear_curb_lb,gvwr_lb,front_gawr_lb,rear_gawr_lb,payload_lb,tow_lb,gcwr_lb,tongue_lb,tank_gal,battery_lb,source,source_url,confidence,notes
+camry25,2025 Toyota Camry XSE AWD,3682,2136,1546,4700,2940,2540,950,0,5700,100,13.0,70,Cars.com; Toyota (toyota.com compare); Toyota 2025 Camry Product Information (copy hosted by PriusChat),https://attachments.priuschat.com/attachment-files/2024/04/249677_2025_Toyota_Camry_Product_Information.pdf https://www.cars.com/research/toyota-camry-2025/specs/453142/ https://www.toyota.com/camry/compare,medium,XSE AWD
+rav4_19,2019 Toyota RAV4 Hybrid XSE,3880,2212,1668,5080,3130,2800,1200,3500,8580,350,14.5,95,game data; game data (model-level mass),,low,not yet researched for this trim
+explorer23,2026 Ford Explorer Platinum 4WD,4760,2523,2237,5960,3410,3540,1200,3500,9460,350,18.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+explorerST,2026 Ford Explorer ST 4WD,4940,2618,2322,6140,3510,3650,1200,3500,9640,350,18.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+camry_le,2025 Toyota Camry LE,3450,2070,1380,4480,2900,2420,950,0,5480,100,13.0,70,Cars.com; Toyota; Toyota (toyota.com compare),https://www.cars.com/research/toyota-camry-2025/specs/453142/ https://www.toyota.com/camry/compare,high,2025 Camry LE hybrid FWD
+camry_se,2025 Toyota Camry SE,3494,2096,1398,4510,2920,2440,950,0,5510,100,13.0,70,Cars.com; Toyota (toyota.com compare); Toyota 2025 Camry Product Information (copy hosted by PriusChat),https://attachments.priuschat.com/attachment-files/2024/04/249677_2025_Toyota_Camry_Product_Information.pdf https://www.cars.com/research/toyota-camry-2025/specs/453142/ https://www.toyota.com/camry/compare,medium,SE FWD
+camry_xle,2025 Toyota Camry XLE AWD,3649,2189,1460,4680,3030,2530,950,0,5680,100,13.0,70,Cars.com; Toyota (toyota.com compare); Toyota 2025 Camry Product Information (copy hosted by PriusChat),https://attachments.priuschat.com/attachment-files/2024/04/249677_2025_Toyota_Camry_Product_Information.pdf https://www.cars.com/research/toyota-camry-2025/specs/453142/ https://www.toyota.com/camry/compare,medium,XLE AWD
+rav4h_le,2019 Toyota RAV4 Hybrid LE,3750,2138,1612,4950,3050,2730,1200,3500,8450,350,14.5,95,game data; game data (model-level mass),,low,not yet researched for this trim
+rav4h_xle,2019 Toyota RAV4 Hybrid XLE,3780,2155,1625,4980,3070,2740,1200,3500,8480,350,14.5,95,game data; game data (model-level mass),,low,not yet researched for this trim
+rav4h_lim,2019 Toyota RAV4 Hybrid Limited,3880,2212,1668,5080,3130,2800,1200,3500,8580,350,14.5,95,game data; game data (model-level mass),,low,not yet researched for this trim
+rav4g_xle,2019 Toyota RAV4 XLE AWD,3570,2071,1499,4770,2990,2580,1200,3500,8270,350,14.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+rav4g_le,2019 Toyota RAV4 LE AWD,3510,2036,1474,4710,2950,2540,1200,3500,8210,350,14.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+rav4g_xlep,2019 Toyota RAV4 XLE Premium AWD,3620,2100,1520,4820,3020,2600,1200,3500,8320,350,14.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+rav4g_lim,2019 Toyota RAV4 Limited AWD,3570,2071,1499,4770,2990,2580,1200,3500,8270,350,14.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+rav4g_adv,2019 Toyota RAV4 Adventure AWD,3640,2111,1529,4840,3030,2610,1200,3500,8340,350,14.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+expl_active,2026 Ford Explorer Active RWD,4540,2406,2134,5740,3290,3410,1200,3500,9240,350,18.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+expl_stline,2026 Ford Explorer ST-Line 4WD,4650,2464,2186,5850,3350,3470,1200,3500,9350,350,18.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+expl_tremor,2026 Ford Explorer Tremor 4WD,4830,2560,2270,6030,3450,3580,1200,3500,9530,350,18.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+acc_lx,2022 Honda Accord LX 1.5T,3220,1964,1256,4170,2750,2250,950,1000,5170,100,14.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+acc_exl,2022 Honda Accord EX-L 1.5T,3260,1989,1271,4210,2770,2270,950,1000,5210,100,14.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+acc_sport20,2022 Honda Accord Sport 2.0T,3370,2056,1314,4320,2850,2330,950,1000,5320,100,14.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+acc_touring20,2022 Honda Accord Touring 2.0T,3440,2098,1342,4390,2890,2370,950,1000,5390,100,14.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+acc_hyb,2022 Honda Accord Hybrid EX-L,3420,2086,1334,4370,2880,2360,950,1000,5370,100,12.7,95,game data; game data (model-level mass),,low,not yet researched for this trim
+aureon_quad,Aureon HX Quad,6720,3494,3226,7920,4450,4790,1200,3500,11420,350,0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+aureon_dual,Aureon HX Dual,6390,3323,3067,7590,4260,4590,1200,3500,11090,350,0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+rx350,2026 Lexus RX 350 AWD,4390,2502,1888,5590,3440,3080,1200,3500,9090,350,18.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+rx350h,2026 Lexus RX 350h AWD,4520,2576,1944,5720,3520,3150,1200,3500,9220,350,17.2,95,game data; game data (model-level mass),,low,not yet researched for this trim
+rx450h,2026 Lexus RX 450h+ AWD,4870,2776,2094,6070,3740,3340,1200,3500,9570,350,14.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+rx500h,2026 Lexus RX 500h F SPORT Performance,4940,2816,2124,6140,3780,3380,1200,3500,9640,350,17.2,95,game data; game data (model-level mass),,low,not yet researched for this trim
+escalade_pl,2026 Cadillac Escalade Premium Luxury,6020,3130,2890,7720,4340,4670,1700,8000,15720,800,24.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+escalade,2026 Cadillac Escalade Sport Platinum,6060,3151,2909,7760,4360,4690,1700,8000,15760,800,24.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+escaladeV,2026 Cadillac Escalade-V,6500,3380,3120,8200,4610,4960,1700,8000,16200,800,24.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+naut_prem,2026 Lincoln Nautilus Premiere AWD,4390,2414,1976,5590,3320,3200,1200,3500,9090,350,17.7,0,game data; game data (model-level mass),,low,not yet researched for this trim
+naut_res,2026 Lincoln Nautilus Reserve AWD,4450,2448,2002,5650,3360,3230,1200,3500,9150,350,17.7,0,game data; game data (model-level mass),,low,not yet researched for this trim
+naut_resh,2026 Lincoln Nautilus Reserve Hybrid AWD,4670,2568,2102,5870,3490,3360,1200,3500,9370,350,17.7,95,game data; game data (model-level mass),,low,not yet researched for this trim
+naut_bl,2026 Lincoln Nautilus Black Label Hybrid,4760,2618,2142,5960,3540,3410,1200,3500,9460,350,17.7,95,game data; game data (model-level mass),,low,not yet researched for this trim
+ty_std,2026 Tesla Model Y Standard,4210,2021,2189,5410,2920,3510,1200,3500,8910,350,0,806,game data; game data (model-level mass),,low,not yet researched for this trim
+ty_lrrwd,2026 Tesla Model Y Long Range RWD,4250,2040,2210,5450,2940,3530,1200,3500,8950,350,0,1014,game data; game data (model-level mass),,low,not yet researched for this trim
+ty_lrawd,2026 Tesla Model Y Long Range AWD,4400,2112,2288,5600,3020,3630,1200,3500,9100,350,0,1014,game data; game data (model-level mass),,low,not yet researched for this trim
+ty_perf,2026 Tesla Model Y Performance,4480,2150,2330,5680,3070,3680,1200,3500,9180,350,0,1040,game data; game data (model-level mass),,low,not yet researched for this trim
+ty_l,2026 Tesla Model Y L Premium Launch Series AWD,4720,2266,2454,5920,3200,3840,1200,3500,9420,350,0,1066,game data; game data (model-level mass),,low,not yet researched for this trim
+esv_lux,2026 Cadillac Escalade ESV Luxury,6240,3245,2995,7940,4460,4800,1700,8000,15940,800,24.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+esv_sport,2026 Cadillac Escalade ESV Sport,6260,3255,3005,7960,4470,4810,1700,8000,15960,800,24.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+esv_platsport,2026 Cadillac Escalade ESV Platinum Sport,6310,3281,3029,8010,4500,4840,1700,8000,16010,800,24.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+esv_v,2026 Cadillac Escalade-V ESV,6700,3484,3216,8400,4720,5080,1700,8000,16400,800,24.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+iq_lux,2026 Cadillac Escalade IQ Luxury,9130,4565,4565,10830,5850,6780,1700,8000,18830,800,0,2665,game data; game data (model-level mass),,low,not yet researched for this trim
+iq_sport,2026 Cadillac Escalade IQ Sport,9130,4565,4565,10830,5850,6780,1700,8000,18830,800,0,2665,game data; game data (model-level mass),,low,not yet researched for this trim
+iq_plux,2026 Cadillac Escalade IQ Premium Luxury,9130,4565,4565,10830,5850,6780,1700,8000,18830,800,0,2665,game data; game data (model-level mass),,low,not yet researched for this trim
+iq_psport,2026 Cadillac Escalade IQ Premium Sport,9130,4565,4565,10830,5850,6780,1700,8000,18830,800,0,2665,game data; game data (model-level mass),,low,not yet researched for this trim
+iql_lux,2026 Cadillac Escalade IQL Luxury,9330,4665,4665,11030,5960,6910,1700,8000,19030,800,0,2665,game data; game data (model-level mass),,low,not yet researched for this trim
+iql_sport,2026 Cadillac Escalade IQL Sport,9330,4665,4665,11030,5960,6910,1700,8000,19030,800,0,2665,game data; game data (model-level mass),,low,not yet researched for this trim
+iql_plux,2026 Cadillac Escalade IQL Premium Luxury,9370,4685,4685,11070,5980,6930,1700,8000,19070,800,0,2665,game data; game data (model-level mass),,low,not yet researched for this trim
+iql_psport,2026 Cadillac Escalade IQL Premium Sport,9370,4685,4685,11070,5980,6930,1700,8000,19070,800,0,2665,game data; game data (model-level mass),,low,not yet researched for this trim
+xt5_lux,2026 Cadillac XT5 Luxury FWD,4110,2384,1726,5310,3330,2870,1200,3500,8810,350,21.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+xt5_plux,2026 Cadillac XT5 Premium Luxury AWD,4300,2494,1806,5500,3450,2970,1200,3500,9000,350,21.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+xt5_sport,2026 Cadillac XT5 Sport AWD,4410,2558,1852,5610,3510,3030,1200,3500,9110,350,21.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+f150_xlt,2025 Ford F-150 XLT SuperCrew 4x4,4890,2738,2152,7065,3990,3700,2175,13500,17590,1100,36,0,Ford 2026 F-150 spec sheet; game data (model-level mass),https://www.fromtheroad.ford.com/content/dam/fordmediasite/us/en/library/2026/specs/2026_Ford_F150_Specs.pdf,low,not yet researched for this trim
+f150_lariat,2025 Ford F-150 Lariat SuperCrew 4x4,5200,2912,2288,7375,4170,3880,2175,13500,17900,1100,36,0,Ford 2026 F-150 spec sheet; game data (model-level mass),https://www.fromtheroad.ford.com/content/dam/fordmediasite/us/en/library/2026/specs/2026_Ford_F150_Specs.pdf,low,not yet researched for this trim
+f150_tremor,2025 Ford F-150 Tremor SuperCrew 4x4,5400,3024,2376,7575,4290,3990,2175,13500,18100,1100,36,0,Ford 2026 F-150 spec sheet; game data (model-level mass),https://www.fromtheroad.ford.com/content/dam/fordmediasite/us/en/library/2026/specs/2026_Ford_F150_Specs.pdf,low,not yet researched for this trim
+f150_pb,2025 Ford F-150 Platinum PowerBoost 4x4,5600,3136,2464,7340,4420,4100,1740,11600,18300,1100,30.6,0,Ford 2026 F-150 spec sheet; game data (model-level mass),https://www.fromtheroad.ford.com/content/dam/fordmediasite/us/en/library/2026/specs/2026_Ford_F150_Specs.pdf,low,not yet researched for this trim
+q5_prem,2019 Audi Q5 Premium 2.0 TFSI quattro,4050,2349,1701,5250,3290,2840,1200,3500,8750,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+q5_plus,2019 Audi Q5 Premium Plus 2.0 TFSI quattro,4080,2366,1714,5280,3310,2850,1200,3500,8780,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+q5_prest,2019 Audi Q5 Prestige 2.0 TFSI quattro,4120,2390,1730,5320,3330,2870,1200,3500,8820,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+sq5,2019 Audi SQ5 Prestige 3.0 TFSI quattro,4400,2596,1804,5600,3570,3020,1200,3500,9100,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+m3_std,2026 Tesla Model 3 Standard,3880,1824,2056,4830,2610,3180,950,0,0,0,0,806,game data; game data (model-level mass),,low,not yet researched for this trim
+m3_lrrwd,2026 Tesla Model 3 Premium Long Range RWD,3920,1842,2078,4870,2630,3210,950,0,0,0,0,1014,game data; game data (model-level mass),,low,not yet researched for this trim
+m3_lrawd,2026 Tesla Model 3 Premium Long Range AWD,4060,1908,2152,5010,2710,3300,950,0,0,0,0,1014,game data; game data (model-level mass),,low,not yet researched for this trim
+m3_perf,2026 Tesla Model 3 Performance,4210,1979,2231,5160,2790,3400,950,0,0,0,0,1040,game data; game data (model-level mass),,low,not yet researched for this trim
+esc_active,2025 Ford Escape Active,3370,2022,1348,4570,2960,2470,1200,3500,8070,350,14.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+esc_elite,2025 Ford Escape ST-Line Elite AWD,3730,2238,1492,4930,3190,2660,1200,3500,8430,350,14.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+esc_hyb,2025 Ford Escape Platinum Hybrid AWD,3790,2274,1516,4990,3230,2690,1200,3500,8490,350,14.3,95,game data; game data (model-level mass),,low,not yet researched for this trim
+esc_phev,2025 Ford Escape Plug-In Hybrid,3860,2316,1544,5060,3280,2730,1200,3500,8560,350,11.1,187,game data; game data (model-level mass),,low,not yet researched for this trim
+cor_prem,2026 Lincoln Corsair Premiere AWD,3750,2212,1538,4950,3150,2670,1200,3500,8450,350,14.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+cor_res,2026 Lincoln Corsair Reserve AWD,3810,2248,1562,5010,3190,2710,1200,3500,8510,350,14.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+cor_gt,2026 Lincoln Corsair Grand Touring PHEV AWD,4190,2472,1718,5390,3430,2910,1200,3500,8890,350,11.1,187,game data; game data (model-level mass),,low,not yet researched for this trim
+gc_laredo,2024 Jeep Grand Cherokee Laredo 4x4,4520,2396,2124,5720,3270,3400,1200,3500,9220,350,23.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+gc_lim,2024 Jeep Grand Cherokee Limited 4x4,4630,2454,2176,5830,3340,3460,1200,3500,9330,350,23.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+gc_th,2024 Jeep Grand Cherokee Trailhawk 4xe,5730,3037,2693,6930,3970,4120,1200,3500,10430,350,23.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+gc_sr,2024 Jeep Grand Cherokee Summit Reserve 4xe,5780,3063,2717,6980,4000,4150,1200,3500,10480,350,23.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+av_std,2026 Lincoln Aviator RWD,4720,2407,2313,5920,3260,3640,1200,3500,9420,350,20.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+av_res,2026 Lincoln Aviator Reserve AWD,4920,2509,2411,6120,3370,3770,1200,3500,9620,350,20.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+av_gt,2026 Lincoln Aviator Grand Touring AWD,5690,2902,2788,6890,3800,4240,1200,3500,10390,350,20.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+av_blgt,2026 Lincoln Aviator Black Label Grand Touring,5730,2922,2808,6930,3820,4270,1200,3500,10430,350,20.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+qx_sens,2027 Infiniti QX55 Concept Sensory AWD,4100,2378,1722,5300,3320,2860,1200,3500,8800,350,15.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+qx_auto,2027 Infiniti QX55 Concept Autograph AWD,4140,2401,1739,5340,3340,2880,1200,3500,8840,350,15.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ms_awd,2026 Tesla Model S All-Wheel Drive,4560,2189,2371,5510,2980,3570,950,0,0,0,0,1300,game data; game data (model-level mass),,low,not yet researched for this trim
+ms_plaid,2026 Tesla Model S Plaid,4760,2285,2475,5710,3080,3700,950,0,0,0,0,1300,game data; game data (model-level mass),,low,not yet researched for this trim
+mx_awd,2026 Tesla Model X All-Wheel Drive,5180,2538,2642,6380,3450,4070,1200,3500,9880,350,0,1300,game data; game data (model-level mass),,low,not yet researched for this trim
+mx_plaid,2026 Tesla Model X Plaid,5410,2651,2759,6610,3570,4210,1200,3500,10110,350,0,1300,game data; game data (model-level mass),,low,not yet researched for this trim
+ct_awd,2026 Tesla Cybertruck All-Wheel Drive,6830,3415,3415,8530,4610,5340,1700,11000,19530,1100,0,1599,game data; game data (model-level mass),,low,not yet researched for this trim
+ct_beast,2026 Tesla Cyberbeast,6830,3415,3415,8530,4610,5340,1700,11000,19530,1100,0,1599,game data; game data (model-level mass),,low,not yet researched for this trim
+ms20_lr,2020 Tesla Model S Long Range Plus,4740,2275,2465,5690,3070,3690,950,0,0,0,0,1300,game data; game data (model-level mass),,low,not yet researched for this trim
+ms20_perf,2020 Tesla Model S Performance,4940,2371,2569,5890,3180,3820,950,0,0,0,0,1300,game data; game data (model-level mass),,low,not yet researched for this trim
+mx20_lr,2020 Tesla Model X Long Range Plus,5400,2646,2754,6600,3560,4210,1200,3500,10100,350,0,1300,game data; game data (model-level mass),,low,not yet researched for this trim
+mx20_perf,2020 Tesla Model X Performance,5510,2700,2810,6710,3620,4280,1200,3500,10210,350,0,1300,game data; game data (model-level mass),,low,not yet researched for this trim
+m3l_srp,2021 Tesla Model 3 Standard Range Plus,3550,1668,1882,4500,2430,2960,950,0,0,0,0,702,game data; game data (model-level mass),,low,not yet researched for this trim
+m3l_lr,2021 Tesla Model 3 Long Range AWD,4030,1894,2136,4980,2690,3280,950,0,0,0,0,1066,game data; game data (model-level mass),,low,not yet researched for this trim
+m3l_perf,2021 Tesla Model 3 Performance,4080,1918,2162,5030,2720,3310,950,0,0,0,0,1066,game data; game data (model-level mass),,low,not yet researched for this trim
+myl_std,2023 Tesla Model Y Standard RWD,4190,2011,2179,5390,2910,3490,1200,3500,8890,350,0,780,game data; game data (model-level mass),,low,not yet researched for this trim
+myl_lr,2023 Tesla Model Y Long Range AWD,4360,2093,2267,5560,3000,3600,1200,3500,9060,350,0,1066,game data; game data (model-level mass),,low,not yet researched for this trim
+myl_perf,2023 Tesla Model Y Performance,4420,2122,2298,5620,3030,3640,1200,3500,9120,350,0,1066,game data; game data (model-level mass),,low,not yet researched for this trim
+ford_bronco_sport_bl,2026 Ford Bronco Sport Big Bend,3640,2038,1602,4840,2930,2720,1200,3500,8340,350,15.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ford_bronco_sport_ol,2026 Ford Bronco Sport Outer Banks,3640,2038,1602,4840,2930,2720,1200,3500,8340,350,15.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ford_bronco_sport_bad,2026 Ford Bronco Sport Badlands,3640,2038,1602,4840,2930,2720,1200,3500,8340,350,15.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ford_bronco_sport_sq,2026 Ford Bronco Sport Sasquatch,3640,2038,1602,4840,2930,2720,1200,3500,8340,350,15.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ford_e_transit_cv,2027 Ford E-Transit Cargo Van High Roof,6500,3120,3380,10000,5400,6480,3500,6000,16000,600,0,1157,game data; game data (model-level mass),,low,not yet researched for this trim
+ford_e_transit_cc,2027 Ford E-Transit Cutaway,6500,3120,3380,10000,5400,6480,3500,6000,16000,600,0,1157,game data; game data (model-level mass),,low,not yet researched for this trim
+ford_expedition_act,2027 Ford Expedition Active,5950,3332,2618,7650,4630,4300,1700,8000,15650,800,28.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ford_expedition_plat,2027 Ford Expedition Platinum,5950,3332,2618,7650,4630,4300,1700,8000,15650,800,28.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ford_expedition_trem,2027 Ford Expedition Tremor,5950,3332,2618,7650,4630,4300,1700,8000,15650,800,28.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ford_expedition_ki,2027 Ford Expedition King Ranch,5950,3332,2618,7650,4630,4300,1700,8000,15650,800,28.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ford_expmax_plat,2027 Ford Expedition MAX Platinum,6190,3466,2724,7890,4770,4430,1700,8000,15890,800,29.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ford_expmax_ki,2027 Ford Expedition MAX King Ranch,6220,3483,2737,7920,4790,4450,1700,8000,15920,800,29.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ford_maverick_xl,2026 Ford Maverick XL Hybrid,3620,2172,1448,5020,3250,2710,1400,6500,11520,650,13.7,95,game data; game data (model-level mass),,low,not yet researched for this trim
+ford_maverick_xlt,2026 Ford Maverick XLT Hybrid,3620,2172,1448,5020,3250,2710,1400,6500,11520,650,13.7,95,game data; game data (model-level mass),,low,not yet researched for this trim
+ford_maverick_lar,2026 Ford Maverick Lariat Hybrid,3620,2172,1448,5020,3250,2710,1400,6500,11520,650,13.7,95,game data; game data (model-level mass),,low,not yet researched for this trim
+ford_maverick_trem,2026 Ford Maverick Tremor (2.0 EcoBoost AWD),3620,2027,1593,5020,3040,2820,1400,6500,11520,650,13.7,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ford_maverick_lobo,2026 Ford Maverick Lobo,3620,2172,1448,5020,3250,2710,1400,6500,11520,650,13.7,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ford_machE_sel,2026 Ford Mustang Mach-E Select RWD,4920,2362,2558,5620,3030,3640,700,0,0,0,0,936,game data; game data (model-level mass),,low,not yet researched for this trim
+ford_machE_prem,2026 Ford Mustang Mach-E Premium AWD Extended Range,4920,2755,2165,5620,3400,3160,700,0,0,0,0,1183,game data; game data (model-level mass),,low,not yet researched for this trim
+ford_machE_rally,2026 Ford Mustang Mach-E Rally,4920,2755,2165,5620,3400,3160,700,0,0,0,0,1183,game data; game data (model-level mass),,low,not yet researched for this trim
+ford_machE_gt,2026 Ford Mustang Mach-E GT,4920,2755,2165,5620,3400,3160,700,0,0,0,0,1183,game data; game data (model-level mass),,low,not yet researched for this trim
+ford_ranger_xl,2026 Ford Ranger XL,4520,2531,1989,5920,3580,3320,1400,6500,12420,650,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ford_ranger_xlt,2026 Ford Ranger XLT,4520,2531,1989,5920,3580,3320,1400,6500,12420,650,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ford_ranger_lar,2026 Ford Ranger Lariat 4x4,4520,2531,1989,5920,3580,3320,1400,6500,12420,650,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ford_ranger_rap,2026 Ford Ranger Raptor,4520,2531,1989,5920,3580,3320,1400,6500,12420,650,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ford_super_duty_xl,2027 Ford Super Duty F-250 XL,7050,3948,3102,10350,6260,5810,3300,18000,28350,1800,33.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ford_super_duty_xlt,2027 Ford Super Duty F-250 XLT,7050,3948,3102,10350,6260,5810,3300,18000,28350,1800,33.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ford_super_duty_lar,2027 Ford Super Duty F-250 Lariat Power Stroke,7050,3948,3102,10350,6260,5810,3300,18000,28350,1800,33.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ford_super_duty_plat,2027 Ford Super Duty F-250 Platinum,7050,3948,3102,10350,6260,5810,3300,18000,28350,1800,33.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ford_super_duty_trem,2027 Ford Super Duty F-250 Tremor,7050,3948,3102,10350,6260,5810,3300,18000,28350,1800,33.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ford_f350_xlt,2027 Ford Super Duty F-350 XLT,7540,4222,3318,10840,6560,6090,3300,18000,28840,1800,33.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ford_f350_lar,2027 Ford Super Duty F-350 Lariat Power Stroke,7940,4446,3494,11240,6800,6310,3300,18000,29240,1800,33.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ford_f450_lar,2027 Ford Super Duty F-450 Lariat Power Stroke DRW,8710,4878,3832,12010,7260,6740,3300,18000,30010,1800,33.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ford_f450_plat,2027 Ford Super Duty F-450 Platinum DRW,8770,4911,3859,12070,7300,6780,3300,18000,30070,1800,33.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ford_transit_cv,2027 Ford Transit Cargo Van High Roof,5400,3024,2376,8900,5380,5000,3500,6000,14900,600,25.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ford_transit_pv,2027 Ford Transit Passenger Van XLT,5400,3024,2376,8900,5380,5000,3500,6000,14900,600,25.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ford_transit_trail,2027 Ford Transit Trail AWD,5400,3024,2376,8900,5380,5000,3500,6000,14900,600,25.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chrysler_pacifica_sel,2027 Chrysler Pacifica Select,4410,2646,1764,5710,3700,3080,1300,3500,9210,350,19.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chrysler_pacifica_lim,2027 Chrysler Pacifica Limited,4410,2646,1764,5710,3700,3080,1300,3500,9210,350,19.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chrysler_pacifica_pin,2027 Chrysler Pacifica Pinnacle AWD,4410,2470,1940,5710,3450,3210,1300,3500,9210,350,19.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chrysler_pacifica_phev,2027 Chrysler Pacifica Hybrid (plug-in),4410,2646,1764,5710,3700,3080,1300,3500,9210,350,19.0,208,game data; game data (model-level mass),,low,not yet researched for this trim
+dodge_durango_gt,2026 Dodge Durango GT AWD,5070,2839,2231,6270,3790,3520,1200,3500,9770,350,24.6,0,game data; game data (model-level mass),,low,not yet researched for this trim
+dodge_durango_rt,2026 Dodge Durango R/T AWD,5070,2839,2231,6270,3790,3520,1200,3500,9770,350,24.6,0,game data; game data (model-level mass),,low,not yet researched for this trim
+dodge_durango_srt392,2026 Dodge Durango SRT 392,5070,2839,2231,6270,3790,3520,1200,3500,9770,350,24.6,0,game data; game data (model-level mass),,low,not yet researched for this trim
+dodge_durango_hc,2026 Dodge Durango SRT Hellcat,5070,2839,2231,6270,3790,3520,1200,3500,9770,350,24.6,0,game data; game data (model-level mass),,low,not yet researched for this trim
+dodge_charger_sp_rt2,2025 Dodge Charger Sixpack R/T 2-Door,4610,2489,2121,5310,3100,3100,700,0,0,0,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+dodge_charger_sp_sp2,2025 Dodge Charger Sixpack Scat Pack 2-Door,4670,2522,2148,5370,3130,3130,700,0,0,0,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+dodge_charger_sp_rt4,2025 Dodge Charger Sixpack R/T 4-Door,4670,2522,2148,5370,3130,3130,700,0,0,0,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+dodge_charger_sp_sp4,2025 Dodge Charger Sixpack Scat Pack 4-Door,4740,2560,2180,5440,3170,3170,700,0,0,0,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+dodge_charger_dt_rt2,2025 Dodge Charger Daytona R/T 2-Door,5700,2850,2850,6400,3460,4010,700,0,0,0,0,1222,game data; game data (model-level mass),,low,not yet researched for this trim
+dodge_charger_dt_sp2,2025 Dodge Charger Daytona Scat Pack 2-Door,5820,2910,2910,6520,3520,4080,700,0,0,0,0,1222,game data; game data (model-level mass),,low,not yet researched for this trim
+dodge_charger_dt_rt4,2025 Dodge Charger Daytona R/T 4-Door,5750,2875,2875,6450,3480,4040,700,0,0,0,0,1222,game data; game data (model-level mass),,low,not yet researched for this trim
+dodge_charger_dt_sp4,2025 Dodge Charger Daytona Scat Pack 4-Door,5880,2940,2940,6580,3550,4120,700,0,0,0,0,1222,game data; game data (model-level mass),,low,not yet researched for this trim
+jeep_cherokee_base,2026 Jeep Cherokee Cherokee,4190,2346,1844,5390,3260,3030,1200,3500,8890,350,15.9,95,game data; game data (model-level mass),,low,not yet researched for this trim
+jeep_cherokee_lar,2026 Jeep Cherokee Laredo,4190,2346,1844,5390,3260,3030,1200,3500,8890,350,15.9,95,game data; game data (model-level mass),,low,not yet researched for this trim
+jeep_cherokee_lim,2026 Jeep Cherokee Limited,4190,2346,1844,5390,3260,3030,1200,3500,8890,350,15.9,95,game data; game data (model-level mass),,low,not yet researched for this trim
+jeep_cherokee_ovl,2026 Jeep Cherokee Overland,4190,2346,1844,5390,3260,3030,1200,3500,8890,350,15.9,95,game data; game data (model-level mass),,low,not yet researched for this trim
+jeep_compass_sp,2026 Jeep Compass Sport,3640,2038,1602,4840,2930,2720,1200,3500,8340,350,13.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+jeep_compass_lat,2026 Jeep Compass Latitude,3640,2038,1602,4840,2930,2720,1200,3500,8340,350,13.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+jeep_compass_lim,2026 Jeep Compass Limited,3640,2038,1602,4840,2930,2720,1200,3500,8340,350,13.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+jeep_compass_th,2026 Jeep Compass Trailhawk,3640,2038,1602,4840,2930,2720,1200,3500,8340,350,13.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+dodge_hornet_gt,2025 Dodge Hornet GT,3550,1988,1562,4500,2720,2530,950,1000,5500,100,13.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+dodge_hornet_gtp,2025 Dodge Hornet GT Plus,3550,1988,1562,4500,2720,2530,950,1000,5500,100,13.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+dodge_hornet_rt,2025 Dodge Hornet R/T,4100,2173,1927,5050,2890,3000,950,1000,6050,100,23.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+jeep_gladiator_sp,2026 Jeep Gladiator Sport,5070,2839,2231,6470,3910,3630,1400,6500,12970,650,21.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+jeep_gladiator_ms,2026 Jeep Gladiator Mojave X,5070,2839,2231,6470,3910,3630,1400,6500,12970,650,21.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+jeep_gladiator_rub,2026 Jeep Gladiator Rubicon,5070,2839,2231,6470,3910,3630,1400,6500,12970,650,21.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+jeep_gladiator_rubx,2026 Jeep Gladiator Rubicon X,5070,2839,2231,6470,3910,3630,1400,6500,12970,650,21.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+jeep_grand_wagoneer_s1,2026 Jeep Grand Wagoneer Series I,6280,3517,2763,7980,4830,4480,1700,8000,15980,800,26.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+jeep_grand_wagoneer_s2,2026 Jeep Grand Wagoneer Series II,6280,3517,2763,7980,4830,4480,1700,8000,15980,800,26.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+jeep_grand_wagoneer_ob,2026 Jeep Grand Wagoneer Obsidian,6280,3517,2763,7980,4830,4480,1700,8000,15980,800,26.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+jeep_grand_wagoneer_s3,2026 Jeep Grand Wagoneer Series III,6280,3517,2763,7980,4830,4480,1700,8000,15980,800,26.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+jeep_recon_moab,2026 Jeep Recon Moab,5950,3094,2856,7150,4020,4320,1200,3500,10650,350,0,1300,game data; game data (model-level mass),,low,not yet researched for this trim
+jeep_wagoneer_s_lim,2026 Jeep Wagoneer S Limited AWD,5470,2844,2626,6670,3750,4030,1200,3500,10170,350,0,1300,game data; game data (model-level mass),,low,not yet researched for this trim
+jeep_wagoneer_s_lim2,2026 Jeep Wagoneer S Limited RWD,5470,2626,2844,6670,3600,4320,1200,3500,10170,350,0,1300,game data; game data (model-level mass),,low,not yet researched for this trim
+jeep_wagoneer_s_trail,2026 Jeep Wagoneer S Trailhawk,5470,2844,2626,6670,3750,4030,1200,3500,10170,350,0,1300,game data; game data (model-level mass),,low,not yet researched for this trim
+ram_1500_tr,2026 Ram 1500 Tradesman,5620,3147,2473,7320,4430,4110,1700,11000,18320,1100,25.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ram_1500_bh,2026 Ram 1500 Big Horn,5620,3147,2473,7320,4430,4110,1700,11000,18320,1100,25.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ram_1500_lar,2026 Ram 1500 Laramie,5620,3147,2473,7320,4430,4110,1700,11000,18320,1100,25.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ram_1500_lim,2026 Ram 1500 Limited,5620,3147,2473,7320,4430,4110,1700,11000,18320,1100,25.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ram_1500_ten,2026 Ram 1500 Tungsten,5620,3147,2473,7320,4430,4110,1700,11000,18320,1100,25.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ram_1500_rho_rho,2026 Ram 1500 RHO,5950,3332,2618,7650,4630,4300,1700,11000,18650,1100,33.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ram_1500_trx_srt_trx,2027 Ram 1500 TRX SRT,6390,3578,2812,8090,4890,4540,1700,11000,19090,1100,33.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ram_2500_tr,2026 Ram 2500 Tradesman 6.4 HEMI,7500,4200,3300,10800,6530,6070,3300,18000,28800,1800,30.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ram_2500_bh,2026 Ram 2500 Big Horn Cummins,7500,4200,3300,10800,6530,6070,3300,18000,28800,1800,30.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ram_2500_lar,2026 Ram 2500 Laramie Cummins,7500,4200,3300,10800,6530,6070,3300,18000,28800,1800,30.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ram_2500_pw,2026 Ram 2500 Power Wagon,7500,4200,3300,10800,6530,6070,3300,18000,28800,1800,30.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ram_2500_lim,2026 Ram 2500 Limited Cummins,7500,4200,3300,10800,6530,6070,3300,18000,28800,1800,30.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ram_3500_dually_tr,2026 Ram 3500 Tradesman Dually,8380,4693,3687,11680,7060,6560,3300,18000,29680,1800,30.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ram_3500_dually_lar,2026 Ram 3500 Laramie Dually,8380,4693,3687,11680,7060,6560,3300,18000,29680,1800,30.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ram_3500_dually_lim,2026 Ram 3500 Limited Dually,8380,4693,3687,11680,7060,6560,3300,18000,29680,1800,30.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ram_3500_chassis_cab_tr,2026 Ram 3500 Chassis Cab Tradesman,7280,4077,3203,14780,8940,8300,7500,20000,34780,2000,52.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ram_3500_chassis_cab_slt,2026 Ram 3500 Chassis Cab SLT,7280,4077,3203,14780,8940,8300,7500,20000,34780,2000,52.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ram_4500_chassis_cab_tr,2026 Ram 4500 Chassis Cab Tradesman,8600,4816,3784,16100,9740,9040,7500,20000,36100,2000,52.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ram_4500_chassis_cab_slt,2026 Ram 4500 Chassis Cab SLT,8600,4816,3784,16100,9740,9040,7500,20000,36100,2000,52.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ram_5500_chassis_cab_tr,2026 Ram 5500 Chassis Cab Tradesman,9260,5186,4074,16760,10140,9410,7500,20000,36760,2000,52.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ram_5500_chassis_cab_slt,2026 Ram 5500 Chassis Cab SLT,9260,5186,4074,16760,10140,9410,7500,20000,36760,2000,52.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ram_promaster_1500,2026 Ram ProMaster 1500 Standard Roof,5290,3174,2116,8790,5700,4750,3500,6000,14790,600,24.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ram_promaster_2500,2026 Ram ProMaster 2500 High Roof,5290,3174,2116,8590,5570,4640,3300,18000,26590,1800,24.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ram_promaster_3500,2026 Ram ProMaster 3500 High Roof Extended,5290,3174,2116,8590,5570,4640,3300,18000,26590,1800,24.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ram_promaster_ev_ev,2025 Ram ProMaster 3500 High Roof,6500,3900,2600,9800,6350,5290,3300,18000,27800,1800,0,1430,game data; game data (model-level mass),,low,not yet researched for this trim
+acura_adx_base,2026 Acura ADX ADX,3420,2052,1368,4620,2990,2490,1200,3500,8120,350,14.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+acura_adx_tech,2026 Acura ADX Technology,3420,2052,1368,4620,2990,2490,1200,3500,8120,350,14.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+acura_adx_as,2026 Acura ADX A-Spec SH-AWD,3420,1915,1505,4620,2790,2590,1200,3500,8120,350,14.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+acura_adx_asa,2026 Acura ADX A-Spec Advance SH-AWD,3420,1915,1505,4620,2790,2590,1200,3500,8120,350,14.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+acura_integra_base,2026 Acura Integra Integra,3090,1854,1236,4040,2620,2180,950,1000,5040,100,12.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+acura_integra_as,2026 Acura Integra A-Spec Technology,3090,1854,1236,4040,2620,2180,950,1000,5040,100,12.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+acura_integra_tys,2026 Acura Integra Type S,3090,1854,1236,4040,2620,2180,950,1000,5040,100,12.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+acura_mdx_base,2026 Acura MDX MDX SH-AWD,4410,2470,1940,5610,3390,3150,1200,3500,9110,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+acura_mdx_tech,2026 Acura MDX Technology,4410,2470,1940,5610,3390,3150,1200,3500,9110,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+acura_mdx_as,2026 Acura MDX A-Spec,4410,2470,1940,5610,3390,3150,1200,3500,9110,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+acura_mdx_adv,2026 Acura MDX Advance,4410,2470,1940,5610,3390,3150,1200,3500,9110,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+acura_mdx_tys,2026 Acura MDX Type S Advance,4410,2470,1940,5610,3390,3150,1200,3500,9110,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+acura_rdx_base,2026 Acura RDX RDX SH-AWD,4030,2257,1773,5230,3160,2940,1200,3500,8730,350,17.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+acura_rdx_tech,2026 Acura RDX Technology,4030,2257,1773,5230,3160,2940,1200,3500,8730,350,17.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+acura_rdx_as,2026 Acura RDX A-Spec,4030,2257,1773,5230,3160,2940,1200,3500,8730,350,17.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+acura_rdx_asa,2026 Acura RDX A-Spec Advance,4030,2257,1773,5230,3160,2940,1200,3500,8730,350,17.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_cr_v_lx,2027 Honda CR-V LX,3570,2142,1428,5270,3410,2850,1700,8000,13270,800,14.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_cr_v_ex,2027 Honda CR-V EX AWD,3570,1999,1571,4770,2880,2680,1200,3500,8270,350,14.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_cr_v_tsl,2027 Honda CR-V TrailSport (2.0 hybrid AWD),3570,1999,1571,4770,2880,2680,1200,3500,8270,350,14.0,95,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_cr_v_hybrid_sp,2027 Honda CR-V Sport Hybrid FWD,3810,2286,1524,5010,3250,2710,1200,3500,8510,350,14.0,95,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_cr_v_hybrid_spa,2027 Honda CR-V Sport Hybrid AWD,3810,2134,1676,5010,3030,2810,1200,3500,8510,350,14.0,95,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_cr_v_hybrid_spl,2027 Honda CR-V Sport-L Hybrid,3810,2134,1676,5010,3030,2810,1200,3500,8510,350,14.0,95,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_cr_v_hybrid_st,2027 Honda CR-V Sport Touring Hybrid,3810,2134,1676,5010,3030,2810,1200,3500,8510,350,14.0,95,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_cr_v_efcev_fc,2026 Honda CR-V e:FCEV,4430,2304,2126,5630,3160,3410,1200,3500,9130,350,0,910,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_civic_hatchback_lx,2026 Honda Civic LX,2950,1770,1180,3900,2530,2110,950,1000,4900,100,12.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_civic_hatchback_sp,2026 Honda Civic Sport,2950,1770,1180,3900,2530,2110,950,1000,4900,100,12.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_civic_hatchback_hybrid_sp,2026 Honda Civic Sport Hybrid,3200,1920,1280,4150,2690,2240,950,1000,5150,100,10.6,95,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_civic_hatchback_hybrid_st,2026 Honda Civic Sport Touring Hybrid,3200,1920,1280,4150,2690,2240,950,1000,5150,100,10.6,95,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_civic_sedan_lx,2026 Honda Civic LX,2910,1746,1164,3860,2500,2080,950,1000,4860,100,12.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_civic_sedan_sp,2026 Honda Civic Sport,2910,1746,1164,3860,2500,2080,950,1000,4860,100,12.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_civic_sedan_hybrid_sp,2026 Honda Civic Sport Hybrid,3150,1890,1260,4100,2660,2210,950,1000,5100,100,10.6,95,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_civic_sedan_hybrid_st,2026 Honda Civic Sport Touring Hybrid,3150,1890,1260,4100,2660,2210,950,1000,5100,100,10.6,95,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_civic_si_sedan_si,2026 Honda Civic Si,2950,1770,1180,3900,2530,2110,950,1000,4900,100,12.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_civic_type_r_tr,2026 Honda Civic Type R,3188,1977,1211,3850,2490,2080,700,0,0,0,12.4,0,Honda Information Center (American Honda),https://www.hondainfocenter.com/2026/Civic-Type-R/Feature-Guide/Civic-Type-R-Specifications/,high,"2026 Civic Type R, 6MT, only trim"
+honda_hr_v_lx,2027 Honda HR-V LX,3350,2010,1340,5050,3270,2730,1700,8000,13050,800,13.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_hr_v_sp,2027 Honda HR-V Sport,3350,2010,1340,4550,2950,2460,1200,3500,8050,350,13.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_hr_v_exl,2027 Honda HR-V EX-L AWD,3350,1876,1474,4550,2750,2560,1200,3500,8050,350,13.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_odyssey_exl,2027 Honda Odyssey EX-L,4450,2670,1780,5750,3730,3100,1300,3500,9250,350,19.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_odyssey_tsp,2027 Honda Odyssey Sport-L,4450,2670,1780,5750,3730,3100,1300,3500,9250,350,19.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_odyssey_tour,2027 Honda Odyssey Touring,4450,2670,1780,5750,3730,3100,1300,3500,9250,350,19.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_odyssey_elite,2027 Honda Odyssey Elite,4450,2670,1780,5750,3730,3100,1300,3500,9250,350,19.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_passport_rtl,2027 Honda Passport RTL,4520,2531,1989,5720,3460,3210,1200,3500,9220,350,19.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_passport_ts,2027 Honda Passport TrailSport,4520,2531,1989,5720,3460,3210,1200,3500,9220,350,19.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_passport_tse,2027 Honda Passport TrailSport Elite,4520,2531,1989,5720,3460,3210,1200,3500,9220,350,19.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_pilot_sp,2026 Honda Pilot Sport,4520,2531,1989,5720,3460,3210,1200,3500,9220,350,19.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_pilot_exl,2026 Honda Pilot EX-L,4520,2531,1989,5720,3460,3210,1200,3500,9220,350,19.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_pilot_tour,2026 Honda Pilot Touring,4520,2531,1989,5720,3460,3210,1200,3500,9220,350,19.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_pilot_ts,2026 Honda Pilot TrailSport,4520,2531,1989,5720,3460,3210,1200,3500,9220,350,19.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_pilot_elite,2026 Honda Pilot Elite,4520,2531,1989,5720,3460,3210,1200,3500,9220,350,19.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_pilot_bl,2026 Honda Pilot Black Edition,4520,2531,1989,5720,3460,3210,1200,3500,9220,350,19.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_prelude_hybrid_pr,2027 Honda Prelude Prelude,3220,1932,1288,3920,2540,2120,700,0,0,0,10.6,95,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_prologue_ex,2026 Honda Prologue EX FWD,5050,2626,2424,6250,3510,3780,1200,3500,9750,350,0,1105,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_prologue_exl,2026 Honda Prologue EX-L AWD,5050,2626,2424,6250,3510,3780,1200,3500,9750,350,0,1105,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_prologue_tour,2026 Honda Prologue Touring AWD,5050,2626,2424,6250,3510,3780,1200,3500,9750,350,0,1105,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_ridgeline_sp,2026 Honda Ridgeline Sport,4520,2531,1989,5920,3580,3320,1400,6500,12420,650,19.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_ridgeline_rtl,2026 Honda Ridgeline RTL,4520,2531,1989,5920,3580,3320,1400,6500,12420,650,19.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_ridgeline_ts,2026 Honda Ridgeline TrailSport,4520,2531,1989,5920,3580,3320,1400,6500,12420,650,19.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_ridgeline_bl,2026 Honda Ridgeline Black Edition,4520,2531,1989,5920,3580,3320,1400,6500,12420,650,19.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+nissan_armada_sv,2026 Nissan Armada SV,5950,3332,2618,7650,4630,4300,1700,8000,15650,800,25.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+nissan_armada_sl,2026 Nissan Armada SL,5950,3332,2618,7650,4630,4300,1700,8000,15650,800,25.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+nissan_armada_pro4x,2026 Nissan Armada PRO-4X,5950,3332,2618,7650,4630,4300,1700,8000,15650,800,25.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+nissan_armada_plat,2026 Nissan Armada Platinum,5950,3332,2618,7650,4630,4300,1700,8000,15650,800,25.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+nissan_frontier_s,2026 Nissan Frontier S,4630,2593,2037,6030,3650,3390,1400,6500,12530,650,21.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+nissan_frontier_sv,2026 Nissan Frontier SV,4630,2593,2037,6030,3650,3390,1400,6500,12530,650,21.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+nissan_frontier_pro4x,2026 Nissan Frontier PRO-4X,4630,2593,2037,6030,3650,3390,1400,6500,12530,650,21.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+nissan_frontier_prox,2026 Nissan Frontier PRO-X,4630,2593,2037,6030,3650,3390,1400,6500,12530,650,21.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+nissan_kicks_s,2027 Nissan Kicks S,3130,1878,1252,4080,2640,2200,950,1000,5080,100,10.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+nissan_kicks_sv,2027 Nissan Kicks SV AWD,3130,1753,1377,4080,2470,2290,950,1000,5080,100,10.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+nissan_kicks_sr,2027 Nissan Kicks SR AWD,3130,1753,1377,4080,2470,2290,950,1000,5080,100,10.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+nissan_kicks_ep_sv,2027 Nissan Kicks SV e-POWER,3200,1920,1280,4150,2690,2240,950,1000,5150,100,10.8,95,game data; game data (model-level mass),,low,not yet researched for this trim
+nissan_kicks_ep_sr,2027 Nissan Kicks SR e-POWER,3370,2022,1348,4320,2800,2330,950,1000,5320,100,10.8,95,game data; game data (model-level mass),,low,not yet researched for this trim
+nissan_leaf_s,2026 Nissan LEAF S,4170,2168,2002,5120,2880,3100,950,0,0,0,0,676,game data; game data (model-level mass),,low,not yet researched for this trim
+nissan_leaf_sv,2026 Nissan LEAF SV+,4170,2168,2002,5120,2880,3100,950,0,0,0,0,975,game data; game data (model-level mass),,low,not yet researched for this trim
+nissan_leaf_plat,2026 Nissan LEAF Platinum+,4170,2168,2002,5120,2880,3100,950,0,0,0,0,975,game data; game data (model-level mass),,low,not yet researched for this trim
+nissan_murano_sv,2026 Nissan Murano SV,4300,2408,1892,5500,3330,3090,1200,3500,9000,350,19.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+nissan_murano_sl,2026 Nissan Murano SL,4300,2408,1892,5500,3330,3090,1200,3500,9000,350,19.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+nissan_murano_plat,2026 Nissan Murano Platinum,4300,2408,1892,5500,3330,3090,1200,3500,9000,350,19.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+nissan_pathfinder_s,2026 Nissan Pathfinder S,4520,2712,1808,5720,3710,3090,1200,3500,9220,350,19.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+nissan_pathfinder_sv,2026 Nissan Pathfinder SV,4520,2531,1989,5720,3460,3210,1200,3500,9220,350,19.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+nissan_pathfinder_sl,2026 Nissan Pathfinder SL,4520,2531,1989,5720,3460,3210,1200,3500,9220,350,19.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+nissan_pathfinder_rs,2026 Nissan Pathfinder Rock Creek,4520,2531,1989,5720,3460,3210,1200,3500,9220,350,19.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+nissan_pathfinder_plat,2026 Nissan Pathfinder Platinum,4520,2531,1989,5720,3460,3210,1200,3500,9220,350,19.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+nissan_rogue_s,2027 Nissan Rogue S,3660,2196,1464,4860,3150,2620,1200,3500,8360,350,14.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+nissan_rogue_sv,2027 Nissan Rogue SV,3660,2050,1610,4860,2940,2730,1200,3500,8360,350,14.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+nissan_rogue_rs,2027 Nissan Rogue Rock Creek,3660,2050,1610,4860,2940,2730,1200,3500,8360,350,14.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+nissan_rogue_sl,2027 Nissan Rogue SL,3660,2050,1610,4860,2940,2730,1200,3500,8360,350,14.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+nissan_rogue_plat,2027 Nissan Rogue Platinum,3660,2050,1610,4860,2940,2730,1200,3500,8360,350,14.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+nissan_rogue_ep_sv,2027 Nissan Rogue SV e-POWER,4070,2320,1750,5270,3240,2900,1200,3500,8770,350,14.5,95,game data; game data (model-level mass),,low,not yet researched for this trim
+nissan_rogue_ep_sr,2027 Nissan Rogue SR e-POWER,4070,2320,1750,5270,3240,2900,1200,3500,8770,350,14.5,95,game data; game data (model-level mass),,low,not yet researched for this trim
+nissan_rogue_ep_plat,2027 Nissan Rogue Platinum e-POWER,4070,2320,1750,5270,3240,2900,1200,3500,8770,350,14.5,95,game data; game data (model-level mass),,low,not yet researched for this trim
+bmw_x1_28i,2026 BMW X1 xDrive28i,3770,2111,1659,4970,3010,2790,1200,3500,8470,350,14.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+bmw_x1_m35i,2026 BMW X1 M35i xDrive,3880,2173,1707,5080,3070,2850,1200,3500,8580,350,14.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+bmw_x2_28i,2026 BMW X2 xDrive28i,3790,2122,1668,4990,3020,2800,1200,3500,8490,350,14.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+bmw_x2_m35i,2026 BMW X2 M35i xDrive,3900,2184,1716,5100,3080,2860,1200,3500,8600,350,14.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+bmw_x3_30,2026 BMW X3 30 xDrive,4140,2318,1822,5340,3230,3000,1200,3500,8840,350,17.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+bmw_x3_m50,2026 BMW X3 M50 xDrive,4390,2458,1932,5590,3380,3140,1200,3500,9090,350,17.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+bmw_x5_s40i,2025 BMW X5 sDrive40i,4670,2335,2335,5870,3170,3680,1200,3500,9370,350,21.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+bmw_x5_40i,2025 BMW X5 xDrive40i,4850,2716,2134,6050,3660,3400,1200,3500,9550,350,21.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+bmw_x5_50e,2025 BMW X5 xDrive50e,5620,3147,2473,6820,4120,3830,1200,3500,10320,350,18.2,334,game data; game data (model-level mass),,low,not yet researched for this trim
+bmw_x5_m60i,2025 BMW X5 M60i xDrive,5180,2901,2279,6380,3860,3580,1200,3500,9880,350,21.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+bmw_x6_40i,2026 BMW X6 xDrive40i,4810,2694,2116,6010,3630,3380,1200,3500,9510,350,21.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+bmw_x6_m60i,2026 BMW X6 M60i xDrive,5140,2878,2262,6340,3830,3560,1200,3500,9840,350,21.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+bmw_x7_40i,2026 BMW X7 xDrive40i,5400,3024,2376,7100,4290,3990,1700,8000,15100,800,21.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+bmw_x7_m60i,2026 BMW X7 M60i xDrive,5730,3209,2521,7430,4490,4170,1700,8000,15430,800,21.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+bmw_x7_alpina,2026 BMW ALPINA XB7,5950,3332,2618,7650,4630,4300,1700,8000,15650,800,21.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+bmw_ix3_50,2027 BMW iX3 50 xDrive,5200,2704,2496,6400,3590,3870,1200,3500,9900,350,0,1413,game data; game data (model-level mass),,low,not yet researched for this trim
+cad_celestiq,2026 Cadillac CELESTIQ,6830,3552,3278,7780,4370,4710,950,0,0,0,0,1443,game data; game data (model-level mass),,low,not yet researched for this trim
+cad_lyriq_lux,2027 Cadillac LYRIQ Luxury RWD,5620,2810,2810,6820,3680,4270,1200,3500,10320,350,0,1326,game data; game data (model-level mass),,low,not yet researched for this trim
+cad_lyriq_lux2,2027 Cadillac LYRIQ Luxury AWD,5840,3037,2803,7040,3950,4260,1200,3500,10540,350,0,1326,game data; game data (model-level mass),,low,not yet researched for this trim
+cad_lyriq_sport,2027 Cadillac LYRIQ Sport AWD,5840,3037,2803,7040,3950,4260,1200,3500,10540,350,0,1326,game data; game data (model-level mass),,low,not yet researched for this trim
+cad_lyriq_v,2027 Cadillac LYRIQ-V,5950,3094,2856,7150,4020,4320,1200,3500,10650,350,0,1326,game data; game data (model-level mass),,low,not yet researched for this trim
+cad_optiq_lux,2027 Cadillac OPTIQ Luxury AWD,5180,2694,2486,6380,3580,3860,1200,3500,9880,350,0,1105,game data; game data (model-level mass),,low,not yet researched for this trim
+cad_optiq_sport,2027 Cadillac OPTIQ Sport AWD,5200,2704,2496,6400,3590,3870,1200,3500,9900,350,0,1105,game data; game data (model-level mass),,low,not yet researched for this trim
+cad_optiq_v,2027 Cadillac OPTIQ-V,5400,2808,2592,6600,3710,3990,1200,3500,10100,350,0,1105,game data; game data (model-level mass),,low,not yet researched for this trim
+cad_vistiq_lux,2027 Cadillac VISTIQ Luxury,6170,3208,2962,7370,4140,4460,1200,3500,10870,350,0,1326,game data; game data (model-level mass),,low,not yet researched for this trim
+gen_g70_25t,2027 Genesis G70 2.5T AWD,3790,2122,1668,4740,2870,2660,950,1000,5740,100,15.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+gen_g70_25tp,2027 Genesis G70 2.5T Prestige AWD,3830,2145,1685,4780,2890,2680,950,1000,5780,100,15.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+gen_g70_33t,2027 Genesis G70 3.3T Sport Prestige AWD,3970,2223,1747,4920,2980,2760,950,1000,5920,100,15.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+gen_g80_25t,2027 Genesis G80 2.5T AWD,4190,2346,1844,5140,3110,2890,950,1000,6140,100,19.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+gen_g80_25ta,2027 Genesis G80 2.5T Advanced AWD,4230,2369,1861,5180,3130,2910,950,1000,6180,100,19.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+gen_g80_25tsp,2027 Genesis G80 2.5T Sport Prestige AWD,4280,2397,1883,5230,3160,2940,950,1000,6230,100,19.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+gen_g80_35tsp,2027 Genesis G80 3.5T Sport Prestige AWD,4430,2481,1949,5380,3250,3020,950,1000,6380,100,19.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+gen_g90_35t_std,2026 Genesis G90 3.5T AWD,4920,2755,2165,5870,3550,3300,950,1000,6870,100,21.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+gen_g90_35t,2026 Genesis G90 3.5T e-SC AWD,5070,2839,2231,6020,3640,3380,950,1000,7020,100,21.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+gen_gv60_std,2027 Genesis GV60 Standard RWD,4410,2205,2205,5360,2890,3360,950,0,0,0,0,1092,game data; game data (model-level mass),,low,not yet researched for this trim
+gen_gv60_adv,2027 Genesis GV60 Advanced AWD,4740,2465,2275,5690,3200,3440,950,0,0,0,0,1092,game data; game data (model-level mass),,low,not yet researched for this trim
+gen_gv60_perf,2027 Genesis GV60 Performance AWD,4850,2522,2328,5800,3260,3510,950,0,0,0,0,1092,game data; game data (model-level mass),,low,not yet researched for this trim
+gen_gv70_25t,2027 Genesis GV70 2.5T AWD,4300,2408,1892,5500,3330,3090,1200,3500,9000,350,17.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+gen_gv70_25ts,2027 Genesis GV70 2.5T Select AWD,4320,2419,1901,5520,3340,3100,1200,3500,9020,350,17.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+gen_gv70_25ta,2027 Genesis GV70 2.5T Advanced AWD,4350,2436,1914,5550,3360,3120,1200,3500,9050,350,17.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+gen_gv70_25tsp,2027 Genesis GV70 2.5T Sport Prestige AWD,4390,2458,1932,5590,3380,3140,1200,3500,9090,350,17.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+gen_gv70_35tsp,2027 Genesis GV70 3.5T Sport Prestige AWD,4520,2531,1989,5720,3460,3210,1200,3500,9220,350,17.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+gen_egv70,2027 Genesis Electrified GV70 Advanced AWD,5070,2636,2434,6270,3520,3790,1200,3500,9770,350,0,1092,game data; game data (model-level mass),,low,not yet researched for this trim
+gen_egv70_prest,2027 Genesis Electrified GV70 Prestige AWD,5110,2657,2453,6310,3540,3820,1200,3500,9810,350,0,1092,game data; game data (model-level mass),,low,not yet researched for this trim
+gen_gv80_25t,2027 Genesis GV80 2.5T AWD,4850,2716,2134,6050,3660,3400,1200,3500,9550,350,21.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+gen_gv80_25ta,2027 Genesis GV80 2.5T Advanced AWD,4890,2738,2152,6090,3680,3420,1200,3500,9590,350,21.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+gen_gv80_35ta,2027 Genesis GV80 3.5T Advanced AWD,5050,2828,2222,6250,3780,3510,1200,3500,9750,350,21.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+gen_gv80_35tp,2027 Genesis GV80 3.5T Prestige AWD,5090,2850,2240,6290,3800,3530,1200,3500,9790,350,21.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+gen_gv80c_35ta,2027 Genesis GV80 Coupe 3.5T Advanced,4960,2778,2182,6160,3730,3460,1200,3500,9660,350,21.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+gen_gv80c_35t,2027 Genesis GV80 Coupe 3.5T e-SC Prestige,5070,2839,2231,6270,3790,3520,1200,3500,9770,350,21.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_bolt_lt,2027 Chevrolet Bolt LT,3860,2007,1853,4810,2700,2910,950,0,0,0,0,845,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_bolt_rs,2027 Chevrolet Bolt RS,3880,2018,1862,4830,2710,2920,950,0,0,0,0,845,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_malibu_ls,2025 Chevrolet Malibu LS,3150,1764,1386,4100,2480,2300,950,1000,5100,100,15.6,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_malibu_rs,2025 Chevrolet Malibu RS,3170,1775,1395,4120,2490,2310,950,1000,5120,100,15.6,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_malibu_lt,2025 Chevrolet Malibu LT,3170,1775,1395,4120,2490,2310,950,1000,5120,100,15.6,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_malibu_2lt,2025 Chevrolet Malibu 2LT,3220,1803,1417,4170,2520,2340,950,1000,5170,100,15.6,0,game data; game data (model-level mass),,low,not yet researched for this trim
+nissan_altima27_sv,2027 Nissan Altima SV,3220,1803,1417,4170,2520,2340,950,1000,5170,100,16.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+nissan_altima27_sr,2027 Nissan Altima SR,3240,1814,1426,4190,2530,2350,950,1000,5190,100,16.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+nissan_altima27_sra,2027 Nissan Altima SR Intelligent AWD,3420,1915,1505,4370,2640,2450,950,1000,5370,100,16.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+q5_25_pr,2025 Audi Q5 Premium,4240,2374,1866,5440,3290,3060,1200,3500,8940,350,17.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+q5_25_pp,2025 Audi Q5 Premium Plus,4270,2391,1879,5470,3310,3070,1200,3500,8970,350,17.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+q5_25_prest,2025 Audi Q5 Prestige,4300,2408,1892,5500,3330,3090,1200,3500,9000,350,17.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+sq5_25_pr,2025 Audi SQ5 Premium,4460,2542,1918,5660,3480,3120,1200,3500,9160,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+sq5_25_pp,2025 Audi SQ5 Premium Plus,4490,2559,1931,5690,3500,3130,1200,3500,9190,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+sq5_25_prest,2025 Audi SQ5 Prestige,4520,2576,1944,5720,3520,3150,1200,3500,9220,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+f150_22_xl,2022 Ford F-150 XL SuperCrew 4x4,4520,2531,1989,6220,3760,3490,1700,11000,17220,1100,23.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+f150_22_stx,2022 Ford F-150 STX SuperCrew 4x4,4670,2615,2055,6370,3850,3580,1700,11000,17370,1100,23.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+f150_22_xlt,2022 Ford F-150 XLT SuperCrew 4x4,4810,2694,2116,6510,3940,3660,1700,11000,17510,1100,23.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+f150_22_lariat,2022 Ford F-150 Lariat SuperCrew 4x4,5070,2839,2231,6770,4090,3800,1700,11000,17770,1100,25.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+f150_22_kr,2022 Ford F-150 King Ranch SuperCrew 4x4,5250,2940,2310,6950,4200,3900,1700,11000,17950,1100,25.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+f150_22_plat,2022 Ford F-150 Platinum SuperCrew 4x4,5290,2962,2328,6990,4230,3930,1700,11000,17990,1100,25.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+f150_22_ltd,2022 Ford F-150 Limited SuperCrew 4x4,5730,3209,2521,7430,4490,4170,1700,11000,18430,1100,30.6,0,game data; game data (model-level mass),,low,not yet researched for this trim
+f150_22_tremor,2022 Ford F-150 Tremor SuperCrew 4x4,5400,3024,2376,7100,4290,3990,1700,11000,18100,1100,25.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+f150_22_raptor,2022 Ford F-150 Raptor SuperCrew 4x4,5730,3209,2521,7430,4490,4170,1700,11000,18430,1100,35.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+f150_22_xlt_pb,2022 Ford F-150 XLT PowerBoost SuperCrew 4x4,5490,3074,2416,7190,4350,4040,1700,11000,18190,1100,30.6,0,game data; game data (model-level mass),,low,not yet researched for this trim
+f150_22_lariat_pb,2022 Ford F-150 Lariat PowerBoost SuperCrew 4x4,5600,3136,2464,7300,4420,4100,1700,11000,18300,1100,30.6,0,game data; game data (model-level mass),,low,not yet researched for this trim
+f150_22_kr_pb,2022 Ford F-150 King Ranch PowerBoost SuperCrew 4x4,5640,3158,2482,7340,4440,4120,1700,11000,18340,1100,30.6,0,game data; game data (model-level mass),,low,not yet researched for this trim
+f150_22_plat_pb,2022 Ford F-150 Platinum PowerBoost SuperCrew 4x4,5690,3186,2504,7390,4470,4150,1700,11000,18390,1100,30.6,0,game data; game data (model-level mass),,low,not yet researched for this trim
+cad_vistiq_sport,2027 Cadillac VISTIQ Sport,6170,3208,2962,7370,4140,4460,1200,3500,10870,350,0,1326,game data; game data (model-level mass),,low,not yet researched for this trim
+cad_vistiq_plat,2027 Cadillac VISTIQ Platinum,6220,3234,2986,7420,4170,4490,1200,3500,10920,350,0,1326,game data; game data (model-level mass),,low,not yet researched for this trim
+mz_3hb_ss,2026 Mazda3 2.5 S Select Sport Hatchback,3060,1714,1346,4010,2430,2250,950,1000,5010,100,13.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mz_3hb_pref,2026 Mazda3 2.5 S Preferred Hatchback,3090,1730,1360,4040,2440,2270,950,1000,5040,100,13.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mz_3hb_carbon,2026 Mazda3 2.5 S Carbon Edition Hatchback,3110,1742,1368,4060,2460,2280,950,1000,5060,100,13.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mz_3hb_prem,2026 Mazda3 2.5 S Premium AWD Hatchback,3310,1854,1456,4260,2580,2390,950,1000,5260,100,13.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mz_3hb_turbo,2026 Mazda3 2.5 Turbo Premium Plus AWD Hatchback,3440,1926,1514,4390,2660,2470,950,1000,5390,100,13.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mz_cx30_ss,2026 Mazda CX-30 2.5 S Select Sport,3370,1887,1483,4570,2760,2570,1200,3500,8070,350,12.7,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mz_cx30_pref,2026 Mazda CX-30 2.5 S Preferred,3400,1904,1496,4600,2780,2580,1200,3500,8100,350,12.7,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mz_cx30_carbon,2026 Mazda CX-30 2.5 S Carbon Edition,3410,1910,1500,4610,2790,2590,1200,3500,8110,350,12.7,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mz_cx30_prem,2026 Mazda CX-30 2.5 S Premium,3420,1915,1505,4620,2790,2590,1200,3500,8120,350,12.7,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mz_cx30_tss,2026 Mazda CX-30 2.5 Turbo Select Sport,3530,1977,1553,4730,2860,2660,1200,3500,8230,350,12.7,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mz_cx30_tpp,2026 Mazda CX-30 2.5 Turbo Premium Plus,3570,1999,1571,4770,2880,2680,1200,3500,8270,350,12.7,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mz_cx5_s,2026 Mazda CX-5 2.5 S AWD,3730,2089,1641,4930,2980,2770,1200,3500,8430,350,14.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mz_cx5_ss,2026 Mazda CX-5 2.5 S Select AWD,3730,2089,1641,4930,2980,2770,1200,3500,8430,350,14.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mz_cx5_sp,2026 Mazda CX-5 2.5 S Preferred AWD,3730,2089,1641,4930,2980,2770,1200,3500,8430,350,14.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mz_cx5_prem,2026 Mazda CX-5 2.5 S Premium AWD,3730,2089,1641,4930,2980,2770,1200,3500,8430,350,14.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mz_cx5_pp,2026 Mazda CX-5 2.5 S Premium Plus AWD,3730,2089,1641,4930,2980,2770,1200,3500,8430,350,14.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mz_cx50_ss,2026 Mazda CX-50 2.5 S Select,3640,2038,1602,4840,2930,2720,1200,3500,8340,350,15.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mz_cx50_pref,2026 Mazda CX-50 2.5 S Preferred,3640,2038,1602,4840,2930,2720,1200,3500,8340,350,15.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mz_cx50_prem,2026 Mazda CX-50 2.5 S Premium,3640,2038,1602,4840,2930,2720,1200,3500,8340,350,15.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mz_cx50_mer,2026 Mazda CX-50 2.5 S Meridian Edition,3640,2038,1602,4840,2930,2720,1200,3500,8340,350,15.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mz_cx50_tprem,2026 Mazda CX-50 2.5 Turbo Premium,3810,2134,1676,5010,3030,2810,1200,3500,8510,350,15.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mz_cx50_tmer,2026 Mazda CX-50 2.5 Turbo Meridian Edition,3810,2134,1676,5010,3030,2810,1200,3500,8510,350,15.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mz_cx50_tpp,2026 Mazda CX-50 2.5 Turbo Premium Plus,3810,2134,1676,5010,3030,2810,1200,3500,8510,350,15.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mz_cx50_hpref,2026 Mazda CX-50 Hybrid Preferred,3880,2173,1707,5080,3070,2850,1200,3500,8580,350,14.5,95,game data; game data (model-level mass),,low,not yet researched for this trim
+mz_cx50_hprem,2026 Mazda CX-50 Hybrid Premium,3880,2173,1707,5080,3070,2850,1200,3500,8580,350,14.5,95,game data; game data (model-level mass),,low,not yet researched for this trim
+mz_cx50_hpp,2026 Mazda CX-50 Hybrid Premium Plus,3880,2173,1707,5080,3070,2850,1200,3500,8580,350,14.5,95,game data; game data (model-level mass),,low,not yet researched for this trim
+mz_cx70_tpref,2026 Mazda CX-70 3.3 Turbo Preferred,4430,2481,1949,5630,3410,3160,1200,3500,9130,350,19.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mz_cx70_tprem,2026 Mazda CX-70 3.3 Turbo Premium,4430,2481,1949,5630,3410,3160,1200,3500,9130,350,19.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mz_cx70_tsprem,2026 Mazda CX-70 3.3 Turbo S Premium,4430,2481,1949,5630,3410,3160,1200,3500,9130,350,19.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mz_cx70_tspp,2026 Mazda CX-70 3.3 Turbo S Premium Plus,4430,2481,1949,5630,3410,3160,1200,3500,9130,350,19.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mz_cx70_phpref,2026 Mazda CX-70 PHEV Preferred,5000,2800,2200,6200,3750,3480,1200,3500,9700,350,15.1,231,game data; game data (model-level mass),,low,not yet researched for this trim
+mz_cx70_phpp,2026 Mazda CX-70 PHEV Premium Plus,5000,2800,2200,6200,3750,3480,1200,3500,9700,350,15.1,231,game data; game data (model-level mass),,low,not yet researched for this trim
+mz_cx90_tsel,2026 Mazda CX-90 3.3 Turbo Select,4590,2570,2020,5790,3500,3250,1200,3500,9290,350,19.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mz_cx90_tpref,2026 Mazda CX-90 3.3 Turbo Preferred,4590,2570,2020,5790,3500,3250,1200,3500,9290,350,19.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mz_cx90_tpp,2026 Mazda CX-90 3.3 Turbo Preferred Plus,4590,2570,2020,5790,3500,3250,1200,3500,9290,350,19.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mz_cx90_tprem,2026 Mazda CX-90 3.3 Turbo Premium,4590,2570,2020,5790,3500,3250,1200,3500,9290,350,19.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mz_cx90_tsprem,2026 Mazda CX-90 3.3 Turbo S Premium,4590,2570,2020,5790,3500,3250,1200,3500,9290,350,19.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mz_cx90_tspp,2026 Mazda CX-90 3.3 Turbo S Premium Plus,4590,2570,2020,5790,3500,3250,1200,3500,9290,350,19.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mz_cx90_phpref,2026 Mazda CX-90 PHEV Preferred,5140,2878,2262,6340,3830,3560,1200,3500,9840,350,15.1,231,game data; game data (model-level mass),,low,not yet researched for this trim
+mz_cx90_phpp,2026 Mazda CX-90 PHEV Premium Plus,5140,2878,2262,6340,3830,3560,1200,3500,9840,350,15.1,231,game data; game data (model-level mass),,low,not yet researched for this trim
+vw_jetta_s,2026 Volkswagen Jetta S,2950,1652,1298,3900,2360,2190,950,1000,4900,100,13.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+vw_jetta_sport,2026 Volkswagen Jetta Sport,2980,1669,1311,3930,2380,2210,950,1000,4930,100,13.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+vw_jetta_se,2026 Volkswagen Jetta SE,2990,1674,1316,3940,2380,2210,950,1000,4940,100,13.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+vw_jetta_sel,2026 Volkswagen Jetta SEL,3020,1691,1329,3970,2400,2230,950,1000,4970,100,13.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+vw_jetta_gli,2026 Volkswagen Jetta GLI Autobahn,3200,1792,1408,4150,2510,2330,950,1000,5150,100,13.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+vw_taos_s,2026 Volkswagen Taos S,3170,1775,1395,4370,2640,2450,1200,3500,7870,350,13.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+vw_taos_se,2026 Volkswagen Taos SE 4MOTION,3370,1887,1483,4570,2760,2570,1200,3500,8070,350,13.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+vw_taos_sel,2026 Volkswagen Taos SEL 4MOTION,3420,1915,1505,4620,2790,2590,1200,3500,8120,350,13.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+vw_tiguan_s,2026 Volkswagen Tiguan S,3620,2027,1593,4820,2920,2710,1200,3500,8320,350,15.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+vw_tiguan_se,2026 Volkswagen Tiguan SE 4MOTION,3790,2122,1668,4990,3020,2800,1200,3500,8490,350,15.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+vw_tiguan_selr,2026 Volkswagen Tiguan SEL R-Line Turbo 4MOTION,3880,2173,1707,5080,3070,2850,1200,3500,8580,350,15.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+vw_atlas_se,2027 Volkswagen Atlas SE 4MOTION,4520,2531,1989,5720,3460,3210,1200,3500,9220,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+vw_atlas_set,2027 Volkswagen Atlas SE with Technology 4MOTION,4520,2531,1989,5720,3460,3210,1200,3500,9220,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+vw_atlas_peak,2027 Volkswagen Atlas Peak Edition SE with Technology,4520,2531,1989,5720,3460,3210,1200,3500,9220,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+vw_atlas_sel,2027 Volkswagen Atlas SEL 4MOTION,4520,2531,1989,5720,3460,3210,1200,3500,9220,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+vw_atlas_selp,2027 Volkswagen Atlas SEL Premium R-Line 4MOTION,4520,2531,1989,5720,3460,3210,1200,3500,9220,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+vw_atlas_cs_se,2026 Volkswagen Atlas Cross Sport SE 4MOTION,4370,2447,1923,5570,3370,3130,1200,3500,9070,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+vw_atlas_cs_set,2026 Volkswagen Atlas Cross Sport SE with Technology 4MOTION,4370,2447,1923,5570,3370,3130,1200,3500,9070,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+vw_atlas_cs_sel,2026 Volkswagen Atlas Cross Sport SEL 4MOTION,4370,2447,1923,5570,3370,3130,1200,3500,9070,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+vw_atlas_cs_selr,2026 Volkswagen Atlas Cross Sport SEL R-Line 4MOTION,4370,2447,1923,5570,3370,3130,1200,3500,9070,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+vw_atlas_cs_selp,2026 Volkswagen Atlas Cross Sport SEL Premium R-Line 4MOTION,4370,2447,1923,5570,3370,3130,1200,3500,9070,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+vw_id4_pro,2026 Volkswagen ID.4 Pro,4720,2360,2360,5920,3200,3710,1200,3500,9420,350,0,1066,game data; game data (model-level mass),,low,not yet researched for this trim
+vw_id4_pros,2026 Volkswagen ID.4 Pro S,4760,2380,2380,5960,3220,3730,1200,3500,9460,350,0,1066,game data; game data (model-level mass),,low,not yet researched for this trim
+vw_id4_prosa,2026 Volkswagen ID.4 Pro S AWD,4960,2579,2381,6160,3460,3730,1200,3500,9660,350,0,1066,game data; game data (model-level mass),,low,not yet researched for this trim
+vw_id4_prospa,2026 Volkswagen ID.4 Pro S Plus AWD,5000,2600,2400,6200,3480,3750,1200,3500,9700,350,0,1066,game data; game data (model-level mass),,low,not yet researched for this trim
+vw_idbuzz_pros,2025 Volkswagen ID. Buzz Pro S,5930,2965,2965,7230,3900,4530,1300,3500,10730,350,0,1118,game data; game data (model-level mass),,low,not yet researched for this trim
+vw_idbuzz_prospa,2025 Volkswagen ID. Buzz Pro S Plus 4MOTION,6150,3444,2706,7450,4510,4180,1300,3500,10950,350,0,1118,game data; game data (model-level mass),,low,not yet researched for this trim
+vw_idbuzz_1st,2025 Volkswagen ID. Buzz 1st Edition 4MOTION,6150,3444,2706,7450,4510,4180,1300,3500,10950,350,0,1118,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_rav4_26_le,2026 Toyota RAV4 Hybrid LE,3690,2066,1624,4900,2960,2750,1200,1750,8400,350,14.5,95,KBB; Toyota Pressroom,https://pressroom.toyota.com/?p=110151 https://www.kbb.com/toyota/rav4-hybrid/2026/specs,medium,2026 RAV4 Hybrid LE
+toy_rav4_26_xle,2026 Toyota RAV4 Hybrid XLE AWD,3775,2114,1661,5060,3060,2840,1200,3500,8560,350,14.5,95,KBB; Toyota Pressroom,https://pressroom.toyota.com/?p=110151 https://www.kbb.com/toyota/rav4-hybrid/2026/specs,medium,"XLE, XLE Premium, SE, Woodland all list 3,775 lb"
+toy_rav4_26_xlep,2026 Toyota RAV4 Hybrid XLE Premium AWD,3775,2114,1661,5060,3060,2840,1200,3500,8560,350,14.5,95,KBB; Toyota Pressroom,https://pressroom.toyota.com/?p=110151 https://www.kbb.com/toyota/rav4-hybrid/2026/specs,medium,"XLE, XLE Premium, SE, Woodland all list 3,775 lb"
+toy_rav4_26_wood,2026 Toyota RAV4 Hybrid Woodland AWD,3775,2114,1661,5060,3060,2840,1200,3500,8560,350,14.5,95,KBB; Toyota Pressroom,https://pressroom.toyota.com/?p=110151 https://www.kbb.com/toyota/rav4-hybrid/2026/specs,medium,"XLE, XLE Premium, SE, Woodland all list 3,775 lb"
+toy_rav4_26_se,2026 Toyota RAV4 Hybrid SE AWD,3775,2114,1661,5060,3060,2840,1200,3500,8560,350,14.5,95,KBB; Toyota Pressroom,https://pressroom.toyota.com/?p=110151 https://www.kbb.com/toyota/rav4-hybrid/2026/specs,medium,"XLE, XLE Premium, SE, Woodland all list 3,775 lb"
+toy_rav4_26_lim,2026 Toyota RAV4 Hybrid Limited AWD,3920,2196,1724,5060,3060,2840,1200,3500,8560,350,14.5,95,Cars.com; KBB; player-verified reference value,https://www.cars.com/research/toyota-rav4-2026/specs/481719 https://www.kbb.com/toyota/rav4-hybrid/2026/specs,medium,"2026 RAV4 Limited hybrid AWD. Sources disagree: KBB 3,800 lb, Cars.com 3,847 lb (base). Primary = the verified 3,920 lb"
+toy_rav4_26_gr,2026 Toyota RAV4 Hybrid GR Sport AWD,3775,2114,1661,5060,3060,2840,1200,3500,8560,350,14.5,95,"KBB; sibling: 2026 RAV4 Hybrid XSE (KBB 3,775 lb)",https://www.kbb.com/toyota/rav4-hybrid/2026/specs,low,not found for the hybrid GR Sport; KBB lists GR Sport only as a plug-in
+toy_rav4_26_phse,2026 Toyota RAV4 SE Plug-in Hybrid,4435,2484,1951,5500,3330,3090,1200,3500,9000,350,14.5,295,KBB,https://www.kbb.com/toyota/rav4-plug-in-hybrid/2026/specs,medium,2026 RAV4 Plug-in Hybrid SE
+toy_rav4_26_phxse,2026 Toyota RAV4 XSE Plug-in Hybrid,4540,2542,1998,5500,3330,3090,1200,3500,9000,350,14.5,295,KBB,https://www.kbb.com/toyota/rav4-plug-in-hybrid/2026/specs,medium,2026 RAV4 Plug-in Hybrid XSE
+toy_rav4_26_phgr,2026 Toyota RAV4 GR Sport Plug-in Hybrid,4430,2481,1949,5500,3330,3090,1200,3500,9000,350,14.5,295,KBB,https://www.kbb.com/toyota/rav4-plug-in-hybrid/2026/specs,medium,2026 RAV4 Plug-in Hybrid GR Sport
+lucid_air_pure,2026 Lucid Air Pure RWD,4670,2335,2335,5620,3030,3520,950,0,0,0,0,1092,game data; game data (model-level mass),,low,not yet researched for this trim
+lucid_air_tour,2026 Lucid Air Touring AWD,4960,2480,2480,5910,3190,3700,950,0,0,0,0,1196,game data; game data (model-level mass),,low,not yet researched for this trim
+lucid_air_gt,2026 Lucid Air Grand Touring,5250,2625,2625,6200,3350,3880,950,0,0,0,0,1456,game data; game data (model-level mass),,low,not yet researched for this trim
+lucid_air_saph,2026 Lucid Air Sapphire,5380,2690,2690,6330,3420,3970,950,0,0,0,0,1534,game data; game data (model-level mass),,low,not yet researched for this trim
+lucid_grav_tour,2026 Lucid Gravity Touring,5640,2820,2820,6840,3690,4280,1200,3500,10340,350,0,1248,game data; game data (model-level mass),,low,not yet researched for this trim
+lucid_grav_gt,2026 Lucid Gravity Grand Touring,5950,2975,2975,7150,3860,4480,1200,3500,10650,350,0,1560,game data; game data (model-level mass),,low,not yet researched for this trim
+mdx10_base,2010 Acura MDX SH-AWD,4520,2622,1898,5720,3580,3090,1200,3500,9220,350,20.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mdx10_tech,2010 Acura MDX SH-AWD Technology,4540,2633,1907,5740,3600,3100,1200,3500,9240,350,20.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mdx10_adv,2010 Acura MDX SH-AWD Advance,4610,2674,1936,5810,3640,3140,1200,3500,9310,350,20.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mdx10_ent,2010 Acura MDX SH-AWD Entertainment,4590,2662,1928,5790,3630,3130,1200,3500,9290,350,20.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+fus17_s,2017 Ford Fusion S,3440,1995,1445,4390,2750,2370,950,1000,5390,100,16.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+fus17_se,2017 Ford Fusion SE 1.5 EcoBoost,3480,2018,1462,4430,2770,2390,950,1000,5430,100,16.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+fus17_ti,2017 Ford Fusion Titanium 2.0 EcoBoost AWD,3730,2163,1567,4680,2930,2530,950,1000,5680,100,16.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+fus17_sport,2017 Ford Fusion Sport 2.7 EcoBoost AWD,3860,2239,1621,4810,3010,2600,950,1000,5810,100,16.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+fus17_plat,2017 Ford Fusion Platinum 2.0 EcoBoost AWD,3790,2198,1592,4740,2970,2560,950,1000,5740,100,16.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+fus17_hyb,2017 Ford Fusion Hybrid SE,3640,2111,1529,4590,2880,2480,950,1000,5590,100,13.5,95,game data; game data (model-level mass),,low,not yet researched for this trim
+fus17_energi,2017 Ford Fusion Energi Titanium,3920,2274,1646,4870,3050,2630,950,1000,5870,100,14.0,99,game data; game data (model-level mass),,low,not yet researched for this trim
+must07_v6,2007 Ford Mustang V6 Deluxe Coupe,3350,1742,1608,4050,2270,2450,700,0,0,0,16.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+must07_v6p,2007 Ford Mustang V6 Premium Coupe,3370,1752,1618,4070,2290,2460,700,0,0,0,16.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+must07_gt,2007 Ford Mustang GT Deluxe Coupe,3490,1815,1675,4190,2350,2530,700,0,0,0,16.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+must07_gtp,2007 Ford Mustang GT Premium Coupe,3520,1830,1690,4220,2370,2550,700,0,0,0,16.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+must07_gt500,2007 Ford Shelby GT500 Coupe,3860,2007,1853,4560,2560,2760,700,0,0,0,16.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+sport07_lx,2007 Kia Sportage LX 2.0,3310,1920,1390,5010,3140,2710,1700,8000,13010,800,15.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+sport07_lxv6,2007 Kia Sportage LX V6 4WD,3620,2100,1520,5320,3330,2870,1700,8000,13320,800,15.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+sport07_ex,2007 Kia Sportage EX V6 4WD,3660,2123,1537,4860,3040,2620,1200,3500,8360,350,15.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_ioniq5_se_sr,2026 Hyundai IONIQ 5 SE Standard Range,4190,2095,2095,5390,2910,3380,1200,3500,8890,350,0,819,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_ioniq5_sel,2026 Hyundai IONIQ 5 SEL RWD,4410,2205,2205,5610,3030,3510,1200,3500,9110,350,0,1092,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_ioniq5_lim,2026 Hyundai IONIQ 5 Limited AWD,4700,2444,2256,5900,3310,3570,1200,3500,9400,350,0,1092,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_ioniq5_xrt,2026 Hyundai IONIQ 5 XRT AWD,4740,2465,2275,5940,3340,3590,1200,3500,9440,350,0,1092,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_ioniq9_s,2026 Hyundai IONIQ 9 S RWD,5400,2700,2700,6600,3560,4130,1200,3500,10100,350,0,1434,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_ioniq9_sel,2026 Hyundai IONIQ 9 SEL AWD,5730,2980,2750,6930,3890,4190,1200,3500,10430,350,0,1434,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_ioniq9_cal,2026 Hyundai IONIQ 9 Performance Calligraphy,5950,3094,2856,7150,4020,4320,1200,3500,10650,350,0,1434,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_kona_ev_se,2025 Hyundai Kona Electric SE,3700,1924,1776,4900,2750,2960,1200,3500,8400,350,0,632,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_kona_ev_sel,2025 Hyundai Kona Electric SEL,3860,2007,1853,5060,2840,3060,1200,3500,8560,350,0,842,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_kona_ev_lim,2025 Hyundai Kona Electric Limited,3900,2028,1872,5100,2860,3080,1200,3500,8600,350,0,842,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_kona_se,2026 Hyundai Kona SE,3040,1702,1338,4240,2560,2380,1200,3500,7740,350,13.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_kona_sel,2026 Hyundai Kona SEL,3060,1714,1346,4260,2580,2390,1200,3500,7760,350,13.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_kona_nl,2026 Hyundai Kona N Line AWD,3310,1854,1456,4510,2730,2530,1200,3500,8010,350,12.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_kona_lim,2026 Hyundai Kona Limited AWD,3310,1854,1456,4510,2730,2530,1200,3500,8010,350,12.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_palisade_se,2026 Hyundai Palisade SE,4430,2481,1949,5630,3410,3160,1200,3500,9130,350,18.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_palisade_sel,2026 Hyundai Palisade SEL AWD,4630,2593,2037,5830,3530,3270,1200,3500,9330,350,18.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_palisade_xrt,2026 Hyundai Palisade XRT PRO,4740,2654,2086,5940,3590,3340,1200,3500,9440,350,18.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_palisade_hev_sel,2026 Hyundai Palisade Hybrid SEL Premium,4870,2727,2143,6070,3670,3410,1200,3500,9570,350,18.8,95,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_palisade_hev_lim,2026 Hyundai Palisade Hybrid Limited,4940,2766,2174,6140,3710,3450,1200,3500,9640,350,18.8,95,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_palisade_cal,2026 Hyundai Palisade Calligraphy,4780,2677,2103,5980,3620,3360,1200,3500,9480,350,18.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_palisade_hev_cal,2026 Hyundai Palisade Hybrid Calligraphy,4980,2789,2191,6180,3740,3470,1200,3500,9680,350,18.8,95,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_santacruz_se,2026 Hyundai Santa Cruz SE,3750,2100,1650,5150,3110,2890,1400,6500,11650,650,17.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_santacruz_sel,2026 Hyundai Santa Cruz SEL AWD,3860,2162,1698,5260,3180,2950,1400,6500,11760,650,17.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_santacruz_xrt,2026 Hyundai Santa Cruz XRT,4140,2318,1822,5540,3350,3110,1400,6500,12040,650,17.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_santacruz_lim,2026 Hyundai Santa Cruz Limited,4140,2318,1822,5540,3350,3110,1400,6500,12040,650,17.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_santafe_se,2026 Hyundai Santa Fe SE,4030,2257,1773,5230,3160,2940,1200,3500,8730,350,17.7,0,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_santafe_sel,2026 Hyundai Santa Fe SEL AWD,4190,2346,1844,5390,3260,3030,1200,3500,8890,350,17.7,0,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_santafe_hev_sel,2026 Hyundai Santa Fe Hybrid SEL,4320,2419,1901,5520,3340,3100,1200,3500,9020,350,17.7,95,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_santafe_xrt,2026 Hyundai Santa Fe XRT,4300,2408,1892,5500,3330,3090,1200,3500,9000,350,17.7,0,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_santafe_hev_lim,2026 Hyundai Santa Fe Hybrid Limited,4410,2470,1940,5610,3390,3150,1200,3500,9110,350,17.7,95,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_santafe_cal,2026 Hyundai Santa Fe Calligraphy,4320,2419,1901,5520,3340,3100,1200,3500,9020,350,17.7,0,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_santafe_hev_cal,2026 Hyundai Santa Fe Hybrid Calligraphy,4480,2509,1971,5680,3440,3190,1200,3500,9180,350,17.7,95,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_tucson_se,2026 Hyundai Tucson SE,3480,1949,1531,4680,2830,2630,1200,3500,8180,350,14.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_tucson_sel,2026 Hyundai Tucson SEL AWD,3620,2027,1593,4820,2920,2710,1200,3500,8320,350,14.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_tucson_hev_blue,2026 Hyundai Tucson Hybrid Blue,3790,2122,1668,4990,3020,2800,1200,3500,8490,350,13.7,95,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_tucson_hev_sel,2026 Hyundai Tucson Hybrid SEL Convenience,3860,2162,1698,5060,3060,2840,1200,3500,8560,350,13.7,95,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_tucson_xrt,2026 Hyundai Tucson XRT AWD,3660,2050,1610,4860,2940,2730,1200,3500,8360,350,14.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_tucson_lim,2026 Hyundai Tucson Limited AWD,3700,2072,1628,4900,2960,2750,1200,3500,8400,350,14.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_tucson_phev_sel,2026 Hyundai Tucson Plug-in Hybrid SEL,4240,2374,1866,5440,3290,3060,1200,3500,8940,350,11.1,179,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_tucson_hev_lim,2026 Hyundai Tucson Hybrid Limited,3950,2212,1738,5150,3110,2890,1200,3500,8650,350,13.7,95,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_tucson_phev_lim,2026 Hyundai Tucson Plug-in Hybrid Limited,4300,2408,1892,5500,3330,3090,1200,3500,9000,350,11.1,179,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_venue_se,2026 Hyundai Venue SE,2690,1506,1184,3640,2200,2040,950,1000,4640,100,11.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_venue_sel,2026 Hyundai Venue SEL,2710,1518,1192,3660,2210,2060,950,1000,4660,100,11.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_venue_lim,2026 Hyundai Venue Limited,2730,1529,1201,3680,2230,2070,950,1000,4680,100,11.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mb_eqb_250,2025 Mercedes-Benz EQB 250+,4520,2350,2170,5720,3210,3460,1200,3500,9220,350,0,916,game data; game data (model-level mass),,low,not yet researched for this trim
+mb_eqb_300,2025 Mercedes-Benz EQB 300 4MATIC,4850,2522,2328,6050,3400,3660,1200,3500,9550,350,0,916,game data; game data (model-level mass),,low,not yet researched for this trim
+mb_eqb_350,2025 Mercedes-Benz EQB 350 4MATIC,4890,2543,2347,6090,3420,3680,1200,3500,9590,350,0,916,game data; game data (model-level mass),,low,not yet researched for this trim
+mb_eqe_suv_350,2026 Mercedes-Benz EQE 350 4MATIC SUV,5730,2980,2750,6930,3890,4190,1200,3500,10430,350,0,1178,game data; game data (model-level mass),,low,not yet researched for this trim
+mb_eqe_suv_500,2026 Mercedes-Benz EQE 500 4MATIC SUV,5840,3037,2803,7040,3950,4260,1200,3500,10540,350,0,1178,game data; game data (model-level mass),,low,not yet researched for this trim
+mb_eqs_suv_450p,2026 Mercedes-Benz EQS 450+ SUV,5950,2975,2975,7150,3860,4480,1200,3500,10650,350,0,1409,game data; game data (model-level mass),,low,not yet researched for this trim
+mb_eqs_suv_450,2026 Mercedes-Benz EQS 450 4MATIC SUV,6170,3208,2962,7370,4140,4460,1200,3500,10870,350,0,1409,game data; game data (model-level mass),,low,not yet researched for this trim
+mb_eqs_suv_580,2026 Mercedes-Benz EQS 580 4MATIC SUV,6280,3266,3014,7480,4200,4520,1200,3500,10980,350,0,1409,game data; game data (model-level mass),,low,not yet researched for this trim
+mb_g550,2026 Mercedes-Benz G 550,5640,3158,2482,7340,4440,4120,1700,8000,15340,800,26.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mb_g580,2026 Mercedes-Benz G 580 with EQ Technology,6800,3536,3264,8500,4770,5140,1700,8000,16500,800,0,1508,game data; game data (model-level mass),,low,not yet researched for this trim
+mb_g63,2026 Mercedes-AMG G 63,5820,3259,2561,7520,4550,4220,1700,8000,15520,800,26.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mb_gla_250,2026 Mercedes-Benz GLA 250 4MATIC,3640,2038,1602,4840,2930,2720,1200,3500,8340,350,13.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mb_gla_amg35,2026 Mercedes-AMG GLA 35 4MATIC,3790,2122,1668,4990,3020,2800,1200,3500,8490,350,13.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mb_glb_250,2026 Mercedes-Benz GLB 250 4MATIC,3860,2162,1698,5060,3060,2840,1200,3500,8560,350,15.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mb_glb_amg35,2026 Mercedes-AMG GLB 35 4MATIC,3990,2234,1756,5190,3140,2910,1200,3500,8690,350,15.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mb_glc_coupe_300,2026 Mercedes-Benz GLC 300 4MATIC Coupe,4230,2369,1861,5430,3280,3050,1200,3500,8930,350,16.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mb_glc_coupe_amg43,2026 Mercedes-AMG GLC 43 4MATIC Coupe,4450,2492,1958,5650,3420,3170,1200,3500,9150,350,16.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mb_glc_300,2026 Mercedes-Benz GLC 300 4MATIC,4190,2346,1844,5390,3260,3030,1200,3500,8890,350,16.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mb_glc_350e,2026 Mercedes-Benz GLC 350e 4MATIC,4960,2778,2182,6160,3730,3460,1200,3500,9660,350,13.2,303,game data; game data (model-level mass),,low,not yet researched for this trim
+mb_glc_amg43,2026 Mercedes-AMG GLC 43 4MATIC,4410,2470,1940,5610,3390,3150,1200,3500,9110,350,16.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mb_glc_ev_400,2027 Mercedes-Benz GLC 400 4MATIC with EQ Technology,5400,2808,2592,6600,3710,3990,1200,3500,10100,350,0,1222,game data; game data (model-level mass),,low,not yet researched for this trim
+mb_gle_coupe_450,2026 Mercedes-Benz GLE 450 4MATIC Coupe,5070,2839,2231,6270,3790,3520,1200,3500,9770,350,22.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mb_gle_coupe_amg53,2026 Mercedes-AMG GLE 53 4MATIC+ Coupe,5250,2940,2310,6450,3900,3620,1200,3500,9950,350,22.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mb_gle_350,2026 Mercedes-Benz GLE 350 4MATIC,4740,2654,2086,5940,3590,3340,1200,3500,9440,350,22.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mb_gle_450,2026 Mercedes-Benz GLE 450 4MATIC,4960,2778,2182,6160,3730,3460,1200,3500,9660,350,22.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mb_gle_amg53,2026 Mercedes-AMG GLE 53 4MATIC+,5180,2901,2279,6380,3860,3580,1200,3500,9880,350,22.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mb_gle_580,2026 Mercedes-Benz GLE 580 4MATIC,5290,2962,2328,6490,3930,3640,1200,3500,9990,350,22.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mb_gls_450,2026 Mercedes-Benz GLS 450 4MATIC,5620,3147,2473,7320,4430,4110,1700,8000,15320,800,23.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mb_gls_580,2026 Mercedes-Benz GLS 580 4MATIC,5840,3270,2570,7540,4560,4230,1700,8000,15540,800,23.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mb_maybach_eqs_680,2026 Mercedes-Maybach EQS 680 SUV,6500,3380,3120,7700,4320,4660,1200,3500,11200,350,0,1409,game data; game data (model-level mass),,low,not yet researched for this trim
+mb_maybach_gls_600,2026 Mercedes-Maybach GLS 600 4MATIC,6170,3455,2715,7870,4760,4420,1700,8000,15870,800,23.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+nissan_rogue_plug_in_hybrid_sl,2026 Nissan Rogue SL,4650,2604,2046,5850,3540,3290,1200,3500,9350,350,14.8,260,game data; game data (model-level mass),,low,not yet researched for this trim
+nissan_rogue_plug_in_hybrid_plat,2026 Nissan Rogue Platinum,4650,2604,2046,5850,3540,3290,1200,3500,9350,350,14.8,260,game data; game data (model-level mass),,low,not yet researched for this trim
+nissan_sentra_s,2027 Nissan Sentra S,2980,1788,1192,3930,2550,2120,950,1000,4930,100,12.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+nissan_sentra_sv,2027 Nissan Sentra SV,2980,1788,1192,3930,2550,2120,950,1000,4930,100,12.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+nissan_sentra_sr,2027 Nissan Sentra SR,2980,1788,1192,3930,2550,2120,950,1000,4930,100,12.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+buick_enclave_pref,2027 Buick Enclave Preferred,4740,2654,2086,5940,3590,3340,1200,3500,9440,350,20.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+buick_enclave_st,2027 Buick Enclave Sport Touring,4740,2654,2086,5940,3590,3340,1200,3500,9440,350,20.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+buick_enclave_av,2027 Buick Enclave Avenir,4740,2654,2086,5940,3590,3340,1200,3500,9440,350,20.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+buick_encore_gx_pref,2026 Buick Encore GX Preferred,3260,1956,1304,4460,2890,2410,1200,3500,7960,350,13.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+buick_encore_gx_st,2026 Buick Encore GX Sport Touring,3260,1826,1434,4460,2700,2500,1200,3500,7960,350,13.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+buick_encore_gx_av,2026 Buick Encore GX Avenir,3260,1826,1434,4460,2700,2500,1200,3500,7960,350,13.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+buick_envision_pref,2026 Buick Envision Preferred,3970,2223,1747,5170,3130,2900,1200,3500,8670,350,16.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+buick_envision_st,2026 Buick Envision Sport Touring,3970,2223,1747,5170,3130,2900,1200,3500,8670,350,16.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+buick_envision_av,2026 Buick Envision Avenir,3970,2223,1747,5170,3130,2900,1200,3500,8670,350,16.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+buick_envista_pref,2026 Buick Envista Preferred,3090,1854,1236,4290,2780,2320,1200,3500,7790,350,12.7,0,game data; game data (model-level mass),,low,not yet researched for this trim
+buick_envista_st,2026 Buick Envista Sport Touring,3090,1854,1236,4290,2780,2320,1200,3500,7790,350,12.7,0,game data; game data (model-level mass),,low,not yet researched for this trim
+buick_envista_av,2026 Buick Envista Avenir,3090,1854,1236,4290,2780,2320,1200,3500,7790,350,12.7,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_blazer_lt2,2026 Chevrolet Blazer 2LT FWD,4190,2514,1676,5390,3490,2910,1200,3500,8890,350,19.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_blazer_rs,2026 Chevrolet Blazer RS AWD,4190,2346,1844,5390,3260,3030,1200,3500,8890,350,19.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_blazer_prem,2026 Chevrolet Blazer 3LT AWD,4190,2346,1844,5390,3260,3030,1200,3500,8890,350,19.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_blazer_ev_lt,2027 Chevrolet Blazer EV LT AWD,5730,2980,2750,6930,3890,4190,1200,3500,10430,350,0,1105,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_blazer_ev_rs,2027 Chevrolet Blazer EV RS AWD,5730,2980,2750,6930,3890,4190,1200,3500,10430,350,0,1105,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_blazer_ev_ss,2027 Chevrolet Blazer EV SS,5730,2980,2750,6930,3890,4190,1200,3500,10430,350,0,1105,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_colorado_wt,2026 Chevrolet Colorado WT,4520,2531,1989,5920,3580,3320,1400,6500,12420,650,21.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_colorado_lt,2026 Chevrolet Colorado LT,4520,2531,1989,5920,3580,3320,1400,6500,12420,650,21.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_colorado_tb,2026 Chevrolet Colorado Trail Boss,4520,2531,1989,5920,3580,3320,1400,6500,12420,650,21.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_colorado_z71,2026 Chevrolet Colorado Z71,4520,2531,1989,5920,3580,3320,1400,6500,12420,650,21.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_colorado_zr2,2026 Chevrolet Colorado ZR2,4520,2531,1989,5920,3580,3320,1400,6500,12420,650,21.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_equinox_lt,2027 Chevrolet Equinox LT FWD,3570,2142,1428,4770,3090,2580,1200,3500,8270,350,14.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_equinox_rs,2027 Chevrolet Equinox RS AWD,3570,1999,1571,4770,2880,2680,1200,3500,8270,350,14.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_equinox_activ,2027 Chevrolet Equinox ACTIV AWD,3570,1999,1571,4770,2880,2680,1200,3500,8270,350,14.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_equinox_ev_lt,2027 Chevrolet Equinox EV LT FWD,4850,2522,2328,6050,3400,3660,1200,3500,9550,350,0,1105,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_equinox_ev_2rs,2027 Chevrolet Equinox EV RS FWD,4850,2522,2328,6050,3400,3660,1200,3500,9550,350,0,1105,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_equinox_ev_3rs,2027 Chevrolet Equinox EV RS eAWD,4850,2522,2328,6050,3400,3660,1200,3500,9550,350,0,1105,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_express_cargo_wt,2026 Chevrolet Express 2500 Cargo WT,5840,3270,2570,9140,5530,5130,3300,18000,27140,1800,30.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_express_cutaway_ctw,2026 Chevrolet Express 3500 Cutaway,7050,3948,3102,10350,6260,5810,3300,18000,28350,1800,54.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_express_passenger_lt,2026 Chevrolet Express 3500 LT Passenger,6390,3578,2812,9690,5860,5440,3300,18000,27690,1800,30.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_silverado_1500_wt,2026 Chevrolet Silverado WT,5510,3086,2424,7210,4360,4050,1700,11000,18210,1100,24.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_silverado_1500_cus,2026 Chevrolet Silverado Custom,5510,3086,2424,7210,4360,4050,1700,11000,18210,1100,24.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_silverado_1500_ctb,2026 Chevrolet Silverado Custom Trail Boss,5510,3086,2424,7210,4360,4050,1700,11000,18210,1100,24.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_silverado_1500_lt,2026 Chevrolet Silverado LT,4594,2682,1912,6800,4360,4050,2206,13300,14500,1100,24,0,Cars.com,https://www.cars.com/research/chevrolet-silverado_1500-2026/specs/474887/,medium,"2026 Silverado 1500 LT 2WD Double Cab 147 in, 2.7L TurboMax"
+chv_silverado_1500_rst,2026 Chevrolet Silverado RST,5510,3086,2424,7210,4360,4050,1700,11000,18210,1100,24.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_silverado_1500_tb,2026 Chevrolet Silverado LT Trail Boss,5510,3086,2424,7210,4360,4050,1700,11000,18210,1100,24.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_silverado_1500_ltz,2026 Chevrolet Silverado LTZ,5510,3086,2424,7210,4360,4050,1700,11000,18210,1100,24.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_silverado_1500_hc,2026 Chevrolet Silverado High Country,5510,3086,2424,7210,4360,4050,1700,11000,18210,1100,24.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_silverado_1500_zr2,2026 Chevrolet Silverado ZR2,5510,3086,2424,7210,4360,4050,1700,11000,18210,1100,24.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_silverado_1500_dsl,2026 Chevrolet Silverado LTZ Duramax 3.0,5510,3086,2424,7210,4360,4050,1700,11000,18210,1100,24.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_silverado_2500_hd_wt,2026 Chevrolet Silverado HD WT 6.6 V8 gas,7500,4200,3300,10800,6530,6070,3300,18000,28800,1800,35.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_silverado_2500_hd_cus,2026 Chevrolet Silverado HD Custom 6.6 V8 gas,7500,4200,3300,10800,6530,6070,3300,18000,28800,1800,35.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+wk_plow_m,2026 City Plow & Salt Truck,21610,11237,10373,29110,16350,17610,7500,20000,49110,2000,50.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+wk_rollback_m,2026 Rollback Tow Truck,18080,8498,9582,25580,13810,16850,7500,20000,45580,2000,50.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+wk_wrecker_m,2026 Wheel-Lift Wrecker,17420,8187,9233,24920,13460,16420,7500,20000,44920,2000,50.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+wk_dump_m,2026 Public Works Dump Truck,20280,9532,10748,27780,15000,18300,7500,20000,47780,2000,50.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+wk_sweeper_m,2026 Street Sweeper,18520,8704,9816,26020,14050,17140,7500,20000,46020,2000,50.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+wk_garbage_m,2026 Sanitation Rear Loader,23150,10880,12270,30650,16550,20190,7500,20000,50650,2000,50.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+wk_bucket_m,2026 Electric Utility Bucket Truck,19400,9118,10282,26900,14530,17720,7500,20000,46900,2000,50.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+wk_vacuum_m,2026 Sewer Vacuum Truck,24250,11398,12852,31750,17140,20920,7500,20000,51750,2000,50.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+wk_van_m,2026 Traffic Maintenance Van,8600,4042,4558,16100,8690,10610,7500,20000,36100,2000,50.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_silverado_2500_hd_lt,2026 Chevrolet Silverado HD LT Duramax,7500,4200,3300,10800,6530,6070,3300,18000,28800,1800,35.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_silverado_2500_hd_ltz,2026 Chevrolet Silverado HD LTZ Duramax,7500,4200,3300,10800,6530,6070,3300,18000,28800,1800,35.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_silverado_2500_hd_zr2,2026 Chevrolet Silverado HD ZR2,7500,4200,3300,10800,6530,6070,3300,18000,28800,1800,35.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_silverado_2500_hd_hc,2026 Chevrolet Silverado HD High Country,7500,4200,3300,10800,6530,6070,3300,18000,28800,1800,35.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_silverado_3500_hd_dually_lt,2026 Chevrolet Silverado HD LT Dually,8380,4693,3687,11680,7060,6560,3300,18000,29680,1800,35.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_silverado_3500_hd_dually_ltz,2026 Chevrolet Silverado HD LTZ Dually,8380,4693,3687,11680,7060,6560,3300,18000,29680,1800,35.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_silverado_3500_hd_dually_hc,2026 Chevrolet Silverado HD High Country Dually,8380,4693,3687,11680,7060,6560,3300,18000,29680,1800,35.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_silverado_ev_wt,2026 Chevrolet Silverado EV WT,8490,4754,3736,10190,6160,5720,1700,11000,21190,1100,0,2210,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_silverado_ev_lt,2026 Chevrolet Silverado EV LT,8490,4754,3736,10190,6160,5720,1700,11000,21190,1100,0,2210,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_silverado_ev_trail,2026 Chevrolet Silverado EV Trail Boss,8490,4754,3736,10190,6160,5720,1700,11000,21190,1100,0,2210,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_silverado_ev_rst,2026 Chevrolet Silverado EV LT Max Range,8490,4754,3736,10190,6160,5720,1700,11000,21190,1100,0,2210,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_suburban_ls,2026 Chevrolet Suburban LS,5950,3332,2618,7650,4630,4300,1700,8000,15650,800,28.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_suburban_lt,2026 Chevrolet Suburban LT,5950,3332,2618,7650,4630,4300,1700,8000,15650,800,28.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_suburban_rst,2026 Chevrolet Suburban RST,5950,3332,2618,7650,4630,4300,1700,8000,15650,800,28.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_suburban_z71,2026 Chevrolet Suburban Z71,5950,3332,2618,7650,4630,4300,1700,8000,15650,800,28.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_suburban_prem,2026 Chevrolet Suburban Premier,5950,3332,2618,7650,4630,4300,1700,8000,15650,800,28.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_suburban_hc,2026 Chevrolet Suburban High Country,5950,3332,2618,7650,4630,4300,1700,8000,15650,800,28.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_tahoe_ls,2026 Chevrolet Tahoe LS,5730,3209,2521,7430,4490,4170,1700,8000,15430,800,24.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_tahoe_lt,2026 Chevrolet Tahoe LT,5730,3209,2521,7430,4490,4170,1700,8000,15430,800,24.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_tahoe_z71,2026 Chevrolet Tahoe Z71,5730,3209,2521,7430,4490,4170,1700,8000,15430,800,24.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_tahoe_rst,2026 Chevrolet Tahoe RST,5730,3209,2521,7430,4490,4170,1700,8000,15430,800,24.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_tahoe_prem,2026 Chevrolet Tahoe Premier,5730,3209,2521,7430,4490,4170,1700,8000,15430,800,24.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_tahoe_hc,2026 Chevrolet Tahoe High Country,5730,3209,2521,7430,4490,4170,1700,8000,15430,800,24.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_trailblazer_ls,2026 Chevrolet Trailblazer LS FWD,3260,1956,1304,4460,2890,2410,1200,3500,7960,350,13.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_trailblazer_lt,2026 Chevrolet Trailblazer LT FWD,3260,1956,1304,4460,2890,2410,1200,3500,7960,350,13.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_trailblazer_activ,2026 Chevrolet Trailblazer ACTIV AWD,3260,1826,1434,4460,2700,2500,1200,3500,7960,350,13.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_trailblazer_rs,2026 Chevrolet Trailblazer RS AWD,3260,1826,1434,4460,2700,2500,1200,3500,7960,350,13.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_traverse_lt,2027 Chevrolet Traverse LT,4630,2778,1852,5830,3780,3150,1200,3500,9330,350,19.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_traverse_z71,2027 Chevrolet Traverse Z71 AWD,4630,2593,2037,5830,3530,3270,1200,3500,9330,350,19.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_traverse_rs,2027 Chevrolet Traverse RS AWD,4630,2593,2037,5830,3530,3270,1200,3500,9330,350,19.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_traverse_hc,2027 Chevrolet Traverse High Country AWD,4630,2593,2037,5830,3530,3270,1200,3500,9330,350,19.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_trax_ls,2026 Chevrolet Trax LS,3090,1854,1236,4040,2620,2180,950,1000,5040,100,12.7,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_trax_lt,2026 Chevrolet Trax 1RS,3090,1854,1236,4040,2620,2180,950,1000,5040,100,12.7,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_trax_lt2,2026 Chevrolet Trax LT,3090,1854,1236,4040,2620,2180,950,1000,5040,100,12.7,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_trax_2rs,2026 Chevrolet Trax 2RS,3090,1854,1236,4040,2620,2180,950,1000,5040,100,12.7,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_trax_activ,2026 Chevrolet Trax ACTIV,3090,1854,1236,4040,2620,2180,950,1000,5040,100,12.7,0,game data; game data (model-level mass),,low,not yet researched for this trim
+audi_a6_allroad_pp,2026 Audi A6 allroad Premium Plus,4410,2470,1940,5360,3240,3010,950,1000,6360,100,16.6,0,game data; game data (model-level mass),,low,not yet researched for this trim
+audi_a6_allroad_pr,2026 Audi A6 allroad Prestige,4410,2470,1940,5360,3240,3010,950,1000,6360,100,16.6,0,game data; game data (model-level mass),,low,not yet researched for this trim
+audi_q3_pr,2027 Audi Q3 Premium,3750,2100,1650,4950,2990,2780,1200,3500,8450,350,15.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+audi_q3_pp,2027 Audi Q3 Premium Plus,3750,2100,1650,4950,2990,2780,1200,3500,8450,350,15.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+audi_q3_ps,2027 Audi Q3 Prestige,3750,2100,1650,4950,2990,2780,1200,3500,8450,350,15.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+audi_q4_etron_pr,2026 Audi Q4 e-tron Premium,4850,2522,2328,6050,3400,3660,1200,3500,9550,350,0,1066,game data; game data (model-level mass),,low,not yet researched for this trim
+audi_q4_etron_pp,2026 Audi Q4 e-tron Premium Plus,4850,2522,2328,6050,3400,3660,1200,3500,9550,350,0,1066,game data; game data (model-level mass),,low,not yet researched for this trim
+audi_q4_etron_ps,2026 Audi Q4 e-tron Prestige,4850,2522,2328,6050,3400,3660,1200,3500,9550,350,0,1066,game data; game data (model-level mass),,low,not yet researched for this trim
+audi_q4_sportback_etron_pr,2026 Audi Q4 Sportback e-tron Premium,4870,2532,2338,6070,3410,3670,1200,3500,9570,350,0,1066,game data; game data (model-level mass),,low,not yet researched for this trim
+audi_q4_sportback_etron_pp,2026 Audi Q4 Sportback e-tron Premium Plus,4870,2532,2338,6070,3410,3670,1200,3500,9570,350,0,1066,game data; game data (model-level mass),,low,not yet researched for this trim
+audi_q6_etron_pr,2027 Audi Q6 e-tron Premium,5290,2751,2539,6490,3640,3930,1200,3500,9990,350,0,1300,game data; game data (model-level mass),,low,not yet researched for this trim
+audi_q6_etron_pp,2027 Audi Q6 e-tron Premium Plus,5290,2751,2539,6490,3640,3930,1200,3500,9990,350,0,1300,game data; game data (model-level mass),,low,not yet researched for this trim
+audi_q6_etron_ps,2027 Audi Q6 e-tron Prestige,5290,2751,2539,6490,3640,3930,1200,3500,9990,350,0,1300,game data; game data (model-level mass),,low,not yet researched for this trim
+audi_q6_etron_sq6,2027 Audi Q6 e-tron SQ6,5290,2751,2539,6490,3640,3930,1200,3500,9990,350,0,1300,game data; game data (model-level mass),,low,not yet researched for this trim
+audi_q6_sportback_etron_pp,2027 Audi Q6 Sportback e-tron Premium Plus,5270,2740,2530,6470,3630,3910,1200,3500,9970,350,0,1300,game data; game data (model-level mass),,low,not yet researched for this trim
+audi_q6_sportback_etron_ps,2027 Audi Q6 Sportback e-tron Prestige,5270,2740,2530,6470,3630,3910,1200,3500,9970,350,0,1300,game data; game data (model-level mass),,low,not yet researched for this trim
+audi_q7_pr,2027 Audi Q7 45 Premium,4960,2778,2182,6160,3730,3460,1200,3500,9660,350,22.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+audi_q7_pp,2027 Audi Q7 55 Premium Plus,4960,2778,2182,6160,3730,3460,1200,3500,9660,350,22.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+audi_q7_ps,2027 Audi Q7 55 Prestige,4960,2778,2182,6160,3730,3460,1200,3500,9660,350,22.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+audi_q7_sq7,2027 Audi Q7 SQ7,4960,2778,2182,6160,3730,3460,1200,3500,9660,350,22.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+audi_q8_pp,2027 Audi Q8 55 Premium Plus,4850,2716,2134,6050,3660,3400,1200,3500,9550,350,22.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+audi_q8_ps,2027 Audi Q8 55 Prestige,4850,2716,2134,6050,3660,3400,1200,3500,9550,350,22.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+audi_q8_sq8,2027 Audi Q8 SQ8,4850,2716,2134,6050,3660,3400,1200,3500,9550,350,22.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+audi_q8_rsq8,2027 Audi Q8 RS Q8 performance,4850,2716,2134,6050,3660,3400,1200,3500,9550,350,22.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+audi_q9_pp,2027 Audi Q9 Premium Plus,5510,3086,2424,6710,4060,3770,1200,3500,10210,350,22.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+audi_q9_ps,2027 Audi Q9 Prestige,5510,3086,2424,6710,4060,3770,1200,3500,10210,350,22.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_carnival_lx,2027 Kia Carnival LX (3.5 V6),4740,2844,1896,6040,3910,3260,1300,3500,9540,350,19.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_carnival_ex,2027 Kia Carnival EX Hybrid,4740,2844,1896,6040,3910,3260,1300,3500,9540,350,19.0,95,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_carnival_sxp,2027 Kia Carnival SX Prestige Hybrid,4740,2844,1896,6040,3910,3260,1300,3500,9540,350,19.0,95,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_ev3_light,2027 Kia EV3 Light,4140,2153,1987,5340,3000,3230,1200,3500,8840,350,0,754,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_ev3_wind,2027 Kia EV3 Wind Long Range,4140,2153,1987,5340,3000,3230,1200,3500,8840,350,0,1053,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_ev3_gtl,2027 Kia EV3 GT-Line AWD,4140,2153,1987,5340,3000,3230,1200,3500,8840,350,0,1053,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_ev6_light,2026 Kia EV6 Light RWD,4760,2285,2475,5960,3220,3860,1200,3500,9460,350,0,1092,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_ev6_wind,2026 Kia EV6 Wind AWD,4760,2475,2285,5960,3350,3600,1200,3500,9460,350,0,1092,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_ev6_gtl,2026 Kia EV6 GT-Line AWD,4760,2475,2285,5960,3350,3600,1200,3500,9460,350,0,1092,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_ev6_gt,2026 Kia EV6 GT,4760,2475,2285,5960,3350,3600,1200,3500,9460,350,0,1092,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_ev9_light,2026 Kia EV9 Light RWD,5840,2803,3037,7040,3800,4560,1200,3500,10540,350,0,988,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_ev9_wind,2026 Kia EV9 Wind AWD,5840,3037,2803,7040,3950,4260,1200,3500,10540,350,0,1300,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_ev9_land,2026 Kia EV9 Land AWD,5840,3037,2803,7040,3950,4260,1200,3500,10540,350,0,1300,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_ev9_gtl,2026 Kia EV9 GT-Line AWD,5840,3037,2803,7040,3950,4260,1200,3500,10540,350,0,1300,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_ev9_gt,2026 Kia EV9 GT,5840,3037,2803,7040,3950,4260,1200,3500,10540,350,0,1300,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_k4_hatchback_ex_ex,2026 Kia K4 Hatchback EX,2980,1788,1192,3930,2550,2120,950,1000,4930,100,12.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_k4_hatchback_ex_gtl,2026 Kia K4 Hatchback GT-Line Turbo,2980,1788,1192,3930,2550,2120,950,1000,4930,100,12.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_niro_ev_wind,2026 Kia Niro EV Wind,3880,2018,1862,4830,2710,2920,950,0,0,0,0,845,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_niro_ev_wave,2026 Kia Niro EV Wave,3880,2018,1862,4830,2710,2920,950,0,0,0,0,845,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_niro_hybrid_lx,2027 Kia Niro LX,3150,1890,1260,4100,2660,2210,950,1000,5100,100,11.1,95,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_niro_hybrid_ex,2027 Kia Niro EX,3150,1890,1260,4100,2660,2210,950,1000,5100,100,11.1,95,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_niro_hybrid_sx,2027 Kia Niro SX,3150,1890,1260,4100,2660,2210,950,1000,5100,100,11.1,95,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_seltos_lx,2027 Kia Seltos LX,3420,1915,1505,5120,3100,2880,1700,8000,13120,800,13.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_seltos_s,2027 Kia Seltos S,3420,1915,1505,4620,2790,2590,1200,3500,8120,350,13.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_seltos_xl,2027 Kia Seltos X-Line,3420,1915,1505,4620,2790,2590,1200,3500,8120,350,13.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_seltos_sx,2027 Kia Seltos SX,3420,1915,1505,4620,2790,2590,1200,3500,8120,350,13.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_sorento_lx,2027 Kia Sorento LX,4190,2514,1676,5890,3820,3180,1700,8000,13890,800,17.7,0,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_sorento_ex,2027 Kia Sorento EX AWD,4190,2346,1844,5390,3260,3030,1200,3500,8890,350,17.7,0,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_sorento_xl,2027 Kia Sorento X-Line SX Prestige,4190,2346,1844,5390,3260,3030,1200,3500,8890,350,17.7,0,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_sorento_hev,2027 Kia Sorento EX Hybrid,4190,2346,1844,5390,3260,3030,1200,3500,8890,350,17.7,95,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_sorento_phev,2027 Kia Sorento SX Prestige Plug-in Hybrid,4190,2346,1844,5390,3260,3030,1200,3500,8890,350,17.7,179,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_sportage_lx,2027 Kia Sportage LX (2.5),3970,2223,1747,5670,3430,3180,1700,8000,13670,800,13.7,0,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_sportage_xp,2027 Kia Sportage X-Pro,3970,2223,1747,5170,3130,2900,1200,3500,8670,350,13.7,0,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_sportage_ex,2027 Kia Sportage EX Hybrid,3970,2223,1747,5170,3130,2900,1200,3500,8670,350,13.7,95,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_sportage_sxp,2027 Kia Sportage SX-Prestige Hybrid,3970,2223,1747,5170,3130,2900,1200,3500,8670,350,13.7,95,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_sportage_phev,2027 Kia Sportage X-Line Prestige PHEV,3970,2223,1747,5170,3130,2900,1200,3500,8670,350,13.7,179,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_telluride_lx,2027 Kia Telluride LX,4520,2712,1808,6220,4030,3360,1700,8000,14220,800,18.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_telluride_s,2027 Kia Telluride S,4520,2712,1808,5720,3710,3090,1200,3500,9220,350,18.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_telluride_ex,2027 Kia Telluride EX AWD,4520,2531,1989,5720,3460,3210,1200,3500,9220,350,18.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_telluride_xp,2027 Kia Telluride X-Pro SX Prestige,4520,2531,1989,5720,3460,3210,1200,3500,9220,350,18.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_telluride_sxp,2027 Kia Telluride SX Prestige AWD,4520,2531,1989,5720,3460,3210,1200,3500,9220,350,18.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+kia_telluride_hev,2027 Kia Telluride Hybrid SX,4520,2531,1989,5720,3460,3210,1200,3500,9220,350,18.8,95,game data; game data (model-level mass),,low,not yet researched for this trim
+mkc19_std,2019 Lincoln MKC Standard FWD,3860,2316,1544,5060,3280,2730,1200,3500,8560,350,15.6,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mkc19_sel,2019 Lincoln MKC Select AWD,3990,2234,1756,5190,3140,2910,1200,3500,8690,350,15.6,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mkc19_res,2019 Lincoln MKC Reserve AWD,3990,2234,1756,5190,3140,2910,1200,3500,8690,350,15.6,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mkc19_bl,2019 Lincoln MKC Black Label 2.3L AWD,3990,2234,1756,5190,3140,2910,1200,3500,8690,350,15.6,0,game data; game data (model-level mass),,low,not yet researched for this trim
+lex_gx_prem,2026 Lexus GX Premium,5640,3158,2482,6840,4140,3840,1200,3500,10340,350,18.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+lex_gx_op,2026 Lexus GX Overtrail,5640,3158,2482,6840,4140,3840,1200,3500,10340,350,18.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+lex_gx_lux,2026 Lexus GX Luxury,5640,3158,2482,6840,4140,3840,1200,3500,10340,350,18.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+lex_lx_prem,2026 Lexus LX LX 600 Premium,6000,3360,2640,7700,4660,4320,1700,8000,15700,800,21.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+lex_lx_700h,2026 Lexus LX LX 700h F Sport,6000,3360,2640,7700,4660,4320,1700,8000,15700,800,21.1,95,game data; game data (model-level mass),,low,not yet researched for this trim
+lex_nx_350,2026 Lexus NX NX 350 AWD,4140,2318,1822,5340,3230,3000,1200,3500,8840,350,14.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+lex_nx_350h,2026 Lexus NX NX 350h Premium,4140,2318,1822,5340,3230,3000,1200,3500,8840,350,14.5,95,game data; game data (model-level mass),,low,not yet researched for this trim
+lex_nx_450h,2026 Lexus NX NX 450h+ Luxury,4140,2318,1822,5340,3230,3000,1200,3500,8840,350,14.5,235,game data; game data (model-level mass),,low,not yet researched for this trim
+lex_rz_350e,2026 Lexus RZ RZ 350e FWD,4560,2371,2189,5760,3230,3480,1200,3500,9260,350,0,971,game data; game data (model-level mass),,low,not yet researched for this trim
+lex_rz_450e,2026 Lexus RZ RZ 450e Premium,4560,2371,2189,5760,3230,3480,1200,3500,9260,350,0,971,game data; game data (model-level mass),,low,not yet researched for this trim
+lex_rz_550e,2026 Lexus RZ RZ 550e F Sport,4560,2371,2189,5760,3230,3480,1200,3500,9260,350,0,971,game data; game data (model-level mass),,low,not yet researched for this trim
+lex_tx_350,2026 Lexus TX TX 350 Premium AWD,4760,2666,2094,5960,3600,3350,1200,3500,9460,350,18.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+lex_tx_500h,2026 Lexus TX TX 500h F Sport Performance,4760,2666,2094,5960,3600,3350,1200,3500,9460,350,18.0,95,game data; game data (model-level mass),,low,not yet researched for this trim
+lex_tx_550h,2026 Lexus TX TX 550h+ Luxury,4760,2666,2094,5960,3600,3350,1200,3500,9460,350,18.0,235,game data; game data (model-level mass),,low,not yet researched for this trim
+lex_ux_base,2026 Lexus UX UX 300h AWD,3510,1966,1544,4710,2850,2650,1200,3500,8210,350,10.8,95,game data; game data (model-level mass),,low,not yet researched for this trim
+lex_ux_prem,2026 Lexus UX UX 300h Premium AWD,3510,1966,1544,4710,2850,2650,1200,3500,8210,350,10.8,95,game data; game data (model-level mass),,low,not yet researched for this trim
+lex_ux_fsh,2026 Lexus UX UX 300h F SPORT Handling AWD,3510,1966,1544,4710,2850,2650,1200,3500,8210,350,10.8,95,game data; game data (model-level mass),,low,not yet researched for this trim
+lex_tz_prem,2027 Lexus TZ TZ 450e Premium,5620,2922,2698,6820,3830,4120,1200,3500,10320,350,0,1001,game data; game data (model-level mass),,low,not yet researched for this trim
+lex_tz_lux,2027 Lexus TZ TZ 450e Luxury,5620,2922,2698,6820,3830,4120,1200,3500,10320,350,0,1245,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_4runner_sr5,2026 Toyota 4Runner SR5 4x2,4850,2716,2134,6050,3660,3400,1200,3500,9550,350,18.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_4runner_trd,2026 Toyota 4Runner TRD Off-Road 4x4,4850,2716,2134,6050,3660,3400,1200,3500,9550,350,18.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_4runner_lim,2026 Toyota 4Runner Limited 4x4,4850,2716,2134,6050,3660,3400,1200,3500,9550,350,18.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_4runner_limh,2026 Toyota 4Runner Limited 4x4 i-FORCE MAX,4850,2716,2134,6050,3660,3400,1200,3500,9550,350,18.0,95,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_4runner_pro,2026 Toyota 4Runner TRD Pro,4850,2716,2134,6050,3660,3400,1200,3500,9550,350,18.0,95,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_4runner_tr,2026 Toyota 4Runner Trailhunter,4850,2716,2134,6050,3660,3400,1200,3500,9550,350,18.0,95,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_bz_xle,2027 Toyota bZ XLE FWD,4230,2200,2030,5430,3050,3280,1200,3500,8930,350,0,971,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_bz_xleawd,2027 Toyota bZ XLE AWD,4230,2200,2030,5430,3050,3280,1200,3500,8930,350,0,971,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_bz_lim,2027 Toyota bZ Limited FWD,4230,2200,2030,5430,3050,3280,1200,3500,8930,350,0,971,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_bz_limawd,2027 Toyota bZ Limited AWD,4230,2200,2030,5430,3050,3280,1200,3500,8930,350,0,971,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_bzw_base,2026 Toyota bZ Woodland bZ Woodland AWD,4650,2418,2232,5850,3290,3540,1200,3500,9350,350,0,971,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_bzw_prem,2026 Toyota bZ Woodland bZ Woodland Premium AWD,4650,2418,2232,5850,3290,3540,1200,3500,9350,350,0,971,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_chr_se,2027 Toyota C-HR SE AWD,4390,2283,2107,5590,3140,3380,1200,3500,9090,350,0,971,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_chr_xse,2027 Toyota C-HR XSE AWD,4390,2283,2107,5590,3140,3380,1200,3500,9090,350,0,971,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_corolla_hb_se,2026 Toyota Corolla Hatchback SE,3040,1824,1216,3990,2590,2150,950,1000,4990,100,13.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_corolla_hb_fx,2026 Toyota Corolla Hatchback FX Edition,3040,1824,1216,3990,2590,2150,950,1000,4990,100,13.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_corolla_hb_xse,2026 Toyota Corolla Hatchback XSE,3040,1824,1216,3990,2590,2150,950,1000,4990,100,13.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_corolla_cross_l,2026 Toyota Corolla Cross L (2.0 L),3440,2064,1376,4390,2840,2370,950,1000,5390,100,10.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_corolla_cross_hs,2026 Toyota Corolla Cross Hybrid S AWD,3440,1926,1514,4390,2660,2470,950,1000,5390,100,10.8,95,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_corolla_cross_hse,2026 Toyota Corolla Cross Hybrid SE AWD,3440,1926,1514,4390,2660,2470,950,1000,5390,100,10.8,95,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_corolla_cross_hxse,2026 Toyota Corolla Cross Hybrid XSE AWD,3440,1926,1514,4390,2660,2470,950,1000,5390,100,10.8,95,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_crown_signia_xle,2026 Toyota Crown Signia XLE,4190,2346,1844,5390,3260,3030,1200,3500,8890,350,14.5,95,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_crown_signia_lim,2026 Toyota Crown Signia Limited,4190,2346,1844,5390,3260,3030,1200,3500,8890,350,14.5,95,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_grand_highlander_xle,2026 Toyota Grand Highlander XLE AWD (2.4T),4760,2666,2094,5960,3600,3350,1200,3500,9460,350,17.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_grand_highlander_hxle,2026 Toyota Grand Highlander Hybrid XLE AWD,4760,2666,2094,5960,3600,3350,1200,3500,9460,350,17.2,95,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_grand_highlander_hlim,2026 Toyota Grand Highlander Hybrid Limited AWD,4760,2666,2094,5960,3600,3350,1200,3500,9460,350,17.2,95,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_grand_highlander_max,2026 Toyota Grand Highlander Hybrid MAX Platinum,4760,2666,2094,5960,3600,3350,1200,3500,9460,350,17.2,95,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_highlander_xle,2026 Toyota Highlander XLE AWD,4390,2458,1932,5590,3380,3140,1200,3500,9090,350,18.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_highlander_hxle,2026 Toyota Highlander Hybrid XLE AWD,4390,2458,1932,5590,3380,3140,1200,3500,9090,350,18.0,95,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_highlander_plat,2026 Toyota Highlander Hybrid Platinum AWD,4390,2458,1932,5590,3380,3140,1200,3500,9090,350,18.0,95,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_land_cruiser_1958,2026 Toyota Land Cruiser 1958,5490,3074,2416,7190,4350,4040,1700,8000,15190,800,18.0,95,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_land_cruiser_lc,2026 Toyota Land Cruiser Land Cruiser,5490,3074,2416,7190,4350,4040,1700,8000,15190,800,18.0,95,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_prius_le,2026 Toyota Prius LE,3130,1878,1252,4080,2640,2200,950,1000,5080,100,10.8,95,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_prius_xle,2026 Toyota Prius XLE,3130,1878,1252,4080,2640,2200,950,1000,5080,100,10.8,95,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_prius_lim,2026 Toyota Prius Limited AWD,3130,1753,1377,4080,2470,2290,950,1000,5080,100,10.8,95,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_prius_prime,2026 Toyota Prius Prius Plug-in XSE,3130,1878,1252,4080,2640,2200,950,1000,5080,100,10.8,177,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_sequoia_sr5,2026 Toyota Sequoia SR5 4x4,6130,3433,2697,7830,4740,4400,1700,8000,15830,800,22.5,95,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_sequoia_lim,2026 Toyota Sequoia Limited 4x4,6130,3433,2697,7830,4740,4400,1700,8000,15830,800,22.5,95,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_sequoia_plat,2026 Toyota Sequoia Platinum 4x4,6130,3433,2697,7830,4740,4400,1700,8000,15830,800,22.5,95,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_sequoia_trd,2026 Toyota Sequoia TRD Pro,6130,3433,2697,7830,4740,4400,1700,8000,15830,800,22.5,95,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_sequoia_cap,2026 Toyota Sequoia Capstone,6130,3433,2697,7830,4740,4400,1700,8000,15830,800,22.5,95,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_sienna_le,2026 Toyota Sienna LE FWD,4720,2832,1888,6020,3900,3250,1300,3500,9520,350,18.0,95,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_sienna_xle,2026 Toyota Sienna XLE AWD,4720,2643,2077,6020,3640,3380,1300,3500,9520,350,18.0,95,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_sienna_wood,2026 Toyota Sienna Woodland AWD,4720,2643,2077,6020,3640,3380,1300,3500,9520,350,18.0,95,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_sienna_plat,2026 Toyota Sienna Platinum AWD,4720,2643,2077,6020,3640,3380,1300,3500,9520,350,18.0,95,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_tacoma_sr,2026 Toyota Tacoma SR 4x2,4520,2531,1989,5920,3580,3320,1400,6500,12420,650,18.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_tacoma_trdsport,2026 Toyota Tacoma TRD Sport 4x4,4520,2531,1989,5920,3580,3320,1400,6500,12420,650,18.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_tacoma_trdor,2026 Toyota Tacoma TRD Off-Road 4x4,4520,2531,1989,5920,3580,3320,1400,6500,12420,650,18.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_tacoma_lim,2026 Toyota Tacoma Limited 4x4 i-FORCE MAX,4520,2531,1989,5920,3580,3320,1400,6500,12420,650,18.0,95,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_tacoma_pro,2026 Toyota Tacoma TRD Pro i-FORCE MAX,4520,2531,1989,5920,3580,3320,1400,6500,12420,650,18.0,95,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_tundra_sr5,2026 Toyota Tundra SR5 CrewMax 4x2,5510,3086,2424,7210,4360,4050,1700,11000,18210,1100,32.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_tundra_lim,2026 Toyota Tundra Limited CrewMax 4x4,5510,3086,2424,7210,4360,4050,1700,11000,18210,1100,32.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_tundra_plat,2026 Toyota Tundra Platinum i-FORCE MAX,5510,3086,2424,7210,4360,4050,1700,11000,18210,1100,32.0,95,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_tundra_trdpro,2026 Toyota Tundra TRD Pro i-FORCE MAX,5510,3086,2424,7210,4360,4050,1700,11000,18210,1100,32.0,95,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_tundra_cap,2026 Toyota Tundra Capstone,5510,3086,2424,7210,4360,4050,1700,11000,18210,1100,32.0,95,game data; game data (model-level mass),,low,not yet researched for this trim
+sub_impreza_sport,2026 Subaru Impreza Sport,3220,1803,1417,4170,2520,2340,950,1000,5170,100,13.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+sub_impreza_rs,2026 Subaru Impreza RS,3220,1803,1417,4170,2520,2340,950,1000,5170,100,13.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+sub_crosstrek_base,2026 Subaru Crosstrek Base,3370,1887,1483,4570,2760,2570,1200,3500,8070,350,16.6,0,game data; game data (model-level mass),,low,not yet researched for this trim
+sub_crosstrek_prem,2026 Subaru Crosstrek Premium,3370,1887,1483,4570,2760,2570,1200,3500,8070,350,16.6,0,game data; game data (model-level mass),,low,not yet researched for this trim
+sub_crosstrek_sport,2026 Subaru Crosstrek Sport,3370,1887,1483,4570,2760,2570,1200,3500,8070,350,16.6,0,game data; game data (model-level mass),,low,not yet researched for this trim
+sub_crosstrek_wild,2026 Subaru Crosstrek Wilderness,3370,1887,1483,4570,2760,2570,1200,3500,8070,350,16.6,0,game data; game data (model-level mass),,low,not yet researched for this trim
+sub_crosstrek_hyb,2026 Subaru Crosstrek Sport Hybrid,3370,1887,1483,4570,2760,2570,1200,3500,8070,350,16.6,95,game data; game data (model-level mass),,low,not yet researched for this trim
+sub_forester_base,2026 Subaru Forester Base,3660,2050,1610,4860,2940,2730,1200,3500,8360,350,16.6,0,game data; game data (model-level mass),,low,not yet researched for this trim
+sub_forester_prem,2026 Subaru Forester Premium,3660,2050,1610,4860,2940,2730,1200,3500,8360,350,16.6,0,game data; game data (model-level mass),,low,not yet researched for this trim
+sub_forester_sport,2026 Subaru Forester Sport,3660,2050,1610,4860,2940,2730,1200,3500,8360,350,16.6,0,game data; game data (model-level mass),,low,not yet researched for this trim
+sub_forester_wild,2026 Subaru Forester Wilderness,3660,2050,1610,4860,2940,2730,1200,3500,8360,350,16.6,0,game data; game data (model-level mass),,low,not yet researched for this trim
+sub_forester_tour,2026 Subaru Forester Touring,3660,2050,1610,4860,2940,2730,1200,3500,8360,350,16.6,0,game data; game data (model-level mass),,low,not yet researched for this trim
+sub_forester_hyb,2026 Subaru Forester Sport Hybrid,3660,2050,1610,4860,2940,2730,1200,3500,8360,350,16.6,95,game data; game data (model-level mass),,low,not yet researched for this trim
+sub_outback_prem,2026 Subaru Outback Premium,3860,2162,1698,5060,3060,2840,1200,3500,8560,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+sub_outback_lim,2026 Subaru Outback Limited,3860,2162,1698,5060,3060,2840,1200,3500,8560,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+sub_outback_tourxt,2026 Subaru Outback Touring XT,3860,2162,1698,5060,3060,2840,1200,3500,8560,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+sub_outback_wild,2026 Subaru Outback Wilderness,3860,2162,1698,5060,3060,2840,1200,3500,8560,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+sub_ascent_prem,2027 Subaru Ascent Premium,4410,2470,1940,5610,3390,3150,1200,3500,9110,350,19.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+sub_ascent_onyx,2027 Subaru Ascent Onyx Edition,4410,2470,1940,5610,3390,3150,1200,3500,9110,350,19.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+sub_ascent_tour,2027 Subaru Ascent Touring,4410,2470,1940,5610,3390,3150,1200,3500,9110,350,19.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+sub_solterra_prem,2026 Subaru Solterra Premium,4540,2361,2179,5740,3220,3470,1200,3500,9240,350,0,971,game data; game data (model-level mass),,low,not yet researched for this trim
+sub_solterra_lim,2026 Subaru Solterra Limited,4540,2361,2179,5740,3220,3470,1200,3500,9240,350,0,971,game data; game data (model-level mass),,low,not yet researched for this trim
+sub_solterra_xt,2026 Subaru Solterra Touring XT,4540,2361,2179,5740,3220,3470,1200,3500,9240,350,0,971,game data; game data (model-level mass),,low,not yet researched for this trim
+sub_trailseeker_prem,2027 Subaru Trailseeker Premium,4650,2418,2232,5850,3290,3540,1200,3500,9350,350,0,971,game data; game data (model-level mass),,low,not yet researched for this trim
+sub_trailseeker_lim,2027 Subaru Trailseeker Limited,4650,2418,2232,5850,3290,3540,1200,3500,9350,350,0,971,game data; game data (model-level mass),,low,not yet researched for this trim
+sub_trailseeker_tour,2027 Subaru Trailseeker Touring,4650,2418,2232,5850,3290,3540,1200,3500,9350,350,0,971,game data; game data (model-level mass),,low,not yet researched for this trim
+sub_uncharted_prem,2027 Subaru Uncharted Premium FWD,4370,2272,2098,5570,3130,3370,1200,3500,9070,350,0,971,game data; game data (model-level mass),,low,not yet researched for this trim
+sub_uncharted_sport,2027 Subaru Uncharted Sport AWD,4370,2272,2098,5570,3130,3370,1200,3500,9070,350,0,971,game data; game data (model-level mass),,low,not yet researched for this trim
+sub_uncharted_gt,2027 Subaru Uncharted GT AWD,4370,2272,2098,5570,3130,3370,1200,3500,9070,350,0,971,game data; game data (model-level mass),,low,not yet researched for this trim
+ex30_sm,2026 Volvo EX30 Single Motor Plus,4080,1836,2244,5030,2720,3420,950,0,0,0,0,832,game data; game data (model-level mass),,low,not yet researched for this trim
+ex30_tm,2026 Volvo EX30 Twin Motor Performance Ultra,4320,2030,2290,5270,2850,3470,950,0,0,0,0,832,game data; game data (model-level mass),,low,not yet researched for this trim
+ex30cc,2026 Volvo EX30 Cross Country,4410,2073,2337,5360,2890,3530,950,0,0,0,0,832,game data; game data (model-level mass),,low,not yet researched for this trim
+ex40_sm,2026 Volvo EX40 Single Motor Extended Range,4520,2079,2441,5720,3090,3830,1200,3500,9220,350,0,1027,game data; game data (model-level mass),,low,not yet researched for this trim
+ex40_tm,2026 Volvo EX40 Twin Motor Performance,4810,2309,2501,6010,3250,3890,1200,3500,9510,350,0,1027,game data; game data (model-level mass),,low,not yet researched for this trim
+ex60_p6,2027 Volvo EX60 P6 Plus,4960,2282,2678,6160,3330,4120,1200,3500,9660,350,0,1079,game data; game data (model-level mass),,low,not yet researched for this trim
+ex60_p10,2027 Volvo EX60 P10 AWD Ultra,5250,2520,2730,6450,3480,4180,1200,3500,9950,350,0,1235,game data; game data (model-level mass),,low,not yet researched for this trim
+ex90_sm,2026 Volvo EX90 Single Motor,5840,2686,3154,7040,3800,4710,1200,3500,10540,350,0,1352,game data; game data (model-level mass),,low,not yet researched for this trim
+ex90_tm,2026 Volvo EX90 Twin Motor Performance,6220,2986,3234,7420,4010,4810,1200,3500,10920,350,0,1352,game data; game data (model-level mass),,low,not yet researched for this trim
+v60cc,2026 Volvo V60 Cross Country B5 AWD,4140,2401,1739,5090,3190,2750,950,1000,6090,100,18.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+xc40,2026 Volvo XC40 B5 AWD Plus,3920,2274,1646,5120,3210,2760,1200,3500,8620,350,14.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+xc60,2026 Volvo XC60 B5 AWD Plus,4220,2448,1772,5420,3400,2930,1200,3500,8920,350,18.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+xc60t8,2026 Volvo XC60 T8 Plug-in Hybrid Ultra,4810,2790,2020,6010,3760,3250,1200,3500,9510,350,18.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+xc90,2026 Volvo XC90 B5 AWD Plus,4590,2662,1928,5790,3630,3130,1200,3500,9290,350,18.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+xc90t8,2026 Volvo XC90 T8 Plug-in Hybrid Ultra,5220,3028,2192,6420,4020,3470,1200,3500,9920,350,18.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+terrain,2027 GMC Terrain Elevation AWD,3750,2250,1500,4950,3210,2670,1200,3500,8450,350,14.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+terrain_at4,2027 GMC Terrain AT4 AWD,3810,2286,1524,5010,3250,2710,1200,3500,8510,350,14.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+acadia,2027 GMC Acadia Elevation AWD,4740,2702,2038,5940,3660,3270,1200,3500,9440,350,21.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+acadia_den,2027 GMC Acadia Denali AWD,4850,2764,2086,6050,3720,3330,1200,3500,9550,350,21.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+canyon,2026 GMC Canyon Elevation 4WD,4520,2576,1944,5920,3640,3260,1400,6500,12420,650,21.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+canyon_at4x,2026 GMC Canyon AT4X 4WD,4850,2764,2086,6250,3850,3440,1400,6500,12750,650,21.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+sierra_elev,2027 GMC Sierra 1500 Elevation 4WD,5030,2817,2213,6730,4070,3780,1700,11000,17730,1100,24.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+sierra_at4,2027 GMC Sierra 1500 AT4 4WD,5400,3024,2376,7100,4290,3990,1700,11000,18100,1100,24.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+sierra_den,2027 GMC Sierra 1500 Denali Ultimate 4WD,5640,3158,2482,7340,4440,4120,1700,11000,18340,1100,24.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+sierra2500,2026 GMC Sierra 2500 HD Denali Duramax,7720,4323,3397,11020,6660,6190,3300,18000,29020,1800,35.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+sierra3500,2026 GMC Sierra 3500 HD Denali Ultimate Dually,8490,4754,3736,11790,7130,6620,3300,18000,29790,1800,35.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+yukon,2027 GMC Yukon Elevation 4WD,5620,3147,2473,7320,4430,4110,1700,8000,15320,800,24.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+yukon_den,2027 GMC Yukon Denali Ultimate 4WD,5950,3332,2618,7650,4630,4300,1700,8000,15650,800,24.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+yukonxl,2027 GMC Yukon XL Denali 4WD,6170,3455,2715,7870,4760,4420,1700,8000,15870,800,28.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+sierraev_elev,2026 GMC Sierra EV Elevation Extended Range,8050,4025,4025,9750,5260,6110,1700,11000,20750,1100,0,2210,game data; game data (model-level mass),,low,not yet researched for this trim
+sierraev_den,2026 GMC Sierra EV Denali Max Range,8820,4410,4410,10520,5680,6590,1700,11000,21520,1100,0,2665,game data; game data (model-level mass),,low,not yet researched for this trim
+hummerpu,2026 GMC Hummer EV Pickup 3X,9040,4520,4520,10740,5800,6730,1700,11000,21740,1100,0,2756,game data; game data (model-level mass),,low,not yet researched for this trim
+hummersuv,2026 GMC Hummer EV SUV 3X,8820,4410,4410,10520,5680,6590,1700,8000,18520,800,0,2210,game data; game data (model-level mass),,low,not yet researched for this trim
+savcargo,2027 GMC Savana 2500 Cargo Van,5950,3273,2677,9250,5490,5290,3300,18000,27250,1800,30.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+savpass,2027 GMC Savana 3500 Passenger LT,6830,3757,3073,10130,6020,5800,3300,18000,28130,1800,30.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+savcut,2027 GMC Savana 3500 Cutaway,7280,4004,3276,10580,6280,6060,3300,18000,28580,1800,30.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+civic_si,2024 Honda Civic Si,2950,1829,1121,3900,2610,2110,950,1000,4900,100,12.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+optima_lx,2019 Kia Optima LX,3310,2019,1291,4260,2810,2300,950,1000,5260,100,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+optima_sx,2019 Kia Optima SX,3510,2176,1334,4460,2990,2410,950,1000,5460,100,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+soul_lx,2023 Kia Soul LX,2930,1817,1113,3880,2600,2100,950,1000,4880,100,14.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+soul_ex,2023 Kia Soul EX,2980,1848,1132,3930,2630,2120,950,1000,4930,100,14.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+altima_s,2021 Nissan Altima 2.5 S,3220,1996,1224,4170,2790,2250,950,1000,5170,100,16.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+altima_sv,2021 Nissan Altima 2.5 SV,3260,2021,1239,4210,2820,2270,950,1000,5210,100,16.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+altima_sr,2021 Nissan Altima 2.0 SR VC-Turbo,3370,2089,1281,4320,2890,2330,950,1000,5320,100,16.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+sx4,2011 Suzuki SX4 Crossover AWD,2930,1817,1113,3880,2600,2100,950,1000,4880,100,13.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+r1t_prem,2027 Rivian R1T Premium,6660,3330,3330,8360,4510,5240,1700,11000,19360,1100,0,1417,game data; game data (model-level mass),,low,not yet researched for this trim
+r1t_perf,2027 Rivian R1T Performance,7050,3525,3525,8750,4720,5480,1700,11000,19750,1100,0,1820,game data; game data (model-level mass),,low,not yet researched for this trim
+r1t_quad,2027 Rivian R1T Quad,7140,3570,3570,8840,4770,5540,1700,11000,19840,1100,0,1820,game data; game data (model-level mass),,low,not yet researched for this trim
+r1s_prem,2027 Rivian R1S Premium,6700,3283,3417,7900,4270,5030,1200,3500,11400,350,0,1417,game data; game data (model-level mass),,low,not yet researched for this trim
+r1s_perf,2027 Rivian R1S Performance,7100,3479,3621,8300,4480,5290,1200,3500,11800,350,0,1820,game data; game data (model-level mass),,low,not yet researched for this trim
+r1s_quad,2027 Rivian R1S Quad,7190,3523,3667,8390,4530,5350,1200,3500,11890,350,0,1820,game data; game data (model-level mass),,low,not yet researched for this trim
+r2_std,2027 Rivian R2 Standard,4740,2180,2560,5940,3210,3980,1200,3500,9440,350,0,1143,game data; game data (model-level mass),,low,not yet researched for this trim
+r2_prem,2027 Rivian R2 Premium,4980,2440,2540,6180,3340,3940,1200,3500,9680,350,0,1143,game data; game data (model-level mass),,low,not yet researched for this trim
+r2_perf,2027 Rivian R2 Performance Launch Edition,5000,2450,2550,6200,3350,3950,1200,3500,9700,350,0,1143,game data; game data (model-level mass),,low,not yet researched for this trim
+gcl_laredo,2026 Jeep Grand Cherokee L Laredo 4x2,4700,2491,2209,5900,3380,3500,1200,3500,9400,350,23.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+gcl_limited,2026 Jeep Grand Cherokee L Limited 4x4,4830,2560,2270,6030,3450,3580,1200,3500,9530,350,23.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+gcl_reserve,2026 Jeep Grand Cherokee L Limited Reserve 4x4,4850,2570,2280,6050,3460,3590,1200,3500,9550,350,23.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+gcl_summit,2026 Jeep Grand Cherokee L Summit 4x4,4940,2618,2322,6140,3510,3650,1200,3500,9640,350,23.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+gwl_base,2026 Jeep Grand Wagoneer L 4x4,6390,3578,2812,8090,4890,4540,1700,8000,16090,800,26.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+gwl_limited,2026 Jeep Grand Wagoneer L Limited 4x4,6440,3606,2834,8140,4920,4570,1700,8000,16140,800,26.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+gwl_summit,2026 Jeep Grand Wagoneer L Summit Reserve 4x4,6500,3640,2860,8200,4960,4610,1700,8000,16200,800,26.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+pal22_se,2022 Hyundai Palisade SE,4130,2354,1776,5330,3280,2940,1200,3500,8830,350,18.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+pal22_sel,2022 Hyundai Palisade SEL,4230,2411,1819,5430,3340,2990,1200,3500,8930,350,18.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+pal22_lim,2022 Hyundai Palisade Limited HTRAC AWD,4320,2462,1858,5520,3400,3040,1200,3500,9020,350,18.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+pal22_cal,2022 Hyundai Palisade Calligraphy HTRAC AWD,4330,2468,1862,5530,3400,3050,1200,3500,9030,350,18.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+k4s_lx,2026 Kia K4 LX,2890,1763,1127,3840,2530,2070,950,1000,4840,100,12.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+k4s_lxs,2026 Kia K4 LXS,2900,1769,1131,3850,2540,2080,950,1000,4850,100,12.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+k4s_ex,2026 Kia K4 EX,2930,1787,1143,3880,2560,2100,950,1000,4880,100,12.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+k4s_gtl,2026 Kia K4 GT-Line,2940,1793,1147,3890,2560,2100,950,1000,4890,100,12.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+k4s_gtlt,2026 Kia K4 GT-Line Turbo,3050,1860,1190,4000,2640,2160,950,1000,5000,100,12.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+k5_lxs,2026 Kia K5 LXS,3230,1938,1292,4180,2710,2260,950,1000,5180,100,15.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+k5_gtl,2026 Kia K5 GT-Line,3290,1974,1316,4240,2750,2290,950,1000,5240,100,15.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+k5_gtl_awd,2026 Kia K5 GT-Line AWD,3460,2041,1419,4410,2810,2380,950,1000,5410,100,15.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+k5_gt,2026 Kia K5 GT,3600,2160,1440,4550,2950,2460,950,1000,5550,100,15.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+k5_ex,2026 Kia K5 EX,3400,2040,1360,4350,2820,2350,950,1000,5350,100,15.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+rr_p400se,2026 Range Rover P400 SE,5530,3097,2433,7230,4370,4060,1700,8000,15230,800,23.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+rr_p550e_se,2026 Range Rover P550e SE,6030,3377,2653,7730,4680,4340,1700,8000,15730,800,18.8,497,game data; game data (model-level mass),,low,not yet researched for this trim
+rr_p530se,2026 Range Rover P530 SE,5700,3192,2508,7400,4480,4160,1700,8000,15400,800,23.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+rr_p530ab,2026 Range Rover P530 Autobiography,5750,3220,2530,7450,4510,4180,1700,8000,15450,800,23.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+rr_p615sv,2026 Range Rover P615 SV,5820,3259,2561,7520,4550,4220,1700,8000,15520,800,23.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+rrs_se,2026 Range Rover Sport P360 SE,5180,2901,2279,6880,4160,3860,1700,8000,14880,800,21.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+rrs_dse,2026 Range Rover Sport P400 Dynamic SE,5220,2923,2297,6920,4190,3890,1700,8000,14920,800,21.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+rrs_p550e,2026 Range Rover Sport P550e Autobiography,5840,3270,2570,7540,4560,4230,1700,8000,15540,800,18.8,497,game data; game data (model-level mass),,low,not yet researched for this trim
+rrs_ab,2026 Range Rover Sport P530 Autobiography,5400,3024,2376,7100,4290,3990,1700,8000,15100,800,21.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+rrs_sv,2026 Range Rover Sport SV,5310,2974,2336,7010,4240,3940,1700,8000,15010,800,21.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+rrv_s,2026 Range Rover Velar P250 S,4300,2408,1892,6000,3630,3370,1700,8000,14000,800,16.6,0,game data; game data (model-level mass),,low,not yet researched for this trim
+rrv_dse,2026 Range Rover Velar P250 Dynamic SE,4320,2419,1901,6020,3640,3380,1700,8000,14020,800,16.6,0,game data; game data (model-level mass),,low,not yet researched for this trim
+rrv_p400dse,2026 Range Rover Velar P400 Dynamic SE,4540,2542,1998,6240,3770,3500,1700,8000,14240,800,16.6,0,game data; game data (model-level mass),,low,not yet researched for this trim
+rrv_ab,2026 Range Rover Velar P400 Autobiography,4590,2570,2020,6290,3800,3530,1700,8000,14290,800,16.6,0,game data; game data (model-level mass),,low,not yet researched for this trim
+rre_s,2026 Range Rover Evoque S,4080,2285,1795,5780,3500,3250,1700,8000,13780,800,17.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+rre_dse,2026 Range Rover Evoque Dynamic SE,4100,2296,1804,5800,3510,3260,1700,8000,13800,800,17.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+nav_prem,2026 Lincoln Navigator Premiere 4x4,5950,3332,2618,7650,4630,4300,1700,8000,15650,800,28.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+nav_res,2026 Lincoln Navigator Reserve 4x4,6000,3360,2640,7700,4660,4320,1700,8000,15700,800,28.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+nav_bl,2026 Lincoln Black Label Navigator 4x4,6040,3382,2658,7740,4680,4350,1700,8000,15740,800,28.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+bmw19_40i,2019 BMW X5 xDrive40i,4810,2694,2116,6010,3630,3380,1200,3500,9510,350,21.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+bmw19_50i,2019 BMW X5 xDrive50i,5090,2850,2240,6290,3800,3530,1200,3500,9790,350,21.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+naut_blg,2026 Lincoln Nautilus Black Label AWD,4450,2448,2002,5650,3360,3230,1200,3500,9150,350,17.7,0,game data; game data (model-level mass),,low,not yet researched for this trim
+av_bl,2026 Lincoln Aviator Black Label AWD,4920,2509,2411,6120,3370,3770,1200,3500,9620,350,20.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+f150_plat,2025 Ford F-150 Platinum SuperCrew 4x4,5360,3002,2358,7535,4270,3960,2175,13500,18060,1100,36,0,Ford 2026 F-150 spec sheet; game data (model-level mass),https://www.fromtheroad.ford.com/content/dam/fordmediasite/us/en/library/2026/specs/2026_Ford_F150_Specs.pdf,low,not yet researched for this trim
+rav4_18_lim,2018 Toyota RAV4 Limited AWD,3580,2076,1504,4780,2990,2580,1200,3500,8280,350,15.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+rav4_18_hlim,2018 Toyota RAV4 Hybrid Limited AWD,3950,2252,1698,5150,3170,2840,1200,3500,8650,350,14.8,95,game data; game data (model-level mass),,low,not yet researched for this trim
+camry22_xle,2022 Toyota Camry XLE,3400,2040,1360,4350,2820,2350,950,1000,5350,100,15.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+camry22_xlev6,2022 Toyota Camry XLE V6,3560,2136,1424,4510,2920,2440,950,1000,5510,100,15.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_4runner22_trd,2022 Toyota 4Runner TRD Off-Road 4x4,4750,2660,2090,5950,3600,3340,1200,3500,9450,350,23.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_4runner22_lim,2022 Toyota 4Runner Limited 4x4,4810,2694,2116,6010,3630,3380,1200,3500,9510,350,23.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_chr21_lim,2021 Toyota C-HR Limited,3300,1848,1452,4500,2720,2530,1200,3500,8000,350,13.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_corolla_im18,2018 Toyota Corolla iM,2910,1746,1164,3860,2500,2080,950,1000,4860,100,13.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_highlander19_lim,2019 Toyota Highlander Limited AWD,4500,2520,1980,5700,3450,3200,1200,3500,9200,350,19.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_highlander19_hlim,2019 Toyota Highlander Hybrid Limited AWD,4620,2587,2033,5820,3520,3270,1200,3500,9320,350,17.2,95,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_lc200,2021 Toyota Land Cruiser Heritage Edition,5820,3259,2561,7520,4550,4220,1700,8000,15520,800,24.6,0,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_prius20_le,2020 Toyota Prius LE,3040,1824,1216,3990,2590,2150,950,1000,4990,100,11.4,95,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_prius20_awde,2020 Toyota Prius XLE AWD-e,3200,1920,1280,4150,2690,2240,950,1000,5150,100,10.6,95,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_sequoia21_lim,2021 Toyota Sequoia Limited 4x4,5990,3354,2636,7690,4650,4320,1700,8000,15690,800,26.4,0,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_sienna19_xle,2019 Toyota Sienna XLE,4430,2481,1949,5730,3470,3220,1300,3500,9230,350,19.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_tacoma22_trd,2022 Toyota Tacoma TRD Sport Double Cab 4x4,4420,2475,1945,5820,3520,3270,1400,6500,12320,650,21.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+toy_tundra20_sr5,2020 Toyota Tundra SR5 CrewMax 4x4,5600,3136,2464,7300,4420,4100,1700,11000,18300,1100,38.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+lex_gx460,2022 Lexus GX 460 Premium,5130,2873,2257,6330,3830,3550,1200,3500,9830,350,23.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+lex_lx570,2020 Lexus LX 570,5990,3354,2636,7690,4650,4320,1700,8000,15690,800,24.6,0,game data; game data (model-level mass),,low,not yet researched for this trim
+lex_nx300,2020 Lexus NX 300 AWD,4050,2268,1782,5250,3180,2950,1200,3500,8750,350,15.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+lex_nx300h,2020 Lexus NX 300h AWD,4170,2335,1835,5370,3250,3020,1200,3500,8870,350,14.8,95,game data; game data (model-level mass),,low,not yet researched for this trim
+lex_rx350_21,2021 Lexus RX 350 AWD,4370,2491,1879,5570,3430,3070,1200,3500,9070,350,19.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+xc90_14,2014 Volvo XC90 3.2 AWD,4600,2668,1932,5800,3630,3130,1200,3500,9300,350,21.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+xc60_16_t5,2016 Volvo XC60 T5 AWD Premier,4100,2378,1722,5300,3320,2860,1200,3500,8800,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+xc60_16_t6,2016 Volvo XC60 T6 AWD,4230,2453,1777,5430,3400,2930,1200,3500,8930,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+v60cc17,2017 Volvo V60 Cross Country T5 AWD,3900,2262,1638,4850,3040,2620,950,1000,5850,100,18.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_sonata_se,2025 Hyundai Sonata SE,3170,1902,1268,4120,2670,2220,950,1000,5120,100,15.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_sonata_sel,2025 Hyundai Sonata SEL AWD,3470,2082,1388,4420,2860,2390,950,1000,5420,100,15.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_sonata_nl,2025 Hyundai Sonata N Line,3510,2106,1404,4460,2890,2410,950,1000,5460,100,15.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+inf_qx60_pure,2027 Infiniti QX60 Pure,4430,2481,1949,5630,3410,3160,1200,3500,9130,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+inf_qx60_luxe,2027 Infiniti QX60 Luxe,4480,2509,1971,5680,3440,3190,1200,3500,9180,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+inf_qx60_sport,2027 Infiniti QX60 Sport,4630,2593,2037,5830,3530,3270,1200,3500,9330,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+inf_qx60_auto,2027 Infiniti QX60 Autograph,4670,2615,2055,5870,3550,3300,1200,3500,9370,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+inf_qx65_luxe,2027 Infiniti QX65 Luxe,4590,2570,2020,5790,3500,3250,1200,3500,9290,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+inf_qx65_sport,2027 Infiniti QX65 Sport,4620,2587,2033,5820,3520,3270,1200,3500,9320,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+inf_qx65_auto,2027 Infiniti QX65 Autograph,4650,2604,2046,5850,3540,3290,1200,3500,9350,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+inf_qx80_pure,2027 Infiniti QX80 Pure,5800,3248,2552,7500,4540,4210,1700,8000,15500,800,25.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+inf_qx80_luxe,2027 Infiniti QX80 Luxe,6060,3394,2666,7760,4690,4360,1700,8000,15760,800,25.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+inf_qx80_sport,2027 Infiniti QX80 Sport,6080,3405,2675,7780,4710,4370,1700,8000,15780,800,25.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+inf_qx80_auto,2027 Infiniti QX80 Autograph,6130,3433,2697,7830,4740,4400,1700,8000,15830,800,25.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_c8_1lt,2026 Chevrolet Corvette Stingray 1LT,3370,1348,2022,4070,2200,2990,700,0,0,0,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_zr1x,2026 Chevrolet Corvette ZR1X,3980,1632,2348,4680,2530,3390,700,0,0,0,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+por_911_c,2026 Porsche 911 Carrera,3320,1295,2025,4020,2170,3000,700,0,0,0,16.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+por_911_cab,2026 Porsche 911 Carrera Cabriolet,3510,1369,2141,4210,2270,3140,700,0,0,0,16.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+por_911_t4,2026 Porsche 911 Targa 4,3620,1412,2208,4320,2330,3220,700,0,0,0,16.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+por_718_c,2025 Porsche 718 Cayman,3100,1364,1736,3800,2050,2630,700,0,0,0,16.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+por_718_b,2025 Porsche 718 Boxster,3120,1373,1747,3820,2060,2640,700,0,0,0,16.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+por_panamera,2026 Porsche Panamera,4350,2175,2175,5300,2860,3320,950,1000,6300,100,19.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+por_cayenne,2026 Porsche Cayenne,4520,2350,2170,5720,3210,3460,1200,3500,9220,350,23.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+por_cayenne_cp,2026 Porsche Cayenne Coupe,4540,2361,2179,5740,3220,3470,1200,3500,9240,350,23.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+por_macan,2026 Porsche Macan,4110,2260,1850,5310,3150,3040,1200,3500,8810,350,17.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+por_macan_ev,2026 Porsche Macan 4 Electric,5290,2539,2751,6490,3500,4210,1200,3500,9990,350,0,1413,game data; game data (model-level mass),,low,not yet researched for this trim
+por_taycan,2026 Porsche Taycan,4520,2124,2396,5470,2950,3600,950,0,0,0,0,1413,game data; game data (model-level mass),,low,not yet researched for this trim
+por_taycan_ct,2026 Porsche Taycan 4 Cross Turismo,4960,2381,2579,5910,3190,3830,950,0,0,0,0,1413,game data; game data (model-level mass),,low,not yet researched for this trim
+por_cayenne_ev,2026 Porsche Cayenne Electric,5840,2803,3037,7040,3800,4560,1200,3500,10540,350,0,1413,game data; game data (model-level mass),,low,not yet researched for this trim
+por_cayenne_evcp,2026 Porsche Cayenne Coupe Electric,5860,2813,3047,7060,3810,4570,1200,3500,10560,350,0,1413,game data; game data (model-level mass),,low,not yet researched for this trim
+por_911_ct,2026 Porsche 911 Carrera T,3240,1264,1976,3940,2130,2940,700,0,0,0,16.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+por_911_s,2026 Porsche 911 Carrera S,3370,1314,2056,4070,2200,3030,700,0,0,0,16.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+por_911_4s,2026 Porsche 911 Carrera 4S,3480,1357,2123,4180,2260,3110,700,0,0,0,16.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+por_911_4sc,2026 Porsche 911 Carrera 4S Cabriolet,3660,1427,2233,4360,2350,3250,700,0,0,0,16.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+por_911_t4s,2026 Porsche 911 Targa 4S,3690,1439,2251,4390,2370,3270,700,0,0,0,16.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+por_911_gts,2026 Porsche 911 Carrera GTS,3520,1373,2147,4220,2280,3140,700,0,0,0,16.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+por_911_4gts,2026 Porsche 911 Carrera 4 GTS,3620,1412,2208,4320,2330,3220,700,0,0,0,16.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+por_911_gt3,2026 Porsche 911 GT3,3160,1232,1928,3860,2080,2880,700,0,0,0,16.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+por_911_ts,2026 Porsche 911 Turbo S,3630,1416,2214,4330,2340,3230,700,0,0,0,16.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+por_718_s,2025 Porsche 718 Cayman S,3200,1408,1792,3900,2110,2700,700,0,0,0,16.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+por_718_gts,2025 Porsche 718 Cayman GTS 4.0,3130,1377,1753,3830,2070,2650,700,0,0,0,16.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+por_718_gt4rs,2025 Porsche 718 Cayman GT4 RS,3120,1373,1747,3820,2060,2640,700,0,0,0,16.9,0,game data; game data (model-level mass),,low,not yet researched for this trim
+por_panamera4,2026 Porsche Panamera 4,4480,2240,2240,5430,2930,3400,950,1000,6430,100,19.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+por_panamera_4eh,2026 Porsche Panamera 4 E-Hybrid,4980,2490,2490,5930,3200,3710,950,1000,6930,100,19.8,337,game data; game data (model-level mass),,low,not yet researched for this trim
+por_panamera_4seh,2026 Porsche Panamera 4S E-Hybrid,5020,2510,2510,5970,3220,3740,950,1000,6970,100,19.8,337,game data; game data (model-level mass),,low,not yet researched for this trim
+por_panamera_gts,2026 Porsche Panamera GTS,4650,2325,2325,5600,3020,3510,950,1000,6600,100,19.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+por_panamera_teh,2026 Porsche Panamera Turbo E-Hybrid,5170,2585,2585,6120,3300,3830,950,1000,7120,100,19.8,337,game data; game data (model-level mass),,low,not yet researched for this trim
+por_panamera_tseh,2026 Porsche Panamera Turbo S E-Hybrid,5200,2600,2600,6150,3320,3850,950,1000,7150,100,19.8,337,game data; game data (model-level mass),,low,not yet researched for this trim
+por_cayenne_s,2026 Porsche Cayenne S,4750,2470,2280,5950,3340,3600,1200,3500,9450,350,23.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+por_cayenne_eh,2026 Porsche Cayenne E-Hybrid,5290,2751,2539,6490,3640,3930,1200,3500,9990,350,23.8,337,game data; game data (model-level mass),,low,not yet researched for this trim
+por_cayenne_gts,2026 Porsche Cayenne GTS,4830,2512,2318,6030,3390,3650,1200,3500,9530,350,23.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+por_cayenne_teh,2026 Porsche Cayenne Turbo E-Hybrid,5610,2917,2693,6810,3820,4120,1200,3500,10310,350,23.8,337,game data; game data (model-level mass),,low,not yet researched for this trim
+por_cayenne_cps,2026 Porsche Cayenne S Coupe,4770,2480,2290,5970,3350,3610,1200,3500,9470,350,23.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+por_macan_t,2025 Porsche Macan T,4140,2277,1863,5340,3170,3060,1200,3500,8840,350,17.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+por_macan_s,2025 Porsche Macan S,4290,2360,1930,5490,3260,3140,1200,3500,8990,350,17.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+por_macan_gts,2025 Porsche Macan GTS,4330,2382,1948,5530,3280,3170,1200,3500,9030,350,17.2,0,game data; game data (model-level mass),,low,not yet researched for this trim
+por_macan_evr,2026 Porsche Macan Electric,5140,2467,2673,6340,3420,4110,1200,3500,9840,350,0,1413,game data; game data (model-level mass),,low,not yet researched for this trim
+por_macan_ev4s,2026 Porsche Macan 4S Electric,5340,2563,2777,6540,3530,4240,1200,3500,10040,350,0,1413,game data; game data (model-level mass),,low,not yet researched for this trim
+por_macan_evt,2026 Porsche Macan Turbo Electric,5450,2616,2834,6650,3590,4310,1200,3500,10150,350,0,1413,game data; game data (model-level mass),,low,not yet researched for this trim
+por_taycan4,2026 Porsche Taycan 4,4740,2228,2512,5690,3070,3750,950,0,0,0,0,1413,game data; game data (model-level mass),,low,not yet researched for this trim
+por_taycan_4s,2026 Porsche Taycan 4S,4850,2280,2570,5800,3130,3820,950,0,0,0,0,1413,game data; game data (model-level mass),,low,not yet researched for this trim
+por_taycan_gts,2026 Porsche Taycan GTS,4920,2312,2608,5870,3170,3870,950,0,0,0,0,1413,game data; game data (model-level mass),,low,not yet researched for this trim
+por_taycan_t,2026 Porsche Taycan Turbo,5070,2383,2687,6020,3250,3970,950,0,0,0,0,1413,game data; game data (model-level mass),,low,not yet researched for this trim
+por_taycan_ts,2026 Porsche Taycan Turbo S,5090,2392,2698,6040,3260,3980,950,0,0,0,0,1413,game data; game data (model-level mass),,low,not yet researched for this trim
+por_taycan_tgt,2026 Porsche Taycan Turbo GT,4890,2298,2592,5840,3150,3850,950,0,0,0,0,1413,game data; game data (model-level mass),,low,not yet researched for this trim
+por_taycan_ct4s,2026 Porsche Taycan 4S Cross Turismo,5050,2424,2626,6000,3240,3890,950,0,0,0,0,1413,game data; game data (model-level mass),,low,not yet researched for this trim
+por_cayenne_evt,2026 Porsche Cayenne Turbo Electric,6280,3014,3266,7480,4040,4850,1200,3500,10980,350,0,1413,game data; game data (model-level mass),,low,not yet researched for this trim
+bmw_535i_11,2011 BMW 535i,3900,1950,1950,4850,2620,3040,950,1000,5850,100,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+bmw_ah7_11,2011 BMW ActiveHybrid 7,4700,2350,2350,5650,3050,3540,950,1000,6650,100,21.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+lin_towncar03,2003 Lincoln Town Car Signature,4370,2316,2054,5320,3050,3160,950,1000,6320,100,19.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+bmw_528i_11,2011 BMW 528i,3750,1875,1875,4700,2540,2940,950,1000,5700,100,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+bmw_535ix_11,2011 BMW 535i xDrive,4080,2040,2040,5030,2720,3150,950,1000,6030,100,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+bmw_550i_11,2011 BMW 550i,4190,2095,2095,5140,2780,3220,950,1000,6140,100,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+bmw_550ix_11,2011 BMW 550i xDrive,4390,2195,2195,5340,2880,3340,950,1000,6340,100,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+bmw_740i_11,2011 BMW 740i,4280,2140,2140,5230,2820,3280,950,1000,6230,100,21.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+bmw_750i_11,2011 BMW 750i,4440,2220,2220,5390,2910,3380,950,1000,6390,100,21.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+bmw_750ix_11,2011 BMW 750i xDrive,4650,2325,2325,5600,3020,3510,950,1000,6600,100,21.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+bmw_760li_11,2011 BMW 760Li,4960,2480,2480,5910,3190,3700,950,1000,6910,100,21.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_c8_2lt,2026 Chevrolet Corvette Stingray 2LT,3380,1352,2028,4080,2200,3000,700,0,0,0,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_c8_3lt,2026 Chevrolet Corvette Stingray 3LT,3400,1360,2040,4100,2210,3010,700,0,0,0,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_eray,2026 Chevrolet Corvette E-Ray 1LZ,3790,1554,2236,4490,2420,3250,700,0,0,0,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_z06,2026 Chevrolet Corvette Z06 1LZ,3440,1376,2064,4140,2240,3040,700,0,0,0,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_zr1,2026 Chevrolet Corvette ZR1 1LZ,3750,1538,2212,4450,2400,3220,700,0,0,0,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+bmw_740li_11,2011 BMW 740Li,4380,2190,2190,5330,2880,3340,950,1000,6330,100,21.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+bmw_750li_11,2011 BMW 750Li,4530,2265,2265,5480,2960,3430,950,1000,6480,100,21.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+bmw_750lix_11,2011 BMW 750Li xDrive,4740,2370,2370,5690,3070,3560,950,1000,6690,100,21.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+bmw_alpb7_11,2011 BMW Alpina B7,4590,2295,2295,5540,2990,3470,950,1000,6540,100,21.1,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_z06_3lz,2026 Chevrolet Corvette Z06 3LZ,3440,1376,2064,4140,2240,3040,700,0,0,0,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_eray_3lz,2026 Chevrolet Corvette E-Ray 3LZ,3790,1554,2236,4490,2420,3250,700,0,0,0,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+chv_zr1_3lz,2026 Chevrolet Corvette ZR1 3LZ,3750,1538,2212,4450,2400,3220,700,0,0,0,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_crv19_lx,2019 Honda CR-V LX,3310,1986,1324,5010,3250,2710,1700,8000,13010,800,14.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_crv19_ex,2019 Honda CR-V EX,3370,2022,1348,4570,2960,2470,1200,3500,8070,350,14.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_crv19_exl,2019 Honda CR-V EX-L AWD,3530,2118,1412,4730,3070,2550,1200,3500,8230,350,14.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_crv19_tour,2019 Honda CR-V Touring AWD,3570,2142,1428,4770,3090,2580,1200,3500,8270,350,14.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+vw_alltrack19_s,2019 Volkswagen Golf Alltrack S 4MOTION,3370,1887,1483,4320,2610,2430,950,1000,5320,100,14.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+vw_alltrack19_se,2019 Volkswagen Golf Alltrack SE 4MOTION,3410,1910,1500,4360,2640,2450,950,1000,5360,100,14.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+vw_alltrack19_sel,2019 Volkswagen Golf Alltrack SEL 4MOTION,3440,1926,1514,4390,2660,2470,950,1000,5390,100,14.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+vw_atlas18_s,2018 Volkswagen Atlas S,4250,2380,1870,5450,3300,3060,1200,3500,8950,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+vw_atlas18_se,2018 Volkswagen Atlas SE V6 4MOTION,4500,2520,1980,5700,3450,3200,1200,3500,9200,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+vw_atlas18_selp,2018 Volkswagen Atlas SEL Premium V6 4MOTION,4610,2582,2028,5810,3510,3260,1200,3500,9310,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+vw_atlas18_s6,2018 Volkswagen Atlas S V6 4MOTION,4430,2481,1949,5630,3410,3160,1200,3500,9130,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+vw_atlas18_le,2018 Volkswagen Atlas Launch Edition V6 4MOTION,4450,2492,1958,5650,3420,3170,1200,3500,9150,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+vw_atlas18_set,2018 Volkswagen Atlas SE with Technology V6 4MOTION,4510,2526,1984,5710,3450,3210,1200,3500,9210,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+vw_atlas18_sel,2018 Volkswagen Atlas SEL V6 4MOTION,4550,2548,2002,5750,3480,3230,1200,3500,9250,350,18.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_crv19_lxa,2019 Honda CR-V LX AWD,3440,2064,1376,5140,3330,2780,1700,8000,13140,800,14.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_crv19_exa,2019 Honda CR-V EX AWD,3510,2106,1404,4710,3050,2540,1200,3500,8210,350,14.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_crv19_exlf,2019 Honda CR-V EX-L,3410,2046,1364,4610,2990,2490,1200,3500,8110,350,14.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+honda_crv19_tourf,2019 Honda CR-V Touring,3450,2070,1380,4650,3010,2510,1200,3500,8150,350,14.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+vw_alltrack19_smt,2019 Volkswagen Golf Alltrack S 4MOTION (manual),3370,1887,1483,4320,2610,2430,950,1000,5320,100,14.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+vw_alltrack19_semt,2019 Volkswagen Golf Alltrack SE 4MOTION (manual),3410,1910,1500,4360,2640,2450,950,1000,5360,100,14.5,0,game data; game data (model-level mass),,low,not yet researched for this trim
+fus_cu_flow,Fusion Current Flow,5250,2520,2730,6200,3350,4020,950,0,0,0,0,1105,game data; game data (model-level mass),,low,not yet researched for this trim
+fus_cu_pulse,Fusion Current Pulse,5640,2820,2820,6590,3560,4130,950,0,0,0,0,1300,game data; game data (model-level mass),,low,not yet researched for this trim
+fus_cu_summit,Fusion Current Summit,6040,3020,3020,6990,3770,4380,950,0,0,0,0,1495,game data; game data (model-level mass),,low,not yet researched for this trim
+fus_cu_storm,Fusion Current Storm,6260,3130,3130,7210,3890,4520,950,0,0,0,0,1495,game data; game data (model-level mass),,low,not yet researched for this trim
+fus_rg_estate,Fusion Regent Estate,5340,2990,2350,6290,3800,3530,950,1000,7290,100,23.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+fus_rg_reserve,Fusion Regent Reserve,5640,3158,2482,6590,3990,3700,950,1000,7590,100,23.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+fus_rg_grand,Fusion Regent Grand,5730,3209,2521,6680,4040,3750,950,1000,7680,100,23.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+fus_rg_sovereign,Fusion Regent Sovereign,6130,3433,2697,7080,4280,3980,950,1000,8080,100,18.2,416,game data; game data (model-level mass),,low,not yet researched for this trim
+fus_rg_blacklabel,Fusion Regent Black Label V8,5840,3270,2570,6790,4110,3810,950,1000,7790,100,23.8,0,game data; game data (model-level mass),,low,not yet researched for this trim
+fus_tl_ramble,Fusion Trailline Ramble,4670,2195,2475,5620,3030,3700,950,0,0,0,0,1014,game data; game data (model-level mass),,low,not yet researched for this trim
+fus_tl_traverse,Fusion Trailline Traverse,4940,2470,2470,5890,3180,3690,950,0,0,0,0,1144,game data; game data (model-level mass),,low,not yet researched for this trim
+fus_tl_gt,Fusion Trailline GT,5050,2525,2525,6000,3240,3760,950,0,0,0,0,1235,game data; game data (model-level mass),,low,not yet researched for this trim
+fus_tl_switch,Fusion Trailline Switchback,5200,2600,2600,6150,3320,3850,950,0,0,0,0,1235,game data; game data (model-level mass),,low,not yet researched for this trim
+fus_tl_apex,Fusion Trailline Apex,5290,2645,2645,6240,3370,3910,950,0,0,0,0,1300,game data; game data (model-level mass),,low,not yet researched for this trim
+fus_so_essence,Fusion Solace Essence,4520,2576,1944,5470,3370,3010,950,1000,6470,100,17.2,95,game data; game data (model-level mass),,low,not yet researched for this trim
+fus_so_haven,Fusion Solace Haven,4940,2816,2124,5890,3630,3240,950,1000,6890,100,14.5,286,game data; game data (model-level mass),,low,not yet researched for this trim
+fus_so_atelier,Fusion Solace Atelier,5160,2890,2270,6110,3700,3430,950,1000,7110,100,15.1,364,game data; game data (model-level mass),,low,not yet researched for this trim
+fus_so_ateliers,Fusion Solace Atelier S,5220,2923,2297,6170,3730,3470,950,1000,7170,100,15.1,364,game data; game data (model-level mass),,low,not yet researched for this trim
+fus_rw_basecamp,Fusion Ridgeway Basecamp,4190,2346,1844,5140,3110,2890,950,1000,6140,100,17.7,95,game data; game data (model-level mass),,low,not yet researched for this trim
+fus_rw_roam,Fusion Ridgeway Roam,4590,2570,2020,5540,3350,3110,950,1000,6540,100,15.1,312,game data; game data (model-level mass),,low,not yet researched for this trim
+fus_rw_summit,Fusion Ridgeway Summit,4500,2520,1980,5450,3300,3060,950,1000,6450,100,17.7,95,game data; game data (model-level mass),,low,not yet researched for this trim
+fus_rw_outpost,Fusion Ridgeway Outpost,4940,2766,2174,5890,3560,3310,950,1000,6890,100,15.1,364,game data; game data (model-level mass),,low,not yet researched for this trim
+fus_ve_origin,Fusion Velora Origin,3860,2162,1698,4810,2910,2700,950,1000,5810,100,19.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+fus_ve_meridian,Fusion Velora Meridian,4140,2318,1822,5090,3080,2860,950,1000,6090,100,19.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+fus_ve_insignia,Fusion Velora Insignia,4320,2419,1901,5270,3190,2960,950,1000,6270,100,19.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+fus_ve_nocturne,Fusion Velora Nocturne,4410,2470,1940,5360,3240,3010,950,1000,6360,100,19.3,0,game data; game data (model-level mass),,low,not yet researched for this trim
+mon_q6_touring,Fusion Monarch Touring,6880,3646,3234,7830,4480,4650,950,1000,8830,100,21.9,468,game data; game data (model-level mass),,low,not yet researched for this trim
+mon_q6_trail,Fusion Monarch Trail,7080,3752,3328,8030,4600,4770,950,1000,9030,100,21.9,468,game data; game data (model-level mass),,low,not yet researched for this trim
+mon_q6_summit,Fusion Monarch Summit,7190,3811,3379,8140,4660,4840,950,1000,9140,100,21.9,468,game data; game data (model-level mass),,low,not yet researched for this trim
+fus_fg_summit,Fusion Forge H8 Summit WorkLux,6940,3886,3054,7890,4770,4430,950,1000,8890,100,32.0,416,game data; game data (model-level mass),,low,not yet researched for this trim
+fus_vl_perf,Fusion Velora Vale Signature,5110,2453,2657,6060,3270,3930,950,0,0,0,0,1300,game data; game data (model-level mass),,low,not yet researched for this trim
+fus_vl_gt,Fusion Velora Vale Signature,5110,2453,2657,6060,3270,3930,950,0,0,0,0,1300,game data; game data (model-level mass),,low,not yet researched for this trim
+hy_sonata_hsel,2025 Hyundai Sonata Hybrid SEL,3380,2028,1352,4330,2810,2340,950,1000,5330,100,13.2,95,game data; game data (model-level mass),,low,not yet researched for this trim
+tsl_roadster,Tesla Roadster (SpaceX package),4080,1714,2366,4780,2580,3410,700,0,0,0,0,2600,game data; game data (model-level mass),,low,not yet researched for this trim
+ex20_base,2020 Ford Explorer Base RWD,4340,2300,2040,5540,3170,3290,1200,3500,9040,350,18.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ex20_xlt,2020 Ford Explorer XLT RWD,4380,2321,2059,5580,3190,3310,1200,3500,9080,350,18.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ex20_lim,2020 Ford Explorer Limited RWD,4510,2390,2120,5710,3270,3390,1200,3500,9210,350,18.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ex20_limh,2020 Ford Explorer Limited Hybrid RWD,4740,2512,2228,5940,3400,3530,1200,3500,9440,350,18.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ex20_st,2020 Ford Explorer ST 4WD,4780,2533,2247,5980,3420,3550,1200,3500,9480,350,18.0,0,game data; game data (model-level mass),,low,not yet researched for this trim
+ex20_plat,2020 Ford Explorer Platinum 4WD,4760,2523,2237,5960,3410,3540,1200,3500,9460,350,18.0,0,game data; game data (model-level mass),,low,not yet researched for this trim

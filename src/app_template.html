@@ -4565,6 +4565,53 @@ function rearGain(v){const m=MD();if(isMon()){const ag=(monF().ws4m==="High Agil
 // ---- vehicle model: four tyres with a combined-slip grip curve, load transfer from body roll and pitch,
 // ---- wheels that spin up and lock, motors with power limits, and ABS / TCS / ESC working on real wheel slip
 let WR=0.36, IW=3.0, HCGB=0.52, KP=0.11, AP=0.13;
+/* v41 weights. Each trim's weight profile comes from tools/weights/build.py (researched specs, US units):
+   [curb lb, front lb, rear lb, GVWR, front GAWR, rear GAWR, payload, tow, GCWR, tongue limit, tank gal, battery lb, CG height in, class, fuel, tag].
+   It's converted to kg and m once here. The car's own weight sits at its curb CG (A behind the front axle); everything else
+   (driver, passengers, cargo, roof load, fuel burned off, trailer tongue) is a list of point masses whose force and moments the suspension
+   feels, so a load sags the springs it sits over and shifts the axle loads, the CG and the inertias */
+const WTS=/*WEIGHTS*/{};const LBKG=0.45359237,FUEL_LBG={gasoline:6.1,diesel:7.1,electric:0};
+function wtProf(k){const r=WTS[k];if(!r)return null;if(r.kg)return r.kg;
+  return r.kg={curb:r[0]*LBKG,fwd:r[1]/r[0],gvwr:r[3]*LBKG,gawrF:r[4]*LBKG,gawrR:r[5]*LBKG,payload:r[6]*LBKG,tow:r[7]*LBKG,gcwr:r[8]*LBKG,tongue:r[9]*LBKG,tankGal:r[10],bat:r[11]*LBKG,cgH:r[12]*0.0254,cls:r[13],fuel:r[14],tag:r[15],lbGal:FUEL_LBG[r[14]]??6.1}}
+function wtApply(){for(const k of ORDER){const T=TRIMS[k],P=wtProf(k);if(!T||!P)continue;T.mass=P.curb;T.fwd=P.fwd;T.cgH=P.cgH}}
+const WT={curb:1700,M:1700,Lm:0,Fz:0,My:0,mh:0,Iyl:0,Ixl:0,Lf:0,Lr:0,h:0.53,xcg:1.4,ycg:0,Iz:3600,front:0,rear:0,gross:0,gcw:0,tongueKg:0,fuelKg:0,paxKg:0,cargoKg:0,roofKg:0,ssf:1.5,warn:0,
+  m:new Float64Array(14),x:new Float64Array(14),y:new Float64Array(14),z:new Float64Array(14),n:0};
+const WT_SEATS=[[0.40,-0.37],[0.80,0.40],[0.80,-0.40],[0.80,0],[1.06,0.40],[1.06,-0.40],[1.06,0]];   // front passenger, 2nd row, 3rd row: share of the wheelbase behind the front axle, left (+)
+function wtAdd(m,x,y,z){if(!m||WT.n>=14)return;const i=WT.n++;WT.m[i]=m;WT.x[i]=x;WT.y[i]=y;WT.z[i]=z}
+function wtBed(){const P=wtProf(st.trim);return !!(P&&/pickup|chassis/.test(P.cls))}
+function wtCargoX(){const w=WB,at=st.cargoAt||"auto";return at==="seat"?0.8*w:at==="bed"||(at==="auto"&&wtBed())?w*0.98:at==="hitch"?w+(VEH&&VEH.tail?VEH.tail[2]-A:1)+0.2:w+0.45}   // trunk / cargo floor: behind the rear axle
+// every load on the car this frame (no allocation): x = metres behind the front axle, y = left, z = height of its own CG
+function wtTick(){const T=TRIMS[st.trim],P=wtProf(st.trim),H=car.hyb||{},w=WB,c=T.mass||1700,h0=T.cgH||0.53,g=9.81;WT.n=0;WT.curb=c;WT.P=P;
+  const nRow=(VEH&&VEH.seats?VEH.seats.length:5)>5?7:4;
+  let pax=0;if(!st.walk){wtAdd(st.driverKg||81.6,0.40*w,0.37,h0+0.05);pax+=st.driverKg||81.6}
+  for(let i=0;i<Math.min(st.dummies||0,nRow);i++){const s=WT_SEATS[i],k=st.dummyKg||81.6;wtAdd(k,s[0]*w,s[1],h0+0.05);pax+=k}
+  const cgo=car.cargo||0,cx=wtCargoX();wtAdd(cgo,cx,0,wtBed()?h0+0.22:h0*0.95);
+  const roof=st.roofKg||0;wtAdd(roof,0.5*w,0,h0*2.75);
+  let fk=0;if(P&&P.lbGal&&H.tank>0){fk=(clamp(H.fuel/H.tank,0,1)-1)*P.tankGal*P.lbGal*LBKG;wtAdd(fk,wtBed()?0.62*w:0.74*w,0,0.35)}   // curb weight is with a full tank: what's burned off comes out here
+  const tN=car.tongueW||0,tX=car.tongueX||-B-1.1;
+  let Lm=0,Mx=0,My=0,Mz=0;for(let i=0;i<WT.n;i++){const m=WT.m[i];Lm+=m;Mx+=m*WT.x[i];My+=m*WT.y[i];Mz+=m*WT.z[i]}
+  const M=c+Lm,xcg=(c*A+Mx)/M,hcg=(c*h0+Mz)/M;let Iyl=0,Ixl=0,Izl=0;
+  for(let i=0;i<WT.n;i++){const m=Math.abs(WT.m[i]),dx=WT.x[i]-A,dz=WT.z[i]-h0*0.6;Iyl+=m*(dx*dx+dz*dz);Ixl+=m*(WT.y[i]*WT.y[i]+dz*dz);const ex=WT.x[i]-xcg;Izl+=m*(ex*ex+WT.y[i]*WT.y[i])}
+  const len=VEH&&VEH.len||4.7,wid=VEH&&VEH.width||1.85,dc=A-xcg;
+  WT.M=M;WT.Lm=Lm;WT.Fz=Lm*g+tN;WT.My=g*(Lm*A-Mx)+tN*tX;WT.mh=Mz;WT.Iyl=Iyl;WT.Ixl=Ixl;WT.Iz=c*((len*len+wid*wid)/12+dc*dc)+Izl;
+  WT.xcg=xcg;WT.ycg=My/M;WT.h=hcg;WT.tongueKg=tN/g;WT.fuelKg=fk;WT.paxKg=pax;WT.cargoKg=cgo;WT.roofKg=roof;
+  const tx=A-tX,fr=c*(T.fwd||0.5)+(Lm*w-Mx)/w+WT.tongueKg*(w-tx)/w;WT.front=fr;WT.rear=M+WT.tongueKg-fr;
+  WT.Lf=(fr-c*(T.fwd||0.5))*g;WT.Lr=(WT.rear-c*(1-(T.fwd||0.5)))*g;WT.gross=M+WT.tongueKg;WT.gcw=M+(TRL.on?TRL.mass||0:0);WT.ssf=TRACK/(2*hcg);
+  let wn=0;if(P){if(WT.gross>P.gvwr*1.005)wn|=1;if(fr>P.gawrF*1.005)wn|=2;if(WT.rear>P.gawrR*1.005)wn|=4;if(TRL.on&&P.tongue&&WT.tongueKg>P.tongue*1.005)wn|=8;if(TRL.on&&(TRL.mass||0)>P.tow*1.005+1)wn|=16;if(TRL.on&&P.gcwr&&WT.gcw>P.gcwr*1.005)wn|=32}WT.warn=wn;
+  return M}
+/* stat bars for the loading screen: a quick physical estimate at the current load (not the full physics, which the drive itself uses).
+   0-60: tractive force limited by grip on the driven wheels (their share of the real axle loads) and by power, minus drag and rolling
+   resistance, stepped at 0.05 s; stopping from 60 mph: 0.25 s for the pressure to build, then the lower of tyre grip and brake capacity
+   (brakes are sized for the GVWR, so past it the deceleration falls); mpg / range scale with the energy that goes into mass (rolling,
+   climbing and speeding up are about 55% of the energy in mixed driving); tow left = the lower of the tow rating and GCWR minus the truck */
+function wtPerf(extraKg,extraX){const T=TRIMS[st.trim],P=wtProf(st.trim),g=9.81,dr=driveOf(st.trim);wtTick();
+  let M=WT.M+(extraKg||0)+(TRL.on?(TRL.mass||0)*0.9:0),fr=WT.front+(extraKg?extraKg*(WB-(extraX||WB))/WB:0);const rr=WT.M+(extraKg||0)+WT.tongueKg-fr,share=dr==="awd"?(fr+rr)/M:(dr==="fwd"?fr:rr)/M;
+  const Pw=(T.kW||150)*1000*(T.ice&&!T.hybrid?0.82:0.9),mu=1.0,cda=T.cda||(/pickup|van|full_suv|chassis/.test(P&&P.cls||"")?1.15:0.75);let v=0,t=0;
+  while(v<26.82&&t<40){const F=Math.min(mu*g*M*share,Pw/Math.max(v,2.5))-0.5*1.2*cda*v*v-0.012*M*g;v+=F/(M*1.08)*0.05;t+=0.05}if(T.ice&&!T.hybrid)t+=0.35;
+  const cap=P?P.gvwr*g*1.0:M*g*1.1,dec=Math.min(mu*g*0.95,cap/M),stop=26.82*0.25+26.82*26.82/(2*dec);
+  const dm=(M-WT.curb-(st.walk?0:81.6))/WT.curb,eff=1/(1+0.55*dm);
+  return {t60:t,stop:stop*3.281,mpg:T.mpg?T.mpg*eff:0,eff,towLeft:P?Math.max(0,Math.min(P.tow-(TRL.on?TRL.mass:0),P.gcwr?P.gcwr-WT.gcw:P.tow)):0,front:fr,rear:rr,M}}
+const WT_WARN=[[1,"Over GVWR"],[2,"Front axle over GAWR"],[4,"Rear axle over GAWR"],[8,"Tongue weight over the hitch limit"],[16,"Trailer over the tow rating"],[32,"Over GCWR"]];
 const WPOS=[[A,TRACK/2],[A,-TRACK/2],[-B,TRACK/2],[-B,-TRACK/2]];       // FL FR RL RR: x forward, y left
 const GEARS8=[4.69,3.31,2.13,1.67,1.29,1.0,0.84,0.67];
 const GEARS10=[4.70,2.99,2.15,1.80,1.52,1.28,1.00,0.85,0.69,0.64];
@@ -5721,7 +5768,7 @@ function rockContact(i,gx,gy,gh,cps,sps,dt,G0){const R=(MODELS[(TRIMS[st.trim].m
     else if(h>P.h){use=Math.min(h,P.h+Math.max(3.5*dt,ds*2.5));const slope=Math.min(1.6,(use-P.h)/Math.max(ds,1e-4));res=(car.fz&&car.fz[i]||0)*Math.max(0,slope-0.45)*0.8}}   // climbing: the wheel rides up the face, and the steeper it is the more it pushes back
   K[i]={x:gx,y:gy,h:use,res,wall};return use}
 function physics(dt){if(TOWH.ride){towRide(dt);return}
-  const T=TRIMS[st.trim], md=LC.st==="go"?MODES[2]:(()=>{const m=MD(),tr=terr();if(tr)m.gamma*=tr.gm;return m})(), D=DRIVES[st.trim], m=T.mass+(car.cargo||0)*0.6+(TRL.on?TRL.mass*0.8:0), g=9.81, Iz=m*1.5*1.5, L=WB, ice=D.layout==="ice";
+  const T=TRIMS[st.trim], md=LC.st==="go"?MODES[2]:(()=>{const m=MD(),tr=terr();if(tr)m.gamma*=tr.gm;return m})(), D=DRIVES[st.trim], m=wtTick()+(TRL.on?TRL.mass*0.8:0), g=9.81, Iz=WT.Iz+(TRL.on?TRL.mass*0.8*2.25:0), L=WB, ice=D.layout==="ice";
   const gC=groundAt(car.px,car.py); car.offroad=gC.kind==="grass"; const SF={dry:1,wet:0.72,snow:0.3}[st.surface]||1, mu=1.15*SF;
   const vx=car.vx, sp=Math.abs(vx), dirG=st.gear==="R"?-1:1;
   // ---- steering: finer near the centre, a little less lock at speed, rate-limited like a real rack
@@ -5738,10 +5785,10 @@ function physics(dt){if(TOWH.ride){towRide(dt);return}
   const del=[Math.atan(L*tF/(L-half*tF)),Math.atan(L*tF/(L+half*tF)),car.dR,car.dR];   // Ackermann on the front pair
   // ---- suspension: spring + damper at each corner, anti-roll bars, bump stops; tyre loads come from the tyres' own springs
   GREF=car.zb||0;const SP=T.sus,SU=suspOf(),zeta=SU.z[st.damp??MD().damp];
-  const MWa=SP?SP.mw:[45,45],MWv=[MWa[0],MWa[0],MWa[1],MWa[1]],MW=45,ms=m-2*MWa[0]-2*MWa[1];
-  const Fs0=[ms*g*B/L/2,ms*g*B/L/2,ms*g*A/L/2,ms*g*A/L/2];
+  const MWa=SP?SP.mw:[45,45],MWv=[MWa[0],MWa[0],MWa[1],MWa[1]],MW=45,ms=Math.max(300,WT.curb-2*MWa[0]-2*MWa[1]),msL=Math.max(300,ms+WT.Lm);   /* the springs are set for the curb weight, so whatever is loaded on top sags them */
+  const fw_=WT.curb*B/L,Fs0f=Math.max(ms*0.2,fw_-2*MWa[0])*g/2,Fs0r=Math.max(ms*0.2,WT.curb-fw_-2*MWa[1])*g/2,Fs0=[Fs0f,Fs0f,Fs0r,Fs0r],Mbody=2*(Fs0f*A-Fs0r*B);   /* the springs carry the curb axle loads less each axle's own unsprung weight; the body's weight sits where that puts it (Mbody) */
   // springs from the car's real ride frequency (soft luxury ~1.1 Hz … sports car ~1.7 Hz; leaf-sprung truck rears stiffer); air springs keep the same frequency loaded
-  const kS=SP?Fs0.map((f,i)=>{const hz=SP.f[i<2?0:1],w=2*Math.PI*hz;return w*w*(f/g)*(SP.airLevel?1+(car.cargo||0)/Math.max(800,ms):1)}):[52000,52000,47000,47000].map(k=>k*SU.k);
+  const kS=SP?Fs0.map((f,i)=>{const hz=SP.f[i<2?0:1],w=2*Math.PI*hz;return w*w*(f/g)*(SP.airLevel?1+Math.max(0,WT.Fz/g)/Math.max(800,ms):1)}):[52000,52000,47000,47000].map(k=>k*SU.k);
   const SUT=susT(),kS0=kS.slice();if(SUT)for(let i=0;i<4;i++)kS[i]*=i<2?SUT.kf:SUT.kr;
   const cS=kS.map((k,i)=>2*zeta*Math.sqrt(k*Fs0[i]/g)*(SUT?(i<2?SUT.df:SUT.dr):1)), KT=260000, CT=350;
   const offTer=!!st.terr||/offroad|rock|mud|sand|trail/.test(MD().type||"");let KARB=[38000,24000];
@@ -5749,10 +5796,10 @@ function physics(dt){if(TOWH.ride){towRide(dt);return}
   if(SP){const y2=(TRACK/2)*(TRACK/2),Ks=2*y2*(kS0[0]*s2[0]+kS0[2]*s2[1]),Kt=ms*g*SP.hR/(SP.grad*Math.PI/180*(1+MD().esc*0.06)),Ka=Math.max(0,Kt-Ks)*(SP.arbOn?1:0);   // sport modes stiffen a little
     KARB=[Ka*SP.split/(4*y2*s2[0]),Ka*(1-SP.split)/(4*y2*s2[1])];if(SP.disc&&offTer&&Math.abs(car.vx)<9)KARB[0]=0}if(SUT){KARB[0]*=SUT.af;KARB[1]*=SUT.ar}car.swayOff=!!(SP&&SP.disc&&!KARB[0]);
   const TB=(SP?[SP.tb[0],SP.tb[0],SP.tb[1],SP.tb[1]]:[0.085,0.085,0.085,0.085]).map(b=>SUT&&SUT.drop>0?Math.max(0.03,b-SUT.drop/1000*0.8):b),TD=SP?[SP.td[0],SP.td[0],SP.td[1],SP.td[1]]:[0.11,0.11,0.11,0.11];
-  if(!car.zw){const h0=car.zInit||0,cps0=Math.cos(car.psi),sps0=Math.sin(car.psi),cg0=car.cargo||0;car.vzw=[0,0,0,0];car.vzb=0;car.thd=car.phid=0;
+  if(!car.zw){const h0=car.zInit||0,cps0=Math.cos(car.psi),sps0=Math.sin(car.psi),cgL=i=>(i<2?WT.Lf:WT.Lr)/2;car.vzw=[0,0,0,0];car.vzb=0;car.thd=car.phid=0;
     /* v365: every car starts already settled at its real ride height: each tyre squashed by its own share of the weight on the ground under it, and the springs at their loaded length (cars used to drop 2-5 cm and bounce when they appeared) */
-    car.zw=Fs0.map((f,i)=>{const [x,y]=WPOS[i],G=groundAt(car.px+x*cps0-y*sps0,car.py+x*sps0+y*cps0);let gh=G.h-tireDrop(i);if(!isFinite(gh)||Math.abs(gh-h0)>0.6)gh=h0;return gh-(f+MWv[i]*g+cg0*g/4)/KT});
-    const tgt=car.zw.map((z,i)=>z-cg0*g/4/kS[i]);let zb=tgt.reduce((a,b)=>a+b,0)/4,th=0,ph=0;
+    car.zw=Fs0.map((f,i)=>{const [x,y]=WPOS[i],G=groundAt(car.px+x*cps0-y*sps0,car.py+x*sps0+y*cps0);let gh=G.h-tireDrop(i);if(!isFinite(gh)||Math.abs(gh-h0)>0.6)gh=h0;return gh-(f+MWv[i]*g+cgL(i))/KT});
+    const tgt=car.zw.map((z,i)=>z-cgL(i)/kS[i]);let zb=tgt.reduce((a,b)=>a+b,0)/4,th=0,ph=0;
     for(let it=0;it<4;it++){let sx=0,sxx=0,sy=0,syy=0;for(let i=0;i<4;i++){const [x,y]=WPOS[i],r=tgt[i]-zb;sx+=x*r;sxx+=x*x;sy+=y*r;syy+=y*y}th=-sx/Math.max(1e-6,sxx);ph=sy/Math.max(1e-6,syy);let r0=0;for(let i=0;i<4;i++){const [x,y]=WPOS[i];r0+=tgt[i]-(zb-x*th+y*ph)}zb+=r0/4}
     {const AR0=susArch();let h0=0;try{h0=AR0.air[0]?airTargetH():0}catch(e){}car.hAir=[AR0.air[0]?h0:0,AR0.air[1]?h0:0];car.hFil=car.hAir.slice();zb+=(car.hAir[0]*B+car.hAir[1]*A)/L;th-=(car.hAir[0]-car.hAir[1])/L}   /* (an air car starts at its chosen height) */
     car.zb=zb;car.th=clamp(th,-0.15,0.15);car.phi=clamp(ph,-0.15,0.15)}
@@ -5762,7 +5809,7 @@ function physics(dt){if(TOWH.ride){towRide(dt);return}
      (anti-dive / anti-squat); dampers have separate compression and rebound; semi-active dampers can only resist motion, a fully active
      system can push; air springs stiffen as they compress and their height is set by the compressor, so the car really rises and lowers */
   try{airTick(dt)}catch(e){}
-  car.tongueW=TRL.on&&!st.walk?(TRL.on.semi?0.2:TRL.kind==="tow"?0.08:0.11)*TRL.mass*9.81:0;car.tongueX=TRL.on&&TRL.on.semi?-B+0.05:-((VEH&&VEH.tail?VEH.tail[2]:BODY_HL)+0.35);   /* a trailer's tongue (or a fifth wheel's kingpin) presses down on the back of the car */
+  car.tongueW=TRL.on&&!st.walk?(TRL.on.semi?0.2:TRL.kind==="tow"?0.08:(TRL.tp||0.12))*TRL.mass*9.81:0;car.tongueX=TRL.on&&TRL.on.semi?-B+0.05:-((VEH&&VEH.tail?VEH.tail[2]:BODY_HL)+0.35);   /* a trailer's tongue (or a fifth wheel's kingpin) presses down on the back of the car */
   const AR=susArch(),hA=car.hAir||(car.hAir=[0,0]),fz=[0,0,0,0], Fsp=[0,0,0,0], Ft=[0,0,0,0], cps=Math.cos(car.psi), sps=Math.sin(car.psi);
   car.gnd=car.gnd||[{},{},{},{}];car.camb=car.camb||[0,0,0,0];car.dmpF=car.dmpF||[0,0,0,0];car.sprF=car.sprF||[0,0,0,0];if(!car.cEff||car.cEff.length!==4)car.cEff=cS.slice();
   /* damper control: passive dampers keep their valving; adaptive and magnetic ones pick a target from speed, steering and body roll, braking
@@ -5771,7 +5818,7 @@ function physics(dt){if(TOWH.ride){towRide(dt);return}
   for(let i=0;i<4;i++){let tgt=cS[i];if(AR.ctrl){tgt*=1+0.004*Math.max(0,sp-20)+0.9*Math.min(1,aLat/7)+(i<2?0.7:0.5)*Math.min(1,aLon/6);tgt*=1-0.3*Math.min(1,rough/0.6)}
     car.cEff[i]+=(tgt-car.cEff[i])*Math.min(1,dt/AR.tau)}
   /* links: the brake dive and acceleration squat the springs don't see (front anti-dive, rear anti-lift under braking; anti-squat at the driven axle) */
-  const dW=ms*(-(car.ax||0))*HCGB/L,jF=dW>0?AR.antiDive*dW/2:(AR.fwd?AR.antiSquatF:0)*dW/2,jR=dW>0?-AR.antiLift*dW/2:-(AR.fwd?0:AR.antiSquat)*dW/2,J=[jF,jF,jR,jR];
+  const dW=(ms*HCGB+WT.mh)*(-(car.ax||0))/L,jF=dW>0?AR.antiDive*dW/2:(AR.fwd?AR.antiSquatF:0)*dW/2,jR=dW>0?-AR.antiLift*dW/2:-(AR.fwd?0:AR.antiSquat)*dW/2,J=[jF,jF,jR,jR];
   const ysOf=i=>{const a=i<2?0:1;return AR.solid[a]?WPOS[i][1]*AR.sTrack[a]:WPOS[i][1]};
   for(let i=0;i<4;i++){const [x,y]=WPOS[i],a=i<2?0:1,ys=ysOf(i);
     const zc=car.zb-x*car.th+ys*car.phi, vzc=car.vzb-x*car.thd+ys*car.phid;
@@ -5811,10 +5858,10 @@ function physics(dt){if(TOWH.ride){towRide(dt);return}
   /* camber relative to the road (deg, negative = top of the tyre leaning in): the body's roll and the linkage's camber gain on an independent
      corner, half of that on a torsion beam, the beam's own tilt (square to the road) on a solid axle */
   for(let i=0;i<4;i++){const a=i<2?0:1,sy=WPOS[i][1]>0?1:-1,rollD=car.phi*57.3;car.camb[i]=AR.solid[a]?AR.cam0[a]:AR.cam0[a]+(-sy*rollD-AR.cg[a]*car.defl[i])*(AR.tb[a]?0.5:1)}
-  const sumF=Fsp.reduce((a,b)=>a+b,0), cg=car.cargo||0,tW=car.tongueW||0;
-  car.vzb+=((sumF-(ms+cg)*g-tW)/ms)*dt; car.zb+=car.vzb*dt;
-  let Mp=-ms*car.ax*HCGB-cg*g*1.3+tW*(car.tongueX||-B-1.1), Mr=ms*car.ay*(SP?SP.hR:0.45)*(1-(SP?SP.act:0)*(AR.activeBar&&offTer?0.2:1)); for(let i=0;i<4;i++){Mp-=Fsp[i]*WPOS[i][0];Mr+=Fsp[i]*ysOf(i)}
-  car.thd+=(Mp/(ms*1.9))*dt; car.th+=car.thd*dt; car.phid+=(Mr/(ms*0.36))*dt; car.phi+=car.phid*dt;
+  const sumF=Fsp.reduce((a,b)=>a+b,0);
+  car.vzb+=((sumF-ms*g-WT.Fz)/msL)*dt; car.zb+=car.vzb*dt;
+  let Mp=-(ms*HCGB+WT.mh)*car.ax+WT.My+Mbody, Mr=(ms*(SP?SP.hR:0.45)+WT.mh-WT.Lm*0.1)*car.ay*(1-(SP?SP.act:0)*(AR.activeBar&&offTer?0.2:1)); for(let i=0;i<4;i++){Mp-=Fsp[i]*WPOS[i][0];Mr+=Fsp[i]*ysOf(i)}
+  car.thd+=(Mp/(ms*1.9+WT.Iyl))*dt; car.th+=car.thd*dt; car.phid+=(Mr/(ms*0.36+WT.Ixl))*dt; car.phi+=car.phid*dt;
   car.fz=fz;
   // ---- driver requests
   let thr=st.power===false||st.power==="acc"||car.disabled?0:Math.max(Math.pow(inp.thr,st.thrK||1),sys.cruiseThr,sys.accThr,sys.crawlT||0);if(car.dmg&&car.dmg.f>0.35)thr*=1-0.6*(car.dmg.f-0.35)/0.65;if(car.dmg&&car.dmg.rad)thr=Math.min(thr,0.55);if(LC.st==="ready"&&ice&&D.turbo)car.hyb.boost=1; if(thr>0.02&&md.gamma!==1)thr=Math.pow(thr,md.gamma);if(md.snow&&Math.abs(car.vx)<4)thr*=0.65;if(md.cap)thr=Math.min(thr,md.cap);
@@ -12313,7 +12360,7 @@ const SAFETY_FIX={rm:{isa:"ty_std ty_lrrwd ty_lrawd ty_perf m3_std m3_lrrwd m3_l
 function safetyFix(){for(const f in SAFETY_FIX.rm)for(const k of SAFETY_FIX.rm[f].split(" ")){const T=TRIMS[k];if(T&&T.no)T.no=T.no.filter(x=>x!==f)}}
 function oldCarsApply(){for(const k in PRICE_REAL)if(TRIMS[k])PRICE[k]=PRICE_REAL[k];
   for(const [n,o] of [["ty_l","ty_lrawd"],["esv_lux","escalade_pl"],["esv_sport","escalade"],["esv_platsport","escalade"],["esv_v","escaladeV"],["iq_lux","escalade"],["iq_sport","escalade"],["iq_plux","escalade"],["iq_psport","escalade"],["iql_lux","escalade"],["iql_sport","escalade"],["iql_plux","escalade"],["iql_psport","escalade"],["xt5_lux","cad_vistiq_lux"],["xt5_plux","cad_vistiq_lux"],["xt5_sport","cad_vistiq_sport"]]){if(!TRIMS[n])continue;if(SUSR[o]&&!SUSR[n])SUSR[n]=SUSR[o].slice();if(DMODES[o]&&!DMODES[n]&&!/^xt5/.test(n))DMODES[n]=DMODES[o]}   /* v349 cars: the suspension and drive modes of their nearest sibling (the tables are complete only now) */
-  hybTorqueFix();dmApply();susApply();matrixApply();cornerApply();for(const k of ORDER){const T=TRIMS[k],L=T&&T.real&&OLD_NO[T.group];if(!L)continue;const no=new Set(T.no||[]);L.forEach(f=>no.add(f));
+  wtApply();hybTorqueFix();dmApply();susApply();matrixApply();cornerApply();for(const k of ORDER){const T=TRIMS[k],L=T&&T.real&&OLD_NO[T.group];if(!L)continue;const no=new Set(T.no||[]);L.forEach(f=>no.add(f));
   const B=bdOf(k),std=B&&B.std[k];if(std&&std.length>=3)for(const f of ["acc","pilot","bsm","autoHigh","cam360","autopark"]){const optF=(OPT_PKGS[k]||[]).some(p=>(p.feats||[]).includes(f)||p.adds.includes(f))||B.op.some(o=>bdIn(o[3],k)&&o[5].includes(f));if(!std.includes(f)&&!optF)no.add(f)}T.no=[...no]}safetyFix()}
 function bdSel(k){const B=bdOf(k),C=cfgOf(k);if(!B)return {op:[],ac:[],wh:null,intr:null,ty:null};return {op:B.op.filter((o,i)=>C.op&&C.op[i]&&bdIn(o[3],k)),ac:B.ac.filter((a,i)=>C.ac&&C.ac[i]),wh:C.wh!=null&&C.wh>=0?B.wh[C.wh]:null,intr:B.int&&C.intr!=null&&B.int[C.intr]&&bdIn(B.int[C.intr][2],k)?B.int[C.intr]:null,ty:B.ty&&C.ty!=null&&B.ty[C.ty]&&bdIn(B.ty[C.ty][2],k)?B.ty[C.ty]:null}}
 function bdPrice(k){const s=bdSel(k);return s.op.reduce((a,o)=>a+o[2],0)+s.ac.reduce((a,o)=>a+o[1],0)+(s.wh?s.wh[1]:0)+(s.intr?s.intr[1]:0)+(s.ty?s.ty[1]:0)}
@@ -13286,7 +13333,7 @@ function normEye(m){const E=m.eye,S=m.steer;if(!E||!S)return E;return [E[0],m.ey
 function applyVehicle(T){const M=T&&T.model&&MODELS[T.mesh||T.model];
   if(!M){VEH=VEH_STRATA}else{const m=M.meta,sc=m.screen;VEH={head:m.head,corner:[m.width/2-0.15,0.5,m.head[2]+0.2],tail:m.tail,mirror:m.mirror,eye:normEye(m),seats:m.seats||null,camD:clamp((m.tail[2]-m.head[2])*1.5,6.6,12.5),camH:clamp(m.eye[1]*0.68,0.85,1.35),rearCam:[0,m.tail[1]+0.25,m.tail[2]-0.1],
     screen:sc,scr:m.scr,clu:m.pano?null:m.clu,xs:m.pano?null:m.xs,pano:m.pano,len:m.length,width:m.width,wb:m.wb,track:m.track,R:M.wheelR}}
-  REAR_MAX=((T&&T.rearMax)||9.8)*Math.PI/180;WB=VEH.wb;{const f=(T&&T.fwd)||0.5;A=WB*(1-f);B=WB*f;VEH.cgOff=VEH===VEH_STRATA?0:(B-A)/2}TRACK=VEH.track;WR=VEH.R;BODY_HL=VEH.len/2-(VEH===VEH_STRATA?0:0.05);BODY_HW=VEH.width/2-0.02;
+  REAR_MAX=((T&&T.rearMax)||9.8)*Math.PI/180;WB=VEH.wb;{const f=(T&&T.fwd)||0.5;A=WB*(1-f);B=WB*f;HCGB=(T&&T.cgH)||0.52;VEH.cgOff=VEH===VEH_STRATA?0:(B-A)/2}TRACK=VEH.track;WR=VEH.R;BODY_HL=VEH.len/2-(VEH===VEH_STRATA?0:0.05);BODY_HW=VEH.width/2-0.02;
   WPOS[0][0]=WPOS[1][0]=A;WPOS[2][0]=WPOS[3][0]=-B;WPOS[0][1]=WPOS[2][1]=TRACK/2;WPOS[1][1]=WPOS[3][1]=-TRACK/2;
   {const E=VEH.eye,leg=T&&/^tsl_model[sx]20$/.test(T.model),q=leg&&VEH.scr?VEH.scr:VEH.clu||VEH.scr;VEH.tilt=0;if(E&&q){const a=Math.atan2(E[1]-q.c[1],Math.max(0.2,E[2]-q.c[2]));VEH.tilt=leg?clamp(a-0.22,0,0.5):clamp(a-0.3,0,0.32)}}   // look down enough to see the gauges and screen
   try{arcScreens()}catch(e){console.error(e)}
@@ -20693,7 +20740,7 @@ TABS.cars=()=>ALLS().filter(p=>secOf(p)==="cars").join("");
 TABS.assists=()=>ALLS().filter(p=>secOf(p)==="assists").join("")+sfHtml()+ownHtml();
 TABS.sound=()=>ALLS().filter(p=>secOf(p)==="sound").join("")
 TABS.display=()=>`<p class="note">How the screens in front of you look: the driving HUD, the gauge cluster and the brand display styles.</p>`+ALLS().filter(p=>secOf(p)==="display").join("")+`<h3>Game clock</h3><p class="note">How fast the in-game day passes. Normal is about 8 minutes a day. Traffic, rush hour, night and opening hours follow it. Money that is paid out each day comes faster too.</p><div class="grid2">${[[1,"1×","Normal: a day takes about 8 minutes"],[2,"2×","A day takes about 4 minutes"],[4,"4×","A day takes about 2 minutes"],[8,"8×","A day takes about 1 minute"]].map(([k,n,d])=>opt(`data-set="clockX:${k}"`,(st.clockX||1)===k,n,d)).join("")}</div>`+`<h3>Pop-up messages</h3><div class="grid2">${opt(`data-set="popMsg:1"`,nstImportantOnly(),"Important only","Warnings, tickets, money, jobs and anything that needs you. One at a time on a phone. The default on phones and tablets")}${opt(`data-set="popMsg:2"`,!nstImportantOnly(),"All messages","Every confirmation too (drive mode changes, saved settings…). The default on a computer")}</div>`+`<h3>Accessibility</h3><div class="grid2">${opt(`data-set="rflash:${st.rflash===1?0:1}"`,st.rflash===1,"Reduce flashing","No lightning flashes. Ambulance, police and tow lights stay on steady instead of flashing")}${opt(`data-set="rmot:${st.rmot===1?0:1}"`,st.rmot===1,"Reduce motion","No camera shake when you hit something")}</div><p class="note">For bigger text and buttons, use HUD size above.</p>`;
-function loadKg(){return (st.cargoKg||0)+(st.dummies||0)*(st.dummyKg||75)}
+function loadKg(){return st.cargoKg||0}   /* v41: cargo only; passengers are their own loads at their seats (wtTick) */
 
 // ---- your own cars: park the one you're in and spawn another, T switches between them
 st.fleet=[];
