@@ -3336,7 +3336,7 @@ function buildNet2(){
   if(!KN)mkR("blvd","Main St",[[-1600,0],[-1525,0]],{lim:35});
   if(!KN)mkR("blvd","Main St",[[-1525,0],...DX.slice(1).flatMap((x,i)=>i<DX.length-2?[[x,0],[(x+DX[i+2])/2,0]]:[[x,0]])],{lim:35});
   if(!KN)DX.forEach((x,i)=>mkR(x===-1000||x===-850?"ave":"st",DXN[i],DY.map(y=>[x,y])));
-  if(KN){for(const [x,y,c,k] of KN.nodes)N(x,y,k?{kind:k}:{ctrl:c});for(const [t,nm,pts,o] of KN.edges)mkR(t,nm,pts,o)}
+  /* (downtown's kit roads go in with the other planned regions once the whole map is built: kitNetApply) */
   // Main St west to I-61 (it becomes Grand River Ave), east over the Clearwater River (it becomes Commerce Pkwy to Fairhaven)
   mkR("blvd","Main St",[[-1890,0],[-1675,0]],{lim:35,tp:[5,150,0.3]});mkR("blvd","Main St",[[-1675,0],[-1600,0]],{lim:35});   /* v38.1: the boulevard starts here: the median opens over 150 m from Grand River Ave */
   mkR("art","Grand River Ave",[[-1890,0],[-2150,0],[-2450,0],[-2710,0]]);
@@ -3616,7 +3616,15 @@ function buildNetKit(){const K=KITMAP;for(const [x,y,ctrl,z] of K.nodes){const o
     /* bridges and ramps: the kit's heights at each point, resampled every 4 m along the edge (e.zp, read by ez) */
     if(kz){const D=[0];for(let i=1;i<P.length;i++)D.push(D[i-1]+Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]));const k=e.L/(D[D.length-1]||1),zp=[];
       for(let u=0;u<=e.L+4;u+=4){const d=Math.min(u/k,D[D.length-1]);let i=0;while(i<D.length-2&&D[i+1]<d)i++;const f=D[i+1]>D[i]?(d-D[i])/(D[i+1]-D[i]):0;zp.push(kz[i]+(kz[i+1]-kz[i])*clamp(f,0,1))}e.zp=zp;e.kitZ=1}}}
-(function buildNet(){if(KITW&&KITMAP)buildNetKit();else buildNet2()
+/* v40: the regions planned from the road kit (tools/kitmaps/knet.py): the old roads they replace come out (matched by their end points) and the
+   planned ones go in, with their kit lane widths, medians and crossovers. Edges and nodes are renumbered after */
+function kitNetApply(){const K=KIT_NET;if(!(KITOLD&&K))return;
+  const hit=(e,q)=>Math.abs(e.a.x-q[0])<1&&Math.abs(e.a.y-q[1])<1&&Math.abs(e.b.x-q[2])<1&&Math.abs(e.b.y-q[3])<1||Math.abs(e.b.x-q[0])<1&&Math.abs(e.b.y-q[1])<1&&Math.abs(e.a.x-q[2])<1&&Math.abs(e.a.y-q[3])<1;
+  if(K.drop&&K.drop.length){const gone=new Set(EDGES.filter(e=>K.drop.some(q=>hit(e,q))));
+    if(gone.size){const keep=EDGES.filter(e=>!gone.has(e));EDGES.length=0;keep.forEach((e,i)=>{e.i=i;EDGES.push(e)});for(const n of NODES)n.E=n.E.filter(r=>!gone.has(r.e))}}
+  for(const [x,y,c,k] of K.nodes)N(x,y,k?{kind:k}:{ctrl:c});for(const [t,nm,pts,o] of K.edges)mkRoad(t,nm,pts,JSON.parse(JSON.stringify(o)));
+  const keepN=NODES.filter(n=>n.E.length);if(keepN.length!==NODES.length){NODES.length=0;keepN.forEach((n,i)=>{n.i=i;NODES.push(n)})}}
+(function buildNet(){if(KITW&&KITMAP)buildNetKit();else{buildNet2();kitNetApply()}
 })();
 const ePick=(ax,ay,bx,by)=>{const f=EDGES.find(e=>Math.hypot(e.a.x-ax,e.a.y-ay)<1&&Math.hypot(e.b.x-bx,e.b.y-by)<1);if(f||!KITW)return f;
   /* the kit world has different roads: places that hang off a named stretch of the old map take the longest two-way road instead, until they are placed on the new map */
