@@ -88,9 +88,11 @@ for e in NET["E"]:
     if len(P) < 3: continue
     legs_at.setdefault(e["a"], []).append((e, 0, head(P[0], P[2])))
     legs_at.setdefault(e["b"], []).append((e, 1, head(P[-1], P[-3])))
+exec(open("tools/kitmaps/dt.py").read())   # v40: downtown is planned piece by piece from the kit (its junctions, lane changes and turnarounds)
 nj = 0
 for ni, L in legs_at.items():
     nd = NET["N"][ni]
+    if inR(nd["x"], nd["y"]): continue
     if nd["k"] != "x" or len(L) not in (3, 4) or any(e["t"] not in CLS for e, _, _ in L): continue
     best = None
     for exact in (True, False):
@@ -335,7 +337,7 @@ def taper_blvd(e, P, FL):
 
 for e in NET["E"]:
     base = BASE.get(e["t"])
-    if not base: continue
+    if not base or e["i"] in DT_SKIP or e.get("kit"): continue
     if (e["i"], 0) in TRIM: e["u0"] = TRIM[(e["i"], 0)]
     if (e["i"], 1) in TRIM: e["u1"] = e["L"] - TRIM[(e["i"], 1)]
     # where a ramp joins or leaves (a merge), the pieces nearest it lose their kerb and sidewalk ("!f") so the ramp's mouth is open

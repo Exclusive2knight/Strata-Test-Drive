@@ -260,7 +260,7 @@ if __name__ == "__main__":
     joints, bad, opn = K.check()
     # a layout that only dresses an existing road graph (the old map rebuilt in kit pieces) sets K.nograph
     nodes, edges = ([], []) if getattr(K, "nograph", False) else graph(K, getattr(K, "names", None))
-    json.dump({"place": K.place, "kj": getattr(K, "kj", []), "nodes": nodes, "edges": edges, "joints": joints, "bad": bad, "open": opn}, open(out, "w"), separators=(",", ":"))
+    json.dump({"place": K.place, "kj": getattr(K, "kj", []), "knet": getattr(K, "knet", None), "nodes": nodes, "edges": edges, "joints": joints, "bad": bad, "open": opn}, open(out, "w"), separators=(",", ":"))
     print(f"graph: {len(nodes)} junctions, {len(edges)} edges")
     print(f"{len(K.place)} pieces, {len(joints)} joints, {len(bad)} BAD joints, {len(opn)} open ends")
     for b in bad[:20]: print("  BAD", b)

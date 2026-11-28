@@ -21,6 +21,8 @@ if _os.path.exists("props/kitold.json"):
     _kj = json.load(open("props/kitold.json")).get("kj", [])
     _j = [round(v, 2) for q in _kj for v in q]
     html = html.replace("/*KIT_J*/[]", json.dumps(_j, separators=(",", ":")))
+    _kn = json.load(open("props/kitold.json")).get("knet")
+    html = html.replace("/*KIT_NET*/null", json.dumps(_kn, separators=(",", ":")) if _kn else "null")
 html=html.replace("/*TRAFFIC_MIND*/", open(os.path.join(here,"traffic","mind.js")).read()+"\n"+open(os.path.join(here,"traffic","park.js")).read())
 html = html.replace("@/*ASSET_REF*/main/", "@" + (ref or "main") + "/")
 html = html.replace("<title>Mission Strata</title>", '<title>Mission Strata</title><meta name="description" content="Mission Strata: a realistic driving simulator in your browser with real cars, drive modes, suspension, a city, freeway and traffic.">', 1)

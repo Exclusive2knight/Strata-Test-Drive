@@ -19,6 +19,6 @@ async def main():
       await pg.evaluate(f"(()=>{{st.walk=null;resetCar({{free:true,x:{x},y:{y},h:{h}}});car.vx=0;st.gear='P';{ex}}})()")
       if sim:await pg.evaluate(f"SIM({sim},()=>{{car.vx=0}})")
       await pg.evaluate(f"(()=>{{st.cam={cam};look.yaw={yw};look.pitch={pt};look.dist={ds}}})()")
-      await pg.wait_for_timeout(2200);await pg.screenshot(path=f"{sys.argv[1]}_{n}.png")
+      await pg.wait_for_timeout(int(os.environ.get("WAIT","2200")));await pg.screenshot(path=f"{sys.argv[1]}_{n}.png")
     print(errs[:3]);await b.close()
 asyncio.run(main())

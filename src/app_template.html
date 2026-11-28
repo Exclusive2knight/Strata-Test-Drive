@@ -3057,6 +3057,7 @@ const W2=true;
 const KITW=(()=>{try{return /[?&]world=kit\b/.test(location.search)}catch(e){return false}})(),KITMAP=/*KIT_MAP*/null;
 /* v352: the old map's roads rebuilt in road-kit pieces (on by default; ?roads=old for the generated look): every road is followed by kit straights cut to
    length, graded and bent to its curve (props/kitold.json, made by tools/kitmaps/oldmap.py); the road graph, junction surfaces and places stay */
+const KIT_NET=/*KIT_NET*/null;   /* v40: regions planned piece by piece from the road kit (tools/kitmaps/knet.py): {nodes, edges, legs: [x, y, heading out, stop bar]} */
 const KIT_J=/*KIT_J*/[];   /* the old map's junctions that got a kit intersection piece: [x, y, leg reach, ...] (spliced in at build from props/kitold.json) */
 const kitJ=n=>{if(!KITOLD)return 0;for(let i=0;i<KIT_J.length;i+=3)if(Math.abs(KIT_J[i]-n.x)<1.5&&Math.abs(KIT_J[i+1]-n.y)<1.5)return KIT_J[i+2];return 0};   /* how far its legs reach (its stop lines sit just inside) */
 /* v361: iPhone / iPad (iPadOS reports itself as a Mac with a touch screen) */
@@ -3310,16 +3311,18 @@ function buildNet2(){
   // ---- Westport downtown: 9 x 7 blocks of 150 m. The parking garage sits between Cass Ave and Park Ave, Jefferson Ave and Fort St
   const DX=[-1600,-1450,-1300,-1150,-1000,-850,-700,-550,-400],DY=[-450,-300,-150,0,150,300,450];
   const DXN=["1st St","2nd St","3rd St","Griswold St","Woodward Ave","Cass Ave","Park Ave","Brush St","River St"],DYN=["Grand Ave","Jefferson Ave","Fort St","Main St","Congress St","Lafayette Ave","Michigan Ave"];
-  for(const x of DX)for(const y of DY){const sig=y===0||x===-850||x===-1000||(Math.abs(y)<=150&&x>-1600&&x<-400)||(Math.abs(y)===300&&[-1600,-1300,-700,-400].includes(x));N(x,y,{ctrl:sig?"signal":"allstop"})}
-  DY.forEach((y,j)=>{if(y===0)return;mkR(j%2===1?"ave":"st",DYN[j],DX.map(x=>[x,y]))});
+  const KN=KITOLD&&KIT_NET;   /* v40: downtown comes from the kit plan (Main St crosses every other street; a Michigan-left turnaround in each block between) */
+  if(!KN)for(const x of DX)for(const y of DY){const sig=y===0||x===-850||x===-1000||(Math.abs(y)<=150&&x>-1600&&x<-400)||(Math.abs(y)===300&&[-1600,-1300,-700,-400].includes(x));N(x,y,{ctrl:sig?"signal":"allstop"})}
+  if(!KN)DY.forEach((y,j)=>{if(y===0)return;mkR(j%2===1?"ave":"st",DYN[j],DX.map(x=>[x,y]))});
   /* v38.1: Main St is a boulevard (three lanes each way, a 16 m median) with Michigan lefts from Grand River Ave to Fairhaven (it carries on east as Commerce Pkwy). No left turns at its lights:
      go through and U-turn at the crossover in the median, or turn right and U-turn. Each crossover sits halfway along the block (75 m past the
      light downtown; out on Commerce Pkwy about 200 m past it, the 660 ft MDOT uses), with a short U-turn bay. The median opens over 150 m
      coming off Grand River Ave and closes over the last 150 m into Fairhaven */
-  const MXO=[-1675,-1525,-1375,-1225,-1075,-925,-775,-625,-475,-330,-60,300,750,1200];for(const x of MXO)N(x,0,{kind:"xo"});
-  mkR("blvd","Main St",[[-1600,0],[-1525,0]],{lim:35});
-  mkR("blvd","Main St",[[-1525,0],...DX.slice(1).flatMap((x,i)=>i<DX.length-2?[[x,0],[(x+DX[i+2])/2,0]]:[[x,0]])],{lim:35});
-  DX.forEach((x,i)=>mkR(x===-1000||x===-850?"ave":"st",DXN[i],DY.map(y=>[x,y])));
+  const MXO=[-1675,-1525,-1375,-1225,-1075,-925,-775,-625,-475,-330,-60,300,750,1200].filter(x=>!KN||x<-1610||x>-390);for(const x of MXO)N(x,0,{kind:"xo"});
+  if(!KN)mkR("blvd","Main St",[[-1600,0],[-1525,0]],{lim:35});
+  if(!KN)mkR("blvd","Main St",[[-1525,0],...DX.slice(1).flatMap((x,i)=>i<DX.length-2?[[x,0],[(x+DX[i+2])/2,0]]:[[x,0]])],{lim:35});
+  if(!KN)DX.forEach((x,i)=>mkR(x===-1000||x===-850?"ave":"st",DXN[i],DY.map(y=>[x,y])));
+  if(KN){for(const [x,y,c,k] of KN.nodes)N(x,y,k?{kind:k}:{ctrl:c});for(const [t,nm,pts,o] of KN.edges)mkR(t,nm,pts,o)}
   // Main St west to I-61 (it becomes Grand River Ave), east over the Clearwater River (it becomes Commerce Pkwy to Fairhaven)
   mkR("blvd","Main St",[[-1890,0],[-1675,0]],{lim:35,tp:[5,150,0.3]});mkR("blvd","Main St",[[-1675,0],[-1600,0]],{lim:35});   /* v38.1: the boulevard starts here: the median opens over 150 m from Grand River Ave */
   mkR("art","Grand River Ave",[[-1890,0],[-2150,0],[-2450,0],[-2710,0]]);
@@ -3631,7 +3634,8 @@ function analyseNet(){
         let u=0;for(;u<lim;u+=1){const q=eAt(e,l.end===0?u:e.L-u);let ok=true;for(const f of ME){const pp=eProj(f,q.x,q.y);if(pp.u<-1||pp.u>f.L+1)continue;if(Math.abs(pp.t)<f.m/2+f.n*LANE+LANE/2+0.2-(f.T.shR?0:0)){ok=false;break}}if(ok)break}r=u}   // clear of the driving lanes (a ramp's acceleration lane runs over the shoulder)
       else for(const o of n.legs){if(o===l)continue;const sn=Math.abs(Math.sin(o.h-l.h));if(sn<0.3)continue;if(n.ctrl==="minor"&&!o.major)continue;
         r=Math.max(r,Math.min(hw(o.e)/sn,2*hw(o.e))+(n.ctrl==="minor"?0.8:2.6))}}
-    {const kd=n.kind==="x"&&typeof kitJ==="function"?kitJ(n):0;if(kd)r=Math.max(r,kd-1.2)}   /* a kit intersection: traffic waits at its painted stop line */
+    {const kd=n.kind==="x"&&typeof kitJ==="function"?kitJ(n):0;if(kd)r=Math.max(r,kd-1.2)}
+    if(KITOLD&&KIT_NET&&n.kind==="x"){const hh=((90-l.h*180/Math.PI)%360+360)%360;for(const q of KIT_NET.legs)if(Math.abs(q[0]-n.x)<1&&Math.abs(q[1]-n.y)<1&&Math.abs(((q[2]-hh+540)%360)-180)<8){r=q[3];break}}   /* v40: a planned kit junction: exactly at its stop bar */   /* a kit intersection: traffic waits at its painted stop line */
     l.r=r;if(l.end===0)l.e.r0=r;else l.e.r1=r}
   for(const e of EDGES){e.p0=0;e.p1=0}
   for(const n of NODES){n.pr=0;
@@ -14376,7 +14380,7 @@ function worldScenery(){CUTO.clear();W2P.length=0;LKP.length=0;LK.sky=0;LK.used=
     LK_LMK=["lk_City_GrandTheater","lk_City_ClassicalBank","lk_City_OldHotel_14F","lk_City_StoneChurch","lk_City_PoliceStation","lk_City_FireStation","lk_City_PostOffice","lk_City_ConeyDiner"],   /* one of each skyscraper and landmark, downtown Westport only */
     pick=A=>A[Math.floor(r()*A.length)];
   const lkFace=(x,y)=>{let fa=(r()*4|0)*Math.PI/2,fd=1e9;for(const e of edgesNear(x,y,70)){if(e.n<1)continue;const q=eProj(e,x,y);if(q.u<0||q.u>e.L||Math.abs(q.t)>=fd)continue;fd=Math.abs(q.t);const p=ePt(e,q.u,0),to=Math.atan2(p[1]-y,p[0]-x);fa=[p[2]+Math.PI/2,p[2]-Math.PI/2].sort((A,B)=>Math.abs(wrapPi(A-to))-Math.abs(wrapPi(B-to)))[0]}return fa};
-  const okD=(cx,cy)=>roadDist(cx,cy,6)>4.7&&!siteIn(cx,cy,5)&&!nearBr(cx,cy)&&!inExtra(cx,cy,2)&&!(cx>GAR.x0-8&&cx<GAR.x1+8&&cy>GAR.y0-8&&cy<GAR.y1+4)&&!(cx>PARKB[0]-3&&cx<PARKB[1]+3&&cy>PARKB[2]-3&&cy<PARKB[3]+3)&&cx>X0+1&&cx<X1-1&&cy>Y0+1&&cy<Y1-1&&riverD(cx,cy)>RIVER.w/2+8;
+  const okD=(cx,cy,e)=>roadDist(cx,cy,6)>(e&&e.kit?2.5:4.7)&&!siteIn(cx,cy,5)&&!nearBr(cx,cy)&&!inExtra(cx,cy,2)&&!(cx>GAR.x0-8&&cx<GAR.x1+8&&cy>GAR.y0-8&&cy<GAR.y1+4)&&!(cx>PARKB[0]-3&&cx<PARKB[1]+3&&cy>PARKB[2]-3&&cy<PARKB[3]+3)&&cx>X0+1&&cx<X1-1&&cy>Y0+1&&cy<Y1-1&&riverD(cx,cy)>RIVER.w/2+8;
   const lkTry=(k,x,y)=>{if(!W2)return false;const fa=lkFace(x,y),fr=fpRect(k,x,y,fa,0);if(!fr.every(([cx,cy])=>okD(cx,cy)))return false;
     {const xs=fr.map(p=>p[0]),ys=fr.map(p=>p[1]);if(Math.min(...xs)<GAR.x1+8&&Math.max(...xs)>GAR.x0-8&&Math.min(...ys)<GAR.y1+4&&Math.max(...ys)>GAR.y0-8)return false}   /* v340: a footprint bigger than the garage used to pass with all its corners outside it, and the parking garage ended up inside a 222 m tower */
 if(!rectFree(k,x,y,fa))return false;w2Put(k,x,y,fa,0);return true};
