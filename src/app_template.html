@@ -147,9 +147,23 @@ body.wheelMode #steerPad{width:150px!important;height:150px;border-radius:50%;tr
 #ui2 .u2left .dk i{position:absolute;top:5px;right:9px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--bad,#ff5b52);color:#fff;font:700 10px/16px system-ui;font-style:normal;text-align:center;box-shadow:0 0 0 2px rgba(14,17,22,.8)}#ui2 .u2left .dk i[hidden]{display:none}
 #ui2 .u2left .dk button:active .ic{transform:scale(.9)}
 #ui2 #u2dock,body.ui2 #ui2 #fpsHud{position:fixed;right:calc(env(safe-area-inset-right,0px) + 8px);bottom:calc(env(safe-area-inset-bottom,0px) + 6px);z-index:40;font:700 11px ui-monospace,Menlo,monospace;color:#7dffb0;background:rgba(0,0,0,.55);padding:3px 7px;border-radius:7px;pointer-events:none}#fpsHud.mid{color:#ffd24a}#fpsHud.bad{color:#ff6b5e}#fpsHud[hidden]{display:none}
-#u2mm{width:116px;height:116px;border-radius:22px;border:1px solid var(--g-brd,rgba(255,255,255,.14));box-shadow:var(--g-sh,0 10px 28px rgba(0,0,0,.35));cursor:pointer;transition:width .25s cubic-bezier(.2,.8,.2,1),height .25s cubic-bezier(.2,.8,.2,1),box-shadow .3s;touch-action:manipulation;align-self:flex-start}
-#u2mm.big{width:190px;height:190px}#u2mm[hidden]{display:none}#u2mm.hot{box-shadow:0 0 0 2px rgba(255,70,70,.85),0 0 22px rgba(70,120,255,.6)}
-@media (max-height:480px){#u2mm{width:84px;height:84px;border-radius:17px}#u2mm.big{width:150px;height:150px}}
+#u2mm{position:fixed;left:calc(env(safe-area-inset-left,0px) + 16px);bottom:var(--mmB,16px);width:150px;height:150px;border-radius:50%;z-index:6;border:2px solid rgba(255,255,255,.22);box-shadow:0 10px 28px rgba(0,0,0,.4);cursor:pointer;touch-action:manipulation;transition:box-shadow .3s,bottom .25s}
+#u2mm[hidden]{display:none}#u2mm.hot{box-shadow:0 0 0 3px rgba(255,70,70,.85),0 0 22px rgba(70,120,255,.6)}#u2mm:hover{border-color:rgba(255,255,255,.45)}
+@media (max-height:480px){#u2mm{width:104px;height:104px}}
+/* the full-screen map: drag to pan, pinch / wheel / buttons to zoom, tap anywhere to pick a spot and navigate there */
+#fmap{position:fixed;inset:0;z-index:60;background:#0d1116;color:#eef2f5;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-user-select:none;user-select:none;animation:fmIn .22s ease-out;outline:none}
+#fmap[hidden]{display:none}@keyframes fmIn{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
+#fmap canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:crosshair}
+#fmap .fmTop{position:absolute;left:max(14px,env(safe-area-inset-left));right:max(14px,env(safe-area-inset-right));top:max(12px,env(safe-area-inset-top));display:flex;align-items:center;gap:10px;pointer-events:none}
+#fmap .fmTop>*{pointer-events:auto}#fmap .fmTop b{font:700 17px system-ui;flex:1;text-shadow:0 1px 4px #000}
+#fmap button{font:inherit;color:inherit;border:0;cursor:pointer;touch-action:manipulation}
+#fmap .fmRound{width:44px;height:44px;border-radius:50%;background:rgba(24,30,38,.92);box-shadow:0 2px 10px rgba(0,0,0,.4);font:600 21px system-ui;display:grid;place-items:center}
+#fmap .fmZoom{position:absolute;right:max(14px,env(safe-area-inset-right));top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:10px}
+#fmap .fmSheet{position:absolute;left:50%;transform:translateX(-50%);bottom:max(14px,env(safe-area-inset-bottom));width:min(460px,calc(100% - 28px));background:rgba(20,26,34,.96);border-radius:18px;box-shadow:0 8px 30px rgba(0,0,0,.5);padding:14px 16px;box-sizing:border-box;animation:fmUp .2s ease-out}
+#fmap .fmSheet[hidden],#fmap .fmHint[hidden]{display:none}@keyframes fmUp{from{transform:translate(-50%,20px);opacity:0}}
+#fmap .fmSheet b{display:block;font:700 16px system-ui}#fmap .fmSheet small{display:block;color:#9fb0c0;font-size:12.5px;margin-top:2px}
+#fmap .fmBtns{display:flex;gap:8px;margin-top:12px}#fmap .fmBtns button{flex:1;padding:11px 8px;border-radius:12px;background:#26313d;font:600 14px system-ui}#fmap .fmBtns button.pri{background:#3d8bff;color:#fff}
+#fmap .fmHint{position:absolute;left:50%;transform:translateX(-50%);bottom:max(18px,env(safe-area-inset-bottom));background:rgba(20,26,34,.85);padding:8px 14px;border-radius:20px;font-size:13px;color:#c9d4de;pointer-events:none;white-space:nowrap}
 #u2dock{width:26px!important;height:18px!important;border-radius:9px;padding:0;display:flex;align-items:center;justify-content:center;background:var(--g-bg,rgba(14,17,22,.6))!important;border:1px solid var(--g-brd,rgba(255,255,255,.1))!important;box-shadow:none!important;opacity:.75}
 #ui2 #u2dock svg{width:14px;height:14px;fill:none;stroke:var(--tx,#fff);stroke-width:2.2;transition:transform .2s}
 body.dkMin #ui2 .u2left .dk small{display:none}body.dkMin #ui2 .u2left .dk button{width:44px!important;height:42px!important}body.dkMin #ui2 #u2dock svg{transform:rotate(180deg)}
@@ -1180,7 +1194,7 @@ html body.ui2 #accel .fill{background:linear-gradient(to top,var(--acc),transpar
   #nstack{left:50%!important;transform:translateX(-50%);top:calc(env(safe-area-inset-top,0px) + 50px)!important;width:min(330px,38vw)!important;gap:4px}
   #nstack .nr{min-height:0!important;padding:5px 12px!important;font-size:11px!important;gap:8px!important;border:1px solid var(--brd,rgba(255,255,255,.2))!important;border-radius:12px;background:var(--cardS,#262320)!important;color:var(--tx,#fff)!important;box-shadow:0 6px 18px rgba(0,0,0,.3)}
   #nstack .nr i{flex:0 0 14px!important;font-size:15px!important}#nstack .nr i svg{width:14px;height:14px}
-  #loadChip{left:calc(env(safe-area-inset-left,0px) + 16px)!important;top:auto!important;bottom:calc(env(safe-area-inset-bottom,0px) + 96px)!important;font-size:10px!important;background:var(--cardS,#262320)!important;color:var(--sub,#aaa)!important;border-color:var(--brd,#333)!important}
+  #loadChip{left:50%!important;transform:translateX(-50%);top:calc(env(safe-area-inset-top,0px) + 50px)!important;bottom:auto!important;font-size:10px!important;background:var(--cardS,#262320)!important;color:var(--sub,#aaa)!important;border-color:var(--brd,#333)!important}
 
   html body.ui2 #ui2 #u2ccb,html body.ui2 #ui2 #u2ev{left:calc(50% - var(--midw)*.4 - 44px)!important}html body.ui2 #ui2 #u2start{left:calc(50% + var(--midw)*.4 + 6px)!important}
   html body.ui2 #ui2 #u2ccb,html body.ui2 #ui2 #u2start{bottom:calc(env(safe-area-inset-bottom,0px) + 26px)!important}html body.ui2 #ui2 #u2ev{bottom:calc(env(safe-area-inset-bottom,0px) + 68px)!important}}
@@ -1391,7 +1405,7 @@ html body.chatOn #ui2 .u2left .dk,html body.chatOn #ui2 #u2mm{transform:translat
     <button id="u2stat" aria-label="Vehicle status"><span class="ic"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3.5 17.5a2 2 0 0 0 3 3l5.8-5.8a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/></svg></span><small>Status</small><i id="u2stB" hidden>!</i></button>
     <button id="u2rs" aria-label="Remote screen" hidden><span class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M7 21l3-3M17 21l-3-3"/><circle cx="12" cy="11" r="1.6"/></svg></span><small>Remote</small></button>
     <button id="u2scr" aria-label="Screen" hidden><span class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M9 20h6M12 17v3"/></svg></span><small id="u2scrL">Screen</small></button>
-  </div><button id="u2dock" aria-label="Collapse"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button><canvas id="u2mm" width="264" height="264" aria-label="Mini map: tap to make it bigger" hidden></canvas></div>
+  </div><button id="u2dock" aria-label="Collapse"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button></div><canvas id="u2mm" width="300" height="300" aria-label="Map: tap to open the full map and pick a place to go" hidden></canvas>
   <div class="u2right">
     <button id="u2rc" aria-label="More controls"><svg viewBox="0 0 24 24"><path d="M6 12h.01M12 12h.01M18 12h.01" stroke-width="3.2"/></svg></button>
     <button id="u2clu" aria-label="Zoom cluster (N)"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M16 16l5 5M11 8v3l2 2"/></svg></button>
@@ -10301,16 +10315,18 @@ function miniMap(g,x,y,w,h,R,col){g.save();g.beginPath();rr2(g,x,y,w,h,10);g.cli
 // the HUD mini map: always on, heading-up, zooms out as you go faster, shows your route, the destination, chargers (EVs), traffic, police, ambulances and tow trucks
 const HMM={t:0,R:200,big:false};try{HMM.big=localStorage.getItem("mstrata.mmBig")==="1"}catch(e){}
 function hudMapTick(dt){const el=$("u2mm");if(!el)return;const show=!!st.started&&st.hudMap!==false&&!(typeof PM!=="undefined"&&PM.on);if(el.hidden===show)el.hidden=!show;if(!show)return;
-  if(!HMM.init){HMM.init=1;el.classList.toggle("big",HMM.big);el.addEventListener("click",()=>{HMM.big=!HMM.big;el.classList.toggle("big",HMM.big);HMM.t=0;try{localStorage.setItem("mstrata.mmBig",HMM.big?"1":"0")}catch(e){}})}
+  if(!HMM.init){HMM.init=1;el.addEventListener("click",()=>fmapOpen())}
+  /* it sits at the bottom left; on a touch screen that's above the steering arrows */
+  if(!HMM.pt||performance.now()-HMM.pt>700){HMM.pt=performance.now();let b=16;const A=$("u2arrows");if(A&&A.offsetParent){const r=A.getBoundingClientRect();if(r.width&&r.left<innerWidth/2)b=Math.max(b,innerHeight-r.top+10)}if(b!==HMM.b){HMM.b=b;el.style.setProperty("--mmB",b+"px")}}
   HMM.t-=dt;if(HMM.t>0)return;HMM.t=0.09;const W_=st.walk,px=W_?W_.x:car.px,py=W_?W_.y:car.py,h=W_?(W_.h??car.psi):car.psi,v=W_?0:Math.abs(car.vx);
-  const tR=(W_?90:clamp(150+v*9,150,430))*(HMM.big?1.35:1);HMM.R+=(tR-HMM.R)*0.18;const R=HMM.R,g=el.getContext("2d"),S=el.width,cx=S/2,cy=S*0.62,sc=S/(2*R),fx=Math.cos(h),fy=Math.sin(h);
+  const tR=(W_?90:clamp(150+v*9,150,430));HMM.R+=(tR-HMM.R)*0.18;const R=HMM.R,g=el.getContext("2d"),S=el.width,cx=S/2,cy=S*0.58,sc=S/(2*R),fx=Math.cos(h),fy=Math.sin(h);
   const P=(x,y)=>{const dx=x-px,dy=y-py;return [cx+(dx*fy-dy*fx)*sc,cy-(dx*fx+dy*fy)*sc]};
-  g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,S,S);g.fillStyle="rgba(13,17,22,.86)";g.fillRect(0,0,S,S);g.lineCap="round";g.lineJoin="round";
+  g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,S,S);g.save();g.beginPath();g.arc(S/2,S/2,S/2,0,7);g.clip();g.fillStyle="rgba(13,17,22,.88)";g.fillRect(0,0,S,S);g.lineCap="round";g.lineJoin="round";
   const far=R*1.9;for(const pass of [0,1])for(const r of ROADS2D){const e=r.e,hw=/xway|ramp/.test(e.type);if(hw!==!!pass)continue;if(Math.min(Math.abs(e.a.x-px)+Math.abs(e.a.y-py),Math.abs(e.b.x-px)+Math.abs(e.b.y-py))>far+e.L)continue;
     g.strokeStyle=hw?"#e2b45c":e.type==="dirt"?"#6b5f4c":"#687482";g.lineWidth=Math.max(hw?3:2,r.w*sc*0.75);g.beginPath();r.pts.forEach((q,i)=>{const a=P(q[0],q[1]);i?g.lineTo(a[0],a[1]):g.moveTo(a[0],a[1])});g.stroke()}
   let NP=null;try{NP=NAV.dest&&!W_?navPoints(me()):null}catch(e){}
   if(NP&&NP.length>1){for(const [col,lw] of [["rgba(40,120,255,.35)",11],["#4aa8ff",5.5]]){g.strokeStyle=col;g.lineWidth=lw;g.beginPath();NP.forEach((q,i)=>{const a=P(q[0],q[1]);i?g.lineTo(a[0],a[1]):g.moveTo(a[0],a[1])});g.stroke()}}
-  const edge=(a,m)=>{const dx=a[0]-cx,dy=a[1]-cy,k=Math.max(Math.abs(dx)/(S/2-m),Math.abs(dy)/(cy-m),dy>0?Math.abs(dy)/(S-cy-m):0,1);return [cx+dx/k,cy+dy/k,k>1]};
+  const edge=(a,m)=>{const dx=a[0]-S/2,dy=a[1]-S/2,k=Math.max(Math.hypot(dx,dy)/(S/2-m),1);return [S/2+dx/k,S/2+dy/k,k>1]};   /* (round: markers off the map ride its rim) */
   try{if(!TRIMS[st.trim].ice||TRIMS[st.trim].phev)for(const c of CHGS){if(c.kind==="td"||Math.abs(c.x-px)>R*1.2||Math.abs(c.y-py)>R*1.6)continue;const a=P(c.x,c.y);g.fillStyle=c.occ?"#7a8a80":"#3ddc84";g.beginPath();g.arc(a[0],a[1],4,0,7);g.fill()}}catch(e){}
   const blink=(performance.now()/260|0)%2;let hot=false;
   for(const c of cars){if(c.wx===undefined||c.kind==="cone")continue;const dx=c.wx-px,dy=c.wy-py;if(Math.abs(dx)>R*1.7||Math.abs(dy)>R*1.7)continue;const a=P(c.wx,c.wy),cop=isCop(c);
@@ -10324,7 +10340,86 @@ function hudMapTick(dt){const el=$("u2mm");if(!el)return;const show=!!st.started
   if(W_&&!st.walkNoCar){const a=edge(P(car.px,car.py),14);g.fillStyle="#ffd24a";g.strokeStyle="#000";g.lineWidth=1.5;g.beginPath();g.rect(a[0]-6,a[1]-6,12,12);g.fill();g.stroke()}
   g.fillStyle="#fff";g.strokeStyle="rgba(0,0,0,.8)";g.lineWidth=2;g.beginPath();g.moveTo(cx,cy-14);g.lineTo(cx-10,cy+10);g.lineTo(cx,cy+5);g.lineTo(cx+10,cy+10);g.closePath();g.fill();g.stroke();
   {const n=edge([cx-fx*1e4,cy-fy*1e4],16);g.fillStyle="rgba(13,17,22,.9)";g.beginPath();g.arc(n[0],n[1],11,0,7);g.fill();g.fillStyle="#ff6b5e";g.font="800 15px system-ui";g.textAlign="center";g.textBaseline="middle";g.fillText("N",n[0],n[1]+1)}
-  {let nm="";try{nm=W_?"":(me().name||"")}catch(e){}const G_=NAV.dest&&NAV.g&&!W_?`${NAV_ARROW[NAV.g.t]||"↑"} ${distTxt(NAV.g.d)}`:"";const t=G_||nm;if(t){g.font="700 "+(HMM.big?19:25)+"px system-ui";let s_=t;while(g.measureText(s_).width>S-28&&s_.length>4)s_=s_.slice(0,-2)+"…";const gr=g.createLinearGradient(0,S-46,0,S);gr.addColorStop(0,"rgba(13,17,22,0)");gr.addColorStop(0.5,"rgba(13,17,22,.85)");g.fillStyle=gr;g.fillRect(0,S-46,S,46);g.fillStyle=G_?"#8fd0ff":"#e8eef3";g.textAlign="center";g.textBaseline="middle";g.fillText(s_,S/2,S-15)}}}
+  {let nm="";try{nm=W_?"":(me().name||"")}catch(e){}const G_=NAV.dest&&NAV.g&&!W_?`${NAV_ARROW[NAV.g.t]||"↑"} ${distTxt(NAV.g.d)}`:"";const t=G_||nm;if(t){g.font="700 24px system-ui";let s_=t;while(g.measureText(s_).width>S*0.62&&s_.length>4)s_=s_.slice(0,-2)+"…";const gr=g.createLinearGradient(0,S-70,0,S);gr.addColorStop(0,"rgba(13,17,22,0)");gr.addColorStop(0.45,"rgba(13,17,22,.85)");g.fillStyle=gr;g.fillRect(0,S-70,S,70);g.fillStyle=G_?"#8fd0ff":"#e8eef3";g.textAlign="center";g.textBaseline="middle";g.fillText(s_,S/2,S-32)}}
+  g.restore();g.strokeStyle="rgba(255,255,255,.18)";g.lineWidth=3;g.beginPath();g.arc(S/2,S/2,S/2-1.5,0,7);g.stroke()}
+/* ---- the full-screen map (tap the round minimap): north up, drag to pan, pinch or scroll to zoom; tap a spot or a place to pick it and
+   Navigate there (or Spawn there when you're not in a mission). Esc or ✕ closes it */
+const FM={on:false,cx:0,cy:0,k:0.5,sel:null,dirty:true,pts:new Map()};
+function fmapBounds(){if(FM.B)return FM.B;let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;for(const r of ROADS2D)for(const q of r.pts){if(q[0]<x0)x0=q[0];if(q[0]>x1)x1=q[0];if(q[1]<y0)y0=q[1];if(q[1]>y1)y1=q[1]}return FM.B={x0,x1,y0,y1}}
+function fmapOpen(){let el=$("fmap");
+  if(!el){el=document.createElement("div");el.id="fmap";el.hidden=true;el.innerHTML=`<canvas></canvas><div class="fmTop"><button class="fmRound" data-f="x" aria-label="Close map">✕</button><b>Map</b><span id="fmEta" style="font-size:13px;color:#9fd0ff;text-shadow:0 1px 4px #000"></span></div>
+    <div class="fmZoom"><button class="fmRound" data-f="in" aria-label="Zoom in">+</button><button class="fmRound" data-f="out" aria-label="Zoom out">−</button><button class="fmRound" data-f="me" aria-label="Back to my car" style="color:#5aa9ff">⌖</button></div>
+    <div class="fmHint" id="fmHint">Tap anywhere to pick a spot</div>
+    <div class="fmSheet" id="fmSheet" hidden><b id="fmT"></b><small id="fmS"></small><div class="fmBtns"><button class="pri" data-f="go">Navigate</button><button data-f="spawn" id="fmSp">Spawn here</button><button data-f="cl">Cancel</button></div></div>`;
+    document.body.appendChild(el);const cv=el.querySelector("canvas");
+    el.addEventListener("click",e=>{const b=e.target.closest("[data-f]");if(!b)return;const f=b.dataset.f;
+      if(f==="x")fmapClose();else if(f==="in")fmapZoom(1.5);else if(f==="out")fmapZoom(1/1.5);else if(f==="me"){FM.cx=FM.me[0];FM.cy=FM.me[1];FM.dirty=true}
+      else if(f==="cl"){FM.sel=null;fmapSheet()}
+      else if(f==="go"&&FM.sel){const p=FM.sel;try{navTo(p)}catch(_){}if(NAV.dest){toast("Navigating to "+(p.pin?(p.road?"the spot on "+p.road:"the spot"):p.name));fmapClose()}else toast("No road to drive to there")}
+      else if(f==="spawn"&&FM.sel){PIN.p=Object.assign({},FM.sel,{pin:true});pinAct("go");fmapClose()}});
+    for(const ev of ["keydown","keyup"])el.addEventListener(ev,e=>{if(e.key==="Escape"&&ev==="keydown")fmapClose();e.stopPropagation()});
+    /* pointers: one finger drags, two pinch; a short tap that didn't move picks */
+    const P=new Map();let t0=0,mv=0,pinch=0;
+    cv.addEventListener("pointerdown",e=>{cv.setPointerCapture(e.pointerId);P.set(e.pointerId,[e.clientX,e.clientY]);if(P.size===1){t0=performance.now();mv=0}if(P.size===2){const [a,b]=[...P.values()];pinch=Math.hypot(a[0]-b[0],a[1]-b[1])}e.preventDefault()});
+    cv.addEventListener("pointermove",e=>{const o=P.get(e.pointerId);if(!o)return;const n=[e.clientX,e.clientY];
+      if(P.size===1){const dx=n[0]-o[0],dy=n[1]-o[1];mv+=Math.abs(dx)+Math.abs(dy);FM.cx-=dx/FM.k;FM.cy+=dy/FM.k;FM.dirty=true}
+      P.set(e.pointerId,n);if(P.size===2){mv=99;const [a,b]=[...P.values()],d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(pinch>0)fmapZoom(d/pinch,(a[0]+b[0])/2,(a[1]+b[1])/2);pinch=d}});
+    const up=e=>{if(!P.has(e.pointerId))return;P.delete(e.pointerId);if(P.size<2)pinch=0;if(P.size===0&&mv<10&&performance.now()-t0<600)fmapTap(e.clientX,e.clientY)};
+    cv.addEventListener("pointerup",up);cv.addEventListener("pointercancel",e=>{P.delete(e.pointerId);pinch=0});
+    cv.addEventListener("wheel",e=>{e.preventDefault();fmapZoom(Math.exp(-e.deltaY*0.0015),e.clientX,e.clientY)},{passive:false})}
+  const W_=st.walk;FM.me=W_?[W_.x,W_.y]:[car.px,car.py];FM.cx=FM.me[0];FM.cy=FM.me[1];FM.k=clamp(Math.min(innerWidth,innerHeight)/900,0.25,1.2);FM.sel=null;FM.on=true;FM.dirty=true;FM.places=null;
+  el.hidden=false;fmapSheet();el.tabIndex=-1;try{el.focus()}catch(_){}requestAnimationFrame(fmapLoop)}
+function fmapClose(){FM.on=false;const el=$("fmap");if(el)el.hidden=true}
+function fmapZoom(f,x,y){const W=innerWidth,H=innerHeight;x=x??W/2;y=y??H/2;const wx=FM.cx+(x-W/2)/FM.k,wy=FM.cy-(y-H/2)/FM.k;FM.k=clamp(FM.k*f,0.06,6);FM.cx=wx-(x-W/2)/FM.k;FM.cy=wy+(y-H/2)/FM.k;FM.dirty=true}
+const fmW=(x,y)=>[FM.cx+(x-innerWidth/2)/FM.k,FM.cy-(y-innerHeight/2)/FM.k];
+const fmS=(x,y)=>[innerWidth/2+(x-FM.cx)*FM.k,innerHeight/2-(y-FM.cy)*FM.k];
+function fmapPlaces(){if(!FM.places){let L=[];try{L=navPlaces().filter(p=>!p.pin&&!/^(⛽|⚡)$/.test(p.ic||""))}catch(_){}FM.places=L}return FM.places}
+function fmapTap(x,y){let best=null,bd=26;for(const p of fmapPlaces()){const s_=fmS(p.x,p.y),d=Math.hypot(s_[0]-x,s_[1]-y);if(d<bd){bd=d;best=p}}
+  if(best)FM.sel=Object.assign({},best);
+  else{const [wx,wy]=fmW(x,y);let f=null;try{f=navSnap({x:wx,y:wy,h:0})}catch(_){}if(!f||!f.e){FM.sel={none:true,x:wx,y:wy};toast("No road there. Pick a spot near a road");fmapSheet();FM.dirty=true;return}
+    let q=null;try{q=fpt(f.e,f.dir,f.s,0)}catch(_){}const d=q?Math.hypot(q[0]-wx,q[1]-wy):0;if(d>160){FM.sel={none:true,x:wx,y:wy};toast("That's too far from a road");fmapSheet();FM.dirty=true;return}
+    FM.sel={name:"Dropped pin",road:f.e.name||"",sub:(f.e.name?f.e.name+" · ":"")+pinGeo(wx,wy),x:wx,y:wy,h:0,ic:"📍",pin:true}}
+  try{beep(1200,.05,"sine",.12)}catch(_){}fmapSheet();FM.dirty=true}
+function fmapSheet(){const sh=$("fmSheet"),hint=$("fmHint");const p=FM.sel&&!FM.sel.none?FM.sel:null;sh.hidden=!p;hint.hidden=!!p;if(!p)return;
+  const d=Math.hypot(p.x-FM.me[0],p.y-FM.me[1]);$("fmT").textContent=(p.ic||"📍")+" "+(p.pin?(p.road?"Near "+p.road:"Dropped pin"):p.name);$("fmS").textContent=(p.pin?pinGeo(p.x,p.y):(p.sub||"Place"))+" · "+distTxt(d)+" away";}
+function fmapLoop(){if(!FM.on)return;requestAnimationFrame(fmapLoop);const now=performance.now();if(!FM.dirty&&now-(FM.lt||0)<250)return;FM.lt=now;FM.dirty=false;
+  const el=$("fmap"),cv=el.querySelector("canvas"),dpr=Math.min(2,devicePixelRatio||1),W=innerWidth,H=innerHeight;if(cv.width!==Math.round(W*dpr)||cv.height!==Math.round(H*dpr)){cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr)}
+  const g=cv.getContext("2d");g.setTransform(dpr,0,0,dpr,0,0);g.fillStyle="#0d1116";g.fillRect(0,0,W,H);g.lineCap="round";g.lineJoin="round";const k=FM.k;
+  FM.me=st.walk?[st.walk.x,st.walk.y]:[car.px,car.py];
+  const [wx0,wy1]=fmW(0,0),[wx1,wy0]=fmW(W,H),pad=60/k;
+  /* water and parks would go here; roads: local streets, then dirt, then highways on top */
+  for(const pass of [0,1,2])for(const r of ROADS2D){const e=r.e,hw=/xway|ramp/.test(e.type),dirt=e.type==="dirt",ps=hw?2:dirt?0:1;if(ps!==pass)continue;
+    const bx0=Math.min(e.a.x,e.b.x)-e.L,bx1=Math.max(e.a.x,e.b.x)+e.L,by0=Math.min(e.a.y,e.b.y)-e.L,by1=Math.max(e.a.y,e.b.y)+e.L;if(bx1<wx0-pad||bx0>wx1+pad||by1<wy0-pad||by0>wy1+pad)continue;
+    if(k<0.12&&!hw&&(e.n||1)<2&&!dirt)continue;
+    g.strokeStyle=hw?"#e2b45c":dirt?"#6b5f4c":"#7a8796";g.lineWidth=Math.max(hw?2.4:1.3,r.w*k*0.8);g.beginPath();r.pts.forEach((q,i)=>{const a=fmS(q[0],q[1]);i?g.lineTo(a[0],a[1]):g.moveTo(a[0],a[1])});g.stroke()}
+  /* street names when zoomed in */
+  if(k>0.55){g.font="600 11px system-ui";g.fillStyle="rgba(230,236,242,.85)";g.textAlign="center";g.textBaseline="middle";const seen=new Set();
+    for(const r of ROADS2D){const e=r.e;if(!e.name||e.L<60||seen.has(e.name+((e.a.x/400)|0)+((e.a.y/400)|0)))continue;const m=r.pts[r.pts.length>>1];if(m[0]<wx0||m[0]>wx1||m[1]<wy0||m[1]>wy1)continue;seen.add(e.name+((e.a.x/400)|0)+((e.a.y/400)|0));
+      const a=fmS(m[0],m[1]),q2=r.pts[Math.min(r.pts.length-1,(r.pts.length>>1)+1)],b=fmS(q2[0],q2[1]);let ang=Math.atan2(b[1]-a[1],b[0]-a[0]);if(ang>Math.PI/2)ang-=Math.PI;if(ang<-Math.PI/2)ang+=Math.PI;
+      g.save();g.translate(a[0],a[1]);g.rotate(ang);g.strokeStyle="rgba(13,17,22,.9)";g.lineWidth=3;g.strokeText(e.name,0,0);g.fillText(e.name,0,0);g.restore()}}
+  let NP=null;try{NP=NAV.dest&&!st.walk?navPoints(me()):null}catch(_){}
+  if(NP&&NP.length>1){for(const [c,lw] of [["rgba(40,120,255,.35)",10],["#4aa8ff",5]]){g.strokeStyle=c;g.lineWidth=lw;g.beginPath();NP.forEach((q,i)=>{const a=fmS(q[0],q[1]);i?g.lineTo(a[0],a[1]):g.moveTo(a[0],a[1])});g.stroke()}}
+  if(NAV.dest&&NAV.dest.e){try{const q=fpt(NAV.dest.e,NAV.dest.dir,NAV.dest.s,0),a=fmS(q[0],q[1]);g.fillStyle="#ff5b52";g.strokeStyle="#fff";g.lineWidth=2;g.beginPath();g.arc(a[0],a[1],8,0,7);g.fill();g.stroke()}catch(_){}}
+  /* places: an icon, and their names once there's room */
+  /* big places first; a label (or an icon) that would sit on top of one already drawn is left out until you zoom in */
+  {const big=p=>/⛰️|🏁|🏘️|🏠|🫧|🏙️|🏨|🌉|🏞️/.test(p.ic||"")||/Hotel|garage|Off-Road Park|Proving/i.test(p.name),boxes=[],icons=[],free=(x,y,w,h)=>!boxes.some(b=>x<b[0]+b[2]&&x+w>b[0]&&y<b[1]+b[3]&&y+h>b[1]);
+    const L=fmapPlaces().slice().sort((a,b)=>big(b)-big(a));g.textAlign="center";g.textBaseline="middle";
+    for(const p of L){const a=fmS(p.x,p.y);if(a[0]<-20||a[0]>W+20||a[1]<-20||a[1]>H+20)continue;const B=big(p);if(!B&&k<0.6)continue;if(/charg/i.test(p.name+(p.sub||""))&&k<1.2)continue;
+      if(icons.some(q=>Math.hypot(q[0]-a[0],q[1]-a[1])<22))continue;icons.push(a);
+      g.fillStyle=B?"rgba(36,46,60,.95)":"rgba(20,26,34,.9)";g.beginPath();g.arc(a[0],a[1],B?13:10,0,7);g.fill();g.font=(B?15:12)+"px system-ui";g.fillStyle="#fff";g.fillText(p.ic||"•",a[0],a[1]+1);
+      if(B||k>1){g.font=(B?"700 12.5px":"600 11px")+" system-ui";const t=p.name,w=g.measureText(t).width+6,y=a[1]+(B?22:19);if(!free(a[0]-w/2,y-8,w,16))continue;boxes.push([a[0]-w/2,y-8,w,16]);
+        g.strokeStyle="rgba(13,17,22,.95)";g.lineWidth=3;g.strokeText(t,a[0],y);g.fillStyle=B?"#ffe9b8":"#d9cfb8";g.fillText(t,a[0],y)}}}
+  /* the picked spot */
+  if(FM.sel){const a=fmS(FM.sel.x,FM.sel.y),bad=!!FM.sel.none;g.fillStyle=bad?"#8a8f96":"#ff4d4d";g.strokeStyle="#fff";g.lineWidth=2;g.beginPath();g.moveTo(a[0],a[1]);g.bezierCurveTo(a[0]-12,a[1]-16,a[0]-11,a[1]-32,a[0],a[1]-32);g.bezierCurveTo(a[0]+11,a[1]-32,a[0]+12,a[1]-16,a[0],a[1]);g.fill();g.stroke();g.fillStyle="#fff";g.beginPath();g.arc(a[0],a[1]-21,4,0,7);g.fill()}
+  /* you (and the car, when you're on foot) */
+  const hd=st.walk?(st.walk.h??car.psi):car.psi,me_=fmS(FM.me[0],FM.me[1]);g.save();g.translate(me_[0],me_[1]);g.rotate(-hd+Math.PI/2);g.fillStyle="#fff";g.strokeStyle="#1d6fff";g.lineWidth=2.5;g.beginPath();g.moveTo(0,-13);g.lineTo(-9,9);g.lineTo(0,4);g.lineTo(9,9);g.closePath();g.fill();g.stroke();g.restore();
+  if(st.walk&&!st.walkNoCar){const a=fmS(car.px,car.py);g.fillStyle="#ffd24a";g.strokeStyle="#000";g.lineWidth=1.5;g.beginPath();g.rect(a[0]-6,a[1]-6,12,12);g.fill();g.stroke()}
+  /* north arrow and scale bar */
+  g.textAlign="center";g.fillStyle="rgba(20,26,34,.9)";g.beginPath();g.arc(W-36,86,15,0,7);g.fill();g.fillStyle="#ff6b5e";g.font="800 14px system-ui";g.fillText("N",W-36,87);
+  {const mi=st.units==="mph",u=mi?1609.34/5280:1,want=120/k;let L=1;for(const c of [10,20,50,100,200,500,1000,2000,5000,10000])if(c*u<=want)L=c;const px_=L*u*k,x0=18,y0=H-24;
+    g.strokeStyle="#cfd8e1";g.lineWidth=2;g.beginPath();g.moveTo(x0,y0-5);g.lineTo(x0,y0);g.lineTo(x0+px_,y0);g.lineTo(x0+px_,y0-5);g.stroke();g.textAlign="left";g.font="11px system-ui";g.fillStyle="#cfd8e1";
+    g.fillText(mi?(L>=5280?(L/5280)+" mi":L+" ft"):(L>=1000?(L/1000)+" km":L+" m"),x0,y0-12)}
+  const eta=$("fmEta");if(eta){const G_=NAV.dest&&NAV.g;eta.textContent=G_&&NAV.name?"→ "+NAV.name:""}}
 function fusNavCard(g,x,y,w,col){const G=NAV.dest&&NAV.g;if(!G)return false;g.fillStyle=col||"rgba(20,26,34,.92)";rr2(g,x,y,w,46,8);g.fill();g.fillStyle="#fff";g.textAlign="left";g.textBaseline="middle";g.font="800 22px system-ui";g.fillText(NAV_ARROW[G.t]||"↑",x+10,y+23);g.font=CF2(15,600);g.fillText(distTxt(G.d),x+40,y+16);g.font=CF2(10);let t=G.t==="A"?"Destination":G.name||navText(G);while(g.measureText(t).width>w-48&&t.length>4)t=t.slice(0,-2)+"…";g.fillText(t,x+40,y+33);return true}
 function compassTxt(){const b=((90-car.psi*180/Math.PI)%360+360)%360,D=["N","NE","E","SE","S","SW","W","NW"];return [D[Math.round(b/45)%8],Math.round(b)]}
 function altFt(){try{const gnd=groundAt(car.px,car.py);return Math.round(((gnd&&gnd.h)||0)*3.281+600)}catch(e){return 600}}
