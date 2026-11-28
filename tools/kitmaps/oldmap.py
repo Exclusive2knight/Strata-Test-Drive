@@ -331,7 +331,7 @@ def taper_blvd(e, P, FL):
         if not wide: follow([P[i] for i in I], "city6d_st96"); continue
         R = [off(i, -(mAt(U[i]) / 2 + 5.4)) for i in I]           # this way: right of the centre line, beyond the median
         Lf = [off(i, mAt(U[i]) / 2 + 5.4) for i in I][::-1]       # and the other way, followed in its own direction
-        follow(R, "svc3_st96"); follow(Lf, "svc3_st96")
+        follow(R, "svc3_st96", tag="!l"); follow(Lf, "svc3_st96", tag="!l")   # the median side keeps its kerb, not the service drive's sidewalk
 
 for e in NET["E"]:
     base = BASE.get(e["t"])
