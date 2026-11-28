@@ -4298,11 +4298,12 @@ const RETAIL_STN=[{x:-2096,s:1,name:"Fuel Stop"},{x:1934,s:1,name:"Fuel Stop"}];
 if(KITW&&KITMAP){RETAIL.length=0;RETAIL_STN.length=0}   /* the old Grand River retail strip sits on fixed spots; the kit world grows its own shops */
 if(W2){const sh=x=>x+(x<0?3155:-160);for(const R of RETAIL){const a=R.a0;R.a0=sh(R.a0);R.a1=R.a1+(R.a0-a);R.ent=R.ent.map(v=>v+(R.a0-a))}for(const T of RETAIL_STN)T.x=sh(T.x)}
 const STORES=[];
-const RB0=13.2;   // lot front edge, measured from the road centre line (road 8.4 + walk 1.8 + a planted strip)
+let RB0=13.2,RBR=8.2;   // lot front edge and the road's kerb, measured from the road centre line (road 8.4 + walk 1.8 + a planted strip). v40: set from the real road (retailSites): in the new world the stores face Commerce Pkwy, a boulevard twice as wide, and their lots sat on its lanes
 function retailSites(){if(XSITES.some(S=>S.custom))return;
+  if(RETAIL.length){let w=8.2;for(const R of RETAIL){const x=(R.a0+R.a1)/2;for(const e of edgesNear(x,0,40)){const p=eProj(e,x,0);if(p.u<0||p.u>e.L||Math.abs(p.t)>4)continue;w=Math.max(w,hwOf(e))}}RBR=w;RB0=w+5.0}
   for(const R of RETAIL){const s=R.s,bf=RB0+R.lotD+4,bb=bf+R.bd,D=bb+3-RB0,ac=(R.a0+R.a1)/2;R.bf=bf;R.bb=bb;R.ac=R.type==="tire"?R.a0+R.bw/2+4:ac;
     const S={kind:"lot",custom:true,R,x:ac,y:s*(RB0+D/2),L:R.a1-R.a0,D,U:[1,0],N:[0,s],stalls:[],chargers:[]};XSITES.push(S);R.S=S;
-    for(const a of R.ent)XSITES.push({kind:"lot",custom:true,drive:true,x:a,y:s*((8.2+RB0)/2+0.05),L:9,D:RB0-8.2+0.1,U:[1,0],N:[0,s],stalls:[]});
+    for(const a of R.ent)XSITES.push({kind:"lot",custom:true,drive:true,x:a,y:s*((RBR+RB0)/2+0.05),L:9,D:RB0-RBR+0.1,U:[1,0],N:[0,s],stalls:[]});
     if(!R.mdl)STORES.push({x:R.ac,y:s*(bf+R.bd/2),U:[1,0],N:[0,s],w:R.bw-0.4,d:R.bd-0.4,hh:R.h,store:R,door:[R.ac+(R.mdl?s:1)*(R.dx||0),s*(bf-1.5)]})}
   // the Fort St garage: a proper concrete driveway from the street, through the kerb, up to the ticket gates
   // the garage driveways: in from Cass Ave (west), out onto Park Ave (east)
@@ -13977,7 +13978,7 @@ function retailInto(SM,lamp,treeAt){let sd=91;const r=()=>(sd=(sd*16807)%2147483
     // asphalt, the store-front walk, the kerb round the lot, grass strip along the road with the driveways cut through
     BX("asph",(a0+a1)/2,(RB0+lotEnd)/2,-0.04,0.04,a1-a0,R.lotD);BX("walk",(a0+a1)/2,(lotEnd+bf)/2,-0.02,0.04,a1-a0,bf-lotEnd);
     BX("asph",(a0+a1)/2,(bb+bb+3)/2,-0.03,0.04,a1-a0,3);
-    for(const a of R.ent){BX("drive",a,(8.2+RB0)/2,-0.015,0.035,9,RB0-8.2);for(const k of [-1,1])BX("paint",a+k*0.15,RB0+3.5,0.006,0.004,0.15,4)}
+    for(const a of R.ent){BX("drive",a,(RBR+RB0)/2,-0.015,0.035,9,RB0-RBR);for(const k of [-1,1])BX("paint",a+k*0.15,RB0+3.5,0.006,0.004,0.15,4)}
     for(const [x0,x1] of [[a0,a1]]){let x=x0;const cuts=R.ent.map(a=>[a-4.5,a+4.5]).sort((p,q)=>p[0]-q[0]);for(const [c0,c1] of cuts.concat([[x1,x1]])){if(c0>x+0.5)BX("kerb",(x+c0)/2,RB0,0,0.15,c0-x,0.3);x=c1}}
     BX("kerb",a0,(RB0+bb+3)/2,0,0.15,0.3,bb+3-RB0);BX("kerb",a1,(RB0+bb+3)/2,0,0.15,0.3,bb+3-RB0);
     // stall rows: back-to-back pairs with 7 m aisles, islands at the ends (and the middle of wide lots) with trees and lights
@@ -14005,8 +14006,8 @@ function retailInto(SM,lamp,treeAt){let sd=91;const r=()=>(sd=(sd*16807)%2147483
         for(let i=0;i<n;i++){const F=FONT[txt[i]];if(!F)continue;for(let r=0;r<5;r++)for(let c=0;c<3;c++)if(F[r*3+c]==="1"){const ao=-W_/2+i*(3*cw+gap)+(c+0.5)*cw,bo=(2-r)*chh;P_(a+rx*ao,b+up*bo,cw*1.02,chh*1.02)}}};
       const rowsB=[];for(let k=0;k<=rows;k++)rowsB.push(RB0+3.5+k*18);
       for(const ba of rowsB)for(let a=a0+16;a<a1-12;a+=30){if(R.ent.some(e=>Math.abs(e-a)<7))continue;for(const d of [1,-1])arrow(a+d*2.5,ba-s*d*1.7,"a",d)}
-      for(const e of R.ent){/* in on the right half, out on the left (seen from the road) */arrow(e+s*2.2,(8.2+RB0)/2+1.2,"b",1);arrow(e-s*2.2,(8.2+RB0)/2-1.2,"b",-1);
-        for(let b=8.6;b<RB0-0.6;b+=2.2)P_(e,b+0.55,0.12,1.1);
+      for(const e of R.ent){/* in on the right half, out on the left (seen from the road) */arrow(e+s*2.2,(RBR+RB0)/2+1.2,"b",1);arrow(e-s*2.2,(RBR+RB0)/2-1.2,"b",-1);
+        for(let b=RBR+0.4;b<RB0-0.6;b+=2.2)P_(e,b+0.55,0.12,1.1);
         P_(e-s*2.25,RB0-0.6,4.1,0.45);word("STOP",e-s*2.25,RB0-0.6+3.4,-1,0.22,0.5)}
       if(R.type!=="tire"){const fa=RB0+rows*18,cw_=3.6;for(let b=fa+0.5;b<lotEnd-0.4;b+=1.2)P_(ac+(R.mdl?s:1)*(R.dx||0),b+0.3,cw_,0.6)}   /* crosswalk to the door */
       BX("red",(a0+a1)/2,lotEnd+0.16,0.002,0.17,a1-a0-0.6,0.33);word("FIRE",ac+(R.mdl?s:1)*(R.dx||0)+(R.type==="tire"?0:9),lotEnd-1.9,1,0.16,0.32);word("LANE",ac+(R.mdl?s:1)*(R.dx||0)+(R.type==="tire"?0:9),lotEnd-4.0,1,0.16,0.32)}
@@ -14105,10 +14106,10 @@ function w2Fill(r){const P=[],Nn=[],I=[],C=[];const gz=(x,y)=>groundAt(x,y).h;
           quad([...p1,gz(...p1)+0.07],[...p2,gz(...p2)+0.07],[...p3,gz(...p3)+0.07],[...p4,gz(...p4)+0.07],col)}}
       if(crop===CROPS[3])for(let n=0;n<10;n++){const p=at(a0+4+r()*(pw-12),b0+6+r()*(b1-b0-12)),z=gz(...p);box(p[0],p[1],z,1.5,1.5,1.4,r()*3,[0.74,0.64,0.36]);collAdd({t:"c",x:p[0],y:p[1],r:0.8,what:"a hay bale"})}}
     // the farmyard by the road at the near corner: house, red barn, silo, a gravel yard
-    const fy=at(-L/2+15,-D/2+12);w2Put("lk_farmhouse",...at(-L/2+12,-D/2+12),Math.atan2(-N[1],-N[0]),gz(...at(-L/2+12,-D/2+12))-0.15);
+    const fy=at(-L/2+15,-D/2+12);{const p=at(-L/2+12,-D/2+12),cs=fpRect("lk_farmhouse",p[0],p[1],Math.atan2(-N[1],-N[0]),0);if(!cs||cs.every(c=>roadDist(c[0],c[1],4)>2))w2Put("lk_farmhouse",...p,Math.atan2(-N[1],-N[0]),gz(...p)-0.15)}   /* (v40: not where the road runs past the corner) */
     /* the Lite Kit's red barn and silo, the barn's doors facing the yard */
-    {const p=at(-L/2+40,-D/2+16);w2Put("lk_barn",p[0],p[1],Math.atan2(-N[1],-N[0]),gz(...p)-0.2)}
-    {const p=at(-L/2+54,-D/2+22);w2Put("lk_silo",p[0],p[1],hh,gz(...p)-0.2)}
+    {const p=at(-L/2+40,-D/2+16);if(roadDist(p[0],p[1],12)>9)w2Put("lk_barn",p[0],p[1],Math.atan2(-N[1],-N[0]),gz(...p)-0.2)}
+    {const p=at(-L/2+54,-D/2+22);if(roadDist(p[0],p[1],8)>5)w2Put("lk_silo",p[0],p[1],hh,gz(...p)-0.2)}
     /* v333: in the farmyard (the strip between the road fence and the first crops): round hay bales by the barn, an old windmill pump on some farms,
        and where the first field is wide enough a machine shed for the tractors, end-on to the road */
     {const p=at(-L/2+27,-D/2+24);lkPut("lk_Rural_HayBales_x5",p[0],p[1],hh,gz(...p))}
@@ -14451,7 +14452,7 @@ if(!rectFree(k,x,y,fa))return false;w2Put(k,x,y,fa,0);return true};
         let hit=false;for(const o of gAt(GRID.e,p[0],p[1])){if(o===e)continue;const q=eProj(o,p[0],p[1]);if(q.u>0&&q.u<o.L&&Math.abs(q.t)<hwOf(o)+6){hit=true;break}}if(hit)continue;   /* not under or beside another road (overpasses, ramps) */
         const zr_=e.hz?ez(e,u):SZ(p[0],p[1]);GREF=zr_;const zg_=groundAt(p[0],p[1]).h;GREF=0;SL.list.push({k:"sl_double",x:p[0],y:p[1],z:isFinite(zg_)&&Math.abs(zg_-zr_)<1.5?zg_:zr_-0.3,h:p[2]+Math.PI/2});collAdd({t:"c",x:p[0],y:p[1],r:0.2,what:"a streetlight"})}}   /* v38.1: on the freeway's own level (in the cuts they stood on the ground above and floated over the median) */
     if(e.type==="blvd"){const k0m=e.tp?e.tp[1]:k0;for(let u=k0m+10;u<k1-4;u+=50){if(nearBr(...ePt(e,u,0))||(e.m||0)<1.5)continue;   /* (no median: no lights down the middle) */const p=ePt(e,u,0),zb_=u_=>{const q=ePt(e,u_,0),zr=e.hz?ez(e,u_):SZ(q[0],q[1]);GREF=zr;const g=groundAt(q[0],q[1]).h;GREF=0;return isFinite(g)&&Math.abs(g-zr)<1.5?g:zr};if(mAt(e,u)<10){SL.list.push({k:"sl_double",x:p[0],y:p[1],z:zb_(u),h:p[2]+Math.PI/2});collAdd({t:"c",x:p[0],y:p[1],r:0.18,what:"a streetlight"})}
-        else for(const sd of [1,-1]){if(bayW(e,u+sd*12,-sd)>0)continue;const q=ePt(e,u+sd*12,sd*(mAt(e,u+sd*12)/2-1.1));SL.list.push({k:"sl_single",x:q[0],y:q[1],z:zb_(u+sd*12),h:q[2]+sd*Math.PI/2});collAdd({t:"c",x:q[0],y:q[1],r:0.18,what:"a streetlight"})}}   /* v38.1: on a wide median (16 m) a pole by each median kerb, its arm out over its own lanes: one double-arm pole in the middle had 8 m arms that read as black bars across the road */
+        else for(const sd of [1,-1]){if(bayW(e,u+sd*12,-sd)>0||u+sd*12<k0m+8||u+sd*12>k1-8)continue;const q=ePt(e,u+sd*12,sd*Math.min(mAt(e,u+sd*12)/2-1.1,KITOLD?5.6:99));SL.list.push({k:"sl_single",x:q[0],y:q[1],z:zb_(u+sd*12),h:q[2]+sd*Math.PI/2});collAdd({t:"c",x:q[0],y:q[1],r:0.18,what:"a streetlight"})}}   /* v38.1: on a wide median (16 m) a pole by each median kerb, its arm out over its own lanes: one double-arm pole in the middle had 8 m arms that read as black bars across the road */
       for(let u=k0m+30;u<k1-10;u+=25){const p=ePt(e,u,(r()-0.5)*3);if(nearBr(p[0],p[1]))continue;treeAt(p[0],p[1],0,true);collAdd({tree:1,t:"c",x:p[0],y:p[1],r:0.35})}
       for(let u=k0+20;u<k1;u+=60)for(const sd of [1,-1]){const p=ePt(e,u,sd*(W+T.walk+1.5));if(clear(p[0],p[1],1.5)){treeAt(p[0],p[1],SZ(p[0],p[1]),false);collAdd({tree:1,t:"c",x:p[0],y:p[1],r:0.3})}}}
     if(e.type==="res"||e.type==="col"){
